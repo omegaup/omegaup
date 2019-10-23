@@ -136,7 +136,8 @@ class Experiments {
         array $knownExperiments
     ): void {
         if (is_null($identity->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            // No experiments can be enabled for unassociated identities.
+            return;
         }
         foreach (
             \OmegaUp\DAO\UsersExperiments::getByUserId(
