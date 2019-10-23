@@ -39,16 +39,18 @@ def normalize_tag(tag: str) -> str:
 
 
 def insert_new_tags(tags: Set[str],
-                    cur: MySQLdb.cursors.DictCursor) -> None:
+                    dbconn: MySQLdb.connections.Connection) -> None:
     '''Inserts new problem tags inside Tags table on DB'''
     logging.info('Inserting new Tags on database')
-    cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
-                    VALUES (%s);''',
-                    [(tag,) for tag in tags])
+    with dbconn.cursor() as cur:
+        cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
+                        VALUES (%s);''',
+                        [(tag,) for tag in tags])
 
 
 def get_inverse_mapper(
-        cur: MySQLdb.cursors.DictCursor) -> Mapping[str, Mapping[str, str]]:
+        dbconn: MySQLdb.connections.Connection) -> Mapping[
+            str, Mapping[str, str]]:
     '''Gets the inverse mapper for problem tags entries in lang files'''
     logging.info('Getting tags mapper from lang files.')
     new_tags = set()
@@ -64,41 +66,42 @@ def get_inverse_mapper(
                     new_tags.add(normalized_tag)
                     inverse_mapping[normalize_tag(value)] = normalized_tag
             inverse_mapper[lang] = inverse_mapping
-    insert_new_tags(new_tags, cur)
+    insert_new_tags(new_tags, dbconn)
     return inverse_mapper
 
 
-def migrate_tags(cur: MySQLdb.cursors.DictCursor,
+def migrate_tags(dbconn: MySQLdb.connections.Connection,
                  mapper: Mapping[str, Mapping[str, str]]) -> None:
     '''Reads all suggestions and modifies their tags if necessary'''
-    cur.execute('''SELECT `qualitynomination_id`, `contents`
-                    FROM `QualityNominations`
-                    WHERE `nomination` = 'suggestion';''')
-    to_update = []
-    for row in cur:
-        try:
-            contents = json.loads(row['contents'])
-        except json.JSONDecodeError:  # pylint: disable=no-member
-            logging.exception('Failed to parse contents')
-            continue
-        if not contents.get('tags'):
-            continue
-        nomination_id = row['qualitynomination_id']
-        canonized_tags = []
-        for tag in contents['tags']:
-            canonized_tags.append(tag)
-            for lang in LANGS:
-                if mapper[lang].get(tag):
-                    canonized_tags[-1] = mapper[lang][tag]
-                    break
-        contents['tags'] = canonized_tags
-        to_update.append((json.dumps(contents), nomination_id))
+    with dbconn.cursor() as cur:
+        cur.execute('''SELECT `qualitynomination_id`, `contents`
+                        FROM `QualityNominations`
+                        WHERE `nomination` = 'suggestion';''')
+        to_update = []
+        for row in cur:
+            try:
+                contents = json.loads(row[1])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+            if not contents.get('tags'):
+                continue
+            nomination_id = row[0]
+            canonized_tags = []
+            for tag in contents['tags']:
+                canonized_tags.append(tag)
+                for lang in LANGS:
+                    if mapper[lang].get(tag):
+                        canonized_tags[-1] = mapper[lang][tag]
+                        break
+            contents['tags'] = canonized_tags
+            to_update.append((json.dumps(contents), nomination_id))
 
-    # Now update records
-    cur.executemany('''UPDATE `QualityNominations`
-                        SET `contents` = %s
-                        WHERE `qualitynomination_id` = %s''',
-                    to_update)
+        # Now update records
+        cur.executemany('''UPDATE `QualityNominations`
+                            SET `contents` = %s
+                            WHERE `qualitynomination_id` = %s''',
+                        to_update)
     logging.info('Feedback problem tags updated.')
 
 
@@ -117,14 +120,13 @@ def main() -> None:
     dbconn = db.connect(args)
     # warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            try:
-                mapper = get_inverse_mapper(cur)
-            except:  # noqa: bare-except
-                logging.exception('Failed to get mapper from lang json files')
-                raise
-            migrate_tags(cur, mapper)
-            dbconn.commit()
+        try:
+            mapper = get_inverse_mapper(dbconn)
+        except:  # noqa: bare-except
+            logging.exception('Failed to get mapper from lang json files')
+            raise
+        migrate_tags(dbconn, mapper)
+        dbconn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to migrate canonical tags.')
     finally:
