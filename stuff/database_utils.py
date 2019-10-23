@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Library of utilities to work with MySQL.'''
 
@@ -19,6 +20,7 @@ def quote(s):
     if 'quote' in dir(shlex):
         # This is unavailable in Python <3.3
         return shlex.quote(s)
+    # pylint: disable=import-outside-toplevel
     import pipes
     return pipes.quote(s)
 

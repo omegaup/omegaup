@@ -1,6 +1,6 @@
 import user_EmailEdit from '../components/user/EmailEdit.vue';
 import Vue from 'vue';
-import {OmegaUp} from '../omegaup.js';
+import { OmegaUp } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -12,16 +12,16 @@ OmegaUp.on('ready', function() {
           initialEmail: this.email,
         },
         on: {
-          'submit': function(newEmail) {
-            omegaup.API.User.updateMainEmail({email: newEmail})
-                .then(function(response) {
-                  $('#status')
-                      .text(omegaup.T.userEditSuccessfulEmailUpdate)
-                      .addClass('alert-success')
-                      .slideDown();
-                })
-                .fail(UI.apiError);
-          }
+          submit: function(newEmail) {
+            omegaup.API.User.updateMainEmail({ email: newEmail })
+              .then(function(response) {
+                $('#status')
+                  .text(omegaup.T.userEditSuccessfulEmailUpdate)
+                  .addClass('alert-success')
+                  .slideDown();
+              })
+              .fail(UI.apiError);
+          },
         },
       });
     },
@@ -29,7 +29,7 @@ OmegaUp.on('ready', function() {
       email: payload.email,
     },
     components: {
-      'userEmailEdit': user_EmailEdit,
+      userEmailEdit: user_EmailEdit,
     },
   });
 });

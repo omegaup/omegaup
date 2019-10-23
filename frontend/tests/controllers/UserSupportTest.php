@@ -43,7 +43,7 @@ class UserSupportTest extends OmegaupTestCase {
         ]));
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
@@ -84,7 +84,7 @@ class UserSupportTest extends OmegaupTestCase {
         );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // Support tries to generate token without a request
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
@@ -138,7 +138,7 @@ class UserSupportTest extends OmegaupTestCase {
         );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // time travel
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(

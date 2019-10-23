@@ -2367,10 +2367,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ];
             }
             $params = \OmegaUp\ScoreboardParams::fromContest($contest);
-            $params->only_ac = $contestParams[$contest->alias]['only_ac'];
+            $params->only_ac = $contestParams[strval(
+                $contest->alias
+            )]['only_ac'];
             $s = new \OmegaUp\Scoreboard($params);
 
-            $scoreboards[$contest->alias] = $s->generate();
+            $scoreboards[strval($contest->alias)] = $s->generate();
         }
 
         /** @var array<string, array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
@@ -3240,8 +3242,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     foreach ($problemData['run_details']['cases'] as $caseData) {
                         // If case is correct
                         if (
-                            strcmp($caseData['meta']['status'], 'OK') === 0 &&
-                            strcmp(strval($caseData['out_diff']), '') === 0
+                            strcmp(
+                                strval(
+                                    $caseData['meta']['status']
+                                ),
+                                'OK'
+                            ) === 0 &&
+                            strcmp($caseData['out_diff'], '') === 0
                         ) {
                             $csvRow[] = '1';
                         } else {

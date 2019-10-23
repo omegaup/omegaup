@@ -55,7 +55,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -95,7 +95,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -103,7 +103,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Call API
@@ -139,7 +139,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -147,7 +147,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant2);
+        $login = self::login($identity2);
         $r['auth_token'] = $login->auth_token;
 
         // Call API, will fail
@@ -175,7 +175,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Manually set the just created clarification to PUBLIC
@@ -190,7 +190,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant2);
+        $login = self::login($identity2);
         $r['auth_token'] = $login->auth_token;
 
         // Call API

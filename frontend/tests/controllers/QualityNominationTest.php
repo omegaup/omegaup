@@ -5,7 +5,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -28,7 +28,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -64,7 +64,7 @@ class QualityNominationTest extends OmegaupTestCase {
                  'reason' => 'offensive',
             ]);
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -124,9 +124,9 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testMustSolveBeforeNominatingItForPromotion() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -176,7 +176,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $nomination['qualitynomination_id'],
         ]));
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $details['nominator']['username']
         );
         $this->assertNotNull($details['original_contents']);
@@ -189,9 +189,9 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testMustSolveBeforeSuggesting() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -232,7 +232,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -274,7 +274,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -308,7 +308,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -385,7 +385,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -418,7 +418,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $emailSender::$listEmails[0]['subject']
         );
         $this->assertContains(
-            $problemData['authorIdentity']->name,
+            $problemData['author']->name,
             $emailSender::$listEmails[0]['body']
         );
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
@@ -438,7 +438,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -488,7 +488,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -567,7 +567,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -645,7 +645,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
 
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -667,9 +667,9 @@ class QualityNominationTest extends OmegaupTestCase {
         }
 
         // Now TRY to solve the problem
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData, 0, 'WA', 60);
-        $login = self::login($user);
+        $login = self::login($identity);
         $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -695,9 +695,9 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Now solve the problem, it must not be allowed to send a before AC
         // nomination, as the problem is already solved
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
-        $login = self::login($user);
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -726,7 +726,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
 
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -788,10 +788,10 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testNominationList() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -851,10 +851,10 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testTagsForDuplicate() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -927,11 +927,11 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testNominationListDoesntShowSuggestionsOrDismisssal() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
         // Create promotion nomination.
-        $login = self::login($contestant);
+        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -969,11 +969,12 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Create dismissal nomination.
         QualityNominationFactory::createSuggestion(
-            $login,
+            $identity,
             $problemData['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
 
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
@@ -1009,8 +1010,8 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testMustSolveBeforeDismissed() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        $login = self::login($contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1146,7 +1147,24 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < 5; $i++) {
             ['user' => $userData[$i], 'identity' => $identityData[$i]] = UserFactory::createUser();
         }
-        self::setUpRankForUsers($problemData, $userData, true);
+        self::setUpRankForUsers($problemData, $identityData, true);
+
+        // Create and extra user and send a before_ac nomination
+        // that should not affect the current results.
+        $beforeACUser = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $beforeACUser['identity']
+        );
+        RunsFactory::gradeRun($runData, 0, 'WA');
+        QualityNominationFactory::createSuggestion(
+            $beforeACUser['identity'],
+            $problemData[0]['request']['problem_alias'],
+            4, /* difficulty */
+            4, /* quality */
+            ['DP', 'Math'],
+            true
+        );
 
         Utils::RunAggregateFeedback();
 
@@ -1301,130 +1319,144 @@ class QualityNominationTest extends OmegaupTestCase {
                 );
                 RunsFactory::gradeRun($runData);
             }
-            $login[] = self::login($users[$i]);
         }
 
         if ($withSuggestions) {
             Utils::deleteAllSuggestions();
 
             QualityNominationFactory::createSuggestion(
-                $login[0],
+                $users[0],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 1, /* quality */
-                ['DP', 'Math']
+                ['DP', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[1],
+                $users[1],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 3, /* quality */
-                ['Matrices', 'Math']
+                ['Matrices', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[2],
+                $users[2],
                 $problems[0]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Math', 'DP']
+                ['Math', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[3],
+                $users[3],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 4, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[4],
+                $users[4],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 4, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[1],
+                $users[1],
                 $problems[1]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Matrices', 'Math']
+                ['Matrices', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[2],
+                $users[2],
                 $problems[1]['request']['problem_alias'],
                 null, /* difficulty */
                 1, /* quality */
-                ['Math', 'DP']
+                ['Math', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[3],
+                $users[3],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 null, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[4],
+                $users[4],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[2],
+                $users[2],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 4, /* quality */
-                ['Search', 'DP', 'Greedy']
+                ['Search', 'DP', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[3],
+                $users[3],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 1, /* quality */
-                ['Geometry', 'DP', 'Search', 'Greedy']
+                ['Geometry', 'DP', 'Search', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[4],
+                $users[4],
                 $problems[2]['request']['problem_alias'],
                 1, /* difficulty */
                 1, /* quality */
-                ['Search', 'Greedy']
+                ['Search', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[3],
+                $users[3],
                 $problems[3]['request']['problem_alias'],
                 4, /* difficulty */
                 3, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[4],
+                $users[4],
                 $problems[3]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
-                $login[4],
+                $users[4],
                 $problems[4]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
         }
     }
@@ -1461,17 +1493,17 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < $numberOfProblems; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
         }
-        $login = [];
+        $contestants = [];
+        $identities = [];
         for ($i = 0; $i < 10; $i++) {
-            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]] = UserFactory::createUser();
             for ($j = 0; $j < $numberOfProblems; $j++) {
                 $runData = RunsFactory::createRunToProblem(
                     $problemData[$j],
-                    $contestant
+                    $identities[$i]
                 );
                 RunsFactory::gradeRun($runData);
             }
-            $login[] = self::login($contestant);
         }
 
         // Easy problem with low quality.
@@ -1490,11 +1522,12 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
             for ($userIdx = 0; $userIdx < 10; $userIdx++) {
                 QualityNominationFactory::createSuggestion(
-                    $login[$userIdx],
+                    $identities[$userIdx],
                     $problemData[$problemIdx]['request']['problem_alias'],
                     $difficultyRatings[$problemIdx][$userIdx],
                     $qualityRatings[$problemIdx][$userIdx],
-                    [] // No tags.
+                    [], // No tags.
+                    false
                 );
             }
         }
@@ -1548,159 +1581,179 @@ class QualityNominationTest extends OmegaupTestCase {
         Utils::deleteAllSuggestions();
 
         // Setup synthetic data.
-        $login = [];
+        $contestants = [];
+        $identities = [];
         for ($i = 0; $i < 10; $i++) {
-            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]] = UserFactory::createUser();
             for ($j = 0; $j < 2; $j++) {
                 $runData = RunsFactory::createRunToProblem(
                     $problemData[$j],
-                    $contestant
+                    $identities[$i]
                 );
                 RunsFactory::gradeRun($runData);
             }
-            $login[] = self::login($contestant);
         }
 
         QualityNominationFactory::createSuggestion(
-            $login[0],
+            $identities[0],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[1],
+            $identities[1],
             $problemData[0]['request']['problem_alias'],
             3,
             3,
-            ['Math', 'DP']
+            ['Math', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[2],
+            $identities[2],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['Matrices', 'Math']
+            ['Matrices', 'Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[3],
+            $identities[3],
             $problemData[0]['request']['problem_alias'],
             null,
             null,
-            ['Math']
+            ['Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[4],
+            $identities[4],
             $problemData[0]['request']['problem_alias'],
             3,
             4,
-            ['DP', 'Math', 'Greedy']
+            ['DP', 'Math', 'Greedy'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[5],
+            $identities[5],
             $problemData[0]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[6],
+            $identities[6],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[7],
+            $identities[7],
             $problemData[0]['request']['problem_alias'],
             4,
             null,
-            ['Greedy', 'DP']
+            ['Greedy', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[8],
+            $identities[8],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['DP']
+            ['DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[9],
+            $identities[9],
             $problemData[0]['request']['problem_alias'],
             4,
             4,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
 
         QualityNominationFactory::createSuggestion(
-            $login[0],
+            $identities[0],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['Search', 'Geometry']
+            ['Search', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[1],
+            $identities[1],
             $problemData[1]['request']['problem_alias'],
             1,
             1,
-            ['Search', 'Geometry']
+            ['Search', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[2],
+            $identities[2],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Matrices', 'Search']
+            ['Matrices', 'Search'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[3],
+            $identities[3],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search']
+            ['Search'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[4],
+            $identities[4],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'Math', 'Geometry']
+            ['Search', 'Math', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[5],
+            $identities[5],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[6],
+            $identities[6],
             $problemData[1]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[7],
+            $identities[7],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'DP']
+            ['Search', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[8],
+            $identities[8],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['DP']
+            ['DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
-            $login[9],
+            $identities[9],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Geometry', 'Math']
+            ['Geometry', 'Math'],
+            false
         );
     }
 

@@ -23,7 +23,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         RunsFactory::gradeRun($runData);
@@ -58,12 +58,12 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $runData1 = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant1
+            $identity1
         );
         $runData2 = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant2
+            $identity2
         );
 
         RunsFactory::gradeRun($runData1);

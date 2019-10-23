@@ -13,9 +13,9 @@ class ProblemRunsTest extends OmegaupTestCase {
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
             ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-            $runData = RunsFactory::createRunToProblem($problemData, $user);
+            $runData = RunsFactory::createRunToProblem($problemData, $identity);
             RunsFactory::gradeRun($runData);
-            $contestants[] = $user;
+            $contestants[] = $identity;
             $runs[] = $runData;
         }
 
@@ -84,29 +84,29 @@ class ProblemRunsTest extends OmegaupTestCase {
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
-            $user->main_identity_id
+            $identity->identity_id
         ));
         // Tried, but didn't solve the problem
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData, 0, 'WA', 60);
         $this->assertFalse(\OmegaUp\DAO\Problems::isProblemSolved(
             $problemData['problem'],
-            $user->main_identity_id
+            $identity->identity_id
         ));
         $this->assertTrue(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
-            $user->main_identity_id
+            $identity->identity_id
         ));
         // Already tried and solved also
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
         $this->assertTrue(\OmegaUp\DAO\Problems::isProblemSolved(
             $problemData['problem'],
-            $user->main_identity_id
+            $identity->identity_id
         ));
         $this->assertTrue(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
-            $user->main_identity_id
+            $identity->identity_id
         ));
     }
 }

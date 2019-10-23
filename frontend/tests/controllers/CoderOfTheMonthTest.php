@@ -13,7 +13,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $runCreationDate = $runCreationDate->modify('first day of last month');
         $runCreationDate = $runCreationDate->format('Y-m-d');
 
-        $this->createRuns($user, $runCreationDate, 10 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request()
@@ -32,7 +32,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
     public function testCoderOfTheMonthList() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $auth_token = self::login($user);
+        $auth_token = self::login($identity);
 
         $r = new \OmegaUp\Request([
             'auth_token' => $auth_token
@@ -65,8 +65,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Test coder of the month details when common user is logged, it's the
         // same that not logged user
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $login = self::login($user);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
             $r,
@@ -80,7 +79,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         // Test coder of the month details when mentor user is logged
         ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
-        $login = self::login($mentorUser);
+        $login = self::login($mentorIdentity);
         $r['auth_token'] = $login->auth_token;
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
             $r,
@@ -106,7 +105,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($userLastYear, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
 
         $runCreationDate = date_create($runCreationDate);
         date_add(
@@ -116,9 +115,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($userLastYear, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
 
-        $this->createRuns($userLastYear, $today, 2 /*numRuns*/);
+        $this->createRuns($identity, $today, 2 /*numRuns*/);
 
         // Getting Coder Of The Month
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
@@ -140,8 +139,12 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         );
     }
 
-    private function createRuns($user = null, $runCreationDate = null, $n = 5) {
-        if (!$user) {
+    private function createRuns(
+        \OmegaUp\DAO\VO\Identities $identity = null,
+        string $runCreationDate = null,
+        int $n = 5
+    ) {
+        if (!$identity) {
             ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         }
         if (!$runCreationDate) {
@@ -150,10 +153,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest();
         $problem = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problem, $contest);
-        ContestsFactory::addUser($contest, $user);
+        ContestsFactory::addUser($contest, $identity);
 
         for ($i = 0; $i < $n; $i++) {
-            $runData = RunsFactory::createRun($problem, $contest, $user);
+            $runData = RunsFactory::createRun($problem, $contest, $identity);
             RunsFactory::gradeRun($runData);
             //sumbmission gap between runs must be 60 seconds
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
@@ -194,7 +197,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
     public function testMentorCanSeeLastCoderOfTheMonthEmail() {
         ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $login = self::login($mentorUser);
+        $login = self::login($mentorIdentity);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
@@ -220,7 +223,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         }
 
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $user_login = self::login($user);
+        $user_login = self::login($identity);
 
         foreach ($coders as $index => $coder) {
             $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
@@ -265,11 +268,11 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         ['user' => $user1, 'identity' => $identity1] = UserFactory::createUser();
         ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
         ['user' => $user3, 'identity' => $identity3] = UserFactory::createUser();
-        $this->createRuns($user1, $runCreationDate->format('Y-m-d'), 2);
-        $this->createRuns($user1, $runCreationDate->format('Y-m-d'), 3);
-        $this->createRuns($user2, $runCreationDate->format('Y-m-d'), 4);
-        $this->createRuns($user2, $runCreationDate->format('Y-m-d'), 1);
-        $this->createRuns($user3, $runCreationDate->format('Y-m-d'), 2);
+        $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 2);
+        $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 3);
+        $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 4);
+        $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 1);
+        $this->createRuns($identity3, $runCreationDate->format('Y-m-d'), 2);
 
         // Setting new date to the first of the month following the run
         // creation.
@@ -285,13 +288,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         );
 
         // Selecting one user as coder of the month
-        $login = self::login($mentorUser);
+        $login = self::login($mentorIdentity);
 
         // Call api. This should fail.
         try {
             \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'username' => $user3->username,
+                'username' => $identity3->username,
             ]));
             $this->fail(
                 'Exception was expected, because date is not in the range to select coder'
@@ -316,7 +319,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Call api again.
         \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user3->username,
+            'username' => $identity3->username,
         ]));
 
         // Set date to first day of next month
@@ -363,7 +366,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $login = self::login($mentorUser);
+        $login = self::login($mentorIdentity);
         $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));
 
         // Testing with an intermediate day of the month

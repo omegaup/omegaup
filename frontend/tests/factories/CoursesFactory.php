@@ -2,17 +2,16 @@
 
 class CoursesFactory {
     public static function createCourse(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
-            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-        $identity = \OmegaUp\DAO\Identities::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
@@ -20,7 +19,7 @@ class CoursesFactory {
 
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'identity_id' => $identity->identity_id,
+                'identity_id' => $admin->identity_id,
             ]));
         }
 
@@ -48,7 +47,7 @@ class CoursesFactory {
     }
 
     public static function createCourseWithOneAssignment(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
@@ -56,7 +55,7 @@ class CoursesFactory {
         $startTimeDelay = 0
     ) {
         if (is_null($admin)) {
-            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
@@ -152,7 +151,7 @@ class CoursesFactory {
         ?ScopedLoginToken $login = null
     ) {
         if (is_null($student)) {
-            ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $student] = UserFactory::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
@@ -192,6 +191,9 @@ class CoursesFactory {
         return $responses;
     }
 
+    /**
+     * @param \OmegaUp\DAO\VO\Identities[] $students
+     */
     public static function submitRunsToAssignmentsInCourse(
         $courseData,
         array $students,
@@ -205,6 +207,11 @@ class CoursesFactory {
         $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {
             $studentUsername = $students[$s]->username;
+            if (is_null($studentUsername)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
             $expectedScores[$studentUsername] = [];
             $studentLogin = OmegaupTestCase::login($students[$s]);
 

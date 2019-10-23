@@ -59,7 +59,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $login = self::login($user);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Update title
@@ -85,8 +85,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
         // Get users
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $user);
-        ContestsFactory::addAdminUser($contestData, $user2);
+        ContestsFactory::addAdminUser($contestData, $identity);
+        ContestsFactory::addAdminUser($contestData, $identity2);
 
         // Prepare request for remove one admin
         $login = self::login($contestData['director']);
@@ -125,7 +125,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
+        GroupsFactory::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -157,7 +157,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
+        GroupsFactory::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -176,7 +176,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $login = self::login($user);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Update title
@@ -205,8 +205,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
-        GroupsFactory::addUserToGroup($groupData, $user2);
+        GroupsFactory::addUserToGroup($groupData, $identity);
+        GroupsFactory::addUserToGroup($groupData, $identity2);
 
         // Prepare request
         $login = self::login($contestData['director']);
