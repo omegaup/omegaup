@@ -27,7 +27,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
         // Normal user is able to see the problem.
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty($r);
 
@@ -40,7 +40,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -55,9 +55,9 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $this->assertFalse($payload['solved']);
 
         // Now try to solved the problem, tried must be true
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData, 0, 'WA', 60);
-        $login = self::login($user);
+        $login = self::login($identity);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
@@ -91,9 +91,9 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
         // Solve the problem and send dismissal, before AC information
         // is not necessary anymore.
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
-        $login = self::login($user);
+        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -151,7 +151,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
         // Normal user should see the problem as locked
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,

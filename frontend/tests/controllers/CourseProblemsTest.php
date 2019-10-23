@@ -5,11 +5,11 @@ class CourseProblemsTest extends OmegaupTestCase {
         // Create a test course
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Create a course with an assignment
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $user,
+            $identity,
             $login
         );
         $courseAlias = $courseData['course_alias'];
@@ -93,9 +93,9 @@ class CourseProblemsTest extends OmegaupTestCase {
         ['user' => $student, 'identity' => $identityStudent] = UserFactory::createUser();
 
         // Create a course with an assignment
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identity);
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $admin,
+            $identity,
             $adminLogin
         );
         CoursesFactory::addStudentToCourse($courseData, $student, $adminLogin);
@@ -117,7 +117,7 @@ class CourseProblemsTest extends OmegaupTestCase {
         );
 
         // Send runs to problem 1 (PA) and 2 (AC).
-        $login = self::login($student);
+        $login = self::login($identityStudent);
         {
             $response = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

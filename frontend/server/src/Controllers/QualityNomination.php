@@ -9,105 +9,31 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     const REVIEWERS_PER_NOMINATION = 2;
 
     /**
-     * Creates a new QualityNomination
-     *
-     * There are three ways in which users can interact with this:
-     *
-     * # Suggestion
-     *
-     * A user that has already solved a problem can make suggestions about a
-     * problem. This expects the `nomination` field to be `suggestion` and the
-     * `contents` field should be a JSON blob with at least one the following fields:
-     *
-     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
-     *                 difficulty of the problem.
-     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
-     *             of the problem.
-     * * `tags`: (Optional) An array of tag names that will be added to the
-     *           problem upon promotion.
-     * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
-     *                before receiving an AC verdict for problem run.
-     *
-     * # Promotion
-     *
-     * A user that has already solved a problem can nominate it to be promoted
-     * as a Quality Problem. This expects the `nomination` field to be
-     * `promotion` and the `contents` field should be a JSON blob with the
-     * following fields:
-     *
-     * * `statements`: A dictionary of languages to objects that contain a
-     *                 `markdown` field, which is the markdown-formatted
-     *                 problem statement for that language.
-     * * `source`: A URL or string clearly documenting the source or full name
-     *             of original author of the problem.
-     * * `tags`: An array of tag names that will be added to the problem upon
-     *           promotion.
-     *
-     * # Demotion
-     *
-     * A demoted problem is banned, and cannot be un-banned or added to any new
-     * problemsets. This expects the `nomination` field to be `demotion` and
-     * the `contents` field should be a JSON blob with the following fields:
-     *
-     * * `rationale`: A small text explaining the rationale for demotion.
-     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
-     * * `original`: If the `reason` is `duplicate`, the alias of the original
-     *               problem.
-     * # Dismissal
-     * A user that has already solved a problem can dismiss suggestions. The
-     * `contents` field is empty.
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array
-     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param \OmegaUp\DAO\VO\Identities $user
+     * @param string $nominationType
+     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+     * @return \OmegaUp\DAO\VO\QualityNominations
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        // Validate request
-        $r->ensureIdentity();
-
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
-        );
-        \OmegaUp\Validators::validateInEnum(
-            $r['nomination'],
-            'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal']
-        );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-        /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
-         */
-        $contents = json_decode($r['contents'], true /*assoc*/);
-        if (!is_array($contents)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'contents'
-            );
-        }
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        if ($r['nomination'] !== 'demotion') {
+    public static function createNomination(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $nominationType,
+        array $contents
+    ): \OmegaUp\DAO\VO\QualityNominations {
+        if ($nominationType !== 'demotion') {
             if (
                 isset($contents['before_ac']) &&
                 boolval($contents['before_ac']) &&
-                ($r['nomination'] === 'dismissal' ||
-                 $r['nomination'] === 'suggestion')
+                ($nominationType === 'dismissal' ||
+                 $nominationType === 'suggestion')
             ) {
                 // Before AC suggestions or dismissals are only allowed
                 // for users who didn't solve a problem, but tried to.
                 if (
                     \OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -118,7 +44,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -132,7 +58,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -142,7 +68,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if ($r['nomination'] === 'suggestion') {
+        if ($nominationType === 'suggestion') {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
                 if (
@@ -205,7 +131,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-        } elseif ($r['nomination'] === 'promotion') {
+        } elseif ($nominationType === 'promotion') {
             if (
                 (!isset($contents['statements'])
                 || !is_array($contents['statements']))
@@ -256,7 +182,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-        } elseif ($r['nomination'] === 'demotion') {
+        } elseif ($nominationType === 'demotion') {
             if (
                 !isset($contents['reason']) ||
                 !in_array(
@@ -312,7 +238,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     }
                 }
             }
-        } elseif ($r['nomination'] === 'dismissal') {
+        } elseif ($nominationType === 'dismissal') {
             if (
                 isset($contents['origin'])
                 || isset($contents['difficulty'])
@@ -328,12 +254,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Create object
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
-            'user_id' => $r->user->user_id,
+            'user_id' => $identity->user_id,
             'problem_id' => $problem->problem_id,
-            'nomination' => $r['nomination'],
-            'contents' => json_encode($contents), // re-encoding it for normalization.
+            'nomination' => $nominationType,
+            'contents' => json_encode($contents),
             'status' => 'open',
         ]);
         \OmegaUp\DAO\QualityNominations::create($nomination);
@@ -359,6 +284,102 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 ]));
             }
         }
+        return $nomination;
+    }
+
+    /**
+     * Creates a new QualityNomination
+     *
+     * There are three ways in which users can interact with this:
+     *
+     * # Suggestion
+     *
+     * A user that has already solved a problem can make suggestions about a
+     * problem. This expects the `nomination` field to be `suggestion` and the
+     * `contents` field should be a JSON blob with at least one the following fields:
+     *
+     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
+     *                 difficulty of the problem.
+     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
+     *             of the problem.
+     * * `tags`: (Optional) An array of tag names that will be added to the
+     *           problem upon promotion.
+     * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
+     *                before receiving an AC verdict for problem run.
+     *
+     * # Promotion
+     *
+     * A user that has already solved a problem can nominate it to be promoted
+     * as a Quality Problem. This expects the `nomination` field to be
+     * `promotion` and the `contents` field should be a JSON blob with the
+     * following fields:
+     *
+     * * `statements`: A dictionary of languages to objects that contain a
+     *                 `markdown` field, which is the markdown-formatted
+     *                 problem statement for that language.
+     * * `source`: A URL or string clearly documenting the source or full name
+     *             of original author of the problem.
+     * * `tags`: An array of tag names that will be added to the problem upon
+     *           promotion.
+     *
+     * # Demotion
+     *
+     * A demoted problem is banned, and cannot be un-banned or added to any new
+     * problemsets. This expects the `nomination` field to be `demotion` and
+     * the `contents` field should be a JSON blob with the following fields:
+     *
+     * * `rationale`: A small text explaining the rationale for demotion.
+     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
+     * * `original`: If the `reason` is `duplicate`, the alias of the original
+     *               problem.
+     * # Dismissal
+     * A user that has already solved a problem can dismiss suggestions. The
+     * `contents` field is empty.
+     *
+     * @param \OmegaUp\Request $r
+     *
+     * @return array
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     */
+    public static function apiCreate(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['nomination'],
+            'nomination',
+            ['suggestion', 'promotion', 'demotion', 'dismissal']
+        );
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        /**
+         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+         */
+        $contents = json_decode($r['contents'], true /*assoc*/);
+        if (!is_array($contents)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
+            $problem,
+            $r->identity,
+            strval($r['nomination']),
+            $contents
+        );
 
         return [
             'status' => 'ok',

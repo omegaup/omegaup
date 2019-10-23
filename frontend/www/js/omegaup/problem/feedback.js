@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import problem_Feedback from '../components/problem/Feedback.vue';
-import {OmegaUp} from '../omegaup.js';
+import { OmegaUp } from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -14,7 +14,7 @@ OmegaUp.on('ready', function() {
           difficultyHistogram: this.difficultyHistogram,
           qualityScore: this.quality,
           difficultyScore: this.difficulty,
-        }
+        },
       });
     },
     data: {
@@ -25,6 +25,6 @@ OmegaUp.on('ready', function() {
     },
     components: {
       'omegaup-problem-feedback': problem_Feedback,
-    }
+    },
   });
 });

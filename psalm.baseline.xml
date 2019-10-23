@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.6.1@7857b07f91bed5afae98574243fed7ec4088d623">
+<files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
   <file src="frontend/server/bootstrap_smarty.php">
     <MixedArrayAccess occurrences="13">
       <code>$session['identity']</code>
@@ -971,11 +971,7 @@
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <InvalidReturnStatement occurrences="1">
-      <code>$result</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="2">
-      <code>array</code>
+    <InvalidReturnType occurrences="1">
       <code>Array</code>
     </InvalidReturnType>
     <InvalidScalarArgument occurrences="3">
@@ -983,9 +979,6 @@
       <code>JSON_OBJECT_AS_ARRAY</code>
       <code>JSON_OBJECT_AS_ARRAY</code>
     </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>\OmegaUp\DAO\VO\Problems</code>
-    </MismatchingDocblockReturnType>
     <MissingParamType occurrences="1">
       <code>$is_update</code>
     </MissingParamType>
@@ -1009,7 +1002,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="56">
+    <MixedArgument occurrences="52">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -1047,7 +1040,6 @@
       <code>$problem-&gt;alias</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$problemset</code>
       <code>$r['lang']</code>
       <code>$container</code>
       <code>$problem</code>
@@ -1077,7 +1069,6 @@
       <code>$orderBy</code>
       <code>$query</code>
       <code>$problem</code>
-      <code>$problemset</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="12">
       <code>$_FILES['problem_contents']['tmp_name']</code>
@@ -1166,12 +1157,11 @@
       <code>$problemSettings['validator']['name']</code>
       <code>$result['sample_input']</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
+    <MixedInferredReturnType occurrences="1">
       <code>array</code>
       <code>array</code>
       <code>array</code>
       <code>array</code>
-      <code>\OmegaUp\DAO\VO\Problems</code>
     </MixedInferredReturnType>
     <MixedMethodCall occurrences="2">
       <code>asArray</code>
@@ -1222,7 +1212,6 @@
       <code>$acl-&gt;owner_id</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>$problem-&gt;current_version</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
     </PossiblyNullArgument>
@@ -1349,7 +1338,7 @@
     <PossiblyNullArgument occurrences="2">
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="2"/>
+    <PossiblyNullPropertyFetch occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
@@ -3412,9 +3401,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <InvalidPropertyFetch occurrences="1">
-      <code>$studentLogin-&gt;auth_token</code>
-    </InvalidPropertyFetch>
     <MissingDependency occurrences="8">
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
@@ -3468,26 +3454,20 @@
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="5">
-      <code>$expectedScores[$studentUsername]</code>
-      <code>$expectedScores[$studentUsername]</code>
+    <MixedArrayOffset occurrences="4">
       <code>$problemAssignmentsMap[$assignmentAlias]</code>
-      <code>$expectedScores[$studentUsername]</code>
-      <code>$expectedScores[$studentUsername]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="8">
+    <MixedAssignment occurrences="7">
       <code>$courseFactoryResult</code>
       <code>$courseAlias</code>
       <code>$admin</code>
       <code>$problem</code>
-      <code>$studentUsername</code>
       <code>$assignmentAlias</code>
       <code>$assignment</code>
       <code>$problemData</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="4">
+    <MixedPropertyFetch occurrences="3">
       <code>$problem['problem']-&gt;alias</code>
-      <code>$students[$s]-&gt;username</code>
       <code>$assignment-&gt;problemset_id</code>
       <code>$assignment-&gt;problemset_id</code>
     </MixedPropertyFetch>
@@ -3575,9 +3555,8 @@
       <code>addGroupAdmin</code>
       <code>addTag</code>
     </MissingReturnType>
-    <MixedArgument occurrences="2">
+    <MixedArgument occurrences="1">
       <code>$params['title']</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="5">
       <code>$this-&gt;params[$offset]</code>
@@ -3599,13 +3578,11 @@
       <code>$array[$parameter]</code>
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$r</code>
-      <code>$problemAuthorUser</code>
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="3">
+    <MixedPropertyFetch occurrences="2">
       <code>$params['author']-&gt;username</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
       <code>$user-&gt;username</code>
     </MixedPropertyFetch>
     <PossiblyInvalidArgument occurrences="1">

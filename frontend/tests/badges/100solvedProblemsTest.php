@@ -13,12 +13,12 @@ class OneHundredSolvedProblems extends BadgesTestCase {
         $problems = [];
         for ($i = 0; $i < 101; $i++) {
             $newProblem = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($newProblem, $user101);
+            $run = RunsFactory::createRunToProblem($newProblem, $identity101);
             RunsFactory::gradeRun($run);
             $problems[] = $newProblem;
         }
         for ($i = 0; $i < 99; $i++) {
-            $run = RunsFactory::createRunToProblem($problems[$i], $user99);
+            $run = RunsFactory::createRunToProblem($problems[$i], $identity99);
             RunsFactory::gradeRun($run);
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
@@ -31,7 +31,7 @@ class OneHundredSolvedProblems extends BadgesTestCase {
         $problem = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         for ($i = 0; $i < 101; $i++) {
-            $run = RunsFactory::createRunToProblem($problem, $user);
+            $run = RunsFactory::createRunToProblem($problem, $identity);
             RunsFactory::gradeRun($run);
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;

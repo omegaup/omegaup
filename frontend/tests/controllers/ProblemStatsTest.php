@@ -30,7 +30,7 @@ class ProblemStatsTest extends OmegaupTestCase {
             $pendingRunsData[$i] = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestant
+                $identity
             );
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
@@ -41,7 +41,7 @@ class ProblemStatsTest extends OmegaupTestCase {
             $ACRunsData[$i] = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestant
+                $identity
             );
 
             // Grade the run
@@ -55,7 +55,7 @@ class ProblemStatsTest extends OmegaupTestCase {
             $WARunsData[$i] = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestant
+                $identity
             );
 
             // Grade the run with WA

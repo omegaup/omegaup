@@ -26,15 +26,15 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
             ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $user[$i]);
+            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
         }
         // Create runs to problems directly
         $runs = [];
-        $runs[0] = RunsFactory::createRunToProblem($problem[0], $user[0]);
-        $runs[1] = RunsFactory::createRunToProblem($problem[1], $user[1]);
-        $runs[2] = RunsFactory::createRunToProblem($problem[2], $user[2]);
-        $runs[3] = RunsFactory::createRunToProblem($problem[0], $user[1]);
-        $runs[4] = RunsFactory::createRunToProblem($problem[0], $user[2]);
+        $runs[0] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
+        $runs[1] = RunsFactory::createRunToProblem($problem[1], $identity[1]);
+        $runs[2] = RunsFactory::createRunToProblem($problem[2], $identity[2]);
+        $runs[3] = RunsFactory::createRunToProblem($problem[0], $identity[1]);
+        $runs[4] = RunsFactory::createRunToProblem($problem[0], $identity[2]);
         RunsFactory::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
         RunsFactory::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
         RunsFactory::gradeRun($runs[2]); // run with a AC verdict
@@ -42,7 +42,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runs[4]); // run with a AC verdict
         // Users must join course
         for ($i = 0; $i < $num_users; $i++) {
-            $userLogin[$i] = self::login($user[$i]);
+            $userLogin[$i] = self::login($identity[$i]);
             $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
@@ -107,7 +107,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             )
         );
         // Now, user[0] submit one run with AC verdict
-        $runs[5] = RunsFactory::createRunToProblem($problem[0], $user[0]);
+        $runs[5] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
         RunsFactory::gradeRun($runs[5]);
         $solvedProblems = \OmegaUp\Controllers\Course::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -147,15 +147,15 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
             ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $user[$i]);
+            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
         }
         // Create runs to problems directly
         $runs = [];
-        $runs[0] = RunsFactory::createRunToProblem($problem[0], $user[0]);
-        $runs[1] = RunsFactory::createRunToProblem($problem[1], $user[1]);
-        $runs[2] = RunsFactory::createRunToProblem($problem[2], $user[2]);
-        $runs[3] = RunsFactory::createRunToProblem($problem[0], $user[1]);
-        $runs[4] = RunsFactory::createRunToProblem($problem[0], $user[2]);
+        $runs[0] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
+        $runs[1] = RunsFactory::createRunToProblem($problem[1], $identity[1]);
+        $runs[2] = RunsFactory::createRunToProblem($problem[2], $identity[2]);
+        $runs[3] = RunsFactory::createRunToProblem($problem[0], $identity[1]);
+        $runs[4] = RunsFactory::createRunToProblem($problem[0], $identity[2]);
         RunsFactory::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
         RunsFactory::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
         RunsFactory::gradeRun($runs[2]); // run with a AC verdict
@@ -175,7 +175,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // Users must join course
         for ($i = 0; $i < ($num_users - 1); $i++) {
-            $userLogin[$i] = self::login($user[$i]);
+            $userLogin[$i] = self::login($identity[$i]);
             $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
@@ -202,7 +202,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $this->assertEquals(0, count($solvedProblems['user_problems']));
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // User[2] accept teacher's request
-        $userLogin[2] = self::login($user[2]);
+        $userLogin[2] = self::login($identity[2]);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin[$i]->auth_token,
             'course_alias' => $courseData['course_alias']

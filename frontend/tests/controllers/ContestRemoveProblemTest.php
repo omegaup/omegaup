@@ -154,7 +154,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = OmegaupTestCase::login($contestant);
+        $login = OmegaupTestCase::login($identity);
 
         $r = new \OmegaUp\Request(
             [
@@ -317,9 +317,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::createRun($problemData, $contestData, $identity);
 
         // Add the sysadmin role to the contest director
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
@@ -351,7 +351,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        ['user' => $secondaryAdmin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = UserFactory::createUser();
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
@@ -370,7 +370,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $secondaryAdmin);
+        RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $secondaryIdentityAdmin
+        );
 
         // remove the problem from the contest
         $response = ContestsFactory::removeProblemFromContest(
@@ -399,9 +403,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::createRun($problemData, $contestData, $identity);
 
         $response = ContestsFactory::removeProblemFromContest(
             $problemData,
@@ -425,14 +429,14 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
         RunsFactory::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::createRun($problemData, $contestData, $identity);
 
         $response = ContestsFactory::removeProblemFromContest(
             $problemData,
@@ -455,10 +459,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
         // Create a run not related to the contest
-        RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::createRunToProblem($problemData, $identity);
 
         // Remove problem, should succeed.
         $response = ContestsFactory::removeProblemFromContest(
@@ -485,10 +489,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
-        RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::createRunToProblem($problemData, $identity);
+        RunsFactory::createRun($problemData, $contestData, $identity);
 
         $response = ContestsFactory::removeProblemFromContest(
             $problemData,
@@ -510,14 +514,14 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
         RunsFactory::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::createRun($problemData, $contestData, $identity);
 
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,

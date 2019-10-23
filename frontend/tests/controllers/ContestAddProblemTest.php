@@ -133,7 +133,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Build request
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],

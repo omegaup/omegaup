@@ -34,7 +34,7 @@ class ListClarificationsContest extends OmegaupTestCase {
                 ClarificationsFactory::createClarification(
                     $problemData,
                     $contestData,
-                    $contestant1
+                    $identity1
                 );
         }
 
@@ -52,12 +52,12 @@ class ListClarificationsContest extends OmegaupTestCase {
                 ClarificationsFactory::createClarification(
                     $problemData,
                     $contestData,
-                    $contestant2
+                    $identity2
                 );
         }
 
         // Prepare the request
-        $login = self::login($contestant1);
+        $login = self::login($identity1);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,

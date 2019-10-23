@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import qualitynomination_List from '../components/qualitynomination/List.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);

@@ -11,7 +11,7 @@ import argparse
 import logging
 
 
-def configure_parser(parser: argparse.ArgumentParser):
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     '''Add Logging-related arguments to `parser`'''
     logging_args = parser.add_argument_group('Logging')
     logging_args.add_argument('--quiet', '-q', action='store_true',
@@ -22,7 +22,7 @@ def configure_parser(parser: argparse.ArgumentParser):
                               help='Enables logging to a file')
 
 
-def init(program: str, args: argparse.Namespace):
+def init(program: str, args: argparse.Namespace) -> None:
     '''Initializes the logging module using arguments from the command line
 
     Args:

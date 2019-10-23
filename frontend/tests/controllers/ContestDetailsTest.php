@@ -114,7 +114,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         )));
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -157,7 +157,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -193,10 +193,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add user to our private contest
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -228,7 +228,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -251,7 +251,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -298,7 +298,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -348,10 +348,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add user to our private contest
-        ContestsFactory::addUser($contestData, $contestant);
+        ContestsFactory::addUser($contestData, $identity);
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -405,7 +405,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         \OmegaUp\DAO\Contests::update($contest);
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -454,7 +454,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call details using token
-        $login = self::login($externalUser);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -466,7 +466,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // Call details using admin token
-        $login = self::login($externalUser);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -529,7 +529,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $externalUser, 'identity' => $identity] = UserFactory::createUser();
 
         // Call details using token
-        $login = self::login($externalUser);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -610,8 +610,8 @@ class ContestDetailsTest extends OmegaupTestCase {
             ['user' => $contestants[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
         }
 
-        ['user' => $contestAdmin, 'identity' => $identity] = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestAdmin);
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = UserFactory::createUser();
+        ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
 
         $detourGrader = new ScopedGraderDetour();
 
@@ -620,25 +620,25 @@ class ContestDetailsTest extends OmegaupTestCase {
         $runsData[0] = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestants[0]
+            $identities[0]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[1] = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestants[0]
+            $identities[0]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[2] = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestants[1]
+            $identities[1]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[3] = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestants[2]
+            $identities[2]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runDataDirector = RunsFactory::createRun(
@@ -650,7 +650,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $runDataAdmin = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestAdmin
+            $contestIdentityAdmin
         );
 
         // Grade the runs
@@ -705,7 +705,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare our request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -784,7 +784,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $run = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestants[0]
+                $identities[0]
             );
             RunsFactory::gradeRun($run, 0, 'CE');
             $runsData[] = $run;
@@ -795,7 +795,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $run = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestants[0]
+                $identities[0]
             );
             RunsFactory::gradeRun($run, 1, 'AC', 60);
             $runsData[] = $run;
@@ -806,7 +806,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $run = RunsFactory::createRun(
                 $problemData,
                 $contestData,
-                $contestants[1]
+                $identities[1]
             );
             RunsFactory::gradeRun($run, .9, 'PA');
             $runsData[] = $run;

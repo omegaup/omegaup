@@ -19,7 +19,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $userLogin
+            'author' => $identity
         ]));
 
         // Get a contest
@@ -35,7 +35,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run
@@ -60,12 +60,12 @@ class ProblemDeleteTest extends OmegaupTestCase {
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $userLogin
+            'author' => $identity
         ]));
 
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $userLogin
+            'author' => $identity
         ]));
 
         $login = self::login($problemData['author']);
@@ -112,11 +112,11 @@ class ProblemDeleteTest extends OmegaupTestCase {
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $userLogin
+            'author' => $identity
         ]));
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $userLogin
+            'author' => $identity
         ]));
 
         $login = self::login($problemData['author']);
@@ -198,7 +198,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         // Get admin user
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
-        $login = self::login($admin);
+        $login = self::login($identityAdmin);
 
         // Call API to delete a problem
         \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([

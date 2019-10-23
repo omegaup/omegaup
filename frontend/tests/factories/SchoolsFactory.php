@@ -19,7 +19,7 @@ class SchoolsFactory {
         }
 
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = OmegaupTestCase::login($user);
+        $login = OmegaupTestCase::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -29,7 +29,7 @@ class SchoolsFactory {
         $response = \OmegaUp\Controllers\School::apiCreate($r);
 
         return [
-            'creator' => $user,
+            'creator' => $identity,
             'request' => $r,
             'response' => $response,
             'school' => \OmegaUp\DAO\Schools::findByName($r['name'])[0]

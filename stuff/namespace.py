@@ -39,7 +39,7 @@ def _sed(filename: str, search: str, fqcn: str) -> None:
         f.write(contents)
 
 
-def _main():
+def _main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('search')
     parser.add_argument('namespace')

@@ -39,7 +39,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
@@ -52,15 +52,15 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Try to login with old password, should fail
         try {
-            self::login($user);
+            self::login($identity);
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
         }
 
         // Set new password and try again, should succeed
-        $user->password = $r['password'];
-        self::login($user);
+        $identity->password = $r['password'];
+        self::login($identity);
 
         $user = \OmegaUp\DAO\Users::FindByUsername($user->username);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
@@ -73,7 +73,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
     public function testUserUpdate() {
         // Create the user to edit
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
         $states = \OmegaUp\DAO\States::getByCountry('MX');
@@ -178,7 +178,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
     public function testUserUpdateBasicInfo() {
         // Create the user to edit
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $newUsername = 'new_username_basic_info';
         $newPassword = Utils::CreateRandomString();

@@ -29,7 +29,7 @@ class UpdateClarificationTest extends OmegaupTestCase {
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Update answer
