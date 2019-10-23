@@ -33,8 +33,7 @@ def normalize_tag(tag: str) -> str:
     tag = unicodedata.normalize('NFD',
                                 tag).encode('ascii', 'ignore').decode("utf-8")
     # Use '-' for splitting if necessary
-    tag = re.sub(r'[^a-z0-9]', '-', tag.lower())
-    tag = re.sub(r'--+', '-', tag)
+    tag = re.sub(r'[^a-z0-9]+', '-', tag.lower())
     return tag
 
 
@@ -48,30 +47,30 @@ def insert_new_tags(tags: Set[str],
                         [(tag,) for tag in tags])
 
 
-def get_inverse_mapper(
+def get_inverse_mapping(
         dbconn: MySQLdb.connections.Connection) -> Mapping[
             str, Mapping[str, str]]:
-    '''Gets the inverse mapper for problem tags entries in lang files'''
-    logging.info('Getting tags mapper from lang files.')
+    '''Gets the inverse mapping for problem tags entries in lang files'''
+    logging.info('Getting tags mapping from lang files.')
     new_tags = set()
-    inverse_mapper = {}
+    inverse_mapping = {}
     for lang in LANGS:
         path = os.path.join(LOCALIZATIONS_ROOT, 'lang.%s.json' % (lang))
         with open(path, 'r') as f:
             mappings = json.load(f)
-            inverse_mapping = {}
+            new_mapping = {}
             for key, value in mappings.items():
                 if key.startswith('problemTopic'):
                     normalized_tag = normalize_tag(key)
                     new_tags.add(normalized_tag)
-                    inverse_mapping[normalize_tag(value)] = normalized_tag
-            inverse_mapper[lang] = inverse_mapping
+                    new_mapping[normalize_tag(value)] = normalized_tag
+            inverse_mapping[lang] = new_mapping
     insert_new_tags(new_tags, dbconn)
-    return inverse_mapper
+    return inverse_mapping
 
 
 def migrate_tags(dbconn: MySQLdb.connections.Connection,
-                 mapper: Mapping[str, Mapping[str, str]]) -> None:
+                 mapping: Mapping[str, Mapping[str, str]]) -> None:
     '''Reads all suggestions and modifies their tags if necessary'''
     with dbconn.cursor() as cur:
         cur.execute('''SELECT `qualitynomination_id`, `contents`
@@ -87,14 +86,13 @@ def migrate_tags(dbconn: MySQLdb.connections.Connection,
             if not contents.get('tags'):
                 continue
             nomination_id = row[0]
-            canonized_tags = []
+            canonicalized_tags = set()
             for tag in contents['tags']:
-                canonized_tags.append(tag)
                 for lang in LANGS:
-                    if mapper[lang].get(tag):
-                        canonized_tags[-1] = mapper[lang][tag]
+                    if mapping[lang].get(tag):
+                        canonicalized_tags.add(mapping[lang][tag])
                         break
-            contents['tags'] = canonized_tags
+            contents['tags'] = list(canonicalized_tags)
             to_update.append((json.dumps(contents), nomination_id))
 
         # Now update records
@@ -121,11 +119,11 @@ def main() -> None:
     # warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
         try:
-            mapper = get_inverse_mapper(dbconn)
+            mapping = get_inverse_mapping(dbconn)
         except:  # noqa: bare-except
-            logging.exception('Failed to get mapper from lang json files')
+            logging.exception('Failed to get mapping from lang json files')
             raise
-        migrate_tags(dbconn, mapper)
+        migrate_tags(dbconn, mapping)
         dbconn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to migrate canonical tags.')

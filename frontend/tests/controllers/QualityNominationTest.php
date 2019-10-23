@@ -1832,7 +1832,7 @@ class QualityNominationTest extends OmegaupTestCase {
         Utils::commit();
         shell_exec('python3 ' . escapeshellarg(
             OMEGAUP_ROOT
-        ) . '/../stuff/canonize_tags.py' .
+        ) . '/../stuff/canonicalize_tags.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -1852,7 +1852,7 @@ class QualityNominationTest extends OmegaupTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['dp', 'lenguaje', 'problemtopicgreedy', 'problemtopicmath']
+            ['lenguaje', 'problemtopicgreedy', 'problemtopicmath']
         );
 
         $tags = array_map(function ($tag) {
@@ -1865,7 +1865,7 @@ class QualityNominationTest extends OmegaupTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['dp', 'lenguaje', 'problemtopicgeometry', 'problemtopicmath', 'search']
+            ['lenguaje', 'problemtopicgeometry', 'problemtopicmath', 'problemtopicmatrices']
         );
     }
 }
