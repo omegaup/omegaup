@@ -3,7 +3,6 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
-    /** @psalm-suppress MixedAssignment */
     [
         'smartyProperties' => $smartyProperties,
         'template' => $template
@@ -14,7 +13,6 @@ try {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
-/** @psalm-suppress MixedAssignment */
 foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);
 }
