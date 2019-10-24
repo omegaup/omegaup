@@ -249,12 +249,11 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$problemStats[$key]['cases_stats']</code>
-      <code>$caseData['out_diff']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="27">
+    <MixedArrayAccess occurrences="25">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
@@ -280,8 +279,6 @@
       <code>$case['meta']</code>
       <code>$case['meta']</code>
       <code>$case['meta']</code>
-      <code>$caseData['meta']</code>
-      <code>$caseData['out_diff']</code>
     </MixedArrayAccess>
     <MixedAssignment occurrences="41">
       <code>$contests</code>
@@ -328,7 +325,6 @@
       <code>$group</code>
       <code>$case</code>
       <code>$counts</code>
-      <code>$caseData</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
       <code>bool</code>
@@ -409,28 +405,25 @@
     <PossiblyNullIterator occurrences="1">
       <code>$resultAdmins</code>
     </PossiblyNullIterator>
-    <PossiblyNullOperand occurrences="6">
+    <PossiblyNullOperand occurrences="5">
       <code>$problemsetIdentity-&gt;access_time</code>
       <code>$r['start_time']</code>
       <code>$contest-&gt;alias</code>
       <code>$finish_time</code>
       <code>$start_time</code>
-      <code>$targetIdentity-&gt;username</code>
     </PossiblyNullOperand>
     <PossiblyNullPropertyAssignment occurrences="3">
       <code>$problemset</code>
       <code>$problemset</code>
       <code>$problemsetIdentity</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="10">
+    <PossiblyNullPropertyFetch occurrences="9">
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$contest-&gt;start_time</code>
       <code>$contest-&gt;finish_time</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$targetIdentity-&gt;identity_id</code>
-      <code>$targetIdentity-&gt;username</code>
     </PossiblyNullPropertyFetch>
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($identity)</code>
@@ -1963,7 +1956,7 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Contests.php">
-    <MissingParamType occurrences="14">
+    <MissingParamType occurrences="13">
       <code>$title</code>
       <code>$alias</code>
       <code>$problemset_id</code>
@@ -1984,13 +1977,11 @@
       <code>$pageSize</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$contestId</code>
-      <code>$contestId</code>
     </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="13">
+    <MissingReturnType occurrences="12">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
@@ -2003,7 +1994,6 @@
       <code>getAllContests</code>
       <code>getContestForProblemset</code>
       <code>getNeedsInformation</code>
-      <code>requestsUserInformation</code>
     </MissingReturnType>
     <MixedArgument occurrences="4">
       <code>$order</code>
@@ -2023,7 +2013,6 @@
       <code>$columns</code>
       <code>$offset</code>
       <code>$columns</code>
-      <code>$requestsUsersInfo</code>
     </MixedAssignment>
     <MixedOperand occurrences="3">
       <code>$page</code>

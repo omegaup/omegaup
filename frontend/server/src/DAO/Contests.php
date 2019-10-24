@@ -268,24 +268,25 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000
     ): array {
         $offset = ($page - 1) * $pageSize;
-        $sql = '
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+        $sql = "
             SELECT
-                c.*,
+                $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin
             FROM
-                Contests c
+                Contests
             INNER JOIN
-                ACLs a ON a.acl_id = c.acl_id
+                ACLs a ON a.acl_id = Contests.acl_id
             INNER JOIN
                 Users u ON u.user_id = a.owner_id
             INNER JOIN
-                Problemsets p ON p.problemset_id = c.problemset_id
+                Problemsets p ON p.problemset_id = Contests.problemset_id
             WHERE
                 u.main_identity_id = ?
             ORDER BY
-                c.contest_id DESC
-            LIMIT ?, ?;';
+                Contests.contest_id DESC
+            LIMIT ?, ?;";
         $params = [
             $identityId,
             intval($offset),
@@ -785,7 +786,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         );
     }
 
-    public static function requestsUserInformation($contestId) {
+    public static function requestsUserInformation(int $contestId): bool {
         $sql = '
             SELECT
                 requests_user_information
@@ -795,12 +796,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 contest_id = ?
             LIMIT 1;
         ';
-
+        /** @var string */
         $requestsUsersInfo = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$contestId]
         );
 
-        return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
+        return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
     }
 }

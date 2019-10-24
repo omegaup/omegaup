@@ -228,12 +228,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Callback to get contests list, depending on a given method
      * @param \OmegaUp\Request $r
-     * @param callback(int, int, int, string):array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string} $callbackUserFunction
-     * @return array{status: string, contests: array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string, finish_time: int|null}[]}
+     * @param Closure(int, int, int, null|string):array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: int, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[] $callbackUserFunction
+     * @return array{contests: array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: int, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[], status: string}
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
-        callback $callbackUserFunction
+        $callbackUserFunction
     ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
@@ -248,20 +248,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $query
         );
 
-        $addedContests = [];
-        foreach ($contests as $contest) {
-            $contest['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                $contest['start_time']
-            );
-            $contest['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                $contest['finish_time']
-            );
-            $contest['last_updated'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                $contest['last_updated']
-            );
-            $addedContests[] = $contest;
-        }
-
         // Expire contest-list cache
         \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
         \OmegaUp\Cache::invalidateAllKeys(
@@ -270,7 +256,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'contests' => $addedContests,
+            'contests' => $contests,
         ];
     }
 
@@ -289,7 +275,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
-                string $query
+                ?string $query
             ) {
                 return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                     $identityId,
@@ -314,7 +300,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
-                string $query
+                ?string $query
             ) {
                 return \OmegaUp\DAO\Contests::getContestsParticipating(
                     $identityId,
@@ -549,7 +535,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     int $identityId,
                     int $page,
                     int $pageSize,
-                    string $query
+                    ?string $query
                 ) {
                     return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                         $identityId,
@@ -2609,6 +2595,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $targetIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $r['username']
         );
+        if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
 
         $request = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
             $targetIdentity->identity_id,
@@ -2940,6 +2931,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -3300,7 +3292,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 // If the user don't have these details then he didn't submit,
                 // we need to fill the report with 0s for completeness
                 if (
-                    !isset($problemData['run_details']['cases']) ||
                     empty($problemData['run_details']['cases'])
                 ) {
                     for (
@@ -3315,7 +3306,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $csvRow[] = '0';
                 } else {
                     // for each case
-                    foreach ($problemData['run_details']['cases'] as $caseData) {
+                    /** @var array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[] */
+                    $cases = $problemData['run_details']['cases'];
+                    foreach ($cases as $caseData) {
                         // If case is correct
                         if (
                             strcmp(
@@ -3324,7 +3317,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                                 ),
                                 'OK'
                             ) === 0 &&
-                            strcmp($caseData['out_diff'], '') === 0
+                            strcmp(strval($caseData['out_diff']), '') === 0
                         ) {
                             $csvRow[] = '1';
                         } else {
@@ -3490,6 +3483,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
+        if (is_null($contest->contest_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
         if (
             !\OmegaUp\DAO\Contests::requestsUserInformation(
                 $contest->contest_id
