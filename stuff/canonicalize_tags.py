@@ -12,7 +12,8 @@ import logging
 import os
 import unicodedata
 import re
-from typing import Mapping, Set
+import collections
+from typing import Mapping, Set, DefaultDict, Dict, Text
 
 import MySQLdb.constants.ER
 
@@ -53,18 +54,17 @@ def get_inverse_mapping(
     '''Gets the inverse mapping for problem tags entries in lang files'''
     logging.info('Getting tags mapping from lang files.')
     new_tags = set()
-    inverse_mapping = {}
+    inverse_mapping: DefaultDict[
+        Text, Dict[Text, Text]] = collections.defaultdict(dict)
     for lang in LANGS:
         path = os.path.join(LOCALIZATIONS_ROOT, 'lang.%s.json' % (lang))
         with open(path, 'r') as f:
             mappings = json.load(f)
-            new_mapping = {}
             for key, value in mappings.items():
                 if key.startswith('problemTopic'):
-                    normalized_tag = normalize_tag(key)
-                    new_tags.add(normalized_tag)
-                    new_mapping[normalize_tag(value)] = normalized_tag
-            inverse_mapping[lang] = new_mapping
+                    normalized = normalize_tag(key)
+                    new_tags.add(normalized)
+                    inverse_mapping[lang][normalize_tag(value)] = normalized
     insert_new_tags(new_tags, dbconn)
     return inverse_mapping
 
@@ -77,15 +77,17 @@ def migrate_tags(dbconn: MySQLdb.connections.Connection,
                         FROM `QualityNominations`
                         WHERE `nomination` = 'suggestion';''')
         to_update = []
-        for row in cur:
+        for qualitynomination_id, json_contents in cur:
             try:
-                contents = json.loads(row[1])
+                contents = json.loads(json_contents)
             except json.JSONDecodeError:  # pylint: disable=no-member
-                logging.exception('Failed to parse contents')
+                logging.exception(
+                    'Failed to parse contents on qualitynomination %s',
+                    qualitynomination_id
+                )
                 continue
-            if not contents.get('tags'):
+            if 'tags' not in contents:
                 continue
-            nomination_id = row[0]
             canonicalized_tags = set()
             for tag in contents['tags']:
                 for lang in LANGS:
@@ -93,7 +95,7 @@ def migrate_tags(dbconn: MySQLdb.connections.Connection,
                         canonicalized_tags.add(mapping[lang][tag])
                         break
             contents['tags'] = list(canonicalized_tags)
-            to_update.append((json.dumps(contents), nomination_id))
+            to_update.append((json.dumps(contents), qualitynomination_id))
 
         # Now update records
         cur.executemany('''UPDATE `QualityNominations`
@@ -116,13 +118,8 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = db.connect(args)
-    # warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        try:
-            mapping = get_inverse_mapping(dbconn)
-        except:  # noqa: bare-except
-            logging.exception('Failed to get mapping from lang json files')
-            raise
+        mapping = get_inverse_mapping(dbconn)
         migrate_tags(dbconn, mapping)
         dbconn.commit()
     except:  # noqa: bare-except

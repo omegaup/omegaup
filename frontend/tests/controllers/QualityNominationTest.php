@@ -1823,7 +1823,7 @@ class QualityNominationTest extends OmegaupTestCase {
      * Test for the script to canonize tags send throught the
      * feedback form (quality nominations).
      */
-    public function testCanonizeTags() {
+    public function testCanonicalizeTags() {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
