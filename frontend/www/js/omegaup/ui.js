@@ -384,6 +384,7 @@ let UI = {
         {
           source: UI.typeaheadWrapper(omegaup.API.School.list),
           async: true,
+          limit: 10,
           display: 'label',
           templates: {
             empty: T.schoolToBeAdded,
