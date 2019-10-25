@@ -782,6 +782,7 @@
 	"reportProblemFormNotAProblemStatement": "Does not describe a problem statement.",
 	"reportProblemFormOffensive": "Is offensive.",
 	"reportProblemFormOtherReason": "Other reason.",
+	"reportProblemFormPoorlyDescribed": "The problem is poorly described.",
 	"reportProblemFormQuestion": "Why is this problem inappropriate?",
 	"reportProblemFormSpam": "Is Spam.",
 	"reportProblemFormThanksForReview": "Thanks for your report!",

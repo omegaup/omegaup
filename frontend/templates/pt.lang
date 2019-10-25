@@ -781,6 +781,7 @@ reportProblemFormLinkToOriginalProblem = "Link para problema original (required)
 reportProblemFormNotAProblemStatement = "Não descreve uma declaração de problema."
 reportProblemFormOffensive = "É ofensivo."
 reportProblemFormOtherReason = "Outra razão."
+reportProblemFormPoorlyDescribed = "O problema é mal descrito."
 reportProblemFormQuestion = "Por que esse problema é inadequado?"
 reportProblemFormSpam = "É spam."
 reportProblemFormThanksForReview = "Obrigado pelo seu relatório!."

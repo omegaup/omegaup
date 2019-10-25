@@ -187,7 +187,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 !isset($contents['reason']) ||
                 !in_array(
                     $contents['reason'],
-                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases']
+                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
                 )
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
