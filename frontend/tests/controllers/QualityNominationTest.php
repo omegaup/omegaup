@@ -1910,7 +1910,7 @@ class QualityNominationTest extends OmegaupTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['lenguaje', 'problemtopicgreedy', 'problemtopicmath']
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
         );
 
         $tags = array_map(function ($tag) {
@@ -1923,7 +1923,7 @@ class QualityNominationTest extends OmegaupTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['lenguaje', 'problemtopicgeometry', 'problemtopicmath', 'problemtopicmatrices']
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
         );
     }
 }

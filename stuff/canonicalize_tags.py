@@ -62,9 +62,15 @@ def get_inverse_mapping(
             mappings = json.load(f)
             for key, value in mappings.items():
                 if key.startswith('problemTopic'):
-                    normalized = normalize_tag(key)
-                    new_tags.add(normalized)
-                    inverse_mapping[lang][normalize_tag(value)] = normalized
+                    new_tags.add(key)
+                    inverse_mapping[lang][normalize_tag(value)] = key
+
+    # Update problemtopictag to problemTopicTag
+    # and also preserve problemTopicTags
+    for tag in new_tags:
+        inverse_mapping['en'][normalize_tag(tag)] = tag
+        inverse_mapping['en'][tag] = tag
+
     insert_new_tags(new_tags, dbconn)
     return inverse_mapping
 
