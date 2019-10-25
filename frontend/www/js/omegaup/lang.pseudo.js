@@ -783,6 +783,7 @@ const translations = {
 	reportProblemFormNotAProblemStatement: "(D035 n07 d35crib3 a pr0b13m 57a73m3n7.)",
 	reportProblemFormOffensive: "(I5 0ff3n5iv3.)",
 	reportProblemFormOtherReason: "(O7h3r r3a50n.)",
+	reportProblemFormPoorlyDescribed: "(Th3 pr0b13m i5 p00r1y d35crib3d.)",
 	reportProblemFormQuestion: "(Why i5 7hi5 pr0b13m inappr0pria73?)",
 	reportProblemFormSpam: "(I5 Spam.)",
 	reportProblemFormThanksForReview: "(Thank5 f0r y0ur r3p0r7!)",
