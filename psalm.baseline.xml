@@ -407,9 +407,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/server/src/Controllers/Course.php">
-    <ArgumentTypeCoercion occurrences="1">
-      <code>$assignment</code>
-    </ArgumentTypeCoercion>
     <InvalidArgument occurrences="1">
       <code>$problem['problem_alias']</code>
     </InvalidArgument>
@@ -440,7 +437,7 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="85">
+    <MixedArgument occurrences="80">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
@@ -448,7 +445,6 @@
       <code>$r['course']</code>
       <code>$r['assignment']</code>
       <code>$course</code>
-      <code>$assignment</code>
       <code>$r['course_alias']</code>
       <code>$r['problem_alias']</code>
       <code>$problemset-&gt;problemset_id</code>
@@ -540,16 +536,13 @@
       <code>$assignmentProblemset['scoreboard_url']</code>
       <code>$problem['problem_id']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="37">
+    <MixedAssignment occurrences="31">
       <code>$assignment</code>
       <code>$group</code>
       <code>$course-&gt;group_id</code>
-      <code>$r['start_time']</code>
-      <code>$r['finish_time']</code>
       <code>$problemset</code>
       <code>$problemSet</code>
       <code>$assignment</code>
-      <code>$currentAssignment</code>
       <code>$identities</code>
       <code>$problemSet</code>
       <code>$assignments</code>
@@ -562,7 +555,6 @@
       <code>$course</code>
       <code>$course</code>
       <code>$result</code>
-      <code>$r['assignment']</code>
       <code>$problem</code>
       <code>$run['source']</code>
       <code>$problem['letter']</code>
@@ -577,7 +569,6 @@
       <code>$assignment</code>
       <code>$problem</code>
       <code>$problem['letter']</code>
-      <code>$r['assignment']</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
       <code>\OmegaUp\DAO\VO\Assignments</code>
@@ -586,21 +577,14 @@
     <MixedOperand occurrences="1">
       <code>$r['course_alias']</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="34">
+    <MixedPropertyFetch occurrences="27">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;finish_time</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;problemset_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$problemSet-&gt;problemset_id</code>
-      <code>$currentAssignment-&gt;assignment_id</code>
       <code>$problemSet-&gt;problemset_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;acl_id</code>
       <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
       <code>$tokenAuthenticationResult['course']-&gt;acl_id</code>
       <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
@@ -636,9 +620,6 @@
       <code>$course-&gt;course_id</code>
       <code>$course-&gt;group_id</code>
       <code>$course-&gt;course_id</code>
-      <code>$privacystatement_id</code>
-      <code>$privacystatement_id</code>
-      <code>$privacystatement_id</code>
     </PossiblyNullArgument>
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$resolvedUser-&gt;user_id</code>
@@ -1518,11 +1499,7 @@
     <MixedArgument occurrences="3">
       <code>$r['alias']</code>
       <code>$r['course_alias']</code>
-      <code>$assignment</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$assignment</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/server/src/Controllers/Submission.php">
     <MissingReturnType occurrences="1">
@@ -1815,25 +1792,23 @@
     <InvalidReturnType occurrences="1">
       <code>Affected</code>
     </InvalidReturnType>
-    <MissingParamType occurrences="11">
+    <MissingParamType occurrences="9">
       <code>$courseId</code>
       <code>$assignmentAlias</code>
       <code>$course_id</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$assignment_alias</code>
       <code>$course_id</code>
       <code>$assignmentId</code>
       <code>$assignment_id</code>
       <code>$order</code>
       <code>$courseId</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
+    <MissingReturnType occurrences="6">
       <code>getProblemset</code>
       <code>getAssignmentCountsForCourse</code>
       <code>getAssignmentForProblemset</code>
       <code>getByProblemset</code>
-      <code>getByAliasAndCourse</code>
       <code>getByIdWithScoreboardUrls</code>
       <code>getSortedCourseAssignments</code>
     </MissingReturnType>
@@ -3358,25 +3333,15 @@
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="4">
-      <code>$expectedScores[$studentUsername][$assignmentAlias]</code>
-      <code>$problemAssignmentsMap[$assignmentAlias]</code>
-      <code>$expectedScores[$studentUsername][$assignmentAlias]</code>
-      <code>$expectedScores[$studentUsername][$assignmentAlias]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="7">
+    <MixedAssignment occurrences="5">
       <code>$courseFactoryResult</code>
       <code>$courseAlias</code>
       <code>$admin</code>
       <code>$problem</code>
-      <code>$assignmentAlias</code>
-      <code>$assignment</code>
       <code>$problemData</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="3">
+    <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>
-      <code>$assignment-&gt;problemset_id</code>
-      <code>$assignment-&gt;problemset_id</code>
     </MixedPropertyFetch>
   </file>
   <file src="frontend/tests/factories/GroupsFactory.php">
