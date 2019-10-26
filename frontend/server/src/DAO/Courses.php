@@ -84,7 +84,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $ar;
     }
 
-    public static function getCoursesForStudent($identity_id) {
+    /**
+     * @return \OmegaUp\DAO\VO\Courses[]
+     */
+    public static function getCoursesForStudent(int $identityId) {
         $sql = 'SELECT c.*
                 FROM Courses c
                 INNER JOIN (
@@ -95,9 +98,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
+        /** @var array{course_id: int, name: string, description: string, alias: string, group_id: int, acl_id: int, start_time: string, finish_time: string, public: int, school_id: null|int, needs_basic_information: int, requests_user_information: string, show_scoreboard: int}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identity_id]
+            [$identityId]
         );
         $courses = [];
         foreach ($rs as $row) {
@@ -227,6 +231,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
     /**
      * Returns all courses that an identity can manage.
+     *
+     * @return \OmegaUp\DAO\VO\Courses[]
      */
     final public static function getAllCoursesAdminedByIdentity(
         $identity_id,
@@ -270,7 +276,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             intval($offset),
             intval($pageSize),
         ];
-
+        /** @var array{course_id: int, name: string, description: string, alias: string, group_id: int, acl_id: int, start_time: string, finish_time: string, public: int, school_id: null|int, needs_basic_information: int, requests_user_information: string, show_scoreboard: int}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
@@ -332,7 +338,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     final public static function getAssignmentByAlias(
         \OmegaUp\DAO\VO\Courses $course,
         string $assignmentAlias
-    ) {
+    ): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 

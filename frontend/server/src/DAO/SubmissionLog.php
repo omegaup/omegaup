@@ -56,7 +56,10 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    final public static function GetSubmissionsForCourse($course_id) {
+    /**
+     * @return list<array{alias?: string, classname: string, ip: int, time: int, username: string}>
+     */
+    final public static function GetSubmissionsForCourse(int $courseId) {
         $sql = 'SELECT
                     i.username,
                     p.alias,
@@ -84,9 +87,10 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
+        /** @var list<array{alias?: string, classname: string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$course_id]
+            [$courseId]
         );
     }
 }

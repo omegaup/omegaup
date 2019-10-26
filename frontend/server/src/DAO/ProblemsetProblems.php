@@ -91,8 +91,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
-    /*
+    /**
      * Get problemset problems including problemset alias, points, and order
+     *
+     * @return list<array{title: string, problem_id: int, alias: string, visibility: int, visits: int, submissions: int, accepted: int, difficulty: float|null, order: int, languages: string, points: float, commit: string, version: string}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -122,7 +124,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     pp.problemset_id = ?
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
-
+        /** @var list<array{title: string, problem_id: int, alias: string, visibility: int, visits: int, submissions: int, accepted: int, difficulty: float|null, order: int, languages: string, points: float, commit: string, version: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]

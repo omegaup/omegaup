@@ -996,7 +996,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a "column name" for the $idx (think Excel column names).
      */
-    public static function columnName($idx) {
+    public static function columnName(int $idx): string {
         $name = chr(ord('A') + $idx % 26);
         while ($idx >= 26) {
             $idx /= 26;

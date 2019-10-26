@@ -31,7 +31,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         string $commit,
         string $currentVersion,
         \OmegaUp\DAO\VO\Identities $identity,
-        int $points,
+        float $points,
         int $order_in_contest = 1,
         bool $validateVisibility = true
     ) {

@@ -12,14 +12,19 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new group.
      */
-    public static function createGroup($alias, $name, $description, $owner_id) {
+    public static function createGroup(
+        string $alias,
+        string $name,
+        string $description,
+        int $ownerId
+    ): \OmegaUp\DAO\VO\Groups {
         $group = new \OmegaUp\DAO\VO\Groups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
         ]);
         $groupAcl = new \OmegaUp\DAO\VO\ACLs([
-            'owner_id' => $owner_id,
+            'owner_id' => $ownerId,
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -57,7 +62,7 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['description'],
             'description'
         );

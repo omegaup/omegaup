@@ -153,16 +153,14 @@
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="3">
+    <MissingParamType occurrences="2">
       <code>$callback_user_function</code>
-      <code>$idx</code>
       <code>$admission_mode</code>
     </MissingParamType>
-    <MissingReturnType occurrences="11">
+    <MissingReturnType occurrences="10">
       <code>apiPublicDetails</code>
       <code>apiRegisterForContest</code>
       <code>apiOpen</code>
-      <code>columnName</code>
       <code>apiCreateVirtual</code>
       <code>apiScoreboardMerge</code>
       <code>apiRequests</code>
@@ -171,7 +169,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="74">
+    <MixedArgument occurrences="67">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -187,20 +185,13 @@
       <code>$result['finish_time']</code>
       <code>$result['rerun_id']</code>
       <code>$result['languages']</code>
-      <code>$problem['languages']</code>
       <code>$result['languages']</code>
       <code>$r['contest_alias']</code>
       <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['contest_alias']</code>
       <code>$accesses</code>
       <code>$submissions</code>
-      <code>ord('A') + $idx % 26</code>
-      <code>ord('A') + $idx % 26</code>
       <code>$r['contest_alias']</code>
-      <code>$problemsetProblem['commit']</code>
-      <code>$problemsetProblem['version']</code>
-      <code>$problemsetProblem['points']</code>
-      <code>$problemsetProblem['order'] ?: 1</code>
       <code>$r['alias']</code>
       <code>$r['languages']</code>
       <code>$contest_length / 60</code>
@@ -259,7 +250,7 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="30">
+    <MixedArrayAccess occurrences="21">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
@@ -270,15 +261,6 @@
       <code>$result['admission_mode']</code>
       <code>$result['start_time']</code>
       <code>$result['finish_time']</code>
-      <code>$problem['languages']</code>
-      <code>$problemsetProblem['problem_id']</code>
-      <code>$problemsetProblem['alias']</code>
-      <code>$problemsetProblem['visibility']</code>
-      <code>$problemsetProblem['commit']</code>
-      <code>$problemsetProblem['version']</code>
-      <code>$problemsetProblem['points']</code>
-      <code>$problemsetProblem['order']</code>
-      <code>$problem['problem_id']</code>
       <code>$clar['time']</code>
       <code>$results['total']</code>
       <code>$group['cases']</code>
@@ -291,7 +273,7 @@
       <code>$caseData['meta']</code>
       <code>$caseData['out_diff']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="46">
+    <MixedAssignment occurrences="42">
       <code>$query</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -307,35 +289,25 @@
       <code>$addedContests[]</code>
       <code>$contestProblemset</code>
       <code>$result</code>
-      <code>$problem</code>
-      <code>$problem['letter']</code>
       <code>$accesses</code>
       <code>$submissions</code>
       <code>$auth_token</code>
-      <code>$problemsetProblem</code>
       <code>$r['start_time']</code>
       <code>$start_time</code>
       <code>$finish_time</code>
       <code>$contest_length</code>
       <code>$requestProblems</code>
       <code>$requestProblem</code>
-      <code>$problem</code>
       <code>$language</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
       <code>$clarifications</code>
       <code>$clar</code>
       <code>$response['clarifications']</code>
       <code>$request-&gt;extra_note</code>
       <code>$contest-&gt;admission_mode</code>
-      <code>$problem</code>
       <code>$verdict</code>
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
-      <code>$problem</code>
       <code>$group</code>
       <code>$case</code>
       <code>$counts</code>
@@ -348,12 +320,9 @@
     <MixedMethodCall occurrences="1">
       <code>asFilteredArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="14">
+    <MixedOperand occurrences="11">
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['window_length']</code>
-      <code>$idx</code>
-      <code>$idx</code>
-      <code>$idx</code>
       <code>$r['start_time']</code>
       <code>$r['start_time']</code>
       <code>$finish_time</code>
@@ -452,252 +421,13 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/src/Controllers/Course.php">
-    <ArgumentTypeCoercion occurrences="1">
-      <code>$assignment</code>
-    </ArgumentTypeCoercion>
-    <InvalidArgument occurrences="1"/>
-    <InvalidPropertyAssignmentValue occurrences="1"/>
-    <MissingClosureParamType occurrences="3">
-      <code>$value</code>
-      <code>$value</code>
-      <code>$value</code>
-    </MissingClosureParamType>
-    <MissingClosureReturnType occurrences="3">
-      <code>function ($value) {</code>
-      <code>function ($value) {</code>
-      <code>function ($value) {</code>
-    </MissingClosureReturnType>
-    <MissingReturnType occurrences="6">
-      <code>validateClone</code>
-      <code>apiCreate</code>
-      <code>apiGetProblemUsers</code>
-      <code>apiListAssignments</code>
-      <code>apiListCourses</code>
-      <code>apiStudentProgress</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="82">
-      <code>$r['school_id']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['start_time']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course']</code>
-      <code>$r['assignment']</code>
-      <code>$course</code>
-      <code>$assignment</code>
-      <code>$r['course_alias']</code>
-      <code>$r['problem_alias']</code>
-      <code>$problemset-&gt;problemset_id</code>
-      <code>$r['assignment_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$problemSet-&gt;problemset_id</code>
-      <code>$r['assignment_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['group']</code>
-      <code>$r['course_alias']</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$problem['runs']</code>
-      <code>$r['alias']</code>
-      <code>$r['group']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$course</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$course</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$course</code>
-      <code>$r['group']</code>
-      <code>$course</code>
-      <code>$r['group']</code>
-      <code>$course</code>
-      <code>$r['course_alias']</code>
-      <code>$r['group']</code>
-      <code>$r['alias']</code>
-      <code>$r['group']</code>
-      <code>$r['course_alias']</code>
-      <code>$accesses</code>
-      <code>$submissions</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$r['course']</code>
-      <code>$r['assignment']</code>
-      <code>$r['token']</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
-      <code>$tokenAuthenticationResult['course']-&gt;acl_id</code>
-      <code>$_SERVER['REMOTE_ADDR']</code>
-      <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$r['status']</code>
-      <code>$r['verdict']</code>
-      <code>!is_null($r['problem']) ? $r['problem']-&gt;problem_id : null</code>
-      <code>$r['language']</code>
-      <code>!is_null($r['identity']) ? $r['identity']-&gt;identity_id : null</code>
-      <code>$r['offset']</code>
-      <code>$r['rowcount']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['username']</code>
-      <code>$r['alias']</code>
-      <code>$r['group']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course']</code>
-      <code>$r['assignment']</code>
-      <code>$r['token']</code>
-      <code>$tokenAuthenticationResult['course']</code>
-      <code>$r['group']</code>
-      <code>$tokenAuthenticationResult['course']</code>
-      <code>$r['course']</code>
-      <code>$r['assignment']</code>
-      <code>$r['token']</code>
-      <code>$tokenAuthenticationResult['assignment']</code>
-      <code>$tokenAuthenticationResult['course']-&gt;group_id</code>
-      <code>$tokenAuthenticationResult['courseAdmin']</code>
-      <code>$r['course_alias']</code>
-      <code>$r['course_alias']</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="11">
-      <code>$assignment['alias']</code>
-      <code>$assignment['order']</code>
-      <code>$assignment['problemset_id']</code>
-      <code>$assignment['problemset_id']</code>
-      <code>$assignment['start_time']</code>
-      <code>$problem['problem_id']</code>
-      <code>$problem['runs']</code>
-      <code>$problem['problem_id']</code>
-      <code>$assignmentProblemset['scoreboard_url_admin']</code>
-      <code>$assignmentProblemset['scoreboard_url']</code>
-      <code>$problem['problem_id']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="32">
-      <code>$assignment</code>
-      <code>$course</code>
-      <code>$problem</code>
-      <code>$group</code>
-      <code>$course-&gt;group_id</code>
-      <code>$problem</code>
-      <code>$r['start_time']</code>
-      <code>$r['finish_time']</code>
-      <code>$problemset</code>
-      <code>$problemSet</code>
-      <code>$problem</code>
-      <code>$assignment</code>
-      <code>$currentAssignment</code>
-      <code>$problem</code>
-      <code>$identities</code>
-      <code>$problemSet</code>
-      <code>$problem</code>
-      <code>$assignments</code>
-      <code>$assignment</code>
-      <code>$response['assignments'][]</code>
-      <code>$problemSet</code>
-      <code>$admin_courses</code>
-      <code>$student_courses</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$result</code>
-      <code>$r['assignment']</code>
-      <code>$problem</code>
-      <code>$run['source']</code>
-      <code>$problem['letter']</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$course</code>
-      <code>$result</code>
-      <code>$accesses</code>
-      <code>$submissions</code>
-      <code>$assignmentProblemset</code>
-      <code>$course</code>
-      <code>$assignment</code>
-      <code>$problem</code>
-      <code>$problem['letter']</code>
-      <code>$r['assignment']</code>
-      <code>$problem</code>
-      <code>$problem</code>
-    </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>\OmegaUp\DAO\VO\Assignments</code>
-    </MixedInferredReturnType>
-    <MixedOperand occurrences="1">
-      <code>$r['course_alias']</code>
-    </MixedOperand>
-    <MixedPropertyFetch occurrences="34">
-      <code>$group-&gt;group_id</code>
-      <code>$group-&gt;group_id</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;finish_time</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;problemset_id</code>
-      <code>$problemset-&gt;problemset_id</code>
-      <code>$problemSet-&gt;problemset_id</code>
-      <code>$currentAssignment-&gt;assignment_id</code>
-      <code>$problemSet-&gt;problemset_id</code>
-      <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;acl_id</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
-      <code>$tokenAuthenticationResult['course']-&gt;acl_id</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;name</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;description</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;assignment_type</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;start_time</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;finish_time</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
-      <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['identity']-&gt;identity_id</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;alias</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;name</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;start_time</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;finish_time</code>
-      <code>$tokenAuthenticationResult['assignment']-&gt;acl_id</code>
-      <code>$tokenAuthenticationResult['course']-&gt;group_id</code>
-      <code>$tokenAuthenticationResult['course']-&gt;group_id</code>
-    </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1">
-      <code>$assignment</code>
-    </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="6">
-      <code>$course-&gt;group_id</code>
-      <code>$problemset-&gt;problemset_id</code>
-      <code>$points</code>
-      <code>$order</code>
-      <code>$course-&gt;course_id</code>
-      <code>$course-&gt;group_id</code>
-      <code>$course-&gt;course_id</code>
-      <code>$course-&gt;group_id</code>
-    </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="1"/>
-    <PossiblyNullPropertyFetch occurrences="2">
-      <code>$resolvedUser-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
-  </file>
   <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
       <code>validateRequest</code>
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/Controllers/Group.php">
-    <MissingParamType occurrences="4">
-      <code>$alias</code>
-      <code>$name</code>
-      <code>$description</code>
-      <code>$owner_id</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="8">
-      <code>createGroup</code>
+    <MissingReturnType occurrences="7">
       <code>apiCreate</code>
       <code>apiAddUser</code>
       <code>apiRemoveUser</code>
@@ -1448,7 +1178,7 @@
       <code>$response['admin']</code>
       <code>$details['compile_error']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="14">
+    <MixedAssignment occurrences="13">
       <code>$r['container']</code>
       <code>$problemset_id</code>
       <code>$r['container']</code>
@@ -1458,7 +1188,6 @@
       <code>$filtered['time']</code>
       <code>$gzippedLogs</code>
       <code>$response['judged_by']</code>
-      <code>$response['source']</code>
       <code>$detailsJson</code>
       <code>$details</code>
       <code>$response['compile_error']</code>
@@ -1559,16 +1288,7 @@
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
       <code>$r['alias']</code>
-      <code>$assignment</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$assignment</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/server/src/Controllers/Submission.php">
-    <MissingReturnType occurrences="1">
-      <code>getSource</code>
-    </MissingReturnType>
   </file>
   <file src="frontend/server/src/Controllers/Tag.php">
     <MissingReturnType occurrences="1">
@@ -1859,34 +1579,16 @@
     <InvalidReturnType occurrences="1">
       <code>Affected</code>
     </InvalidReturnType>
-    <MissingParamType occurrences="11">
-      <code>$courseId</code>
-      <code>$assignmentAlias</code>
-      <code>$course_id</code>
+    <MissingParamType occurrences="4">
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$assignment_alias</code>
-      <code>$course_id</code>
-      <code>$assignmentId</code>
       <code>$assignment_id</code>
       <code>$order</code>
-      <code>$courseId</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
-      <code>getProblemset</code>
-      <code>getAssignmentCountsForCourse</code>
+    <MissingReturnType occurrences="2">
       <code>getAssignmentForProblemset</code>
       <code>getByProblemset</code>
-      <code>getByAliasAndCourse</code>
-      <code>getByIdWithScoreboardUrls</code>
-      <code>getSortedCourseAssignments</code>
     </MissingReturnType>
-    <MixedArrayOffset occurrences="1">
-      <code>$counts[$row['assignment_type']]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="1">
-      <code>$params[]</code>
-    </MixedAssignment>
     <UndefinedDocblockClass occurrences="1">
       <code>Affected</code>
     </UndefinedDocblockClass>
@@ -2082,7 +1784,7 @@
     <InvalidDocblockParamName occurrences="1">
       <code>$user_id</code>
     </InvalidDocblockParamName>
-    <MissingParamType occurrences="6">
+    <MissingParamType occurrences="5">
       <code>$name</code>
       <code>$identity_id</code>
       <code>$identity_id</code>
@@ -2093,11 +1795,8 @@
       <code>$pageSize</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="2">
       <code>findByName</code>
-      <code>getCoursesForStudent</code>
-      <code>getAllCoursesAdminedByIdentity</code>
-      <code>getAssignmentByAlias</code>
       <code>updateAssignmentMaxPoints</code>
     </MissingReturnType>
     <MixedArrayOffset occurrences="1">
@@ -2215,10 +1914,6 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/PrivacyStatementConsentLog.php">
-    <MismatchingDocblockReturnType occurrences="2">
-      <code>the</code>
-      <code>the</code>
-    </MismatchingDocblockReturnType>
     <MissingParamType occurrences="2">
       <code>$identity_id</code>
       <code>$privacystatement_id</code>
@@ -2226,10 +1921,6 @@
     <MissingReturnType occurrences="1">
       <code>hasAcceptedPrivacyStatement</code>
     </MissingReturnType>
-    <MixedInferredReturnType occurrences="2">
-      <code>the</code>
-      <code>the</code>
-    </MixedInferredReturnType>
   </file>
   <file src="frontend/server/src/DAO/ProblemOfTheWeek.php">
     <MissingParamType occurrences="1">
@@ -2252,7 +1943,7 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="23">
+    <MissingParamType occurrences="21">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
@@ -2272,13 +1963,12 @@
       <code>$cols_per_page</code>
       <code>$order</code>
       <code>$order_type</code>
-      <code>$group_id</code>
       <code>$problem_id</code>
       <code>$problem_id</code>
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="14">
+    <MissingReturnType occurrences="13">
       <code>byIdentityType</code>
       <code>searchByAlias</code>
       <code>getPracticeDeadline</code>
@@ -2287,7 +1977,6 @@
       <code>getAllProblemsAdminedByIdentity</code>
       <code>getAllProblemsOwnedByUser</code>
       <code>getAllProblems</code>
-      <code>getIdentitiesInGroupWhoAttemptedProblem</code>
       <code>isVisible</code>
       <code>deleteProblem</code>
       <code>hasBeenUsedInCoursesOrContests</code>
@@ -2305,7 +1994,7 @@
       <code>$clause[0]</code>
       <code>$clause[1]</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="11">
+    <MixedAssignment occurrences="10">
       <code>$programmingLanguage</code>
       <code>$clause</code>
       <code>$total</code>
@@ -2316,7 +2005,6 @@
       <code>$quoted</code>
       <code>$offset</code>
       <code>$offset</code>
-      <code>$identities[]</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="1">
       <code>int</code>
@@ -2397,9 +2085,8 @@
       <code>$problemsetId</code>
       <code>$identityId</code>
     </MissingParamType>
-    <MissingReturnType occurrences="3">
+    <MissingReturnType occurrences="2">
       <code>GetAccessForProblemset</code>
-      <code>GetAccessForCourse</code>
       <code>getByProblemsetIdentityId</code>
     </MissingReturnType>
   </file>
@@ -2625,13 +2312,11 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/SubmissionLog.php">
-    <MissingParamType occurrences="2">
+    <MissingParamType occurrences="1">
       <code>$problemset_id</code>
-      <code>$course_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
+    <MissingReturnType occurrences="1">
       <code>GetSubmissionsForProblemset</code>
-      <code>GetSubmissionsForCourse</code>
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Submissions.php">
@@ -3438,22 +3123,15 @@
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="4">
-      <code>$problemAssignmentsMap[$assignmentAlias]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="7">
+    <MixedAssignment occurrences="5">
       <code>$courseFactoryResult</code>
       <code>$courseAlias</code>
       <code>$admin</code>
       <code>$problem</code>
-      <code>$assignmentAlias</code>
-      <code>$assignment</code>
       <code>$problemData</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="3">
+    <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>
-      <code>$assignment-&gt;problemset_id</code>
-      <code>$assignment-&gt;problemset_id</code>
     </MixedPropertyFetch>
   </file>
   <file src="frontend/tests/factories/GroupsFactory.php">
