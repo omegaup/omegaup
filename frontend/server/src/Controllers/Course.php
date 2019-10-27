@@ -1054,9 +1054,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        $identity = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $identity = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session']['identity'];
+        )['identity'];
 
         // User doesn't have activity because is not logged.
         if (is_null($identity)) {

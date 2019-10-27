@@ -441,12 +441,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         bool $shouldShowIntro
     ): array {
         // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (!$shouldShowIntro) {
             return ['payload' => [
                 'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['identity']) &&
                     !is_null($session['user']) &&
                     !\OmegaUp\Controllers\User::isMainIdentity(
                         $session['user'],
@@ -512,9 +513,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
         try {
-            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $session = \OmegaUp\Controllers\Session::getCurrentSession(
                 $r
-            )['session'];
+            );
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
@@ -704,9 +705,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Contests::getNeedsInformation(
             $response['contest']->problemset_id
         );
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
 
         if (
             $needsInformation
