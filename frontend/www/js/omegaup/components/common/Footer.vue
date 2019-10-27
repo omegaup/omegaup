@@ -62,7 +62,8 @@
           </li>
         </ul>
         <div class="social-icons">
-          GITHUB / FACEBOOK
+          <a href="https://github.com/omegaup/omegaup/">GitHub</a> |
+          <a href="https://www.facebook.com/omegaup/">Facebook</a>
         </div>
       </div>
     </div>
