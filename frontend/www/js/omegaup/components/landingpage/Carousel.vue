@@ -71,7 +71,7 @@ $omegaup-unit-7: 56px;
 $omegaup-unit-8: 64px;
 $omegaup-unit-9: 72px;
 $omegaup-unit-10: 80px;
- 
+
 // VueAgile styles
 .agile {
   .agile__actions {

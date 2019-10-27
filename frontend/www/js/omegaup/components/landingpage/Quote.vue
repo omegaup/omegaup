@@ -7,7 +7,7 @@
         <span class="author">~ {{ this.authorName }}</span>
       </div>
     </div>
-    
+
   </div>
 </template>
 

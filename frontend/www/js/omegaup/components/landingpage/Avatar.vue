@@ -1,7 +1,5 @@
 <template>
-  <div class="avatar">
-    <img :src="imageSrc" />
-  </div>
+  <div class="avatar"><img></div>
 </template>
 
 <script lang="ts">
@@ -11,6 +9,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class Avatar extends Vue {
   @Prop({ default: '' }) private imageSrc!: string;
 }
+
 </script>
 
 <style lang="scss" scoped>

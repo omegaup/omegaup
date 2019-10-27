@@ -13,8 +13,6 @@
 <script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}" async></script>
 <div id="coder-of-the-month-notice"></div>
 
-
-
 <div id="landing-page"></div>
 <script type="text/javascript" src="{version_hash src="/js/dist/common_landing_page.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>

@@ -1,5 +1,5 @@
 import LandingPage from '../components/landingpage/Homepage.vue';
-import { OmegaUp, T } from '../omegaup.js';
+import {OmegaUp, T} from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

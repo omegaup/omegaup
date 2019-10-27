@@ -1,7 +1,7 @@
 <template>
   <div class="homepage">
     <OmegaupCarousel />
-    
+
     <OmegaupRanksSection />
 
     <OmegaupQuote
@@ -9,7 +9,6 @@
       authorName="Elsy Pinzón"
       authorPicture="https://www.w3schools.com/howto/img_avatar.png"
     />
-
 
     <OmegaupSections />
   </div>

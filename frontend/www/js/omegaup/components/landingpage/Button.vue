@@ -1,5 +1,5 @@
 <template>
-  <div :class="buttonClassnames">
+  <div>
     {{ this.label }}
   </div>
 </template>
@@ -20,6 +20,7 @@ export default class Button extends Vue {
     };
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
