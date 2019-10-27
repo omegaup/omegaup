@@ -2,13 +2,15 @@
 
 require_once('../server/bootstrap_smarty.php');
 
+/** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+[
+    'identity' => $_identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 try {
-    $session = \OmegaUp\Controllers\Session::apiCurrentSession(
-        new \OmegaUp\Request($_REQUEST)
-    )['session'];
     $smartyProperties = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST),
-        $session['identity']
+        $_identity
     );
 } catch (Exception  $e) {
     \OmegaUp\ApiCaller::handleException($e);

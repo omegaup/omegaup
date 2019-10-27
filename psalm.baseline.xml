@@ -1,33 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
-  <file src="frontend/server/bootstrap_smarty.php">
-    <MixedArrayAccess occurrences="13">
-      <code>$session['identity']</code>
-      <code>$session['email']</code>
-      <code>$session['is_admin']</code>
-      <code>$session['identity']</code>
-      <code>$session['auth_token']</code>
-      <code>$session['email']</code>
-      <code>$session['email']</code>
-      <code>$session['email']</code>
-      <code>$session['email']</code>
-      <code>$session['identity']</code>
-      <code>$session['is_admin']</code>
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="4">
-      <code>$session</code>
-      <code>\OmegaUp\UITools::$isAdmin</code>
-      <code>$identityRequest['username']</code>
-      <code>$lang</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="4">
-      <code>$session['identity']-&gt;username</code>
-      <code>$session['user']-&gt;verified</code>
-      <code>$session['identity']-&gt;username</code>
-      <code>$session['identity']-&gt;username</code>
-    </MixedPropertyFetch>
-  </file>
   <file src="frontend/server/src/Controllers/ACL.php">
     <MissingParamType occurrences="12">
       <code>$acl_id</code>
@@ -386,8 +358,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>$result['requestsUserInformation']</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="28">
-      <code>$session['identity']</code>
+    <PossiblyNullArgument occurrences="27">
       <code>$contest-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$contest-&gt;problemset_id</code>
@@ -408,14 +379,6 @@
       <code>$problemsetIdentity</code>
       <code>$contest-&gt;problemset_id</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="5">
-      <code>$session['user']</code>
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-    </PossiblyNullArrayAccess>
     <PossiblyNullArrayOffset occurrences="1"/>
     <PossiblyNullIterator occurrences="1">
       <code>$resultAdmins</code>
@@ -697,7 +660,6 @@
       <code>$course-&gt;course_id</code>
       <code>$course-&gt;group_id</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="1"/>
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$resolvedUser-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
@@ -1844,13 +1806,6 @@
       <code>$identity</code>
       <code>$email</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="5">
-      <code>$session['identity']</code>
-      <code>$session['is_admin']</code>
-      <code>$session['is_admin']</code>
-      <code>$session['is_admin']</code>
-      <code>$session['identity']</code>
-    </PossiblyNullArrayAccess>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
     </PossiblyNullArrayOffset>
@@ -3750,11 +3705,6 @@
       <code>Boolean</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/www/admin/support.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-  </file>
   <file src="frontend/www/admin/user.php">
     <MissingClosureParamType occurrences="3">
       <code>$email</code>
@@ -3810,8 +3760,7 @@
     </MixedAssignment>
   </file>
   <file src="frontend/www/arena/problem.php">
-    <MixedAssignment occurrences="3">
-      <code>$session</code>
+    <MixedAssignment occurrences="2">
       <code>$smartyProperties</code>
       <code>$value</code>
     </MixedAssignment>
@@ -3827,8 +3776,7 @@
       <code>$result['settings']</code>
       <code>$result['settings']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="3">
-      <code>$session</code>
+    <MixedAssignment occurrences="2">
       <code>$result</code>
       <code>$problem</code>
     </MixedAssignment>
@@ -3843,11 +3791,7 @@
     </MixedArrayAccess>
   </file>
   <file src="frontend/www/coderofthemonth.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="3">
-      <code>$session</code>
+    <MixedAssignment occurrences="2">
       <code>$smartyProperties</code>
       <code>$value</code>
     </MixedAssignment>
@@ -3859,7 +3803,6 @@
     </MixedArrayAccess>
   </file>
   <file src="frontend/www/contestmine.php">
-    <MixedArrayAccess occurrences="2"/>
     <MixedAssignment occurrences="1">
       <code>$payload</code>
     </MixedAssignment>
@@ -3896,15 +3839,6 @@
   <file src="frontend/www/cspreport.php">
     <MixedAssignment occurrences="1">
       <code>$log</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/groupedit.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$session</code>
     </MixedAssignment>
   </file>
   <file src="frontend/www/grouplist.php">
@@ -4031,17 +3965,11 @@
     </MixedOperand>
   </file>
   <file src="frontend/www/permissions.php">
-    <MixedArrayAccess occurrences="3">
-      <code>$session['user']</code>
-      <code>$session['user']</code>
-      <code>$session['user']</code>
-    </MixedArrayAccess>
     <MixedArrayOffset occurrences="2">
       <code>$userSystemRoles[$key]</code>
       <code>$userSystemGroups[$key]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="7">
-      <code>$session</code>
+    <MixedAssignment occurrences="6">
       <code>$systemRoles</code>
       <code>$roles</code>
       <code>$systemGroups</code>
@@ -4049,14 +3977,11 @@
       <code>$role</code>
       <code>$group</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="7">
-      <code>$session['user']-&gt;user_id</code>
-      <code>$session['user']-&gt;user_id</code>
+    <MixedPropertyFetch occurrences="4">
       <code>$role-&gt;name</code>
       <code>$role-&gt;name</code>
       <code>$group-&gt;name</code>
       <code>$group-&gt;name</code>
-      <code>$session['user']-&gt;username</code>
     </MixedPropertyFetch>
   </file>
   <file src="frontend/www/problemedit.php">
@@ -4117,7 +4042,6 @@
     </MixedAssignment>
   </file>
   <file src="frontend/www/problemmine.php">
-    <MixedArrayAccess occurrences="1"/>
     <MixedAssignment occurrences="2">
       <code>$smartyProperties</code>
       <code>$value</code>
@@ -4157,40 +4081,25 @@
     </MixedAssignment>
   </file>
   <file src="frontend/www/profileedit.php">
-    <MixedArrayAccess occurrences="3">
+    <MixedArrayAccess occurrences="2">
       <code>$response['userinfo']</code>
       <code>$response['userinfo']</code>
-      <code>$ses['user']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$response</code>
-      <code>$ses</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$ses['user']-&gt;password</code>
-    </MixedPropertyFetch>
   </file>
   <file src="frontend/www/qualitynomination.php">
-    <MixedArrayAccess occurrences="3">
+    <MixedArrayAccess occurrences="1">
       <code>$_GET['qualitynomination_id']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="3">
+    <MixedAssignment occurrences="2">
       <code>$qualitynomination_id</code>
       <code>$payload</code>
-      <code>$payload['currentUser']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="1"/>
-  </file>
-  <file src="frontend/www/qualitynomination_mine.php">
-    <MixedArrayAccess occurrences="1"/>
-    <MixedPropertyFetch occurrences="1"/>
   </file>
   <file src="frontend/www/rank.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="3">
-      <code>$session</code>
+    <MixedAssignment occurrences="2">
       <code>$smartyProperties</code>
       <code>$value</code>
     </MixedAssignment>

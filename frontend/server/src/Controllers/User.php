@@ -2229,9 +2229,9 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
@@ -2613,9 +2613,9 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         string $filteredBy
     ): array {
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (is_null($session['identity'])) {
             return ['filteredBy' => null, 'value' => null];
         }

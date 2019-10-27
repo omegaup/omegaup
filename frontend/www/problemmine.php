@@ -14,8 +14,12 @@ foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);
 }
 
+/** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+[
+    'user' => $_user,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
 $privateProblemsAlert = (!isset($_SESSION['private_problems_alert']) &&
-    \OmegaUp\DAO\Problems::getPrivateCount($session['user']) > 0);
+    \OmegaUp\DAO\Problems::getPrivateCount($_user) > 0);
 if ($privateProblemsAlert) {
     $_SESSION['private_problems_alert'] = true;
 }
