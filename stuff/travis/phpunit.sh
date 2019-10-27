@@ -4,6 +4,8 @@
 
 stage_before_install() {
 	init_submodules
+
+	sudo ln -sf python3.6 /usr/bin/python3
 }
 
 stage_install() {

@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
-    ) : ?array {
+    ): ?array {
         $sql = '
             SELECT
                 r.*,
@@ -34,10 +34,13 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId]
+        );
     }
 
-    public static function getRequestsForProblemset(int $problemsetId) : array {
+    public static function getRequestsForProblemset(int $problemsetId): array {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
@@ -67,7 +70,12 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$problemsetId]
+            ) as $row
+        ) {
             $row['accepted'] = $row['accepted'] == '1';
             $result[] = $row;
         }

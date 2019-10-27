@@ -16,7 +16,7 @@ class Utils {
         }
     }
 
-    public static function CreateRandomString() : string {
+    public static function CreateRandomString(): string {
         return md5(uniqid(rand(), true));
     }
 
@@ -45,7 +45,10 @@ class Utils {
     public static function GetTimeFromUnixTimestamp($time) {
         // Go to the DB to take the unix timestamp
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT FROM_UNIXTIME(?);',
+            [$time]
+        );
     }
 
     public static function CleanLog() {
@@ -59,22 +62,34 @@ class Utils {
     }
 
     public static function deleteAllSuggestions() {
-        \OmegaUp\MySQLConnection::getInstance()->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            "DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';"
+        );
     }
 
     public static function deleteAllRanks() {
-        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `User_Rank`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'DELETE FROM `User_Rank`;'
+        );
     }
 
     public static function deleteAllPreviousRuns() {
-        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Submission_Log`;');
-        \OmegaUp\MySQLConnection::getInstance()->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'DELETE FROM `Submission_Log`;'
+        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `Submissions` SET `current_run_id` = NULL;'
+        );
         \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
-        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Submissions`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'DELETE FROM `Submissions`;'
+        );
     }
 
     public static function deleteAllProblemsOfTheWeek() {
-        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Problem_Of_The_Week`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'DELETE FROM `Problem_Of_The_Week`;'
+        );
     }
 
     /**
@@ -92,10 +107,12 @@ class Utils {
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null
-    ) : void {
+    ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
-            $submission = \OmegaUp\DAO\Submissions::getByPK($run->submission_id);
+            $submission = \OmegaUp\DAO\Submissions::getByPK(
+                $run->submission_id
+            );
         } else {
             $submission = \OmegaUp\DAO\Submissions::getByGuid($runGuid);
             $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
@@ -145,7 +162,7 @@ class Utils {
     public static function setUpDefaultDataConfig() {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        $admin = UserFactory::createUser(new UserParams([
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser(new UserParams([
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
@@ -232,27 +249,39 @@ class Utils {
 
         try {
             // Disable foreign checks
-            \OmegaUp\MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 0;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'SET foreign_key_checks = 0;'
+            );
 
             foreach ($tables as $t) {
-                \OmegaUp\MySQLConnection::getInstance()->Execute("TRUNCATE TABLE `$t`;");
+                \OmegaUp\MySQLConnection::getInstance()->Execute(
+                    "TRUNCATE TABLE `$t`;"
+                );
             }
 
             // Tables with special entries.
-            \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";'
+            );
 
             // The format of the question changed from this id
-            \OmegaUp\MySQLConnection::getInstance()->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'ALTER TABLE QualityNominations auto_increment = 18664'
+            );
 
             // Make sure the user_id and identity_id never matches in tests.
-            \OmegaUp\MySQLConnection::getInstance()->Execute('ALTER TABLE Identities auto_increment = 100000;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'ALTER TABLE Identities auto_increment = 100000;'
+            );
             self::setUpDefaultDataConfig();
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
-            \OmegaUp\MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 1;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'SET foreign_key_checks = 1;'
+            );
         }
         self::commit();
     }
@@ -262,7 +291,9 @@ class Utils {
         // the external script.
         self::commit();
 
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
+        shell_exec('python3 ' . escapeshellarg(
+            OMEGAUP_ROOT
+        ) . '/../stuff/cron/update_user_rank.py' .
         ' --quiet ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
         ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -283,7 +314,9 @@ class Utils {
         // the external script.
         self::commit();
 
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+        shell_exec('python3 ' . escapeshellarg(
+            OMEGAUP_ROOT
+        ) . '/../stuff/cron/aggregate_feedback.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -294,7 +327,9 @@ class Utils {
     public static function RunAssignBadges() {
         // Ensure everything is commited before invoking external script
         self::commit();
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/assign_badges.py' .
+        shell_exec('python3 ' . escapeshellarg(
+            OMEGAUP_ROOT
+        ) . '/../stuff/cron/assign_badges.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .

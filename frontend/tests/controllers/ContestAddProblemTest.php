@@ -14,13 +14,24 @@ class AddProblemToContestTest extends OmegaupTestCase {
      * @param array $contestData
      * @param \OmegaUp\Request $r
      */
-    public static function assertProblemAddedToContest($problemData, $contestData, $r) {
+    public static function assertProblemAddedToContest(
+        $problemData,
+        $contestData,
+        $r
+    ) {
         // Get problem and contest from DB
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
 
         // Get problem-contest and verify it
-        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK($contest->problemset_id, $problem->problem_id);
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
         self::assertNotNull($problemset_problems);
         self::assertEquals($r['points'], $problemset_problems->points);
         self::assertEquals($r['order_in_contest'], $problemset_problems->order);
@@ -119,10 +130,10 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Log in as another random user
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Build request
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -175,7 +186,10 @@ class AddProblemToContestTest extends OmegaupTestCase {
             ]));
             $this->fail('Should have failed adding the problem to the contest');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals($e->getMessage(), 'contestAddproblemTooManyProblems');
+            $this->assertEquals(
+                $e->getMessage(),
+                'contestAddproblemTooManyProblems'
+            );
         }
     }
 
@@ -203,7 +217,9 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 'points' => 100,
                 'order_in_contest' => 1,
             ]));
-            $this->fail('Banned problems should not be able to be added to a contest');
+            $this->fail(
+                'Banned problems should not be able to be added to a contest'
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'problemIsBanned');
         }

@@ -84,6 +84,9 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course_id]
+        );
     }
 }

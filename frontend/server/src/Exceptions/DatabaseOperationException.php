@@ -19,11 +19,11 @@ class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
         $this->_errno = $errno;
     }
 
-    public function __toString() : string {
+    public function __toString(): string {
         return "{$this->_message}: " . parent::__toString();
     }
 
-    public function isDuplicate() : bool {
+    public function isDuplicate(): bool {
         return $this->_errno == 1062;
     }
 }

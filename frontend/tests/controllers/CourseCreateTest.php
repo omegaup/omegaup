@@ -2,6 +2,7 @@
 
 class CourseCreateTest extends OmegaupTestCase {
     private static $curator = null;
+    private static $curatorIdentity = null;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -10,11 +11,10 @@ class CourseCreateTest extends OmegaupTestCase {
             \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 
-        self::$curator = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK(self::$curator->main_identity_id);
+        ['user' => self::$curator, 'identity' => self::$curatorIdentity] = UserFactory::createUser();
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $curatorGroup->group_id,
-            'identity_id' => $identity->identity_id,
+            'identity_id' => self::$curatorIdentity->identity_id,
         ]));
     }
 
@@ -22,9 +22,9 @@ class CourseCreateTest extends OmegaupTestCase {
      * Create course hot path
      */
     public function testCreateSchoolCourse() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -37,7 +37,14 @@ class CourseCreateTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(\OmegaUp\DAO\Courses::findByName($r['name'])));
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\Courses::findByName(
+                    $r['name']
+                )
+            )
+        );
     }
 
     /**
@@ -49,9 +56,9 @@ class CourseCreateTest extends OmegaupTestCase {
         $sameAlias = Utils::CreateRandomString();
         $sameName = Utils::CreateRandomString();
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $sameName,
@@ -64,12 +71,19 @@ class CourseCreateTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(\OmegaUp\DAO\Courses::findByName($r['name'])));
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\Courses::findByName(
+                    $r['name']
+                )
+            )
+        );
 
         // Create a new Course with different alias and name
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $sameName,
@@ -84,11 +98,11 @@ class CourseCreateTest extends OmegaupTestCase {
 
     public function testCreateSchoolAssignment() {
         // Create a test course
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $courseAlias = Utils::CreateRandomString();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -103,7 +117,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Create a test course
-        $login = self::login($user);
+        $login = self::login($identity);
         $assignmentAlias = Utils::CreateRandomString();
         $response = \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -119,7 +133,10 @@ class CourseCreateTest extends OmegaupTestCase {
 
         // There should exist 1 assignment with this alias
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
-        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($assignmentAlias, $course->course_id);
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $course->course_id
+        );
         $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.
@@ -136,7 +153,9 @@ class CourseCreateTest extends OmegaupTestCase {
             'points' => $points,
         ]));
 
-        $problems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset($assignment->problemset_id);
+        $problems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
+            $assignment->problemset_id
+        );
         $this->assertEquals(1, count($problems));
         $this->assertEquals($points, $problems[0]->points);
     }
@@ -169,13 +188,16 @@ class CourseCreateTest extends OmegaupTestCase {
     }
 
     public function testDuplicateAssignmentAliases() {
-        $admin = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($admin);
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($identity);
 
         $assignmentAlias = Utils::CreateRandomString();
 
         // Create the course number 1
-        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
+        $courseFactoryResult = CoursesFactory::createCourse(
+            $identity,
+            $adminLogin
+        );
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 1
@@ -191,7 +213,10 @@ class CourseCreateTest extends OmegaupTestCase {
         ]));
 
         // Create the course number 2
-        $courseFactoryResult = CoursesFactory::createCourse($admin, $adminLogin);
+        $courseFactoryResult = CoursesFactory::createCourse(
+            $identity,
+            $adminLogin
+        );
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 2
@@ -212,9 +237,9 @@ class CourseCreateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateAssignmentWithInvertedTimes() {
-        $admin = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($admin);
-        $courseData = CoursesFactory::createCourse($admin, $adminLogin);
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($identity);
+        $courseData = CoursesFactory::createCourse($identity, $adminLogin);
 
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -233,9 +258,9 @@ class CourseCreateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicCourseFailForNonCurator() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -253,7 +278,7 @@ class CourseCreateTest extends OmegaupTestCase {
      * Only curators can make Public courses
      */
     public function testCreatePublicCourse() {
-        $login = self::login(self::$curator);
+        $login = self::login(self::$curatorIdentity);
         $school = SchoolsFactory::createSchool()['school'];
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -269,34 +294,57 @@ class CourseCreateTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(\OmegaUp\DAO\Courses::findByName($r['name'])));
-        $this->assertEquals($school->name, \OmegaUp\Controllers\Course::apiDetails($r)['school_name']);
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\Courses::findByName(
+                    $r['name']
+                )
+            )
+        );
+        $this->assertEquals(
+            $school->name,
+            \OmegaUp\Controllers\Course::apiDetails(
+                $r
+            )['school_name']
+        );
     }
 
     /**
      * Test updating show_scoreboard attribute in the Course object
      */
     public function testUpdateCourseShowScoreboard() {
-        $admin = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($admin);
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($identity);
 
         // Creating a course with one assignment and turning on show_scoreboard flag
-        $courseData = CoursesFactory::createCourseWithOneAssignment($admin, $adminLogin, null, null, 'true');
-        $group = \OmegaUp\DAO\Groups::getByPK($courseData['request']['course']->group_id);
+        $courseData = CoursesFactory::createCourseWithOneAssignment(
+            $identity,
+            $adminLogin,
+            null,
+            null,
+            'true'
+        );
+        $group = \OmegaUp\DAO\Groups::getByPK(
+            $courseData['request']['course']->group_id
+        );
         // User not linked to course
-        $user = UserFactory::createUser();
-        $identityUser = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $identityUser = \OmegaUp\DAO\Identities::getByPK(
+            $user->main_identity_id
+        );
         // User linked to course
-        $student = UserFactory::createUser();
-        $identityStudent = \OmegaUp\DAO\Identities::getByPK($student->main_identity_id);
+        ['user' => $student, 'identity' => $identityStudent] = UserFactory::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $student->username,
+            'usernameOrEmail' => $identityStudent->username,
             'course_alias' => $courseData['course_alias'],
         ]));
 
-        $course = \OmegaUp\DAO\Courses::getByPK($courseData['request']['course']->course_id);
-        $studentLogin = OmegaupTestCase::login($student);
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $studentLogin = OmegaupTestCase::login($identityStudent);
         // Scoreboard have to be visible to associated user
         $this->assertTrue(\OmegaUp\Controllers\Course::shouldShowScoreboard(
             $identityStudent,
@@ -320,7 +368,9 @@ class CourseCreateTest extends OmegaupTestCase {
             'show_scoreboard' => 'false',
         ]));
 
-        $course = \OmegaUp\DAO\Courses::getByPK($courseData['request']['course']->course_id);
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
 
         // Scoreboard shouldn't be visible to associated or unassociated user
         $this->assertFalse(\OmegaUp\Controllers\Course::shouldShowScoreboard(

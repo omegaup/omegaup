@@ -24,7 +24,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     public static function getNominationStatusForProblem(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : array {
+    ): array {
         $response = [
             'nominated' => false,
             'dismissed' => false,
@@ -44,12 +44,18 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.qualitynomination_id DESC";
 
         /** @var null|array{contents: string} $suggestion */
-        $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
+        $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problem->problem_id, $identity->user_id]
+        );
         if (!is_null($suggestion)) {
             $response['nominated'] = true;
             /** @var array $suggestionContents */
             $suggestionContents = json_decode($suggestion['contents'], true);
-            if (isset($suggestionContents['before_ac']) && $suggestionContents['before_ac']) {
+            if (
+                isset($suggestionContents['before_ac']) &&
+                $suggestionContents['before_ac']
+            ) {
                 $response['nominated'] = false;
                 $response['nominatedBeforeAC'] = true;
             }
@@ -71,12 +77,21 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.qualitynomination_id DESC";
 
         /** @var null|array{contents: string} $dismissal */
-        $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
+        $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problem->problem_id, $identity->user_id]
+        );
         if (!is_null($dismissal)) {
             $response['dismissed'] = true;
             /** @var array $dismissalContents */
-            $dismissalContents = json_decode($dismissal['contents'], true /*assoc*/);
-            if (isset($dismissalContents['before_ac']) && $dismissalContents['before_ac']) {
+            $dismissalContents = json_decode(
+                $dismissal['contents'],
+                true /*assoc*/
+            );
+            if (
+                isset($dismissalContents['before_ac']) &&
+                $dismissalContents['before_ac']
+            ) {
                 $response['dismissed'] = false;
                 $response['dismissedBeforeAC'] = true;
             }
@@ -134,7 +149,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $votes = [];
 
         /** @var array{time: int, vote: int, username: string, name: string} $vote */
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$qualitynomination_id]
+            ) as $vote
+        ) {
             $vote['user'] = [
                 'username' => $vote['username'],
                 'name' => $vote['name'],
@@ -268,7 +288,13 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 return \OmegaUp\MySQLConnection::getInstance()->escape($type);
             };
             $conditions[] =
-                ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
+                ' qn.nomination in ("' . implode(
+                    '", "',
+                    array_map(
+                        $escapeFunc,
+                        $types
+                    )
+                ) . '")';
         }
         if (!is_null($nominator)) {
             $conditions[] = ' qn.user_id = ?';
@@ -284,7 +310,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $nominations = [];
         /** @var array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination */
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            ) as $nomination
+        ) {
             $nominations[] = self::processNomination($nomination);
         }
 
@@ -340,7 +371,10 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             qn.qualitynomination_id = ?;';
 
         /** @var null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $result */
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$qualitynomination_id]);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$qualitynomination_id]
+        );
         return self::processNomination($result);
     }
 
@@ -442,10 +476,16 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $nomination) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql
+            ) as $nomination
+        ) {
             $problemId = $nomination['problem_id'];
             $contents = self::getAllSuggestionsPerProblem($problemId);
-            $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
+            $problemAggregates = self::calculateProblemSuggestionAggregates(
+                $contents
+            );
 
             $problem = \OmegaUp\DAO\Problems::getByPK($problemId);
             $problem->quality = self::bayesianAverage(
@@ -459,13 +499,16 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 $problemAggregates['difficulty_n']
             );
 
-            if ($problem->quality != null || $problem->difficulty != null) {
+            if (!is_null($problem->quality) || !is_null($problem->difficulty)) {
                 \OmegaUp\DAO\Problems::update($problem);
             }
             // TODO(heduenas): Get threshold parameter from DB for each problem independently.
             $tags = self::mostVotedTags($problemAggregates['tags'], 0.25);
             if (!empty($tags)) {
-                \OmegaUp\DAO\ProblemsTags::replaceAutogeneratedTags($problem, $tags);
+                \OmegaUp\DAO\ProblemsTags::replaceAutogeneratedTags(
+                    $problem,
+                    $tags
+                );
             }
         }
     }
@@ -522,11 +565,19 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 AND
                     status = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$userId, $problemId, $nomination, $contents, $status]
+        );
 
         $qualityNominations = [];
         foreach ($rs as $row) {
-            array_push($qualityNominations, new \OmegaUp\DAO\VO\QualityNominations($row));
+            array_push(
+                $qualityNominations,
+                new \OmegaUp\DAO\VO\QualityNominations(
+                    $row
+                )
+            );
         }
         return $qualityNominations;
     }

@@ -3,19 +3,23 @@
 '''Updates the user ranking.'''
 
 import argparse
-import collections
 import logging
+from typing import Sequence, NamedTuple
 
 import MySQLdb
+import MySQLdb.cursors
 
 import lib.db
 import lib.logs
 
 
-Cutoff = collections.namedtuple('Cutoff', ['percentile', 'classname'])
+class Cutoff(NamedTuple):
+    '''Cutoff percentile for user ranking.'''
+    percentile: float
+    classname: str
 
 
-def update_user_rank(cur):
+def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     '''Updates the user ranking.'''
 
     cur.execute('DELETE FROM `User_Rank`;')
@@ -42,8 +46,8 @@ def update_user_rank(cur):
                 ON
                     u.user_id = i.user_id
                 WHERE
-                    s.problem_id = p.problem_id AND r.verdict = 'AC' AND
-                    NOT EXISTS (
+                    s.problem_id = p.problem_id AND r.verdict = 'AC'
+                    AND NOT EXISTS (
                         SELECT
                             pf.problem_id, pf.user_id
                         FROM
@@ -51,6 +55,15 @@ def update_user_rank(cur):
                         WHERE
                             pf.problem_id = p.problem_id AND
                             pf.user_id = u.user_id
+                    )
+                    AND NOT EXISTS (
+                        SELECT
+                            a.acl_id
+                        FROM
+                            ACLs a
+                        WHERE
+                            a.acl_id = p.acl_id AND
+                            a.owner_id = u.user_id
                     )
             );
     ''')
@@ -64,13 +77,13 @@ def update_user_rank(cur):
             i.school_id,
             up.identity_id,
             i.user_id,
-            COUNT(ps.problem_id) problems_solved_count,
-            SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+            COUNT(p.problem_id) problems_solved_count,
+            SUM(ROUND(100 / LOG(2, p.accepted+1) , 0)) score
         FROM
         (
             SELECT DISTINCT
-              s.identity_id,
-              s.problem_id
+                s.identity_id,
+                s.problem_id
             FROM
                 Submissions s
             INNER JOIN
@@ -78,23 +91,32 @@ def update_user_rank(cur):
             ON
                 r.run_id = s.current_run_id
             WHERE
-              r.verdict = 'AC' AND s.type = 'normal'
+                r.verdict = 'AC' AND s.type = 'normal'
         ) AS up
         INNER JOIN
-            Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0
+            Problems p ON p.problem_id = up.problem_id AND p.visibility > 0
         INNER JOIN
             Identities i ON i.identity_id = up.identity_id
         INNER JOIN
             Users u ON u.user_id = i.user_id
         WHERE
-            u.is_private = 0 AND
-            NOT EXISTS (
+            u.is_private = 0
+            AND NOT EXISTS (
                 SELECT
                     pf.problem_id, pf.user_id
                 FROM
                     Problems_Forfeited pf
                 WHERE
-                    pf.problem_id = ps.problem_id AND pf.user_id = u.user_id
+                    pf.problem_id = p.problem_id AND pf.user_id = u.user_id
+            )
+            AND NOT EXISTS (
+                SELECT
+                    a.acl_id
+                FROM
+                    ACLs a
+                WHERE
+                    a.acl_id = p.acl_id AND
+                    a.owner_id = u.user_id
             )
         GROUP BY
             identity_id
@@ -123,7 +145,8 @@ def update_user_rank(cur):
     return scores
 
 
-def update_user_rank_cutoffs(cur, scores):
+def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
+                             scores: Sequence[float]) -> None:
     '''Updates the user ranking cutoff table.'''
 
     cur.execute('DELETE FROM `User_Rank_Cutoffs`;')
@@ -148,7 +171,7 @@ def update_user_rank_cutoffs(cur, scores):
                      cutoff.percentile, cutoff.classname))
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser(description=__doc__)

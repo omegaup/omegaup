@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,14 +25,38 @@ abstract class Messages {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Messages $Messages) : int {
-        $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Messages $Messages
+    ): int {
+        $sql = '
+            UPDATE
+                `Messages`
+            SET
+                `read` = ?,
+                `sender_id` = ?,
+                `recipient_id` = ?,
+                `message` = ?,
+                `date` = ?
+            WHERE
+                (
+                    `message_id` = ?
+                );';
         $params = [
             intval($Messages->read),
-            is_null($Messages->sender_id) ? null : intval($Messages->sender_id),
-            is_null($Messages->recipient_id) ? null : intval($Messages->recipient_id),
+            (
+                is_null($Messages->sender_id) ?
+                null :
+                intval($Messages->sender_id)
+            ),
+            (
+                is_null($Messages->recipient_id) ?
+                null :
+                intval($Messages->recipient_id)
+            ),
             $Messages->message,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Messages->date
+            ),
             intval($Messages->message_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -42,15 +66,31 @@ abstract class Messages {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Messages} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Messages}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Messages}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Messages Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Messages} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $message_id) : ?\OmegaUp\DAO\VO\Messages {
-        $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM Messages WHERE (message_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $message_id
+    ): ?\OmegaUp\DAO\VO\Messages {
+        $sql = '
+            SELECT
+                `Messages`.`message_id`,
+                `Messages`.`read`,
+                `Messages`.`sender_id`,
+                `Messages`.`recipient_id`,
+                `Messages`.`message`,
+                `Messages`.`date`
+            FROM
+                `Messages`
+            WHERE
+                (
+                    `message_id` = ?
+                )
+            LIMIT 1;';
         $params = [$message_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -78,9 +118,19 @@ abstract class Messages {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Messages $Messages) : void {
-        $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
-        $params = [$Messages->message_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Messages $Messages
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Messages`
+            WHERE
+                (
+                    `message_id` = ?
+                );';
+        $params = [
+            $Messages->message_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -114,17 +164,41 @@ abstract class Messages {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` from Messages';
+    ): array {
+        $sql = '
+            SELECT
+                `Messages`.`message_id`,
+                `Messages`.`read`,
+                `Messages`.`sender_id`,
+                `Messages`.`recipient_id`,
+                `Messages`.`message`,
+                `Messages`.`date`
+            FROM
+                `Messages`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Messages($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Messages(
+                $row
+            );
         }
         return $allData;
     }
@@ -137,25 +211,55 @@ abstract class Messages {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Messages $Messages El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Messages} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Messages}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Messages $Messages) : int {
-        $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Messages $Messages
+    ): int {
+        $sql = '
+            INSERT INTO
+                Messages (
+                    `read`,
+                    `sender_id`,
+                    `recipient_id`,
+                    `message`,
+                    `date`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             intval($Messages->read),
-            is_null($Messages->sender_id) ? null : intval($Messages->sender_id),
-            is_null($Messages->recipient_id) ? null : intval($Messages->recipient_id),
+            (
+                is_null($Messages->sender_id) ?
+                null :
+                intval($Messages->sender_id)
+            ),
+            (
+                is_null($Messages->recipient_id) ?
+                null :
+                intval($Messages->recipient_id)
+            ),
             $Messages->message,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Messages->date
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Messages->message_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Messages->message_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

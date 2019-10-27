@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -33,42 +33,66 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = intval($data['identity_id']);
+            $this->identity_id = intval(
+                $data['identity_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = intval($data['problemset_id']);
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['access_time'])) {
             /**
              * @var string|int|float $data['access_time']
              * @var int $this->access_time
              */
-            $this->access_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['access_time']);
+            $this->access_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['access_time']
+                )
+            );
         }
         if (isset($data['end_time'])) {
             /**
              * @var string|int|float $data['end_time']
              * @var int $this->end_time
              */
-            $this->end_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['end_time']);
+            $this->end_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['end_time']
+                )
+            );
         }
         if (isset($data['score'])) {
-            $this->score = intval($data['score']);
+            $this->score = intval(
+                $data['score']
+            );
         }
         if (isset($data['time'])) {
-            $this->time = intval($data['time']);
+            $this->time = intval(
+                $data['time']
+            );
         }
         if (isset($data['share_user_information'])) {
-            $this->share_user_information = boolval($data['share_user_information']);
+            $this->share_user_information = boolval(
+                $data['share_user_information']
+            );
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = intval($data['privacystatement_consent_id']);
+            $this->privacystatement_consent_id = intval(
+                $data['privacystatement_consent_id']
+            );
         }
         if (isset($data['is_invited'])) {
-            $this->is_invited = boolval($data['is_invited']);
+            $this->is_invited = boolval(
+                $data['is_invited']
+            );
         }
     }
 

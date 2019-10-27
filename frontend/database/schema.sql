@@ -826,7 +826,7 @@ CREATE TABLE `Submissions` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Tags` (
   `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) NOT NULL,
+  `name` varchar(50) NOT NULL,
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.';

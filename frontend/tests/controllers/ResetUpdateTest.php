@@ -52,7 +52,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('parameterStringTooShort', $expected->getMessage());
+            $this->assertEquals(
+                'parameterStringTooShort',
+                $expected->getMessage()
+            );
         }
 
         $user_data['password'] = str_pad('', 73, 'a');
@@ -62,7 +65,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('parameterStringTooLong', $expected->getMessage());
+            $this->assertEquals(
+                'parameterStringTooLong',
+                $expected->getMessage()
+            );
         }
     }
 
@@ -86,7 +92,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('passwordResetResetExpired', $expected->getMessage());
+            $this->assertEquals(
+                'passwordResetResetExpired',
+                $expected->getMessage()
+            );
         }
     }
 
@@ -102,9 +111,9 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);
 
-        $user = \OmegaUp\DAO\Users::findByEmail($user_data['email']);
         \OmegaUp\Controllers\Reset::apiUpdate($r);
-        $user->password = $new_password;
-        self::login($user);
+        $identity = \OmegaUp\DAO\Identities::findByEmail($user_data['email']);
+        $identity->password = $new_password;
+        self::login($identity);
     }
 }

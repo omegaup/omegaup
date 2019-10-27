@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../bootstrap.php');
+require_once(__DIR__ . '/../bootstrap.php');
 
 if (count($argv) < 2) {
     echo "Usage: ${argv[0]} <experiment-name>\n";

@@ -17,7 +17,11 @@ class ACL extends \OmegaUp\Controllers\Controller {
      * @param $user_id
      * @param $role_id
      */
-    public static function addUser($acl_id, $user_id, $role_id = \OmegaUp\Authorization::ADMIN_ROLE) {
+    public static function addUser(
+        $acl_id,
+        $user_id,
+        $role_id = \OmegaUp\Authorization::ADMIN_ROLE
+    ) {
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'acl_id' => $acl_id,
             'user_id' => $user_id,
@@ -32,7 +36,11 @@ class ACL extends \OmegaUp\Controllers\Controller {
      * @param $user_id
      * @param $role_id
      */
-    public static function removeUser($acl_id, $user_id, $role_id = \OmegaUp\Authorization::ADMIN_ROLE) {
+    public static function removeUser(
+        $acl_id,
+        $user_id,
+        $role_id = \OmegaUp\Authorization::ADMIN_ROLE
+    ) {
         \OmegaUp\DAO\UserRoles::delete(new \OmegaUp\DAO\VO\UserRoles([
             'acl_id' => $acl_id,
             'user_id' => $user_id,
@@ -47,7 +55,11 @@ class ACL extends \OmegaUp\Controllers\Controller {
      * @param $group_id
      * @param $role_id
      */
-    public static function addGroup($acl_id, $group_id, $role_id = \OmegaUp\Authorization::ADMIN_ROLE) {
+    public static function addGroup(
+        $acl_id,
+        $group_id,
+        $role_id = \OmegaUp\Authorization::ADMIN_ROLE
+    ) {
         \OmegaUp\DAO\GroupRoles::create(new \OmegaUp\DAO\VO\GroupRoles([
             'acl_id' => $acl_id,
             'group_id' => $group_id,
@@ -62,7 +74,11 @@ class ACL extends \OmegaUp\Controllers\Controller {
      * @param $group_id
      * @param $role_id
      */
-    public static function removeGroup($acl_id, $group_id, $role_id = \OmegaUp\Authorization::ADMIN_ROLE) {
+    public static function removeGroup(
+        $acl_id,
+        $group_id,
+        $role_id = \OmegaUp\Authorization::ADMIN_ROLE
+    ) {
         \OmegaUp\DAO\GroupRoles::delete(new \OmegaUp\DAO\VO\GroupRoles([
             'acl_id' => $acl_id,
             'group_id' => $group_id,

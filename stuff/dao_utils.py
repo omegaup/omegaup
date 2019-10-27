@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 '''A tool that helps update the DAOs.'''
 
 from __future__ import print_function
@@ -76,10 +77,10 @@ class Table:
 
     @property
     def fieldnames(self):
-        '''A quoted, comma-separated list of fields.'''
+        '''A quoted list of fields.'''
 
-        return ', '.join("`{}`.`{}`".format(self.name, column.name)
-                         for column in self.columns)
+        return ["`{}`.`{}`".format(self.name, column.name)
+                for column in self.columns]
 
     def __repr__(self):
         return 'Table<name={}, columns={}>'.format(self.name, self.columns)

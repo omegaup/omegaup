@@ -22,7 +22,10 @@ class School extends \OmegaUp\Controllers\Controller {
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
         }
 
         $schools = \OmegaUp\DAO\Schools::findByName($r[$param]);
@@ -50,7 +53,10 @@ class School extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
-        $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
+        $state = self::getStateIdFromCountryAndState(
+            $r['country_id'],
+            $r['state_id']
+        );
 
         return [
             'status' => 'ok',
@@ -65,12 +71,15 @@ class School extends \OmegaUp\Controllers\Controller {
      * @return int the school ID
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function createSchool(string $name, ?\OmegaUp\DAO\VO\States $state) : int {
+    public static function createSchool(
+        string $name,
+        ?\OmegaUp\DAO\VO\States $state
+    ): int {
         // Create school object
         $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
-            'country_id' => $state != null ? $state->country_id : null,
-            'state_id' => $state != null ? $state->state_id : null,
+            'country_id' => !is_null($state) ? $state->country_id : null,
+            'state_id' => !is_null($state) ? $state->state_id : null,
         ]);
 
         $school_id = 0;
@@ -90,7 +99,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return array
      */
-    private static function validateRankDetails(\OmegaUp\Request $r) : array {
+    private static function validateRankDetails(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
@@ -100,10 +109,16 @@ class School extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             if (!is_null($r['start_time'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'start_time');
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'paramterInvalid',
+                    'start_time'
+                );
             }
             if (!is_null($r['finish_time'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'finish_time');
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'paramterInvalid',
+                    'finish_time'
+                );
             }
             // Both endpoints were not specified, so the API can be used
             // unauthenticated since it'll be cached.
@@ -113,10 +128,20 @@ class School extends \OmegaUp\Controllers\Controller {
             'offset' => $r['offset'] ?: 0,
             'rowcount' => $r['rowcount'] ?: 100,
             'start_time' => $r['start_time'] ?:
-                            strtotime('first day of this month', \OmegaUp\Time::get()),
+                            strtotime(
+                                'first day of this month',
+                                \OmegaUp\Time::get()
+                            ),
             'finish_time' => $r['finish_time'] ?:
-                             strtotime('first day of next month', \OmegaUp\Time::get()),
-            'can_use_cache' => is_null($r['start_time']) && is_null($r['finish_time'])
+                            strtotime(
+                                'first day of next month',
+                                \OmegaUp\Time::get()
+                            ),
+            'can_use_cache' => is_null(
+                $r['start_time']
+            ) && is_null(
+                $r['finish_time']
+            )
         ];
     }
 
@@ -162,7 +187,7 @@ class School extends \OmegaUp\Controllers\Controller {
         int $startTime,
         int $finishTime,
         bool $canUseCache
-    ) : array {
+    ): array {
         $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
             return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
                 $startTime,
@@ -193,15 +218,21 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function getSchoolsRankForSmarty(
         int $rowCount,
         bool $isIndex
-    ) : array {
+    ): array {
         $schoolsRank = [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
                 'rank' => self::getSchoolsRank(
                     /*$offset=*/0,
                     $rowCount,
-                    /*$startTime=*/strtotime('first day of this month', \OmegaUp\Time::get()),
-                    /*$finishTime=*/strtotime('first day of next month', \OmegaUp\Time::get()),
+                    /*$startTime=*/strtotime(
+                        'first day of this month',
+                        \OmegaUp\Time::get()
+                    ),
+                    /*$finishTime=*/strtotime(
+                        'first day of next month',
+                        \OmegaUp\Time::get()
+                    ),
                     /*$canUseCache=*/true
                 ),
             ]
@@ -220,7 +251,7 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function getStateIdFromCountryAndState(
         ?string $countryId,
         ?string $stateId
-    ) : ?\OmegaUp\DAO\VO\States {
+    ): ?\OmegaUp\DAO\VO\States {
         if (is_null($countryId) || is_null($stateId)) {
             // Both state and country must be specified together.
             return null;

@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Tags extends \OmegaUp\DAO\Base\Tags {
-    final public static function getByName(string $name) : ?\OmegaUp\DAO\VO\Tags {
+    final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
@@ -24,7 +24,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         return new \OmegaUp\DAO\VO\Tags($row);
     }
 
-    public static function findByName(string $name) : array {
+    public static function findByName(string $name): array {
         $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 

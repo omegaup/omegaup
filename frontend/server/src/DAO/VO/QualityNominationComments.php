@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -30,31 +30,47 @@ class QualityNominationComments extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['qualitynomination_comment_id'])) {
-            $this->qualitynomination_comment_id = intval($data['qualitynomination_comment_id']);
+            $this->qualitynomination_comment_id = intval(
+                $data['qualitynomination_comment_id']
+            );
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = intval($data['qualitynomination_id']);
+            $this->qualitynomination_id = intval(
+                $data['qualitynomination_id']
+            );
         }
         if (isset($data['user_id'])) {
-            $this->user_id = intval($data['user_id']);
+            $this->user_id = intval(
+                $data['user_id']
+            );
         }
         if (isset($data['time'])) {
             /**
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
+            $this->time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['time']
+                )
+            );
         } else {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['vote'])) {
-            $this->vote = intval($data['vote']);
+            $this->vote = intval(
+                $data['vote']
+            );
         }
         if (isset($data['contents'])) {
-            $this->contents = strval($data['contents']);
+            $this->contents = strval(
+                $data['contents']
+            );
         }
     }
 

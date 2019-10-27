@@ -1,21 +1,51 @@
 <?php
 require_once('../../../server/bootstrap_smarty.php');
 
-if ($_POST) {
+if (!empty($_POST)) {
     if (!in_array($_POST['language'], ['c', 'cpp', 'java'])) {
-        $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
+        $smarty->assign(
+            'error',
+            \OmegaUp\Translations::getInstance()->get(
+                'parameterInvalid'
+            )
+        );
         $smarty->assign('error_field', 'language');
     } elseif (!in_array($_POST['os'], ['unix', 'windows'])) {
-        $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
+        $smarty->assign(
+            'error',
+            \OmegaUp\Translations::getInstance()->get(
+                'parameterInvalid'
+            )
+        );
         $smarty->assign('error_field', 'os');
-    } elseif (!preg_match('/^[a-z_][a-z0-9_]{0,31}$/i', $_POST['name'])) {
-        $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
+    } elseif (
+        !preg_match(
+            '/^[a-z_][a-z0-9_]{0,31}$/i',
+            strval(
+                $_POST['name']
+            )
+        )
+    ) {
+        $smarty->assign(
+            'error',
+            \OmegaUp\Translations::getInstance()->get(
+                'parameterInvalid'
+            )
+        );
         $smarty->assign('error_field', 'name');
     } elseif (empty($_POST['idl'])) {
-        $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
+        $smarty->assign(
+            'error',
+            \OmegaUp\Translations::getInstance()->get(
+                'parameterInvalid'
+            )
+        );
         $smarty->assign('error_field', 'idl');
     } else {
-        $dirname = \OmegaUp\FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
+        $dirname = \OmegaUp\FileHandler::TempDir(
+            sys_get_temp_dir(),
+            'libinteractive'
+        );
         try {
             file_put_contents("{$dirname}/{$_POST['name']}.idl", $_POST['idl']);
             $args = ['/usr/bin/java', '-jar', '/usr/share/java/libinteractive.jar',
@@ -47,17 +77,18 @@ if ($_POST) {
                 if ($retval != 0) {
                     $smarty->assign('error', $output . $err);
                 } else {
-                    $zip = new ZipArchive();
+                    $zip = new \ZipArchive();
                     $zip->open(
                         "{$dirname}/interactive.zip",
                         ZipArchive::CREATE | ZipArchive::OVERWRITE
                     );
 
-                    $files = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($dirname),
-                        RecursiveIteratorIterator::LEAVES_ONLY
+                    $files = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($dirname),
+                        \RecursiveIteratorIterator::LEAVES_ONLY
                     );
 
+                    /** @var \SplFileInfo $file */
                     foreach ($files as $name => $file) {
                         if ($file->isDir()) {
                             continue;
@@ -76,7 +107,9 @@ if ($_POST) {
                     $zip->close();
 
                     header('Content-Type: application/zip');
-                    header("Content-Disposition: attachment; filename={$_POST['name']}.zip");
+                    header(
+                        "Content-Disposition: attachment; filename={$_POST['name']}.zip"
+                    );
                     readfile("{$dirname}/interactive.zip");
                     \OmegaUp\FileHandler::deleteDirRecursively($dirname);
                     die();
