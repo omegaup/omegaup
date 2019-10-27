@@ -9,21 +9,20 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
 
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
-/** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
 [
-    'user' => $_user,
+    'user' => $user,
 ] = \OmegaUp\Controllers\Session::getCurrentSession();
-if (is_null($_user)) {
+if (is_null($user) || is_null($user->user_id)) {
     header('HTTP/1.1 404 Not found');
     die();
 }
 
 $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
-    $_user->user_id
+    $user->user_id
 );
 $roles = \OmegaUp\DAO\Roles::getAll();
 $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
-    $_user->user_id
+    $user->user_id
 );
 $groups = \OmegaUp\DAO\Groups::SearchByName('omegaup:');
 $userSystemRoles = [];
@@ -43,7 +42,7 @@ foreach ($groups as $key => $group) {
 $payload = [
     'userSystemRoles' => $userSystemRoles,
     'userSystemGroups' => $userSystemGroups,
-    'username' => $_user->username,
+    'username' => $user->username,
 ];
 
 $smarty->assign('payload', $payload);

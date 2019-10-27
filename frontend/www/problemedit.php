@@ -6,13 +6,15 @@ $smarty->assign('IS_UPDATE', 1);
 $smarty->assign('LOAD_MATHJAX', 1);
 $smarty->assign('LOAD_PAGEDOWN', 1);
 
+[
+    'auth_token' => $authToken,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 try {
     if (isset($_POST['request'])) {
         if ($_POST['request'] == 'submit') {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-                'auth_token' => $smarty->getTemplateVars(
-                    'CURRENT_USER_AUTH_TOKEN'
-                ),
+                'auth_token' => $authToken,
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'title' => $_POST['title'] ?? null,
                 'message' => $_POST['message'] ?? null,
@@ -30,15 +32,13 @@ try {
                 'email_clarifications' => $_POST['email_clarifications'] ?? null,
             ]));
         } elseif ($_POST['request'] == 'markdown') {
-            \OmegaUp\Controllers\Problem::apiUpdateStatement([
-                'auth_token' => $smarty->getTemplateVars(
-                    'CURRENT_USER_AUTH_TOKEN'
-                ),
+            \OmegaUp\Controllers\Problem::apiUpdateStatement(new \OmegaUp\Request([
+                'auth_token' => $authToken,
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'statement' => $_POST['wmd-input-statement'] ?? null,
                 'message' => $_POST['message'] ?? null,
                 'lang' => $_POST['statement-language'] ?? null,
-            ]);
+            ]));
         }
         $smarty->assign('STATUS_SUCCESS', 'Problem updated succesfully!');
     }

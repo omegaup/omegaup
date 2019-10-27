@@ -20,12 +20,16 @@ try {
     die(file_get_contents('../404.html'));
 }
 
+[
+    'auth_token' => $authToken,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
     $problem['payload'] = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
         'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
-        'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+        'auth_token' => $authToken,
     ]));
 }
 

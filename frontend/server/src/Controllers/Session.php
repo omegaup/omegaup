@@ -103,7 +103,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, auth_token: ?string, is_admin: bool}
      */
     public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
         if (
