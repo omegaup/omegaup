@@ -50,7 +50,7 @@
             T.frontPageFooterHelpUs }}</a>
           </li>
           <li>
-            <a href="https://github.com/omegaup/omegaup">Github</a>
+            <a href="https://github.com/omegaup/omegaup">GitHub</a>
           </li>
         </ul>
       </div>
