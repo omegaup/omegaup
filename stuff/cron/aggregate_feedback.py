@@ -11,15 +11,21 @@ import calendar
 import collections
 import datetime
 import json
-import operator
 import logging
+import operator
+import os
+import sys
 import warnings
 from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
 
 import MySQLdb.constants.ER
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 CONFIDENCE = 10
 MIN_POINTS = 10
