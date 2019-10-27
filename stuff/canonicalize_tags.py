@@ -17,8 +17,8 @@ from typing import Mapping, Set, DefaultDict, Dict, Text
 
 import MySQLdb.constants.ER
 
-import cron.lib.db as db
-import cron.lib.logs as logs
+import lib.db as db
+import lib.logs as logs
 
 LOCALIZATIONS_ROOT = os.path.abspath(os.path.join(__file__,
                                                   '..', '..',
