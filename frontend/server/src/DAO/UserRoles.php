@@ -105,7 +105,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         return self::getAdmins($problem->acl_id);
     }
 
-    public static function getSystemRoles($user_id) {
+    /**
+     * @return string[]
+     */
+    public static function getSystemRoles(int $userId): array {
         $sql = '
             SELECT
                 r.name
@@ -116,18 +119,19 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 ur.user_id = ? AND ur.acl_id = ?;';
         $params = [
-            $user_id,
+            $userId,
             \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];
+        /** @var array{name: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 $params
             ) as $role
         ) {
-            $roles[] = $role['name'];
+            $roles[] = $row['name'];
         }
         return $roles;
     }

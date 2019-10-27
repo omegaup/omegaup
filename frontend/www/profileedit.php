@@ -19,9 +19,8 @@ try {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
-/** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
 [
-    'identity' => $_identity,
+    'identity' => $identity,
 ] = \OmegaUp\Controllers\Session::getCurrentSession();
 
 $smarty->assign(
@@ -29,7 +28,7 @@ $smarty->assign(
     \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
 );
 $smarty->assign('COUNTRIES', \OmegaUp\DAO\Countries::getAll(null, 100, 'name'));
-if (is_null($_identity) || is_null($_identity->password)) {
+if (is_null($identity) || is_null($identity->password)) {
     $smarty->display('../templates/user.basicedit.tpl');
 } else {
     $smarty->display('../templates/user.edit.tpl');
