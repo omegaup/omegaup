@@ -57,8 +57,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     public static function currentSessionAvailable(): bool {
-        $session = self::apiCurrentSession()['session'];
-        return !is_null($session) && !is_null($session['identity']);
+        $session = self::getCurrentSession();
+        return !is_null($session['identity']);
     }
 
     /**
@@ -67,50 +67,12 @@ class Session extends \OmegaUp\Controllers\Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      *
-     * @return array
-     * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
-        if (
-            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-            OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null(self::$_currentSession)
-        ) {
-            return [
-                'status' => 'ok',
-                'session' => self::$_currentSession,
-                'time' => \OmegaUp\Time::get(),
-            ];
-        }
-        if (is_null($r)) {
-            $r = new \OmegaUp\Request();
-        }
-        if (is_null($r['auth_token'])) {
-            $authToken = self::getAuthToken($r);
-            $r['auth_token'] = $authToken;
-        } else {
-            $authToken = strval($r['auth_token']);
-        }
-        if (
-            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-            OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null($authToken)
-        ) {
-            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
-            self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SESSION_PREFIX,
-                $authToken,
-                function () use ($r) {
-                    return self::getCurrentSession($r);
-                },
-                APC_USER_CACHE_SESSION_TIMEOUT
-            );
-        } else {
-            self::$_currentSession = self::getCurrentSession($r);
-        }
         return [
             'status' => 'ok',
-            'session' => self::$_currentSession,
+            'session' => self::getCurrentSession($r),
             'time' => \OmegaUp\Time::get(),
         ];
     }
@@ -141,10 +103,49 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array
-     * @psalm-return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
      */
-    public static function getCurrentSession(\OmegaUp\Request $r): array {
+    public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
+        if (
+            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+            OMEGAUP_SESSION_CACHE_ENABLED === true &&
+            !is_null(self::$_currentSession)
+        ) {
+            return self::$_currentSession;
+        }
+        if (is_null($r)) {
+            $r = new \OmegaUp\Request();
+        }
+        if (is_null($r['auth_token'])) {
+            $authToken = self::getAuthToken($r);
+            $r['auth_token'] = $authToken;
+        } else {
+            $authToken = strval($r['auth_token']);
+        }
+        if (
+            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+            OMEGAUP_SESSION_CACHE_ENABLED === true &&
+            !is_null($authToken)
+        ) {
+            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+            self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::SESSION_PREFIX,
+                $authToken,
+                function () use ($r) {
+                    return self::getCurrentSessionImpl($r);
+                },
+                APC_USER_CACHE_SESSION_TIMEOUT
+            );
+            return self::$_currentSession;
+        }
+        self::$_currentSession = self::getCurrentSessionImpl($r);
+        return self::$_currentSession;
+    }
+
+    /**
+     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     */
+    private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
         if (empty($r['auth_token'])) {
             return [
                 'valid' => false,
@@ -203,9 +204,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      * Invalidates the current user's session cache.
      */
     public static function invalidateCache(): void {
-        $currentSession = self::apiCurrentSession()['session'];
+        $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession) ||
             is_null($currentSession['auth_token'])
         ) {
             return;
@@ -226,9 +226,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function unregisterSession(): void {
         self::invalidateCache();
 
-        $currentSession = self::apiCurrentSession()['session'];
+        $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession) ||
             is_null($currentSession['auth_token'])
         ) {
             return;
