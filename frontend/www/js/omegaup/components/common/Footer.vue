@@ -69,7 +69,7 @@
     <div class="copy">
       <div class="copy-content">
         <div class="">
-          Copyright © 2019 OmegaUp. All rights reserved.​
+          Copyright © 2019 omegaUp, Inc. All rights reserved.​
         </div>
         <div class="menu">
           <ul>
