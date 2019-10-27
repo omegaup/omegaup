@@ -21,10 +21,14 @@ class RunRejudgeTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Grade the run
         RunsFactory::gradeRun($runData);

@@ -30,7 +30,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             $acl_id,
         ];
 
-        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
 
         $sql = '
             SELECT
@@ -84,7 +87,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $params
+        ) > 0;
     }
 
     public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
@@ -99,7 +105,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         return self::getAdmins($problem->acl_id);
     }
 
-    public static function getSystemRoles($user_id) {
+    /**
+     * @return string[]
+     */
+    public static function getSystemRoles(int $userId): array {
         $sql = '
             SELECT
                 r.name
@@ -110,13 +119,19 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 ur.user_id = ? AND ur.acl_id = ?;';
         $params = [
-            $user_id,
+            $userId,
             \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
-            $roles[] = $role['name'];
+        /** @var array{name: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            ) as $row
+        ) {
+            $roles[] = $row['name'];
         }
         return $roles;
     }
@@ -136,7 +151,12 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         ];
 
         $groups = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            ) as $group
+        ) {
             $groups[] = $group['name'];
         }
 

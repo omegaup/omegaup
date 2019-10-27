@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -31,28 +31,44 @@ class Interviews extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = intval($data['interview_id']);
+            $this->interview_id = intval(
+                $data['interview_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = intval($data['problemset_id']);
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = intval($data['acl_id']);
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['alias'])) {
-            $this->alias = strval($data['alias']);
+            $this->alias = strval(
+                $data['alias']
+            );
         }
         if (isset($data['title'])) {
-            $this->title = strval($data['title']);
+            $this->title = strval(
+                $data['title']
+            );
         }
         if (isset($data['description'])) {
-            $this->description = strval($data['description']);
+            $this->description = strval(
+                $data['description']
+            );
         }
         if (isset($data['window_length'])) {
-            $this->window_length = intval($data['window_length']);
+            $this->window_length = intval(
+                $data['window_length']
+            );
         }
     }
 

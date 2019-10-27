@@ -39,7 +39,8 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
         // Update title
-        $login = self::login(UserFactory::createUser());
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -57,7 +58,11 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         // Update public
         $login = self::login($contestData['director']);
@@ -77,7 +82,11 @@ class UpdateContestTest extends OmegaupTestCase {
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -108,7 +117,8 @@ class UpdateContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Update value
-        $login = self::login(UserFactory::createAdminUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -190,16 +200,20 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // STEP 2: Get contestant ready to create a run
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
+        ContestsFactory::openContest($contestData, $identity);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+        ContestsFactory::openProblemInContest(
+            $contestData,
+            $problemData,
+            $identity
+        );
 
         // STEP 3: Send a new run
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -307,16 +321,24 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create a run
         {
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
-            $contestant = UserFactory::createUser();
-            ContestsFactory::addUser($contestData, $contestant);
+            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+            ContestsFactory::addUser($contestData, $identity);
 
             // The problem is opened 5 minutes after contest starts.
-            ContestsFactory::openContest($contestData, $contestant);
-            ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+            ContestsFactory::openContest($contestData, $identity);
+            ContestsFactory::openProblemInContest(
+                $contestData,
+                $problemData,
+                $identity
+            );
 
             // The run is sent 10 minutes after contest starts.
             \OmegaUp\Time::setTimeForTesting($originalTime + 10 * 60);
-            $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $runData = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
             RunsFactory::gradeRun($runData, 1.0, 'AC', 10);
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
@@ -343,7 +365,10 @@ class UpdateContestTest extends OmegaupTestCase {
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
-            $this->assertEquals($response['runs'][0]['penalty'], $response['runs'][0]['runtime']);
+            $this->assertEquals(
+                $response['runs'][0]['penalty'],
+                $response['runs'][0]['runtime']
+            );
         }
 
         // Update penalty type to none
@@ -385,7 +410,10 @@ class UpdateContestTest extends OmegaupTestCase {
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
-            $this->assertEquals($originalPenalty, $response['runs'][0]['penalty']);
+            $this->assertEquals(
+                $originalPenalty,
+                $response['runs'][0]['penalty']
+            );
         }
     }
 
@@ -404,11 +432,15 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         $directorLogin = self::login($contestData['director']);
 
@@ -423,9 +455,16 @@ class UpdateContestTest extends OmegaupTestCase {
         $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant2);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $identity2
+        );
 
-        $this->assertNull($contest['window_length'], 'Window length is not setted');
+        $this->assertNull(
+            $contest['window_length'],
+            'Window length is not setted'
+        );
 
         $r['window_length'] = 0;
         // Call API
@@ -433,7 +472,10 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
-        $this->assertNull($contest['window_length'], 'Window length is not setted, because 0 is not a valid value');
+        $this->assertNull(
+            $contest['window_length'],
+            'Window length is not setted, because 0 is not a valid value'
+        );
 
         $windowLength = 10;
         $r['window_length'] = $windowLength;
@@ -449,8 +491,10 @@ class UpdateContestTest extends OmegaupTestCase {
 
         try {
             // Trying to create a run out of contest time
-            RunsFactory::createRun($problemData, $contestData, $contestant);
-            $this->fail('User could not create a run when is out of contest time');
+            RunsFactory::createRun($problemData, $contestData, $identity);
+            $this->fail(
+                'User could not create a run when is out of contest time'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -466,7 +510,11 @@ class UpdateContestTest extends OmegaupTestCase {
         $this->assertEquals($windowLength, $contest['window_length']);
 
         // Trying to create a run inside contest time
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         $r['window_length'] = 'Not valid';
 
@@ -571,15 +619,15 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins the contest 4 hours and 50 minutes after it starts
         $updatedTime = $originalTime + 290 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
+        ContestsFactory::openContest($contest, $identity);
         $directorLogin = self::login($contest['director']);
 
         // Update window_length
@@ -593,8 +641,10 @@ class UpdateContestTest extends OmegaupTestCase {
         $updatedTime = $updatedTime + 15 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $contestant);
-            $this->fail('Contestant should not create a run after contest finishes');
+            RunsFactory::createRun($problem, $contest, $identity);
+            $this->fail(
+                'Contestant should not create a run after contest finishes'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -625,13 +675,13 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins contest immediatly it was created
-        ContestsFactory::openContest($contest, $contestant);
+        ContestsFactory::openContest($contest, $identity);
 
         $directorLogin = self::login($contest['director']);
 
@@ -645,7 +695,7 @@ class UpdateContestTest extends OmegaupTestCase {
         // User creates a run 50 minutes later, it is ok
         $updatedTime = $originalTime + 50 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         // 20 minutes later is no longer available because window_length has
@@ -653,8 +703,10 @@ class UpdateContestTest extends OmegaupTestCase {
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $contestant);
-            $this->fail('Contestant should not create a run after window length expires');
+            RunsFactory::createRun($problem, $contest, $identity);
+            $this->fail(
+                'Contestant should not create a run after window length expires'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -685,21 +737,21 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins the contest 4 hours and 30 minutes after it starts
         $updatedTime = $originalTime + 270 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
-        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+        ContestsFactory::openContest($contest, $identity);
+        ContestsFactory::openProblemInContest($contest, $problem, $identity);
 
         // User creates a run 20 minutes later, it is ok
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         $directorLogin = self::login($contest['director']);
@@ -719,7 +771,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
     }
 
@@ -742,29 +794,31 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins the contest 10 minutes after it starts
         $updatedTime = $originalTime + 10 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
-        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+        ContestsFactory::openContest($contest, $identity);
+        ContestsFactory::openProblemInContest($contest, $problem, $identity);
 
         // User creates a run 20 minutes later, it is ok
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         // User tries to create another run 20 minutes later, it should fail
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $contestant);
-            $this->fail('User should not be able to send runs beause window_length is over');
+            RunsFactory::createRun($problem, $contest, $identity);
+            $this->fail(
+                'User should not be able to send runs beause window_length is over'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -782,15 +836,17 @@ class UpdateContestTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // User tries to create run agaian, it should works fine
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         // User tries to create another run 30 minutes later, it should fail
         $updatedTime = $updatedTime + 30 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $contestant);
-            $this->fail('User should not be able to send runs beause window_length is over');
+            RunsFactory::createRun($problem, $contest, $identity);
+            $this->fail(
+                'User should not be able to send runs beause window_length is over'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -803,7 +859,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Now user can submit run until contest finishes
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
     }
 }

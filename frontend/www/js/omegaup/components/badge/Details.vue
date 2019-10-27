@@ -3,6 +3,7 @@
     <h1 class="text-center">{{ name }}</h1>
     <figure class="badge-info-grid">
       <img class="badge-icon"
+              v-bind:class="{'badge-gray': !this.badge.assignation_time}"
               v-bind:src="iconUrl">
       <figcaption class="badge-description">
         {{ description }}
@@ -42,7 +43,6 @@
 .badge-details-panel {
   padding: 15px;
 }
-
 .badge-info-grid,
 .badge-details-grid {
   display: grid;
@@ -54,41 +54,36 @@
   column-gap: 20px;
   padding: 30px 20px;
 }
-
 .badge-info-grid {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
-
 .badge-details-grid {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
-
 .badge-icon {
   max-width: 300px;
 }
-
 .badge-description {
   font-size: 20px;
 }
-
 .badge-detail {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
 .badge-detail-data {
   font-size: 45px;
   font-weight: bold;
 }
-
 .badge-detail-text {
   font-size: 18px;
 }
-
 .badge-detail-text-icon {
   font-size: 30px;
+}
+.badge-gray {
+  filter: grayscale(100%);
 }
 </style>
 
@@ -114,9 +109,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get iconUrl(): string {
-    return !!this.badge.assignation_time
-      ? `/media/dist/badges/${this.badge.badge_alias}.svg`
-      : '/media/locked_badge.svg';
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 
   get ownedMessage(): string {

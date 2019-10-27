@@ -11,7 +11,7 @@ class IdentityContestsTest extends OmegaupTestCase {
         array $problemData,
         string $username,
         string $password
-    ) : array {
+    ): array {
         // Get an invited identity to login and join the private contest
         $contestant = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $contestant->password = $password;
@@ -52,10 +52,10 @@ class IdentityContestsTest extends OmegaupTestCase {
         [$problemData] = ContestsFactory::insertProblemsInContest($contestData);
 
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -128,7 +128,9 @@ class IdentityContestsTest extends OmegaupTestCase {
                 $uninvitedIdentityPrivateContest['username'],
                 $password
             );
-            $this->fail('Only invited identities can access to private contest');
+            $this->fail(
+                'Only invited identities can access to private contest'
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }

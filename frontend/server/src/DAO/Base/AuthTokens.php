@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,16 +35,42 @@ abstract class AuthTokens {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : int {
-        if (empty($Auth_Tokens->token)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\AuthTokens $Auth_Tokens
+    ): int {
+        if (
+            empty($Auth_Tokens->token)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Auth_Tokens (
+                    `user_id`,
+                    `identity_id`,
+                    `token`,
+                    `create_time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            !is_null($Auth_Tokens->user_id) ? intval($Auth_Tokens->user_id) : null,
-            !is_null($Auth_Tokens->identity_id) ? intval($Auth_Tokens->identity_id) : null,
+            (
+                !is_null($Auth_Tokens->user_id) ?
+                intval($Auth_Tokens->user_id) :
+                null
+            ),
+            (
+                !is_null($Auth_Tokens->identity_id) ?
+                intval($Auth_Tokens->identity_id) :
+                null
+            ),
             $Auth_Tokens->token,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Auth_Tokens->create_time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -57,12 +83,34 @@ abstract class AuthTokens {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : int {
-        $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `identity_id` = ?, `create_time` = ? WHERE `token` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\AuthTokens $Auth_Tokens
+    ): int {
+        $sql = '
+            UPDATE
+                `Auth_Tokens`
+            SET
+                `user_id` = ?,
+                `identity_id` = ?,
+                `create_time` = ?
+            WHERE
+                (
+                    `token` = ?
+                );';
         $params = [
-            is_null($Auth_Tokens->user_id) ? null : intval($Auth_Tokens->user_id),
-            is_null($Auth_Tokens->identity_id) ? null : intval($Auth_Tokens->identity_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            (
+                is_null($Auth_Tokens->user_id) ?
+                null :
+                intval($Auth_Tokens->user_id)
+            ),
+            (
+                is_null($Auth_Tokens->identity_id) ?
+                null :
+                intval($Auth_Tokens->identity_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Auth_Tokens->create_time
+            ),
             $Auth_Tokens->token,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -72,15 +120,29 @@ abstract class AuthTokens {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\AuthTokens} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\AuthTokens}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\AuthTokens}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\AuthTokens Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\AuthTokens} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?string $token) : ?\OmegaUp\DAO\VO\AuthTokens {
-        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM Auth_Tokens WHERE (token = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?string $token
+    ): ?\OmegaUp\DAO\VO\AuthTokens {
+        $sql = '
+            SELECT
+                `Auth_Tokens`.`user_id`,
+                `Auth_Tokens`.`identity_id`,
+                `Auth_Tokens`.`token`,
+                `Auth_Tokens`.`create_time`
+            FROM
+                `Auth_Tokens`
+            WHERE
+                (
+                    `token` = ?
+                )
+            LIMIT 1;';
         $params = [$token];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -108,9 +170,19 @@ abstract class AuthTokens {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : void {
-        $sql = 'DELETE FROM `Auth_Tokens` WHERE token = ?;';
-        $params = [$Auth_Tokens->token];
+    final public static function delete(
+        \OmegaUp\DAO\VO\AuthTokens $Auth_Tokens
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Auth_Tokens`
+            WHERE
+                (
+                    `token` = ?
+                );';
+        $params = [
+            $Auth_Tokens->token
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -144,17 +216,39 @@ abstract class AuthTokens {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` from Auth_Tokens';
+    ): array {
+        $sql = '
+            SELECT
+                `Auth_Tokens`.`user_id`,
+                `Auth_Tokens`.`identity_id`,
+                `Auth_Tokens`.`token`,
+                `Auth_Tokens`.`create_time`
+            FROM
+                `Auth_Tokens`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\AuthTokens($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\AuthTokens(
+                $row
+            );
         }
         return $allData;
     }
@@ -167,17 +261,43 @@ abstract class AuthTokens {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\AuthTokens $Auth_Tokens El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\AuthTokens} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\AuthTokens}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : int {
-        $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\AuthTokens $Auth_Tokens
+    ): int {
+        $sql = '
+            INSERT INTO
+                Auth_Tokens (
+                    `user_id`,
+                    `identity_id`,
+                    `token`,
+                    `create_time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Auth_Tokens->user_id) ? null : intval($Auth_Tokens->user_id),
-            is_null($Auth_Tokens->identity_id) ? null : intval($Auth_Tokens->identity_id),
+            (
+                is_null($Auth_Tokens->user_id) ?
+                null :
+                intval($Auth_Tokens->user_id)
+            ),
+            (
+                is_null($Auth_Tokens->identity_id) ?
+                null :
+                intval($Auth_Tokens->identity_id)
+            ),
             $Auth_Tokens->token,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Auth_Tokens->create_time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

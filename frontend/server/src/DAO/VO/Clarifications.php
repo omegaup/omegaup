@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -33,40 +33,62 @@ class Clarifications extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['clarification_id'])) {
-            $this->clarification_id = intval($data['clarification_id']);
+            $this->clarification_id = intval(
+                $data['clarification_id']
+            );
         }
         if (isset($data['author_id'])) {
-            $this->author_id = intval($data['author_id']);
+            $this->author_id = intval(
+                $data['author_id']
+            );
         }
         if (isset($data['receiver_id'])) {
-            $this->receiver_id = intval($data['receiver_id']);
+            $this->receiver_id = intval(
+                $data['receiver_id']
+            );
         }
         if (isset($data['message'])) {
-            $this->message = strval($data['message']);
+            $this->message = strval(
+                $data['message']
+            );
         }
         if (isset($data['answer'])) {
-            $this->answer = strval($data['answer']);
+            $this->answer = strval(
+                $data['answer']
+            );
         }
         if (isset($data['time'])) {
             /**
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
+            $this->time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['time']
+                )
+            );
         } else {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = intval($data['problem_id']);
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = intval($data['problemset_id']);
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['public'])) {
-            $this->public = boolval($data['public']);
+            $this->public = boolval(
+                $data['public']
+            );
         }
     }
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Utils for Selenium tests.'''
 

@@ -8,45 +8,60 @@
 
 class NotificationTest extends OmegaupTestCase {
     public function testListUnreadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testRead'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testRead']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]));
 
         // Get all unread notifications through API
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
         ]));
         $notifications = $results['notifications'];
         $this->assertEquals(1, sizeof($notifications));
-        $this->assertEquals('testUnread', json_decode($notifications[0]['contents'])->badge);
+        $this->assertEquals(
+            'testUnread',
+            json_decode(
+                $notifications[0]['contents']
+            )->badge
+        );
     }
 
     public function testReadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread2'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread2']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread3'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread3']
+            )
         ]));
 
         // Get all unread notifications (3) for user
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -76,8 +91,8 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsExceptions() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -101,15 +116,17 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]);
         \OmegaUp\DAO\Notifications::create($notification);
 
-        $maliciousUser = UserFactory::createUser();
-        $login = self::login($maliciousUser);
+        ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = UserFactory::createUser();
+        $login = self::login($maliciousIdentity);
 
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([

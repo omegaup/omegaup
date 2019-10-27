@@ -25,26 +25,30 @@ class ContestProblemsListTest extends OmegaupTestCase {
             ]));
 
             // Add the problems to the contest
-            ContestsFactory::addProblemToContest($problemData[$i], $contestData);
+            ContestsFactory::addProblemToContest(
+                $problemData[$i],
+                $contestData
+            );
         }
 
         $contestants = [];
+        $identities = [];
         for ($i = 0; $i < $numUsers; $i++) {
             // Create our contestants
-            $contestants[] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]]  = UserFactory::createUser();
 
             // Add users to contest
-            ContestsFactory::addUser($contestData, $contestants[$i]);
+            ContestsFactory::addUser($contestData, $identities[$i]);
         }
         $contestDirector = $contestData['director'];
-        $contestAdmin = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestAdmin);
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin]  = UserFactory::createUser();
+        ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
 
         return [
             'problemData' => $problemData,
             'contestData' => $contestData,
-            'contestants' => $contestants,
-            'contestAdmin' => $contestAdmin,
+            'contestants' => $identities,
+            'contestAdmin' => $contestIdentityAdmin,
         ];
     }
 
@@ -75,8 +79,14 @@ class ContestProblemsListTest extends OmegaupTestCase {
         ]));
 
         foreach ($scoreboardResponse['problems'] as $index => $problem) {
-            $this->assertEquals($problem['alias'], $detailsResponse['problems'][$index]['alias']);
-            $this->assertEquals($problem['alias'], $problemsResponse['problems'][$index]['alias']);
+            $this->assertEquals(
+                $problem['alias'],
+                $detailsResponse['problems'][$index]['alias']
+            );
+            $this->assertEquals(
+                $problem['alias'],
+                $problemsResponse['problems'][$index]['alias']
+            );
         }
     }
 }

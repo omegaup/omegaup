@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,11 +25,31 @@ abstract class Groups {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Groups $Groups) : int {
-        $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Groups $Groups
+    ): int {
+        $sql = '
+            UPDATE
+                `Groups`
+            SET
+                `acl_id` = ?,
+                `create_time` = ?,
+                `alias` = ?,
+                `name` = ?,
+                `description` = ?
+            WHERE
+                (
+                    `group_id` = ?
+                );';
         $params = [
-            is_null($Groups->acl_id) ? null : intval($Groups->acl_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups->create_time),
+            (
+                is_null($Groups->acl_id) ?
+                null :
+                intval($Groups->acl_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Groups->create_time
+            ),
             $Groups->alias,
             $Groups->name,
             $Groups->description,
@@ -42,15 +62,31 @@ abstract class Groups {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Groups} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Groups}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Groups}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Groups Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Groups} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $group_id) : ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM Groups WHERE (group_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $group_id
+    ): ?\OmegaUp\DAO\VO\Groups {
+        $sql = '
+            SELECT
+                `Groups`.`group_id`,
+                `Groups`.`acl_id`,
+                `Groups`.`create_time`,
+                `Groups`.`alias`,
+                `Groups`.`name`,
+                `Groups`.`description`
+            FROM
+                `Groups`
+            WHERE
+                (
+                    `group_id` = ?
+                )
+            LIMIT 1;';
         $params = [$group_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -78,9 +114,19 @@ abstract class Groups {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Groups $Groups) : void {
-        $sql = 'DELETE FROM `Groups` WHERE group_id = ?;';
-        $params = [$Groups->group_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Groups $Groups
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Groups`
+            WHERE
+                (
+                    `group_id` = ?
+                );';
+        $params = [
+            $Groups->group_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -114,17 +160,41 @@ abstract class Groups {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` from Groups';
+    ): array {
+        $sql = '
+            SELECT
+                `Groups`.`group_id`,
+                `Groups`.`acl_id`,
+                `Groups`.`create_time`,
+                `Groups`.`alias`,
+                `Groups`.`name`,
+                `Groups`.`description`
+            FROM
+                `Groups`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Groups($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Groups(
+                $row
+            );
         }
         return $allData;
     }
@@ -137,15 +207,39 @@ abstract class Groups {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Groups $Groups El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Groups} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Groups}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Groups $Groups) : int {
-        $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Groups $Groups
+    ): int {
+        $sql = '
+            INSERT INTO
+                Groups (
+                    `acl_id`,
+                    `create_time`,
+                    `alias`,
+                    `name`,
+                    `description`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Groups->acl_id) ? null : intval($Groups->acl_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups->create_time),
+            (
+                is_null($Groups->acl_id) ?
+                null :
+                intval($Groups->acl_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Groups->create_time
+            ),
             $Groups->alias,
             $Groups->name,
             $Groups->description,
@@ -155,7 +249,9 @@ abstract class Groups {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Groups->group_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Groups->group_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

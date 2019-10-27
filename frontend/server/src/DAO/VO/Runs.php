@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -36,49 +36,77 @@ class Runs extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['run_id'])) {
-            $this->run_id = intval($data['run_id']);
+            $this->run_id = intval(
+                $data['run_id']
+            );
         }
         if (isset($data['submission_id'])) {
-            $this->submission_id = intval($data['submission_id']);
+            $this->submission_id = intval(
+                $data['submission_id']
+            );
         }
         if (isset($data['version'])) {
-            $this->version = strval($data['version']);
+            $this->version = strval(
+                $data['version']
+            );
         }
         if (isset($data['status'])) {
-            $this->status = strval($data['status']);
+            $this->status = strval(
+                $data['status']
+            );
         }
         if (isset($data['verdict'])) {
-            $this->verdict = strval($data['verdict']);
+            $this->verdict = strval(
+                $data['verdict']
+            );
         }
         if (isset($data['runtime'])) {
-            $this->runtime = intval($data['runtime']);
+            $this->runtime = intval(
+                $data['runtime']
+            );
         }
         if (isset($data['penalty'])) {
-            $this->penalty = intval($data['penalty']);
+            $this->penalty = intval(
+                $data['penalty']
+            );
         }
         if (isset($data['memory'])) {
-            $this->memory = intval($data['memory']);
+            $this->memory = intval(
+                $data['memory']
+            );
         }
         if (isset($data['score'])) {
-            $this->score = floatval($data['score']);
+            $this->score = floatval(
+                $data['score']
+            );
         }
         if (isset($data['contest_score'])) {
-            $this->contest_score = floatval($data['contest_score']);
+            $this->contest_score = floatval(
+                $data['contest_score']
+            );
         }
         if (isset($data['time'])) {
             /**
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
+            $this->time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['time']
+                )
+            );
         } else {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['judged_by'])) {
-            $this->judged_by = strval($data['judged_by']);
+            $this->judged_by = strval(
+                $data['judged_by']
+            );
         }
     }
 

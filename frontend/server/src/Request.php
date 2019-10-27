@@ -54,7 +54,7 @@ class Request extends \ArrayObject {
      *
      * @return array<int, mixed>|array<string, mixed>
      */
-    public function execute() : array {
+    public function execute(): array {
         if (is_null($this->method)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -80,7 +80,7 @@ class Request extends \ArrayObject {
      *
      * @return string the global per-request unique(-ish) ID
      */
-    public static function requestId() : string {
+    public static function requestId(): string {
         return \OmegaUp\Request::$_requestId;
     }
 
@@ -90,7 +90,7 @@ class Request extends \ArrayObject {
     public function ensureBool(
         string $key,
         bool $required = true
-    ) : void {
+    ): void {
         /** @var mixed */
         $val = $this->offsetGet($key);
         if (is_int($val)) {
@@ -102,7 +102,10 @@ class Request extends \ArrayObject {
                 if (!$required) {
                     return;
                 }
-                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $key
+                );
             }
             $this[$key] = $val == '1' || $val == 'true';
         }
@@ -116,16 +119,24 @@ class Request extends \ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
             }
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
         $this[$key] = intval($val);
     }
 
@@ -137,16 +148,24 @@ class Request extends \ArrayObject {
         ?float $lowerBound = null,
         ?float $upperBound = null,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
             }
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
         $this[$key] = floatval($val);
     }
 
@@ -158,14 +177,16 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->identity->identity_id
      * @psalm-assert !null $this->identity->username
      */
-    public function ensureIdentity() : void {
+    public function ensureIdentity(): void {
         if (!is_null($this->user) || !is_null($this->identity)) {
             return;
         }
         $this->user = null;
         $this->identity = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($this)['session'];
-        if (is_null($session) || is_null($session['identity'])) {
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
+            $this
+        );
+        if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];
@@ -188,12 +209,13 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->user->user_id
      * @psalm-assert !null $this->user->username
      */
-    public function ensureMainUserIdentity() : void {
+    public function ensureMainUserIdentity(): void {
         if (!is_null($this->user) && !is_null($this->identity)) {
             return;
         }
         $this->ensureIdentity();
-        if (is_null($this->user)
+        if (
+            is_null($this->user)
             || $this->user->main_identity_id != $this->identity->identity_id
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();

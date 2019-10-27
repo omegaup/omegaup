@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,12 +25,30 @@ abstract class UsersBadges {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\UsersBadges $Users_Badges) : int {
-        $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\UsersBadges $Users_Badges
+    ): int {
+        $sql = '
+            UPDATE
+                `Users_Badges`
+            SET
+                `user_id` = ?,
+                `badge_alias` = ?,
+                `assignation_time` = ?
+            WHERE
+                (
+                    `user_badge_id` = ?
+                );';
         $params = [
-            is_null($Users_Badges->user_id) ? null : intval($Users_Badges->user_id),
+            (
+                is_null($Users_Badges->user_id) ?
+                null :
+                intval($Users_Badges->user_id)
+            ),
             $Users_Badges->badge_alias,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users_Badges->assignation_time
+            ),
             intval($Users_Badges->user_badge_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -40,15 +58,29 @@ abstract class UsersBadges {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\UsersBadges} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\UsersBadges}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UsersBadges}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\UsersBadges Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\UsersBadges} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $user_badge_id) : ?\OmegaUp\DAO\VO\UsersBadges {
-        $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` FROM Users_Badges WHERE (user_badge_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $user_badge_id
+    ): ?\OmegaUp\DAO\VO\UsersBadges {
+        $sql = '
+            SELECT
+                `Users_Badges`.`user_badge_id`,
+                `Users_Badges`.`user_id`,
+                `Users_Badges`.`badge_alias`,
+                `Users_Badges`.`assignation_time`
+            FROM
+                `Users_Badges`
+            WHERE
+                (
+                    `user_badge_id` = ?
+                )
+            LIMIT 1;';
         $params = [$user_badge_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -76,9 +108,19 @@ abstract class UsersBadges {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\UsersBadges $Users_Badges) : void {
-        $sql = 'DELETE FROM `Users_Badges` WHERE user_badge_id = ?;';
-        $params = [$Users_Badges->user_badge_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\UsersBadges $Users_Badges
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Users_Badges`
+            WHERE
+                (
+                    `user_badge_id` = ?
+                );';
+        $params = [
+            $Users_Badges->user_badge_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -112,17 +154,39 @@ abstract class UsersBadges {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` from Users_Badges';
+    ): array {
+        $sql = '
+            SELECT
+                `Users_Badges`.`user_badge_id`,
+                `Users_Badges`.`user_id`,
+                `Users_Badges`.`badge_alias`,
+                `Users_Badges`.`assignation_time`
+            FROM
+                `Users_Badges`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\UsersBadges($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\UsersBadges(
+                $row
+            );
         }
         return $allData;
     }
@@ -135,23 +199,45 @@ abstract class UsersBadges {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\UsersBadges $Users_Badges El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UsersBadges} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\UsersBadges}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\UsersBadges $Users_Badges) : int {
-        $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\UsersBadges $Users_Badges
+    ): int {
+        $sql = '
+            INSERT INTO
+                Users_Badges (
+                    `user_id`,
+                    `badge_alias`,
+                    `assignation_time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Users_Badges->user_id) ? null : intval($Users_Badges->user_id),
+            (
+                is_null($Users_Badges->user_id) ?
+                null :
+                intval($Users_Badges->user_id)
+            ),
             $Users_Badges->badge_alias,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Users_Badges->assignation_time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Users_Badges->user_badge_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Users_Badges->user_badge_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

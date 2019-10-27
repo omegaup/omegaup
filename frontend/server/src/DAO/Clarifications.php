@@ -14,7 +14,13 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
-    final public static function GetProblemsetClarifications($problemset_id, $admin, $identity_id, $offset, $rowcount) {
+    final public static function GetProblemsetClarifications(
+        $problemset_id,
+        $admin,
+        $identity_id,
+        $offset,
+        $rowcount
+    ) {
         $sql = 'SELECT
                   c.clarification_id,
                   p.alias `problem_alias`,
@@ -52,7 +58,13 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    final public static function GetProblemClarifications($problem_id, $admin, $identity_id, $offset, $rowcount) {
+    final public static function GetProblemClarifications(
+        $problem_id,
+        $admin,
+        $identity_id,
+        $offset,
+        $rowcount
+    ) {
         $sql = '';
         if ($admin) {
             $sql = 'SELECT c.clarification_id, con.alias contest_alias, i.username author, ' .
@@ -64,7 +76,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                    'UNIX_TIMESTAMP(c.time) `time`, c.answer, c.public ' .
                    'FROM Clarifications c ';
         }
-        $sql .= 'LEFT JOIN Contests con ON con.problemset_id = c.problemset_id '.
+        $sql .= 'LEFT JOIN Contests con ON con.problemset_id = c.problemset_id ' .
                 'WHERE ' .
                 'c.problem_id = ? ';
         $val = [$problem_id];

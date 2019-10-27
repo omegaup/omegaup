@@ -22,14 +22,14 @@ class UpdateClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create clarification
         $this->detourBroadcasterCalls($this->exactly(2));
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Update answer

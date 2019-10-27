@@ -11,11 +11,11 @@ class CourseUsersTest extends OmegaupTestCase {
         // Create a course with 5 assignments
         $courseData = CoursesFactory::createCourseWithAssignments(5);
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         CoursesFactory::addStudentToCourse($courseData, $user);
 
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
 
         // Call the details API for the assignment that's already started.
         \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -33,7 +33,10 @@ class CourseUsersTest extends OmegaupTestCase {
 
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));
-        $this->assertEquals($user->username, $response['events'][0]['username']);
+        $this->assertEquals(
+            $user->username,
+            $response['events'][0]['username']
+        );
         $this->assertEquals(0, $response['events'][0]['ip']);
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }

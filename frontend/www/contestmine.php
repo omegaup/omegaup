@@ -2,16 +2,24 @@
 
 require_once('../server/bootstrap_smarty.php');
 
+[
+    'user' => $user,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 try {
-    $payload = \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([]));
+    $payload = \OmegaUp\Controllers\Contest::apiMyList(
+        new \OmegaUp\Request(
+            []
+        )
+    );
 
     // If the user have private material (contests/problems), an alert is issued
     // suggesting to contribute to the community by releasing the material to
     // the public. This flag ensures that this alert is shown only once per
     // session, the first time the user visits the "My contests" page.
-    $privateContestsAlert = (!is_null($session['identity']) &&
+    $privateContestsAlert = (!is_null($user) &&
         !isset($_SESSION['private_contests_alert']) &&
-        \OmegaUp\DAO\Contests::getPrivateContestsCount($session['user']) > 0);
+        \OmegaUp\DAO\Contests::getPrivateContestsCount($user) > 0);
 
     if ($privateContestsAlert) {
         $_SESSION['private_contests_alert'] = true;

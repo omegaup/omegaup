@@ -16,11 +16,43 @@ class ProblemParams implements ArrayAccess {
             $this->params = clone $params;
         }
 
-        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
-        ProblemParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
-        ProblemParams::validateParameter('visibility', $this->params, false, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC);
-        ProblemParams::validateParameter('author', $this->params, false, UserFactory::createUser());
-        ProblemParams::validateParameter('languages', $this->params, false, 'c,cpp,py');
+        ProblemParams::validateParameter(
+            'zipName',
+            $this->params,
+            false,
+            OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip'
+        );
+        ProblemParams::validateParameter(
+            'title',
+            $this->params,
+            false,
+            Utils::CreateRandomString()
+        );
+        ProblemParams::validateParameter(
+            'visibility',
+            $this->params,
+            false,
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+        );
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ProblemParams::validateParameter(
+            'author',
+            $this->params,
+            false,
+            $identity
+        );
+        ProblemParams::validateParameter(
+            'authorUser',
+            $this->params,
+            false,
+            $user
+        );
+        ProblemParams::validateParameter(
+            'languages',
+            $this->params,
+            false,
+            'c,cpp,py'
+        );
     }
 
     public function offsetGet($offset) {
@@ -52,10 +84,18 @@ class ProblemParams implements ArrayAccess {
      * @return boolean
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
+    private static function validateParameter(
+        $parameter,
+        &$array,
+        $required = true,
+        $default = null
+    ) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('ParameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'ParameterEmpty',
+                    $parameter
+                );
             }
             $array[$parameter] = $default;
         }
@@ -73,11 +113,14 @@ class ProblemParams implements ArrayAccess {
  * We need to create a new FileUploader object that uses our own implementations.
  */
 class FileUploaderMock extends \OmegaUp\FileUploader {
-    public function isUploadedFile(string $filename) : bool {
+    public function isUploadedFile(string $filename): bool {
         return file_exists($filename);
     }
 
-    public function moveUploadedFile(string $filename, string $targetPath) : bool {
+    public function moveUploadedFile(
+        string $filename,
+        string $targetPath
+    ): bool {
         return copy($filename, $targetPath);
     }
 }
@@ -133,11 +176,15 @@ class ProblemsFactory {
         return [
             'request' => $r,
             'author' => $params['author'],
+            'authorUser' => $params['authorUser'],
             'zip_path' => $params['zipName'],
         ];
     }
 
-    public static function createProblemWithAuthor(\OmegaUp\DAO\VO\Users $author, ScopedLoginToken $login = null) {
+    public static function createProblemWithAuthor(
+        \OmegaUp\DAO\VO\Identities $author,
+        ScopedLoginToken $login = null
+    ) {
         return self::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $author,
@@ -147,7 +194,10 @@ class ProblemsFactory {
     /**
      *
      */
-    public static function createProblem($params = null, ScopedLoginToken $login = null) {
+    public static function createProblem(
+        $params = null,
+        ScopedLoginToken $login = null
+    ) {
         if (!($params instanceof ProblemParams)) {
             $params = new ProblemParams($params);
         }
@@ -159,14 +209,11 @@ class ProblemsFactory {
         // Get a user
         $problemData = self::getRequest($params);
         $r = $problemData['request'];
-        $problemAuthorUser = $problemData['author'];
-        $problemAuthorIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $problemData['author']->main_identity_id
-        );
+        $problemAuthorIdentity = $problemData['author'];
 
-        if ($login == null) {
+        if (is_null($login)) {
             // Login user
-            $login = OmegaupTestCase::login($problemAuthorUser);
+            $login = OmegaupTestCase::login($problemAuthorIdentity);
         }
         $r['auth_token'] = $login->auth_token;
 
@@ -178,7 +225,8 @@ class ProblemsFactory {
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $visibility = $params['visibility'];
 
-        if ($visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+        if (
+            $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
             || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
             || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
         ) {
@@ -191,8 +239,8 @@ class ProblemsFactory {
 
         return  [
             'request' => $r,
-            'author' => $problemAuthorUser,
-            'authorIdentity' => $problemAuthorIdentity,
+            'author' => $problemAuthorIdentity,
+            'authorUser' => $problemData['authorUser'],
             'problem' => $problem,
         ];
     }
@@ -213,7 +261,10 @@ class ProblemsFactory {
         unset($_REQUEST);
     }
 
-    public static function addGroupAdmin($problemData, \OmegaUp\DAO\VO\Groups $group) {
+    public static function addGroupAdmin(
+        $problemData,
+        \OmegaUp\DAO\VO\Groups $group
+    ) {
         // Prepare our request
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],

@@ -65,10 +65,16 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course_id]
+        );
     }
 
-    final public static function getByProblemsetIdentityId($problemsetId, $identityId) {
+    final public static function getByProblemsetIdentityId(
+        $problemsetId,
+        $identityId
+    ) {
         $sql = 'SELECT
                     *
                 FROM
@@ -78,11 +84,19 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 AND
                     identity_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId, $identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId, $identityId]
+        );
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {
-            array_push($problemsetAccessLog, new \OmegaUp\DAO\VO\ProblemsetAccessLog($row));
+            array_push(
+                $problemsetAccessLog,
+                new \OmegaUp\DAO\VO\ProblemsetAccessLog(
+                    $row
+                )
+            );
         }
         return $problemsetAccessLog;
     }

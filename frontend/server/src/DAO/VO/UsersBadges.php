@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -28,23 +28,35 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['user_badge_id'])) {
-            $this->user_badge_id = intval($data['user_badge_id']);
+            $this->user_badge_id = intval(
+                $data['user_badge_id']
+            );
         }
         if (isset($data['user_id'])) {
-            $this->user_id = intval($data['user_id']);
+            $this->user_id = intval(
+                $data['user_id']
+            );
         }
         if (isset($data['badge_alias'])) {
-            $this->badge_alias = strval($data['badge_alias']);
+            $this->badge_alias = strval(
+                $data['badge_alias']
+            );
         }
         if (isset($data['assignation_time'])) {
             /**
              * @var string|int|float $data['assignation_time']
              * @var int $this->assignation_time
              */
-            $this->assignation_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['assignation_time']);
+            $this->assignation_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['assignation_time']
+                )
+            );
         } else {
             $this->assignation_time = \OmegaUp\Time::get();
         }

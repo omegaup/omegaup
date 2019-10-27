@@ -32,7 +32,12 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$name];
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $args
+            ) as $row
+        ) {
             $result[] = new \OmegaUp\DAO\VO\Schools($row);
         }
         return $result;
@@ -52,7 +57,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         int $finishDate,
         int $offset,
         int $rowcount
-    ) : array {
+    ): array {
         $sql = '
             SELECT
               s.name,
@@ -82,7 +87,12 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $args
+            ) as $row
+        ) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],
@@ -94,7 +104,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         return $result;
     }
 
-    public static function countActiveSchools(int $startTimestamp, int $endTimestamp) : int {
+    public static function countActiveSchools(
+        int $startTimestamp,
+        int $endTimestamp
+    ): int {
         $sql = '
             SELECT
                 COUNT(DISTINCT si.school_id)
@@ -116,6 +129,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 ) AS si;
 ';
         /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$startTimestamp, $endTimestamp]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$startTimestamp, $endTimestamp]
+        );
     }
 }

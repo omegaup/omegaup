@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import notifications_List from '../components/notification/List.vue';
-import {OmegaUp, T, API} from '../omegaup.js';
+import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -14,16 +14,19 @@ OmegaUp.on('ready', function() {
         on: {
           read: function(notifications) {
             API.Notification.readNotifications({
-                              'notifications': notifications.map(
-                                  notification => notification.notification_id),
-                            })
-                .then(function() { return API.Notification.myList({}); })
-                .then(function(data) {
-                  notificationsList.notifications = data.notifications;
-                })
-                .fail(UI.apiError);
+              notifications: notifications.map(
+                notification => notification.notification_id,
+              ),
+            })
+              .then(function() {
+                return API.Notification.myList({});
+              })
+              .then(function(data) {
+                notificationsList.notifications = data.notifications;
+              })
+              .fail(UI.apiError);
           },
-        }
+        },
       });
     },
     data: {
@@ -35,8 +38,8 @@ OmegaUp.on('ready', function() {
   });
 
   API.Notification.myList({})
-      .then(function(data) {
-        notificationsList.notifications = data.notifications;
-      })
-      .fail(UI.apiError);
+    .then(function(data) {
+      notificationsList.notifications = data.notifications;
+    })
+    .fail(UI.apiError);
 });

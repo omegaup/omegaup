@@ -7,20 +7,29 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
         self::TEST,
     ];
 
-    private static function getRequestForExperiments(array $experiments) : string {
+    private static function getRequestForExperiments(array $experiments): string {
         $kvp = [];
         foreach ($experiments as $name) {
-            $kvp[] = $name . '=' . \OmegaUp\Experiments::getExperimentHash($name);
+            $kvp[] = $name . '=' . \OmegaUp\Experiments::getExperimentHash(
+                $name
+            );
         }
         return implode(',', $kvp);
     }
 
     public function testConfigExperiments() {
         $defines = [
-            \OmegaUp\Experiments::EXPERIMENT_PREFIX . strtoupper(self::TEST) => true,
+            \OmegaUp\Experiments::EXPERIMENT_PREFIX . strtoupper(
+                self::TEST
+            ) => true,
         ];
         $experiments = new
-            \OmegaUp\Experiments(null, null, $defines, self::$kKnownExperiments);
+            \OmegaUp\Experiments(
+                null,
+                null,
+                $defines,
+                self::$kKnownExperiments
+            );
 
         $this->assertEquals(
             self::$kKnownExperiments,
@@ -72,7 +81,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testUserExperiments() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $experiments = new
             \OmegaUp\Experiments(
                 null,
