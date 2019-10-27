@@ -2,12 +2,11 @@
 
 require_once('../server/bootstrap_smarty.php');
 
-/** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
 [
-    'identity' => $_identity,
+    'identity' => $identity,
 ] = \OmegaUp\Controllers\Session::getCurrentSession();
 
-if (is_null($_identity)) {
+if (is_null($identity)) {
     header('HTTP/1.1 404 Not Found');
     die();
 }
@@ -15,7 +14,7 @@ if (is_null($_identity)) {
 $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
     \OmegaUp\Experiments::IDENTITIES
 ) &&
-    \OmegaUp\Authorization::canCreateGroupIdentities($_identity);
+    \OmegaUp\Authorization::canCreateGroupIdentities($identity);
 $smarty->assign('IS_ORGANIZER', $isOrganizer);
 $smarty->assign('payload', [
     'countries' => \OmegaUp\DAO\Countries::getAll(null, 100, 'name'),

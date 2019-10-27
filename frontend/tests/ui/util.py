@@ -34,6 +34,33 @@ import database_utils  # NOQA
 Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
 
 
+class StatusBarIsDismissed:
+    """A class that can wait for the status bar to be dismissed."""
+
+    def __init__(self, status_element):
+        self.status_element = status_element
+        self.counter = int(
+            self.status_element.get_attribute('data-counter') or '0')
+        self.clicked = False
+
+    def __call__(self, driver):
+        counter = int(self.status_element.get_attribute('data-counter') or '0')
+        if counter in (self.counter, self.counter + 1):
+            # We're still waiting for the status bar to open.
+            return False
+        if counter == self.counter + 2:
+            # Status has finished animating. Time to click the close button.
+            if not self.clicked:
+                self.status_element.find_element_by_css_selector(
+                    'button.close').click()
+                self.clicked = True
+            return False
+        if counter == self.counter + 3:
+            # Status is currently closing down.
+            return False
+        return self.status_element
+
+
 # pylint: disable=too-many-arguments
 def add_students(driver, users, *, tab_xpath,
                  container_xpath, parent_xpath, submit_locator):
@@ -49,26 +76,25 @@ def add_students(driver, users, *, tab_xpath,
     for user in users:
         driver.typeahead_helper(parent_xpath, user)
 
-        driver.wait.until(
-            EC.element_to_be_clickable(submit_locator)).click()
+        with dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(submit_locator)).click()
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '%s//a[text()="%s"]' % (container_xpath, user))))
-        dismiss_status(driver)
 
 
+@contextlib.contextmanager
 def dismiss_status(driver):
     '''Closes the status bar and waits for it to disappear.'''
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#status:not(.animating)')))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             '#status:not(.animating) button.close'))).click()
-    driver.wait.until(
-        EC.invisibility_of_element_located((By.CSS_SELECTOR, '#status')))
+    status_element = driver.wait.until(
+        EC.presence_of_element_located((By.ID, 'status')))
+    status_bar_is_dismissed = StatusBarIsDismissed(status_element)
+    try:
+        yield
+    finally:
+        driver.wait.until(status_bar_is_dismissed)
 
 
 def create_run(driver, problem_alias, filename):

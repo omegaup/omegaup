@@ -2,7 +2,6 @@
 
 require_once('../server/bootstrap_smarty.php');
 
-/** @var ?\OmegaUp\DAO\VO\Identities */
 $identity = \OmegaUp\Controllers\Session::getCurrentSession()['identity'];
 if (is_null($identity)) {
     \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
