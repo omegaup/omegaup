@@ -901,23 +901,16 @@ export class Arena {
         let problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
-        if (self.problems[alias]) {
-          if (rank.username == OmegaUp.username) {
-            $('#problems .problem_' + alias + ' .solved').html(
-              '(' +
-                problem.points.toFixed(self.digitsAfterDecimalPoint) +
-                ' / ' +
-                self.problems[alias].points.toFixed(
-                  self.digitsAfterDecimalPoint,
-                ) +
-                ')',
-            );
-            self.updateProblemScore(
-              alias,
-              self.problems[alias].points,
-              problem.points,
-            );
-          }
+        if (self.problems[alias] && rank.username == OmegaUp.username) {
+          const currentPoints = parseFloat(self.problems[alias].points || '0');
+          $('#problems .problem_' + alias + ' .solved').html(
+            '(' +
+              problem.points.toFixed(self.digitsAfterDecimalPoint) +
+              ' / ' +
+              currentPoints.toFixed(self.digitsAfterDecimalPoint) +
+              ')',
+          );
+          self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
