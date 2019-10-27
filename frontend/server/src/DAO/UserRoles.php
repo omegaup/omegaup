@@ -129,7 +129,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 $params
-            ) as $role
+            ) as $row
         ) {
             $roles[] = $row['name'];
         }
