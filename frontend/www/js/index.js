@@ -32,7 +32,7 @@
           minDate.setDate(minDate.getDate() - (30 * 3));
 
           var minY = dataInSeries[0] - (dataInSeries[0] * 0.50);
-          window.chart = new Highcharts.Chart({
+          /* window.chart = new Highcharts.Chart({
             chart: {
               type: 'area',
               renderTo: 'runs-chart',
@@ -73,7 +73,7 @@
                 }
               }
             ]
-          });
+          }); */
         }
       })
       .fail(omegaup.UI.apiError);

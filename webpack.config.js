@@ -21,6 +21,7 @@ let config = [
         '@babel/polyfill', './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js'
       ],
+      common_landing_page: './frontend/www/js/omegaup/landingpage/index.js',
       activity_feed: './frontend/www/js/omegaup/activity/feed.js',
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
@@ -131,6 +132,14 @@ let config = [
           test: /\.css$/,
           loader: 'style-loader!css-loader',
         },
+        {
+          test: /\.scss$/,
+          use: [
+            'vue-style-loader',
+            'css-loader',
+            'sass-loader'
+          ]
+        }
       ],
     },
     resolve: {
