@@ -1,5 +1,8 @@
 <?php
-//set paths
+
+namespace OmegaUp;
+
+// Set paths
 if (!defined('OMEGAUP_ROOT')) {
     define('OMEGAUP_ROOT', dirname(__DIR__));
 }

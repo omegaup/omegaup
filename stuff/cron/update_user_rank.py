@@ -4,13 +4,19 @@
 
 import argparse
 import logging
+import os
+import sys
 from typing import Sequence, NamedTuple
 
 import MySQLdb
 import MySQLdb.cursors
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 
 class Cutoff(NamedTuple):

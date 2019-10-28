@@ -235,6 +235,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         $callbackUserFunction
     ): array {
+        $r->ensureIdentity();
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -447,12 +448,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         bool $shouldShowIntro
     ): array {
         // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (!$shouldShowIntro) {
             return ['payload' => [
                 'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['identity']) &&
                     !is_null($session['user']) &&
                     !\OmegaUp\Controllers\User::isMainIdentity(
                         $session['user'],
@@ -578,9 +580,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
         try {
-            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $session = \OmegaUp\Controllers\Session::getCurrentSession(
                 $r
-            )['session'];
+            );
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
@@ -770,9 +772,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Contests::getNeedsInformation(
             $response['contest']->problemset_id
         );
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
 
         if (
             $needsInformation
@@ -896,9 +898,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
 
                 $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                $result['director'] = \OmegaUp\DAO\Identities::findByUserId(
+                $director = \OmegaUp\DAO\Identities::findByUserId(
                     $acl->owner_id
-                )->username;
+                );
+                if (is_null($director)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'userNotFound'
+                    );
+                }
+                $result['director'] = $director->username;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
@@ -3192,7 +3200,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Gets all details to show the report
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{contestReport: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[]}
      */
     public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];

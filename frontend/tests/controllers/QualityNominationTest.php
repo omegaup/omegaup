@@ -654,7 +654,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 'nomination' => 'suggestion',
                 'contents' => json_encode([
                     'quality' => 3,
-                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'tags' => ['problemTopicGraphTheory', 'problemTopicGreedy', 'problemTopicBinarySearch'],
                     'before_ac' => true,
                 ]),
             ]));
@@ -676,7 +676,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'nomination' => 'suggestion',
             'contents' => json_encode([
                 'quality' => 3,
-                'tags' => ['ez-pz', 'ez'],
+                'tags' => ['problemTopicGraphTheory', 'problemTopicGreedy'],
                 'before_ac' => true,
             ]),
         ]));
@@ -705,7 +705,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 'nomination' => 'suggestion',
                 'contents' => json_encode([
                     'quality' => 3,
-                    'tags' => ['ez-pz', 'ez'],
+                    'tags' => ['problemTopicGreedy', 'problemTopicMath'],
                     'before_ac' => true,
                 ]),
             ]));
@@ -804,7 +804,7 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz'],
+                'tags' => ['problemTopicSorting'],
             ]),
         ]));
 
@@ -868,7 +868,7 @@ class QualityNominationTest extends OmegaupTestCase {
                         ],
                     ],
                     'source' => 'omegaUp',
-                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'tags' => ['problemTopicSorting', 'problemTopicMath', 'problemTopicMath'],
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
@@ -884,7 +884,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 'contents' => json_encode([
                     // No difficulty!
                     'quality' => 3,
-                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'tags' => ['problemTopicSorting', 'problemTopicMath', 'problemTopicMath'],
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
@@ -904,7 +904,7 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz', 'ez'],
+                'tags' => ['problemTopicSorting', 'problemTopicMath'],
             ]),
         ]));
 
@@ -915,9 +915,54 @@ class QualityNominationTest extends OmegaupTestCase {
             'contents' => json_encode([
                 // No difficulty!
                 'quality' => 3,
-                'tags' => ['ez-pz', 'ez'],
+                'tags' => ['problemTopicSorting', 'problemTopicMath'],
             ]),
         ]));
+    }
+
+    public function testIncorrectTag() {
+        $problemData = ProblemsFactory::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        RunsFactory::gradeRun($runData);
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'promotion',
+                'contents' => json_encode([
+                    'rationale' => 'cool!',
+                    'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                    ],
+                    'source' => 'omegaUp',
+                    'tags' => ['ez', 'ez-pz'],
+                ]),
+            ]));
+            $this->fail('Incorrect tags should be caught.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            // Expected.
+        }
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    // No difficulty!
+                    'quality' => 3,
+                    'tags' => ['ez', 'ez-pz'],
+                ]),
+            ]));
+            $this->fail('Incorrect tags should be caught.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            // Expected.
+        }
     }
 
     /**
@@ -944,7 +989,7 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz'],
+                'tags' => ['problemTopicSorting'],
             ]),
         ]));
 
@@ -973,7 +1018,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math'],
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
             false
         );
 
@@ -1106,10 +1151,10 @@ class QualityNominationTest extends OmegaupTestCase {
             'difficulty_n' => 7,
             'tags_n' => 15,
             'tags' => [
-                'dp' => 6,
-                'math' => 6,
-                'matrices' => 1,
-                'greedy' => 2,
+                'problemTopicDynamicProgramming' => 6,
+                'problemTopicMath' => 6,
+                'problemTopicMatrices' => 1,
+                'problemTopicGreedy' => 2,
                 ]
             ];
         $expectedResult[1] = [
@@ -1119,11 +1164,11 @@ class QualityNominationTest extends OmegaupTestCase {
             'difficulty_n' => 9,
             'tags_n' => 15,
             'tags' => [
-                'search' => 6,
-                'geometry' => 4,
-                'matrices' => 1,
-                'math' => 2,
-                'dp' => 2,
+                'problemTopicSorting' => 6,
+                'problemTopicGeometry' => 4,
+                'problemTopicMatrices' => 1,
+                'problemTopicMath' => 2,
+                'problemTopicDynamicProgramming' => 2,
             ],
         ];
         $this->assertEquals($expectedResult, $actualResult);
@@ -1162,7 +1207,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             4, /* difficulty */
             4, /* quality */
-            ['DP', 'Math'],
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
             true
         );
 
@@ -1224,13 +1269,13 @@ class QualityNominationTest extends OmegaupTestCase {
         $tags1 = array_map($extractName, $tagArrayForProblem1);
         $this->assertEquals(
             $tags1,
-            ['dp', 'math', 'matrices', 'greedy', 'lenguaje']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemTopicMatrices', 'lenguaje']
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals(
             $tags3,
-            ['dp', 'greedy', 'geometry', 'search', 'lenguaje']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
 
         Utils::RunUpdateUserRank();
@@ -1297,12 +1342,15 @@ class QualityNominationTest extends OmegaupTestCase {
         );
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals($tags1, ['dp', 'math', 'greedy', 'lenguaje']);
+        $this->assertEquals(
+            $tags1,
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'lenguaje']
+        );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals(
             $tags3,
-            ['dp', 'greedy', 'geometry', 'search', 'lenguaje']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
     }
 
@@ -1329,7 +1377,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 1, /* quality */
-                ['DP', 'Math'],
+                ['problemTopicDynamicProgramming', 'problemTopicMath'],
                 false
             );
 
@@ -1338,7 +1386,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 3, /* quality */
-                ['Matrices', 'Math'],
+                ['problemTopicMatrices', 'problemTopicMath'],
                 false
             );
 
@@ -1347,7 +1395,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Math', 'DP'],
+                ['problemTopicMath', 'problemTopicDynamicProgramming'],
                 false
             );
 
@@ -1356,7 +1404,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 4, /* quality */
-                ['DP', 'Math', 'Greedy'],
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
                 false
             );
 
@@ -1365,7 +1413,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 4, /* quality */
-                ['Greedy', 'DP'],
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
                 false
             );
 
@@ -1374,7 +1422,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Matrices', 'Math'],
+                ['problemTopicMatrices', 'problemTopicMath'],
                 false
             );
 
@@ -1383,7 +1431,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 null, /* difficulty */
                 1, /* quality */
-                ['Math', 'DP'],
+                ['problemTopicMath', 'problemTopicDynamicProgramming'],
                 false
             );
 
@@ -1392,7 +1440,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 null, /* quality */
-                ['DP', 'Math', 'Greedy'],
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
                 false
             );
 
@@ -1401,7 +1449,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Greedy', 'DP'],
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
                 false
             );
 
@@ -1410,7 +1458,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 4, /* quality */
-                ['Search', 'DP', 'Greedy'],
+                ['problemTopicSorting', 'problemTopicDynamicProgramming', 'problemTopicGreedy'],
                 false
             );
 
@@ -1419,7 +1467,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 1, /* quality */
-                ['Geometry', 'DP', 'Search', 'Greedy'],
+                ['problemTopicGeometry', 'problemTopicDynamicProgramming', 'problemTopicSorting', 'problemTopicGreedy'],
                 false
             );
 
@@ -1428,7 +1476,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 1, /* difficulty */
                 1, /* quality */
-                ['Search', 'Greedy'],
+                ['problemTopicSorting', 'problemTopicGreedy'],
                 false
             );
 
@@ -1437,7 +1485,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[3]['request']['problem_alias'],
                 4, /* difficulty */
                 3, /* quality */
-                ['DP', 'Math', 'Greedy'],
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
                 false
             );
 
@@ -1446,7 +1494,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[3]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP'],
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
                 false
             );
 
@@ -1455,7 +1503,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[4]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP'],
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
                 false
             );
         }
@@ -1555,7 +1603,11 @@ class QualityNominationTest extends OmegaupTestCase {
         self::setUpSyntheticSuggestions($problemData);
 
         // Manually add one tag.
-        ProblemsFactory::addTag($problemData[0], 'dp', 1 /* public */);
+        ProblemsFactory::addTag(
+            $problemData[0],
+            'problemTopicDynamicProgramming',
+            1 /* public */
+        );
         $tags = array_map(function ($tag) {
             return $tag['name'];
         }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
@@ -1563,7 +1615,10 @@ class QualityNominationTest extends OmegaupTestCase {
             false /* public_only */,
             true /* includeAutogenerated */
         ));
-        $this->assertEquals($tags, ['dp', 'lenguaje']);
+        $this->assertEquals(
+            $tags,
+            ['problemTopicDynamicProgramming', 'lenguaje']
+        );
 
         Utils::RunAggregateFeedback();
 
@@ -1574,7 +1629,10 @@ class QualityNominationTest extends OmegaupTestCase {
             false /* public_only */,
             true /* includeAutogenerated */
         ));
-        $this->assertEquals($tags, ['dp', 'math', 'greedy', 'lenguaje']);
+        $this->assertEquals(
+            $tags,
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'lenguaje']
+        );
     }
 
     public function setUpSyntheticSuggestions($problemData) {
@@ -1599,7 +1657,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math'],
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1607,7 +1665,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             3,
             3,
-            ['Math', 'DP'],
+            ['problemTopicMath', 'problemTopicDynamicProgramming'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1615,7 +1673,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['Matrices', 'Math'],
+            ['problemTopicMatrices', 'problemTopicMath'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1623,7 +1681,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             null,
             null,
-            ['Math'],
+            ['problemTopicMath'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1631,7 +1689,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             3,
             4,
-            ['DP', 'Math', 'Greedy'],
+            ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1655,7 +1713,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             4,
             null,
-            ['Greedy', 'DP'],
+            ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1663,7 +1721,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['DP'],
+            ['problemTopicDynamicProgramming'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1671,7 +1729,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             4,
             4,
-            ['DP', 'Math'],
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
             false
         );
 
@@ -1680,7 +1738,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['Search', 'Geometry'],
+            ['problemTopicSorting', 'problemTopicGeometry'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1688,7 +1746,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             1,
             1,
-            ['Search', 'Geometry'],
+            ['problemTopicSorting', 'problemTopicGeometry'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1696,7 +1754,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Matrices', 'Search'],
+            ['problemTopicMatrices', 'problemTopicSorting'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1704,7 +1762,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search'],
+            ['problemTopicSorting'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1712,7 +1770,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'Math', 'Geometry'],
+            ['problemTopicSorting', 'problemTopicMath', 'problemTopicGeometry'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1736,7 +1794,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'DP'],
+            ['problemTopicSorting', 'problemTopicDynamicProgramming'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1744,7 +1802,7 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['DP'],
+            ['problemTopicDynamicProgramming'],
             false
         );
         QualityNominationFactory::createSuggestion(
@@ -1752,48 +1810,48 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Geometry', 'Math'],
+            ['problemTopicGeometry', 'problemTopicMath'],
             false
         );
     }
 
     public function testMostVotedTags() {
         $tags = [
-            'DP' => 15,
-            'Graph' => 10,
-            'Binary Search' => 5,
-            'Math' => 2,
-            'Greedy' => 1,
+            'problemTopicDynamicProgramming' => 15,
+            'problemTopicGraphTheory' => 10,
+            'problemTopicBinarySearch' => 5,
+            'problemTopicMath' => 2,
+            'problemTopicGreedy' => 1,
         ];
 
         $this->assertEquals(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.25),
-            ['DP', 'Graph', 'Binary Search']
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch']
         );
 
         $this->assertEquals(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.5),
-            ['DP', 'Graph']
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory']
         );
 
         $this->assertEquals(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
-            ['DP']
+            ['problemTopicDynamicProgramming']
         );
 
         $this->assertEquals(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
-            ['DP']
+            ['problemTopicDynamicProgramming']
         );
 
         $this->assertEquals(
             \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.01),
-            ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch', 'problemTopicMath', 'problemTopicGreedy']
         );
 
         $tagsWithLittleVotes = [
-            'DP' => 2,
-            'Graph' => 1,
+            'problemTopicDynamicProgramming' => 2,
+            'problemTopicGraphTheory' => 1,
         ];
 
         $this->assertEquals(
@@ -1816,6 +1874,56 @@ class QualityNominationTest extends OmegaupTestCase {
             ),
             [],
             'There must be a maximum number of tags to be assigned.'
+        );
+    }
+
+    /**
+     * Test for the script to canonize tags send throught the
+     * feedback form (quality nominations).
+     */
+    public function testCanonicalizeTags() {
+        $problemData[0] = ProblemsFactory::createProblem();
+        $problemData[1] = ProblemsFactory::createProblem();
+        self::setUpSyntheticSuggestions($problemData);
+
+        // Run canonize tags
+        Utils::commit();
+        shell_exec('python3 ' . escapeshellarg(
+            OMEGAUP_ROOT
+        ) . '/../stuff/canonicalize_tags.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+
+        Utils::RunAggregateFeedback();
+        Utils::commit();
+
+        $tags = array_map(function ($tag) {
+            return $tag['name'];
+        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
+            $problemData[0]['problem'],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        ));
+        sort($tags);
+        $this->assertEquals(
+            $tags,
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
+        );
+
+        $tags = array_map(function ($tag) {
+            return $tag['name'];
+        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
+            $problemData[1]['problem'],
+            false /* public_only */,
+            true /* includeAutogenerated */
+        ));
+        sort($tags);
+        $this->assertEquals(
+            $tags,
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
         );
     }
 }

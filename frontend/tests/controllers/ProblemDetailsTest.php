@@ -438,7 +438,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([
-            'token' => OMEGAUP_GRADER_SECRET,
+            'token' => OMEGAUP_GITSERVER_SECRET_TOKEN,
             'username' => $contestant->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
@@ -448,7 +448,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertFalse($result['can_edit']);
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([
-            'token' => OMEGAUP_GRADER_SECRET,
+            'token' => OMEGAUP_GITSERVER_SECRET_TOKEN,
             'username' => $problemData['author']->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));

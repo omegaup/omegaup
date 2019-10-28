@@ -193,6 +193,7 @@ class CoursesFactory {
 
     /**
      * @param \OmegaUp\DAO\VO\Identities[] $students
+     * @param string[] $assignmentAliases
      */
     public static function submitRunsToAssignmentsInCourse(
         $courseData,
@@ -222,6 +223,11 @@ class CoursesFactory {
                     $assignmentAlias,
                     $course->course_id
                 );
+                if (is_null($assignment)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
 
                 $expectedScores[$studentUsername][$assignmentAlias] = 0;
 

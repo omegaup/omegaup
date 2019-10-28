@@ -183,10 +183,10 @@ class Request extends \ArrayObject {
         }
         $this->user = null;
         $this->identity = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $this
-        )['session'];
-        if (is_null($session) || is_null($session['identity'])) {
+        );
+        if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];

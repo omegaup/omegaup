@@ -80,3 +80,8 @@ rewrite ^/schoolsrank/?$ /schoolsrank.php last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/redirecttointerview/([a-zA-Z0-9_+-]+)/?$ /userverifyemail.php?id=$1&redirecttointerview=$2 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
+
+# Cache control
+location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
+  add_header  Cache-Control "max-age=31557600";
+}

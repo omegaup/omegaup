@@ -107,17 +107,28 @@ let UI = {
     $('#root').show();
 
     $('#status .message').html(message);
-    $('#status')
+    const statusElement = $('#status');
+    let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
+    if (statusCounter % 2 == 1) {
+      statusCounter++;
+    }
+    statusElement
       .removeClass('alert-success alert-info alert-warning alert-danger')
-      .addClass(type + ' animating')
+      .addClass(type)
+      .addClass('animating')
+      .attr('data-counter', statusCounter + 1)
       .slideDown({
         complete: function() {
-          $('#status').removeClass('animating');
+          statusElement
+            .removeClass('animating')
+            .attr('data-counter', statusCounter + 2);
+          if (type == 'alert-success') {
+            setTimeout(() => {
+              UI.dismissNotifications(statusCounter + 2);
+            }, 5000);
+          }
         },
       });
-    if (type == 'alert-success') {
-      setTimeout(UI.dismissNotifications, 5000);
-    }
   },
 
   error: function(message) {
@@ -142,12 +153,27 @@ let UI = {
 
   ignoreError: function(response) {},
 
-  dismissNotifications: function() {
-    $('#status')
+  dismissNotifications: function(originalStatusCounter) {
+    const statusElement = $('#status');
+    let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
+    if (
+      typeof originalStatusCounter == 'number' &&
+      statusCounter > originalStatusCounter
+    ) {
+      // This status has already been dismissed.
+      return;
+    }
+    if (statusCounter % 2 == 1) {
+      statusCounter++;
+    }
+    statusElement
       .addClass('animating')
+      .attr('data-counter', statusCounter + 1)
       .slideUp({
         complete: function() {
-          $('#status').removeClass('animating');
+          statusElement
+            .removeClass('animating')
+            .attr('data-counter', statusCounter + 2);
         },
       });
   },
@@ -384,6 +410,7 @@ let UI = {
         {
           source: UI.typeaheadWrapper(omegaup.API.School.list),
           async: true,
+          limit: 10,
           display: 'label',
           templates: {
             empty: T.schoolToBeAdded,
