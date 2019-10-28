@@ -1,6 +1,10 @@
 <?php
 
-function smarty_compiler_version_hash($params, Smarty $smarty) {
+/**
+ * @param array{src: string} $params
+ * @param \Smarty $smarty
+ */
+function smarty_compiler_version_hash(array $params, \Smarty $smarty): string {
     $src = $params['src'];
     if ($src[0] == '"' || $src[0] == "'") {
         $src = substr($src, 1, strlen($src) - 2);

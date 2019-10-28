@@ -1144,7 +1144,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateDetails(\OmegaUp\Request $r) {
+    private static function validateDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['contest_alias'],
             'contest_alias'
@@ -1600,7 +1600,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * inside a contest
      *
      * @param \OmegaUp\Request $r
-     * @return \OmegaUp\DAO\VO\Problems
+     *
+     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      */
     private static function getValidProblemAndProblemset(\OmegaUp\Request $r): array {
@@ -2150,6 +2151,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Return a report of which runs would change due to a version change.
+     *
+     * @return array{status: 'ok', diff: list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}>}
      */
     public static function apiRunsDiff(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -2173,7 +2176,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'diff' => \OmegaUp\DAO\Runs::getRunsDiffsForVersion(
                 $problem,
                 null,
-                $problem->current_version,
+                strval($problem->current_version),
                 $r['version']
             ),
         ];

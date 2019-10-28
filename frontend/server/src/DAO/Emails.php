@@ -14,7 +14,10 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Emails extends \OmegaUp\DAO\Base\Emails {
-    final public static function getByUserId($user_id) {
+    /**
+     * @return \OmegaUp\DAO\VO\Emails[]
+     */
+    final public static function getByUserId(int $userId): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -22,7 +25,7 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
                 WHERE
                     user_id = ?';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$user_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
 
         $emails = [];
         foreach ($rs as $row) {

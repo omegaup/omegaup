@@ -14,14 +14,11 @@ class QualityNominationFactory {
         );
         for ($i = 0; $i < 5; $i++) {
             ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
-            if (is_null($reviewer->main_identity_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-            }
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));
-            self::$reviewers[] = $reviewer;
+            self::$reviewers[] = $identity;
         }
     }
 
@@ -48,6 +45,46 @@ class QualityNominationFactory {
                 ['name' => 'search']
             )
         );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicDynamicProgramming']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGraphTheory']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGreedy']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicBinarySearch']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMath']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMatrices']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGeometry']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicSorting']
+            )
+        );
     }
 
     /**
@@ -60,7 +97,7 @@ class QualityNominationFactory {
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createSuggestion(
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $user,
         string $problemAlias,
         ?int $difficulty,
         ?int $quality,
@@ -93,7 +130,7 @@ class QualityNominationFactory {
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createQualityNomination(
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $user,
         string $problemAlias,
         string $type,
         $contents

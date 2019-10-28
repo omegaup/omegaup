@@ -783,6 +783,7 @@ const translations = {
 	reportProblemFormNotAProblemStatement: "No describe un problema de programaci\u00f3n.",
 	reportProblemFormOffensive: "Es ofensivo.",
 	reportProblemFormOtherReason: "Otra razon.",
+	reportProblemFormPoorlyDescribed: "El problema est\u00e1 mal descrito.",
 	reportProblemFormQuestion: "\u00bfPor qu\u00e9 es inapropiado este problema?",
 	reportProblemFormSpam: "Es Spam.",
 	reportProblemFormThanksForReview: "\u00a1Gracias por tu reporte!",

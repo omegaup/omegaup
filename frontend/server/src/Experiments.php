@@ -254,9 +254,9 @@ class Experiments {
                 $request = [];
             }
 
-            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $session = \OmegaUp\Controllers\Session::getCurrentSession(
                 new \OmegaUp\Request($request)
-            )['session'];
+            );
             if (
                 isset($request[self::EXPERIMENT_REQUEST_NAME])
                 && !empty($request[self::EXPERIMENT_REQUEST_NAME])
@@ -270,7 +270,7 @@ class Experiments {
             }
             self::$_instance = new Experiments(
                 $requestExperiments,
-                !is_null($session) ? $session['user'] : null
+                $session['user']
             );
         }
         return self::$_instance;

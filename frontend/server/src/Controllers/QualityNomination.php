@@ -8,16 +8,60 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     const REVIEWERS_PER_NOMINATION = 2;
 
+    const ALLOWED_TAGS = [
+        'problemTopic2Sat',
+        'problemTopicArrays',
+        'problemTopicBacktracking',
+        'problemTopicBigNumbers',
+        'problemTopicBinarySearch',
+        'problemTopicBitmasks',
+        'problemTopicBreadthDepthFirstSearch',
+        'problemTopicBruteForce',
+        'problemTopicBuckets',
+        'problemTopicCombinatorics',
+        'problemTopicDataStructures',
+        'problemTopicDisjointSets',
+        'problemTopicDivideAndConquer',
+        'problemTopicDynamicProgramming',
+        'problemTopicFastFourierTransform',
+        'problemTopicGameTheory',
+        'problemTopicGeometry',
+        'problemTopicGraphTheory',
+        'problemTopicGreedy',
+        'problemTopicHashing',
+        'problemTopicIfElseSwitch',
+        'problemTopicImplementation',
+        'problemTopicInputOutput',
+        'problemTopicLoops',
+        'problemTopicMath',
+        'problemTopicMatrices',
+        'problemTopicMaxFlow',
+        'problemTopicMeetInTheMiddle',
+        'problemTopicNumberTheory',
+        'problemTopicParsing',
+        'problemTopicProbability',
+        'problemTopicShortestPath',
+        'problemTopicSimulation',
+        'problemTopicSorting',
+        'problemTopicStackQueue',
+        'problemTopicStrings',
+        'problemTopicSuffixArray',
+        'problemTopicSuffixTree',
+        'problemTopicTernarySearch',
+        'problemTopicTrees',
+        'problemTopicTwoPointers',
+    ];
+
     /**
      * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param \OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Identities $user
      * @param string $nominationType
      * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $nominationType,
         array $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
@@ -33,7 +77,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     \OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -44,7 +88,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -58,7 +102,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -117,13 +161,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if (isset($contents['tags'])) {
                 /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
-                    if (!is_string($tag)) {
+                    if (
+                        !is_string($tag) ||
+                        !in_array($tag, self::ALLOWED_TAGS)
+                    ) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'contents'
                         );
                     }
-                    $tag = \OmegaUp\Controllers\Tag::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -149,13 +195,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             // Tags must be strings.
             /** @var mixed $tag */
             foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
+                if (
+                    !is_string($tag) ||
+                    !in_array($tag, self::ALLOWED_TAGS)
+                ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'contents'
                     );
                 }
-                $tag = \OmegaUp\Controllers\Tag::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -187,7 +235,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 !isset($contents['reason']) ||
                 !in_array(
                     $contents['reason'],
-                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases']
+                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
                 )
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -255,7 +303,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
-            'user_id' => $user->user_id,
+            'user_id' => $identity->user_id,
             'problem_id' => $problem->problem_id,
             'nomination' => $nominationType,
             'contents' => json_encode($contents),
@@ -376,7 +424,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
             $problem,
-            $r->user,
+            $r->identity,
             strval($r['nomination']),
             $contents
         );

@@ -4,7 +4,7 @@
 class AdminTest extends OmegaupTestCase {
     public function testPlatformReportStatsRequiresAdmin() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = OmegaupTestCase::login($user);
+        $login = OmegaupTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Admin::apiPlatformReportStats(new \OmegaUp\Request([
@@ -18,7 +18,7 @@ class AdminTest extends OmegaupTestCase {
 
     public function testPlatformReportStats() {
         ['user' => $admin, 'identity' => $identity] = UserFactory::createAdminUser();
-        $adminLogin = OmegaupTestCase::login($admin);
+        $adminLogin = OmegaupTestCase::login($identity);
 
         \OmegaUp\Controllers\Admin::apiPlatformReportStats(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,

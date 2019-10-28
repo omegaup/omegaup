@@ -1,5 +1,8 @@
 [MESSAGES CONTROL]
 
+# Python does not allow relative imports above main entrypoints, but are needed for cron scripts.
+#  C0413 = wrong-import-position
+#
 # We are locally disabling something because we don't want to hear about it.
 #  I0011 = Locally disabling
 #
@@ -14,7 +17,7 @@
 #
 # TODOs are useful to locally indicate that something is not (yet) working.
 #  fixme = (warning notes in code comments; message varies).
-disable=I0011,R0903,E1101,W0702,fixme
+disable=C0413,I0011,R0903,E1101,W0702,fixme
 
 [BASIC]
 

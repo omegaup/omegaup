@@ -39,9 +39,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testCreateSingleIdentity() {
         // Identity creator group member will create the identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -76,9 +76,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testCreateIdentityWithWrongGroup() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -113,9 +113,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testCreateIdentityWithoutGroup() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -149,9 +149,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testCreateIdentityWithWrongUsername() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -204,9 +204,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testUploadCsvFile() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -238,9 +238,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testUploadCsvFileWithDuplicatedUsernames() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -269,9 +269,9 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testUploadCsvFileWithWrongCountryId() {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -299,9 +299,9 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testLoginIdentity() {
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
