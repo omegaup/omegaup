@@ -441,12 +441,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         bool $shouldShowIntro
     ): array {
         // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (!$shouldShowIntro) {
             return ['payload' => [
                 'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['identity']) &&
                     !is_null($session['user']) &&
                     !\OmegaUp\Controllers\User::isMainIdentity(
                         $session['user'],
@@ -489,12 +490,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 "contest_{$result['requestsUserInformation']}_consent";
             $result['privacyStatement'] = [
                 'markdown' => $privacyStatementMarkdown,
-                'gitObjectId' =>
-                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                        $statementType
-                    )['git_object_id'],
                 'statementType' => $statementType
             ];
+            $statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                $statementType
+            );
+            if (!is_null($statement)) {
+                $result['privacyStatement']['gitObjectId'] = $statement['git_object_id'];
+            }
         }
 
         return $result;
@@ -512,9 +515,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
         try {
-            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $session = \OmegaUp\Controllers\Session::getCurrentSession(
                 $r
-            )['session'];
+            );
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);

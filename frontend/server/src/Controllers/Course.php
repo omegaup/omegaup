@@ -590,10 +590,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Update an assignment
      *
-     * @param  \OmegaUp\Request $r
-     * @return array
+     * @return array{status: 'ok'}
      */
-    public static function apiUpdateAssignment(\OmegaUp\Request $r) {
+    public static function apiUpdateAssignment(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -618,24 +617,22 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if (is_null($r['start_time'])) {
             $r['start_time'] = $assignment->start_time;
-        } else {
-            $r->ensureInt(
-                'start_time',
-                $course->start_time,
-                $course->finish_time,
-                true /* is_required */
-            );
         }
-        if (is_null($r['start_time'])) {
+        $r->ensureInt(
+            'start_time',
+            $course->start_time,
+            $course->finish_time,
+            true /* is_required */
+        );
+        if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
-        } else {
-            $r->ensureInt(
-                'finish_time',
-                $course->start_time,
-                $course->finish_time,
-                true /* is_required */
-            );
         }
+        $r->ensureInt(
+            'finish_time',
+            $course->start_time,
+            $course->finish_time,
+            true /* is_required */
+        );
 
         if ($r['start_time'] > $r['finish_time']) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -645,8 +642,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Prevent date changes if a course already has runs
         if ($r['start_time'] != $assignment->start_time) {
-            $runCount = 0;
-
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 intval($assignment->problemset_id)
             );
@@ -1193,16 +1188,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $identity = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        )['identity'];
 
         // User doesn't have activity because is not logged.
-        if (is_null($session) || is_null($session['identity'])) {
+        if (is_null($identity)) {
             return false;
         }
 
-        $identity = $session['identity'];
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -1472,11 +1466,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                  && $course->requests_user_information !== 'no'
             ) {
                 $privacyStatementId = \OmegaUp\DAO\PrivacyStatements::getId(
-                    strval($r['privacy_git_object_id']),
-                    strval($r['statement_type'])
+                    $r['privacy_git_object_id'],
+                    $r['statement_type']
                 );
                 if (is_null($privacyStatementId)) {
-                    throw new  \OmegaUp\Exceptions\NotFoundException();
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'privacyStatementNotFound'
+                    );
                 }
                 if (
                     !\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
@@ -1502,11 +1498,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                  && !empty($r['accept_teacher'])
             ) {
                 $privacyStatementId = \OmegaUp\DAO\PrivacyStatements::getId(
-                    strval($r['accept_teacher_git_object_id']),
+                    $r['accept_teacher_git_object_id'],
                     'accept_teacher'
                 );
                 if (is_null($privacyStatementId)) {
-                    throw new  \OmegaUp\Exceptions\NotFoundException();
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'privacyStatementNotFound'
+                    );
                 }
                 if (
                     !\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
@@ -2259,9 +2257,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * Validates assignment by course alias and assignment alias given
-     * @param  string $courseAlias
-     * @param  string $assignmentAlias
-     * @param  \OmegaUp\DAO\VO\Identities $identity
+     *
      * @return array{course: \OmegaUp\DAO\VO\Courses, assignment: \OmegaUp\DAO\VO\Assignments}
      */
     private static function validateAssignmentDetails(
@@ -2280,7 +2276,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $assignmentAlias,
-            $course->course_id
+            intval($course->course_id)
         );
         if (is_null($assignment)) {
             throw new \OmegaUp\Exceptions\NotFoundException(

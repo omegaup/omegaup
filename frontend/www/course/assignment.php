@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
@@ -9,12 +10,20 @@ try {
     ] = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
-} catch (Exception $e) {
+} catch (\Exception $e) {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {
-    $smarty->assign($key, $value);
+    \OmegaUp\UITools::getSmartyInstance()->assign($key, $value);
 }
 
-$smarty->display(sprintf('%s/templates/%s', OMEGAUP_ROOT, $template));
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/%s',
+        strval(
+            OMEGAUP_ROOT
+        ),
+        $template
+    )
+);

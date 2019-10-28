@@ -2229,9 +2229,9 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
@@ -2618,9 +2618,9 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         string $filteredBy
     ): array {
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (is_null($session['identity'])) {
             return ['filteredBy' => null, 'value' => null];
         }
@@ -2833,13 +2833,11 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param \OmegaUp\Request $r
      * @param \OmegaUp\DAO\VO\Identities $identity
-     * @param \Smarty $smarty
      * @return array
      */
     public static function getRankDetailsForSmarty(
         \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity,
-        \Smarty $smarty
+        ?\OmegaUp\DAO\VO\Identities $identity
     ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
@@ -2850,23 +2848,29 @@ class User extends \OmegaUp\Controllers\Controller {
             /*$required=*/false
         );
 
-        $page = $r['page'] ?? 1;
-        $length = $r['length'] ?? 100;
-        $filter = $r['filter'] ?? '';
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $filter = strval($r['filter']);
 
         $availableFilters = [];
         if (!is_null($identity)) {
             if (!is_null($identity->country_id)) {
                 $availableFilters['country'] =
-                    $smarty->getConfigVars('wordsFilterByCountry');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterByCountry'
+                    );
             }
             if (!is_null($identity->state_id)) {
                 $availableFilters['state'] =
-                    $smarty->getConfigVars('wordsFilterByState');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterByState'
+                    );
             }
             if (!is_null($identity->school_id)) {
                 $availableFilters['school'] =
-                    $smarty->getConfigVars('wordsFilterBySchool');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterBySchool'
+                    );
             }
         }
 
