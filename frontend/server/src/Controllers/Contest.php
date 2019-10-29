@@ -1246,7 +1246,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Creates a new contest
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
@@ -1753,7 +1753,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Removes a problem from a contest
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      */
     public static function apiRemoveProblem(\OmegaUp\Request $r) {
         // Authenticate user

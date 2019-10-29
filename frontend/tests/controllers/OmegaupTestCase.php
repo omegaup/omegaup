@@ -429,7 +429,7 @@ class ScopedLoginToken {
     }
 
     public function __destruct() {
-        OmegaUpTestCase::logout();
+        OmegaupTestCase::logout();
         \OmegaUp\Authorization::clearCacheForTesting();
     }
 }

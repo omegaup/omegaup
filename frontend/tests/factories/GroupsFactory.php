@@ -55,8 +55,7 @@ class GroupsFactory {
     /**
      * Add identity to group helper
      *
-     * @param array $groupData
-     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData
      */
     public static function addUserToGroup(
         array $groupData,
@@ -121,17 +120,17 @@ class GroupsFactory {
     /**
      * Adds contest to scoreboard helper
      *
-     * @param array $contestData
-     * @param array $scorebaordData
-     * @param array $groupData
+     * @param array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, contest: \OmegaUp\DAO\VO\Contests} $contestData
+     * @param array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards} $scoreboardData
+     * @param array{response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, group: \OmegaUp\DAO\VO\Groups} $groupData
      */
     public static function addContestToScoreboard(
         $contestData,
         $scoreboardData,
         $groupData,
-        $onlyAC = 0,
-        $weight = 1
-    ) {
+        int $onlyAC = 0,
+        int $weight = 1
+    ): void {
         $login = OmegaupTestCase::login($groupData['owner']);
         \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
