@@ -18,7 +18,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * Finds schools that cotains 'name'
      *
      * @param string $name
-     * @return array Schools
+     * @return list<\OmegaUp\DAO\VO\Schools>
      */
     public static function findByName($name) {
         $sql = '

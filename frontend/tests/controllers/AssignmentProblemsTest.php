@@ -16,7 +16,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user
+            'author' => $identity
         ]), $login);
         $response = CoursesFactory::addProblemsToAssignment(
             $login,
@@ -63,7 +63,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user,
+            'author' => $identity,
         ]), $login);
         CoursesFactory::addProblemsToAssignment(
             $login,
@@ -106,15 +106,15 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $problems = [
             ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
-                'author' => $user
+                'author' => $identity
             ]), $login),
             ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
-                'author' => $user
+                'author' => $identity
             ]), $login),
             ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
-                'author' => $user
+                'author' => $identity
             ]), $login)
         ];
         $responses = CoursesFactory::addProblemsToAssignment(
@@ -174,7 +174,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user
+            'author' => $identity
         ]), $login);
 
         // Create a course with an assignment
@@ -206,7 +206,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user
+            'author' => $identity
         ]), $login);
 
         // Create a course with an assignment
@@ -248,7 +248,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user
+            'author' => $identity
         ]), $login);
         CoursesFactory::addProblemsToAssignment(
             $login,
@@ -288,7 +288,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $user
+            'author' => $identity
         ]), $login);
         CoursesFactory::addProblemsToAssignment(
             $login,

@@ -505,7 +505,7 @@ class ProblemList extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
-            'usernameOrEmail' => $addedAdmin->username,
+            'usernameOrEmail' => $addedIdentityAdmin->username,
         ]));
 
         $this->assertEquals('ok', $response['status']);

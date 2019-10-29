@@ -321,7 +321,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment(
             $identity,
             $adminLogin,
-            null,
+            false,
             null,
             'true'
         );

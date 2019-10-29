@@ -51,11 +51,11 @@ class UserFilterTest extends OmegaupTestCase {
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user->username,
+            'filter' => '/user/' . $identity->username,
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals($response['status'], 'ok');
-        $this->assertEquals($response['user'], $user->username);
+        $this->assertEquals($response['user'], $identity->username);
         $this->assertEquals($response['admin'], false);
         $this->assertEmpty($response['problem_admin']);
         $this->assertEmpty($response['contest_admin']);
@@ -70,7 +70,7 @@ class UserFilterTest extends OmegaupTestCase {
 
         $login = self::login($identity1);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user2->username,
+            'filter' => "/user/{$identity2->username}",
             'auth_token' => $login->auth_token,
         ]));
     }
@@ -81,7 +81,7 @@ class UserFilterTest extends OmegaupTestCase {
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user->username,
+            'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals($response['admin'], true);
@@ -240,7 +240,7 @@ class UserFilterTest extends OmegaupTestCase {
             'filter' => '/problem/' . $problem->alias,
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['user'], $user->username);
+        $this->assertEquals($response['user'], $identity->username);
     }
 
     public function testAnonymousPublicProblemAccess() {

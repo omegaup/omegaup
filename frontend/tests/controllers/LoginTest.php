@@ -26,8 +26,8 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]);
 
         // Call the API
@@ -60,7 +60,7 @@ class LoginTest extends OmegaupTestCase {
         // Inflate request with user data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
-            'password' => $user->password
+            'password' => $identity->password
         ]);
 
         $response = \OmegaUp\Controllers\User::apiLogin($r);
@@ -80,7 +80,7 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'password' => 'badpasswordD:'
         ]);
 
@@ -134,11 +134,10 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Set required context
-        $_REQUEST['usernameOrEmail'] = $user->username;
-        $_REQUEST['password'] = $user->password;
+        $_REQUEST['usernameOrEmail'] = $identity->username;
+        $_REQUEST['password'] = $identity->password;
 
         // Turn on flag to return auth_token in response, just to validate it
         $_REQUEST['returnAuthToken'] = true;
@@ -162,12 +161,11 @@ class LoginTest extends OmegaupTestCase {
     public function test2ConsecutiveLogins() {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'password' => $identity->password
         ]);
 
         // Call the API

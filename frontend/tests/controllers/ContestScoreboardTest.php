@@ -270,7 +270,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $response['ranking'][0]['username']
         );
 
@@ -385,7 +385,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(1, count($response['ranking']));
 
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $response['ranking'][0]['username']
         );
 

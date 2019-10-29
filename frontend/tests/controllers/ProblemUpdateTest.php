@@ -545,7 +545,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create our new admin
-        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = UserFactory::createUser();
 
         // Add admin to the problem
         $login = self::login($problemData['author']);

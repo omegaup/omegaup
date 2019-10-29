@@ -45,7 +45,7 @@ class QualityNominationTest extends OmegaupTestCase {
         self::assertArrayHasKey('author', $nomination);
         self::assertArrayHasKey('nominator', $nomination);
         self::assertEquals(
-            $contestant->username,
+            $identity->username,
             $nomination['nominator']['username']
         );
     }
@@ -87,7 +87,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'Should have set demotion'
         );
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $details['nominator']['username'],
             'Should have set user'
         );

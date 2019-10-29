@@ -16,9 +16,9 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
+            'username' => $identity->username,
             'password' => Utils::CreateRandomString(),
-            'old_password' => $user->password,
+            'old_password' => $identity->password,
         ]);
 
         // Call api
@@ -49,7 +49,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
+            'username' => $identity->username,
             'password' => Utils::CreateRandomString(),
             'old_password' => 'bad old password',
         ]);

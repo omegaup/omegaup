@@ -357,7 +357,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestData['director']);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $secondaryAdmin->username,
+            'usernameOrEmail' => $secondaryIdentityAdmin->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 

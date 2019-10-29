@@ -108,6 +108,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername('Z' . $username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has different username but the same email

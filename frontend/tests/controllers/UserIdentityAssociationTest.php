@@ -58,7 +58,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         // User has one default associated identity when joins omegaUp
         $this->assertEquals(1, count($associatedIdentities['identities']));
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $associatedIdentities['identities'][0]['username']
         );
 
@@ -79,7 +79,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $associatedIdentities['identities']
         );
         $this->assertUsernameInArray(
-            $user->username,
+            $identity->username,
             $associatedIdentities['identities']
         );
 
@@ -88,11 +88,14 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $identityLogin = self::login($identity);
 
         $details = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $identityLogin->auth_token,
         ]));
 
         // apiProfile must show associated user's info
-        $this->assertEquals($details['userinfo']['username'], $user->username);
+        $this->assertEquals(
+            $details['userinfo']['username'],
+            $identity->username
+        );
     }
 
     /**

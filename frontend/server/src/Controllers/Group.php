@@ -51,6 +51,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * New group
      *
      * @param \OmegaUp\Request $r
+     * @return array{status: string}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -290,6 +291,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Create a scoreboard set to a group
      *
      * @param \OmegaUp\Request $r
+     * @return array{status: string}
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
         $r->ensureIdentity();
