@@ -164,9 +164,10 @@ interface Priority {
   text: string;
 }
 
-interface TagsObject {
-  [key: string]: string;
-}
+interface TagObject {
+  key: string;
+  value: string;
+};
 
 @Component({
   components: {
@@ -182,7 +183,7 @@ export default class ProblemFinderWizard extends Vue {
 
   T = T;
   karel = false;
-  selectedTags = [];
+  selectedTags: TagObject[] = [];
   difficultyRange = [0, 4];
   SLIDER_MARKS: { [key: string]: string } = {
     '0': T.qualityFormDifficultyVeryEasy,
@@ -207,11 +208,16 @@ export default class ProblemFinderWizard extends Vue {
     },
   ];
 
-  get tagsObject(): TagsObject {
-    const singleTagsObject: TagsObject = {};
-    this.possibleTags.forEach(
-      tagObject => (singleTagsObject[tagObject.name] = tagObject.name),
-    );
+  get tagsObject(): TagObject[] {
+    const singleTagsObject: TagObject[] = [];
+    this.possibleTags.forEach(tagObject => {
+      singleTagsObject.push({
+        key: tagObject.name,
+        value: this.T.hasOwnProperty(tagObject.name) ?
+          T[tagObject.name] :
+          tagObject.name
+      });
+    });
     return singleTagsObject;
   }
 
@@ -228,7 +234,7 @@ export default class ProblemFinderWizard extends Vue {
       queryParameters.only_karel = true;
     }
     if (this.selectedTags.length > 0) {
-      queryParameters.tag = this.selectedTags;
+      queryParameters.tag = this.selectedTags.map(tag => tag.key);
     }
     this.$emit('search-problems', queryParameters);
   }
