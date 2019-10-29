@@ -9,20 +9,20 @@ INNER JOIN (
         `Schools` `sc`
     INNER JOIN (
         SELECT
-            `name`, min(`school_id`) as `min_id`
+            `name`, MIN(`school_id`) as `min_id`
         FROM
             `Schools`
         GROUP BY
-            `name`
+            `name`, `country_id`, `state_id`
         HAVING
             COUNT(*) > 1
-    ) `dups` # duplicates
-    ON `sc`.`name` = `dups`.`name`
-) `upd` # updatable
+    ) `duplicates`
+    ON `sc`.`name` = `duplicates`.`name`
+) `updatables`
 ON
-    `Courses`.`school_id` = `upd`.`school_id`
+    `Courses`.`school_id` = `updatables`.`school_id`
 SET
-    `Courses`.`school_id` = `upd`.`min_id`;
+    `Courses`.`school_id` = `updatables`.`min_id`;
 
 # Update the relations with User_Rank
 UPDATE
@@ -34,20 +34,20 @@ INNER JOIN (
         `Schools` `sc`
     INNER JOIN (
         SELECT
-            `name`, min(`school_id`) as `min_id`
+            `name`, MIN(`school_id`) as `min_id`
         FROM
             `Schools`
         GROUP BY
-            `name`
+            `name`, `country_id`, `state_id`
         HAVING
             COUNT(*) > 1
-    ) `dups` # duplicates
-    ON `sc`.`name` = `dups`.`name`
-) `upd` # updatable
+    ) `duplicates`
+    ON `sc`.`name` = `duplicates`.`name`
+) `updatables`
 ON
-    `User_Rank`.`school_id` = `upd`.`school_id`
+    `User_Rank`.`school_id` = `updatables`.`school_id`
 SET
-    `User_Rank`.`school_id` = `upd`.`min_id`;
+    `User_Rank`.`school_id` = `updatables`.`min_id`;
 
 # Update the relations with User_Rank
 UPDATE
@@ -59,20 +59,20 @@ INNER JOIN (
         `Schools` `sc`
     INNER JOIN (
         SELECT
-            `name`, min(`school_id`) as `min_id`
+            `name`, MIN(`school_id`) as `min_id`
         FROM
             `Schools`
         GROUP BY
-            `name`
+            `name`, `country_id`, `state_id`
         HAVING
             COUNT(*) > 1
-    ) `dups` # duplicates
-    ON `sc`.`name` = `dups`.`name`
-) `upd` # updatable
+    ) `duplicates`
+    ON `sc`.`name` = `duplicates`.`name`
+) `updatables`
 ON
-    `Identities`.`school_id` = `upd`.`school_id`
+    `Identities`.`school_id` = `updatables`.`school_id`
 SET
-    `Identities`.`school_id` = `upd`.`min_id`;
+    `Identities`.`school_id` = `updatables`.`min_id`;
 
 # Now remove all the Schools that have no relations with any tables (unused schools).
 DELETE FROM
@@ -88,3 +88,7 @@ WHERE
         SELECT DISTINCT `school_id`
         FROM `User_Rank`
     );
+
+# Add UNIQUE index to Schools
+ALTER TABLE `Schools`
+    ADD UNIQUE KEY `name_country_id_state_id` (`name`, `country_id`, `state_id`);
