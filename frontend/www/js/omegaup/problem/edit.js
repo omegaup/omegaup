@@ -46,13 +46,14 @@ OmegaUp.on('ready', function() {
         $('#tags .tag-list').append(
           $('<a></a>')
             .attr('href', '#tags')
+            .attr('data-key', e.name)
             .addClass('tag')
             .addClass('pull-left')
-            .text(e.name),
+            .text(T.hasOwnProperty(e.name) ? T[e.name] : e.name),
         );
       });
       $(document).on('click', '.tag', function(event) {
-        var tagname = $(this).html();
+        var tagname = $(this).data('key');
         var isPublic = $('#tag-public').val();
         $(this).remove();
         API.Problem.addTag({

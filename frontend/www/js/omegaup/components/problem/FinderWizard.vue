@@ -167,7 +167,7 @@ interface Priority {
 interface TagObject {
   key: string;
   value: string;
-};
+}
 
 @Component({
   components: {
@@ -213,9 +213,9 @@ export default class ProblemFinderWizard extends Vue {
     this.possibleTags.forEach(tagObject => {
       singleTagsObject.push({
         key: tagObject.name,
-        value: this.T.hasOwnProperty(tagObject.name) ?
-          T[tagObject.name] :
-          tagObject.name
+        value: this.T.hasOwnProperty(tagObject.name)
+          ? T[tagObject.name]
+          : tagObject.name,
       });
     });
     return singleTagsObject;
