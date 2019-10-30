@@ -19,7 +19,7 @@
                        v-bind:value="karel"
                        v-bind:width="160"
                        v-model="karel"></toggle-button> <tags-input element-id="tags"
-                    v-bind:existing-tags="tagsObject"
+                    v-bind:existing-tags="tagObjects"
                     v-bind:only-existing-tags="true"
                     v-bind:placeholder="T.wordsAddTag"
                     v-bind:typeahead="true"
@@ -208,7 +208,7 @@ export default class ProblemFinderWizard extends Vue {
     },
   ];
 
-  get tagsObject(): TagObject[] {
+  get tagObjects(): TagObject[] {
     const singleTagsObject: TagObject[] = [];
     this.possibleTags.forEach(tagObject => {
       singleTagsObject.push({
