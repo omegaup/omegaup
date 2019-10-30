@@ -551,7 +551,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{LANGUAGES: string[], IS_UPDATE?: int}
+     * @return array{LANGUAGES: list<string>, IS_UPDATE: bool}
      */
     public static function getContestNewDetailsForSmarty(
         \OmegaUp\Request $r,
@@ -561,10 +561,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'LANGUAGES' => array_keys(
                 \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
             ),
+            'IS_UPDATE' => $isUpdate,
         ];
-        if ($isUpdate === true) {
-            $result['IS_UPDATE'] = 1;
-        }
         return $result;
     }
 
@@ -3163,7 +3161,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, problems: array{order: int, alias: string}[], ranking: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int}
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], groups: array{cases?: array{meta: array{time: float, time-wall: float, mem: float}}[]}}[], runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3204,30 +3202,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];
-
-        foreach ($contestReport as &$user) {
-            if (!isset($user['problems'])) {
-                continue;
-            }
-            foreach ($user['problems'] as &$problem) {
-                if (
-                    !isset($problem['run_details']) ||
-                    !isset($problem['run_details']['groups'])
-                ) {
-                    continue;
-                }
-
-                foreach ($problem['run_details']['groups'] as &$group) {
-                    foreach ($group['cases'] as &$case) {
-                        $case['meta']['time'] = floatval($case['meta']['time']);
-                        $case['meta']['time-wall'] =
-                            floatval($case['meta']['time-wall']);
-                        $case['meta']['mem'] =
-                            floatval($case['meta']['mem']) / 1024.0 / 1024.0;
-                    }
-                }
-            }
-        }
 
         return [
             'contestReport' => $contestReport,
@@ -3314,9 +3288,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $csvRow[] = '0';
                 } else {
                     // for each case
-                    /** @var array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[] */
-                    $cases = $problemData['run_details']['cases'];
-                    foreach ($cases as $caseData) {
+                    foreach ($problemData['run_details']['cases'] as $caseData) {
                         // If case is correct
                         if (
                             strcmp(

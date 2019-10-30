@@ -178,7 +178,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /*
      * Get relevant problems including problemset alias
-     * @return \OmegaUp\DAO\VO\Problems[]
+     * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getRelevantProblems(
         \OmegaUp\DAO\VO\Problemsets $problemset

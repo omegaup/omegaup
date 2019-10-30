@@ -217,7 +217,7 @@
       <code>$verdict</code>
       <code>$problemStats[$key]['cases_stats']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="25">
+    <MixedArrayAccess occurrences="18">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
@@ -236,15 +236,8 @@
       <code>$problem['problem_id']</code>
       <code>$clar['time']</code>
       <code>$results['total']</code>
-      <code>$group['cases']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="41">
+    <MixedAssignment occurrences="39">
       <code>$contests</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -282,8 +275,6 @@
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
-      <code>$group</code>
-      <code>$case</code>
       <code>$counts</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
