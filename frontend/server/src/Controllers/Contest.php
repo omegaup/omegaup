@@ -3161,7 +3161,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], groups: array{cases?: array{meta: array{time: float, time-wall: float, mem: float}}[]}}[], runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[]}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3291,13 +3291,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     foreach ($problemData['run_details']['cases'] as $caseData) {
                         // If case is correct
                         if (
-                            strcmp(
-                                strval(
-                                    $caseData['meta']['status']
-                                ),
-                                'OK'
-                            ) === 0 &&
-                            strcmp(strval($caseData['out_diff']), '') === 0
+                            strcmp($caseData['meta']['status'], 'OK') === 0 &&
+                            strcmp($caseData['out_diff'], '') === 0
                         ) {
                             $csvRow[] = '1';
                         } else {
