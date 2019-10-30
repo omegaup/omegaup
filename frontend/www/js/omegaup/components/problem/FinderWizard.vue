@@ -19,7 +19,7 @@
                        v-bind:value="karel"
                        v-bind:width="160"
                        v-model="karel"></toggle-button> <tags-input element-id="tags"
-                    v-bind:existing-tags="tagsObject"
+                    v-bind:existing-tags="tagObjects"
                     v-bind:only-existing-tags="true"
                     v-bind:placeholder="T.wordsAddTag"
                     v-bind:typeahead="true"
@@ -164,8 +164,9 @@ interface Priority {
   text: string;
 }
 
-interface TagsObject {
-  [key: string]: string;
+interface TagObject {
+  key: string;
+  value: string;
 }
 
 @Component({
@@ -182,7 +183,7 @@ export default class ProblemFinderWizard extends Vue {
 
   T = T;
   karel = false;
-  selectedTags = [];
+  selectedTags: TagObject[] = [];
   difficultyRange = [0, 4];
   SLIDER_MARKS: { [key: string]: string } = {
     '0': T.qualityFormDifficultyVeryEasy,
@@ -207,12 +208,17 @@ export default class ProblemFinderWizard extends Vue {
     },
   ];
 
-  get tagsObject(): TagsObject {
-    const singleTagsObject: TagsObject = {};
-    this.possibleTags.forEach(
-      tagObject => (singleTagsObject[tagObject.name] = tagObject.name),
-    );
-    return singleTagsObject;
+  get tagObjects(): TagObject[] {
+    const tagObjects: TagObject[] = [];
+    this.possibleTags.forEach(tagObject => {
+      tagObjects.push({
+        key: tagObject.name,
+        value: this.T.hasOwnProperty(tagObject.name)
+          ? T[tagObject.name]
+          : tagObject.name,
+      });
+    });
+    return tagObjects;
   }
 
   searchProblems(): void {
@@ -228,7 +234,7 @@ export default class ProblemFinderWizard extends Vue {
       queryParameters.only_karel = true;
     }
     if (this.selectedTags.length > 0) {
-      queryParameters.tag = this.selectedTags;
+      queryParameters.tag = this.selectedTags.map(tag => tag.key);
     }
     this.$emit('search-problems', queryParameters);
   }
