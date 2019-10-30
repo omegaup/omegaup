@@ -174,7 +174,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'Assignment should not have been updated because the date falls outside of valid range'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
+            $this->assertEquals('parameterDateTooLarge', $e->getMessage());
         }
     }
 }

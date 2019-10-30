@@ -325,6 +325,49 @@ class Validators {
 
     /**
      *
+     * @param mixed     $parameter
+     * @param string    $parameterName
+     * @param int|float|null $lowerBound
+     * @param int|float|null $upperBound
+     * @param boolean   $required
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateTimestampInRange(
+        $parameter,
+        string $parameterName,
+        $lowerBound,
+        $upperBound,
+        bool $required = true
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        if (!is_numeric($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotADate',
+                $parameterName
+            );
+        }
+        // Coerce $parameter into a numeric value.
+        $parameter = $parameter + 0;
+        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooSmall',
+                $parameterName,
+                ['lower_bound' => date('d/m/Y H:i', intval($lowerBound))]
+            );
+        }
+        if (!is_null($upperBound) && $parameter > $upperBound) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooLarge',
+                $parameterName,
+                ['upper_bound' => date('d/m/Y H:i', intval($upperBound))]
+            );
+        }
+    }
+
+    /**
+     *
      * @param mixed  $parameter
      * @param string $parameterName
      * @psalm-assert int $parameter
