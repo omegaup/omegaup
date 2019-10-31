@@ -41,7 +41,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * @return array<string, int>
      */
-    public static function getAssignmentCountsForCourse(int $courseId) {
+    public static function getAssignmentCountsForCourse(int $courseId): array {
         $sql = 'SELECT a.assignment_type, COUNT(*) AS count
                 FROM Assignments a
                 WHERE a.course_id = ?
@@ -120,14 +120,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 WHERE
                     a.assignment_id = ? LIMIT 1;';
         /** @var null|array{scoreboard_url: string, scoreboard_url_admin: string} */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$assignmentId]
         );
-        if (empty($rs)) {
-            return null;
-        }
-        return $rs;
     }
 
     /**

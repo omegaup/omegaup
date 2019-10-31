@@ -1983,9 +1983,8 @@
     </UndefinedPropertyFetch>
   </file>
   <file src="frontend/server/src/DAO/ProblemsetAccessLog.php">
-    <MissingParamType occurrences="4">
+    <MissingParamType occurrences="3">
       <code>$problemset_id</code>
-      <code>$course_id</code>
       <code>$problemsetId</code>
       <code>$identityId</code>
     </MissingParamType>

@@ -713,9 +713,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         if (
             $needsInformation
-              && (!$r->identity->country_id
-                  || !$r->identity->state_id
-                  || !$r->identity->school_id)
+              && (is_null($r->identity->country_id)
+                  || is_null($r->identity->state_id)
+                  || is_null($r->identity->school_id))
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'contestBasicInformationNeeded'

@@ -246,8 +246,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the Group assigned to the Course.
-     * @param \OmegaUp\DAO\VO\Courses $course
-     * @param \OmegaUp\DAO\VO\Groups $group
+     *
      * @return \OmegaUp\DAO\VO\Groups
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
@@ -291,13 +290,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
-        $offset = intval(
-            round(
-                floatval(
-                    $r['start_time']
-                )
-            ) - $originalCourse->start_time
-        );
+        $offset = intval($r['start_time']) - $originalCourse->start_time;
 
         \OmegaUp\DAO\DAO::transBegin();
 
@@ -1896,19 +1889,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course,
             $group
         );
-        $isFirstTimeAccess = false;
-        $shouldShowAcceptTeacher = false;
+        $hasSharedUserInformation = true;
+        $hasAcceptedTeacher = true;
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
-            $sharingInformation = \OmegaUp\DAO\Courses::getSharingInformation(
+            [
+                'share_user_information' => $hasSharedUserInformation,
+                'accept_teacher' => $hasAcceptedTeacher,
+            ] = \OmegaUp\DAO\Courses::getSharingInformation(
                 $r->identity->identity_id,
                 $course,
                 $group
-            );
-            $isFirstTimeAccess = empty(
-                $sharingInformation['share_user_information']
-            );
-            $shouldShowAcceptTeacher = empty(
-                $sharingInformation['accept_teacher']
             );
         }
         if ($shouldShowIntro && !$course->public) {
@@ -1923,8 +1913,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $requestUserInformation = $courseDetails['requests_user_information'];
         if (
             $shouldShowIntro
-            || $shouldShowAcceptTeacher
-            || ($isFirstTimeAccess
+            || $hasAcceptedTeacher
+            || ($hasSharedUserInformation
             && $requestUserInformation != 'no'
             )
         ) {
@@ -1986,12 +1976,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'needsBasicInformation' => $needsBasicInformation,
                     'requestsUserInformation' =>
                         $courseDetails['requests_user_information'],
-                    'shouldShowAcceptTeacher' => $shouldShowAcceptTeacher,
+                    'shouldShowAcceptTeacher' => $hasAcceptedTeacher,
                     'statements' => [
                         'privacy' => $privacyStatement,
                         'acceptTeacher' => $acceptTeacherStatement,
                     ],
-                    'isFirstTimeAccess' => $isFirstTimeAccess,
+                    'isFirstTimeAccess' => $hasSharedUserInformation,
                     'shouldShowResults' => $shouldShowIntro,
                 ]
             ];
@@ -2159,7 +2149,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::GetAccessForCourse(
+        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
             $course->course_id
         );
         $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForCourse(
