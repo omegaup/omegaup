@@ -3148,7 +3148,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     public static function apiReport(\OmegaUp\Request $r): array {
         $contestReport = self::getContestReportDetails($r);
@@ -3161,7 +3161,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[]}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3198,10 +3198,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Gets all details to show the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{contestReport: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[]}
+     * @return array{contestReport: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[]}
      */
     public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];
+        foreach ($contestReport as &$user) {
+            if (!isset($user['problems'])) {
+                continue;
+            }
+            foreach ($user['problems'] as &$problem) {
+                if (
+                    !isset($problem['run_details']) ||
+                    !isset($problem['run_details']['details']) ||
+                    !isset($problem['run_details']['details']['groups'])
+                ) {
+                    continue;
+                }
+                foreach ($problem['run_details']['details']['groups'] as &$group) {
+                    foreach ($group['cases'] as &$case) {
+                        $case['meta']['memory'] =
+                            floatval($case['meta']['memory']) / 1024.0 / 1024.0;
+                    }
+                }
+            }
+        }
 
         return [
             'contestReport' => $contestReport,
@@ -3210,11 +3230,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Generates a CSV for contest report
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
      */
-    public static function apiCsvReport(\OmegaUp\Request $r) {
+    public static function apiCsvReport(\OmegaUp\Request $r): void {
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty(
