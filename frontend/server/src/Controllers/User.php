@@ -513,29 +513,28 @@ class User extends \OmegaUp\Controllers\Controller {
 
             self::$log->info("Admin verifying user... {$r['usernameOrEmail']}");
             $user = self::resolveUser($r['usernameOrEmail']);
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $r['usernameOrEmail']
-            );
         } else {
             // Normal user verification path
             \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
             $user = \OmegaUp\DAO\Users::getByVerification($r['id']);
-            $identity = \OmegaUp\DAO\Identities::getByPK(
-                $user->main_identity_id
-            );
         }
 
-        if (is_null($user)) {
+        if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'verificationIdInvalid'
             );
         }
+        $identity = \OmegaUp\DAO\Identities::getByPK(
+            $user->main_identity_id
+        );
 
         $user->verified = true;
         $user->verification_id = null;
         \OmegaUp\DAO\Users::update($user);
 
-        self::$log->info("User verification complete for {$user->username}");
+        self::$log->info(
+            "User verification complete for {$identity->username}"
+        );
 
         // Expire profile cache
 

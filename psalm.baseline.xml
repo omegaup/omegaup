@@ -129,8 +129,7 @@
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="2">
-      <code>$callback_user_function</code>
+    <MissingParamType occurrences="1">
       <code>$admission_mode</code>
     </MissingParamType>
     <MissingReturnType occurrences="10">
@@ -145,14 +144,10 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="67">
+    <MixedArgument occurrences="63">
       <code>$r['active']</code>
       <code>$r['recommended']</code>
       <code>$r['participating']</code>
-      <code>$callback_user_function</code>
-      <code>$contest['start_time']</code>
-      <code>$contest['finish_time']</code>
-      <code>$contest['last_updated']</code>
       <code>$contestProblemset</code>
       <code>$contestProblemset</code>
       <code>$r['contest_alias']</code>
@@ -212,32 +207,19 @@
       <code>$r['contest_alias']</code>
       <code>$verdict</code>
       <code>$problemStats[$key]['cases_stats']</code>
-      <code>$caseData['out_diff']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="21">
+    <MixedArrayAccess occurrences="9">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
       <code>$contestInfo['window_length']</code>
-      <code>$contest['start_time']</code>
-      <code>$contest['finish_time']</code>
-      <code>$contest['last_updated']</code>
       <code>$result['admission_mode']</code>
       <code>$result['start_time']</code>
       <code>$result['finish_time']</code>
       <code>$clar['time']</code>
       <code>$results['total']</code>
-      <code>$group['cases']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$case['meta']</code>
-      <code>$caseData['meta']</code>
-      <code>$caseData['out_diff']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="42">
+    <MixedAssignment occurrences="35">
       <code>$contests</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -248,9 +230,7 @@
       <code>$contestInfo['duration']</code>
       <code>$addedContests[]</code>
       <code>$contests</code>
-      <code>$query</code>
       <code>$contests</code>
-      <code>$contest</code>
       <code>$addedContests[]</code>
       <code>$contestProblemset</code>
       <code>$result</code>
@@ -273,10 +253,7 @@
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
-      <code>$group</code>
-      <code>$case</code>
       <code>$counts</code>
-      <code>$caseData</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
       <code>bool</code>
@@ -312,7 +289,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>$result['requestsUserInformation']</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="26">
+    <PossiblyNullArgument occurrences="25">
       <code>$r-&gt;identity</code>
       <code>$privacyStatementId</code>
       <code>$contest-&gt;acl_id</code>
@@ -344,21 +321,19 @@
     <PossiblyNullIterator occurrences="1">
       <code>$resultAdmins</code>
     </PossiblyNullIterator>
-    <PossiblyNullOperand occurrences="6">
+    <PossiblyNullOperand occurrences="5">
       <code>$problemsetIdentity-&gt;access_time</code>
       <code>$r['start_time']</code>
       <code>$contest-&gt;alias</code>
       <code>$finish_time</code>
       <code>$start_time</code>
-      <code>$targetIdentity-&gt;username</code>
     </PossiblyNullOperand>
     <PossiblyNullPropertyAssignment occurrences="3">
       <code>$problemset</code>
       <code>$problemset</code>
       <code>$problemsetIdentity</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="12">
-      <code>$r-&gt;identity-&gt;identity_id</code>
+    <PossiblyNullPropertyFetch occurrences="7">
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
@@ -366,9 +341,7 @@
       <code>$contest-&gt;start_time</code>
       <code>$contest-&gt;finish_time</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$targetIdentity-&gt;identity_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
-      <code>$targetIdentity-&gt;username</code>
     </PossiblyNullPropertyFetch>
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($identity)</code>
@@ -1471,7 +1444,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="17">
+    <PossiblyNullArgument occurrences="16">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1500,7 +1473,7 @@
       <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="8">
+    <PossiblyNullPropertyFetch occurrences="7">
       <code>$email-&gt;email</code>
       <code>$identity-&gt;password</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1604,7 +1577,7 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Contests.php">
-    <MissingParamType occurrences="21">
+    <MissingParamType occurrences="13">
       <code>$title</code>
       <code>$alias</code>
       <code>$problemset_id</code>
@@ -1616,21 +1589,18 @@
       <code>$pageSize</code>
       <code>$order</code>
       <code>$orderType</code>
-      <code>$user_id</code>
       <code>$page</code>
       <code>$pageSize</code>
       <code>$identity_id</code>
       <code>$page</code>
       <code>$pageSize</code>
-      <code>$query</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$contestId</code>
     </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="15">
+    <MissingReturnType occurrences="12">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
@@ -1638,35 +1608,29 @@
       <code>hasFinished</code>
       <code>getContestsParticipated</code>
       <code>getAllContestsAdminedByIdentity</code>
-      <code>getAllContestsOwnedByUser</code>
-      <code>getContestsParticipating</code>
       <code>getRecentPublicContests</code>
       <code>getAllPublicContests</code>
       <code>getAllContests</code>
       <code>getContestForProblemset</code>
       <code>getNeedsInformation</code>
-      <code>requestsUserInformation</code>
     </MissingReturnType>
-    <MixedArgument occurrences="5">
+    <MixedArgument occurrences="4">
       <code>$order</code>
-      <code>$query</code>
       <code>$params</code>
       <code>$params</code>
       <code>$params</code>
     </MixedArgument>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="7">
       <code>$offset</code>
       <code>$offset</code>
       <code>$columns</code>
       <code>$offset</code>
-      <code>$params[]</code>
       <code>$columns</code>
       <code>$columns</code>
       <code>$columns</code>
       <code>$columns</code>
-      <code>$requestsUsersInfo</code>
     </MixedAssignment>
-    <MixedOperand occurrences="5">
+    <MixedOperand occurrences="3">
       <code>$page</code>
       <code>$page</code>
       <code>($page - 1) * $pageSize</code>
@@ -3291,14 +3255,6 @@
     </MixedArgument>
   </file>
   <file src="frontend/www/coderofthemonth.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/contestreport.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$key</code>
     </MixedArgumentTypeCoercion>
