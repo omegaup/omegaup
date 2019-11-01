@@ -1118,6 +1118,16 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys = [
                 'Virtual-ESCOM2018' => 50,
             ];
+        } elseif ($r['contest_type'] == '2CONTESTCAC') {
+            if (
+                $r->identity->username != 'Franco1010'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+            $keys = [
+                'CAC2019B' => 50,
+            ];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
