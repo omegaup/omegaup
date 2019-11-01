@@ -1,39 +1,39 @@
-*En el caso de un feature, provee un título en el siguiente formato:*
+---
+name: Sugerencia de mejora
+about: Ayúdanos a mejorar la plataforma describiendo tus ideas con este formato
+title: "[FEATURE] Como un [tipo de usuario], quiero [funcionalidad o mejora esperada]
+  para [beneficio esperado]"
+labels: ''
+assignees: ''
+
+---
+
+*Provee un título para esta sugerencia con el siguiente formato:*
 
 *Como un [tipo de usuario], quiero [funcionalidad o mejora esperada] para
 [beneficio esperado]*
 
-*E.g. Como [usuario], quiero [un botón de inicio] para [poder regresar a la
+*Ejemplo: Como [usuario], quiero [un botón de inicio] para [poder regresar a la
 página inicial con un solo click]*
 
 ## Comportamiento Esperado
-
-*Si estás describiendo un bug, describe lo que pasó*
 
 *Si estás sugiriendo un cambio/mejora, describe cómo debería funcionar*
 
 ## Comportamiento Actual
 
-*Si estás describiendo un bug, dinos lo que paso en lugar de lo que se
-esperaba*
-
-*Si estás sugiriendo un cambio/mejora, explicanos la diferencia con la
-funcionalidad actual*
+*Si estás sugiriendo un cambio/mejora, explícanos la diferencia con la
+funcionalidad actual y por qué lo que existe actualmente no te funciona*
 
 ## Posible Solución
 
 *No es obligatorio, pero puedes sugerir una manera de arreglar el bug, o ideas
 de cómo implementar la mejora*
 
-## Pasos para reproducir (para bugs)
+## Alternativas consideradas
 
-*Provee un link a un ejemplo, o una lista de pasos detallada de cómo reproducir
-este bug.  Incluye el código que lo reproduce, si es relevante*
+*Opcional, si has pensado en alternativas para solucionar este problema y las has descartado, nos gustaría también escucharlas.*
 
-1. 
-2. 
-3. 
-4. 
 
 ## Contexto
 
