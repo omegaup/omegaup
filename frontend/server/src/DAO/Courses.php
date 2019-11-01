@@ -382,7 +382,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         \OmegaUp\DAO\VO\Groups $group
     ): array {
         if ($course->group_id !== $group->group_id) {
-            return ['share_user_information' => true, 'accept_teacher' => true];
+            return ['share_user_information' => false, 'accept_teacher' => false];
         }
         $sql = '
             SELECT
@@ -405,14 +405,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         /** @var null|array{share_user_information: null|int, accept_teacher: null|int} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
-            return ['share_user_information' => true, 'accept_teacher' => true];
+            return ['share_user_information' => false, 'accept_teacher' => false];
         }
 
         return [
-            'share_user_information' => !boolval(
+            'share_user_information' => boolval(
                 $row['share_user_information']
             ),
-            'accept_teacher' => !boolval($row['accept_teacher']),
+            'accept_teacher' => boolval($row['accept_teacher']),
         ];
     }
 

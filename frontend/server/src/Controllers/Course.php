@@ -251,12 +251,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function resolveGroup(
-        \OmegaUp\DAO\VO\Courses $course,
-        ?\OmegaUp\DAO\VO\Groups $group = null
+        \OmegaUp\DAO\VO\Courses $course
     ): \OmegaUp\DAO\VO\Groups {
-        if (!is_null($group)) {
-            return $group;
-        }
         if (is_null($course->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1913,8 +1909,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $requestUserInformation = $courseDetails['requests_user_information'];
         if (
             $shouldShowIntro
-            || $hasAcceptedTeacher
-            || ($hasSharedUserInformation
+            || !$hasAcceptedTeacher
+            || (!$hasSharedUserInformation
             && $requestUserInformation != 'no'
             )
         ) {
@@ -1976,12 +1972,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'needsBasicInformation' => $needsBasicInformation,
                     'requestsUserInformation' =>
                         $courseDetails['requests_user_information'],
-                    'shouldShowAcceptTeacher' => $hasAcceptedTeacher,
+                    'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
                     'statements' => [
                         'privacy' => $privacyStatement,
                         'acceptTeacher' => $acceptTeacherStatement,
                     ],
-                    'isFirstTimeAccess' => $hasSharedUserInformation,
+                    'isFirstTimeAccess' => !$hasSharedUserInformation,
                     'shouldShowResults' => $shouldShowIntro,
                 ]
             ];
