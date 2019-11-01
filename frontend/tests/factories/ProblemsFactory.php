@@ -4,6 +4,7 @@
  * ProblemParams
  */
 class ProblemParams implements ArrayAccess {
+    /** @var array{author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, title?: string, visibility?: int, zipName?: string}|array<array-key, mixed> */
     private $params;
 
     public function __construct($params = null) {
@@ -135,12 +136,10 @@ class ProblemsFactory {
      * Returns a Request object with valid info to create a problem and the
      * author of the problem
      *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
      * @param ProblemParams $params
      * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, request: \OmegaUp\Request, zip_path: string}
      */
-    public static function getRequest($params = null) {
+    public static function getRequest(?ProblemParams $params = null) {
         if (!($params instanceof ProblemParams)) {
             $params = new ProblemParams($params);
         }

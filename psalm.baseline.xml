@@ -2748,9 +2748,6 @@
       <code>$contestData</code>
       <code>$percentage</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$params</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="4">
       <code>createContest</code>
       <code>openProblemInContest</code>
@@ -2762,9 +2759,7 @@
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']['alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="4">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
+    <MixedArrayAccess occurrences="2">
       <code>$contestData['request']</code>
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']['alias']</code>
@@ -2891,9 +2886,6 @@
       <code>$params</code>
       <code>$params</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$params</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="2">
       <code>createProblemWithAuthor</code>
       <code>addGroupAdmin</code>
@@ -2901,10 +2893,6 @@
     <MixedArgument occurrences="1">
       <code>$params['title']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="2">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-    </MixedArrayAccess>
     <MixedArrayAssignment occurrences="1">
       <code>$_FILES['problem_contents']['tmp_name']</code>
     </MixedArrayAssignment>

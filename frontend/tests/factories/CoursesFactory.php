@@ -168,7 +168,7 @@ class CoursesFactory {
     /**
      * Add a Student to a course
      * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseData
-     * @param \OmegaUp\DAO\VO\Identities $student
+     * @param ?\OmegaUp\DAO\VO\Identities $student
      */
     public static function addStudentToCourse(
         $courseData,

@@ -4,6 +4,7 @@
  * ContestParams
  */
 class ContestParams implements ArrayAccess {
+    /** @var array{admission_mode?: string, basic_information?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestUserDirector?: \OmegaUp\DAO\VO\Users, finish_time?: int, languages?: string, last_updated?: int, penalty_calc_policy?: string, requests_user_information?: string, start_time?: int, title?: string, window_length?: int}|array<array-key, mixed> */
     private $params;
 
     public function __construct($params = null) {
@@ -139,12 +140,10 @@ class ContestsFactory {
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
      *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
      * @param ContestParams $params
      * @return array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
      */
-    public static function getRequest($params = null) {
+    public static function getRequest(?ContestParams $params = null): array {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }
