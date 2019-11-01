@@ -473,7 +473,7 @@ class Scoreboard {
      * @param bool $sortByName
      * @param bool $withRunDetails
      * @param null|string $authToken
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: array<int, array{country: null|string, is_invited: bool, name: string, problems: array{alias: string, penalty: float, percent: float, points: float, runs: int}[], total: array{penalty: float, points: float}, username: string}>, start_time: int, status: string, time: int, title: string}
+     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: array{country: null|string, is_invited: bool, name: string, problems: array{alias: string, penalty: float, percent: float, points: float, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     private static function getScoreboardFromRuns(
         array $contestRuns,
@@ -640,7 +640,7 @@ class Scoreboard {
     }
 
     /**
-     * @param array<int, array{country: null|string, is_invited: bool, name: string, problems: array<array-key, array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}> $scoreboard
+     * @param array{country: null|string, is_invited: bool, name: string, problems: array{alias: string, penalty: float, percent: float, points: float, runs: int}[], total: array{penalty: float, points: float}, username: string}[] $scoreboard
      * @param bool $sortByName
      */
     private static function sortScoreboard(
