@@ -523,13 +523,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // suggesting to contribute to the community by releasing the material to
         // the public. This flag ensures that this alert is shown only once per
         // session, the first time the user visits the "My contests" page.
-        $privateContestsAlert = (
-            !isset($_SESSION['private_contests_alert']) &&
-            \OmegaUp\DAO\Contests::getPrivateContestsCount($r->user) > 0
-        );
-
+        $privateContestsAlert = false;
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+            $privateContestsAlert = (
+                !isset($_SESSION['private_contests_alert']) &&
+                \OmegaUp\DAO\Contests::getPrivateContestsCount($r->user) > 0
+            );
         if ($privateContestsAlert) {
             $_SESSION['private_contests_alert'] = true;
+        }
         }
 
         return [
