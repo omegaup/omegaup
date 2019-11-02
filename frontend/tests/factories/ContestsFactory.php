@@ -1,130 +1,105 @@
 <?php
 
-/**
- * ContestParams
- */
-class ContestParams implements ArrayAccess {
-    private $params;
-
-    public function __construct($params = null) {
-        if (!is_object($params)) {
-            $this->params = [];
-            if (is_array($params)) {
-                $this->params = array_merge([], $params);
-            }
-        } else {
-            $this->params = clone $params;
-        }
-        ContestParams::validateParameter(
-            'title',
-            $this->params,
-            false,
-            Utils::CreateRandomString()
-        );
-        ContestParams::validateParameter(
-            'admission_mode',
-            $this->params,
-            false,
-            'public'
-        );
-        ContestParams::validateParameter(
-            'basic_information',
-            $this->params,
-            false,
-            'false'
-        );
-        ContestParams::validateParameter(
-            'requests_user_information',
-            $this->params,
-            false,
-            'no'
-        );
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ContestParams::validateParameter(
-            'contestDirector',
-            $this->params,
-            false,
-            $identity
-        );
-        ContestParams::validateParameter(
-            'contestUserDirector',
-            $this->params,
-            false,
-            $user
-        );
-        ContestParams::validateParameter('window_length', $this->params, false);
-        ContestParams::validateParameter('languages', $this->params, false);
-        ContestParams::validateParameter(
-            'start_time',
-            $this->params,
-            false,
-            (\OmegaUp\Time::get() - 60 * 60)
-        );
-        ContestParams::validateParameter(
-            'finish_time',
-            $this->params,
-            false,
-            (\OmegaUp\Time::get() + 60 * 60)
-        );
-        ContestParams::validateParameter(
-            'last_updated',
-            $this->params,
-            false,
-            (\OmegaUp\Time::get() + 60 * 60)
-        );
-        ContestParams::validateParameter(
-            'penalty_calc_policy',
-            $this->params,
-            false
-        );
-    }
-
-    public function offsetGet($offset) {
-        return isset($this->params[$offset]) ? $this->params[$offset] : null;
-    }
-
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->params[] = $value;
-        } else {
-            $this->params[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->params[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->params[$offset]);
-    }
+class ContestParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $title;
 
     /**
-     * Checks if array contains a key defined by $parameter
-     * @param string $parameter
-     * @param array $array
-     * @param boolean $required
-     * @param $default
-     * @return boolean
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @var string
      */
-    private static function validateParameter(
-        $parameter,
-        &$array,
-        $required = true,
-        $default = null
-    ) {
-        if (!isset($array[$parameter])) {
-            if ($required) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'ParameterEmpty',
-                    $parameter
-                );
-            }
-            $array[$parameter] = $default;
-        }
+    public $admissionMode;
 
-        return true;
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $basicInformation;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $requestsUserInformation;
+
+    /**
+     * @readonly
+     * @var \OmegaUp\DAO\VO\Identities
+     */
+    public $contestDirector;
+
+    /**
+     * @readonly
+     * @var \OmegaUp\DAO\VO\Users
+     */
+    public $contestDirectorUser;
+
+    /**
+     * @readonly
+     * @var ?int
+     */
+    public $windowLength;
+
+    /**
+     * @readonly
+     * @var null|list<string>
+     */
+    public $languages;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $startTime;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $finishTime;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $lastUpdated;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $penaltyCalcPolicy;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string} $params
+     */
+    public function __construct($params = []) {
+        $this->title = $params['title'] ?? Utils::CreateRandomString();
+        $this->admissionMode = $params['admissionMode'] ?? 'public';
+        $this->basicInformation = $params['basicInformation'] ?? false;
+        $this->requestsUserInformation = $params['requestsUserInformation'] ?? 'no';
+        if (
+            !empty($params['contestDirector']) &&
+            !empty($params['contestDirectorUser'])
+        ) {
+            $this->contestDirector = $params['contestDirector'];
+            $this->contestDirectorUser = $params['contestDirectorUser'];
+        } else {
+            [
+                'user' => $user,
+                'identity' => $identity,
+            ] = UserFactory::createUser();
+            $this->contestDirector = $params['contestDirector'] ?? $identity;
+            $this->contestDirectorUser = $params['contestDirectorUser'] ?? $user;
+        }
+        $this->windowLength = $params['windowLength'] ?? null;
+        $this->languages = $params['languages'] ?? null;
+        $this->startTime = $params['startTime'] ?? (\OmegaUp\Time::get() - 60 * 60);
+        $this->finishTime = $params['finishTime'] ?? (\OmegaUp\Time::get() + 60 * 60);
+        $this->lastUpdated = $params['lastUpdated'] ?? (\OmegaUp\Time::get() + 60 * 60);
+        $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
     }
 }
 
@@ -138,27 +113,23 @@ class ContestsFactory {
     /**
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
-     *
-     * @param string $title
-     * @param string $public
-     * @param \OmegaUp\DAO\VO\Users $contestDirector
-     * @return \OmegaUp\Request
+     * return array{request: \OmegaUp\Request, director: \OmegaUp\DAO\VO\Identities, userDirector: \OmegaUp\DAO\VO\Users}
      */
-    public static function getRequest($params = null) {
-        if (!($params instanceof ContestParams)) {
-            $params = new ContestParams($params);
+    public static function getRequest(?ContestParams $params = null): array {
+        if (is_null($params)) {
+            $params = new ContestParams();
         }
 
         // Set context
         $r = new \OmegaUp\Request([
-            'title' => $params['title'],
+            'title' => $params->title,
             'description' => 'description',
-            'start_time' => $params['start_time'],
-            'finish_time' => $params['finish_time'],
-            'last_updated' => $params['last_updated'],
-            'window_length' => $params['window_length'],
-            'admission_mode' => $params['admission_mode'],
-            'alias' => substr($params['title'], 0, 20),
+            'start_time' => $params->startTime,
+            'finish_time' => $params->finishTime,
+            'last_updated' => $params->lastUpdated,
+            'window_length' => $params->windowLength,
+            'admission_mode' => $params->admissionMode,
+            'alias' => substr($params->title, 0, 20),
             'points_decay_factor' => '0.02',
             'partial_score' => '0',
             'submissions_gap' => '60',
@@ -166,22 +137,17 @@ class ContestsFactory {
             'penalty' => 100,
             'scoreboard' => 100,
             'penalty_type' => 'contest_start',
-            'languages' => $params['languages'],
+            'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params['basic_information'],
-            'requests_user_information' => $params['requests_user_information'],
-            'languages' => $params['languages'],
+            'basic_information' => $params->basicInformation,
+            'requests_user_information' => $params->requestsUserInformation,
+            'penalty_calc_policy' => $params->penaltyCalcPolicy,
         ]);
-        if (is_null($params['penalty_calc_policy'])) {
-            $r['penalty_calc_policy'] = 'sum';
-        } else {
-            $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
-        }
 
         return [
             'request' => $r,
-            'director' => $params['contestDirector'],
-            'userDirector' => $params['contestUserDirector'],
+            'director' => $params->contestDirector,
+            'userDirector' => $params->contestDirectorUser,
         ];
     }
 
@@ -206,14 +172,14 @@ class ContestsFactory {
         return $problems;
     }
 
-    public static function createContest($params = null) {
-        if (!($params instanceof ContestParams)) {
-            $params = new ContestParams($params);
+    public static function createContest(?ContestParams $params = null) {
+        if (is_null($params)) {
+            $params = new ContestParams();
         }
 
-        $privateParams = new ContestParams($params);
+        $privateParams = clone $params;
         // Create a valid contest Request object
-        $privateParams['admission_mode'] = 'private';
+        $privateParams->admissionMode = 'private';
         $contestData = ContestsFactory::getRequest($privateParams);
 
         $r = $contestData['request'];
@@ -225,8 +191,8 @@ class ContestsFactory {
 
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate($r);
-        if ($params['admission_mode'] === 'public') {
-            self::forcePublic($contestData, $params['last_updated']);
+        if ($params->admissionMode === 'public') {
+            self::forcePublic($contestData, $params->lastUpdated);
             $r['admission_mode'] = 'public';
         }
 

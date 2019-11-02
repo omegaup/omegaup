@@ -64,7 +64,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemFromPrivateContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -89,7 +89,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveInvalidProblemFromPrivateContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -118,7 +118,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemFromInvalidContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -147,7 +147,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -192,7 +192,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveOldestProblemFromPublicContestWithTwoProblems() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -223,7 +223,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveNewestProblemFromPublicContestWithTwoProblems() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -255,7 +255,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -277,7 +277,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -310,7 +310,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -345,7 +345,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithAdminRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -396,7 +396,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithRunsFromPrivateContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -422,7 +422,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -452,7 +452,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithRunsOutsideContestFromPrivateContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -482,7 +482,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
@@ -507,7 +507,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     public function testRemoveProblemWithMixedRunsFromContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $problemData = ProblemsFactory::createProblem();
