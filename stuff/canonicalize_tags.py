@@ -7,12 +7,13 @@ and ensures that only canonical tags are used.
 '''
 
 import argparse
+import collections
 import json
 import logging
 import os
-import unicodedata
 import re
-import collections
+import unicodedata
+import warnings
 from typing import Mapping, Set, DefaultDict, Dict, Text
 
 import MySQLdb.constants.ER
@@ -43,9 +44,11 @@ def insert_new_tags(tags: Set[str],
     '''Inserts new problem tags inside Tags table on DB'''
     logging.info('Inserting new Tags on database')
     with dbconn.cursor() as cur:
-        cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
-                        VALUES (%s);''',
-                        [(tag,) for tag in tags])
+        cur.executemany(
+            '''
+                INSERT IGNORE INTO `Tags`(`name`) VALUES (%s);
+            ''',
+            [(tag,) for tag in tags])
 
 
 def get_inverse_mapping(
@@ -79,9 +82,11 @@ def migrate_tags(dbconn: MySQLdb.connections.Connection,
                  mapping: Mapping[str, Mapping[str, str]]) -> None:
     '''Reads all suggestions and modifies their tags if necessary'''
     with dbconn.cursor() as cur:
-        cur.execute('''SELECT `qualitynomination_id`, `contents`
-                        FROM `QualityNominations`
-                        WHERE `nomination` = 'suggestion';''')
+        cur.execute('''
+            SELECT `qualitynomination_id`, `contents`
+            FROM `QualityNominations`
+            WHERE `nomination` = 'suggestion';
+        ''')
         to_update = []
         for qualitynomination_id, json_contents in cur:
             try:
@@ -104,10 +109,13 @@ def migrate_tags(dbconn: MySQLdb.connections.Connection,
             to_update.append((json.dumps(contents), qualitynomination_id))
 
         # Now update records
-        cur.executemany('''UPDATE `QualityNominations`
-                            SET `contents` = %s
-                            WHERE `qualitynomination_id` = %s''',
-                        to_update)
+        cur.executemany(
+            '''
+                UPDATE `QualityNominations`
+                SET `contents` = %s
+                WHERE `qualitynomination_id` = %s;
+            ''',
+            to_update)
     logging.info('Feedback problem tags updated.')
 
 
@@ -124,6 +132,7 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = db.connect(args)
+    warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
         mapping = get_inverse_mapping(dbconn)
         migrate_tags(dbconn, mapping)

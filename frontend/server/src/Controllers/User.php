@@ -1118,13 +1118,23 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys = [
                 'Virtual-ESCOM2018' => 50,
             ];
+        } elseif ($r['contest_type'] == 'CONTESTCAC') {
+            if (
+                $r->identity->username != 'Franco1010'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+            $keys = [
+                'CAC2019B' => 50,
+            ];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
+                    'expected_set' => 'CONTESTCAC, OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
                 ]
             );
         }

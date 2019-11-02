@@ -2790,21 +2790,9 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/ContestsFactory.php">
-    <DuplicateArrayKey occurrences="1">
-      <code>'languages' =&gt; $params['languages']</code>
-    </DuplicateArrayKey>
-    <InvalidDocblockParamName occurrences="3">
-      <code>$title</code>
-      <code>$public</code>
-      <code>$contestDirector</code>
-    </InvalidDocblockParamName>
     <InvalidParamDefault occurrences="1">
       <code>type</code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="1"/>
-    <InvalidReturnType occurrences="1">
-      <code>\OmegaUp\Request</code>
-    </InvalidReturnType>
     <MissingDependency occurrences="9">
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
@@ -2816,11 +2804,7 @@
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="18">
-      <code>$params</code>
-      <code>$default</code>
-      <code>$params</code>
-      <code>$params</code>
+    <MissingParamType occurrences="14">
       <code>$problemData</code>
       <code>$contestData</code>
       <code>$problemData</code>
@@ -2836,9 +2820,6 @@
       <code>$contestData</code>
       <code>$percentage</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$params</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="9">
       <code>createContest</code>
       <code>addProblemToContest</code>
@@ -2850,14 +2831,11 @@
       <code>forcePublic</code>
       <code>setScoreboardPercentage</code>
     </MissingReturnType>
-    <MixedArgument occurrences="3">
-      <code>$params['title']</code>
+    <MixedArgument occurrences="2">
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']['alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="10">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
+    <MixedArrayAccess occurrences="8">
       <code>$contestData['request']</code>
       <code>$problemData['request']</code>
       <code>$contestData['request']['alias']</code>
@@ -2867,15 +2845,7 @@
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="4">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="10">
-      <code>$array[$parameter]</code>
-      <code>$r['penalty_calc_policy']</code>
+    <MixedAssignment occurrences="8">
       <code>$r</code>
       <code>$contestDirector</code>
       <code>$r['contest_alias']</code>
@@ -2891,9 +2861,6 @@
     <MixedPropertyFetch occurrences="1">
       <code>$user-&gt;username</code>
     </MixedPropertyFetch>
-    <PossiblyInvalidArgument occurrences="1">
-      <code>$this-&gt;params</code>
-    </PossiblyInvalidArgument>
     <PossiblyNullArgument occurrences="2">
       <code>$contest</code>
       <code>$contest</code>
@@ -3027,21 +2994,13 @@
     </PossiblyNullPropertyAssignment>
   </file>
   <file src="frontend/tests/factories/ProblemsFactory.php">
-    <InvalidDocblockParamName occurrences="2">
-      <code>$title</code>
-      <code>$zipName</code>
-    </InvalidDocblockParamName>
     <MissingDependency occurrences="4">
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="10">
-      <code>$params</code>
-      <code>$default</code>
-      <code>$params</code>
-      <code>$params</code>
+    <MissingParamType occurrences="6">
       <code>$problemData</code>
       <code>$user</code>
       <code>$problemData</code>
@@ -3049,9 +3008,6 @@
       <code>$tag</code>
       <code>$public</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$params</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="5">
       <code>createProblemWithAuthor</code>
       <code>createProblem</code>
@@ -3059,12 +3015,7 @@
       <code>addGroupAdmin</code>
       <code>addTag</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$params['title']</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="5">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
+    <MixedArrayAccess occurrences="3">
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
@@ -3072,27 +3023,15 @@
     <MixedArrayAssignment occurrences="1">
       <code>$_FILES['problem_contents']['tmp_name']</code>
     </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="4">
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-      <code>$this-&gt;params[$offset]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="6">
-      <code>$array[$parameter]</code>
-      <code>$_FILES['problem_contents']['tmp_name']</code>
+    <MixedAssignment occurrences="4">
       <code>$r</code>
       <code>$problemAuthorIdentity</code>
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="2">
-      <code>$params['author']-&gt;username</code>
+    <MixedPropertyFetch occurrences="1">
       <code>$user-&gt;username</code>
     </MixedPropertyFetch>
-    <PossiblyInvalidArgument occurrences="1">
-      <code>$this-&gt;params</code>
-    </PossiblyInvalidArgument>
   </file>
   <file src="frontend/tests/factories/QualityNominationFactory.php">
     <MissingPropertyType occurrences="1">

@@ -46,7 +46,7 @@ class IdentityContestsTest extends OmegaupTestCase {
      */
     public function testIdentityJoinsContest() {
         // Get a public contest
-        $contestData = ContestsFactory::createContest(new ContestParams());
+        $contestData = ContestsFactory::createContest();
 
         // Get some problems into the contest
         [$problemData] = ContestsFactory::insertProblemsInContest($contestData);
