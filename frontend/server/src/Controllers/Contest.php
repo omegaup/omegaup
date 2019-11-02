@@ -497,12 +497,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 "contest_{$result['requestsUserInformation']}_consent";
             $result['privacyStatement'] = [
                 'markdown' => $privacyStatementMarkdown,
-                'gitObjectId' =>
-                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                        $statementType
-                    )['git_object_id'],
                 'statementType' => $statementType
             ];
+            $statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                $statementType
+            );
+            if (!is_null($statement)) {
+                $result['privacyStatement']['gitObjectId'] = $statement['git_object_id'];
+            }
         }
 
         return $result;
@@ -763,6 +765,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiOpen(\OmegaUp\Request $r) {
+        // Authenticate request
+        $r->ensureIdentity();
+
         $response = self::validateDetails($r);
         [
             'needsBasicInformation' => $needsInformation,
@@ -770,16 +775,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Contests::getNeedsInformation(
             $response['contest']->problemset_id
         );
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        );
 
         if (
             $needsInformation
-            && !is_null($session['identity'])
-              && (!$session['identity']->country_id
-              || !$session['identity']->state_id
-                || !$session['identity']->school_id)
+              && (is_null($r->identity->country_id)
+                  || is_null($r->identity->state_id)
+                  || is_null($r->identity->school_id))
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'contestBasicInformationNeeded'
@@ -1069,7 +1070,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a "column name" for the $idx (think Excel column names).
      */
-    public static function columnName($idx) {
+    public static function columnName(int $idx): string {
         $name = chr(ord('A') + $idx % 26);
         while ($idx >= 26) {
             $idx /= 26;
@@ -2429,6 +2430,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get all scoreboards
         $scoreboards = [];
         foreach ($contests as $contest) {
+            if (is_null($contest->alias)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
             // Set defaults for contests params
             if (!isset($contestParams[$contest->alias])) {
                 $contestParams[$contest->alias] = [
