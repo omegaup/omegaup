@@ -76,7 +76,7 @@ class ContestUsersTest extends OmegaupTestCase {
     public function testContestParticipantsReport() {
         // Get a contest
         $contestData = ContestsFactory::createContest(new ContestParams([
-            'requests_user_information' => 'optional'
+            'requestsUserInformation' => 'optional',
         ]));
         $user = [];
         $identity = [];
@@ -191,7 +191,7 @@ class ContestUsersTest extends OmegaupTestCase {
     public function testNeedsBasicInformation() {
         // Get a contest
         $contestData = ContestsFactory::createContest(new ContestParams([
-            'basic_information' => 'true'
+            'basicInformation' => 'true',
         ]));
 
         // Create and login a user to view the contest

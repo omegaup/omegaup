@@ -1341,8 +1341,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $r->ensureBool('basic_information', false);
+
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
-            'needs_basic_information' => $r['basic_information'] == 'true',
+            'needs_basic_information' => boolval($r['basic_information']),
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
@@ -2801,7 +2803,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                     $contest->problemset_id
                 );
-                $problemset->needs_basic_information = $r['basic_information'] ?? 0;
+                $problemset->needs_basic_information = $r['basic_information'] ?? false;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
             }
