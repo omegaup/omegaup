@@ -86,8 +86,6 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public function mockSessionManager(): void {
         $sessionManagerMock =
             $this->getMockBuilder('\\OmegaUp\\SessionManager')->getMock();
-        $sessionManagerMock->expects($this->once())
-                ->method('sessionStart');
         \OmegaUp\Controllers\Session::setSessionManagerForTesting(
             $sessionManagerMock
         );

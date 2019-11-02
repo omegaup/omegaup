@@ -2,6 +2,17 @@
 
 namespace OmegaUp;
 
+// An RAII wrapper to manage the lifetime of a session.
+class ScopedSession {
+    public function __construct() {
+        session_start();
+    }
+
+    public function __destruct() {
+        session_write_close();
+    }
+}
+
 class SessionManager {
     public function setCookie(
         string $name,
@@ -59,10 +70,7 @@ class SessionManager {
         return strval($_COOKIE[$name]);
     }
 
-    public function sessionStart(): void {
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            return;
-        }
-        @session_start();
+    public function sessionStart(): ScopedSession {
+        return new ScopedSession();
     }
 }
