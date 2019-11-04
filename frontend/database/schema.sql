@@ -763,6 +763,7 @@ CREATE TABLE `Schools` (
   `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   PRIMARY KEY (`school_id`),
+  UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

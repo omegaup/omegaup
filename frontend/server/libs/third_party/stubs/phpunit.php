@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 namespace PHPUnit\Framework;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\MockBuilder;

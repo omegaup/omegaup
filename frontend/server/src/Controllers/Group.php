@@ -12,14 +12,19 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new group.
      */
-    public static function createGroup($alias, $name, $description, $owner_id) {
+    public static function createGroup(
+        string $alias,
+        string $name,
+        string $description,
+        int $ownerId
+    ): \OmegaUp\DAO\VO\Groups {
         $group = new \OmegaUp\DAO\VO\Groups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
         ]);
         $groupAcl = new \OmegaUp\DAO\VO\ACLs([
-            'owner_id' => $owner_id,
+            'owner_id' => $ownerId,
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -57,7 +62,7 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['description'],
             'description'
         );
@@ -319,5 +324,48 @@ class Group extends \OmegaUp\Controllers\Controller {
         self::$log->info("New scoreboard created {$r['alias']}");
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @return array{IS_ORGANIZER: bool, payload: array{countries: \OmegaUp\DAO\VO\Countries[]}}
+     */
+    public static function getGroupEditDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
+            \OmegaUp\Experiments::IDENTITIES
+        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+            $r->identity
+        );
+        return [
+            'IS_ORGANIZER' => $isOrganizer,
+            'payload' => [
+                'countries' => \OmegaUp\DAO\Countries::getAll(
+                    null,
+                    100,
+                    'name'
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * @return array{payload: array{groups: array{alias: string, create_time: int, description: string, name: string}[]}}
+     */
+    public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        return [
+            'payload' => [
+                'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
+                    $r->user->user_id,
+                    $r->identity->identity_id
+                ),
+            ],
+        ];
     }
 }

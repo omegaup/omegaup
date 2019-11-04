@@ -95,7 +95,7 @@ class UserContestsTest extends OmegaupTestCase {
             new ContestParams(
                 [
                     'contestDirector' => $directorIdentity,
-                    'admission_mode' => 'private'
+                    'admissionMode' => 'private',
                 ]
             )
         );
@@ -148,7 +148,7 @@ class UserContestsTest extends OmegaupTestCase {
         // Create private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $user = $contestData['userDirector'];

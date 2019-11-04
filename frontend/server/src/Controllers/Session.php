@@ -78,13 +78,14 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
-        $SessionM = self::getSessionManagerInstance();
-        $SessionM->sessionStart();
+        $sessionManager = self::getSessionManagerInstance();
         $authToken = null;
         if (!is_null($r['auth_token'])) {
             $authToken = strval($r['auth_token']);
         } else {
-            $authToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+            $authToken = $sessionManager->getCookie(
+                OMEGAUP_AUTH_TOKEN_COOKIE_NAME
+            );
         }
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;

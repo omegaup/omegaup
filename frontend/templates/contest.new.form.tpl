@@ -1,9 +1,5 @@
-{if !isset($IS_UPDATE)}
-	{assign "IS_UPDATE" 0}
-{/if}
-
 <div class="panel panel-primary">
-	{if $IS_UPDATE != 1}
+	{if $IS_UPDATE eq FALSE}
 	<div class="panel-heading">
 		<h3 class="panel-title">
 			{#contestNew#}
@@ -11,7 +7,7 @@
 	</div>
 	{/if}
 	<div class="panel-body">
-		{if $IS_UPDATE != 1}
+		{if $IS_UPDATE eq FALSE}
 		<div class="btn-group bottom-margin">
 			<button class="btn btn-default" id="omi" name="omi">{#contestNewFormOmiStyle#}</button>
 			<button class="btn btn-default" id="preioi" name="preioi">{#contestNewForm#}</button>
@@ -27,7 +23,7 @@
 
 					<div class="form-group col-md-6">
 						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
-						<input id="alias" name="alias" value="" type="text" class="form-control" {IF $IS_UPDATE eq 1} disabled="true" {/if}>
+						<input id="alias" name="alias" value="" type="text" class="form-control" {if $IS_UPDATE eq TRUE} disabled="true" {/if}>
 						<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
 					</div>
 				</div>
@@ -160,7 +156,7 @@
 				</div>
 
 				<div class="form-group">
-				{if $IS_UPDATE eq 1}
+				{if $IS_UPDATE eq TRUE}
 					<button type="submit" class="btn btn-primary">{#contestNewFormUpdateContest#}</button>
 				{else}
 					<button type="submit" class="btn btn-primary">{#contestNewFormScheduleContest#}</button>
