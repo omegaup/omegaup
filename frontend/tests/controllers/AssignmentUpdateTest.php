@@ -62,6 +62,18 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
+                'name' => 'some new name'
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to missing parameter'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'course' => $courseData['course_alias'],
                 'name' => 'some new name'
             ]));

@@ -42,24 +42,30 @@ class LinkedIn {
             'redirect_uri' => $this->_redirectUrl,
             'state' => json_encode($this->_state),
         ]);
-        $_SESSION['li-state'] = $this->_state['ct'];
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+            $_SESSION['li-state'] = $this->_state['ct'];
+        }
         return "https://www.linkedin.com/oauth/v2/authorization?$query_string";
     }
 
     public function getAuthToken(string $code, string $state): string {
         /** @var null|array{ct: string} */
         $stateArray = json_decode($state, true);
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
         if (
-            !isset($_SESSION['li-state'])
-            || empty($stateArray)
-            || !isset($stateArray['ct'])
-            || $_SESSION['li-state'] != $stateArray['ct']
+                !isset($_SESSION['li-state'])
+                || empty($stateArray)
+                || !isset($stateArray['ct'])
+                || $_SESSION['li-state'] != $stateArray['ct']
         ) {
             throw new \OmegaUp\Exceptions\CSRFException('invalidCsrfToken');
         }
 
-        // If we make it here, the CSRF token has been consumed
-        unset($_SESSION['li-state']);
+            // If we make it here, the CSRF token has been consumed
+            unset($_SESSION['li-state']);
+        }
 
         $curl = new \OmegaUp\CurlSession(
             'https://www.linkedin.com/oauth/v2/accessToken'
