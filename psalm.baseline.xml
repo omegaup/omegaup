@@ -636,12 +636,11 @@
     <MissingParamType occurrences="1">
       <code>$is_update</code>
     </MissingParamType>
-    <MissingReturnType occurrences="18">
+    <MissingReturnType occurrences="16">
       <code>validateCreateOrUpdate</code>
       <code>apiCreate</code>
       <code>validateRejudge</code>
       <code>apiRejudge</code>
-      <code>apiUpdate</code>
       <code>setRestrictedTags</code>
       <code>apiDownload</code>
       <code>validateDownload</code>
@@ -652,7 +651,6 @@
       <code>apiRuns</code>
       <code>apiClarifications</code>
       <code>validateList</code>
-      <code>apiList</code>
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
@@ -771,7 +769,6 @@
       <code>$language</code>
       <code>$orderBy</code>
       <code>$query</code>
-      <code>$response['results']</code>
       <code>$problems</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
@@ -833,7 +830,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="18">
+    <PossiblyNullArgument occurrences="16">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -1837,8 +1834,7 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="13">
-      <code>byIdentityType</code>
+    <MissingReturnType occurrences="12">
       <code>searchByAlias</code>
       <code>getPracticeDeadline</code>
       <code>getProblemsSolved</code>
@@ -1863,14 +1859,11 @@
       <code>$clause[0]</code>
       <code>$clause[1]</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="7">
       <code>$programmingLanguage</code>
       <code>$clause</code>
       <code>$total</code>
       <code>$hiddenTags</code>
-      <code>$problem['score']</code>
-      <code>$problem['points']</code>
-      <code>$problem['ratio']</code>
       <code>$quoted</code>
       <code>$offset</code>
       <code>$offset</code>
@@ -1887,12 +1880,6 @@
     <MixedReturnStatement occurrences="1">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>
-    <RedundantCondition occurrences="1">
-      <code>is_null($result)</code>
-    </RedundantCondition>
-    <TypeDoesNotContainNull occurrences="1">
-      <code>is_null($result)</code>
-    </TypeDoesNotContainNull>
     <UndefinedMethod occurrences="1">
       <code>Quote</code>
     </UndefinedMethod>
@@ -3279,69 +3266,6 @@
       <code>$systemGroups</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/problemlist.php">
-    <MissingReturnType occurrences="2">
-      <code>getTagList</code>
-      <code>getDifficultyRange</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="4">
-      <code>getDifficultyRange()</code>
-      <code>$_GET['query']</code>
-      <code>$_GET['query']</code>
-      <code>$response['total']</code>
-    </MixedArgument>
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$params</code>
-    </MixedArgumentTypeCoercion>
-    <MixedArrayAccess occurrences="15">
-      <code>$response['total']</code>
-      <code>$response['results']</code>
-      <code>$response['results']</code>
-      <code>$problem['difficulty']</code>
-      <code>$response['results']</code>
-      <code>$response['results']</code>
-      <code>$problem['quality']</code>
-      <code>$response['results']</code>
-      <code>$problem['points']</code>
-      <code>$response['results']</code>
-      <code>$problem['ratio']</code>
-      <code>$response['results']</code>
-      <code>$problem['score']</code>
-      <code>$response['results']</code>
-      <code>$response['results']</code>
-    </MixedArrayAccess>
-    <MixedArrayOffset occurrences="7">
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-      <code>$response['results'][$key]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="12">
-      <code>$tags</code>
-      <code>$mode</code>
-      <code>$order_by</code>
-      <code>$language</code>
-      <code>$tags</code>
-      <code>$r['language']</code>
-      <code>$r['order_by']</code>
-      <code>$r['mode']</code>
-      <code>$r['tag']</code>
-      <code>$r['difficulty_range']</code>
-      <code>$response</code>
-      <code>$problem</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/problemmine.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/profile.php">
     <MixedArgument occurrences="1">
       <code>$response['userinfo']['graduation_date']</code>
@@ -3357,11 +3281,6 @@
     <MixedArrayAssignment occurrences="1">
       <code>$response['userinfo']['graduation_date']</code>
     </MixedArrayAssignment>
-  </file>
-  <file src="frontend/www/qualitynomination.php">
-    <MixedAssignment occurrences="1">
-      <code>$qualitynomination_id</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/www/rank.php">
     <MixedArgumentTypeCoercion occurrences="1">
