@@ -327,19 +327,17 @@ class Validators {
      *
      * @param mixed     $parameter
      * @param string    $parameterName
-     * @param int|float|null $lowerBound
-     * @param int|float|null $upperBound
-     * @param boolean   $required
+     * @param int|null $lowerBound
+     * @param int|null $upperBound
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateTimestampInRange(
         $parameter,
         string $parameterName,
-        $lowerBound,
-        $upperBound,
-        bool $required = true
+        ?int $lowerBound,
+        ?int $upperBound
     ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, true)) {
             return;
         }
         if (!is_numeric($parameter)) {
@@ -348,21 +346,28 @@ class Validators {
                 $parameterName
             );
         }
-        // Coerce $parameter into a numeric value.
-        $parameter = $parameter + 0;
+        $parameter = intval($parameter);
         if (!is_null($lowerBound) && $parameter < $lowerBound) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooSmall',
-                $parameterName,
-                ['lower_bound' => date('d/m/Y H:i', intval($lowerBound))]
+                $parameterName
             );
+            $exception->addCustomMessageToArray(
+                'payload',
+                intval($lowerBound)
+            );
+            throw $exception;
         }
         if (!is_null($upperBound) && $parameter > $upperBound) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooLarge',
-                $parameterName,
-                ['upper_bound' => date('d/m/Y H:i', intval($upperBound))]
+                $parameterName
             );
+            $exception->addCustomMessageToArray(
+                'payload',
+                intval($upperBound)
+            );
+            throw $exception;
         }
     }
 
