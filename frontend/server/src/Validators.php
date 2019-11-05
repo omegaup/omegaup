@@ -354,7 +354,7 @@ class Validators {
             );
             $exception->addCustomMessageToArray(
                 'payload',
-                intval($lowerBound)
+                ['lower_bound' => $lowerBound]
             );
             throw $exception;
         }
@@ -365,7 +365,7 @@ class Validators {
             );
             $exception->addCustomMessageToArray(
                 'payload',
-                intval($upperBound)
+                ['upper_bound' => $upperBound]
             );
             throw $exception;
         }

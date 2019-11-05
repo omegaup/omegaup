@@ -175,6 +175,16 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterDateTooLarge', $e->getMessage());
+
+            $responseArray =  $e->asResponseArray();
+            $this->assertEquals(
+                'parameterDateTooLarge',
+                $responseArray['errorname']
+            );
+            $this->assertEquals(
+                $courseData['course']->finish_time,
+                $responseArray['payload']['upper_bound']
+            );
         }
     }
 }
