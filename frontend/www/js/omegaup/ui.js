@@ -536,7 +536,13 @@ let UI = {
     document
       .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
       .forEach(function(item, index) {
-        let inputValue = item.querySelector('pre').innerHTML;
+        let preElement = item.querySelector('pre');
+        if (!preElement) {
+          // This can only happen if a user messed up with the markdown of a
+          // problem.
+          return;
+        }
+        let inputValue = preElement.innerHTML;
 
         let clipboardButton = document.createElement('button');
         clipboardButton.title = T.copySampleCaseTooltip;
