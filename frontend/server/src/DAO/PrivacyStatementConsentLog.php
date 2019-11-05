@@ -35,7 +35,7 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConse
      *
      * @param int $identityId the identity of the user giving consent.
      * @param int $privacyStatementId the id of the privacy statement.
-     * @return the ID of the newly inserted consent.
+     * @return int the ID of the newly inserted consent.
      */
     public static function saveLog(
         int $identityId,
@@ -60,7 +60,7 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConse
      *
      * @param int $identityId the identity of the user giving consent.
      * @param int $privacyStatementId the id of the privacy statement.
-     * @return the ID of the consent, null if missing.
+     * @return null|int The ID of the consent, null if missing.
      */
     public static function getId(
         int $identityId,
@@ -76,6 +76,7 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConse
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
+        /** @var null|int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$identityId, $privacyStatementId]

@@ -72,14 +72,21 @@ let UI = {
   },
 
   formatString: function(template, values) {
-    for (var key in values) {
-      if (!values.hasOwnProperty(key)) continue;
-      template = template.replace(
-        new RegExp('%\\(' + key + '\\)', 'g'),
-        values[key],
-      );
-    }
-    return template;
+    const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
+    return template.replace(re, (match, key, modifier) => {
+      if (!values.hasOwnProperty(key)) {
+        // If the array does not provide a replacement for the key, just return
+        // the original substring.
+        return match;
+      }
+      let replacement = values[key];
+      if (modifier === 'date') {
+        replacement = UI.formatDate(new Date(replacement));
+      } else if (modifier === 'timestamp') {
+        replacement = UI.formatDateTime(new Date(replacement));
+      }
+      return replacement;
+    });
   },
 
   contestUpdated: function(data, contestAlias) {

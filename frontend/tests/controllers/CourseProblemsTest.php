@@ -98,7 +98,11 @@ class CourseProblemsTest extends OmegaupTestCase {
             $identity,
             $adminLogin
         );
-        CoursesFactory::addStudentToCourse($courseData, $student, $adminLogin);
+        CoursesFactory::addStudentToCourse(
+            $courseData,
+            $identityStudent,
+            $adminLogin
+        );
         $course = $courseData['course'];
         $assignment = $courseData['assignment'];
 

@@ -60,7 +60,7 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -84,7 +84,7 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -311,9 +311,9 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Create a contest with one problem.
         $contestData = ContestsFactory::createContest(new ContestParams([
-            'start_time' => $originalTime,
-            'last_updated' => $originalTime,
-            'finish_time' => $originalTime + 60 * 60,
+            'startTime' => $originalTime,
+            'lastUpdated' => $originalTime,
+            'finishTime' => $originalTime + 60 * 60,
         ]));
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
@@ -609,9 +609,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create contest with 5 hours and a window length 20 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 20,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 5 * 60,
+                'windowLength' => 20,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 5 * 60,
             ])
         );
 
@@ -665,9 +665,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create contest with 5 hours and a window length 60 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 60,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 5 * 60,
+                'windowLength' => 60,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 5 * 60,
             ])
         );
 
@@ -727,9 +727,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create contest with 5 hours and a window length 60 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 60,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 5 * 60,
+                'windowLength' => 60,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 5 * 60,
             ])
         );
 
@@ -784,9 +784,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create contest with 5 hours and a window length 60 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 30,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 2 * 60,
+                'windowLength' => 30,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 2 * 60,
             ])
         );
 

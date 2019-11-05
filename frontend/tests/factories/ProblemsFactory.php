@@ -1,106 +1,60 @@
 <?php
 
-/**
- * ProblemParams
- */
-class ProblemParams implements ArrayAccess {
-    private $params;
-
-    public function __construct($params = null) {
-        if (!is_object($params)) {
-            $this->params = [];
-            if (is_array($params)) {
-                $this->params = array_merge([], $params);
-            }
-        } else {
-            $this->params = clone $params;
-        }
-
-        ProblemParams::validateParameter(
-            'zipName',
-            $this->params,
-            false,
-            OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip'
-        );
-        ProblemParams::validateParameter(
-            'title',
-            $this->params,
-            false,
-            Utils::CreateRandomString()
-        );
-        ProblemParams::validateParameter(
-            'visibility',
-            $this->params,
-            false,
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
-        );
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ProblemParams::validateParameter(
-            'author',
-            $this->params,
-            false,
-            $identity
-        );
-        ProblemParams::validateParameter(
-            'authorUser',
-            $this->params,
-            false,
-            $user
-        );
-        ProblemParams::validateParameter(
-            'languages',
-            $this->params,
-            false,
-            'c,cpp,py'
-        );
-    }
-
-    public function offsetGet($offset) {
-        return isset($this->params[$offset]) ? $this->params[$offset] : null;
-    }
-
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->params[] = $value;
-        } else {
-            $this->params[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->params[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->params[$offset]);
-    }
+class ProblemParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $zipName;
 
     /**
-     * Checks if array contains a key defined by $parameter
-     * @param string $parameter
-     * @param array $array
-     * @param boolean $required
-     * @param $default
-     * @return boolean
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @readonly
+     * @var string
      */
-    private static function validateParameter(
-        $parameter,
-        &$array,
-        $required = true,
-        $default = null
-    ) {
-        if (!isset($array[$parameter])) {
-            if ($required) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'ParameterEmpty',
-                    $parameter
-                );
-            }
-            $array[$parameter] = $default;
-        }
+    public $title;
 
-        return true;
+    /**
+     * @var int
+     */
+    public $visibility;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $languages;
+
+    /**
+     * @readonly
+     * @var \OmegaUp\DAO\VO\Identities
+     */
+    public $author;
+
+    /**
+     * @readonly
+     * @var \OmegaUp\DAO\VO\Users
+     */
+    public $authorUser;
+
+    /**
+     * @param array{zipName?: string, title?: string, visibility?: int, author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string} $params
+     */
+    public function __construct($params = []) {
+        $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
+        $this->title = $params['title'] ?? Utils::CreateRandomString();
+        $this->languages = $params['languages'] ?? 'c,cpp,py';
+        $this->visibility = $params['visibility'] ?? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
+        if (!empty($params['author']) && !empty($params['authorUser'])) {
+            $this->author = $params['author'];
+            $this->authorUser = $params['authorUser'];
+        } else {
+            [
+                'user' => $user,
+                'identity' => $identity,
+            ] = UserFactory::createUser();
+            $this->author = $params['author'] ?? $identity;
+            $this->authorUser = $params['authorUser'] ?? $user;
+        }
     }
 }
 
@@ -135,27 +89,24 @@ class ProblemsFactory {
      * Returns a Request object with valid info to create a problem and the
      * author of the problem
      *
-     * @param string $title
-     * @param string $zipName
-     * @return Array
+     * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, request: \OmegaUp\Request, zip_path: string}
      */
-    public static function getRequest($params = null) {
-        if (!($params instanceof ProblemParams)) {
-            $params = new ProblemParams($params);
+    public static function getRequest(?ProblemParams $params = null) {
+        if (is_null($params)) {
+            $params = new ProblemParams();
         }
-
         $r = new \OmegaUp\Request([
-            'title' => $params['title'],
+            'title' => $params->title,
             'problem_alias' => substr(
                 preg_replace(
                     '/[^a-zA-Z0-9_-]/',
                     '',
-                    str_replace(' ', '-', $params['title'])
+                    str_replace(' ', '-', $params->title)
                 ),
                 0,
                 32
             ),
-            'author_username' => $params['author']->username,
+            'author_username' => $params->author->username,
             'validator' => 'token',
             'time_limit' => 5000,
             'overall_wall_time_limit' => 60000,
@@ -164,20 +115,20 @@ class ProblemsFactory {
             'memory_limit' => 32000,
             'source' => 'yo',
             'order' => 'normal',
-            'visibility' => $params['visibility'],
+            'visibility' => $params->visibility,
             'output_limit' => 10240,
             'input_limit' => 10240,
-            'languages' => $params['languages'],
+            'languages' => $params->languages,
         ]);
 
         // Set file upload context
-        $_FILES['problem_contents']['tmp_name'] = $params['zipName'];
+        $_FILES['problem_contents']['tmp_name'] = $params->zipName;
 
         return [
             'request' => $r,
-            'author' => $params['author'],
-            'authorUser' => $params['authorUser'],
-            'zip_path' => $params['zipName'],
+            'author' => $params->author,
+            'authorUser' => $params->authorUser,
+            'zip_path' => $params->zipName,
         ];
     }
 
@@ -192,17 +143,16 @@ class ProblemsFactory {
     }
 
     /**
-     *
+     * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
      */
     public static function createProblem(
-        $params = null,
+        ?ProblemParams $params = null,
         ScopedLoginToken $login = null
     ) {
-        if (!($params instanceof ProblemParams)) {
-            $params = new ProblemParams($params);
+        if (is_null($params)) {
+            $params = new ProblemParams();
         }
-
-        $params['visibility'] = $params['visibility'] >= \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+        $params->visibility = $params->visibility >= \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
             ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
             : \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
 
@@ -222,13 +172,22 @@ class ProblemsFactory {
 
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        $visibility = $params['visibility'];
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            strval(
+                $r['problem_alias']
+            )
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $visibility = intval($params->visibility);
 
         if (
-            $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
-            || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
-            || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+            || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+            || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;
             \OmegaUp\DAO\Problems::update($problem);
@@ -245,11 +204,17 @@ class ProblemsFactory {
         ];
     }
 
-    public static function addAdminUser($problemData, $user) {
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
+    public static function addAdminUser(
+        $problemData,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['usernameOrEmail'] = $user->username;
+        $r['usernameOrEmail'] = $identity->username;
 
         // Log in the problem author
         $login = OmegaupTestCase::login($problemData['author']);
@@ -261,6 +226,9 @@ class ProblemsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
     public static function addGroupAdmin(
         $problemData,
         \OmegaUp\DAO\VO\Groups $group
@@ -279,7 +247,14 @@ class ProblemsFactory {
         \OmegaUp\Controllers\Problem::apiAddGroupAdmin($r);
     }
 
-    public static function addTag($problemData, $tag, $public) {
+     /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
+    public static function addTag(
+        $problemData,
+        string $tag,
+        int $public
+    ): void {
         // Prepare our request
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
