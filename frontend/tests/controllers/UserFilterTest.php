@@ -137,7 +137,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousProblemsetAccess() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
 
@@ -152,7 +152,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousContestAccess() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
 
@@ -164,7 +164,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousProblemsetWithToken() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -181,7 +181,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousContestWithToken() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -198,7 +198,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousProblemsetWithAdminToken() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -216,7 +216,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAnonymousContestWithAdminToken() {
         $contest = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(

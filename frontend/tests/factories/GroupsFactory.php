@@ -59,7 +59,6 @@ class GroupsFactory {
      * Add identity to group helper
      *
      * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData
-     * @param \OmegaUp\DAO\VO\Identities $identity
      */
     public static function addUserToGroup(
         array $groupData,

@@ -947,9 +947,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return $allData;
     }
 
+    /**
+     * @return string[]
+     */
     final public static function getIdentitiesInGroupWhoAttemptedProblem(
-        $group_id,
-        $problem_id
+        int $groupId,
+        int $problemId
     ) {
         $sql = '
             SELECT
@@ -971,8 +974,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     gi.group_id = ?
                     AND s.problem_id = ?
             );';
-        $params = [$group_id, $problem_id];
+        $params = [$groupId, $problemId];
 
+        /** @var array{username: string}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $identities = [];

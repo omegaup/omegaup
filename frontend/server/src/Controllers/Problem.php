@@ -84,7 +84,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (is_null($r['problem'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
-                    'Problem not found'
+                    'problemNotFound'
                 );
             }
 
@@ -2977,8 +2977,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
+        $privateProblemsAlert = false;
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+            $privateProblemsAlert = (
+                !isset($_SESSION['private_problems_alert']) &&
+                \OmegaUp\DAO\Problems::getPrivateCount($r->user) > 0
+            );
+        if ($privateProblemsAlert) {
+            $_SESSION['private_problems_alert'] = true;
+        }
+        }
         return [
             'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin($r->identity),
+            'privateProblemsAlert' => $privateProblemsAlert,
         ];
     }
 

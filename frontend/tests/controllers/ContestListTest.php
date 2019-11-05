@@ -89,7 +89,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -126,7 +126,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -153,7 +153,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -190,7 +190,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -230,7 +230,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $title = $contestData['request']['title'];
@@ -286,7 +286,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $author = $contestData['director'];
@@ -331,7 +331,7 @@ class ContestListTest extends OmegaupTestCase {
         $recommendedContestData = ContestsFactory::createContest();
         $notRecommendedContestData = ContestsFactory::createContest(new ContestParams(
             [
-                'finish_time' => $recommendedContestData['request']['finish_time'] + 1,
+                'finishTime' => $recommendedContestData['request']['finish_time'] + 1,
             ]
         ));
 
@@ -447,14 +447,14 @@ class ContestListTest extends OmegaupTestCase {
         // Create 2 contests, the second one will occur in to the future.
         $currentContestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
         $futureContestData = ContestsFactory::createContest(new ContestParams(
             [
-                'admission_mode' => 'private',
-                'finish_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
-                'start_time' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
+                'admissionMode' => 'private',
+                'finishTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                'startTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
             ]
         ));
 
@@ -488,10 +488,10 @@ class ContestListTest extends OmegaupTestCase {
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
-            $isPublic = ($i === 0) ? 'public' : 'private';
+            $admissionMode = ($i === 0) ? 'public' : 'private';
             $contestData[$i] = ContestsFactory::createContest(
                 new ContestParams(
-                    ['admission_mode' => $isPublic]
+                    ['admissionMode' => $admissionMode]
                 )
             );
         }
@@ -529,20 +529,20 @@ class ContestListTest extends OmegaupTestCase {
         // Create three PUBLIC contests
         $contests[0] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => \OmegaUp\Time::get()
+                'lastUpdated' => \OmegaUp\Time::get(),
             ])
         );
 
         $contests[1] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => \OmegaUp\Time::get() + 1
+                'lastUpdated' => \OmegaUp\Time::get() + 1,
             ])
         );
         ContestsFactory::addProblemToContest($problemData, $contests[1]);
 
         $contests[2] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => \OmegaUp\Time::get() + 2
+                'lastUpdated' => \OmegaUp\Time::get() + 2,
             ])
         );
         $originalOrderContest = [

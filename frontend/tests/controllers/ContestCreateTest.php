@@ -14,7 +14,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateContestPositive() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -54,7 +54,7 @@ class CreateContestTest extends OmegaupTestCase {
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
             $contestData = ContestsFactory::getRequest(new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             ));
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
@@ -88,7 +88,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -113,7 +113,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -137,7 +137,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreatePublicContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -163,7 +163,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -193,7 +193,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -224,9 +224,9 @@ class CreateContestTest extends OmegaupTestCase {
         // Create contest with 2 hours and a window length 30 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 30,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 2 * 60,
+                'windowLength' => 30,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 2 * 60,
             ])
         );
 

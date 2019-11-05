@@ -214,7 +214,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         try {
             ContestsFactory::createContest(new ContestParams([
-                'contestDirector' => $identity
+                'contestDirector' => $identity,
             ]));
             $this->fail('unassociated identity can not create contests');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {

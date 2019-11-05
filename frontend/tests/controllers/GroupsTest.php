@@ -280,7 +280,7 @@ class GroupsTest extends OmegaupTestCase {
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
