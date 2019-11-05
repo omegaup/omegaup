@@ -84,7 +84,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (is_null($r['problem'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
-                    'Problem not found'
+                    'problemNotFound'
                 );
             }
 
