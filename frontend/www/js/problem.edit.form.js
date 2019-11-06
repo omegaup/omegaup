@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#problem-form .tag-list').append(
           $('<a></a>')
             .attr('href', '#tags')
-            .attr('data-key', e.name)
+            .data('key', e.name)
             .addClass('tag')
             .addClass('pull-left')
             .text(omegaup.T.hasOwnProperty(e.name) ? omegaup.T[e.name] : e.name)
@@ -32,7 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function refreshProblemTags(tagname, public) {
-    var tagLongName = omegaup.T.hasOwnProperty(tagname)
+    var tagLocalizedName = omegaup.T.hasOwnProperty(tagname)
       ? omegaup.T[tagname]
       : tagname;
     $('#problem-tags').append(
@@ -40,9 +40,9 @@ omegaup.OmegaUp.on('ready', function() {
         .append(
           $('<td class="tag-name"></td>').append(
             $('<a></a>')
-              .attr('data-key', tagname)
+              .data('key', tagname)
               .attr('href', '/problem/?tag[]=' + encodeURIComponent(tagname))
-              .text(tagLongName),
+              .text(tagLocalizedName),
           ),
         )
         .append(
@@ -58,10 +58,10 @@ omegaup.OmegaUp.on('ready', function() {
               $('#problem-form .tag-list').append(
                 $('<a></a>')
                   .attr('href', '#tags')
-                  .attr('data-key', tagname)
+                  .data('key', tagname)
                   .addClass('tag')
                   .addClass('pull-left')
-                  .text(tagLongName)
+                  .text(tagLocalizedName)
                   .on('click', onTabClicked),
               );
               $(tr).remove();
