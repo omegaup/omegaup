@@ -44,6 +44,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.User.profile()
     .then(function(data) {
+      console.log(data);
       $('#username').text(data.userinfo.username);
       $('#username').val(data.userinfo.username);
       $('#name').val(data.userinfo.name);
