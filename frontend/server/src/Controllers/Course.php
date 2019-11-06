@@ -66,13 +66,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        $r->ensureTimestamp(
+        $r->ensureOptionalTimestamp(
             'start_time',
             $courseStartTime,
             $courseFinishTime,
             $isRequired
         );
-        $r->ensureTimestamp(
+        $r->ensureOptionalTimestamp(
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
@@ -610,8 +610,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureTimestamp(
             'start_time',
             $course->start_time,
-            $course->finish_time,
-            true /* is_required */
+            $course->finish_time
         );
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
@@ -619,8 +618,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureTimestamp(
             'finish_time',
             $course->start_time,
-            $course->finish_time,
-            true /* is_required */
+            $course->finish_time
         );
 
         if ($r['start_time'] > $r['finish_time']) {
