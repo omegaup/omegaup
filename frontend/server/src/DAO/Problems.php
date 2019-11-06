@@ -109,7 +109,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         $languageJoin = '';
-        if (!is_null($language)) {
+        if (!is_null($language) && $language !== 'all') {
             $languageJoin = '
                 INNER JOIN
                     Problems_Languages ON Problems_Languages.problem_id = p.problem_id
@@ -337,14 +337,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $args[] = intval($offset);
         $args[] = intval($rowcount);
 
-        /** @var null|list<array{points: int, ratio: float, score: int, problem_id: int, acl_id: int, visibility: int, title: string, alias: string, commit: string, current_version: string, languages: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: int, creation_date: string, source: string, order: string, deprecated: int, email_clarifications: int, quality: null|float, quality_histogram: null|list<int>, difficulty_histogram: list<int>}> */
+        /** @var list<array{points: int, ratio: float, score: int, problem_id: int, acl_id: int, visibility: int, title: string, alias: string, commit: string, current_version: string, languages: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: int, creation_date: string, source: string, order: string, deprecated: int, email_clarifications: int, quality: null|float, quality_histogram: null|list<int>, difficulty_histogram: list<int>}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql};",
             $args
         );
-        if (is_null($result)) {
-            return [];
-        }
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
@@ -356,7 +353,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $identityId
         ) : false;
         foreach ($result as $row) {
-            $temp = new \OmegaUp\DAO\VO\Problems(
+            $problemObject = new \OmegaUp\DAO\VO\Problems(
                 array_intersect_key(
                     $row,
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
@@ -364,14 +361,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             );
             /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,
             quality_histogram: list<int>, difficulty_histogram: list<int>} */
-            $problem = $temp->asFilteredArray($filters);
+            $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
             $problem['score'] = $row['score'];
             $problem['points'] = $row['points'];
             $problem['ratio'] = $row['ratio'];
             $problem['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
-                $temp,
+                $problemObject,
                 true
             );
             array_push($problems, $problem);

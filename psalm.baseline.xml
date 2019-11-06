@@ -636,7 +636,7 @@
     <MissingParamType occurrences="1">
       <code>$is_update</code>
     </MissingParamType>
-    <MissingReturnType occurrences="18">
+    <MissingReturnType occurrences="17">
       <code>validateCreateOrUpdate</code>
       <code>apiCreate</code>
       <code>validateRejudge</code>
@@ -651,12 +651,11 @@
       <code>validateRuns</code>
       <code>apiRuns</code>
       <code>apiClarifications</code>
-      <code>validateList</code>
       <code>apiList</code>
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="52">
+    <MixedArgument occurrences="49">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -703,9 +702,6 @@
       <code>$run</code>
       <code>$case['name']</code>
       <code>$casesStats['counts']</code>
-      <code>$language</code>
-      <code>$orderBy</code>
-      <code>$query</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$r['contest_alias']</code>
@@ -737,7 +733,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="46">
+    <MixedAssignment occurrences="43">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -768,9 +764,6 @@
       <code>$group</code>
       <code>$case</code>
       <code>$casesStats['last_submission_id']</code>
-      <code>$language</code>
-      <code>$orderBy</code>
-      <code>$query</code>
       <code>$problems</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
