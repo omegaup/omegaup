@@ -81,9 +81,9 @@ let UI = {
       }
       let replacement = values[key];
       if (modifier === 'date') {
-        replacement = UI.formatDate(new Date(replacement));
+        replacement = UI.formatDate(new Date(replacement * 1000));
       } else if (modifier === 'timestamp') {
-        replacement = UI.formatDateTime(new Date(replacement));
+        replacement = UI.formatDateTime(new Date(replacement * 1000));
       }
       return replacement;
     });
@@ -155,7 +155,11 @@ let UI = {
   },
 
   apiError: function(response) {
-    UI.error(((response && response.error) || 'error').toString());
+    UI.error(
+      response.hasOwnProperty('payload')
+        ? UI.formatString(response.error, response.payload)
+        : ((response && response.error) || 'error').toString(),
+    );
   },
 
   ignoreError: function(response) {},
