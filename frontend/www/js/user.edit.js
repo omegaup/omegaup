@@ -44,15 +44,24 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.User.profile()
     .then(function(data) {
-      console.log(data);
       $('#username').text(data.userinfo.username);
       $('#username').val(data.userinfo.username);
       $('#name').val(data.userinfo.name);
-      $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
+      $('#birth_date')
+        .data('date', data.userinfo.birth_date)
+        .val(
+          data.userinfo.birth_date
+          ? omegaup.UI.formatDate(data.userinfo.birth_date)
+          : data.userinfo.birth_date
+        );
       $('#gender').val(data.userinfo.gender);
-      $('#graduation_date').val(
-        omegaup.UI.formatDate(data.userinfo.graduation_date),
-      );
+      $('#graduation_date')
+        .data('date', data.userinfo.graduation_date)
+        .val(
+          data.userinfo.graduation_date
+          ? omegaup.UI.formatDate(data.userinfo.graduation_date)
+          : data.userinfo.graduation_date
+        );
       $('#country_id').val(data.userinfo.country_id);
       $('#locale').val(data.userinfo.locale);
 
@@ -78,10 +87,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('form#user_profile_form').on('submit', function(ev) {
     ev.preventDefault();
-    var birth_date = new Date($('#birth_date').val());
+    var birth_date = new Date($('#birth_date').data('date'));
     birth_date.setHours(23);
 
-    var graduation_date = new Date($('#graduation_date').val());
+    var graduation_date = new Date($('#graduation_date').data('date'));
     graduation_date.setHours(23);
 
     var locale_changed = original_locale != $('#locale').val();
@@ -97,6 +106,9 @@ omegaup.OmegaUp.on('ready', function() {
       omegaup.UI.error(omegaup.T.userEditNameTooLong);
       return;
     }
+
+    console.log(birth_date);
+    console.log(graduation_date);
 
     omegaup.API.User.update({
       username: $('#username').val(),
