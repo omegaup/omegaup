@@ -640,7 +640,6 @@ export default {
     problemsSolved: _call('/api/user/problemssolved/'),
 
     profile: _call('/api/user/profile/', function(data) {
-      console.log(data);
       if (data.userinfo.birth_date !== null) {
         data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
           data.userinfo.birth_date * 1000,
