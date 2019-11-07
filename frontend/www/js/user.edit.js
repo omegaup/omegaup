@@ -126,7 +126,7 @@ omegaup.OmegaUp.on('ready', function() {
       school_id: $('#school_id').val(),
       school_name: $('#school').val(),
       locale: $('#locale').val(),
-      preferred_language: $('#programming_language option:selected').val(),
+      preferred_language: $('#programming_language').val(),
       is_private: $('#is_private').prop('checked') ? 1 : 0,
       hide_problem_tags: $('#hide_problem_tags').prop('checked') ? 1 : 0,
     })
