@@ -2,9 +2,16 @@ omegaup.OmegaUp.on('ready', function() {
   var original_locale = null;
   var original_school = null;
   var original_school_id = null;
-  $('#birth_date').datepicker();
-  $('#graduation_date').datepicker();
-
+  $('#birth_date')
+    .datepicker()
+    .on('changeDate', function(e) {
+      $(this).data('date', e.date);
+    });
+  $('#graduation_date')
+    .datepicker()
+    .on('changeDate', function(e) {
+      $(this).data('date', e.date);
+    });
   $('#school_id').val('');
   omegaup.UI.schoolTypeahead($('#school'), function(item, val, text) {
     $('#school_id').val(val.id);
@@ -47,17 +54,21 @@ omegaup.OmegaUp.on('ready', function() {
       $('#username').text(data.userinfo.username);
       $('#username').val(data.userinfo.username);
       $('#name').val(data.userinfo.name);
-      $('#birth_date').val(
-        data.userinfo.birth_date
-          ? omegaup.UI.formatDate(data.userinfo.birth_date)
-          : data.userinfo.birth_date,
-      );
+      $('#birth_date')
+        .data('date', data.userinfo.birth_date)
+        .val(
+          data.userinfo.birth_date
+            ? omegaup.UI.formatDate(data.userinfo.birth_date)
+            : data.userinfo.birth_date,
+        );
       $('#gender').val(data.userinfo.gender);
-      $('#graduation_date').val(
-        data.userinfo.graduation_date
-          ? omegaup.UI.formatDate(data.userinfo.graduation_date)
-          : data.userinfo.graduation_date,
-      );
+      $('#graduation_date')
+        .data('date', data.userinfo.graduation_date)
+        .val(
+          data.userinfo.graduation_date
+            ? omegaup.UI.formatDate(data.userinfo.graduation_date)
+            : data.userinfo.graduation_date,
+        );
       $('#country_id').val(data.userinfo.country_id);
       $('#locale').val(data.userinfo.locale);
 
@@ -83,10 +94,10 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('form#user_profile_form').on('submit', function(ev) {
     ev.preventDefault();
-    var birth_date = new Date($('#birth_date').val());
+    var birth_date = new Date($('#birth_date').data('date'));
     birth_date.setHours(23);
 
-    var graduation_date = new Date($('#graduation_date').val());
+    var graduation_date = new Date($('#graduation_date').data('date'));
     graduation_date.setHours(23);
 
     var locale_changed = original_locale != $('#locale').val();
