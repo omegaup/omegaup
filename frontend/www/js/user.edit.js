@@ -47,10 +47,16 @@ omegaup.OmegaUp.on('ready', function() {
       $('#username').text(data.userinfo.username);
       $('#username').val(data.userinfo.username);
       $('#name').val(data.userinfo.name);
-      $('#birth_date').val(omegaup.UI.formatDate(data.userinfo.birth_date));
+      $('#birth_date').val(
+        data.userinfo.birth_date
+          ? omegaup.UI.formatDate(data.userinfo.birth_date)
+          : data.userinfo.birth_date,
+      );
       $('#gender').val(data.userinfo.gender);
       $('#graduation_date').val(
-        omegaup.UI.formatDate(data.userinfo.graduation_date),
+        data.userinfo.graduation_date
+          ? omegaup.UI.formatDate(data.userinfo.graduation_date)
+          : data.userinfo.graduation_date,
       );
       $('#country_id').val(data.userinfo.country_id);
       $('#locale').val(data.userinfo.locale);
