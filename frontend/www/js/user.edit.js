@@ -2,9 +2,16 @@ omegaup.OmegaUp.on('ready', function() {
   var original_locale = null;
   var original_school = null;
   var original_school_id = null;
-  $('#birth_date').datepicker();
-  $('#graduation_date').datepicker();
-
+  $('#birth_date')
+    .datepicker()
+    .on('changeDate', function(e) {
+      $(this).data('date', e.date);
+    });
+  $('#graduation_date')
+    .datepicker()
+    .on('changeDate', function(e) {
+      $(this).data('date', e.date);
+    });
   $('#school_id').val('');
   omegaup.UI.schoolTypeahead($('#school'), function(item, val, text) {
     $('#school_id').val(val.id);
@@ -51,16 +58,16 @@ omegaup.OmegaUp.on('ready', function() {
         .data('date', data.userinfo.birth_date)
         .val(
           data.userinfo.birth_date
-          ? omegaup.UI.formatDate(data.userinfo.birth_date)
-          : data.userinfo.birth_date
+            ? omegaup.UI.formatDate(data.userinfo.birth_date)
+            : data.userinfo.birth_date,
         );
       $('#gender').val(data.userinfo.gender);
       $('#graduation_date')
         .data('date', data.userinfo.graduation_date)
         .val(
           data.userinfo.graduation_date
-          ? omegaup.UI.formatDate(data.userinfo.graduation_date)
-          : data.userinfo.graduation_date
+            ? omegaup.UI.formatDate(data.userinfo.graduation_date)
+            : data.userinfo.graduation_date,
         );
       $('#country_id').val(data.userinfo.country_id);
       $('#locale').val(data.userinfo.locale);
@@ -107,9 +114,6 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
 
-    console.log(birth_date);
-    console.log(graduation_date);
-
     omegaup.API.User.update({
       username: $('#username').val(),
       name: $('#name').val(),
@@ -122,7 +126,7 @@ omegaup.OmegaUp.on('ready', function() {
       school_id: $('#school_id').val(),
       school_name: $('#school').val(),
       locale: $('#locale').val(),
-      preferred_language: $('#programming_language').val(),
+      preferred_language: $('#programming_language option:selected').val(),
       is_private: $('#is_private').prop('checked') ? 1 : 0,
       hide_problem_tags: $('#hide_problem_tags').prop('checked') ? 1 : 0,
     })
