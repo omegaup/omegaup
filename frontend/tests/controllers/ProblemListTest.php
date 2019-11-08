@@ -126,10 +126,11 @@ class ProblemList extends OmegaupTestCase {
         $tags = [];
         for ($j = 0; $j < $n; $j++) {
             $tags[] = "tag-$j";
+            $plainTags = implode(',', $tags);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => $tags,
+                'tag' => $plainTags,
             ]));
             $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
@@ -236,8 +237,8 @@ class ProblemList extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => 'test-tag-0',
-            'programming_languages' => ['kp', 'kj'],
-            'difficulty_range' => [0,2],
+            'programming_languages' => 'kp,kj',
+            'difficulty_range' => '0,2',
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
@@ -256,9 +257,9 @@ class ProblemList extends OmegaupTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['test-tag-0', 'test-tag-3'],
+            'tag' => 'test-tag-0,test-tag-3',
             'require_all_tags' => false,
-            'difficulty_range' => [0,4],
+            'difficulty_range' => '0,4',
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
@@ -274,9 +275,9 @@ class ProblemList extends OmegaupTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['test-tag-2', 'test-tag-3'],
+            'tag' => 'test-tag-2,test-tag-3',
             'require_all_tags' => false,
-            'difficulty_range' => [1,4],
+            'difficulty_range' => '1,4',
             'order_by' => 'quality',
         ]));
         $this->assertCount(0, $response['results']);
@@ -373,14 +374,14 @@ class ProblemList extends OmegaupTestCase {
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => ['a', 'b']
+                'tag' => 'a,b',
             ]));
             $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ab_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => ['a', 'c']
+                'tag' => 'a,c',
             ]));
             $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ac_results[$i], $response['results']);
