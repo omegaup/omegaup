@@ -8,8 +8,13 @@ if (OMEGAUP_LOCKDOWN) {
 
 // Fetch ranks
 try {
-    $coderOfTheMonthResponse = \OmegaUp\Controllers\User::apiCoderOfTheMonth(new \OmegaUp\Request());
-    $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
+    $coderOfTheMonthResponse = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+        new \OmegaUp\Request()
+    );
+    $smarty->assign(
+        'coderOfTheMonthData',
+        $coderOfTheMonthResponse['userinfo']
+    );
 
     $smartyProperties = \OmegaUp\Controllers\School::getSchoolsRankForSmarty(
         /*$rowCount=*/ 5,

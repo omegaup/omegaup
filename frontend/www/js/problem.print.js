@@ -1,9 +1,12 @@
 (function() {
   var payload = JSON.parse(document.getElementById('payload').innerText);
-  var markdownConverter = omegaup.UI.markdownConverter({preview: true});
+  var markdownConverter = omegaup.UI.markdownConverter({ preview: true });
 
   var statement = document.querySelector('div.statement');
   statement.innerHTML = markdownConverter.makeHtmlWithImages(
-      payload.statement.markdown, payload.statement.images, payload.settings);
+    payload.statement.markdown,
+    payload.statement.images,
+    payload.settings,
+  );
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
 })();

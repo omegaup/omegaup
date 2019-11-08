@@ -60,62 +60,146 @@ class ScoreboardParams {
      * @param array<string, mixed> $params
      */
     public function __construct(array $params) {
-        ScoreboardParams::validateParameter('alias', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'alias',
+            $params,
+            true /*is_required*/
+        );
         $this->alias = strval($params['alias']);
 
-        ScoreboardParams::validateParameter('title', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'title',
+            $params,
+            true /*is_required*/
+        );
         $this->title = strval($params['title']);
 
-        ScoreboardParams::validateParameter('problemset_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'problemset_id',
+            $params,
+            true /*is_required*/
+        );
         $this->problemset_id = intval($params['problemset_id']);
 
-        ScoreboardParams::validateParameter('start_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'start_time',
+            $params,
+            true /*is_required*/
+        );
         $this->start_time = is_int($params['start_time'])
             ? $params['start_time']
             : strtotime(strval($params['start_time']));
 
-        ScoreboardParams::validateParameter('finish_time', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'finish_time',
+            $params,
+            true /*is_required*/
+        );
         $this->finish_time = is_int($params['finish_time'])
             ? $params['finish_time']
             : strtotime(strval($params['finish_time']));
 
-        ScoreboardParams::validateParameter('acl_id', $params, true /*is_required*/);
+        ScoreboardParams::validateParameter(
+            'acl_id',
+            $params,
+            true /*is_required*/
+        );
         $this->acl_id = intval($params['acl_id']);
 
-        ScoreboardParams::validateParameter('group_id', $params, false /*is_required*/, null);
-        $this->group_id = is_null($params['group_id']) ? null : intval($params['group_id']);
+        ScoreboardParams::validateParameter(
+            'group_id',
+            $params,
+            false /*is_required*/,
+            null
+        );
+        $this->group_id = is_null(
+            $params['group_id']
+        ) ? null : intval(
+            $params['group_id']
+        );
 
-        ScoreboardParams::validateParameter('penalty', $params, false /*is_required*/, 0);
+        ScoreboardParams::validateParameter(
+            'penalty',
+            $params,
+            false /*is_required*/,
+            0
+        );
         $this->penalty = intval($params['penalty']);
 
-        ScoreboardParams::validateParameter('virtual', $params, false /*is_required */, false);
+        ScoreboardParams::validateParameter(
+            'virtual',
+            $params,
+            false /*is_required */,
+            false
+        );
         $this->virtual = boolval($params['virtual']);
 
-        ScoreboardParams::validateParameter('penalty_calc_policy', $params, false /*is_required*/, 'sum');
+        ScoreboardParams::validateParameter(
+            'penalty_calc_policy',
+            $params,
+            false /*is_required*/,
+            'sum'
+        );
         $this->penalty_calc_policy = strval($params['penalty_calc_policy']);
 
-        ScoreboardParams::validateParameter('show_scoreboard_after', $params, false /*is_required*/, 1);
-        $this->show_scoreboard_after = boolval($params['show_scoreboard_after']);
+        ScoreboardParams::validateParameter(
+            'show_scoreboard_after',
+            $params,
+            false /*is_required*/,
+            1
+        );
+        $this->show_scoreboard_after = boolval(
+            $params['show_scoreboard_after']
+        );
 
-        ScoreboardParams::validateParameter('scoreboard_pct', $params, false /*is_required*/, 100);
+        ScoreboardParams::validateParameter(
+            'scoreboard_pct',
+            $params,
+            false /*is_required*/,
+            100
+        );
         $this->scoreboard_pct = intval($params['scoreboard_pct']);
 
-        ScoreboardParams::validateParameter('admin', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter(
+            'admin',
+            $params,
+            false /*is_required*/,
+            false
+        );
         $this->admin = boolval($params['admin']);
 
-        ScoreboardParams::validateParameter('auth_token', $params, false /*is_required*/, null);
-        $this->auth_token = is_null($params['auth_token']) ? null : strval($params['auth_token']);
+        ScoreboardParams::validateParameter(
+            'auth_token',
+            $params,
+            false /*is_required*/,
+            null
+        );
+        $this->auth_token = is_null(
+            $params['auth_token']
+        ) ? null : strval(
+            $params['auth_token']
+        );
 
-        ScoreboardParams::validateParameter('only_ac', $params, false /*is_required*/, false);
+        ScoreboardParams::validateParameter(
+            'only_ac',
+            $params,
+            false /*is_required*/,
+            false
+        );
         $this->only_ac = boolval($params['only_ac']);
 
-        ScoreboardParams::validateParameter('show_all_runs', $params, false /*is_required*/, true);
+        ScoreboardParams::validateParameter(
+            'show_all_runs',
+            $params,
+            false /*is_required*/,
+            true
+        );
         $this->show_all_runs = boolval($params['show_all_runs']);
     }
 
     public static function fromContest(
         \OmegaUp\DAO\VO\Contests $contest
-    ) : ScoreboardParams {
+    ): ScoreboardParams {
         return new ScoreboardParams([
             'alias' => $contest->alias,
             'title' => $contest->title,
@@ -135,7 +219,7 @@ class ScoreboardParams {
         \OmegaUp\DAO\VO\Assignments $assignment,
         int $groupId,
         bool $showAllRuns
-    ) : ScoreboardParams {
+    ): ScoreboardParams {
         return new ScoreboardParams([
             'alias' => $assignment->alias,
             'title' => $assignment->name,
@@ -158,15 +242,18 @@ class ScoreboardParams {
      */
     private static function validateParameter(
         string $parameter,
-        array& $array,
+        array &$array,
         bool $required = true,
         $default = null
-    ) : void {
+    ): void {
         if (isset($array[$parameter])) {
             return;
         }
         if ($required) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameter);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $parameter
+            );
         }
         /** @var mixed */
         $array[$parameter] = $default;

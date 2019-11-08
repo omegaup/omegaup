@@ -6,11 +6,11 @@ class ApiUtils {
     /**
      * Gets a random string
      */
-    public static function getRandomString() : string {
+    public static function getRandomString(): string {
         return md5(uniqid(strval(rand()), true));
     }
 
-    public static function getStringTime(?int $time = null) : string {
+    public static function getStringTime(?int $time = null): string {
         if (is_null($time)) {
             return date('Y-m-d H:i:s', \OmegaUp\Time::get());
         }
@@ -22,7 +22,7 @@ class ApiUtils {
      * From: http://stackoverflow.com/questions/1017599/how-do-i-remove-accents-from-characters-in-a-php-string
      * (Wordpress)
      */
-    public static function removeAccents(string $string) : string {
+    public static function removeAccents(string $string): string {
         if (!preg_match('/[\x80-\xff]/', $string)) {
             return $string;
         }
@@ -131,7 +131,10 @@ class ApiUtils {
      * @param string $format
      * @param array<string, string> $namedArgs
      */
-    public static function formatString(string $format, array $namedArgs) : string {
+    public static function formatString(
+        string $format,
+        array $namedArgs
+    ): string {
         foreach ($namedArgs as $key => $value) {
             $format = str_replace("%($key)", $value, $format);
         }

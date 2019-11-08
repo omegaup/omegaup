@@ -1,5 +1,5 @@
 import course_ViewStudent from '../components/course/ViewStudent.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -31,12 +31,14 @@ OmegaUp.on('ready', function() {
           update: function(student, assignment) {
             if (assignment == null) return;
             API.Course.studentProgress({
-                        course_alias: payload.course.alias,
-                        assignment_alias: assignment.alias,
-                        usernameOrEmail: student.username,
-                      })
-                .then(function(data) { viewStudent.problems = data.problems; })
-                .fail(UI.apiError);
+              course_alias: payload.course.alias,
+              assignment_alias: assignment.alias,
+              usernameOrEmail: student.username,
+            })
+              .then(function(data) {
+                viewStudent.problems = data.problems;
+              })
+              .fail(UI.apiError);
           },
         },
       });

@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Users extends \OmegaUp\DAO\Base\Users {
-    public static function findByEmail(string $email) : ?\OmegaUp\DAO\VO\Users {
+    public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -24,9 +24,22 @@ class Users extends \OmegaUp\DAO\Base\Users {
 
     public static function FindByUsername(
         string $username
-    ) : ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
+    ): ?\OmegaUp\DAO\VO\Users {
+        $sql = 'SELECT
+                    u.*
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i
+                ON
+                    i.user_id = u.user_id
+                WHERE
+                    i.username = ?
+                LIMIT 1;';
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$username]
+        );
         if (empty($rs)) {
             return null;
         }
@@ -42,13 +55,16 @@ class Users extends \OmegaUp\DAO\Base\Users {
             WHERE
                 ur.user_id = ? AND ur.role_id = 4;';
         $params = [$user_id];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $params
+        ) > 0;
     }
 
     /**
      * @return null|array{reset_digest: ?string, reset_sent_at: ?int}
      */
-    public static function FindResetInfoByEmail(string $email) : ?array {
+    public static function FindResetInfoByEmail(string $email): ?array {
         $user = self::findByEmail($email);
         if (is_null($user)) {
             return null;
@@ -59,7 +75,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         ];
     }
 
-    public static function savePassword(\OmegaUp\DAO\VO\Users $Users) {
+    public static function savePassword(\OmegaUp\DAO\VO\Users $Users): int {
         $sql = '
             UPDATE
                 `Users`
@@ -137,7 +153,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getRankingClassName(?int $userId) : string {
+    public static function getRankingClassName(?int $userId): string {
         if (is_null($userId)) {
             return 'user-rank-unranked';
         }
@@ -160,24 +176,34 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     1;';
         $params = [$userId];
         /** @var string */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $params
+        ) ?? 'user-rank-unranked';
     }
 
-    final public static function getByVerification($verification_id) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    Users
-                WHERE
-                    verification_id = ?';
+    final public static function getByVerification(
+        string $verificationId
+    ): ?\OmegaUp\DAO\VO\Users {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Users
+            WHERE
+                verification_id = ?
+            LIMIT 1;
+        ';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$verification_id]);
-
-        $users = [];
-        foreach ($rs as $row) {
-            array_push($users, new \OmegaUp\DAO\VO\Users($row));
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$verificationId]
+        );
+        if (empty($row)) {
+            return null;
         }
-        return $users;
+
+        return new \OmegaUp\DAO\VO\Users($row);
     }
 
     final public static function getVerified($verified, $in_mailing_list) {
@@ -190,7 +216,10 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 AND
                     in_mailing_list = ?';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$verified, $in_mailing_list]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$verified, $in_mailing_list]
+        );
 
         $users = [];
         foreach ($rs as $row) {

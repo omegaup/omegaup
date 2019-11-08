@@ -19,7 +19,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = \OmegaUp\Time::get();
@@ -33,14 +35,18 @@ class Reset extends \OmegaUp\Controllers\Controller {
             ?: 'wordsReset';
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage')
+        $message = \OmegaUp\Translations::getInstance()->get(
+            'wordsResetMessage'
+        )
             ?: 'wordsResetMessage';
         $body = str_replace('[link]', $link, $message);
 
         try {
             \OmegaUp\Email::sendEmail([$email], $subject, $body);
         } catch (\Exception $e) {
-            self::$log->error('Failed to send reset password email ' . $e->getMessage());
+            self::$log->error(
+                'Failed to send reset password email ' . $e->getMessage()
+            );
             $user->reset_digest = null;
             $user->reset_sent_at = null;
             \OmegaUp\DAO\Users::update($user);
@@ -48,7 +54,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'message' => \OmegaUp\Translations::getInstance()->get('passwordResetRequestSuccess')
+            'message' => \OmegaUp\Translations::getInstance()->get(
+                'passwordResetRequestSuccess'
+            )
         ];
     }
 
@@ -73,11 +81,15 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $lastRequest = \OmegaUp\DAO\Identities::getExtraInformation($email);
 
         if (is_null($lastRequest)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
 
         if (!$lastRequest['within_last_day']) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'userDoesNotHaveAnyPasswordChangeRequest'
+            );
         }
 
         $token = \OmegaUp\ApiUtils::getRandomString();
@@ -85,7 +97,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = \OmegaUp\Time::get();
@@ -109,17 +123,23 @@ class Reset extends \OmegaUp\Controllers\Controller {
         self::validateUpdateRequest($r);
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $user->password = \OmegaUp\SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
         if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $identity->password = $user->password;
         try {
@@ -135,7 +155,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : \OmegaUp\Translations::getInstance()->get('passwordResetResetSuccess')
+            'message' =>  IS_TEST ? 'message' : \OmegaUp\Translations::getInstance()->get(
+                'passwordResetResetSuccess'
+            )
         ];
     }
 
@@ -143,15 +165,24 @@ class Reset extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
 
         if (!$user->verified) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('unverifiedUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'unverifiedUser'
+            );
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && \OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+        if (
+            !is_null($r->identity) &&
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $r->identity
+            )
+        ) {
             return;
         }
 
@@ -160,7 +191,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
         }
         $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetMinWait');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetMinWait'
+            );
         }
     }
 
@@ -170,29 +203,41 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $reset_token = $r['reset_token'];
         $password = $r['password'];
         $password_confirmation = $r['password_confirmation'];
-        if (is_null($user)
+        if (
+            is_null($user)
             || is_null($reset_token)
             || is_null($password)
-            || is_null($password_confirmation)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
+            || is_null($password_confirmation)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
         }
 
         if ($user->reset_digest !== hash('sha1', $reset_token)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidResetToken');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidResetToken'
+            );
         }
 
         if ($password !== $password_confirmation) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordMismatch');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMismatch'
+            );
         }
 
         \OmegaUp\SecurityTools::testStrongPassword($password);
 
         if (is_null($user->reset_sent_at)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetResetExpired');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetResetExpired'
+            );
         }
         $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetResetExpired');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetResetExpired'
+            );
         }
     }
 }

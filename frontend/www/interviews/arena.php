@@ -6,7 +6,10 @@ $show_intro = true;
 
 try {
     $r = new \OmegaUp\Request([
-        'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
+        'auth_token' => array_key_exists(
+            'ouat',
+            $_REQUEST
+        ) ? $_REQUEST['ouat'] : null,
         'contest_alias' => $_REQUEST['alias'],
     ]);
 

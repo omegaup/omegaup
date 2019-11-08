@@ -27,7 +27,10 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 
-    public static function getUserBadgeAssignationTime(\OmegaUp\DAO\VO\Users $user, string $badge): ?int {
+    public static function getUserBadgeAssignationTime(
+        \OmegaUp\DAO\VO\Users $user,
+        string $badge
+    ): ?int {
         $sql = 'SELECT
                     UNIX_TIMESTAMP(ub.assignation_time)
                 FROM

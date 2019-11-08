@@ -33,12 +33,16 @@ export default {
   methods: {
     select: function(item) {
       this.active = item.name;
-      item.async('string')
-          .then(value => { this.contents = value; })
-          .catch(Util.asyncError);
+      item
+        .async('string')
+        .then(value => {
+          this.contents = value;
+        })
+        .catch(Util.asyncError);
     },
   },
 };
+
 </script>
 
 <style scoped>

@@ -19,17 +19,23 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
 
         // Whenever I see a problemset I say it's used by a contest
         // and 99% of the time I'm right!
-        $contest = \OmegaUp\DAO\Contests::getContestForProblemset($problemset_id);
+        $contest = \OmegaUp\DAO\Contests::getContestForProblemset(
+            $problemset_id
+        );
         if (!is_null($contest)) {
             return $contest;
         }
 
-        $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset($problemset_id);
+        $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+            $problemset_id
+        );
         if (!is_null($assignment)) {
             return $assignment;
         }
 
-        $interview = \OmegaUp\DAO\Interviews::getInterviewForProblemset($problemset_id);
+        $interview = \OmegaUp\DAO\Interviews::getInterviewForProblemset(
+            $problemset_id
+        );
         if (!is_null($interview)) {
             return $interview;
         }
@@ -42,9 +48,9 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
      *  No one, including admins, can submit after the deadline.
      */
     public static function isLateSubmission(
-        Object $container,
+        object $container,
         ?\OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
-    ) : bool {
+    ): bool {
         if (is_null($problemsetIdentity)) {
             return isset($container->finish_time) &&
                    (\OmegaUp\Time::get() > $container->finish_time);
@@ -52,7 +58,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
         return \OmegaUp\Time::get() > $problemsetIdentity->end_time;
     }
 
-    public static function isSubmissionWindowOpen(Object $container) : bool {
+    public static function isSubmissionWindowOpen(object $container): bool {
         return isset($container->start_time) &&
                 \OmegaUp\Time::get() >= $container->start_time;
     }
@@ -88,7 +94,10 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     1;';
         $params = [$problemset_id];
 
-        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            $params
+        );
         if (empty($problemset)) {
             return null;
         }
@@ -105,7 +114,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
      */
     public static function shouldShowFirstAssociatedIdentityRunWarning(
         \OmegaUp\DAO\VO\Users $user
-    ) : bool {
+    ): bool {
         $sql = '
             SELECT
                 COUNT(*)
@@ -125,6 +134,9 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             LIMIT
                 1;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$user->user_id]
+        ) == '0';
     }
 }

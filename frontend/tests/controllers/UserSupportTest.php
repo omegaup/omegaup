@@ -10,14 +10,22 @@ class UserSupportTest extends OmegaupTestCase {
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        [, $supportIdentity] = UserFactory::createSupportUser();
-        [, $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         // Asserting that user belongs to the support group
-        $this->assertTrue(\OmegaUp\Authorization::isSupportTeamMember($supportIdentity));
+        $this->assertTrue(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $supportIdentity
+            )
+        );
 
         // Asserting that user doesn't belong to the support group
-        $this->assertFalse(\OmegaUp\Authorization::isSupportTeamMember($mentorIdentity));
+        $this->assertFalse(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $mentorIdentity
+            )
+        );
     }
 
     /**
@@ -25,17 +33,17 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams([
+        $email = Utils::CreateRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(new UserParams([
             'email' => $email,
             'verify' => false
         ]));
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
@@ -65,14 +73,18 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        $email = Utils::CreateRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // Support tries to generate token without a request
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
@@ -115,14 +127,18 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        [$supportUser, ] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        $email = Utils::CreateRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // time travel
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(

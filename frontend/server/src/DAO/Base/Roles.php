@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,12 +25,23 @@ abstract class Roles {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Roles $Roles) : int {
-        $sql = 'UPDATE `Roles` SET `name` = ?, `description` = ? WHERE `role_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Roles $Roles
+    ): int {
+        $sql = '
+            UPDATE
+                `Roles`
+            SET
+                `name` = ?,
+                `description` = ?
+            WHERE
+                (
+                    `role_id` = ?
+                );';
         $params = [
             $Roles->name,
             $Roles->description,
-            (int)$Roles->role_id,
+            intval($Roles->role_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -39,15 +50,28 @@ abstract class Roles {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Roles} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Roles}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Roles}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Roles Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Roles} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $role_id) : ?\OmegaUp\DAO\VO\Roles {
-        $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` FROM Roles WHERE (role_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $role_id
+    ): ?\OmegaUp\DAO\VO\Roles {
+        $sql = '
+            SELECT
+                `Roles`.`role_id`,
+                `Roles`.`name`,
+                `Roles`.`description`
+            FROM
+                `Roles`
+            WHERE
+                (
+                    `role_id` = ?
+                )
+            LIMIT 1;';
         $params = [$role_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -75,9 +99,19 @@ abstract class Roles {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Roles $Roles) : void {
-        $sql = 'DELETE FROM `Roles` WHERE role_id = ?;';
-        $params = [$Roles->role_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Roles $Roles
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Roles`
+            WHERE
+                (
+                    `role_id` = ?
+                );';
+        $params = [
+            $Roles->role_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -111,17 +145,38 @@ abstract class Roles {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` from Roles';
+    ): array {
+        $sql = '
+            SELECT
+                `Roles`.`role_id`,
+                `Roles`.`name`,
+                `Roles`.`description`
+            FROM
+                `Roles`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Roles($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Roles(
+                $row
+            );
         }
         return $allData;
     }
@@ -134,12 +189,24 @@ abstract class Roles {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Roles $Roles El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Roles} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Roles}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Roles $Roles) : int {
-        $sql = 'INSERT INTO Roles (`name`, `description`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Roles $Roles
+    ): int {
+        $sql = '
+            INSERT INTO
+                Roles (
+                    `name`,
+                    `description`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
             $Roles->name,
             $Roles->description,
@@ -149,7 +216,9 @@ abstract class Roles {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Roles->role_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Roles->role_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

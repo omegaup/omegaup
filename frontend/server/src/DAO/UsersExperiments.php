@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class UsersExperiments extends \OmegaUp\DAO\Base\UsersExperiments {
-    public static function delete(int $userId, string $experiment) : void {
+    public static function delete(int $userId, string $experiment): void {
         $sql = '
             DELETE FROM
                 Users_Experiments
@@ -39,8 +39,18 @@ class UsersExperiments extends \OmegaUp\DAO\Base\UsersExperiments {
 
         /** @var \OmegaUp\DAO\VO\UsersExperiments[] */
         $usersExperiments = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]) as $row) {
-            array_push($usersExperiments, new \OmegaUp\DAO\VO\UsersExperiments($row));
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$userId]
+            ) as $row
+        ) {
+            array_push(
+                $usersExperiments,
+                new \OmegaUp\DAO\VO\UsersExperiments(
+                    $row
+                )
+            );
         }
         return $usersExperiments;
     }

@@ -12,29 +12,45 @@ class SchoolRankTest extends OmegaupTestCase {
      */
     private function createRunsWithSchool(&$schoolsData) {
         $users = [];
+        $identities = [];
         for ($i = 0; $i < 5; $i++) {
-            $users[] = UserFactory::createUser();
+            ['user' => $users[], 'identity' => $identities[]] = UserFactory::createUser();
         }
 
-        SchoolsFactory::addUserToSchool($schoolsData[0], $users[0]);
-        SchoolsFactory::addUserToSchool($schoolsData[0], $users[1]);
-        SchoolsFactory::addUserToSchool($schoolsData[1], $users[2]);
-        SchoolsFactory::addUserToSchool($schoolsData[1], $users[3]);
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
+        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[3]);
 
         $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $users[0]);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $identities[0]
+        );
         RunsFactory::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem($problemData, $users[1]);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $identities[1]
+        );
         RunsFactory::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem($problemData, $users[2]);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $identities[2]
+        );
         RunsFactory::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem($problemData, $users[3]);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $identities[3]
+        );
         RunsFactory::gradeRun($runData, 0.5, 'PA');
 
-        $runData = RunsFactory::createRunToProblem($problemData, $users[4]);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $identities[4]
+        );
         RunsFactory::gradeRun($runData);
     }
 
@@ -44,7 +60,10 @@ class SchoolRankTest extends OmegaupTestCase {
      */
     public function testSchoolRankPositive() {
         $currentTime = \OmegaUp\Time::get();
-        $pastMonthTime = strtotime('first day of last month', \OmegaUp\Time::get());
+        $pastMonthTime = strtotime(
+            'first day of last month',
+            \OmegaUp\Time::get()
+        );
 
         \OmegaUp\Time::setTimeForTesting($pastMonthTime);
 
@@ -69,8 +88,8 @@ class SchoolRankTest extends OmegaupTestCase {
         $this->createRunsWithSchool($schoolsData);
 
         // Call API
-        $rankViewer = UserFactory::createUser();
-        $rankViewerLogin = self::login($rankViewer);
+        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
+        $rankViewerLogin = self::login($identity);
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
@@ -105,8 +124,8 @@ class SchoolRankTest extends OmegaupTestCase {
         // 1 in school #2 but PA, 1 with no school.
         $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
 
-        $rankViewer = UserFactory::createUser();
-        $rankViewerLogin = self::login($rankViewer);
+        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
+        $rankViewerLogin = self::login($identity);
         $originalResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));

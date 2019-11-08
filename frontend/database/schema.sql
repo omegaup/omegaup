@@ -763,6 +763,7 @@ CREATE TABLE `Schools` (
   `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   PRIMARY KEY (`school_id`),
+  UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -826,7 +827,7 @@ CREATE TABLE `Submissions` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Tags` (
   `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) NOT NULL,
+  `name` varchar(50) NOT NULL,
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.';

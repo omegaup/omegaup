@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,18 +35,56 @@ abstract class SubmissionLog {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\SubmissionLog $Submission_Log) : int {
-        if (empty($Submission_Log->submission_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\SubmissionLog $Submission_Log
+    ): int {
+        if (
+            empty($Submission_Log->submission_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Submission_Log (
+                    `problemset_id`,
+                    `submission_id`,
+                    `user_id`,
+                    `identity_id`,
+                    `ip`,
+                    `time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            !is_null($Submission_Log->problemset_id) ? intval($Submission_Log->problemset_id) : null,
+            (
+                !is_null($Submission_Log->problemset_id) ?
+                intval($Submission_Log->problemset_id) :
+                null
+            ),
             $Submission_Log->submission_id,
-            !is_null($Submission_Log->user_id) ? intval($Submission_Log->user_id) : null,
-            !is_null($Submission_Log->identity_id) ? intval($Submission_Log->identity_id) : null,
-            !is_null($Submission_Log->ip) ? intval($Submission_Log->ip) : null,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
+            (
+                !is_null($Submission_Log->user_id) ?
+                intval($Submission_Log->user_id) :
+                null
+            ),
+            (
+                !is_null($Submission_Log->identity_id) ?
+                intval($Submission_Log->identity_id) :
+                null
+            ),
+            (
+                !is_null($Submission_Log->ip) ?
+                intval($Submission_Log->ip) :
+                null
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Submission_Log->time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -59,15 +97,51 @@ abstract class SubmissionLog {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\SubmissionLog $Submission_Log) : int {
-        $sql = 'UPDATE `Submission_Log` SET `problemset_id` = ?, `user_id` = ?, `identity_id` = ?, `ip` = ?, `time` = ? WHERE `submission_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\SubmissionLog $Submission_Log
+    ): int {
+        $sql = '
+            UPDATE
+                `Submission_Log`
+            SET
+                `problemset_id` = ?,
+                `user_id` = ?,
+                `identity_id` = ?,
+                `ip` = ?,
+                `time` = ?
+            WHERE
+                (
+                    `submission_id` = ?
+                );';
         $params = [
-            is_null($Submission_Log->problemset_id) ? null : (int)$Submission_Log->problemset_id,
-            is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
-            is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
-            is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
-            is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
+            (
+                is_null($Submission_Log->problemset_id) ?
+                null :
+                intval($Submission_Log->problemset_id)
+            ),
+            (
+                is_null($Submission_Log->user_id) ?
+                null :
+                intval($Submission_Log->user_id)
+            ),
+            (
+                is_null($Submission_Log->identity_id) ?
+                null :
+                intval($Submission_Log->identity_id)
+            ),
+            (
+                is_null($Submission_Log->ip) ?
+                null :
+                intval($Submission_Log->ip)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Submission_Log->time
+            ),
+            (
+                is_null($Submission_Log->submission_id) ?
+                null :
+                intval($Submission_Log->submission_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -76,15 +150,31 @@ abstract class SubmissionLog {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\SubmissionLog} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\SubmissionLog}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\SubmissionLog}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\SubmissionLog Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\SubmissionLog} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $submission_id) : ?\OmegaUp\DAO\VO\SubmissionLog {
-        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (submission_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $submission_id
+    ): ?\OmegaUp\DAO\VO\SubmissionLog {
+        $sql = '
+            SELECT
+                `Submission_Log`.`problemset_id`,
+                `Submission_Log`.`submission_id`,
+                `Submission_Log`.`user_id`,
+                `Submission_Log`.`identity_id`,
+                `Submission_Log`.`ip`,
+                `Submission_Log`.`time`
+            FROM
+                `Submission_Log`
+            WHERE
+                (
+                    `submission_id` = ?
+                )
+            LIMIT 1;';
         $params = [$submission_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -112,9 +202,19 @@ abstract class SubmissionLog {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\SubmissionLog $Submission_Log) : void {
-        $sql = 'DELETE FROM `Submission_Log` WHERE submission_id = ?;';
-        $params = [$Submission_Log->submission_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\SubmissionLog $Submission_Log
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Submission_Log`
+            WHERE
+                (
+                    `submission_id` = ?
+                );';
+        $params = [
+            $Submission_Log->submission_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -148,17 +248,41 @@ abstract class SubmissionLog {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
+    ): array {
+        $sql = '
+            SELECT
+                `Submission_Log`.`problemset_id`,
+                `Submission_Log`.`submission_id`,
+                `Submission_Log`.`user_id`,
+                `Submission_Log`.`identity_id`,
+                `Submission_Log`.`ip`,
+                `Submission_Log`.`time`
+            FROM
+                `Submission_Log`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\SubmissionLog($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\SubmissionLog(
+                $row
+            );
         }
         return $allData;
     }
@@ -171,19 +295,61 @@ abstract class SubmissionLog {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\SubmissionLog $Submission_Log El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\SubmissionLog} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SubmissionLog}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\SubmissionLog $Submission_Log) : int {
-        $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\SubmissionLog $Submission_Log
+    ): int {
+        $sql = '
+            INSERT INTO
+                Submission_Log (
+                    `problemset_id`,
+                    `submission_id`,
+                    `user_id`,
+                    `identity_id`,
+                    `ip`,
+                    `time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Submission_Log->problemset_id) ? null : (int)$Submission_Log->problemset_id,
-            is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
-            is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
-            is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
-            is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
+            (
+                is_null($Submission_Log->problemset_id) ?
+                null :
+                intval($Submission_Log->problemset_id)
+            ),
+            (
+                is_null($Submission_Log->submission_id) ?
+                null :
+                intval($Submission_Log->submission_id)
+            ),
+            (
+                is_null($Submission_Log->user_id) ?
+                null :
+                intval($Submission_Log->user_id)
+            ),
+            (
+                is_null($Submission_Log->identity_id) ?
+                null :
+                intval($Submission_Log->identity_id)
+            ),
+            (
+                is_null($Submission_Log->ip) ?
+                null :
+                intval($Submission_Log->ip)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Submission_Log->time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

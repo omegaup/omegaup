@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,14 +25,33 @@ abstract class Notifications {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Notifications $Notifications) : int {
-        $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `contents` = ? WHERE `notification_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Notifications $Notifications
+    ): int {
+        $sql = '
+            UPDATE
+                `Notifications`
+            SET
+                `user_id` = ?,
+                `timestamp` = ?,
+                `read` = ?,
+                `contents` = ?
+            WHERE
+                (
+                    `notification_id` = ?
+                );';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Notifications->timestamp),
-            (int)$Notifications->read,
+            (
+                is_null($Notifications->user_id) ?
+                null :
+                intval($Notifications->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Notifications->timestamp
+            ),
+            intval($Notifications->read),
             $Notifications->contents,
-            (int)$Notifications->notification_id,
+            intval($Notifications->notification_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -41,15 +60,30 @@ abstract class Notifications {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Notifications} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Notifications}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Notifications}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Notifications Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Notifications} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $notification_id) : ?\OmegaUp\DAO\VO\Notifications {
-        $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` FROM Notifications WHERE (notification_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $notification_id
+    ): ?\OmegaUp\DAO\VO\Notifications {
+        $sql = '
+            SELECT
+                `Notifications`.`notification_id`,
+                `Notifications`.`user_id`,
+                `Notifications`.`timestamp`,
+                `Notifications`.`read`,
+                `Notifications`.`contents`
+            FROM
+                `Notifications`
+            WHERE
+                (
+                    `notification_id` = ?
+                )
+            LIMIT 1;';
         $params = [$notification_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -77,9 +111,19 @@ abstract class Notifications {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Notifications $Notifications) : void {
-        $sql = 'DELETE FROM `Notifications` WHERE notification_id = ?;';
-        $params = [$Notifications->notification_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Notifications $Notifications
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Notifications`
+            WHERE
+                (
+                    `notification_id` = ?
+                );';
+        $params = [
+            $Notifications->notification_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -113,17 +157,40 @@ abstract class Notifications {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` from Notifications';
+    ): array {
+        $sql = '
+            SELECT
+                `Notifications`.`notification_id`,
+                `Notifications`.`user_id`,
+                `Notifications`.`timestamp`,
+                `Notifications`.`read`,
+                `Notifications`.`contents`
+            FROM
+                `Notifications`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Notifications($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Notifications(
+                $row
+            );
         }
         return $allData;
     }
@@ -136,16 +203,38 @@ abstract class Notifications {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Notifications $Notifications El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Notifications} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Notifications}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Notifications $Notifications) : int {
-        $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `contents`) VALUES (?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Notifications $Notifications
+    ): int {
+        $sql = '
+            INSERT INTO
+                Notifications (
+                    `user_id`,
+                    `timestamp`,
+                    `read`,
+                    `contents`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Notifications->timestamp),
-            (int)$Notifications->read,
+            (
+                is_null($Notifications->user_id) ?
+                null :
+                intval($Notifications->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Notifications->timestamp
+            ),
+            intval($Notifications->read),
             $Notifications->contents,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -153,7 +242,9 @@ abstract class Notifications {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Notifications->notification_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Notifications->notification_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

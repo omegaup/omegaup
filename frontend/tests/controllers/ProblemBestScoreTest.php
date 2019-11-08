@@ -13,16 +13,16 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $runDataPA = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiBestScore(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias']
@@ -41,16 +41,23 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runDataOutsideContest = RunsFactory::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        $runDataInsideContest = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
         RunsFactory::gradeRun($runDataOutsideContest);
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiBestScore(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -68,23 +75,29 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
 
         // Create user who will use the API
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestantIdentity
+        );
+        $runDataPA = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestantIdentity
+        );
         RunsFactory::gradeRun($runData);
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $login = self::login($user);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiBestScore(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
-            'username' => $contestant->username
+            'username' => $contestantIdentity->username
         ]));
 
         $this->assertEquals(100.00, $response['score']);

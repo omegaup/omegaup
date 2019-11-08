@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,15 +25,47 @@ abstract class ProblemsetIdentityRequestHistory {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
-        $sql = 'UPDATE `Problemset_Identity_Request_History` SET `identity_id` = ?, `problemset_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE `history_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History
+    ): int {
+        $sql = '
+            UPDATE
+                `Problemset_Identity_Request_History`
+            SET
+                `identity_id` = ?,
+                `problemset_id` = ?,
+                `time` = ?,
+                `accepted` = ?,
+                `admin_id` = ?
+            WHERE
+                (
+                    `history_id` = ?
+                );';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
-            (int)$Problemset_Identity_Request_History->history_id,
+            (
+                is_null($Problemset_Identity_Request_History->identity_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->identity_id)
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->problemset_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->problemset_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Identity_Request_History->time
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->accepted) ?
+                null :
+                intval($Problemset_Identity_Request_History->accepted)
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->admin_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->admin_id)
+            ),
+            intval($Problemset_Identity_Request_History->history_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -42,15 +74,31 @@ abstract class ProblemsetIdentityRequestHistory {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $history_id) : ?\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory {
-        $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` FROM Problemset_Identity_Request_History WHERE (history_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $history_id
+    ): ?\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory {
+        $sql = '
+            SELECT
+                `Problemset_Identity_Request_History`.`history_id`,
+                `Problemset_Identity_Request_History`.`identity_id`,
+                `Problemset_Identity_Request_History`.`problemset_id`,
+                `Problemset_Identity_Request_History`.`time`,
+                `Problemset_Identity_Request_History`.`accepted`,
+                `Problemset_Identity_Request_History`.`admin_id`
+            FROM
+                `Problemset_Identity_Request_History`
+            WHERE
+                (
+                    `history_id` = ?
+                )
+            LIMIT 1;';
         $params = [$history_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -78,9 +126,19 @@ abstract class ProblemsetIdentityRequestHistory {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : void {
-        $sql = 'DELETE FROM `Problemset_Identity_Request_History` WHERE history_id = ?;';
-        $params = [$Problemset_Identity_Request_History->history_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problemset_Identity_Request_History`
+            WHERE
+                (
+                    `history_id` = ?
+                );';
+        $params = [
+            $Problemset_Identity_Request_History->history_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -114,17 +172,41 @@ abstract class ProblemsetIdentityRequestHistory {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` from Problemset_Identity_Request_History';
+    ): array {
+        $sql = '
+            SELECT
+                `Problemset_Identity_Request_History`.`history_id`,
+                `Problemset_Identity_Request_History`.`identity_id`,
+                `Problemset_Identity_Request_History`.`problemset_id`,
+                `Problemset_Identity_Request_History`.`time`,
+                `Problemset_Identity_Request_History`.`accepted`,
+                `Problemset_Identity_Request_History`.`admin_id`
+            FROM
+                `Problemset_Identity_Request_History`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory(
+                $row
+            );
         }
         return $allData;
     }
@@ -137,25 +219,63 @@ abstract class ProblemsetIdentityRequestHistory {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
-        $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problemset_Identity_Request_History (
+                    `identity_id`,
+                    `problemset_id`,
+                    `time`,
+                    `accepted`,
+                    `admin_id`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
+            (
+                is_null($Problemset_Identity_Request_History->identity_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->identity_id)
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->problemset_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->problemset_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Identity_Request_History->time
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->accepted) ?
+                null :
+                intval($Problemset_Identity_Request_History->accepted)
+            ),
+            (
+                is_null($Problemset_Identity_Request_History->admin_id) ?
+                null :
+                intval($Problemset_Identity_Request_History->admin_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Problemset_Identity_Request_History->history_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Problemset_Identity_Request_History->history_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

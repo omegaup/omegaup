@@ -25,16 +25,37 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
         if (is_null($contest)) {
             $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
-            if (is_null($course)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+            if (
+                is_null($course) ||
+                is_null($course->group_id) ||
+                is_null($course->course_id)
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
             }
-            $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($r['alias'], $course->course_id);
+            $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                $r['alias'],
+                intval($course->course_id)
+            );
             if (is_null($assignment)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'assignmentNotFound'
+                );
             }
-            \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromAssignment($assignment, $course->group_id, true));
+            \OmegaUp\Scoreboard::refreshScoreboardCache(
+                \OmegaUp\ScoreboardParams::fromAssignment(
+                    $assignment,
+                    $course->group_id,
+                    true
+                )
+            );
         } else {
-            \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($contest));
+            \OmegaUp\Scoreboard::refreshScoreboardCache(
+                \OmegaUp\ScoreboardParams::fromContest(
+                    $contest
+                )
+            );
         }
 
         return [

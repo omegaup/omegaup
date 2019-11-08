@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,11 +35,28 @@ abstract class GroupsScoreboardsProblemsets {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (empty($Groups_Scoreboards_Problemsets->group_scoreboard_id) || empty($Groups_Scoreboards_Problemsets->problemset_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets
+    ): int {
+        if (
+            empty($Groups_Scoreboards_Problemsets->group_scoreboard_id) ||
+            empty($Groups_Scoreboards_Problemsets->problemset_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Groups_Scoreboards_Problemsets (
+                    `group_scoreboard_id`,
+                    `problemset_id`,
+                    `only_ac`,
+                    `weight`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Groups_Scoreboards_Problemsets->group_scoreboard_id,
             $Groups_Scoreboards_Problemsets->problemset_id,
@@ -57,13 +74,33 @@ abstract class GroupsScoreboardsProblemsets {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        $sql = 'UPDATE `Groups_Scoreboards_Problemsets` SET `only_ac` = ?, `weight` = ? WHERE `group_scoreboard_id` = ? AND `problemset_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets
+    ): int {
+        $sql = '
+            UPDATE
+                `Groups_Scoreboards_Problemsets`
+            SET
+                `only_ac` = ?,
+                `weight` = ?
+            WHERE
+                (
+                    `group_scoreboard_id` = ? AND
+                    `problemset_id` = ?
+                );';
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
+            (
+                is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ?
+                null :
+                intval($Groups_Scoreboards_Problemsets->group_scoreboard_id)
+            ),
+            (
+                is_null($Groups_Scoreboards_Problemsets->problemset_id) ?
+                null :
+                intval($Groups_Scoreboards_Problemsets->problemset_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -72,15 +109,31 @@ abstract class GroupsScoreboardsProblemsets {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $group_scoreboard_id, ?int $problemset_id) : ?\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets {
-        $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $group_scoreboard_id,
+        ?int $problemset_id
+    ): ?\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets {
+        $sql = '
+            SELECT
+                `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`,
+                `Groups_Scoreboards_Problemsets`.`problemset_id`,
+                `Groups_Scoreboards_Problemsets`.`only_ac`,
+                `Groups_Scoreboards_Problemsets`.`weight`
+            FROM
+                `Groups_Scoreboards_Problemsets`
+            WHERE
+                (
+                    `group_scoreboard_id` = ? AND
+                    `problemset_id` = ?
+                )
+            LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -108,9 +161,21 @@ abstract class GroupsScoreboardsProblemsets {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : void {
-        $sql = 'DELETE FROM `Groups_Scoreboards_Problemsets` WHERE group_scoreboard_id = ? AND problemset_id = ?;';
-        $params = [$Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Groups_Scoreboards_Problemsets`
+            WHERE
+                (
+                    `group_scoreboard_id` = ? AND
+                    `problemset_id` = ?
+                );';
+        $params = [
+            $Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            $Groups_Scoreboards_Problemsets->problemset_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -144,17 +209,39 @@ abstract class GroupsScoreboardsProblemsets {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` from Groups_Scoreboards_Problemsets';
+    ): array {
+        $sql = '
+            SELECT
+                `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`,
+                `Groups_Scoreboards_Problemsets`.`problemset_id`,
+                `Groups_Scoreboards_Problemsets`.`only_ac`,
+                `Groups_Scoreboards_Problemsets`.`weight`
+            FROM
+                `Groups_Scoreboards_Problemsets`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets(
+                $row
+            );
         }
         return $allData;
     }
@@ -167,17 +254,41 @@ abstract class GroupsScoreboardsProblemsets {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets
+    ): int {
+        $sql = '
+            INSERT INTO
+                Groups_Scoreboards_Problemsets (
+                    `group_scoreboard_id`,
+                    `problemset_id`,
+                    `only_ac`,
+                    `weight`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
+            (
+                is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ?
+                null :
+                intval($Groups_Scoreboards_Problemsets->group_scoreboard_id)
+            ),
+            (
+                is_null($Groups_Scoreboards_Problemsets->problemset_id) ?
+                null :
+                intval($Groups_Scoreboards_Problemsets->problemset_id)
+            ),
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

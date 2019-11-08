@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import {OmegaUp, T, API} from '../omegaup.js';
+import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -19,7 +19,7 @@ OmegaUp.on('ready', function() {
           profileBadges: this.profileBadges,
           rank: this.rank,
           charts: this.charts,
-        }
+        },
       });
     },
     data: {
@@ -47,54 +47,62 @@ OmegaUp.on('ready', function() {
           case 'user-rank-international-master':
             return T.profileRankInternationalMaster;
         }
-      }
+      },
     },
     components: {
       'omegaup-user-profile': user_Profile,
     },
   });
 
-  API.User.contestStats({username: profile.username})
-      .then(function(data) {
-        let contests = [];
-        for (var contest_alias in data['contests']) {
-          var now = new Date();
-          var currentTimestamp =
-              data['contests'][contest_alias]['finish_time'] * 1000;
-          var end = OmegaUp.remoteTime(currentTimestamp);
-          if (data['contests'][contest_alias]['place'] != null && now > end) {
-            contests.push(data['contests'][contest_alias]);
-          }
+  API.User.contestStats({ username: profile.username })
+    .then(function(data) {
+      let contests = [];
+      for (var contest_alias in data['contests']) {
+        var now = new Date();
+        var currentTimestamp =
+          data['contests'][contest_alias]['finish_time'] * 1000;
+        var end = OmegaUp.remoteTime(currentTimestamp);
+        if (data['contests'][contest_alias]['place'] != null && now > end) {
+          contests.push(data['contests'][contest_alias]);
         }
-        viewProfile.contests = contests;
-      })
-      .fail(UI.apiError);
+      }
+      viewProfile.contests = contests;
+    })
+    .fail(UI.apiError);
 
-  API.User.problemsSolved({username: profile.username})
-      .then(function(data) { viewProfile.solvedProblems = data['problems']; })
-      .fail(UI.apiError);
+  API.User.problemsSolved({ username: profile.username })
+    .then(function(data) {
+      viewProfile.solvedProblems = data['problems'];
+    })
+    .fail(UI.apiError);
 
-  API.User.listUnsolvedProblems({username: profile.username})
-      .then(function(data) { viewProfile.unsolvedProblems = data['problems']; })
-      .fail(UI.apiError);
+  API.User.listUnsolvedProblems({ username: profile.username })
+    .then(function(data) {
+      viewProfile.unsolvedProblems = data['problems'];
+    })
+    .fail(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myList({})
-        .then(function(data) {
-          viewProfile.visitorBadges =
-              new Set(data['badges'].map(badge => badge.badge_alias));
-        })
-        .fail(UI.apiError);
-  }
-
-  API.Badge.userList({target_username: profile.username})
       .then(function(data) {
-        viewProfile.profileBadges =
-            new Set(data['badges'].map(badge => badge.badge_alias));
+        viewProfile.visitorBadges = new Set(
+          data['badges'].map(badge => badge.badge_alias),
+        );
       })
       .fail(UI.apiError);
+  }
 
-  API.User.stats({username: profile.username})
-      .then(function(data) { viewProfile.charts = data; })
-      .fail(omegaup.UI.apiError);
+  API.Badge.userList({ target_username: profile.username })
+    .then(function(data) {
+      viewProfile.profileBadges = new Set(
+        data['badges'].map(badge => badge.badge_alias),
+      );
+    })
+    .fail(UI.apiError);
+
+  API.User.stats({ username: profile.username })
+    .then(function(data) {
+      viewProfile.charts = data;
+    })
+    .fail(omegaup.UI.apiError);
 });

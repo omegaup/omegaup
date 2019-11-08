@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,29 @@ abstract class Favorites {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Favorites} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Favorites}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Favorites}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Favorites Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Favorites} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $user_id, ?int $problem_id) : ?\OmegaUp\DAO\VO\Favorites {
-        $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` FROM Favorites WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $user_id,
+        ?int $problem_id
+    ): ?\OmegaUp\DAO\VO\Favorites {
+        $sql = '
+            SELECT
+                `Favorites`.`user_id`,
+                `Favorites`.`problem_id`
+            FROM
+                `Favorites`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `problem_id` = ?
+                )
+            LIMIT 1;';
         $params = [$user_id, $problem_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +71,21 @@ abstract class Favorites {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Favorites $Favorites) : void {
-        $sql = 'DELETE FROM `Favorites` WHERE user_id = ? AND problem_id = ?;';
-        $params = [$Favorites->user_id, $Favorites->problem_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Favorites $Favorites
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Favorites`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [
+            $Favorites->user_id,
+            $Favorites->problem_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +119,37 @@ abstract class Favorites {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` from Favorites';
+    ): array {
+        $sql = '
+            SELECT
+                `Favorites`.`user_id`,
+                `Favorites`.`problem_id`
+            FROM
+                `Favorites`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Favorites($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Favorites(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,15 +162,35 @@ abstract class Favorites {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Favorites $Favorites El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Favorites} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Favorites}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Favorites $Favorites) : int {
-        $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Favorites $Favorites
+    ): int {
+        $sql = '
+            INSERT INTO
+                Favorites (
+                    `user_id`,
+                    `problem_id`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,
-            is_null($Favorites->problem_id) ? null : (int)$Favorites->problem_id,
+            (
+                is_null($Favorites->user_id) ?
+                null :
+                intval($Favorites->user_id)
+            ),
+            (
+                is_null($Favorites->problem_id) ?
+                null :
+                intval($Favorites->problem_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

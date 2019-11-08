@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,21 +25,57 @@ abstract class Problemsets {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Problemsets $Problemsets) : int {
-        $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `type` = ?, `contest_id` = ?, `assignment_id` = ?, `interview_id` = ? WHERE `problemset_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Problemsets $Problemsets
+    ): int {
+        $sql = '
+            UPDATE
+                `Problemsets`
+            SET
+                `acl_id` = ?,
+                `access_mode` = ?,
+                `languages` = ?,
+                `needs_basic_information` = ?,
+                `requests_user_information` = ?,
+                `scoreboard_url` = ?,
+                `scoreboard_url_admin` = ?,
+                `type` = ?,
+                `contest_id` = ?,
+                `assignment_id` = ?,
+                `interview_id` = ?
+            WHERE
+                (
+                    `problemset_id` = ?
+                );';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            (
+                is_null($Problemsets->acl_id) ?
+                null :
+                intval($Problemsets->acl_id)
+            ),
             $Problemsets->access_mode,
             $Problemsets->languages,
-            (int)$Problemsets->needs_basic_information,
+            intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
-            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
-            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
-            (int)$Problemsets->problemset_id,
+            (
+                is_null($Problemsets->contest_id) ?
+                null :
+                intval($Problemsets->contest_id)
+            ),
+            (
+                is_null($Problemsets->assignment_id) ?
+                null :
+                intval($Problemsets->assignment_id)
+            ),
+            (
+                is_null($Problemsets->interview_id) ?
+                null :
+                intval($Problemsets->interview_id)
+            ),
+            intval($Problemsets->problemset_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -48,15 +84,37 @@ abstract class Problemsets {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Problemsets} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Problemsets}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Problemsets}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Problemsets Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Problemsets} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $problemset_id) : ?\OmegaUp\DAO\VO\Problemsets {
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $problemset_id
+    ): ?\OmegaUp\DAO\VO\Problemsets {
+        $sql = '
+            SELECT
+                `Problemsets`.`problemset_id`,
+                `Problemsets`.`acl_id`,
+                `Problemsets`.`access_mode`,
+                `Problemsets`.`languages`,
+                `Problemsets`.`needs_basic_information`,
+                `Problemsets`.`requests_user_information`,
+                `Problemsets`.`scoreboard_url`,
+                `Problemsets`.`scoreboard_url_admin`,
+                `Problemsets`.`type`,
+                `Problemsets`.`contest_id`,
+                `Problemsets`.`assignment_id`,
+                `Problemsets`.`interview_id`
+            FROM
+                `Problemsets`
+            WHERE
+                (
+                    `problemset_id` = ?
+                )
+            LIMIT 1;';
         $params = [$problemset_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -84,9 +142,19 @@ abstract class Problemsets {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Problemsets $Problemsets) : void {
-        $sql = 'DELETE FROM `Problemsets` WHERE problemset_id = ?;';
-        $params = [$Problemsets->problemset_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Problemsets $Problemsets
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problemsets`
+            WHERE
+                (
+                    `problemset_id` = ?
+                );';
+        $params = [
+            $Problemsets->problemset_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -120,17 +188,47 @@ abstract class Problemsets {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` from Problemsets';
+    ): array {
+        $sql = '
+            SELECT
+                `Problemsets`.`problemset_id`,
+                `Problemsets`.`acl_id`,
+                `Problemsets`.`access_mode`,
+                `Problemsets`.`languages`,
+                `Problemsets`.`needs_basic_information`,
+                `Problemsets`.`requests_user_information`,
+                `Problemsets`.`scoreboard_url`,
+                `Problemsets`.`scoreboard_url_admin`,
+                `Problemsets`.`type`,
+                `Problemsets`.`contest_id`,
+                `Problemsets`.`assignment_id`,
+                `Problemsets`.`interview_id`
+            FROM
+                `Problemsets`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Problemsets($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Problemsets(
+                $row
+            );
         }
         return $allData;
     }
@@ -143,31 +241,79 @@ abstract class Problemsets {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Problemsets $Problemsets El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Problemsets} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Problemsets}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Problemsets $Problemsets) : int {
-        $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Problemsets $Problemsets
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problemsets (
+                    `acl_id`,
+                    `access_mode`,
+                    `languages`,
+                    `needs_basic_information`,
+                    `requests_user_information`,
+                    `scoreboard_url`,
+                    `scoreboard_url_admin`,
+                    `type`,
+                    `contest_id`,
+                    `assignment_id`,
+                    `interview_id`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            (
+                is_null($Problemsets->acl_id) ?
+                null :
+                intval($Problemsets->acl_id)
+            ),
             $Problemsets->access_mode,
             $Problemsets->languages,
-            (int)$Problemsets->needs_basic_information,
+            intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
-            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
-            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
+            (
+                is_null($Problemsets->contest_id) ?
+                null :
+                intval($Problemsets->contest_id)
+            ),
+            (
+                is_null($Problemsets->assignment_id) ?
+                null :
+                intval($Problemsets->assignment_id)
+            ),
+            (
+                is_null($Problemsets->interview_id) ?
+                null :
+                intval($Problemsets->interview_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Problemsets->problemset_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Problemsets->problemset_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

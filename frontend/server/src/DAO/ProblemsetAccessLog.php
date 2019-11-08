@@ -46,7 +46,10 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    final public static function GetAccessForCourse($course_id) {
+    /**
+     * @return list<array{alias?: string, classname: string, ip: int, time: int, username: string}>
+     */
+    final public static function getAccessForCourse(int $courseId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
@@ -65,10 +68,17 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        /** @var list<array{alias?: string, classname: string, ip: int, time: int, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$courseId]
+        );
     }
 
-    final public static function getByProblemsetIdentityId($problemsetId, $identityId) {
+    final public static function getByProblemsetIdentityId(
+        $problemsetId,
+        $identityId
+    ) {
         $sql = 'SELECT
                     *
                 FROM
@@ -78,11 +88,19 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 AND
                     identity_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId, $identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId, $identityId]
+        );
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {
-            array_push($problemsetAccessLog, new \OmegaUp\DAO\VO\ProblemsetAccessLog($row));
+            array_push(
+                $problemsetAccessLog,
+                new \OmegaUp\DAO\VO\ProblemsetAccessLog(
+                    $row
+                )
+            );
         }
         return $problemsetAccessLog;
     }

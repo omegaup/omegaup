@@ -13,26 +13,97 @@ class QualityNominationFactory {
             \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
         );
         for ($i = 0; $i < 5; $i++) {
-            $reviewer = UserFactory::createUser();
-            $identity = \OmegaUp\DAO\Identities::getByPK($reviewer->main_identity_id);
+            ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));
-            self::$reviewers[] = $reviewer;
+            self::$reviewers[] = $identity;
         }
     }
 
     public static function initTags() {
         \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'dp']));
         \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'math']));
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'matrices']));
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'greedy']));
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'geometry']));
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'search']));
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'matrices']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'greedy']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'geometry']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'search']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicDynamicProgramming']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGraphTheory']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGreedy']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicBinarySearch']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMath']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMatrices']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGeometry']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicSorting']
+            )
+        );
     }
 
-    public static function createSuggestion($login, $problemAlias, $difficulty, $quality, $tags) {
+    /**
+     * @param ScopedLoginToken $login
+     * @param string $problemAlias
+     * @param null|int $difficulty
+     * @param null|int $quality
+     * @param null|string[] $tags
+     * @param bool $beforeAC
+     * @return \OmegaUp\DAO\VO\QualityNominations
+     */
+    public static function createSuggestion(
+        \OmegaUp\DAO\VO\Identities $user,
+        string $problemAlias,
+        ?int $difficulty,
+        ?int $quality,
+        ?array $tags,
+        bool $beforeAC
+    ): \OmegaUp\DAO\VO\QualityNominations {
         $contents = [];
         if (!is_null($difficulty)) {
             $contents['difficulty'] = $difficulty;
@@ -43,18 +114,39 @@ class QualityNominationFactory {
         if (!is_null($tags)) {
             $contents['tags'] = $tags;
         }
-        $contentsJson = json_encode($contents);
-        return self::createQualityNomination($login, $problemAlias, 'suggestion', $contentsJson);
+        if ($beforeAC) {
+            $contents['before_ac'] = true;
+        }
+        return self::createQualityNomination(
+            $user,
+            $problemAlias,
+            'suggestion',
+            $contents
+        );
     }
 
-    public static function createQualityNomination($login, $problemAlias, $type, $contents) {
-        $request = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemAlias,
-            'nomination' => $type,
-            'contents' => $contents,
-        ]);
-        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate($request);
-        return $qualitynomination;
+    /**
+     * @param array{difficulty?: float, quality?: float, tags?: string[], before_AC?: boolean} $contents
+     * @return \OmegaUp\DAO\VO\QualityNominations
+     */
+    public static function createQualityNomination(
+        \OmegaUp\DAO\VO\Identities $user,
+        string $problemAlias,
+        string $type,
+        $contents
+    ): \OmegaUp\DAO\VO\QualityNominations {
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        return \OmegaUp\Controllers\QualityNomination::createNomination(
+            $problem,
+            $user,
+            $type,
+            $contents
+        );
     }
 }

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.

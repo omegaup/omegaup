@@ -68,28 +68,29 @@ omegaup.OmegaUp.on('ready', function() {
   for (var i = 0, len = contestListConfigs.length; i < len; i++) {
     var config = contestListConfigs[i];
     var contestList = new omegaup.arena.ContestList(
-        document.querySelector(config[0]),
-        {
-          active: config[1],
-          recommended: config[2],
-          participating: config[3], public: config[4],
-          query: query,
-        },
-        {header: config[5]});
+      document.querySelector(config[0]),
+      {
+        active: config[1],
+        recommended: config[2],
+        participating: config[3],
+        public: config[4],
+        query: query,
+      },
+      { header: config[5] },
+    );
     contestLists.push(contestList);
     requests.push(contestList.deferred);
   }
 
   // Wait until all of the calls above finish before showing the contents.
-  $.when.apply($, requests)
-      .done(function() {
-        for (var i = 0, len = contestLists.length; i < len; i++) {
-          if (contestLists[i].totalPages()) {
-            $('.nav-link', $('.nav-item')[i]).tab('show');
-            break;
-          }
-        }
-        $('#root').show();
-        $('#loading').fadeOut('slow');
-      });
+  $.when.apply($, requests).done(function() {
+    for (var i = 0, len = contestLists.length; i < len; i++) {
+      if (contestLists[i].totalPages()) {
+        $('.nav-link', $('.nav-item')[i]).tab('show');
+        break;
+      }
+    }
+    $('#root').show();
+    $('#loading').fadeOut('slow');
+  });
 });

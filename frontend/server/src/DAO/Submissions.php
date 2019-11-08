@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class Submissions extends \OmegaUp\DAO\Base\Submissions {
-    final public static function getByGuid(string $guid) : ?\OmegaUp\DAO\VO\Submissions {
+    final public static function getByGuid(string $guid): ?\OmegaUp\DAO\VO\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
@@ -24,7 +24,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         return new \OmegaUp\DAO\VO\Submissions($rs);
     }
 
-    final public static function disqualify(string $guid) : void {
+    final public static function disqualify(string $guid): void {
         $sql = '
             UPDATE
                 Submissions s
@@ -41,7 +41,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      */
     final public static function countTotalSubmissionsOfProblem(
         int $problemId
-    ) : int {
+    ): int {
         $sql = '
             SELECT
                 COUNT(*)
@@ -64,7 +64,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     final public static function countTotalRunsOfProblemInProblemset(
         int $problemId,
         int $problemsetId
-    ) : int {
+    ): int {
         $sql = '
             SELECT
                 COUNT(*)
@@ -83,7 +83,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      */
     final public static function countTotalSubmissionsOfProblemset(
         int $problemsetId
-    ) : int {
+    ): int {
         $sql = '
             SELECT
                 COUNT(*)
@@ -104,7 +104,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         int $identityId,
         int $problemId,
         ?int $problemsetId
-    ) : ?int {
+    ): ?int {
         if (is_null($problemsetId)) {
             $sql = '
                 SELECT
@@ -136,7 +136,10 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
-    public static function countAcceptedSubmissions(int $startTimestamp, int $endTimestamp) : int {
+    public static function countAcceptedSubmissions(
+        int $startTimestamp,
+        int $endTimestamp
+    ): int {
         $sql = '
             SELECT
                 COUNT(s.submission_id)
@@ -149,6 +152,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
 ';
         /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$startTimestamp, $endTimestamp]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$startTimestamp, $endTimestamp]
+        );
     }
 }

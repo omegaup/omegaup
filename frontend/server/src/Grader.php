@@ -10,14 +10,14 @@ class Grader {
     const REQUEST_MODE_RAW = 2;
     const REQUEST_MODE_PASSTHRU = 3;
 
-    public static function getInstance() : \OmegaUp\Grader {
+    public static function getInstance(): \OmegaUp\Grader {
         if (is_null(self::$_instance)) {
             self::$_instance = new \OmegaUp\Grader();
         }
         return self::$_instance;
     }
 
-    public static function setInstanceForTesting(?\OmegaUp\Grader $instance) : void {
+    public static function setInstanceForTesting(?\OmegaUp\Grader $instance): void {
         self::$_instance = $instance;
     }
 
@@ -29,12 +29,14 @@ class Grader {
      *
      * @throws \Exception
      */
-    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) : void {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source): void {
         if (OMEGAUP_GRADER_FAKE) {
             if (is_null($run->submission_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
-            $submission = \OmegaUp\DAO\Submissions::getByPK($run->submission_id);
+            $submission = \OmegaUp\DAO\Submissions::getByPK(
+                $run->submission_id
+            );
             if (is_null($submission)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
@@ -56,7 +58,7 @@ class Grader {
      *
      * @throws \Exception
      */
-    public function rejudge(array $runs, bool $debug) : void {
+    public function rejudge(array $runs, bool $debug): void {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
@@ -65,7 +67,7 @@ class Grader {
             self::REQUEST_MODE_JSON,
             [
                 'run_ids' => array_map(function (\OmegaUp\DAO\VO\Runs $r) {
-                    return (int)$r->run_id;
+                    return intval($r->run_id);
                 }, $runs),
                 'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
@@ -80,7 +82,7 @@ class Grader {
      *
      * @throws \Exception
      */
-    public function getSource(string $guid) : string {
+    public function getSource(string $guid): string {
         if (OMEGAUP_GRADER_FAKE) {
             return file_get_contents("/tmp/{$guid}");
         }
@@ -96,7 +98,7 @@ class Grader {
      *
      * @return array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: array{name: string, id: int}[], run_queue_length: int, runner_queue_length: 0, runners: string[]}} json array
      */
-    public function status() : array {
+    public function status(): array {
         if (OMEGAUP_GRADER_FAKE) {
             return [
                 'status' => 'ok',
@@ -126,7 +128,7 @@ class Grader {
         ?string $username,
         int $userId = -1,
         bool $userOnly = false
-    ) : void {
+    ): void {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
@@ -152,7 +154,7 @@ class Grader {
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $missingOk = false
-    ) : ?string {
+    ): ?string {
         if (OMEGAUP_GRADER_FAKE) {
             return null;
         }
@@ -161,7 +163,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             self::REQUEST_MODE_RAW,
             [
-                'run_id' => (int)$run->run_id,
+                'run_id' => intval($run->run_id),
                 'filename' => $filename,
             ],
             $missingOk
@@ -172,7 +174,7 @@ class Grader {
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $missingOk = false
-    ) : ?bool {
+    ): ?bool {
         if (OMEGAUP_GRADER_FAKE) {
             return null;
         }
@@ -181,7 +183,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             self::REQUEST_MODE_PASSTHRU,
             [
-                'run_id' => (int)$run->run_id,
+                'run_id' => intval($run->run_id),
                 'filename' => $filename,
             ],
             $missingOk
@@ -245,7 +247,6 @@ class Grader {
             }
 
             // Execute call
-            /** @var bool|string */
             $response = curl_exec($curl);
             /** @var int */
             $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);

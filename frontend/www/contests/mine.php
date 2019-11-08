@@ -1,27 +1,24 @@
 <?php
-
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 try {
-    $payload = \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([]));
-
-    // If the user have private material (contests/problems), an alert is issued
-    // suggesting to contribute to the community by releasing the material to
-    // the public. This flag ensures that this alert is shown only once per
-    // session, the first time the user visits the "My contests" page.
-    $privateContestsAlert = (!is_null($session['identity']) &&
-        !isset($_SESSION['private_contests_alert']) &&
-        \OmegaUp\DAO\Contests::getPrivateContestsCount($session['user']) > 0);
-
-    if ($privateContestsAlert) {
-        $_SESSION['private_contests_alert'] = true;
-    }
-
-    $smarty->assign('privateContestsAlert', $privateContestsAlert);
-    $smarty->assign('payload', $payload);
-    $smarty->display(OMEGAUP_ROOT . '/templates/contest.mine.tpl');
-} catch (\OmegaUp\Exceptions\ApiException $e) {
-    Logger::getLogger('contestlist')->error('APIException ' . $e);
-    header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('404.html'));
+    $result = \OmegaUp\Controllers\Contest::getContestListMineForSmarty(
+        new \OmegaUp\Request($_REQUEST)
+    );
+} catch (\Exception $e) {
+    \OmegaUp\ApiCaller::handleException($e);
 }
+
+foreach ($result as $key => $value) {
+    \OmegaUp\UITools::getSmartyInstance()->assign($key, $value);
+}
+
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/contest.mine.tpl',
+        strval(
+            OMEGAUP_ROOT
+        )
+    )
+);

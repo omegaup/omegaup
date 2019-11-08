@@ -8,9 +8,15 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      */
-    public static function createGroup(\OmegaUp\DAO\VO\Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
+    public static function createGroup(
+        \OmegaUp\DAO\VO\Identities $owner = null,
+        $name = null,
+        $description = null,
+        $alias = null,
+        ScopedLoginToken $login = null
+    ) {
         if (is_null($owner)) {
-            $owner = UserFactory::createUser();
+            ['user' => $user, 'identity' => $owner] = UserFactory::createUser();
         }
 
         if (is_null($name)) {
@@ -47,18 +53,21 @@ class GroupsFactory {
     }
 
     /**
-     * Add user to group helper
+     * Add identity to group helper
      *
-     * @param array $groupData
-     * @param \OmegaUp\DAO\VO\Users $user
+     * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData
      */
-    public static function addUserToGroup(array $groupData, \OmegaUp\DAO\VO\Users $user, ScopedLoginToken $login = null) {
+    public static function addUserToGroup(
+        array $groupData,
+        \OmegaUp\DAO\VO\Identities $identity,
+        ScopedLoginToken $login = null
+    ) {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($groupData['owner']);
         }
         \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $groupData['group']->alias
         ]));
     }
@@ -71,7 +80,12 @@ class GroupsFactory {
      * @param type $description
      * @param type $alias
      */
-    public static function createGroupScoreboard(array $groupData, $name = null, $description = null, $alias = null) {
+    public static function createGroupScoreboard(
+        array $groupData,
+        $name = null,
+        $description = null,
+        $alias = null
+    ) {
         if (is_null($name)) {
             $name = Utils::CreateRandomString();
         }
@@ -106,11 +120,17 @@ class GroupsFactory {
     /**
      * Adds contest to scoreboard helper
      *
-     * @param array $contestData
-     * @param array $scorebaordData
-     * @param array $groupData
+     * @param array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, contest: \OmegaUp\DAO\VO\Contests} $contestData
+     * @param array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards} $scoreboardData
+     * @param array{response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, group: \OmegaUp\DAO\VO\Groups} $groupData
      */
-    public static function addContestToScoreboard($contestData, $scoreboardData, $groupData, $onlyAC = 0, $weight = 1) {
+    public static function addContestToScoreboard(
+        $contestData,
+        $scoreboardData,
+        $groupData,
+        int $onlyAC = 0,
+        int $weight = 1
+    ): void {
         $login = OmegaupTestCase::login($groupData['owner']);
         \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,

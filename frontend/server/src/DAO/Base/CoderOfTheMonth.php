@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,16 +25,43 @@ abstract class CoderOfTheMonth {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month) : int {
-        $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ?, `rank` = ?, `selected_by` = ? WHERE `coder_of_the_month_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month
+    ): int {
+        $sql = '
+            UPDATE
+                `Coder_Of_The_Month`
+            SET
+                `user_id` = ?,
+                `description` = ?,
+                `time` = ?,
+                `interview_url` = ?,
+                `rank` = ?,
+                `selected_by` = ?
+            WHERE
+                (
+                    `coder_of_the_month_id` = ?
+                );';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            (
+                is_null($Coder_Of_The_Month->user_id) ?
+                null :
+                intval($Coder_Of_The_Month->user_id)
+            ),
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
-            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
-            (int)$Coder_Of_The_Month->coder_of_the_month_id,
+            (
+                is_null($Coder_Of_The_Month->rank) ?
+                null :
+                intval($Coder_Of_The_Month->rank)
+            ),
+            (
+                is_null($Coder_Of_The_Month->selected_by) ?
+                null :
+                intval($Coder_Of_The_Month->selected_by)
+            ),
+            intval($Coder_Of_The_Month->coder_of_the_month_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -43,15 +70,32 @@ abstract class CoderOfTheMonth {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\CoderOfTheMonth} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\CoderOfTheMonth}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\CoderOfTheMonth}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\CoderOfTheMonth Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\CoderOfTheMonth} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $coder_of_the_month_id) : ?\OmegaUp\DAO\VO\CoderOfTheMonth {
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $coder_of_the_month_id
+    ): ?\OmegaUp\DAO\VO\CoderOfTheMonth {
+        $sql = '
+            SELECT
+                `Coder_Of_The_Month`.`coder_of_the_month_id`,
+                `Coder_Of_The_Month`.`user_id`,
+                `Coder_Of_The_Month`.`description`,
+                `Coder_Of_The_Month`.`time`,
+                `Coder_Of_The_Month`.`interview_url`,
+                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`selected_by`
+            FROM
+                `Coder_Of_The_Month`
+            WHERE
+                (
+                    `coder_of_the_month_id` = ?
+                )
+            LIMIT 1;';
         $params = [$coder_of_the_month_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -79,9 +123,19 @@ abstract class CoderOfTheMonth {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month) : void {
-        $sql = 'DELETE FROM `Coder_Of_The_Month` WHERE coder_of_the_month_id = ?;';
-        $params = [$Coder_Of_The_Month->coder_of_the_month_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Coder_Of_The_Month`
+            WHERE
+                (
+                    `coder_of_the_month_id` = ?
+                );';
+        $params = [
+            $Coder_Of_The_Month->coder_of_the_month_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -115,17 +169,42 @@ abstract class CoderOfTheMonth {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` from Coder_Of_The_Month';
+    ): array {
+        $sql = '
+            SELECT
+                `Coder_Of_The_Month`.`coder_of_the_month_id`,
+                `Coder_Of_The_Month`.`user_id`,
+                `Coder_Of_The_Month`.`description`,
+                `Coder_Of_The_Month`.`time`,
+                `Coder_Of_The_Month`.`interview_url`,
+                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`selected_by`
+            FROM
+                `Coder_Of_The_Month`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\CoderOfTheMonth($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\CoderOfTheMonth(
+                $row
+            );
         }
         return $allData;
     }
@@ -138,26 +217,60 @@ abstract class CoderOfTheMonth {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\CoderOfTheMonth} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CoderOfTheMonth}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month) : int {
-        $sql = 'INSERT INTO Coder_Of_The_Month (`user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month
+    ): int {
+        $sql = '
+            INSERT INTO
+                Coder_Of_The_Month (
+                    `user_id`,
+                    `description`,
+                    `time`,
+                    `interview_url`,
+                    `rank`,
+                    `selected_by`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            (
+                is_null($Coder_Of_The_Month->user_id) ?
+                null :
+                intval($Coder_Of_The_Month->user_id)
+            ),
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
-            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
+            (
+                is_null($Coder_Of_The_Month->rank) ?
+                null :
+                intval($Coder_Of_The_Month->rank)
+            ),
+            (
+                is_null($Coder_Of_The_Month->selected_by) ?
+                null :
+                intval($Coder_Of_The_Month->selected_by)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Coder_Of_The_Month->coder_of_the_month_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Coder_Of_The_Month->coder_of_the_month_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

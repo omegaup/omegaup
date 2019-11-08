@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,12 +25,23 @@ abstract class Permissions {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Permissions $Permissions) : int {
-        $sql = 'UPDATE `Permissions` SET `name` = ?, `description` = ? WHERE `permission_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Permissions $Permissions
+    ): int {
+        $sql = '
+            UPDATE
+                `Permissions`
+            SET
+                `name` = ?,
+                `description` = ?
+            WHERE
+                (
+                    `permission_id` = ?
+                );';
         $params = [
             $Permissions->name,
             $Permissions->description,
-            (int)$Permissions->permission_id,
+            intval($Permissions->permission_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -39,15 +50,28 @@ abstract class Permissions {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Permissions} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Permissions}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Permissions}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Permissions Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Permissions} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $permission_id) : ?\OmegaUp\DAO\VO\Permissions {
-        $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` FROM Permissions WHERE (permission_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $permission_id
+    ): ?\OmegaUp\DAO\VO\Permissions {
+        $sql = '
+            SELECT
+                `Permissions`.`permission_id`,
+                `Permissions`.`name`,
+                `Permissions`.`description`
+            FROM
+                `Permissions`
+            WHERE
+                (
+                    `permission_id` = ?
+                )
+            LIMIT 1;';
         $params = [$permission_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -75,9 +99,19 @@ abstract class Permissions {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Permissions $Permissions) : void {
-        $sql = 'DELETE FROM `Permissions` WHERE permission_id = ?;';
-        $params = [$Permissions->permission_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Permissions $Permissions
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Permissions`
+            WHERE
+                (
+                    `permission_id` = ?
+                );';
+        $params = [
+            $Permissions->permission_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -111,17 +145,38 @@ abstract class Permissions {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` from Permissions';
+    ): array {
+        $sql = '
+            SELECT
+                `Permissions`.`permission_id`,
+                `Permissions`.`name`,
+                `Permissions`.`description`
+            FROM
+                `Permissions`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Permissions($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Permissions(
+                $row
+            );
         }
         return $allData;
     }
@@ -134,12 +189,24 @@ abstract class Permissions {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Permissions $Permissions El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Permissions} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Permissions}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Permissions $Permissions) : int {
-        $sql = 'INSERT INTO Permissions (`name`, `description`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Permissions $Permissions
+    ): int {
+        $sql = '
+            INSERT INTO
+                Permissions (
+                    `name`,
+                    `description`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
             $Permissions->name,
             $Permissions->description,
@@ -149,7 +216,9 @@ abstract class Permissions {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Permissions->permission_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Permissions->permission_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium course tests.'''
 
@@ -253,8 +254,9 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector('textarea').send_keys(
         'homework description')
 
-    new_assignment_form.find_element_by_css_selector(
-        'button[type=submit]').click()
+    with util.dismiss_status(driver):
+        new_assignment_form.find_element_by_css_selector(
+            'button[type=submit]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
@@ -263,7 +265,6 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH,
              '//*[contains(@class, "omegaup-course-assignmentlist")]'
              '//a[text()="%s"]' % assignment_alias)))
-    util.dismiss_status(driver)
 
 
 @util.annotate

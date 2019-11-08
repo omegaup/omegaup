@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,19 +25,49 @@ abstract class Identities {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Identities $Identities) : int {
-        $sql = 'UPDATE `Identities` SET `username` = ?, `password` = ?, `name` = ?, `user_id` = ?, `language_id` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `gender` = ? WHERE `identity_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Identities $Identities
+    ): int {
+        $sql = '
+            UPDATE
+                `Identities`
+            SET
+                `username` = ?,
+                `password` = ?,
+                `name` = ?,
+                `user_id` = ?,
+                `language_id` = ?,
+                `country_id` = ?,
+                `state_id` = ?,
+                `school_id` = ?,
+                `gender` = ?
+            WHERE
+                (
+                    `identity_id` = ?
+                );';
         $params = [
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
-            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
+            (
+                is_null($Identities->user_id) ?
+                null :
+                intval($Identities->user_id)
+            ),
+            (
+                is_null($Identities->language_id) ?
+                null :
+                intval($Identities->language_id)
+            ),
             $Identities->country_id,
             $Identities->state_id,
-            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
+            (
+                is_null($Identities->school_id) ?
+                null :
+                intval($Identities->school_id)
+            ),
             $Identities->gender,
-            (int)$Identities->identity_id,
+            intval($Identities->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -46,15 +76,35 @@ abstract class Identities {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Identities} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Identities}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Identities}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Identities Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Identities} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $identity_id) : ?\OmegaUp\DAO\VO\Identities {
-        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $identity_id
+    ): ?\OmegaUp\DAO\VO\Identities {
+        $sql = '
+            SELECT
+                `Identities`.`identity_id`,
+                `Identities`.`username`,
+                `Identities`.`password`,
+                `Identities`.`name`,
+                `Identities`.`user_id`,
+                `Identities`.`language_id`,
+                `Identities`.`country_id`,
+                `Identities`.`state_id`,
+                `Identities`.`school_id`,
+                `Identities`.`gender`
+            FROM
+                `Identities`
+            WHERE
+                (
+                    `identity_id` = ?
+                )
+            LIMIT 1;';
         $params = [$identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -82,9 +132,19 @@ abstract class Identities {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Identities $Identities) : void {
-        $sql = 'DELETE FROM `Identities` WHERE identity_id = ?;';
-        $params = [$Identities->identity_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Identities $Identities
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Identities`
+            WHERE
+                (
+                    `identity_id` = ?
+                );';
+        $params = [
+            $Identities->identity_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -118,17 +178,45 @@ abstract class Identities {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` from Identities';
+    ): array {
+        $sql = '
+            SELECT
+                `Identities`.`identity_id`,
+                `Identities`.`username`,
+                `Identities`.`password`,
+                `Identities`.`name`,
+                `Identities`.`user_id`,
+                `Identities`.`language_id`,
+                `Identities`.`country_id`,
+                `Identities`.`state_id`,
+                `Identities`.`school_id`,
+                `Identities`.`gender`
+            FROM
+                `Identities`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Identities($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Identities(
+                $row
+            );
         }
         return $allData;
     }
@@ -141,21 +229,59 @@ abstract class Identities {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Identities $Identities El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Identities} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Identities}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Identities $Identities) : int {
-        $sql = 'INSERT INTO Identities (`username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Identities $Identities
+    ): int {
+        $sql = '
+            INSERT INTO
+                Identities (
+                    `username`,
+                    `password`,
+                    `name`,
+                    `user_id`,
+                    `language_id`,
+                    `country_id`,
+                    `state_id`,
+                    `school_id`,
+                    `gender`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
-            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
+            (
+                is_null($Identities->user_id) ?
+                null :
+                intval($Identities->user_id)
+            ),
+            (
+                is_null($Identities->language_id) ?
+                null :
+                intval($Identities->language_id)
+            ),
             $Identities->country_id,
             $Identities->state_id,
-            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
+            (
+                is_null($Identities->school_id) ?
+                null :
+                intval($Identities->school_id)
+            ),
             $Identities->gender,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -163,7 +289,9 @@ abstract class Identities {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Identities->identity_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Identities->identity_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

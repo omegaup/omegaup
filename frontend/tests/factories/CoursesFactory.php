@@ -1,30 +1,40 @@
 <?php
 
 class CoursesFactory {
+    /**
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, request: \OmegaUp\Request}
+     */
     public static function createCourse(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
-            $admin = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-        $identity = \OmegaUp\DAO\Identities::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
+            if (is_null($curatorGroup)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseGroupNotFound'
+                );
+            }
 
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'identity_id' => $identity->identity_id,
+                'identity_id' => $admin->identity_id,
             ]));
         }
 
         $courseAlias = Utils::CreateRandomString();
+        if (is_null($adminLogin)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -38,7 +48,7 @@ class CoursesFactory {
             'show_scoreboard' => $showScoreboard,
         ]);
 
-        $response = \OmegaUp\Controllers\Course::apiCreate($r);
+        \OmegaUp\Controllers\Course::apiCreate($r);
 
         return [
             'request' => $r,
@@ -47,26 +57,41 @@ class CoursesFactory {
         ];
     }
 
+    /**
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request}
+     */
     public static function createCourseWithOneAssignment(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
-        $public = false,
-        $requestsUserInformation = 'no',
-        $showScoreboard = 'false',
-        $startTimeDelay = 0
+        bool $public = false,
+        ?string $requestsUserInformation = 'no',
+        string $showScoreboard = 'false',
+        int $startTimeDelay = 0
     ) {
         if (is_null($admin)) {
-            $admin = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
         // Create the course
-        $courseFactoryResult = self::createCourse($admin, $adminLogin, $public, $requestsUserInformation, $showScoreboard);
+        $courseFactoryResult = self::createCourse(
+            $admin,
+            $adminLogin,
+            $public,
+            $requestsUserInformation,
+            $showScoreboard
+        );
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        if (is_null($adminLogin)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -79,8 +104,18 @@ class CoursesFactory {
             'assignment_type' => 'homework',
             'course' => $course,
         ]);
-        $assignmentResult = \OmegaUp\Controllers\Course::apiCreateAssignment($r);
-        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($assignmentAlias, $course->course_id);
+        $assignmentResult = \OmegaUp\Controllers\Course::apiCreateAssignment(
+            $r
+        );
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $course->course_id
+        );
+        if (is_null($assignment) || is_null($assignment->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
         return [
             'course' => $course,
             'course_alias' => $courseAlias,
@@ -132,16 +167,28 @@ class CoursesFactory {
 
     /**
      * Add a Student to a course
-     * @param Array $courseData [from self::createCourse]
-     * @param \OmegaUp\DAO\VO\Users $student
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseData
+     * @param ?\OmegaUp\DAO\VO\Identities $student
      */
-    public static function addStudentToCourse($courseData, $student = null, ?ScopedLoginToken $login = null) {
+    public static function addStudentToCourse(
+        $courseData,
+        $student = null,
+        ?ScopedLoginToken $login = null
+    ): \OmegaUp\DAO\VO\Identities {
         if (is_null($student)) {
-            $student = UserFactory::createUser();
+            ['user' => $user, 'identity' => $student] = UserFactory::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        if (is_null($course) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
+        if (is_null($group) || is_null($group->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
         if (is_null($login)) {
             $login = OmegaupTestCase::login($courseData['admin']);
         }
@@ -154,7 +201,12 @@ class CoursesFactory {
         return $student;
     }
 
-    public static function addProblemsToAssignment(ScopedLoginToken $login, $courseAlias, $assignmentAlias, $problems) {
+    public static function addProblemsToAssignment(
+        ScopedLoginToken $login,
+        $courseAlias,
+        $assignmentAlias,
+        $problems
+    ) {
         $responses = [];
         foreach ($problems as $problem) {
             // Add a problem to the assignment
@@ -169,6 +221,10 @@ class CoursesFactory {
         return $responses;
     }
 
+    /**
+     * @param \OmegaUp\DAO\VO\Identities[] $students
+     * @param string[] $assignmentAliases
+     */
     public static function submitRunsToAssignmentsInCourse(
         $courseData,
         array $students,
@@ -176,9 +232,17 @@ class CoursesFactory {
         array $problemAssignmentsMap
     ) {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        if (is_null($course) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {
             $studentUsername = $students[$s]->username;
+            if (is_null($studentUsername)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
             $expectedScores[$studentUsername] = [];
             $studentLogin = OmegaupTestCase::login($students[$s]);
 
@@ -189,6 +253,14 @@ class CoursesFactory {
                     $assignmentAlias,
                     $course->course_id
                 );
+                if (
+                    is_null($assignment) ||
+                    is_null($assignment->problemset_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
 
                 $expectedScores[$studentUsername][$assignmentAlias] = 0;
 
@@ -203,7 +275,13 @@ class CoursesFactory {
                             'language' => 'c',
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
-                        RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $runResponsePA['guid']);
+                        RunsFactory::gradeRun(
+                            null /*runData*/,
+                            0.5,
+                            'PA',
+                            null,
+                            $runResponsePA['guid']
+                        );
                         $expectedScores[$studentUsername][$assignmentAlias] += 50;
 
                         if (($s + $p) % 3 == 0) {
@@ -215,7 +293,13 @@ class CoursesFactory {
                                 'language' => 'c',
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));
-                            RunsFactory::gradeRun(null /*runData*/, 1, 'AC', null, $runResponseAC['guid']);
+                            RunsFactory::gradeRun(
+                                null /*runData*/,
+                                1,
+                                'AC',
+                                null,
+                                $runResponseAC['guid']
+                            );
                             $expectedScores[$studentUsername][$assignmentAlias] += 50;
                         }
                     }
@@ -226,7 +310,13 @@ class CoursesFactory {
         return $expectedScores;
     }
 
-    public static function openCourse($courseAssignmentData, $user) {
+    /**
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
+     */
+    public static function openCourse(
+        $courseAssignmentData,
+        \OmegaUp\DAO\VO\Identities $user
+    ): void {
         // Log in as course adminy
         $login = OmegaupTestCase::login($user);
 
@@ -237,7 +327,13 @@ class CoursesFactory {
         ]));
     }
 
-    public static function openAssignmentCourse($courseAssignmentData, $user) {
+    /**
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
+     */
+    public static function openAssignmentCourse(
+        $courseAssignmentData,
+        \OmegaUp\DAO\VO\Identities $user
+    ): void {
         // Log in as course adminy
         $login = OmegaupTestCase::login($user);
 
@@ -249,7 +345,15 @@ class CoursesFactory {
         ]));
     }
 
-    public static function openProblemInCourseAssignment($courseAssignmentData, $problemData, $user) {
+    /**
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
+    public static function openProblemInCourseAssignment(
+        $courseAssignmentData,
+        $problemData,
+        \OmegaUp\DAO\VO\Identities $user
+    ): void {
         // Log in the user
         $login = OmegaupTestCase::login($user);
 

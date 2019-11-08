@@ -1,5 +1,8 @@
 <?php
-//set paths
+
+namespace OmegaUp;
+
+// Set paths
 if (!defined('OMEGAUP_ROOT')) {
     define('OMEGAUP_ROOT', dirname(__DIR__));
 }
@@ -21,7 +24,11 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         <h1>No config file.</h1>
         <p>You are missing the config file. These are the default values:</p>
         <pre class="code" style="margin: 3em; border: 1px solid #000; background: #ccc;">
-        <?php echo htmlspecialchars(file_get_contents(__DIR__ . '/config.default.php')); ?>
+        <?php echo htmlspecialchars(
+            file_get_contents(
+                __DIR__ . '/config.default.php'
+            )
+        ); ?>
         </pre>
         <p>Create a file called <code>config.php</code> &emdash; the settings there will
         override any of the default values.</p>
@@ -53,6 +60,7 @@ $contentSecurityPolicy = [
         'https://js-agent.newrelic.com',
         'https://bam.nr-data.net',
         'https://ssl.google-analytics.com',
+        'https://www.google-analytics.com',
         'https://connect.facebook.net',
         'https://platform.twitter.com',
     ],

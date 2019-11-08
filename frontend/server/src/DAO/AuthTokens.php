@@ -25,14 +25,17 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     at.user_id = u.user_id
                 WHERE
                     at.token = ?;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$auth_token]
+        );
         if (empty($rs)) {
             return null;
         }
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function getIdentityByToken($auth_token) : ?\OmegaUp\DAO\VO\Identities {
+    public static function getIdentityByToken($auth_token): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                     i.*
                 FROM
@@ -43,7 +46,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     at.identity_id = i.identity_id
                 WHERE
                     at.token = ?;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$auth_token]
+        );
 
         if (empty($rs)) {
             return null;
@@ -68,7 +74,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identityId]
+        );
 
         $authTokens = [];
         foreach ($rs as $row) {

@@ -14,7 +14,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateContestPositive() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -54,7 +54,7 @@ class CreateContestTest extends OmegaupTestCase {
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
             $contestData = ContestsFactory::getRequest(new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             ));
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
@@ -88,7 +88,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -113,7 +113,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -137,7 +137,7 @@ class CreateContestTest extends OmegaupTestCase {
     public function testCreatePublicContest() {
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -163,7 +163,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -193,7 +193,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // Create a valid contest Request object
         $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -224,9 +224,9 @@ class CreateContestTest extends OmegaupTestCase {
         // Create contest with 2 hours and a window length 30 of minutes
         $contest = ContestsFactory::createContest(
             new ContestParams([
-                'window_length' => 30,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 2 * 60,
+                'windowLength' => 30,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 2 * 60,
             ])
         );
 
@@ -234,28 +234,30 @@ class CreateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
-        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+        ContestsFactory::openContest($contest, $identity);
+        ContestsFactory::openProblemInContest($contest, $problem, $identity);
 
         // User creates a run in a valid time
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         try {
             // User tries to create a run 5 minutes after contest has finished
             $updatedTime = $updatedTime + 15 * 60;
             \OmegaUp\Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            $run = RunsFactory::createRun($problem, $contest, $identity);
             RunsFactory::gradeRun($run, 1.0, 'AC', 10);
-            $this->fail('Contestant should not create a run after contest finishes');
+            $this->fail(
+                'Contestant should not create a run after contest finishes'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());

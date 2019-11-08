@@ -13,7 +13,7 @@
         <div class="container-fluid">
           <template v-if="currentView == 'suggestion'">
             <div class="title-text">
-              {{ T.qualityFormCongrats }}
+              {{ this.solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC }}
             </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>
@@ -39,7 +39,7 @@
                 <li class="tag-select"
                     v-for="problemTopic in sortedProblemTopics"><label class=
                     "tag-select"><input type="checkbox"
-                       v-bind:value="problemTopic.text"
+                       v-bind:value="problemTopic.value"
                        v-model="tags"> {{ problemTopic.text }}</label></li>
               </ul></label>
             </div>
@@ -186,8 +186,11 @@ interface ProblemTopic {
 @Component
 export default class QualityNominationPopup extends Vue {
   @Prop() solved!: boolean;
+  @Prop() tried!: boolean;
   @Prop() nominated!: boolean;
+  @Prop() nominatedBeforeAC!: boolean;
   @Prop() dismissed!: boolean;
+  @Prop() dismissedBeforeAC!: boolean;
   @Prop() canNominateProblem!: boolean;
 
   T = T;
@@ -196,8 +199,8 @@ export default class QualityNominationPopup extends Vue {
   difficulty = '';
   quality = '';
   showFormOverride = true;
-  localDismissed = this.dismissed;
-  localNominated = this.nominated;
+  localDismissed = this.dismissed || (this.dismissedBeforeAC && !this.solved);
+  localNominated = this.nominated || (this.nominatedBeforeAC && !this.solved);
   tags: string[] = [];
   static readonly PROBLEM_TOPICS = [
     'problemTopic2Sat',
@@ -246,7 +249,7 @@ export default class QualityNominationPopup extends Vue {
   get showForm(): boolean {
     return (
       this.showFormOverride &&
-      this.solved &&
+      (this.solved || this.tried) &&
       !this.localNominated &&
       !this.localDismissed &&
       this.canNominateProblem
@@ -254,7 +257,7 @@ export default class QualityNominationPopup extends Vue {
   }
 
   get showSuggestLink(): boolean {
-    return this.solved && !this.localNominated;
+    return (this.tried || this.solved) && !this.localNominated;
   }
 
   get sortedProblemTopics(): ProblemTopic[] {

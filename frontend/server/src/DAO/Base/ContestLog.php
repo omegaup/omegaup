@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,15 +25,39 @@ abstract class ContestLog {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ContestLog $Contest_Log) : int {
-        $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ContestLog $Contest_Log
+    ): int {
+        $sql = '
+            UPDATE
+                `Contest_Log`
+            SET
+                `contest_id` = ?,
+                `user_id` = ?,
+                `from_admission_mode` = ?,
+                `to_admission_mode` = ?,
+                `time` = ?
+            WHERE
+                (
+                    `public_contest_id` = ?
+                );';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            (
+                is_null($Contest_Log->contest_id) ?
+                null :
+                intval($Contest_Log->contest_id)
+            ),
+            (
+                is_null($Contest_Log->user_id) ?
+                null :
+                intval($Contest_Log->user_id)
+            ),
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),
-            (int)$Contest_Log->public_contest_id,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Contest_Log->time
+            ),
+            intval($Contest_Log->public_contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -42,15 +66,31 @@ abstract class ContestLog {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ContestLog} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ContestLog}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ContestLog}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ContestLog Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ContestLog} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $public_contest_id) : ?\OmegaUp\DAO\VO\ContestLog {
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $public_contest_id
+    ): ?\OmegaUp\DAO\VO\ContestLog {
+        $sql = '
+            SELECT
+                `Contest_Log`.`public_contest_id`,
+                `Contest_Log`.`contest_id`,
+                `Contest_Log`.`user_id`,
+                `Contest_Log`.`from_admission_mode`,
+                `Contest_Log`.`to_admission_mode`,
+                `Contest_Log`.`time`
+            FROM
+                `Contest_Log`
+            WHERE
+                (
+                    `public_contest_id` = ?
+                )
+            LIMIT 1;';
         $params = [$public_contest_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -78,9 +118,19 @@ abstract class ContestLog {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ContestLog $Contest_Log) : void {
-        $sql = 'DELETE FROM `Contest_Log` WHERE public_contest_id = ?;';
-        $params = [$Contest_Log->public_contest_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ContestLog $Contest_Log
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Contest_Log`
+            WHERE
+                (
+                    `public_contest_id` = ?
+                );';
+        $params = [
+            $Contest_Log->public_contest_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -114,17 +164,41 @@ abstract class ContestLog {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` from Contest_Log';
+    ): array {
+        $sql = '
+            SELECT
+                `Contest_Log`.`public_contest_id`,
+                `Contest_Log`.`contest_id`,
+                `Contest_Log`.`user_id`,
+                `Contest_Log`.`from_admission_mode`,
+                `Contest_Log`.`to_admission_mode`,
+                `Contest_Log`.`time`
+            FROM
+                `Contest_Log`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ContestLog($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ContestLog(
+                $row
+            );
         }
         return $allData;
     }
@@ -137,25 +211,55 @@ abstract class ContestLog {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ContestLog $Contest_Log El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ContestLog} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ContestLog}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ContestLog $Contest_Log) : int {
-        $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ContestLog $Contest_Log
+    ): int {
+        $sql = '
+            INSERT INTO
+                Contest_Log (
+                    `contest_id`,
+                    `user_id`,
+                    `from_admission_mode`,
+                    `to_admission_mode`,
+                    `time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            (
+                is_null($Contest_Log->contest_id) ?
+                null :
+                intval($Contest_Log->contest_id)
+            ),
+            (
+                is_null($Contest_Log->user_id) ?
+                null :
+                intval($Contest_Log->user_id)
+            ),
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Contest_Log->time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Contest_Log->public_contest_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Contest_Log->public_contest_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

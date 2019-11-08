@@ -10,7 +10,12 @@ class CreateClarificationTest extends OmegaupTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      */
-    private function setupContest(&$problemData, &$contestData, &$contestant, $isGraderExpectedToBeCalled = true) {
+    private function setupContest(
+        &$problemData,
+        &$contestData,
+        &$contestant,
+        $isGraderExpectedToBeCalled = true
+    ) {
          // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
@@ -21,7 +26,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $userContestant, 'identity' => $contestant] = UserFactory::createUser();
 
         // Call the API avoiding the broadcaster logic
         if ($isGraderExpectedToBeCalled) {
@@ -47,11 +52,16 @@ class CreateClarificationTest extends OmegaupTestCase {
         );
 
         // Assert status of new contest
-        $this->assertArrayHasKey('clarification_id', $clarificationData['response']);
+        $this->assertArrayHasKey(
+            'clarification_id',
+            $clarificationData['response']
+        );
 
         // Verify that clarification was inserted in the database
         $clarification =
-            \OmegaUp\DAO\Clarifications::getByPK($clarificationData['response']['clarification_id']);
+            \OmegaUp\DAO\Clarifications::getByPK(
+                $clarificationData['response']['clarification_id']
+            );
 
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
@@ -62,10 +72,17 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // We need to verify that the contest and problem IDs where properly saved
         // Extractiing the contest and problem from DB to check IDs
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
 
-        $this->assertEquals($contest->problemset_id, $clarification->problemset_id);
+        $this->assertEquals(
+            $contest->problemset_id,
+            $clarification->problemset_id
+        );
         $this->assertEquals($problem->problem_id, $clarification->problem_id);
     }
 
@@ -80,7 +97,12 @@ class CreateClarificationTest extends OmegaupTestCase {
         $contestant = null;
 
         // Setup contest is required to submit a clarification
-        $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
+        $this->setupContest(
+            $problemData,
+            $contestData,
+            $contestant,
+            false /*isGraderExpectedToBeCalled*/
+        );
 
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
@@ -100,17 +122,22 @@ class CreateClarificationTest extends OmegaupTestCase {
         $contestant = null;
 
         // Setup contest is required to submit a clarification
-        $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
-        $directorIdentity = \OmegaUp\DAO\Identities::getByPK($contestData['director']->main_identity_id);
+        $this->setupContest(
+            $problemData,
+            $contestData,
+            $contestant,
+            false /*isGraderExpectedToBeCalled*/
+        );
         // Create 5 users
         $n = 5;
         $users = [];
+        $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            $users[$i] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
 
             // Add it to the contest
-            ContestsFactory::addUser($contestData, $users[$i]);
+            ContestsFactory::addUser($contestData, $identities[$i]);
         }
 
         $messageToEveryone = ClarificationsFactory::createClarification(
@@ -118,7 +145,7 @@ class CreateClarificationTest extends OmegaupTestCase {
             $contestData,
             $contestData['director'],
             'Message to everyone',
-            $directorIdentity->username
+            $contestData['director']->username
         );
 
         $messageToSpecificUser = ClarificationsFactory::createClarification(
@@ -148,7 +175,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         $this->assertEquals(3, count($response['clarifications']));
 
         for ($i = 0; $i < $n; $i++) {
-            $logins[$i] = self::login($users[$i]);
+            $logins[$i] = self::login($identities[$i]);
 
             $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],

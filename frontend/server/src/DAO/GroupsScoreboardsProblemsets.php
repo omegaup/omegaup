@@ -17,14 +17,22 @@ class GroupsScoreboardsProblemsets extends \OmegaUp\DAO\Base\GroupsScoreboardsPr
      */
     public static function getByGroupScoreboard(
         int $groupScoreboardId
-    ) : array {
+    ): array {
         $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupScoreboardId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$groupScoreboardId]
+        );
 
         /** @var \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets[] */
         $groupsScoreboardsProblemsets = [];
         foreach ($rs as $row) {
-            array_push($groupsScoreboardsProblemsets, new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets($row));
+            array_push(
+                $groupsScoreboardsProblemsets,
+                new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets(
+                    $row
+                )
+            );
         }
         return $groupsScoreboardsProblemsets;
     }

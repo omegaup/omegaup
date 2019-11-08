@@ -28,7 +28,7 @@ class ProblemsForfeited extends \OmegaUp\DAO\Base\ProblemsForfeited {
     public static function isProblemForfeited(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : bool {
+    ): bool {
         $sql = 'SELECT
                     COUNT(*)
                 FROM

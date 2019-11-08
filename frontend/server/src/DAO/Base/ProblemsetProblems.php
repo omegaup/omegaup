@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,11 +35,32 @@ abstract class ProblemsetProblems {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems) : int {
-        if (empty($Problemset_Problems->problemset_id) || empty($Problemset_Problems->problem_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems
+    ): int {
+        if (
+            empty($Problemset_Problems->problemset_id) ||
+            empty($Problemset_Problems->problem_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Problemset_Problems (
+                    `problemset_id`,
+                    `problem_id`,
+                    `commit`,
+                    `version`,
+                    `points`,
+                    `order`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Problemset_Problems->problemset_id,
             $Problemset_Problems->problem_id,
@@ -59,15 +80,37 @@ abstract class ProblemsetProblems {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems) : int {
-        $sql = 'UPDATE `Problemset_Problems` SET `commit` = ?, `version` = ?, `points` = ?, `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems
+    ): int {
+        $sql = '
+            UPDATE
+                `Problemset_Problems`
+            SET
+                `commit` = ?,
+                `version` = ?,
+                `points` = ?,
+                `order` = ?
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ?
+                );';
         $params = [
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            (float)$Problemset_Problems->points,
-            (int)$Problemset_Problems->order,
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            floatval($Problemset_Problems->points),
+            intval($Problemset_Problems->order),
+            (
+                is_null($Problemset_Problems->problemset_id) ?
+                null :
+                intval($Problemset_Problems->problemset_id)
+            ),
+            (
+                is_null($Problemset_Problems->problem_id) ?
+                null :
+                intval($Problemset_Problems->problem_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -76,15 +119,33 @@ abstract class ProblemsetProblems {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemsetProblems} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetProblems}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetProblems}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemsetProblems Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsetProblems} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $problemset_id, ?int $problem_id) : ?\OmegaUp\DAO\VO\ProblemsetProblems {
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $problemset_id,
+        ?int $problem_id
+    ): ?\OmegaUp\DAO\VO\ProblemsetProblems {
+        $sql = '
+            SELECT
+                `Problemset_Problems`.`problemset_id`,
+                `Problemset_Problems`.`problem_id`,
+                `Problemset_Problems`.`commit`,
+                `Problemset_Problems`.`version`,
+                `Problemset_Problems`.`points`,
+                `Problemset_Problems`.`order`
+            FROM
+                `Problemset_Problems`
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ?
+                )
+            LIMIT 1;';
         $params = [$problemset_id, $problem_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -112,9 +173,21 @@ abstract class ProblemsetProblems {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems) : void {
-        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
-        $params = [$Problemset_Problems->problemset_id, $Problemset_Problems->problem_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problemset_Problems`
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [
+            $Problemset_Problems->problemset_id,
+            $Problemset_Problems->problem_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -148,17 +221,41 @@ abstract class ProblemsetProblems {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` from Problemset_Problems';
+    ): array {
+        $sql = '
+            SELECT
+                `Problemset_Problems`.`problemset_id`,
+                `Problemset_Problems`.`problem_id`,
+                `Problemset_Problems`.`commit`,
+                `Problemset_Problems`.`version`,
+                `Problemset_Problems`.`points`,
+                `Problemset_Problems`.`order`
+            FROM
+                `Problemset_Problems`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsetProblems($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsetProblems(
+                $row
+            );
         }
         return $allData;
     }
@@ -171,19 +268,47 @@ abstract class ProblemsetProblems {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblems} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblems}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems) : int {
-        $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problemset_Problems (
+                    `problemset_id`,
+                    `problem_id`,
+                    `commit`,
+                    `version`,
+                    `points`,
+                    `order`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            (
+                is_null($Problemset_Problems->problemset_id) ?
+                null :
+                intval($Problemset_Problems->problemset_id)
+            ),
+            (
+                is_null($Problemset_Problems->problem_id) ?
+                null :
+                intval($Problemset_Problems->problem_id)
+            ),
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            (float)$Problemset_Problems->points,
-            (int)$Problemset_Problems->order,
+            floatval($Problemset_Problems->points),
+            intval($Problemset_Problems->order),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

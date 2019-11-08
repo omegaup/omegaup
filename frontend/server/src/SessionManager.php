@@ -2,13 +2,24 @@
 
 namespace OmegaUp;
 
+// An RAII wrapper to manage the lifetime of a session.
+class ScopedSession {
+    public function __construct() {
+        session_start();
+    }
+
+    public function __destruct() {
+        session_write_close();
+    }
+}
+
 class SessionManager {
     public function setCookie(
         string $name,
         string $value,
         int $expire,
         string $path
-    ) : void {
+    ): void {
         // Expire all old cookies
         if (isset($_SERVER['HTTP_COOKIE'])) {
             $cookies = explode(';', strval($_SERVER['HTTP_COOKIE']));
@@ -23,18 +34,35 @@ class SessionManager {
         // Set the new one
         $domain = OMEGAUP_COOKIE_DOMAIN;
         $_COOKIE[$name] = $value;
-        setcookie(
-            $name,
-            $value,
-            $expire,
-            $path,
-            $domain,
-            /*secure=*/!empty($_SERVER['HTTPS']),
-            /*httponly=*/true
-        );
+        if (PHP_VERSION_ID < 70300) {
+            setcookie(
+                $name,
+                $value,
+                $expire,
+                "{$path}; SameSite=Lax",  // This hack only works for PHP < 7.3.
+                $domain,
+                /*secure=*/!empty($_SERVER['HTTPS']),
+                /*httponly=*/true
+            );
+        } else {
+            /**
+             * @psalm-suppress TooManyArguments this is needed to support
+             *                                  Same-Site cookies.
+             */
+            setcookie(
+                $name,
+                $value,
+                $expire,
+                $path,
+                $domain,
+                /*secure=*/!empty($_SERVER['HTTPS']),
+                /*httponly=*/true,
+                /*samesite=*/'Lax'
+            );
+        }
     }
 
-    public function getCookie(string $name) : ?string {
+    public function getCookie(string $name): ?string {
         if (!array_key_exists($name, $_COOKIE)) {
             return null;
         }
@@ -42,10 +70,7 @@ class SessionManager {
         return strval($_COOKIE[$name]);
     }
 
-    public function sessionStart() : void {
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            return;
-        }
-        @session_start();
+    public function sessionStart(): ScopedSession {
+        return new ScopedSession();
     }
 }

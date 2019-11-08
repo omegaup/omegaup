@@ -30,7 +30,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 rerun_id
                                 ';
 
-    final public static function getByAlias(string $alias) : ?\OmegaUp\DAO\VO\Contests {
+    final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
@@ -77,7 +77,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problemset_id]
+        );
         if (empty($row)) {
             return null;
         }
@@ -85,7 +88,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return new \OmegaUp\DAO\VO\Contests($row);
     }
 
-    public static function getPrivateContestsCount(\OmegaUp\DAO\VO\Users $user) {
+    public static function getPrivateContestsCount(
+        \OmegaUp\DAO\VO\Users $user
+    ): int {
+        if (is_null($user->user_id)) {
+            return 0;
+        }
         $sql = 'SELECT
            COUNT(c.contest_id) as total
         FROM
@@ -104,7 +112,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             return 0;
         }
 
-        return $rs['total'];
+        return intval($rs['total']);
     }
 
     public static function hasStarted(\OmegaUp\DAO\VO\Contests $contest) {
@@ -213,7 +221,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @param $orderType
      * @return Array
      */
-    final public static function getAllContestsWithScoreboard($page = 1, $pageSize = 1000, $order = null, $orderType = 'ASC') {
+    final public static function getAllContestsWithScoreboard(
+        $page = 1,
+        $pageSize = 1000,
+        $order = null,
+        $orderType = 'ASC'
+    ) {
         $sql = '
             SELECT
                 c.title,
@@ -230,11 +243,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets ps ON ps.problemset_id = c.problemset_id';
 
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `c`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' .
+            $sql .= ' ORDER BY `c`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+                $order
+            ) . '` ' .
                     ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
-            $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . (int)$pageSize;
+            $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . intval(
+                $pageSize
+            );
         }
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
@@ -242,49 +259,61 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
     /**
      * Returns all contests owned by a user.
+     *
+     * @return array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]
      */
     final public static function getAllContestsOwnedByUser(
-        $user_id,
-        $page = 1,
-        $pageSize = 1000
-    ) {
+        int $identityId,
+        int $page = 1,
+        int $pageSize = 1000
+    ): array {
         $offset = ($page - 1) * $pageSize;
-        $sql = '
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+        $sql = "
             SELECT
-                c.*,
+                $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin
             FROM
-                Contests c
+                Contests
             INNER JOIN
-                ACLs a ON a.acl_id = c.acl_id
+                ACLs a ON a.acl_id = Contests.acl_id
             INNER JOIN
-                Problemsets p ON p.problemset_id = c.problemset_id
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Problemsets p ON p.problemset_id = Contests.problemset_id
             WHERE
-                a.owner_id = ?
+                u.main_identity_id = ?
             ORDER BY
-                c.contest_id DESC
-            LIMIT ?, ?;';
+                Contests.contest_id DESC
+            LIMIT ?, ?;";
         $params = [
-            $user_id,
-            (int)$offset,
-            (int)$pageSize,
+            $identityId,
+            intval($offset),
+            intval($pageSize),
         ];
 
+        /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Returns all contests where a user is participating in.
+     *
+     * @return array{contest_id: int, problemset_id: int, title: string, description: string, original_finish_time: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]
      */
     final public static function getContestsParticipating(
-        $identity_id,
-        $page = 1,
-        $pageSize = 1000,
-        $query = null
+        int $identityId,
+        int $page = 1,
+        int $pageSize = 1000,
+        ?string $query = null
     ) {
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(\OmegaUp\DAO\Enum\ActiveStatus::ACTIVE);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(\OmegaUp\DAO\Enum\ActiveStatus::ALL);
+        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
+        );
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::ALL
+        );
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
         $filter = self::formatSearch($query);
@@ -312,16 +341,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
-        $params[] = $identity_id;
+        $params[] = $identityId;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$pageSize;
+        $params[] = intval($offset);
+        $params[] = intval($pageSize);
 
+        /** @var array{contest_id: int, problemset_id: int, title: string, description: string, original_finish_time: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -334,8 +364,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000,
         ?string $query = null
     ) {
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(\OmegaUp\DAO\Enum\ActiveStatus::ACTIVE);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(\OmegaUp\DAO\Enum\ActiveStatus::ALL);
+        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
+        );
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            \OmegaUp\DAO\Enum\ActiveStatus::ALL
+        );
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
         $filter = self::formatSearch($query);
@@ -362,8 +396,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$pageSize;
+        $params[] = intval($offset);
+        $params[] = intval($pageSize);
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
@@ -403,7 +437,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql($recomendados);
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recomendados
+        );
         $filter = self::formatSearch($query);
         $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
@@ -535,8 +571,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -549,7 +585,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     ) {
         $offset = ($pagina - 1) * $renglones_por_pagina;
         $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql($recomendados);
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recomendados
+        );
         $filter = self::formatSearch($query);
         $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
@@ -578,8 +616,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -594,7 +632,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($activos);
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql($recomendados);
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recomendados
+        );
         $filter = self::formatSearch($query);
         $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
@@ -617,8 +657,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -646,7 +686,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
         }
         return [
             'needsBasicInformation' => $rs['needs_basic_information'] == '1',
@@ -665,13 +707,19 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         // Virtual contest alias format (alias-virtual-random)
         $alias = $contest->alias;
 
-        return substr($alias, 0, 20) . '-virtual-' . \OmegaUp\SecurityTools::randomString(3);
+        return substr(
+            $alias,
+            0,
+            20
+        ) . '-virtual-' . \OmegaUp\SecurityTools::randomString(
+            3
+        );
     }
 
     /**
      * Check if contest is virtual contest
      */
-    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest) : bool {
+    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest): bool {
         return $contest->rerun_id != 0;
     }
 
@@ -691,7 +739,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             }
             $result[] = '+' . urlencode($token) . '*';
         }
-        return ['type' => \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT, 'query' => join(' ', $result)];
+        return ['type' => \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT, 'query' => join(
+            ' ',
+            $result
+        )];
     }
 
     /**
@@ -699,11 +750,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      */
     public static function getContestantsInfo(
         int $contestId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 i.name,
-                u.username,
+                i.username,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
                 IF(pi.share_user_information, cn.name, NULL) AS country,
@@ -729,10 +780,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ';
 
         /** @var array{name: string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}[] */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$contestId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$contestId]
+        );
     }
 
-    public static function requestsUserInformation($contestId) {
+    public static function requestsUserInformation(int $contestId): bool {
         $sql = '
             SELECT
                 requests_user_information
@@ -742,9 +796,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 contest_id = ?
             LIMIT 1;
         ';
+        /** @var string */
+        $requestsUsersInfo = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$contestId]
+        );
 
-        $requestsUsersInfo = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$contestId]);
-
-        return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
+        return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
     }
 }

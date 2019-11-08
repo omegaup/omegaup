@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -44,17 +44,38 @@ abstract class IdentityLoginLog {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time` from Identity_Login_Log';
+    ): array {
+        $sql = '
+            SELECT
+                `Identity_Login_Log`.`identity_id`,
+                `Identity_Login_Log`.`ip`,
+                `Identity_Login_Log`.`time`
+            FROM
+                `Identity_Login_Log`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\IdentityLoginLog($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\IdentityLoginLog(
+                $row
+            );
         }
         return $allData;
     }
@@ -67,16 +88,40 @@ abstract class IdentityLoginLog {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\IdentityLoginLog} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\IdentityLoginLog}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log) : int {
-        $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log
+    ): int {
+        $sql = '
+            INSERT INTO
+                Identity_Login_Log (
+                    `identity_id`,
+                    `ip`,
+                    `time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
-            is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Identity_Login_Log->time),
+            (
+                is_null($Identity_Login_Log->identity_id) ?
+                null :
+                intval($Identity_Login_Log->identity_id)
+            ),
+            (
+                is_null($Identity_Login_Log->ip) ?
+                null :
+                intval($Identity_Login_Log->ip)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Identity_Login_Log->time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

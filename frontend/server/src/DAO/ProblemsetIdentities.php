@@ -15,16 +15,16 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     public static function checkProblemsetOpened(
         int $identityId,
         int $problemsetId
-    ) : bool {
+    ): bool {
         return !is_null(self::getByPK($identityId, $problemsetId));
     }
 
     public static function checkAndSaveFirstTimeAccess(
         \OmegaUp\DAO\VO\Identities $identity,
-        Object $container,
+        object $container,
         bool $grantAccess = false,
         bool $shareUserInformation = false
-    ) : \OmegaUp\DAO\VO\ProblemsetIdentities {
+    ): \OmegaUp\DAO\VO\ProblemsetIdentities {
         $currentTime = \OmegaUp\Time::get();
         $problemsetIdentity  = self::getByPK(
             $identity->identity_id,
@@ -85,7 +85,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 WHERE
                     p.problemset_id = ?;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemset_id]
+        );
     }
 
     final public static function getIdentitiesByProblemset($problemset_id) {
@@ -112,7 +115,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             WHERE
                 pi.problemset_id = ?;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemset_id]
+        );
     }
 
     /**
@@ -122,7 +128,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
      */
     public static function recalculateEndTimeForProblemsetIdentities(
         \OmegaUp\DAO\VO\Contests $contest
-    ) : int {
+    ): int {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
@@ -145,7 +151,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
 
     public static function recalculateEndTimeAsFinishTime(
         \OmegaUp\DAO\VO\Contests $contest
-    ) : int {
+    ): int {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
@@ -153,7 +159,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 WHERE
                     `problemset_id` = ?;';
 
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$contest->finish_time, $contest->problemset_id]
+        );
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }

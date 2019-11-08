@@ -1,13 +1,24 @@
 <?php
-
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 try {
-    $payload = \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([]));
-    $smarty->assign('payload', $payload);
-    $smarty->display(OMEGAUP_ROOT . '/templates/group.list.tpl');
-} catch (\OmegaUp\Exceptions\ApiException $e) {
-    Logger::getLogger('grouplist')->error('APIException ' . $e);
-    header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('404.html'));
+    $result = \OmegaUp\Controllers\Group::getGroupListForSmarty(
+        new \OmegaUp\Request($_REQUEST)
+    );
+} catch (\Exception $e) {
+    \OmegaUp\ApiCaller::handleException($e);
 }
+
+foreach ($result as $key => $value) {
+    \OmegaUp\UITools::getSmartyInstance()->assign($key, $value);
+}
+
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/group.list.tpl',
+        strval(
+            OMEGAUP_ROOT
+        )
+    )
+);

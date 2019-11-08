@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,29 @@ abstract class RolesPermissions {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\RolesPermissions} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\RolesPermissions}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\RolesPermissions}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\RolesPermissions Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\RolesPermissions} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $role_id, ?int $permission_id) : ?\OmegaUp\DAO\VO\RolesPermissions {
-        $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` FROM Roles_Permissions WHERE (role_id = ? AND permission_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $role_id,
+        ?int $permission_id
+    ): ?\OmegaUp\DAO\VO\RolesPermissions {
+        $sql = '
+            SELECT
+                `Roles_Permissions`.`role_id`,
+                `Roles_Permissions`.`permission_id`
+            FROM
+                `Roles_Permissions`
+            WHERE
+                (
+                    `role_id` = ? AND
+                    `permission_id` = ?
+                )
+            LIMIT 1;';
         $params = [$role_id, $permission_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +71,21 @@ abstract class RolesPermissions {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions) : void {
-        $sql = 'DELETE FROM `Roles_Permissions` WHERE role_id = ? AND permission_id = ?;';
-        $params = [$Roles_Permissions->role_id, $Roles_Permissions->permission_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Roles_Permissions`
+            WHERE
+                (
+                    `role_id` = ? AND
+                    `permission_id` = ?
+                );';
+        $params = [
+            $Roles_Permissions->role_id,
+            $Roles_Permissions->permission_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +119,37 @@ abstract class RolesPermissions {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` from Roles_Permissions';
+    ): array {
+        $sql = '
+            SELECT
+                `Roles_Permissions`.`role_id`,
+                `Roles_Permissions`.`permission_id`
+            FROM
+                `Roles_Permissions`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\RolesPermissions($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\RolesPermissions(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,15 +162,35 @@ abstract class RolesPermissions {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\RolesPermissions} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\RolesPermissions}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions) : int {
-        $sql = 'INSERT INTO Roles_Permissions (`role_id`, `permission_id`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions
+    ): int {
+        $sql = '
+            INSERT INTO
+                Roles_Permissions (
+                    `role_id`,
+                    `permission_id`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Roles_Permissions->role_id) ? null : (int)$Roles_Permissions->role_id,
-            is_null($Roles_Permissions->permission_id) ? null : (int)$Roles_Permissions->permission_id,
+            (
+                is_null($Roles_Permissions->role_id) ?
+                null :
+                intval($Roles_Permissions->role_id)
+            ),
+            (
+                is_null($Roles_Permissions->permission_id) ?
+                null :
+                intval($Roles_Permissions->permission_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

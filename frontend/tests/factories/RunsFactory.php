@@ -15,8 +15,13 @@ class RunsFactory {
      * @param type $contestant
      * @return \OmegaUp\Request
      */
-    private static function createRequestCommon($problemData, $contestData, $contestant, ScopedLoginToken $login = null) {
-        if ($login == null) {
+    private static function createRequestCommon(
+        $problemData,
+        $contestData,
+        $contestant,
+        ScopedLoginToken $login = null
+    ) {
+        if (is_null($login)) {
             // Login as contestant
             $login = OmegaupTestCase::login($contestant);
         }
@@ -54,7 +59,7 @@ class RunsFactory {
         $participant,
         ScopedLoginToken $login = null
     ) {
-        if ($login == null) {
+        if (is_null($login)) {
             // Login as participant
             $login = OmegaupTestCase::login($participant);
         }
@@ -85,17 +90,32 @@ class RunsFactory {
      * @param $participant
      * @return array
      */
-    public static function createCourseAssignmentRun($problemData, $courseAssignmentData, $participant) {
+    public static function createCourseAssignmentRun(
+        $problemData,
+        $courseAssignmentData,
+        $participant
+    ) {
         // Our participant has to open the course before sending a run
         CoursesFactory::openCourse($courseAssignmentData, $participant);
 
         // Our participant has to open the assignment in a course before sending a run
-        CoursesFactory::openAssignmentCourse($courseAssignmentData, $participant);
+        CoursesFactory::openAssignmentCourse(
+            $courseAssignmentData,
+            $participant
+        );
 
         // Then we need to open the problem
-        CoursesFactory::openProblemInCourseAssignment($courseAssignmentData, $problemData, $participant);
+        CoursesFactory::openProblemInCourseAssignment(
+            $courseAssignmentData,
+            $problemData,
+            $participant
+        );
 
-        $r = self::createRequestCourseAssignmentCommon($problemData, $courseAssignmentData, $participant);
+        $r = self::createRequestCourseAssignmentCommon(
+            $problemData,
+            $courseAssignmentData,
+            $participant
+        );
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -115,7 +135,7 @@ class RunsFactory {
      *
      * @param type $problemData
      * @param type $contestData
-     * @param \OmegaUp\DAO\VO\Users $contestant
+     * @param \OmegaUp\DAO\VO\Identities $contestant
      * @return array
      */
     public static function createRun($problemData, $contestData, $contestant) {
@@ -123,7 +143,11 @@ class RunsFactory {
         ContestsFactory::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+        ContestsFactory::openProblemInContest(
+            $contestData,
+            $problemData,
+            $contestant
+        );
 
         $r = self::createRequestCommon($problemData, $contestData, $contestant);
 
@@ -146,7 +170,11 @@ class RunsFactory {
      * @param type $problemData
      * @param type $contestant
      */
-    public static function createRunToProblem($problemData, $contestant, ScopedLoginToken $login = null) {
+    public static function createRunToProblem(
+        $problemData,
+        $contestant,
+        ScopedLoginToken $login = null
+    ) {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
@@ -179,8 +207,8 @@ class RunsFactory {
         ?int $submitDelay = null,
         ?string $runGuid = null,
         ?int $runId = null
-    ) : void {
-        $guid = $runGuid === null ? $runData['response']['guid'] : $runGuid;
+    ): void {
+        $guid = is_null($runGuid) ? $runData['response']['guid'] : $runGuid;
         Utils::gradeRun($runId, $guid, $points, $verdict, $submitDelay);
     }
 }

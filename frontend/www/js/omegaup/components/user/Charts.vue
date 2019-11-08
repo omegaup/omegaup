@@ -29,12 +29,14 @@
 </template>
 
 <script>
-import {T} from '../../omegaup.js';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {data: Object, username: String},
-  data: function() { return {T: T, UI: UI, type: 'delta', period: 'day'};},
+  props: { data: Object, username: String },
+  data: function() {
+    return { T: T, UI: UI, type: 'delta', period: 'day' };
+  },
   watch: {
     type: function(val) {
       let self = this;
@@ -53,8 +55,9 @@ export default {
     let self = this;
     self.chart = Highcharts.chart('verdict-chart', {
       title: {
-        text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                      {user: this.username})
+        text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf, {
+          user: this.username,
+        }),
       },
     });
     self.renderPeriodStatistics();
@@ -72,19 +75,26 @@ export default {
       let self = this;
       let total = self.totalRuns;
       let stats = self.data.runs;
-      let runs = stats.reduce((total, amount) => {
-        total[amount.verdict] += parseInt(amount.runs);
-        return total;
-      }, {WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0});
+      let runs = stats.reduce(
+        (total, amount) => {
+          total[amount.verdict] += parseInt(amount.runs);
+          return total;
+        },
+        { WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0 },
+      );
       let verdicts = Object.keys(runs);
       let response = [];
       for (let verdict of verdicts) {
         let numRuns = runs[verdict];
         if (verdict == 'AC') {
-          response.push(
-              {name: verdict, y: numRuns, sliced: true, selected: true});
+          response.push({
+            name: verdict,
+            y: numRuns,
+            sliced: true,
+            selected: true,
+          });
         } else {
-          response.push({name: verdict, y: numRuns});
+          response.push({ name: verdict, y: numRuns });
         }
       }
       return response;
@@ -98,21 +108,22 @@ export default {
         response[period] = {
           categories: Object.keys(runs[period]),
           delta: [],
-          cumulative: []
+          cumulative: [],
         };
         let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
         for (let verdict of verdicts) {
           runs[period][verdict] = 0;
         }
-        for (let[index, verdict] of verdicts.entries()) {
-          response[period].delta[index] = {name: verdict, data: []};
-          response[period].cumulative[index] = {name: verdict, data: []};
-          for (let[ind, date] of response[period].categories.entries()) {
+        for (let [index, verdict] of verdicts.entries()) {
+          response[period].delta[index] = { name: verdict, data: [] };
+          response[period].cumulative[index] = { name: verdict, data: [] };
+          for (let [ind, date] of response[period].categories.entries()) {
             runs[period][verdict] += parseInt(runs[period][date][verdict]);
-            response[period].delta[index]['data'][ind] =
-                parseInt(runs[period][date][verdict]);
+            response[period].delta[index]['data'][ind] = parseInt(
+              runs[period][date][verdict],
+            );
             response[period].cumulative[index]['data'][ind] =
-                runs[period][verdict];
+              runs[period][verdict];
           }
         }
       }
@@ -122,7 +133,7 @@ export default {
       let self = this;
       let stats = self.data.runs;
       let periods = ['day', 'week', 'month', 'year'];
-      for (let[index, run] of stats.entries()) {
+      for (let [index, run] of stats.entries()) {
         for (let period of periods) {
           if (typeof stats[index][period] != 'undefined') break;
         }
@@ -135,8 +146,10 @@ export default {
         let diffSunday = date.getDate() + (7 - day);
         let firstDay = new Date(date.setDate(diffMonday));
         let lastDay = new Date(date.setDate(diffSunday));
-        stats[index]['week'] = firstDay.toLocaleDateString(T.locale) + ' - ' +
-                               lastDay.toLocaleDateString(T.locale);
+        stats[index]['week'] =
+          firstDay.toLocaleDateString(T.locale) +
+          ' - ' +
+          lastDay.toLocaleDateString(T.locale);
         // group by month
         stats[index]['month'] = run.date.substring(0, 7);
         // group by year
@@ -146,7 +159,7 @@ export default {
       for (let period of periods) {
         periodStats[period] = stats.reduce(function(groups, item) {
           let val = item[period];
-          groups[val] = groups[val] || {WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0};
+          groups[val] = groups[val] || { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 };
           groups[val][item.verdict] += parseInt(item.runs);
           return groups;
         }, {});
@@ -156,7 +169,7 @@ export default {
     normalizedRunCountsForPeriod: function() {
       let self = this;
       return self.normalizedPeriodRunCounts[self.period];
-    }
+    },
   },
   methods: {
     renderPeriodStatistics: function() {
@@ -164,24 +177,24 @@ export default {
       let runs = self.normalizedRunCountsForPeriod;
       let data = runs[self.type];
       self.chart.update({
-        chart: {type: 'column'},
+        chart: { type: 'column' },
         xAxis: {
           categories: runs.categories,
-          title: {text: omegaup.T.profileStatisticsPeriod},
+          title: { text: omegaup.T.profileStatisticsPeriod },
           labels: {
             rotation: -45,
-          }
+          },
         },
         yAxis: {
           min: 0,
-          title: {text: omegaup.T.profileStatisticsNumberOfSolvedProblems},
+          title: { text: omegaup.T.profileStatisticsNumberOfSolvedProblems },
           stackLabels: {
             enabled: false,
             style: {
               fontWeight: 'bold',
-              color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-            }
-          }
+              color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray',
+            },
+          },
         },
         legend: {
           align: 'right',
@@ -190,26 +203,27 @@ export default {
           y: 25,
           floating: true,
           backgroundColor:
-              (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            (Highcharts.theme && Highcharts.theme.background2) || 'white',
           borderColor: '#CCC',
           borderWidth: 1,
-          shadow: false
+          shadow: false,
         },
         tooltip: {
           headerFormat: '<b>{point.x}</b><br/>',
-          pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+          pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
         },
         plotOptions: {
           column: {
             stacking: 'normal',
             dataLabels: {
               enabled: false,
-              color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) ||
-                         'white'
-            }
-          }
+              color:
+                (Highcharts.theme && Highcharts.theme.dataLabelsColor) ||
+                'white',
+            },
+          },
         },
-        series: []
+        series: [],
       });
       // Removing old series
       while (self.chart.series.length) self.chart.series[0].remove(false);
@@ -231,19 +245,20 @@ export default {
           plotBackgroundColor: null,
           plotBorderWidth: null,
           plotShadow: false,
-          type: 'pie'
+          type: 'pie',
         },
         xAxis: {
-          title: {text: ''},
+          title: { text: '' },
         },
         yAxis: {
-          title: {text: ''},
+          title: { text: '' },
         },
         title: {
-          text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf,
-                                        {user: self.username})
+          text: omegaup.UI.formatString(omegaup.T.profileStatisticsVerdictsOf, {
+            user: self.username,
+          }),
         },
-        tooltip: {pointFormat: '{series.name}: {point.y}'},
+        tooltip: { pointFormat: '{series.name}: {point.y}' },
         plotOptions: {
           pie: {
             allowPointSelect: true,
@@ -253,19 +268,20 @@ export default {
               color: '#000000',
               connectorColor: '#000000',
               format:
-                  '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-            }
-          }
+                '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
+            },
+          },
         },
         series: [
           {
             name: omegaup.UI.formatString(omegaup.T.profileStatisticsRuns),
-            data: runs
-          }
-        ]
+            data: runs,
+          },
+        ],
       });
       self.chart.redraw();
     },
-  }
+  },
 };
+
 </script>

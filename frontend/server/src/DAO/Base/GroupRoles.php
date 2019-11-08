@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,32 @@ abstract class GroupRoles {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\GroupRoles} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\GroupRoles}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\GroupRoles}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\GroupRoles Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\GroupRoles} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $group_id, ?int $role_id, ?int $acl_id) : ?\OmegaUp\DAO\VO\GroupRoles {
-        $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` FROM Group_Roles WHERE (group_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $group_id,
+        ?int $role_id,
+        ?int $acl_id
+    ): ?\OmegaUp\DAO\VO\GroupRoles {
+        $sql = '
+            SELECT
+                `Group_Roles`.`group_id`,
+                `Group_Roles`.`role_id`,
+                `Group_Roles`.`acl_id`
+            FROM
+                `Group_Roles`
+            WHERE
+                (
+                    `group_id` = ? AND
+                    `role_id` = ? AND
+                    `acl_id` = ?
+                )
+            LIMIT 1;';
         $params = [$group_id, $role_id, $acl_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +74,23 @@ abstract class GroupRoles {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\GroupRoles $Group_Roles) : void {
-        $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
-        $params = [$Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->acl_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\GroupRoles $Group_Roles
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Group_Roles`
+            WHERE
+                (
+                    `group_id` = ? AND
+                    `role_id` = ? AND
+                    `acl_id` = ?
+                );';
+        $params = [
+            $Group_Roles->group_id,
+            $Group_Roles->role_id,
+            $Group_Roles->acl_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +124,38 @@ abstract class GroupRoles {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` from Group_Roles';
+    ): array {
+        $sql = '
+            SELECT
+                `Group_Roles`.`group_id`,
+                `Group_Roles`.`role_id`,
+                `Group_Roles`.`acl_id`
+            FROM
+                `Group_Roles`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\GroupRoles($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\GroupRoles(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,16 +168,42 @@ abstract class GroupRoles {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\GroupRoles $Group_Roles El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupRoles} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupRoles}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\GroupRoles $Group_Roles) : int {
-        $sql = 'INSERT INTO Group_Roles (`group_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\GroupRoles $Group_Roles
+    ): int {
+        $sql = '
+            INSERT INTO
+                Group_Roles (
+                    `group_id`,
+                    `role_id`,
+                    `acl_id`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Group_Roles->group_id) ? null : (int)$Group_Roles->group_id,
-            is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
-            is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
+            (
+                is_null($Group_Roles->group_id) ?
+                null :
+                intval($Group_Roles->group_id)
+            ),
+            (
+                is_null($Group_Roles->role_id) ?
+                null :
+                intval($Group_Roles->role_id)
+            ),
+            (
+                is_null($Group_Roles->acl_id) ?
+                null :
+                intval($Group_Roles->acl_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

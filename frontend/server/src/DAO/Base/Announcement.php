@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,13 +25,31 @@ abstract class Announcement {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Announcement $Announcement) : int {
-        $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Announcement $Announcement
+    ): int {
+        $sql = '
+            UPDATE
+                `Announcement`
+            SET
+                `user_id` = ?,
+                `time` = ?,
+                `description` = ?
+            WHERE
+                (
+                    `announcement_id` = ?
+                );';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
+            (
+                is_null($Announcement->user_id) ?
+                null :
+                intval($Announcement->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Announcement->time
+            ),
             $Announcement->description,
-            (int)$Announcement->announcement_id,
+            intval($Announcement->announcement_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -40,15 +58,29 @@ abstract class Announcement {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Announcement} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Announcement}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Announcement}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Announcement Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Announcement} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $announcement_id) : ?\OmegaUp\DAO\VO\Announcement {
-        $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` FROM Announcement WHERE (announcement_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $announcement_id
+    ): ?\OmegaUp\DAO\VO\Announcement {
+        $sql = '
+            SELECT
+                `Announcement`.`announcement_id`,
+                `Announcement`.`user_id`,
+                `Announcement`.`time`,
+                `Announcement`.`description`
+            FROM
+                `Announcement`
+            WHERE
+                (
+                    `announcement_id` = ?
+                )
+            LIMIT 1;';
         $params = [$announcement_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -76,9 +108,19 @@ abstract class Announcement {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Announcement $Announcement) : void {
-        $sql = 'DELETE FROM `Announcement` WHERE announcement_id = ?;';
-        $params = [$Announcement->announcement_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Announcement $Announcement
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Announcement`
+            WHERE
+                (
+                    `announcement_id` = ?
+                );';
+        $params = [
+            $Announcement->announcement_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -112,17 +154,39 @@ abstract class Announcement {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` from Announcement';
+    ): array {
+        $sql = '
+            SELECT
+                `Announcement`.`announcement_id`,
+                `Announcement`.`user_id`,
+                `Announcement`.`time`,
+                `Announcement`.`description`
+            FROM
+                `Announcement`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Announcement($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Announcement(
+                $row
+            );
         }
         return $allData;
     }
@@ -135,15 +199,35 @@ abstract class Announcement {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Announcement $Announcement El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Announcement} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Announcement}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Announcement $Announcement) : int {
-        $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Announcement $Announcement
+    ): int {
+        $sql = '
+            INSERT INTO
+                Announcement (
+                    `user_id`,
+                    `time`,
+                    `description`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
+            (
+                is_null($Announcement->user_id) ?
+                null :
+                intval($Announcement->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Announcement->time
+            ),
             $Announcement->description,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -151,7 +235,9 @@ abstract class Announcement {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Announcement->announcement_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Announcement->announcement_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }
