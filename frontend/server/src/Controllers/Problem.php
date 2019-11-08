@@ -2590,7 +2590,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
-            ['all', 'es', 'en', 'pt'],
+            array_merge(
+                ['all'],
+                \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+            ),
             false
         );
         $tags = [];
@@ -2617,16 +2620,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $r['difficulty_range']
                 )
             );
-            $difficultyRange = self::getDifficultyRange(
-                intval($minDifficulty),
-                intval($maxDifficulty)
-            );
         } else {
-            $difficultyRange = self::getDifficultyRange(
-                $r['min_difficulty'],
-                $r['max_difficulty']
-            );
+            $minDifficulty = intval($r['min_difficulty']);
+            $maxDifficulty = intval($r['max_difficulty']);
         }
+        $difficultyRange = self::getDifficultyRange(
+            intval($minDifficulty),
+            intval($maxDifficulty)
+        );
         if (isset($r['only_karel'])) {
             $programmingLanguages = ['kp', 'kj'];
         } elseif (isset($r['programming_languages'])) {
@@ -2754,7 +2755,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if (is_null($offset) || is_null($rowcount)) {
-            $offset = $page === 1 ? 0 : ($page - 1) * PROBLEMS_PER_PAGE;
+            $offset = ($page - 1) * PROBLEMS_PER_PAGE;
             $rowcount = PROBLEMS_PER_PAGE;
         }
 
@@ -3233,9 +3234,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
-            /** @var null $r->identity */
         }
-        // Validate list
         [
             'offset' => $offset,
             'rowcount' => $rowcount,
