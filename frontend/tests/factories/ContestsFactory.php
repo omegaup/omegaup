@@ -368,8 +368,7 @@ class ContestsFactory {
     ): void {
         // Prepare our request
         $r = new \OmegaUp\Request();
-        /** @var string */
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['contest_alias'] = strval($contestData['request']['alias']);
         $r['usernameOrEmail'] = $user->username;
 
         // Log in the contest director

@@ -51,7 +51,7 @@ class UserFilterTest extends OmegaupTestCase {
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $identity->username,
+            'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals($response['status'], 'ok');
