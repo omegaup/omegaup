@@ -206,6 +206,12 @@ class RunsFactory {
         ?int $runId = null
     ): void {
         $guid = is_null($runGuid) ? $runData['response']['guid'] : $runGuid;
-        Utils::gradeRun($runId, $guid, $points, $verdict, $submitDelay);
+        \OmegaUp\Test\Utils::gradeRun(
+            $runId,
+            $guid,
+            $points,
+            $verdict,
+            $submitDelay
+        );
     }
 }

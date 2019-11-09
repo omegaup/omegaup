@@ -12,14 +12,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [
             $unassociatedIdentity,
             $associatedIdentity
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -49,14 +49,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse();
 
         // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [
             $unassociatedIdentity,
             $associatedIdentity
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -83,14 +83,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
      */
     public function testRestrictionsForProblems() {
         // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [
             $unassociatedIdentity,
             $associatedIdentity
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -115,14 +115,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
      */
     public function testRestrictionsForGroups() {
         // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [
             $unassociatedIdentity,
             $associatedIdentity
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Associate identity with user
@@ -146,7 +146,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $password
     ): array {
         // Add a new user with identity groups creator privileges, and login
-        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
 
         // Create a group, where identities will be added
@@ -202,9 +202,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
-                'title' => Utils::CreateRandomString(),
-                'description' => Utils::CreateRandomString(),
-                'alias' => Utils::CreateRandomString(),
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
                 'start_time' => \OmegaUp\Time::get(),
             ]));
             $this->fail("{$identityStatus} identity can not clone contests");
@@ -234,8 +234,8 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],
-                'name' => Utils::CreateRandomString(),
-                'alias' => Utils::CreateRandomString(),
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
                 'start_time' => \OmegaUp\Time::get()
             ]));
             $this->fail("{$identityStatus} identity can not clone courses");
@@ -246,9 +246,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         try {
             \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'name' => Utils::CreateRandomString(),
-                'alias' => Utils::CreateRandomString(),
-                'description' => Utils::CreateRandomString(),
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
                 'start_time' => (\OmegaUp\Time::get() + 60),
                 'finish_time' => (\OmegaUp\Time::get() + 120)
             ]));

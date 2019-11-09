@@ -13,9 +13,9 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -37,13 +37,13 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $identity->username,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'old_password' => $identity->password,
         ]);
 
@@ -72,7 +72,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -80,7 +80,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => 'new_username',
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
             'scholar_degree' => 'master',
@@ -120,7 +120,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
         $states = \OmegaUp\DAO\States::getByCountry('US');
-        $newName = Utils::CreateRandomString();
+        $newName = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $newName,
@@ -177,11 +177,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdateBasicInfo() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $newUsername = 'new_username_basic_info';
-        $newPassword = Utils::CreateRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $newUsername,

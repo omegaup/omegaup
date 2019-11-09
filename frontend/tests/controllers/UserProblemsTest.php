@@ -7,7 +7,7 @@
  */
 class UserProblemsTest extends OmegaupTestCase {
     public function testEditableProblems() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemData[0] = ProblemsFactory::createProblemWithAuthor($identity);
         $problemData[1] = ProblemsFactory::createProblemWithAuthor($identity);
@@ -36,7 +36,7 @@ class UserProblemsTest extends OmegaupTestCase {
     }
 
     public function testNoProblems() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call API
         $login = self::login($identity);
@@ -53,7 +53,7 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testAdminList() {
         // Our author
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemAdminData = [];
 
         // Get two problems with another author, add $author to their
@@ -143,7 +143,7 @@ class UserProblemsTest extends OmegaupTestCase {
      * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 0 problems
      */
     public function testPrivateProblemsCountWithNoProblems() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }

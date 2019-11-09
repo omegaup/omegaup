@@ -190,6 +190,15 @@ class Grader {
         );
     }
 
+    public function setGraderResourceForTesting(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename,
+        string $contents
+    ): void {
+        // Not implemented.
+        throw new \BadMethodCallException();
+    }
+
     /**
      * Sends a request to the grader.
      *

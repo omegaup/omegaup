@@ -13,9 +13,9 @@ class CourseDetailsTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
-            'alias' => Utils::CreateRandomString(),
-            'description' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get()),
             'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
@@ -68,12 +68,12 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
-        $assignmentAlias = Utils::CreateRandomString();
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
-            'description' => Utils::CreateRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
             'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
@@ -115,7 +115,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -130,7 +130,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -141,7 +141,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -173,19 +173,19 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // Add assignment that hasn't started yet.
         $adminLogin = self::login($courseData['admin']);
-        $assignmentAlias = Utils::CreateRandomString();
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
-            'description' => Utils::CreateRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
             'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         // Try to get details before being added to the course;

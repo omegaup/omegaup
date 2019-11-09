@@ -9,7 +9,7 @@
 class ContestRequestsTest extends OmegaupTestCase {
     private function preparePublicContestWithRegistration(): array {
         // create a contest and its admin
-        ['user' => $user, 'identity' => $contestAdmin] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $contestAdmin] = \OmegaUp\Test\Factories\User::createUser();
         $contestData = ContestsFactory::createContest(new ContestParams([
             'contestDirector' => $contestAdmin,
         ]));
@@ -98,7 +98,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         ] = $this->preparePublicContestWithRegistration();
 
         // some user asks for contest
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $this->registerUserForContest($identity, $contestData['request']);
 
@@ -121,7 +121,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         ] = $this->preparePublicContestWithRegistration();
 
         // Adding secondary admin
-        ['user' => $user, 'identity' => $secondaryAdminLogin] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $secondaryAdminLogin] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::addAdminUser($contestData, $secondaryAdminLogin);
 
         // some users ask for contest
@@ -131,7 +131,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         $arbitratedUsers = [];
         $acceptedUsers = [];
         for ($i = 0; $i < $numberOfContestants; $i++) {
-            ['user' => $contestants[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             $this->registerUserForContest(
                 $identities[$i],
                 $contestData['request']

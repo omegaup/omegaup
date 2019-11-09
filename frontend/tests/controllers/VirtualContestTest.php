@@ -21,7 +21,7 @@ class VirtualContestTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -109,7 +109,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -135,7 +135,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
@@ -173,7 +173,7 @@ class VirtualContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
@@ -204,7 +204,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);

@@ -15,14 +15,14 @@ class SchoolsFactory {
      */
     public static function createSchool($name = null) {
         if (is_null($name)) {
-            $name = Utils::CreateRandomString();
+            $name = \OmegaUp\Test\Utils::createRandomString();
         }
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = OmegaupTestCase::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
         ]);
 
         // Call api
