@@ -3082,6 +3082,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    /**
+     * @return array{isSysadmin: bool, privateProblemsAlert: bool}
+     */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
