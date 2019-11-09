@@ -172,6 +172,9 @@ class ContestsFactory {
         return $problems;
     }
 
+    /**
+     * @return array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
+     */
     public static function createContest(?ContestParams $params = null) {
         if (is_null($params)) {
             $params = new ContestParams();
@@ -242,7 +245,7 @@ class ContestsFactory {
     public static function removeProblemFromContest(
         $problemData,
         $contestData
-    ) {
+    ): array {
         // Log in as contest director
         $login = OmegaupTestCase::login($contestData['director']);
 
@@ -300,7 +303,7 @@ class ContestsFactory {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
+        $r['problem_alias'] = strval($problemData['request']['problem_alias']);
 
         // Log in the user
         $login = OmegaupTestCase::login($user);
@@ -365,7 +368,7 @@ class ContestsFactory {
     ): void {
         // Prepare our request
         $r = new \OmegaUp\Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['contest_alias'] = strval($contestData['request']['alias']);
         $r['usernameOrEmail'] = $user->username;
 
         // Log in the contest director
@@ -399,10 +402,13 @@ class ContestsFactory {
         \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
     }
 
+    /**
+     * @param array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
     public static function forcePublic(
         array $contestData,
         ?int $lastUpdated = null
-    ) {
+    ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
@@ -411,7 +417,13 @@ class ContestsFactory {
         \OmegaUp\DAO\Contests::update($contest);
     }
 
-    public static function setScoreboardPercentage($contestData, $percentage) {
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
+    public static function setScoreboardPercentage(
+        $contestData,
+        int $percentage
+    ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );

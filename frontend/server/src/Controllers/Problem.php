@@ -57,7 +57,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validates a Create or Update Problem API request
      *
-     * @return array{languages: string, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: array{tagname: string, public: bool}[]|null}
+     * @return array{languages: string, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: \OmegaUp\Tag[]|null}
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreateOrUpdate(
@@ -168,11 +168,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'visibility',
                 [\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC]
             );
-            /** @var array{tagname: string, public: bool}[] */
+            /** @var \OmegaUp\Tag[]|null */
             $selectedTags = json_decode($r['selected_tags']);
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
-                    if (empty($tag->tagname)) {
+                    if (is_null($tag->tagname)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterEmpty',
                             'tagname'
@@ -1894,7 +1894,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiSolution(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         // Validate request
         $problem = self::validateDetails($r);
@@ -2140,7 +2140,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'published'
             ))->commit())['commit'];
             if (is_null($commit)) {
-                throw new \OmegaUp\Exceptions\NotFoundException();
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemVersionNotFound'
+                );
             }
             $problemDeployer->updatePublished(
                 $commit,
@@ -3145,6 +3147,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    /**
+     * @return array{isSysadmin: bool, privateProblemsAlert: bool}
+     */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 

@@ -171,7 +171,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $this->assertEquals(sizeof($result['users']), 1);
 
         self::log('admin rejects registration');
-        $r3['username'] = $contestant->username;
+        $r3['username'] = $identity->username;
         $r3['resolution'] = false;
         \OmegaUp\Controllers\Contest::apiArbitrateRequest($r3);
 
@@ -191,7 +191,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         }
 
         // admin admits user
-        $r3['username'] = $contestant->username;
+        $r3['username'] = $identity->username;
         $r3['resolution'] = true;
         \OmegaUp\Controllers\Contest::apiArbitrateRequest($r3);
 
@@ -237,7 +237,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $r3 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
-            'username' => $contestant->username,
+            'username' => $identity->username,
             'resolution' => true,
         ]);
 

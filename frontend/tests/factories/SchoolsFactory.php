@@ -11,7 +11,7 @@ class SchoolsFactory {
     /**
      * Create a random school
      * @param  string $name
-     * @return array
+     * @return array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools}
      */
     public static function createSchool($name = null) {
         if (is_null($name)) {

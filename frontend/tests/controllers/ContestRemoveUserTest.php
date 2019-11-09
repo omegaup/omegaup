@@ -30,7 +30,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]);
         \OmegaUp\Controllers\Contest::apiRemoveUser($r);
 
