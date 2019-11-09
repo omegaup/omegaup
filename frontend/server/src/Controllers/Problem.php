@@ -172,6 +172,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $selectedTags = json_decode($r['selected_tags']);
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
+                    $tag = new \OmegaUp\Tag($tag->tagname, $tag->public);
                     if (is_null($tag->tagname)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterEmpty',
