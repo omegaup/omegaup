@@ -2720,14 +2720,6 @@
       <code>$systemGroups</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/problemmine.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/profile.php">
     <MixedArgument occurrences="1">
       <code>$response['userinfo']['graduation_date']</code>
