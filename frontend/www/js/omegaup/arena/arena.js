@@ -901,7 +901,11 @@ export class Arena {
         let problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
-        if (self.problems[alias] && rank.username == OmegaUp.username) {
+        if (
+          self.problems[alias] &&
+          rank.username == OmegaUp.username &&
+          self.problems[alias].languages !== ''
+        ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
           $('#problems .problem_' + alias + ' .solved').html(
             '(' +
