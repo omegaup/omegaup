@@ -20,7 +20,7 @@ class CourseProblemsTest extends OmegaupTestCase {
         for ($i = 0; $i < $numberOfProblems; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
-                'author' => $user,
+                'author' => $identity,
             ]), $login);
         }
         CoursesFactory::addProblemsToAssignment(
@@ -110,7 +110,7 @@ class CourseProblemsTest extends OmegaupTestCase {
         for ($i = 0; $i < 3; $i++) {
             $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
-                'author' => $admin,
+                'author' => $identity,
             ]), $adminLogin);
         }
         CoursesFactory::addProblemsToAssignment(
@@ -161,13 +161,19 @@ class CourseProblemsTest extends OmegaupTestCase {
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[0]['problem']->alias,
         ]));
-        $this->assertEquals([$student->username], $response['identities']);
+        $this->assertEquals(
+            [$identityStudent->username],
+            $response['identities']
+        );
         $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[1]['problem']->alias,
         ]));
-        $this->assertEquals([$student->username], $response['identities']);
+        $this->assertEquals(
+            [$identityStudent->username],
+            $response['identities']
+        );
         $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,

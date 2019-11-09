@@ -92,7 +92,7 @@ class GroupsTest extends OmegaupTestCase {
         $login = self::login($identityCalling);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $group['group']->alias
         ]));
     }
@@ -108,7 +108,7 @@ class GroupsTest extends OmegaupTestCase {
         $login = self::login($groupData['owner']);
         $response = \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $groupData['group']->alias
         ]));
 
@@ -133,7 +133,7 @@ class GroupsTest extends OmegaupTestCase {
         $login = self::login($groupData['owner']);
         \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $groupData['group']->alias
         ]));
     }
@@ -150,7 +150,7 @@ class GroupsTest extends OmegaupTestCase {
         $login = self::login($identity);
         \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $groupData['group']->alias
         ]));
     }

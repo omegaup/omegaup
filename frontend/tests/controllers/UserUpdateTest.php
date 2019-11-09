@@ -96,7 +96,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
         // Double check language update with the appropiate API
         $r = new \OmegaUp\Request([
-            'username' => $user->username
+            'username' => $identity->username
         ]);
         $this->assertEquals($locale->name, \OmegaUp\Controllers\Identity::getPreferredLanguage(
             $r

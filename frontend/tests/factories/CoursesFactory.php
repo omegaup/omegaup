@@ -127,13 +127,24 @@ class CoursesFactory {
         ];
     }
 
-    public static function createCourseWithAssignments($nAssignments) {
+    /**
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string}
+     */
+    public static function createCourseWithAssignments(
+        int $nAssignments
+    ) {
         return self::createCourseWithNAssignmentsPerType([
             'homework' => $nAssignments
         ]);
     }
 
-    public static function createCourseWithNAssignmentsPerType($assignmentsPerType) {
+    /**
+     * @param array{homework?: int, test?: int} $assignmentsPerType
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string}
+     */
+    public static function createCourseWithNAssignmentsPerType(
+        $assignmentsPerType
+    ) {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
         $admin = $courseFactoryResult['admin'];
@@ -153,7 +164,7 @@ class CoursesFactory {
                     'assignment_type' => $assignmentType
                 ]);
 
-                $assignmentAlias[] = $r['alias'];
+                $assignmentAlias[] = strval($r['alias']);
                 \OmegaUp\Controllers\Course::apiCreateAssignment($r);
             }
         }
@@ -236,15 +247,13 @@ class CoursesFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $expectedScores = [];
-        for ($s = 0; $s < count($students); $s++) {
-            $studentUsername = $students[$s]->username;
-            if (is_null($studentUsername)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'courseNotFound'
-                );
+        foreach ($students as $s => $student) {
+            if (is_null($student->username)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
+            $studentUsername = $student->username;
             $expectedScores[$studentUsername] = [];
-            $studentLogin = OmegaupTestCase::login($students[$s]);
+            $studentLogin = OmegaupTestCase::login($student);
 
             // Loop through all problems inside assignments created
             $p = 0;
@@ -266,7 +275,7 @@ class CoursesFactory {
 
                 foreach ($problemAssignmentsMap[$assignmentAlias] as $problemData) {
                     $p++;
-                    if ($s % 2 == $p % 2) {
+                    if (intval($s) % 2 == $p % 2) {
                         // PA run
                         $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                             'auth_token' => $studentLogin->auth_token,
@@ -284,7 +293,7 @@ class CoursesFactory {
                         );
                         $expectedScores[$studentUsername][$assignmentAlias] += 50;
 
-                        if (($s + $p) % 3 == 0) {
+                        if ((intval($s) + $p) % 3 == 0) {
                             // 100 pts run
                             $runResponseAC = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                                 'auth_token' => $studentLogin->auth_token,

@@ -366,14 +366,12 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/Controllers/Group.php">
-    <MissingReturnType occurrences="7">
-      <code>apiCreate</code>
+    <MissingReturnType occurrences="5">
       <code>apiAddUser</code>
       <code>apiRemoveUser</code>
       <code>apiList</code>
       <code>apiDetails</code>
       <code>apiMembers</code>
-      <code>apiCreateScoreboard</code>
     </MissingReturnType>
     <MixedArgument occurrences="8">
       <code>$r['group_alias']</code>
@@ -1195,17 +1193,9 @@
       <code>$finishTime</code>
       <code>$canUseCache</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$school</code>
-    </MixedAssignment>
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="3">
-      <code>$school-&gt;name</code>
-      <code>$school-&gt;name</code>
-      <code>$school-&gt;school_id</code>
-    </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
@@ -1366,7 +1356,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="45">
+    <MixedAssignment occurrences="43">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1403,7 +1393,6 @@
       <code>$problem</code>
       <code>$identity</code>
       <code>$r-&gt;identity-&gt;school_id</code>
-      <code>$r['school_id']</code>
       <code>$r-&gt;identity-&gt;school_id</code>
       <code>$language</code>
       <code>$r-&gt;identity-&gt;language_id</code>
@@ -2345,36 +2334,14 @@
     <InvalidParamDefault occurrences="1">
       <code>type</code>
     </InvalidParamDefault>
-    <MissingParamType occurrences="2">
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$percentage</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>createContest</code>
+    <MissingReturnType occurrences="1">
       <code>openProblemInContest</code>
-      <code>forcePublic</code>
-      <code>setScoreboardPercentage</code>
     </MissingReturnType>
     <MixedArgument occurrences="2">
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']['alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="2">
-      <code>$contestData['request']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']</code>
-      <code>$contestData['request']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="6">
+    <MixedAssignment occurrences="4">
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
       <code>$r['contest_alias']</code>
@@ -2399,23 +2366,19 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <MissingParamType occurrences="9">
+    <MissingParamType occurrences="7">
       <code>$public</code>
       <code>$requestsUserInformation</code>
       <code>$showScoreboard</code>
       <code>$public</code>
       <code>$requestsUserInformation</code>
       <code>$showScoreboard</code>
-      <code>$nAssignments</code>
-      <code>$assignmentsPerType</code>
       <code>$courseAlias</code>
       <code>$assignmentAlias</code>
       <code>$problems</code>
       <code>$courseData</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>createCourseWithAssignments</code>
-      <code>createCourseWithNAssignmentsPerType</code>
+    <MissingReturnType occurrences="2">
       <code>addProblemsToAssignment</code>
       <code>submitRunsToAssignmentsInCourse</code>
     </MissingReturnType>
@@ -2429,31 +2392,13 @@
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="4">
+    <MixedAssignment occurrences="2">
       <code>$problem</code>
       <code>$problemData</code>
     </MixedAssignment>
     <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>
     </MixedPropertyFetch>
-  </file>
-  <file src="frontend/tests/factories/GroupsFactory.php">
-    <MismatchingDocblockParamType occurrences="1">
-      <code>type</code>
-    </MismatchingDocblockParamType>
-    <MissingReturnType occurrences="3">
-      <code>createGroup</code>
-      <code>addUserToGroup</code>
-      <code>createGroupScoreboard</code>
-    </MissingReturnType>
-    <UndefinedDocblockClass occurrences="6">
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-    </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
     <MixedArgument occurrences="2">
@@ -2511,7 +2456,7 @@
     <MixedAssignment occurrences="1">
       <code>$guid</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="4">
+    <MixedInferredReturnType occurrences="2">
       <code>\OmegaUp\Request</code>
       <code>\OmegaUp\Request</code>
       <code>array</code>
@@ -2520,7 +2465,7 @@
     <PossiblyNullArrayAccess occurrences="1">
       <code>$runData['response']</code>
     </PossiblyNullArrayAccess>
-    <UndefinedDocblockClass occurrences="12">
+    <UndefinedDocblockClass occurrences="7">
       <code>type</code>
       <code>type</code>
       <code>type</code>
