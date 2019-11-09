@@ -23,7 +23,10 @@ class UserProfileTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
-        $this->assertEquals($user->username, $response['userinfo']['username']);
+        $this->assertEquals(
+            $identity->username,
+            $response['userinfo']['username']
+        );
     }
 
     /*
@@ -89,7 +92,7 @@ class UserProfileTest extends OmegaupTestCase {
             $this->assertNull($v);
         }
         $this->assertEquals(
-            $user2->username,
+            $identity2->username,
             $response['userinfo']['username']
         );
     }
@@ -123,7 +126,7 @@ class UserProfileTest extends OmegaupTestCase {
         $login = self::login($identityAdmin);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username
+            'username' => $identity->username
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
@@ -148,7 +151,7 @@ class UserProfileTest extends OmegaupTestCase {
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username
+            'username' => $identity->username
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
@@ -225,7 +228,7 @@ class UserProfileTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
                     'auth_token' => $login->auth_token,
-                    'username' => $contestant->username
+                    'username' => $identity->username
                 ]
         ));
 

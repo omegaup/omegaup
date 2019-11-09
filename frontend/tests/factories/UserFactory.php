@@ -146,7 +146,6 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->password = strval($params['password']);
         $identity->password = strval($params['password']);
 
         return ['user' => $user, 'identity' => $identity];

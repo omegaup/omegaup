@@ -42,9 +42,9 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
+            'username' => $identity->username,
             'password' => Utils::CreateRandomString(),
-            'old_password' => $user->password,
+            'old_password' => $identity->password,
         ]);
 
         // Call api
@@ -62,7 +62,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $identity->password = $r['password'];
         self::login($identity);
 
-        $user = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $this->assertEquals($identity->password, $user->password);
     }

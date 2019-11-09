@@ -189,7 +189,7 @@ class ProblemsFactory {
             || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
             || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
         ) {
-            $problem->visibility = $visibility;
+            $problem->visibility = intval($visibility);
             \OmegaUp\DAO\Problems::update($problem);
         }
 
@@ -247,7 +247,7 @@ class ProblemsFactory {
         \OmegaUp\Controllers\Problem::apiAddGroupAdmin($r);
     }
 
-     /**
+    /**
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
      */
     public static function addTag(

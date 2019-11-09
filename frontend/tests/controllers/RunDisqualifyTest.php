@@ -86,7 +86,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
 
         // Contestant 2 should not be changed
         $this->assertEquals(
-            $contestant2->username,
+            $identity2->username,
             $response['ranking'][0]['username']
         );
         $this->assertEquals(
@@ -96,7 +96,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
         // Contestant 1 should be changed
         $this->assertEquals(
-            $contestant1->username,
+            $identity1->username,
             $response['ranking'][1]['username']
         );
         $this->assertEquals(

@@ -1984,6 +1984,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
+            'preferred_language',
             'is_private',
             'hide_problem_tags',
         ];
