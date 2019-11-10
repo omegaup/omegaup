@@ -1386,6 +1386,12 @@ class User extends \OmegaUp\Controllers\Controller {
             $coderOfTheMonthUserId = $users[0]['user_id'];
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
+            foreach ($codersOfTheMonth as $coder) {
+                if (isset($coder->selected_by)) {
+                    $coderOfTheMonthUserId = $coder->user_id;
+                    break;
+                }
+            }
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
