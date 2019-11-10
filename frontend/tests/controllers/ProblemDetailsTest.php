@@ -49,7 +49,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
             $contestData['request']['alias']
         );
         $contestantDAO = \OmegaUp\DAO\Users::FindByUsername(
-            $contestant->username
+            $identity->username
         );
 
         // Assert data
@@ -58,7 +58,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['points'], 100);
         $this->assertEquals(
             $response['problemsetter']['username'],
-            $authorUser->username
+            $authorIdentity->username
         );
         $this->assertEquals(
             $response['problemsetter']['name'],
@@ -350,7 +350,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
             ]));
             $this->assertCount(1, $response['solvers']);
             $this->assertEquals(
-                $contestant->username,
+                $identity->username,
                 $response['solvers'][0]['username']
             );
         }
@@ -439,7 +439,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([
             'token' => OMEGAUP_GITSERVER_SECRET_TOKEN,
-            'username' => $contestant->username,
+            'username' => $identity->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertTrue($result['has_solved']);

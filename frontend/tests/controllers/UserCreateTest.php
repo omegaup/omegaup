@@ -263,7 +263,7 @@ class CreateUserTest extends OmegaupTestCase {
         ]));
 
         // Get user from db again to pick up verification changes
-        $userdb = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $userdb = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
         $this->assertEquals(1, $userdb->verified);
         $this->assertEquals('ok', $response['status']);
@@ -305,7 +305,7 @@ class CreateUserTest extends OmegaupTestCase {
         $login = self::login($identity2);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]));
     }
 
@@ -351,7 +351,7 @@ class CreateUserTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             true,
-            $response['users'][$unregisteredUser->username]
+            $response['users'][$unregisteredIdentity->username]
         );
     }
 
@@ -386,7 +386,7 @@ class CreateUserTest extends OmegaupTestCase {
         // Check user was not added into the mailing list
         $this->assertEquals('ok', $response['status']);
         $this->assertArrayNotHasKey(
-            $userNotVerified->username,
+            $identityNotVerified->username,
             $response['users']
         );
     }

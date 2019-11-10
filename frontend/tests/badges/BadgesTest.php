@@ -251,7 +251,7 @@ class BadgesTest extends BadgesTestCase {
 
             // Fetch badges through apiUserList
             $userTwoBadges = \OmegaUp\Controllers\Badge::apiUserList(new \OmegaUp\Request([
-                'target_username' => $userTwo->username,
+                'target_username' => $identityTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
             $this->assertEquals(
