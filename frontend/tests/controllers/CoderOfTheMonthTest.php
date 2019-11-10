@@ -352,6 +352,21 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             ),
             $response['coders'][0]['date']
         );
+
+        // Should get all other candidates for coder of the month that had not been
+        // selected, and also the coder of the month previously selected.
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+            new \OmegaUp\Request([
+                'date' => date('Y-m-d', \OmegaUp\Time::get()),
+            ])
+        );
+        $coders = [];
+        foreach ($response['coders'] as $coder) {
+            $coders[] = $coder['username'];
+        }
+        $this->assertContains($identity1->username, $coders);
+        $this->assertContains($identity2->username, $coders);
+        $this->assertContains($identity3->username, $coders);
     }
 
     /**

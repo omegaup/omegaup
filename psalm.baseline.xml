@@ -1229,9 +1229,6 @@
     </MixedPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/User.php">
-    <InvalidNullableReturnType occurrences="1">
-      <code>Array</code>
-    </InvalidNullableReturnType>
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>

@@ -1468,19 +1468,23 @@ class User extends \OmegaUp\Controllers\Controller {
 
         foreach ($users as $index => $user) {
             if ($user['username'] != $r['username']) {
-                continue;
+                \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                ]));
+            } else {
+                // Save it
+                \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                    'selected_by' => $r->identity->identity_id,
+                ]));
             }
-
-            // Save it
-            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                'user_id' => $user['user_id'],
-                'time' => $dateToSelect,
-                'rank' => $index + 1,
-                'selected_by' => $r->identity->identity_id,
-            ]));
-
-            return ['status' => 'ok'];
         }
+
+        return ['status' => 'ok'];
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
