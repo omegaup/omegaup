@@ -1286,7 +1286,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="26">
+    <MixedArgument occurrences="25">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1297,7 +1297,6 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$user</code>
       <code>$response['userinfo']['email']</code>
-      <code>$coderOfTheMonthUserId</code>
       <code>$user_id</code>
       <code>$problemset_id</code>
       <code>$item</code>
@@ -1315,7 +1314,7 @@
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="22">
+    <MixedArrayAccess occurrences="21">
       <code>$userDb['email']</code>
       <code>$userDb['country']</code>
       <code>$userDb['country_id']</code>
@@ -1326,7 +1325,6 @@
       <code>$userDb['locale']</code>
       <code>$response['verified']</code>
       <code>$response['username']</code>
-      <code>$codersOfTheMonth[0]</code>
       <code>$response['userinfo']['email']</code>
       <code>$contest['alias']</code>
       <code>$contest['scoreboard_url_admin']</code>
@@ -1353,7 +1351,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="43">
+    <MixedAssignment occurrences="40">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1375,9 +1373,6 @@
       <code>$response['userinfo']['locale']</code>
       <code>$v</code>
       <code>$response</code>
-      <code>$codersOfTheMonth</code>
-      <code>$coderOfTheMonthUserId</code>
-      <code>$codersOfTheMonth</code>
       <code>$contestsParticipated</code>
       <code>$contest</code>
       <code>$identityData</code>
@@ -1402,9 +1397,8 @@
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="12">
+    <MixedPropertyFetch occurrences="11">
       <code>$user-&gt;main_identity_id</code>
-      <code>$codersOfTheMonth[0]-&gt;user_id</code>
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
       <code>$r['school']-&gt;school_id</code>
@@ -1543,15 +1537,14 @@
     <InvalidReturnType occurrences="1">
       <code>Array</code>
     </InvalidReturnType>
-    <MissingParamType occurrences="4">
+    <MissingParamType occurrences="3">
       <code>$username</code>
       <code>$time</code>
       <code>$autoselected</code>
       <code>$time</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
+    <MissingReturnType occurrences="1">
       <code>getByTimeAndSelected</code>
-      <code>getByTime</code>
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Contests.php">

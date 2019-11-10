@@ -205,7 +205,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         return $coders;
     }
 
-    final public static function getByTime($time) {
+    /**
+     * @param string $time
+     * @return \OmegaUp\DAO\VO\CoderOfTheMonth[]
+     */
+    final public static function getByTime(string $time): array {
         $sql = 'SELECT
                     *
                 FROM

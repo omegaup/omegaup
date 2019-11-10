@@ -2521,7 +2521,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
         /** @var \OmegaUp\DAO\VO\Identities $r->identity */
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (
+            is_null($r->identity) ||
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
