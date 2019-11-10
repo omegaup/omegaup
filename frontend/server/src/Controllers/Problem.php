@@ -57,7 +57,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validates a Create or Update Problem API request
      *
-     * @return array{languages: string, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: \OmegaUp\Tag[]|null}
+     * @return array{languages: string, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: array{tagname: string, public: bool}[]|null}
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreateOrUpdate(
@@ -168,12 +168,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'visibility',
                 [\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC]
             );
-            /** @var \OmegaUp\Tag[]|null */
-            $selectedTags = json_decode($r['selected_tags']);
+            /** @var array{tagname: string, public: bool}[]|null */
+            $selectedTags = json_decode($r['selected_tags'], /*assoc=*/true);
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
-                    $tag = new \OmegaUp\Tag($tag->tagname, $tag->public);
-                    if (is_null($tag->tagname)) {
+                    if (empty($tag['tagname'])) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterEmpty',
                             'tagname'
@@ -336,12 +335,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (!is_null($selectedTags)) {
                 foreach ($selectedTags as $tag) {
                     $tagName = \OmegaUp\Controllers\Tag::normalize(
-                        $tag->tagname
+                        $tag['tagname']
                     );
                     if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
                         continue;
                     }
-                    self::addTag($tagName, $tag->public, $problem);
+                    self::addTag($tagName, $tag['public'], $problem);
                 }
             }
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
@@ -1111,6 +1110,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate($r, true);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['statement'],
             'statement'
@@ -1136,6 +1140,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate($r, true);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
         \OmegaUp\Validators::validateStringNonEmpty($r['solution'], 'solution');
         $updatedFileLanguages = self::updateLooseFile(
             $r,
