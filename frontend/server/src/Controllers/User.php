@@ -1386,6 +1386,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $coderOfTheMonthUserId = $users[0]['user_id'];
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
+            // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
             foreach ($codersOfTheMonth as $coder) {
                 if (isset($coder->selected_by)) {
                     $coderOfTheMonthUserId = $coder->user_id;
@@ -1473,21 +1474,17 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         foreach ($users as $index => $user) {
-            if ($user['username'] != $r['username']) {
-                \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                    'user_id' => $user['user_id'],
-                    'time' => $dateToSelect,
-                    'rank' => $index + 1,
-                ]));
-            } else {
-                // Save it
-                \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                    'user_id' => $user['user_id'],
-                    'time' => $dateToSelect,
-                    'rank' => $index + 1,
-                    'selected_by' => $r->identity->identity_id,
-                ]));
+            $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                'user_id' => $user['user_id'],
+                'time' => $dateToSelect,
+                'rank' => $index + 1,
+            ]);
+            // All users calculated as CoderOfTheMonth are going to be saved on database,
+            // the one selected by the mentor is gonna have the field 'selected_by' filled.
+            if ($user['username'] === $r['username']) {
+                $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
             }
+            \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
         }
 
         return ['status' => 'ok'];
