@@ -5,7 +5,9 @@ namespace OmegaUp;
 // An RAII wrapper to manage the lifetime of a session.
 class ScopedSession {
     public function __construct() {
-        session_start();
+        if (!session_id()) {
+            session_start();
+        }
     }
 
     public function __destruct() {

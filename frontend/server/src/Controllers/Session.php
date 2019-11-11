@@ -34,6 +34,9 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
             require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
+            if (!session_id()) {
+                session_start();
+            }
 
             self::$_facebook = new \Facebook\Facebook([
                 'app_id' => OMEGAUP_FB_APPID,
