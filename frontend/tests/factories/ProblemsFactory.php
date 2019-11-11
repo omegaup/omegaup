@@ -41,7 +41,7 @@ class ProblemParams {
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
-        $this->title = $params['title'] ?? Utils::CreateRandomString();
+        $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
         $this->languages = $params['languages'] ?? 'c,cpp,py';
         $this->visibility = $params['visibility'] ?? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
         if (!empty($params['author']) && !empty($params['authorUser'])) {
@@ -51,7 +51,7 @@ class ProblemParams {
             [
                 'user' => $user,
                 'identity' => $identity,
-            ] = UserFactory::createUser();
+            ] = \OmegaUp\Test\Factories\User::createUser();
             $this->author = $params['author'] ?? $identity;
             $this->authorUser = $params['authorUser'] ?? $user;
         }

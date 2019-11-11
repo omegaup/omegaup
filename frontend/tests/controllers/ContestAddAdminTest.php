@@ -11,7 +11,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -40,7 +40,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -63,7 +63,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Update title
-        $r['title'] = Utils::CreateRandomString();
+        $r['title'] = \OmegaUp\Test\Utils::createRandomString();
 
         // Call API
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
@@ -83,8 +83,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get users
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::addAdminUser($contestData, $identity);
         ContestsFactory::addAdminUser($contestData, $identity2);
 
@@ -121,7 +121,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
@@ -153,7 +153,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
@@ -180,7 +180,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Update title
-        $r['title'] = Utils::CreateRandomString();
+        $r['title'] = \OmegaUp\Test\Utils::createRandomString();
 
         // Call API
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
@@ -200,8 +200,8 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get users
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();

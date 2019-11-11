@@ -14,7 +14,7 @@ class SchoolRankTest extends OmegaupTestCase {
         $users = [];
         $identities = [];
         for ($i = 0; $i < 5; $i++) {
-            ['user' => $users[], 'identity' => $identities[]] = UserFactory::createUser();
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
@@ -88,7 +88,7 @@ class SchoolRankTest extends OmegaupTestCase {
         $this->createRunsWithSchool($schoolsData);
 
         // Call API
-        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $rankViewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $rankViewerLogin = self::login($identity);
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
@@ -124,7 +124,7 @@ class SchoolRankTest extends OmegaupTestCase {
         // 1 in school #2 but PA, 1 with no school.
         $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
 
-        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $rankViewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $rankViewerLogin = self::login($identity);
         $originalResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,

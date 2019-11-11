@@ -76,7 +76,7 @@ class ContestParams {
      * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string} $params
      */
     public function __construct($params = []) {
-        $this->title = $params['title'] ?? Utils::CreateRandomString();
+        $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
         $this->admissionMode = $params['admissionMode'] ?? 'public';
         $this->basicInformation = $params['basicInformation'] ?? false;
         $this->requestsUserInformation = $params['requestsUserInformation'] ?? 'no';
@@ -90,7 +90,7 @@ class ContestParams {
             [
                 'user' => $user,
                 'identity' => $identity,
-            ] = UserFactory::createUser();
+            ] = \OmegaUp\Test\Factories\User::createUser();
             $this->contestDirector = $params['contestDirector'] ?? $identity;
             $this->contestDirectorUser = $params['contestDirectorUser'] ?? $user;
         }

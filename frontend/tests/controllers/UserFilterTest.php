@@ -26,7 +26,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testInsufficientPrivileges() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -36,7 +36,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAllEventsWithAdmin() {
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -47,7 +47,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testMyEvents() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -65,8 +65,8 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testOtherUsersEvents() {
-        ['user' => $user1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $user1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity1);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -76,8 +76,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testOtherUsersEventsWithAdmin() {
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -89,7 +89,7 @@ class UserFilterTest extends OmegaupTestCase {
 
     public function testPublicProblemsetAccess() {
         $contest = ContestsFactory::createContest()['contest'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -100,7 +100,7 @@ class UserFilterTest extends OmegaupTestCase {
 
     public function testPublicContestAccess() {
         $contest = ContestsFactory::createContest()['contest'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -233,7 +233,7 @@ class UserFilterTest extends OmegaupTestCase {
 
     public function testPublicProblemAccess() {
         $problem = ProblemsFactory::createProblem()['problem'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([

@@ -11,7 +11,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testDirectorList() {
         // Our director
-        ['user' => $director, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $director, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contestData[0] = ContestsFactory::createContest(
             new ContestParams(
@@ -48,7 +48,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testAdminList() {
         // Our director
-        ['user' => $director, 'identity' => $directorIdentity] = UserFactory::createUser();
+        ['user' => $director, 'identity' => $directorIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $contestAdminData = [];
 
         // Create a group with two arbitrary users.
@@ -56,7 +56,7 @@ class UserContestsTest extends OmegaupTestCase {
         $users = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             GroupsFactory::addUserToGroup($helperGroup, $identities[$i]);
         }
 
@@ -74,7 +74,7 @@ class UserContestsTest extends OmegaupTestCase {
         $contestAdminData[1] = ContestsFactory::createContest();
         $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
         GroupsFactory::addUserToGroup($group, $directorIdentity);
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         GroupsFactory::addUserToGroup($group, $identity);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin(
@@ -182,7 +182,7 @@ class UserContestsTest extends OmegaupTestCase {
      * created
      */
     public function testPrivateContestsCountWithNoContests() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $this->assertEquals(
             0,

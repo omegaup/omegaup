@@ -12,7 +12,7 @@ class CoursesFactory {
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
-            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
         if ($public != false) {
@@ -31,16 +31,16 @@ class CoursesFactory {
             ]));
         }
 
-        $courseAlias = Utils::CreateRandomString();
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
         if (is_null($adminLogin)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
-            'description' => Utils::CreateRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get()),
             'finish_time' => (\OmegaUp\Time::get() + 120),
             'public' => $public,
@@ -69,7 +69,7 @@ class CoursesFactory {
         int $startTimeDelay = 0
     ) {
         if (is_null($admin)) {
-            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
@@ -84,7 +84,7 @@ class CoursesFactory {
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment
-        $assignmentAlias = Utils::CreateRandomString();
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
         if (is_null($course) || is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -95,9 +95,9 @@ class CoursesFactory {
 
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
-            'description' => Utils::CreateRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => \OmegaUp\Time::get() + $startTimeDelay,
             'finish_time' => \OmegaUp\Time::get() + 120,
             'course_alias' => $courseAlias,
@@ -155,9 +155,9 @@ class CoursesFactory {
             for ($i = 0; $i < $count; $i++) {
                 $r = new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
-                    'name' => Utils::CreateRandomString(),
-                    'alias' => Utils::CreateRandomString(),
-                    'description' => Utils::CreateRandomString(),
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
                     'start_time' => (\OmegaUp\Time::get()),
                     'finish_time' => (\OmegaUp\Time::get() + 120),
                     'course_alias' => $courseAlias,
@@ -187,7 +187,7 @@ class CoursesFactory {
         ?ScopedLoginToken $login = null
     ): \OmegaUp\DAO\VO\Identities {
         if (is_null($student)) {
-            ['user' => $user, 'identity' => $student] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);

@@ -1,122 +1,80 @@
 <?php
 
-/**
- * UserFactory
- *
- * This class is a helper for creating users as needed in other places
- *
- * @author joemmanuel
- */
-class UserParams implements ArrayAccess {
-    public $params;
+namespace OmegaUp\Test\Factories;
 
-    public function __construct($params = null) {
-        if (!is_object($params)) {
-            $this->params = [];
-            if (is_array($params)) {
-                $this->params = array_merge([], $params);
-            }
-        } else {
-            $this->params = clone $params;
-        }
-        $username = Utils::CreateRandomString();
-        UserParams::validateParameter(
-            'username',
-            $this->params,
-            false,
-            $username
-        );
-        UserParams::validateParameter('name', $this->params, false, $username);
-        UserParams::validateParameter(
-            'password',
-            $this->params,
-            false,
-            Utils::CreateRandomString()
-        );
-        UserParams::validateParameter(
-            'email',
-            $this->params,
-            false,
-            Utils::CreateRandomString() . '@mail.com'
-        );
-        UserParams::validateParameter(
-            'is_private',
-            $this->params,
-            false,
-            false
-        );
-        UserParams::validateParameter('verify', $this->params, false, true);
-    }
-
-    public function offsetGet($offset) {
-        return isset($this->params[$offset]) ? $this->params[$offset] : null;
-    }
-
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->params[] = $value;
-        } else {
-            $this->params[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->params[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->params[$offset]);
-    }
+class UserParams {
+    /**
+     * @readonly
+     * @var string
+     */
+    public $username;
 
     /**
-     * Checks if array contains a key defined by $parameter
-     * @param string $parameter
-     * @param array $array
-     * @param boolean $required
-     * @param $default
-     * @return boolean
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @readonly
+     * @var string
      */
-    private static function validateParameter(
-        $parameter,
-        &$array,
-        $required = true,
-        $default = null
-    ) {
-        if (!isset($array[$parameter])) {
-            if ($required) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'ParameterEmpty',
-                    $parameter
-                );
-            }
-            $array[$parameter] = $default;
-        }
+    public $name;
 
-        return true;
+    /**
+     * @readonly
+     * @var string
+     */
+    public $password;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $email;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $isPrivate;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $verify;
+
+    /**
+     * @param array{username?: string, name?: string, password?: string, email?: string, isPrivate?: bool, verify?: bool} $params
+     */
+    public function __construct(array $params = []) {
+        $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
+        $this->name = $params['name'] ?? $this->username;
+        $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
+        $this->email = $params['email'] ?? \OmegaUp\Test\Utils::CreateRandomString() . '@mail.com';
+        $this->isPrivate = $params['isPrivate'] ?? false;
+        $this->verify = $params['verify'] ?? true;
     }
 }
 
-class UserFactory {
+/**
+ * This class is a helper for creating users as needed in other places
+ */
+class User {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
     */
     public static function createUser(
-        UserParams $params = null
+        ?UserParams $params = null
     ): array {
-        if (!($params instanceof UserParams)) {
-            $params = new UserParams($params);
+        if (is_null($params)) {
+            $params = new UserParams();
         }
 
         // Populate a new Request to pass to the API
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => $params['username'],
-            'name' => $params['name'],
-            'password' => $params['password'],
-            'email' => $params['email'],
-            'is_private' => $params['is_private'],
+            'username' => $params->username,
+            'name' => $params->name,
+            'password' => $params->password,
+            'email' => $params->email,
+            'is_private' => $params->isPrivate,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -125,11 +83,13 @@ class UserFactory {
 
         // If status is not OK
         if (strcasecmp($response['status'], 'ok') !== 0) {
-            throw new Exception('UserFactory::createUser failed');
+            throw new \Exception(
+                '\OmegaUp\Test\Factories\User::createUser failed'
+            );
         }
 
         // Get user from db
-        $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($params->username);
         if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -138,7 +98,7 @@ class UserFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
-        if ($params['verify']) {
+        if ($params->verify) {
             $user = self::verifyUser($user);
         } else {
             $user->verified = false;
@@ -146,7 +106,7 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $identity->password = strval($params['password']);
+        $identity->password = strval($params->password);
 
         return ['user' => $user, 'identity' => $identity];
     }
@@ -154,13 +114,13 @@ class UserFactory {
     /**
      * Creates a native user in Omegaup and returns an array with the data used
      * to create the user.
-     * @param $verify
-     * @return array
+     *
+     * @return array{username: string, password: string, email: string}
      */
-    public static function generateUser($verify = true) {
-        $username = Utils::CreateRandomString();
-        $password = Utils::CreateRandomString();
-        $email = Utils::CreateRandomString() . '@mail.com';
+    public static function generateUser(bool $verify = true): array {
+        $username = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
         self::createUser(new UserParams([
             'username' => $username,
             'password' => $password,
@@ -176,10 +136,9 @@ class UserFactory {
 
     /**
      * Creates a user using self::createUser with verify = false
-     *
-     * @return user (DAO)
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createUserWithoutVerify() {
+    public static function createUserWithoutVerify(): array {
         return self::createUser(new UserParams(['verify' => false]));
     }
 
@@ -201,7 +160,7 @@ class UserFactory {
      *
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createAdminUser(UserParams $params = null): array {
+    public static function createAdminUser(?UserParams $params = null): array {
         ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
@@ -214,7 +173,7 @@ class UserFactory {
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
     public static function createMentorIdentity(
-        UserParams $params = null
+        ?UserParams $params = null
     ): array {
         ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addMentorRole($identity);
@@ -228,7 +187,7 @@ class UserFactory {
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
     public static function createSupportUser(
-        UserParams $params = null
+        ?UserParams $params = null
     ): array {
         ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSupportRole($identity);
@@ -242,7 +201,7 @@ class UserFactory {
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
     public static function createGroupIdentityCreator(
-        UserParams $params = null
+        ?UserParams $params = null
     ): array {
         ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addGroupIdentityCreator($identity);
@@ -252,62 +211,59 @@ class UserFactory {
 
     /**
      * Adds a system role to the user.
-     *
-     * @param \OmegaUp\DAO\VO\Users $user
-     * @param int $role_id
      */
     public static function addSystemRole(
         \OmegaUp\DAO\VO\Users $user,
-        $role_id
-    ) {
+        int $roleId
+    ): void {
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $user->user_id,
-            'role_id' => $role_id,
+            'role_id' => $roleId,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
     }
 
     /**
      * Adds mentor role to the identity
-     *
-     * @param \OmegaUp\DAO\VO\Identities $identity
      */
-    public static function addMentorRole(\OmegaUp\DAO\VO\Identities $identity) {
-        $mentor_group = \OmegaUp\DAO\Groups::findByAlias(
+    public static function addMentorRole(\OmegaUp\DAO\VO\Identities $identity): void {
+        $mentorGroup = \OmegaUp\DAO\Groups::findByAlias(
             \OmegaUp\Authorization::MENTOR_GROUP_ALIAS
         );
+        if (is_null($mentorGroup) || is_null($mentorGroup->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
-            'group_id' => $mentor_group->group_id,
+            'group_id' => $mentorGroup->group_id,
         ]));
     }
 
-    /**
-     * Adds support role to the identity
-     *
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     */
-    public static function addSupportRole(\OmegaUp\DAO\VO\Identities $identity) {
-        $support_group = \OmegaUp\DAO\Groups::findByAlias(
+    public static function addSupportRole(\OmegaUp\DAO\VO\Identities $identity): void {
+        $supportGroup = \OmegaUp\DAO\Groups::findByAlias(
             \OmegaUp\Authorization::SUPPORT_GROUP_ALIAS
         );
+        if (is_null($supportGroup) || is_null($supportGroup->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
-            'group_id' => $support_group->group_id,
+            'group_id' => $supportGroup->group_id,
         ]));
     }
 
-    /**
-     * Adds group identity creator
-     *
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     */
-    public static function addGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity) {
+    public static function addGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): void {
         $groupIdentityCreator = \OmegaUp\DAO\Groups::findByAlias(
             \OmegaUp\Authorization::IDENTITY_CREATOR_GROUP_ALIAS
         );
+        if (
+            is_null($groupIdentityCreator) ||
+            is_null($groupIdentityCreator->group_id)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
 
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
@@ -315,14 +271,9 @@ class UserFactory {
         ]));
     }
 
-    /**
-     * creates privacy statement
-     * @param $type
-     * @return Boolean
-     */
-    public static function createPrivacyStatement($type = 'privacy_policy') {
+    public static function createPrivacyStatement(string $type = 'privacy_policy'): int {
         return \OmegaUp\DAO\PrivacyStatements::create(new \OmegaUp\DAO\VO\PrivacyStatements([
-            'git_object_id' => Utils::CreateRandomString(),
+            'git_object_id' => \OmegaUp\Test\Utils::createRandomString(),
             'type' => $type,
         ]));
     }

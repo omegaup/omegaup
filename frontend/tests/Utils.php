@@ -1,79 +1,42 @@
 <?php
 
+namespace OmegaUp\Test;
+
 /**
  * Test utils
  *
  * @author joemmanuel
  */
 class Utils {
-    public static $inittime;
-    public static $counttime;
-
-    //put your code here
-    public static function cleanup() {
+    public static function cleanup(): void {
+        /** @var string $p */
         foreach ($_REQUEST as $p) {
-            unset($p);
+            unset($_REQUEST[$p]);
         }
     }
 
-    public static function CreateRandomString(): string {
-        return md5(uniqid(rand(), true));
+    public static function createRandomString(): string {
+        return md5(uniqid(strval(rand()), true));
     }
 
-    public static function GetValidPublicContestId() {
-        // Create a clean contest and get the ID
-        $contestCreator = new NewContestTest();
-        $contest_id = $contestCreator->testCreateValidContest(1);
-
-        return $contest_id;
-    }
-
-    public static function GetValidProblemOfContest($contest_id) {
-        // Create problem in our contest
-        $problemCreator = new NewProblemInContestTest();
-        $problem_id = $problemCreator->testCreateValidProblem($contest_id);
-
-        return $problem_id;
-    }
-
-    public static function GetDbDatetime() {
-        // Go to the DB
-
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne('SELECT NOW();');
-    }
-
-    public static function GetTimeFromUnixTimestamp($time) {
-        // Go to the DB to take the unix timestamp
-
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            'SELECT FROM_UNIXTIME(?);',
-            [$time]
-        );
-    }
-
-    public static function CleanLog() {
-        file_put_contents(OMEGAUP_LOG_FILE, '');
-        file_put_contents(__DIR__ . '/../controllers/gitserver.log', '');
-    }
-
-    public static function CleanPath($path) {
+    private static function cleanPath(string $path): void {
         \OmegaUp\FileHandler::deleteDirRecursively($path);
         mkdir($path, 0755, true);
     }
 
-    public static function deleteAllSuggestions() {
+    public static function deleteAllSuggestions(): void {
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             "DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';"
         );
     }
 
-    public static function deleteAllRanks() {
+    public static function deleteAllRanks(): void {
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             'DELETE FROM `User_Rank`;'
         );
     }
 
-    public static function deleteAllPreviousRuns() {
+    public static function deleteAllPreviousRuns(): void {
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             'DELETE FROM `Submission_Log`;'
         );
@@ -86,7 +49,7 @@ class Utils {
         );
     }
 
-    public static function deleteAllProblemsOfTheWeek() {
+    public static function deleteAllProblemsOfTheWeek(): void {
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             'DELETE FROM `Problem_Of_The_Week`;'
         );
@@ -110,12 +73,28 @@ class Utils {
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
+            if (is_null($run) || is_null($run->submission_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
             $submission = \OmegaUp\DAO\Submissions::getByPK(
                 $run->submission_id
             );
+            if (is_null($submission)) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
         } else {
+            if (is_null($runGuid)) {
+                // At most one of $runId and $runGuid may be null.
+                throw new \BadMethodCallException();
+            }
             $submission = \OmegaUp\DAO\Submissions::getByGuid($runGuid);
+            if (is_null($submission) || is_null($submission->current_run_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
             $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
+            if (is_null($run)) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
         }
 
         $run->verdict = $verdict;
@@ -127,7 +106,6 @@ class Utils {
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
             \OmegaUp\DAO\Submissions::update($submission);
-            $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
@@ -159,10 +137,10 @@ class Utils {
         );
     }
 
-    public static function setUpDefaultDataConfig() {
+    public static function setUpDefaultDataConfig(): void {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser(new UserParams([
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
@@ -175,7 +153,7 @@ class Utils {
             'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
-        UserFactory::createUser(new UserParams([
+        \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'test',
             'password' => 'testtesttest',
         ]));
@@ -185,22 +163,29 @@ class Utils {
         \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
-    public static function CleanupFilesAndDb() {
+    public static function cleanupFilesAndDB(): void {
         // Clean previous log
-        self::CleanLog();
+        file_put_contents(OMEGAUP_LOG_FILE, '');
+        file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
+
         // Clean problems and runs path
-        self::CleanPath(IMAGES_PATH);
-        self::CleanPath(RUNS_PATH);
-        self::CleanPath(TEMPLATES_PATH);
-        self::CleanPath(PROBLEMS_GIT_PATH);
+        $runsPath = OMEGAUP_TEST_ROOT . 'submissions';
+        // We need to have this directory be NOT within the /opt/omegaup directory
+        // since we intend to share it through VirtualBox, and that does not support
+        // mmapping files, which is needed for libgit2.
+        $problemsGitPath = '/tmp/omegaup/problems.git';
+        self::cleanPath(IMAGES_PATH);
+        self::cleanPath($runsPath);
+        self::cleanPath(TEMPLATES_PATH);
+        self::cleanPath($problemsGitPath);
         for ($i = 0; $i < 256; $i++) {
-            mkdir(RUNS_PATH . sprintf('/%02x', $i), 0775, true);
+            mkdir(sprintf('%s/%02x', $runsPath, $i), 0775, true);
         }
         // Clean DB
         self::CleanupDB();
     }
 
-    public static function CleanupDB() {
+    public static function cleanupDB(): void {
         // Tables to truncate
         $tables = [
             'ACLs',
@@ -274,8 +259,9 @@ class Utils {
                 'ALTER TABLE Identities auto_increment = 100000;'
             );
             self::setUpDefaultDataConfig();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
+            /** @psalm-suppress ForbiddenCode It's important to expose this error during tests. */
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
@@ -286,13 +272,14 @@ class Utils {
         self::commit();
     }
 
-    public static function RunUpdateUserRank() {
+    public static function runUpdateUserRank(): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
 
+        /** @psalm-suppress ForbiddenCode this only runs in tests. */
         shell_exec('python3 ' . escapeshellarg(
-            OMEGAUP_ROOT
+            strval(OMEGAUP_ROOT)
         ) . '/../stuff/cron/update_user_rank.py' .
         ' --quiet ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -301,7 +288,7 @@ class Utils {
         ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 
-    public static function Commit() {
+    public static function commit(): void {
         try {
             \OmegaUp\MySQLConnection::getInstance()->StartTrans();
         } finally {
@@ -309,13 +296,14 @@ class Utils {
         }
     }
 
-    public static function RunAggregateFeedback() {
+    public static function runAggregateFeedback(): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
 
+        /** @psalm-suppress ForbiddenCode this only runs in tests. */
         shell_exec('python3 ' . escapeshellarg(
-            OMEGAUP_ROOT
+            strval(OMEGAUP_ROOT)
         ) . '/../stuff/cron/aggregate_feedback.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -324,11 +312,12 @@ class Utils {
                  ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 
-    public static function RunAssignBadges() {
+    public static function runAssignBadges(): void {
         // Ensure everything is commited before invoking external script
         self::commit();
+        /** @psalm-suppress ForbiddenCode this only runs in tests. */
         shell_exec('python3 ' . escapeshellarg(
-            OMEGAUP_ROOT
+            strval(OMEGAUP_ROOT)
         ) . '/../stuff/cron/assign_badges.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .

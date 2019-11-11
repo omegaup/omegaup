@@ -13,7 +13,7 @@ class QualityNominationFactory {
             \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
         );
         for ($i = 0; $i < 5; $i++) {
-            ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $reviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
                 'identity_id' => $identity->identity_id,

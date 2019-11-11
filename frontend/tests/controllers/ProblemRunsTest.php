@@ -12,7 +12,7 @@ class ProblemRunsTest extends OmegaupTestCase {
         $contestants = [];
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
-            ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             $runData = RunsFactory::createRunToProblem($problemData, $identity);
             RunsFactory::gradeRun($runData);
             $contestants[] = $identity;
@@ -80,7 +80,7 @@ class ProblemRunsTest extends OmegaupTestCase {
 
     public function testUserHasTriedToSolvedProblem() {
         $problemData = ProblemsFactory::createProblem();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],
