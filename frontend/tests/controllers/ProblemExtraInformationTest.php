@@ -26,7 +26,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $this->assertFalse($result['problem_admin']);
 
         // Normal user is able to see the problem.
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty($r);
@@ -38,7 +38,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
     public function testQualityPayload() {
         $problemData = ProblemsFactory::createProblem();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -150,7 +150,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         );
 
         // Normal user should see the problem as locked
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],

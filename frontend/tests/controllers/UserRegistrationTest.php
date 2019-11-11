@@ -53,7 +53,7 @@ class UserRegistrationTest extends OmegaupTestCase {
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $username = 'X' . \OmegaUp\Time::get();
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
@@ -99,7 +99,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z' . $username,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
