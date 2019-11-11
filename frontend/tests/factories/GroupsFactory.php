@@ -14,19 +14,19 @@ class GroupsFactory {
         ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
-            ['user' => $user, 'identity' => $owner] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         if (is_null($name)) {
-            $name = Utils::CreateRandomString();
+            $name = \OmegaUp\Test\Utils::createRandomString();
         }
 
         if (is_null($description)) {
-            $description = Utils::CreateRandomString();
+            $description = \OmegaUp\Test\Utils::createRandomString();
         }
 
         if (is_null($alias)) {
-            $alias = Utils::CreateRandomString();
+            $alias = \OmegaUp\Test\Utils::createRandomString();
         }
 
         if (is_null($login)) {
@@ -88,15 +88,15 @@ class GroupsFactory {
         string $alias = null
     ) {
         if (is_null($name)) {
-            $name = Utils::CreateRandomString();
+            $name = \OmegaUp\Test\Utils::createRandomString();
         }
 
         if (is_null($description)) {
-            $description = Utils::CreateRandomString();
+            $description = \OmegaUp\Test\Utils::createRandomString();
         }
 
         if (is_null($alias)) {
-            $alias = Utils::CreateRandomString();
+            $alias = \OmegaUp\Test\Utils::createRandomString();
         }
 
         $login = OmegaupTestCase::login($groupData['owner']);

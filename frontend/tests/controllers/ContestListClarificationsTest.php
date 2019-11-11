@@ -24,7 +24,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        ['user' => $contestant1, 'identity' => $identity1] = UserFactory::createUser();
+        ['user' => $contestant1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 4 clarifications with this contestant
         $clarificationData1 = [];
@@ -43,7 +43,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         ClarificationsFactory::answer($clarificationData1[2], $contestData);
 
         // Create another contestant
-        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 3 clarifications with this contestant
         $clarificationData2 = [];

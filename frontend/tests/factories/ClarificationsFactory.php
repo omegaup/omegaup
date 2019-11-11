@@ -37,7 +37,7 @@ class ClarificationsFactory {
         $r = new \OmegaUp\Request();
         $r['message'] = (
             is_null($message) ?
-            Utils::CreateRandomString() :
+            \OmegaUp\Test\Utils::createRandomString() :
             $message
         );
         $r['contest_alias'] = $contestData['request']['alias'];

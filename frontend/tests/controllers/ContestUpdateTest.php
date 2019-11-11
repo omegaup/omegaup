@@ -18,7 +18,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'title' => Utils::CreateRandomString(),
+            'title' => \OmegaUp\Test\Utils::createRandomString(),
         ]);
 
         // Call API
@@ -39,12 +39,12 @@ class UpdateContestTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
         // Update title
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'title' => Utils::CreateRandomString(),
+            'title' => \OmegaUp\Test\Utils::createRandomString(),
         ]);
 
         // Call API
@@ -117,7 +117,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Update value
-        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -200,7 +200,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // STEP 2: Get contestant ready to create a run
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
         ContestsFactory::openContest($contestData, $identity);
@@ -321,7 +321,7 @@ class UpdateContestTest extends OmegaupTestCase {
         // Create a run
         {
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
-            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             ContestsFactory::addUser($contestData, $identity);
 
             // The problem is opened 5 minutes after contest starts.
@@ -432,8 +432,8 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
-        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -623,7 +623,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $identity);
@@ -679,7 +679,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $identity);
@@ -741,7 +741,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $identity);
@@ -798,7 +798,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $identity);

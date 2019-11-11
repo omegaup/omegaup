@@ -43,14 +43,14 @@ class CourseCloneTest extends OmegaupTestCase {
             $studentsUsername[] = $studentsData->username;
         }
 
-        $courseAlias = Utils::CreateRandomString();
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
 
         // Clone the course
         $adminLogin = self::login($courseData['admin']);
         $courseClonedData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'start_time' => \OmegaUp\Time::get()
         ]));
@@ -135,7 +135,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $courseClonedData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseData['course_alias'],
             'start_time' => \OmegaUp\Time::get()
         ]));
@@ -223,12 +223,12 @@ class CourseCloneTest extends OmegaupTestCase {
             );
         }
 
-        $courseAlias = Utils::CreateRandomString();
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
 
         $clonedCourseData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'start_time' => \OmegaUp\Time::get()
         ]));

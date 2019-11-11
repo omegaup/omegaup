@@ -234,7 +234,7 @@ class CreateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $identity);
