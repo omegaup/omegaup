@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class AddProblemToContestTest extends OmegaupTestCase {
+class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check in DB for problem added to contest
      *

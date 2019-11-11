@@ -3,7 +3,7 @@
 /**
  * Tests the /api/user/validateFilter/ API.
  */
-class UserFilterTest extends OmegaupTestCase {
+class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */

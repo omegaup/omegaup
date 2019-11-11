@@ -1,6 +1,6 @@
 <?php
 
-class QualityNominationTest extends OmegaupTestCase {
+class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -381,7 +381,7 @@ class QualityNominationTest extends OmegaupTestCase {
      * Check that a demotion approved by a reviewer sends an email to the problem creator.
      */
     public function testDemotionApprovedByReviewerAndSendMail() {
-        $emailSender = new ScopedEmailSender();
+        $emailSender = new \OmegaUp\Test\ScopedEmailSender();
         $problemData = ProblemsFactory::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

@@ -4,7 +4,7 @@
  *
  * @author juan.pablo
  */
-class ProblemListCourseTest extends OmegaupTestCase {
+class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSolvedAndUnsolvedProblemByUsersOfACourse() {
         $num_users = 3;
         $num_problems = 3;

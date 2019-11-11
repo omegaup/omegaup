@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateProblemTest extends OmegaupTestCase {
+class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for creating a problem
      */

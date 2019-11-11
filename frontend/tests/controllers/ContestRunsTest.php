@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestRunsTest extends OmegaupTestCase {
+class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them
      */

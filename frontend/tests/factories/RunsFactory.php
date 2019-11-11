@@ -19,11 +19,11 @@ class RunsFactory {
         $problemData,
         $contestData,
         $contestant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($login)) {
             // Login as contestant
-            $login = OmegaupTestCase::login($contestant);
+            $login = \OmegaUp\Test\ControllerTestCase::login($contestant);
         }
 
         // Build request
@@ -57,11 +57,11 @@ class RunsFactory {
         $problemData,
         $courseAssignmentData,
         $participant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($login)) {
             // Login as participant
-            $login = OmegaupTestCase::login($participant);
+            $login = \OmegaUp\Test\ControllerTestCase::login($participant);
         }
         // Build request
         if (is_null($courseAssignmentData['assignment'])) {
@@ -170,7 +170,7 @@ class RunsFactory {
     public static function createRunToProblem(
         $problemData,
         $contestant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 

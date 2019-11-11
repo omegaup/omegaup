@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class GroupsTest extends OmegaupTestCase {
+class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic create group test
      */

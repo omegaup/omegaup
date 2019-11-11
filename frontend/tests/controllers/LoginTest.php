@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class LoginTest extends OmegaupTestCase {
+class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test user login with valid credentials, username and password
      *
@@ -147,7 +147,10 @@ class LoginTest extends OmegaupTestCase {
 
         // Call api
         $_SERVER['REQUEST_URI'] = '/api/user/login';
-        $response = json_decode(ApiCallerMock::httpEntryPoint(), true);
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
 
         // Validate output
         $this->assertEquals('ok', $response['status']);

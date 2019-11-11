@@ -1,6 +1,6 @@
 <?php
 
-class UserRankTest extends OmegaupTestCase {
+class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Tests apiRankByProblemsSolved
      */

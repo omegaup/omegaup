@@ -3,7 +3,7 @@
 /**
  * @author alanboy
  */
-class AssignmentUpdateTest extends OmegaupTestCase {
+class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentUpdate() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
@@ -119,7 +119,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      */
     public function testAssignmentUpdateByStudent() {
         ['user' => $admin, 'identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $adminLogin = OmegaupTestCase::login($adminIdentity);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($adminIdentity);
         $courseData = CoursesFactory::createCourseWithOneAssignment(
             $adminIdentity,
             $adminLogin
@@ -132,7 +132,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
 
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

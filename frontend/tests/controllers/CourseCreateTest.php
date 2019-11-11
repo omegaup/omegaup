@@ -1,6 +1,6 @@
 <?php
 
-class CourseCreateTest extends OmegaupTestCase {
+class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;
     private static $curatorIdentity = null;
 
@@ -189,7 +189,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
     public function testDuplicateAssignmentAliases() {
         ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $adminLogin = OmegaupTestCase::login($identity);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
 
@@ -238,7 +238,7 @@ class CourseCreateTest extends OmegaupTestCase {
      */
     public function testCreateAssignmentWithInvertedTimes() {
         ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $adminLogin = OmegaupTestCase::login($identity);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $courseData = CoursesFactory::createCourse($identity, $adminLogin);
 
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
@@ -315,7 +315,7 @@ class CourseCreateTest extends OmegaupTestCase {
      */
     public function testUpdateCourseShowScoreboard() {
         ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $adminLogin = OmegaupTestCase::login($identity);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         // Creating a course with one assignment and turning on show_scoreboard flag
         $courseData = CoursesFactory::createCourseWithOneAssignment(
@@ -344,7 +344,9 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = \OmegaUp\DAO\Courses::getByPK(
             $courseData['request']['course']->course_id
         );
-        $studentLogin = OmegaupTestCase::login($identityStudent);
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $identityStudent
+        );
         // Scoreboard have to be visible to associated user
         $this->assertTrue(\OmegaUp\Controllers\Course::shouldShowScoreboard(
             $identityStudent,

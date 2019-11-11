@@ -6,7 +6,7 @@
  * @author edhzsz
  */
 
-class ContestRemoveProblemTest extends OmegaupTestCase {
+class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check in DB that a problem does not exist on a contest
      *
@@ -96,7 +96,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
         // Create a new request
         $r = new \OmegaUp\Request(
@@ -125,7 +127,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
         $r = new \OmegaUp\Request(
             [
@@ -154,7 +158,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         $r = new \OmegaUp\Request(
             [
@@ -171,7 +175,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Converts a private contest into a public contest
      */
     private function makeContestPublic($contestData) {
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
         $r = new \OmegaUp\Request(
             [
@@ -354,7 +360,9 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $secondaryIdentityAdmin->username,

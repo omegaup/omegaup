@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class RunsTotalsTest extends OmegaupTestCase {
+class RunsTotalsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRunTotals() {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();

@@ -5,7 +5,7 @@
  *
  * @author Alberto
  */
-class UserProfileTest extends OmegaupTestCase {
+class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Test for the function which returns the general user info
      */

@@ -4,7 +4,7 @@
  *
  * @author joemmanuel
  */
-class ProblemList extends OmegaupTestCase {
+class ProblemList extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Gets the list of problems
      */

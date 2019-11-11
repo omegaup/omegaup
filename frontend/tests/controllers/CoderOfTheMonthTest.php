@@ -5,7 +5,7 @@
  *
  * @author Alberto
  */
-class CoderOfTheMonthTest extends OmegaupTestCase {
+class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCoderOfTheMonthCalc() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Creating 10 AC runs for our user in the last month

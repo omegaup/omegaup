@@ -6,7 +6,7 @@
  * @author carlosabcs
  */
 
-class ProblemsForfeitedTest extends OmegaupTestCase {
+class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCounts() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);

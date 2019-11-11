@@ -6,7 +6,7 @@
  * @author SpaceWhite
  */
 
-class VirtualContestTest extends OmegaupTestCase {
+class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCreateVirtualContest() {
         // create a real contest
         $contestData = ContestsFactory::createContest();

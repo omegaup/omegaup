@@ -5,7 +5,7 @@
  * @author alan
  */
 
-class CourseDetailsTest extends OmegaupTestCase {
+class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 

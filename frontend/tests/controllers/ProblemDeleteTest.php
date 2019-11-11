@@ -6,7 +6,7 @@
  * @author juan.pablo@omegaup.com
  */
 
-class ProblemDeleteTest extends OmegaupTestCase {
+class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Tests problem with submissions in a contest or a course can't be deleted anymore
      *

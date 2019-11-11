@@ -2180,9 +2180,6 @@
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>
   </file>
-  <file src="frontend/tests/controllers/OmegaupTestCase.php">
-    <MissingDependency occurrences="1"/>
-  </file>
   <file src="frontend/tests/factories/ClarificationsFactory.php">
     <InvalidParamDefault occurrences="2">
       <code>type</code>

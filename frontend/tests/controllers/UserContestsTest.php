@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UserContestsTest extends OmegaupTestCase {
+class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Get contests where user is the director
      */

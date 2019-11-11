@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ContestAddAdminTest extends OmegaupTestCase {
+class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddContestAdmin() {
         // Get a contest
         $contestData = ContestsFactory::createContest();
