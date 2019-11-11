@@ -39,7 +39,7 @@ abstract class Identities {
                 `language_id` = ?,
                 `country_id` = ?,
                 `state_id` = ?,
-                `school_id` = ?,
+                `current_school_id` = ?,
                 `gender` = ?
             WHERE
                 (
@@ -62,9 +62,9 @@ abstract class Identities {
             $Identities->country_id,
             $Identities->state_id,
             (
-                is_null($Identities->school_id) ?
+                is_null($Identities->current_school_id) ?
                 null :
-                intval($Identities->school_id)
+                intval($Identities->current_school_id)
             ),
             $Identities->gender,
             intval($Identities->identity_id),
@@ -96,7 +96,7 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
+                `Identities`.`current_school_id`,
                 `Identities`.`gender`
             FROM
                 `Identities`
@@ -189,7 +189,7 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
+                `Identities`.`current_school_id`,
                 `Identities`.`gender`
             FROM
                 `Identities`
@@ -248,7 +248,7 @@ abstract class Identities {
                     `language_id`,
                     `country_id`,
                     `state_id`,
-                    `school_id`,
+                    `current_school_id`,
                     `gender`
                 ) VALUES (
                     ?,
@@ -278,9 +278,9 @@ abstract class Identities {
             $Identities->country_id,
             $Identities->state_id,
             (
-                is_null($Identities->school_id) ?
+                is_null($Identities->current_school_id) ?
                 null :
-                intval($Identities->school_id)
+                intval($Identities->current_school_id)
             ),
             $Identities->gender,
         ];

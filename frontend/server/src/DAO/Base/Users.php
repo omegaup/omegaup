@@ -39,7 +39,6 @@ abstract class Users {
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
                 `scholar_degree` = ?,
-                `graduation_date` = ?,
                 `birth_date` = ?,
                 `verified` = ?,
                 `verification_id` = ?,
@@ -69,7 +68,6 @@ abstract class Users {
                 intval($Users->main_identity_id)
             ),
             $Users->scholar_degree,
-            $Users->graduation_date,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
@@ -114,7 +112,6 @@ abstract class Users {
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
                 `Users`.`scholar_degree`,
-                `Users`.`graduation_date`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
@@ -215,7 +212,6 @@ abstract class Users {
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
                 `Users`.`scholar_degree`,
-                `Users`.`graduation_date`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
@@ -282,7 +278,6 @@ abstract class Users {
                     `main_email_id`,
                     `main_identity_id`,
                     `scholar_degree`,
-                    `graduation_date`,
                     `birth_date`,
                     `verified`,
                     `verification_id`,
@@ -293,7 +288,6 @@ abstract class Users {
                     `is_private`,
                     `preferred_language`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -327,7 +321,6 @@ abstract class Users {
                 intval($Users->main_identity_id)
             ),
             $Users->scholar_degree,
-            $Users->graduation_date,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,

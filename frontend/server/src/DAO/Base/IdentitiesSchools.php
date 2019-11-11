@@ -9,128 +9,103 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** Submissions Data Access Object (DAO) Base.
+/** IdentitiesSchools Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\Submissions}.
+ * {@link \OmegaUp\DAO\VO\IdentitiesSchools}.
  * @access public
  * @abstract
  */
-abstract class Submissions {
+abstract class IdentitiesSchools {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\Submissions $Submissions El objeto de tipo Submissions a actualizar.
+     * @param \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools El objeto de tipo IdentitiesSchools a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\Submissions $Submissions
+        \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools
     ): int {
         $sql = '
             UPDATE
-                `Submissions`
+                `Identities_Schools`
             SET
-                `current_run_id` = ?,
                 `identity_id` = ?,
-                `problem_id` = ?,
-                `problemset_id` = ?,
-                `guid` = ?,
-                `language` = ?,
-                `time` = ?,
-                `submit_delay` = ?,
-                `type` = ?,
-                `school_id` = ?
+                `school_id` = ?,
+                `graduation_date` = ?,
+                `creation_time` = ?,
+                `end_time` = ?
             WHERE
                 (
-                    `submission_id` = ?
+                    `identity_school_id` = ?
                 );';
         $params = [
             (
-                is_null($Submissions->current_run_id) ?
+                is_null($Identities_Schools->identity_id) ?
                 null :
-                intval($Submissions->current_run_id)
+                intval($Identities_Schools->identity_id)
             ),
             (
-                is_null($Submissions->identity_id) ?
+                is_null($Identities_Schools->school_id) ?
                 null :
-                intval($Submissions->identity_id)
+                intval($Identities_Schools->school_id)
             ),
-            (
-                is_null($Submissions->problem_id) ?
-                null :
-                intval($Submissions->problem_id)
-            ),
-            (
-                is_null($Submissions->problemset_id) ?
-                null :
-                intval($Submissions->problemset_id)
-            ),
-            $Submissions->guid,
-            $Submissions->language,
+            $Identities_Schools->graduation_date,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Submissions->time
+                $Identities_Schools->creation_time
             ),
-            intval($Submissions->submit_delay),
-            $Submissions->type,
-            (
-                is_null($Submissions->school_id) ?
-                null :
-                intval($Submissions->school_id)
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Identities_Schools->end_time
             ),
-            intval($Submissions->submission_id),
+            intval($Identities_Schools->identity_school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\Submissions} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\IdentitiesSchools} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Submissions}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\IdentitiesSchools}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\Submissions Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\Submissions} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\IdentitiesSchools Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\IdentitiesSchools} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        int $submission_id
-    ): ?\OmegaUp\DAO\VO\Submissions {
+        int $identity_school_id
+    ): ?\OmegaUp\DAO\VO\IdentitiesSchools {
         $sql = '
             SELECT
-                `Submissions`.`submission_id`,
-                `Submissions`.`current_run_id`,
-                `Submissions`.`identity_id`,
-                `Submissions`.`problem_id`,
-                `Submissions`.`problemset_id`,
-                `Submissions`.`guid`,
-                `Submissions`.`language`,
-                `Submissions`.`time`,
-                `Submissions`.`submit_delay`,
-                `Submissions`.`type`,
-                `Submissions`.`school_id`
+                `Identities_Schools`.`identity_school_id`,
+                `Identities_Schools`.`identity_id`,
+                `Identities_Schools`.`school_id`,
+                `Identities_Schools`.`graduation_date`,
+                `Identities_Schools`.`creation_time`,
+                `Identities_Schools`.`end_time`
             FROM
-                `Submissions`
+                `Identities_Schools`
             WHERE
                 (
-                    `submission_id` = ?
+                    `identity_school_id` = ?
                 )
             LIMIT 1;';
-        $params = [$submission_id];
+        $params = [$identity_school_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\Submissions($row);
+        return new \OmegaUp\DAO\VO\IdentitiesSchools($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\Submissions} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\IdentitiesSchools} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -139,24 +114,24 @@ abstract class Submissions {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\Submissions $Submissions El
-     * objeto de tipo \OmegaUp\DAO\VO\Submissions a eliminar
+     * @param \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools El
+     * objeto de tipo \OmegaUp\DAO\VO\IdentitiesSchools a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\Submissions $Submissions
+        \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools
     ): void {
         $sql = '
             DELETE FROM
-                `Submissions`
+                `Identities_Schools`
             WHERE
                 (
-                    `submission_id` = ?
+                    `identity_school_id` = ?
                 );';
         $params = [
-            $Submissions->submission_id
+            $Identities_Schools->identity_school_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -170,7 +145,7 @@ abstract class Submissions {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\Submissions}.
+     * {@link \OmegaUp\DAO\VO\IdentitiesSchools}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -181,10 +156,10 @@ abstract class Submissions {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Submissions[] Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\Submissions}.
+     * @return \OmegaUp\DAO\VO\IdentitiesSchools[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\IdentitiesSchools}.
      *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Submissions>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\IdentitiesSchools>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -194,19 +169,14 @@ abstract class Submissions {
     ): array {
         $sql = '
             SELECT
-                `Submissions`.`submission_id`,
-                `Submissions`.`current_run_id`,
-                `Submissions`.`identity_id`,
-                `Submissions`.`problem_id`,
-                `Submissions`.`problemset_id`,
-                `Submissions`.`guid`,
-                `Submissions`.`language`,
-                `Submissions`.`time`,
-                `Submissions`.`submit_delay`,
-                `Submissions`.`type`,
-                `Submissions`.`school_id`
+                `Identities_Schools`.`identity_school_id`,
+                `Identities_Schools`.`identity_id`,
+                `Identities_Schools`.`school_id`,
+                `Identities_Schools`.`graduation_date`,
+                `Identities_Schools`.`creation_time`,
+                `Identities_Schools`.`end_time`
             FROM
-                `Submissions`
+                `Identities_Schools`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -228,7 +198,7 @@ abstract class Submissions {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\Submissions(
+            $allData[] = new \OmegaUp\DAO\VO\IdentitiesSchools(
                 $row
             );
         }
@@ -239,38 +209,28 @@ abstract class Submissions {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\Submissions}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\IdentitiesSchools}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\Submissions $Submissions El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Submissions}
+     * @param \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\IdentitiesSchools}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\Submissions $Submissions
+        \OmegaUp\DAO\VO\IdentitiesSchools $Identities_Schools
     ): int {
         $sql = '
             INSERT INTO
-                Submissions (
-                    `current_run_id`,
+                Identities_Schools (
                     `identity_id`,
-                    `problem_id`,
-                    `problemset_id`,
-                    `guid`,
-                    `language`,
-                    `time`,
-                    `submit_delay`,
-                    `type`,
-                    `school_id`
+                    `school_id`,
+                    `graduation_date`,
+                    `creation_time`,
+                    `end_time`
                 ) VALUES (
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -279,36 +239,21 @@ abstract class Submissions {
                 );';
         $params = [
             (
-                is_null($Submissions->current_run_id) ?
+                is_null($Identities_Schools->identity_id) ?
                 null :
-                intval($Submissions->current_run_id)
+                intval($Identities_Schools->identity_id)
             ),
             (
-                is_null($Submissions->identity_id) ?
+                is_null($Identities_Schools->school_id) ?
                 null :
-                intval($Submissions->identity_id)
+                intval($Identities_Schools->school_id)
             ),
-            (
-                is_null($Submissions->problem_id) ?
-                null :
-                intval($Submissions->problem_id)
-            ),
-            (
-                is_null($Submissions->problemset_id) ?
-                null :
-                intval($Submissions->problemset_id)
-            ),
-            $Submissions->guid,
-            $Submissions->language,
+            $Identities_Schools->graduation_date,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Submissions->time
+                $Identities_Schools->creation_time
             ),
-            intval($Submissions->submit_delay),
-            $Submissions->type,
-            (
-                is_null($Submissions->school_id) ?
-                null :
-                intval($Submissions->school_id)
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Identities_Schools->end_time
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -316,7 +261,7 @@ abstract class Submissions {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Submissions->submission_id = (
+        $Identities_Schools->identity_school_id = (
             \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
         );
 
