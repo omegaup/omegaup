@@ -5,6 +5,10 @@ $qualitynomination_id = isset(
     $_GET['qualitynomination_id']
 ) ? $_GET['qualitynomination_id'] : null;
 
+[
+    'identity' => $identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 try {
     if (!is_null($qualitynomination_id)) {
         $payload = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
@@ -20,8 +24,8 @@ try {
         )['nominations'],
         'myView' => false,
         ];
-        if (!is_null($session['identity'])) {
-            $payload['currentUser'] = $session['identity']->username;
+        if (!is_null($identity)) {
+            $payload['currentUser'] = $identity->username;
         }
         $template = '../templates/quality.nomination.list.tpl';
     }

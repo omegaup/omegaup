@@ -8,6 +8,50 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     const REVIEWERS_PER_NOMINATION = 2;
 
+    const ALLOWED_TAGS = [
+        'problemTopic2Sat',
+        'problemTopicArrays',
+        'problemTopicBacktracking',
+        'problemTopicBigNumbers',
+        'problemTopicBinarySearch',
+        'problemTopicBitmasks',
+        'problemTopicBreadthDepthFirstSearch',
+        'problemTopicBruteForce',
+        'problemTopicBuckets',
+        'problemTopicCombinatorics',
+        'problemTopicDataStructures',
+        'problemTopicDisjointSets',
+        'problemTopicDivideAndConquer',
+        'problemTopicDynamicProgramming',
+        'problemTopicFastFourierTransform',
+        'problemTopicGameTheory',
+        'problemTopicGeometry',
+        'problemTopicGraphTheory',
+        'problemTopicGreedy',
+        'problemTopicHashing',
+        'problemTopicIfElseSwitch',
+        'problemTopicImplementation',
+        'problemTopicInputOutput',
+        'problemTopicLoops',
+        'problemTopicMath',
+        'problemTopicMatrices',
+        'problemTopicMaxFlow',
+        'problemTopicMeetInTheMiddle',
+        'problemTopicNumberTheory',
+        'problemTopicParsing',
+        'problemTopicProbability',
+        'problemTopicShortestPath',
+        'problemTopicSimulation',
+        'problemTopicSorting',
+        'problemTopicStackQueue',
+        'problemTopicStrings',
+        'problemTopicSuffixArray',
+        'problemTopicSuffixTree',
+        'problemTopicTernarySearch',
+        'problemTopicTrees',
+        'problemTopicTwoPointers',
+    ];
+
     /**
      * @param \OmegaUp\DAO\VO\Problems $problem
      * @param \OmegaUp\DAO\VO\Identities $user
@@ -117,13 +161,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if (isset($contents['tags'])) {
                 /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
-                    if (!is_string($tag)) {
+                    if (
+                        !is_string($tag) ||
+                        !in_array($tag, self::ALLOWED_TAGS)
+                    ) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'contents'
                         );
                     }
-                    $tag = \OmegaUp\Controllers\Tag::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -149,13 +195,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             // Tags must be strings.
             /** @var mixed $tag */
             foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
+                if (
+                    !is_string($tag) ||
+                    !in_array($tag, self::ALLOWED_TAGS)
+                ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'contents'
                     );
                 }
-                $tag = \OmegaUp\Controllers\Tag::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -187,7 +235,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 !isset($contents['reason']) ||
                 !in_array(
                     $contents['reason'],
-                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases']
+                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
                 )
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(

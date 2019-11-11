@@ -17,7 +17,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     } catch (\OmegaUp\Exceptions\ApiException $e) {
         $response = $e->asResponseArray();
     } catch (\Exception $e) {
-        self::$log->error($e);
+        \Logger::getLogger('login')->error($e);
         $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
             $e
         );
@@ -36,7 +36,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
     $smarty->assign(
         'ERROR_MESSAGE',
-        $smarty->getConfigVars(
+        \OmegaUp\Translations::getInstance()->get(
             'unableToVerifyCaptcha'
         )
     );
@@ -91,7 +91,7 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
         $smarty->assign('ERROR_TO_USER', 'THIRD_PARTY_LOGIN_FAILED');
         $smarty->assign(
             'ERROR_MESSAGE',
-            $smarty->getConfigVars(
+            \OmegaUp\Translations::getInstance()->get(
                 'loginFederatedFailed'
             )
         );

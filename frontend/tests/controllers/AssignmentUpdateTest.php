@@ -62,6 +62,18 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
+                'name' => 'some new name'
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to missing parameter'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'course' => $courseData['course_alias'],
                 'name' => 'some new name'
             ]));
@@ -162,7 +174,17 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'Assignment should not have been updated because the date falls outside of valid range'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
+            $this->assertEquals('parameterDateTooLarge', $e->getMessage());
+
+            $responseArray =  $e->asResponseArray();
+            $this->assertEquals(
+                'parameterDateTooLarge',
+                $responseArray['errorname']
+            );
+            $this->assertEquals(
+                $courseData['course']->finish_time,
+                $responseArray['payload']['upper_bound']
+            );
         }
     }
 }

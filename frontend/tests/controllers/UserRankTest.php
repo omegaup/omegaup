@@ -106,14 +106,14 @@ class UserRankTest extends OmegaupTestCase {
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestantIdentity->username) {
+            if ($entry['username'] === $contestantIdentity->username) {
                 $found = true;
                 $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
 
-            if ($entry['username'] == $identity2->username) {
+            if ($entry['username'] === $identity2->username) {
                 $this->fail('User with private problem solved showed in rank.');
             }
         }

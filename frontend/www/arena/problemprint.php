@@ -2,7 +2,6 @@
 require_once('../../server/bootstrap_smarty.php');
 
 $r = new \OmegaUp\Request($_REQUEST);
-$session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 $r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {

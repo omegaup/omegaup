@@ -497,23 +497,20 @@ class User extends \OmegaUp\Controllers\Controller {
 
             self::$log->info("Admin verifying user... {$r['usernameOrEmail']}");
             $user = self::resolveUser($r['usernameOrEmail']);
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $r['usernameOrEmail']
-            );
         } else {
             // Normal user verification path
             \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
             $user = \OmegaUp\DAO\Users::getByVerification($r['id']);
-            $identity = \OmegaUp\DAO\Identities::getByPK(
-                $user->main_identity_id
-            );
         }
 
-        if (is_null($user)) {
+        if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'verificationIdInvalid'
             );
         }
+        $identity = \OmegaUp\DAO\Identities::getByPK(
+            $user->main_identity_id
+        );
 
         $user->verified = true;
         $user->verification_id = null;
@@ -1104,13 +1101,23 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys = [
                 'Virtual-ESCOM2018' => 50,
             ];
+        } elseif ($r['contest_type'] == 'CONTESTCAC') {
+            if (
+                $r->identity->username != 'Franco1010'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+            $keys = [
+                'CAC2019B' => 50,
+            ];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
+                    'expected_set' => 'CONTESTCAC, OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
                 ]
             );
         }
@@ -1951,6 +1958,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
+            'preferred_language',
             'is_private',
             'hide_problem_tags',
         ];
@@ -2205,9 +2213,9 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
@@ -2567,7 +2575,12 @@ class User extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
-        $latest_statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        if (is_null($latestStatement)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'privacyStatementNotFound'
+            );
+        }
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
@@ -2575,9 +2588,9 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
             'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                $latest_statement['privacystatement_id']
+                $latestStatement['privacystatement_id']
             ),
-            'git_object_id' => $latest_statement['git_object_id'],
+            'git_object_id' => $latestStatement['git_object_id'],
             'statement_type' => 'privacy_policy',
         ];
     }
@@ -2589,9 +2602,9 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         string $filteredBy
     ): array {
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $r
-        )['session'];
+        );
         if (is_null($session['identity'])) {
             return ['filteredBy' => null, 'value' => null];
         }
@@ -2627,11 +2640,17 @@ class User extends \OmegaUp\Controllers\Controller {
 
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
+        $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        if (is_null($latestStatement)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'privacyStatementNotFound'
+            );
+        }
         return [
             'status' => 'ok',
             'hasAccepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement()['privacystatement_id']
+                $latestStatement['privacystatement_id']
             ),
         ];
     }
@@ -2798,13 +2817,11 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param \OmegaUp\Request $r
      * @param \OmegaUp\DAO\VO\Identities $identity
-     * @param \Smarty $smarty
      * @return array
      */
     public static function getRankDetailsForSmarty(
         \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity,
-        \Smarty $smarty
+        ?\OmegaUp\DAO\VO\Identities $identity
     ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
@@ -2815,23 +2832,29 @@ class User extends \OmegaUp\Controllers\Controller {
             /*$required=*/false
         );
 
-        $page = $r['page'] ?? 1;
-        $length = $r['length'] ?? 100;
-        $filter = $r['filter'] ?? '';
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $filter = strval($r['filter']);
 
         $availableFilters = [];
         if (!is_null($identity)) {
             if (!is_null($identity->country_id)) {
                 $availableFilters['country'] =
-                    $smarty->getConfigVars('wordsFilterByCountry');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterByCountry'
+                    );
             }
             if (!is_null($identity->state_id)) {
                 $availableFilters['state'] =
-                    $smarty->getConfigVars('wordsFilterByState');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterByState'
+                    );
             }
             if (!is_null($identity->school_id)) {
                 $availableFilters['school'] =
-                    $smarty->getConfigVars('wordsFilterBySchool');
+                    \OmegaUp\Translations::getInstance()->get(
+                        'wordsFilterBySchool'
+                    );
             }
         }
 

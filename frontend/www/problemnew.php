@@ -18,10 +18,14 @@ $smarty->assign('VISIBILITY', '0');
 $smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
 $smarty->assign('SELECTED_TAGS', '');
 
+[
+    'auth_token' => $authToken,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     try {
         \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
-            'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+            'auth_token' => $authToken,
             'title' => $_POST['title'],
             'problem_alias' => $_POST['alias'],
             'validator' => $_POST['validator'],

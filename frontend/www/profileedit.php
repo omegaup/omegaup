@@ -19,14 +19,16 @@ try {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
-$ses = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
+[
+    'identity' => $identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
 
 $smarty->assign(
     'PROGRAMMING_LANGUAGES',
     \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
 );
 $smarty->assign('COUNTRIES', \OmegaUp\DAO\Countries::getAll(null, 100, 'name'));
-if (is_null($ses['user']->password)) {
+if (is_null($identity) || is_null($identity->password)) {
     $smarty->display('../templates/user.basicedit.tpl');
 } else {
     $smarty->display('../templates/user.edit.tpl');

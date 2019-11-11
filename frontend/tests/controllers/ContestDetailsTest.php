@@ -182,7 +182,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -217,7 +217,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -244,7 +244,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
         // Get a contest
         $contestData = ContestsFactory::createContest(new ContestParams([
-            'window_length' => 20
+            'windowLength' => 20,
         ]));
 
         // Get a user for our scenario
@@ -340,7 +340,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -422,7 +422,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -521,7 +521,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -545,7 +545,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a private contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -694,7 +694,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 

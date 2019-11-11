@@ -45,6 +45,46 @@ class QualityNominationFactory {
                 ['name' => 'search']
             )
         );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicDynamicProgramming']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGraphTheory']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGreedy']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicBinarySearch']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMath']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicMatrices']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicGeometry']
+            )
+        );
+        \OmegaUp\DAO\Tags::create(
+            new \OmegaUp\DAO\VO\Tags(
+                ['name' => 'problemTopicSorting']
+            )
+        );
     }
 
     /**

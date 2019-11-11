@@ -26,15 +26,9 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
         if (is_null($contest)) {
             $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
             if (
-                is_null(
-                    $course
-                )
-                || is_null(
-                    $course->group_id
-                )
-                || is_null(
-                    $course->course_id
-                )
+                is_null($course) ||
+                is_null($course->group_id) ||
+                is_null($course->course_id)
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseNotFound'
@@ -42,7 +36,7 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
             }
             $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                 $r['alias'],
-                $course->course_id
+                intval($course->course_id)
             );
             if (is_null($assignment)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(

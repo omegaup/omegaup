@@ -72,14 +72,21 @@ let UI = {
   },
 
   formatString: function(template, values) {
-    for (var key in values) {
-      if (!values.hasOwnProperty(key)) continue;
-      template = template.replace(
-        new RegExp('%\\(' + key + '\\)', 'g'),
-        values[key],
-      );
-    }
-    return template;
+    const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
+    return template.replace(re, (match, key, modifier) => {
+      if (!values.hasOwnProperty(key)) {
+        // If the array does not provide a replacement for the key, just return
+        // the original substring.
+        return match;
+      }
+      let replacement = values[key];
+      if (modifier === 'date') {
+        replacement = UI.formatDate(new Date(replacement * 1000));
+      } else if (modifier === 'timestamp') {
+        replacement = UI.formatDateTime(new Date(replacement * 1000));
+      }
+      return replacement;
+    });
   },
 
   contestUpdated: function(data, contestAlias) {
@@ -107,17 +114,28 @@ let UI = {
     $('#root').show();
 
     $('#status .message').html(message);
-    $('#status')
+    const statusElement = $('#status');
+    let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
+    if (statusCounter % 2 == 1) {
+      statusCounter++;
+    }
+    statusElement
       .removeClass('alert-success alert-info alert-warning alert-danger')
-      .addClass(type + ' animating')
+      .addClass(type)
+      .addClass('animating')
+      .attr('data-counter', statusCounter + 1)
       .slideDown({
         complete: function() {
-          $('#status').removeClass('animating');
+          statusElement
+            .removeClass('animating')
+            .attr('data-counter', statusCounter + 2);
+          if (type == 'alert-success') {
+            setTimeout(() => {
+              UI.dismissNotifications(statusCounter + 2);
+            }, 5000);
+          }
         },
       });
-    if (type == 'alert-success') {
-      setTimeout(UI.dismissNotifications, 5000);
-    }
   },
 
   error: function(message) {
@@ -137,17 +155,36 @@ let UI = {
   },
 
   apiError: function(response) {
-    UI.error(((response && response.error) || 'error').toString());
+    UI.error(
+      response.hasOwnProperty('payload')
+        ? UI.formatString(response.error, response.payload)
+        : ((response && response.error) || 'error').toString(),
+    );
   },
 
   ignoreError: function(response) {},
 
-  dismissNotifications: function() {
-    $('#status')
+  dismissNotifications: function(originalStatusCounter) {
+    const statusElement = $('#status');
+    let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
+    if (
+      typeof originalStatusCounter == 'number' &&
+      statusCounter > originalStatusCounter
+    ) {
+      // This status has already been dismissed.
+      return;
+    }
+    if (statusCounter % 2 == 1) {
+      statusCounter++;
+    }
+    statusElement
       .addClass('animating')
+      .attr('data-counter', statusCounter + 1)
       .slideUp({
         complete: function() {
-          $('#status').removeClass('animating');
+          statusElement
+            .removeClass('animating')
+            .attr('data-counter', statusCounter + 2);
         },
       });
   },
@@ -384,6 +421,7 @@ let UI = {
         {
           source: UI.typeaheadWrapper(omegaup.API.School.list),
           async: true,
+          limit: 10,
           display: 'label',
           templates: {
             empty: T.schoolToBeAdded,
@@ -502,7 +540,13 @@ let UI = {
     document
       .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
       .forEach(function(item, index) {
-        let inputValue = item.querySelector('pre').innerHTML;
+        let preElement = item.querySelector('pre');
+        if (!preElement) {
+          // This can only happen if a user messed up with the markdown of a
+          // problem.
+          return;
+        }
+        let inputValue = preElement.innerHTML;
 
         let clipboardButton = document.createElement('button');
         clipboardButton.title = T.copySampleCaseTooltip;

@@ -225,11 +225,11 @@ class ApiCaller {
         }
 
         // Get the auth_token and user data from cookies
-        $cs = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
+        $session = \OmegaUp\Controllers\Session::getCurrentSession();
 
         // If we got an auth_token from cookies, replace it
-        if (!empty($cs['auth_token'])) {
-            $request['auth_token'] = $cs['auth_token'];
+        if (!empty($session['auth_token'])) {
+            $request['auth_token'] = $session['auth_token'];
         }
 
         for ($i = 4; ($i + 1) < sizeof($args); $i += 2) {

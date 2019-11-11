@@ -4,8 +4,8 @@ namespace OmegaUp;
 
 class ActivityReport {
     /**
-     * @param array{username: string, ip: int, time: int, classname: string}[] $accesses
-     * @param array{username: string, alias: string, ip: int, time: int, classname: string}[] $submissions
+     * @param list<array{alias?: string, classname: string, ip: int, time: int, username: string}> $accesses
+     * @param list<array{alias?: string, classname: string, ip: int, time: int, username: string}> $submissions
      *
      * @return array{username: string, ip: int, time: int, classname: string, alias?: string}[]
      */

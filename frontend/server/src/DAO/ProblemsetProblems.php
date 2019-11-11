@@ -91,8 +91,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
-    /*
+    /**
      * Get problemset problems including problemset alias, points, and order
+     *
+     * @return list<array{title: string, problem_id: int, alias: string, visibility: bool, visits: int, submissions: int, accepted: int, difficulty: float, order: int, languages: string, points: float, commit: string, version: string}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -123,10 +125,25 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$problemsetId]
-        );
+        $result = [];
+        /** @var array{title: string, problem_id: string, alias: string, visibility: string, visits: string, submissions: string, accepted: string, difficulty: string, order: string, languages: string, points: string, commit: string, version: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$problemsetId]
+            ) as $row
+        ) {
+            $row['problem_id'] = intval($row['problem_id']);
+            $row['visibility'] = boolval($row['visibility']);
+            $row['visits'] = intval($row['visits']);
+            $row['submissions'] = intval($row['submissions']);
+            $row['accepted'] = intval($row['accepted']);
+            $row['difficulty'] = floatval($row['difficulty']);
+            $row['order'] = intval($row['order']);
+            $row['points'] = floatval($row['points']);
+            $result[] = $row;
+        }
+        return $result;
     }
 
     /*
@@ -162,7 +179,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /*
      * Get relevant problems including problemset alias
-     * @return \OmegaUp\DAO\VO\Problems[]
+     * @return list<\OmegaUp\DAO\VO\Problems>
      */
     final public static function getRelevantProblems(
         \OmegaUp\DAO\VO\Problemsets $problemset

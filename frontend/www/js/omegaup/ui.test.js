@@ -22,6 +22,18 @@ describe('omegaup.ui', function() {
       expect(omegaup.UI.formatString('%(x)', { x: 42 })).toEqual('42');
     });
 
+    it('Should handle dates', function() {
+      expect(omegaup.UI.formatString('%(x!date)', { x: 0 })).toEqual(
+        omegaup.UI.formatDate(new Date(0)),
+      );
+    });
+
+    it('Should handle timestamps', function() {
+      expect(omegaup.UI.formatString('%(x!timestamp)', { x: 0 })).toEqual(
+        omegaup.UI.formatDateTime(new Date(0)),
+      );
+    });
+
     it('Should handle strings with multiple replacements', function() {
       expect(omegaup.UI.formatString('%(x) %(x)', { x: 'foo' })).toEqual(
         'foo foo',

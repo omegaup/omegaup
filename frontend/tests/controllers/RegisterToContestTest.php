@@ -98,7 +98,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'private']
+                ['admissionMode' => 'private']
             )
         );
 
@@ -339,7 +339,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         }
         $contestData = ContestsFactory::createContest(
             new ContestParams(
-                ['admission_mode' => 'public']
+                ['admissionMode' => 'public']
             )
         );
         foreach ($invitedContestantIdentities as $contestant) {

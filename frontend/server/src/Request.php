@@ -141,6 +141,57 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that the value associated with the key is a timestamp.
+     */
+    public function ensureTimestamp(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null
+    ): void {
+        if (!self::offsetExists($key)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        \OmegaUp\Validators::validateTimestampInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
+        $this[$key] = intval($val);
+    }
+
+    public function ensureOptionalTimestamp(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required
+    ): void {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        \OmegaUp\Validators::validateTimestampInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
+        $this[$key] = intval($val);
+    }
+
+    /**
      * Ensures that the value associated with the key is a float.
      */
     public function ensureFloat(
@@ -183,10 +234,10 @@ class Request extends \ArrayObject {
         }
         $this->user = null;
         $this->identity = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $this
-        )['session'];
-        if (is_null($session) || is_null($session['identity'])) {
+        );
+        if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];

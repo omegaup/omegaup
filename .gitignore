@@ -76,7 +76,6 @@ frontend/.DS_Store
 frontend/www/apc.php
 frontend/www/coverage/
 frontend/www/img/
-frontend/www/js/google-analytics.js
 frontend/www/pmamini.php
 frontend/www/phpminiadmin/
 frontend/www/templates/

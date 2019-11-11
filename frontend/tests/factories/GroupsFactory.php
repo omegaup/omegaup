@@ -4,19 +4,14 @@ class GroupsFactory {
     /**
      * Create group
      *
-     * @param \OmegaUp\DAO\VO\Identities $owner
-     * @param null|string $name
-     * @param null|string $description
-     * @param null|string $alias
-     * @param null|ScopedLoginToken $login
      * @return array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}}
      */
     public static function createGroup(
-        \OmegaUp\DAO\VO\Identities $owner = null,
-        $name = null,
-        $description = null,
-        $alias = null,
-        ScopedLoginToken $login = null
+        ?\OmegaUp\DAO\VO\Identities $owner = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
             ['user' => $user, 'identity' => $owner] = UserFactory::createUser();
@@ -66,7 +61,6 @@ class GroupsFactory {
      * Add identity to group helper
      *
      * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData
-     * @param \OmegaUp\DAO\VO\Identities $identity
      */
     public static function addUserToGroup(
         array $groupData,
@@ -87,16 +81,13 @@ class GroupsFactory {
      * Creates a scoreboard in a group
      *
      * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData
-     * @param null|string $name
-     * @param null|string $description
-     * @param null|string $alias
      * @return array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards}
      */
     public static function createGroupScoreboard(
         array $groupData,
-        $name = null,
-        $description = null,
-        $alias = null
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null
     ) {
         if (is_null($name)) {
             $name = Utils::CreateRandomString();

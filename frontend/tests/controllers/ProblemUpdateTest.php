@@ -1081,8 +1081,8 @@ class UpdateProblemTest extends OmegaupTestCase {
 
             // Create a contest in the past with one run.
             $pastContestData = ContestsFactory::createContest(new ContestParams([
-                'start_time' => $originalTime - 60 * 60,
-                'finish_time' => $originalTime - 5 * 60,
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime - 5 * 60,
                 'contestDirector' => $contestDirector,
             ]));
             ContestsFactory::addProblemToContest(
@@ -1102,8 +1102,8 @@ class UpdateProblemTest extends OmegaupTestCase {
 
             // Now create one in the present with one more run.
             $presentContestData = ContestsFactory::createContest(new ContestParams([
-                'start_time' => $originalTime - 60 * 60,
-                'finish_time' => $originalTime + 60 * 60,
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime + 60 * 60,
                 'contestDirector' => $contestDirector,
             ]));
             ContestsFactory::addProblemToContest(

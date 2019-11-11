@@ -19,7 +19,7 @@ try {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
-$currentSession = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
+$currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 $smarty->assign('payload', [
     'email' => $currentSession['email'],
 ]);

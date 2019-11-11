@@ -34,13 +34,13 @@
 				<h4>{#loginNative#}</h4>
 				<form method='POST' action='{$smarty.server.REQUEST_URI}' id='login_form' class="form-horizontal">
 					<div class="form-group">
-						<label for='user'>{#loginEmailUsername#}</label>
-						<input id='user' name='user' value='' type='text' class='form-control' tabindex="1" />
+						<label for="user">{#loginEmailUsername#}</label>
+						<input id="user" name="user" value="" type="text" class="form-control" tabindex="1" autocomplete="username" />
 					</div>
 
 					<div class="form-group">
-						<label for='pass'>{#loginPassword#} (<a href="/login/password/recover/">{#loginRecover#}</a>)</label>
-						<input id='pass' name='pass' value='' type='password' class='form-control' tabindex="2" />
+						<label for="pass">{#loginPassword#} (<a href="/login/password/recover/">{#loginRecover#}</a>)</label>
+						<input id="pass" name="pass" value="" type="password" class="form-control" tabindex="2" autocomplete="current-password" />
 					</div>
 
 					<input name="request" value="login" type="hidden" />
@@ -63,14 +63,14 @@
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">
 							<label for="reg_username" class="control-label">{#wordsUser#}</label>
-							<input id='reg_username' name='reg_username' value='' type='text' class="form-control">
+							<input id="reg_username" name="reg_username" value="" type="text" class="form-control" autocomplete="username">
 						</div>
 					</div>
 
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="reg_email" class="control-label">{#loginEmail#}</label>
-							<input id='reg_email' name='reg_email' value='' type='email' class="form-control">
+							<input id="reg_email" name="reg_email" value="" type="email" class="form-control" autocomplete="email">
 						</div>
 					</div>
 				</div>
@@ -79,14 +79,14 @@
 					<div class="col-md-4 col-md-offset-2">
 						<div class="form-group">
 							<label for="reg_pass" class="control-label">{#loginPasswordCreate#}</label>
-							<input id='reg_pass' name='reg_pass' value='' type='password' class="form-control">
+							<input id="reg_pass" name="reg_pass" value="" type="password" class="form-control" autocomplete="new-password">
 						</div>
 					</div>
 
 					<div class="col-md-4">
 						<div class="form-group">
 							<label for="reg_pass2" class="control-label">{#loginRepeatPassword#}</label>
-							<input id='reg_pass2' name='reg_pass2' value='' type='password' class="form-control">
+							<input id="reg_pass2" name="reg_pass2" value="" type="password" class="form-control" autocomplete="new-password">
 						</div>
 					</div>
 				</div>

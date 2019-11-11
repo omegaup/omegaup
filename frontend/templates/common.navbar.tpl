@@ -25,7 +25,7 @@
                 <li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
                 <li><a href="/contest/mine/">{#navMyContests#}</a></li>
                 <li><a href="/group/">{#navMyGroups#}</a></li>
-                <li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
+                <li><a href="/scoreboardmerge/">{#contestsJoinScoreboards#}</a></li>
               </ul>
             </li>
             <li class="dropdown {if isset($navbarSection) && $navbarSection === "problems"} active{/if}" id="nav-problems">

@@ -11,7 +11,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
         // gitserver. Regular sessions cannot be used since they
         // expire, so use a pre-shared secret to authenticate that
         // grants admin-level privileges just for this call.
-        if ($r['token'] !== OMEGAUP_GRADER_SECRET) {
+        if ($r['token'] !== OMEGAUP_GITSERVER_SECRET_TOKEN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 

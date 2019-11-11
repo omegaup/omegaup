@@ -45,7 +45,7 @@ class SchoolsFactory {
     public static function addUserToSchool(
         $schoolData,
         $user
-    ) {
+    ): void {
         $login = \OmegaupTestCase::login($user);
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,

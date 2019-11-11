@@ -57,8 +57,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     public static function currentSessionAvailable(): bool {
-        $session = self::apiCurrentSession()['session'];
-        return !is_null($session) && !is_null($session['identity']);
+        $session = self::getCurrentSession();
+        return !is_null($session['identity']);
     }
 
     /**
@@ -67,20 +67,52 @@ class Session extends \OmegaUp\Controllers\Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      *
-     * @return array
-     * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
+        return [
+            'status' => 'ok',
+            'session' => self::getCurrentSession($r),
+            'time' => \OmegaUp\Time::get(),
+        ];
+    }
+
+    private static function getAuthToken(\OmegaUp\Request $r): ?string {
+        $sessionManager = self::getSessionManagerInstance();
+        $authToken = null;
+        if (!is_null($r['auth_token'])) {
+            $authToken = strval($r['auth_token']);
+        } else {
+            $authToken = $sessionManager->getCookie(
+                OMEGAUP_AUTH_TOKEN_COOKIE_NAME
+            );
+        }
+        if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
+            return $authToken;
+        }
+        if (
+            isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
+                && self::isAuthTokenValid(
+                    strval(
+                        $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]
+                    )
+                )
+        ) {
+            return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        return null;
+    }
+
+    /**
+     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, auth_token: ?string, is_admin: bool}
+     */
+    public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
         if (
             defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null(self::$_currentSession)
         ) {
-            return [
-                'status' => 'ok',
-                'session' => self::$_currentSession,
-                'time' => \OmegaUp\Time::get(),
-            ];
+            return self::$_currentSession;
         }
         if (is_null($r)) {
             $r = new \OmegaUp\Request();
@@ -101,50 +133,20 @@ class Session extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
                 function () use ($r) {
-                    return self::getCurrentSession($r);
+                    return self::getCurrentSessionImpl($r);
                 },
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
-        } else {
-            self::$_currentSession = self::getCurrentSession($r);
+            return self::$_currentSession;
         }
-        return [
-            'status' => 'ok',
-            'session' => self::$_currentSession,
-            'time' => \OmegaUp\Time::get(),
-        ];
-    }
-
-    private static function getAuthToken(\OmegaUp\Request $r): ?string {
-        $SessionM = self::getSessionManagerInstance();
-        $SessionM->sessionStart();
-        $authToken = null;
-        if (!is_null($r['auth_token'])) {
-            $authToken = strval($r['auth_token']);
-        } else {
-            $authToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
-        }
-        if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
-            return $authToken;
-        }
-        if (
-            isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-                && self::isAuthTokenValid(
-                    strval(
-                        $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]
-                    )
-                )
-        ) {
-            return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
-        }
-        return null;
+        self::$_currentSession = self::getCurrentSessionImpl($r);
+        return self::$_currentSession;
     }
 
     /**
-     * @return array
-     * @psalm-return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
      */
-    public static function getCurrentSession(\OmegaUp\Request $r): array {
+    private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
         if (empty($r['auth_token'])) {
             return [
                 'valid' => false,
@@ -203,9 +205,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      * Invalidates the current user's session cache.
      */
     public static function invalidateCache(): void {
-        $currentSession = self::apiCurrentSession()['session'];
+        $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession) ||
             is_null($currentSession['auth_token'])
         ) {
             return;
@@ -226,9 +227,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function unregisterSession(): void {
         self::invalidateCache();
 
-        $currentSession = self::apiCurrentSession()['session'];
+        $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession) ||
             is_null($currentSession['auth_token'])
         ) {
             return;

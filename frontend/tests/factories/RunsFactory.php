@@ -79,6 +79,7 @@ class RunsFactory {
 
         return new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
             'problem_alias' => $problemData['problem']->alias,
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",

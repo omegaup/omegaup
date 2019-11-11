@@ -6,13 +6,17 @@ import argparse
 import json
 import logging
 import os
-
+import sys
 from typing import Set
 
 import MySQLdb
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 
 BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',

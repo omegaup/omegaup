@@ -1,7 +1,12 @@
 <?php
 
 require_once('../server/bootstrap_smarty.php');
-\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+
+$identity = \OmegaUp\Controllers\Session::getCurrentSession()['identity'];
+if (is_null($identity)) {
+    \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+    die();
+}
 
 try {
     $payload = [
@@ -10,7 +15,7 @@ try {
             []
         )
     )['nominations'],
-    'currentUser' => $session['identity']->username,
+    'currentUser' => $identity->username,
     'myView' => true,
     ];
     $smarty->assign('payload', $payload);

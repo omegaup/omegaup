@@ -20,6 +20,9 @@
             <option value="no-problem-statement">
               {{ T.reportProblemFormNotAProblemStatement }}
             </option>
+            <option value="poorly-described">
+              {{ T.reportProblemFormPoorlyDescribed }}
+            </option>
             <option value="offensive">
               {{ T.reportProblemFormOffensive }}
             </option>

@@ -51,6 +51,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
         'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
 
+    // Number of rows shown in problems list
+    const PAGE_SIZE = 1000;
+
     /**
      * Validates a Create or Update Problem API request
      *
@@ -84,7 +87,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (is_null($r['problem'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
-                    'Problem not found'
+                    'problemNotFound'
                 );
             }
 
@@ -1041,7 +1044,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdateStatement(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        self::updateStatement($r);
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    private static function updateStatement(\OmegaUp\Request $r): void {
+        $r->ensureMainUserIdentity();
         self::validateCreateOrUpdate($r, true);
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['statement'],
@@ -1054,9 +1064,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['statement']
         );
         self::invalidateCache($r['problem'], $updatedFileLanguages);
-        return [
-            'status' => 'ok'
-        ];
     }
 
     /**
@@ -2539,25 +2546,116 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Validate list request
      *
      * @param \OmegaUp\Request $r
+     * @return array{offset: null|int, rowcount: null|int}
      */
     private static function validateList(\OmegaUp\Request $r) {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
         // Defaults for offset and rowcount
+        $offset = null;
+        $rowcount = null;
         if (!isset($r['page'])) {
-            if (!isset($r['offset'])) {
-                $r['offset'] = 0;
-            }
-            if (!isset($r['rowcount'])) {
-                $r['rowcount'] = 1000;
-            }
+            $offset = !isset($r['offset']) ? 0 : intval($r['offset']);
+            $rowcount = !isset(
+                $r['rowcount']
+            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
+                $r['rowcount']
+            );
         }
 
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['query'],
-            'query'
+        return [
+            'offset' => $offset,
+            'rowcount' => $rowcount,
+        ];
+    }
+
+    /**
+     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, mode: string, orderBy: string, page: int, programmingLanguages: string[]|string, requireAllTags: bool, tags: string[]}
+     */
+    private static function validateListParams(\OmegaUp\Request $r) {
+        \OmegaUp\Validators::validateInEnum(
+            $r['mode'],
+            'mode',
+            ['asc', 'desc'],
+            false
         );
+        \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
+        \OmegaUp\Validators::validateInEnum(
+            $r['order_by'],
+            'order_by',
+            ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'creation_date'],
+            false
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['language'],
+            'language',
+            array_merge(
+                ['all'],
+                \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+            ),
+            false
+        );
+        $tags = [];
+        if (isset($r['tag'])) {
+            $tags = self::getTagList(strval($r['tag']));
+        }
+
+        $keyword = substr(strval($r['query']), 0, 256);
+        if (!$keyword) {
+            $keyword = '';
+        }
+        \OmegaUp\Validators::validateOptionalNumber(
+            $r['min_difficulty'],
+            'min_difficulty'
+        );
+        \OmegaUp\Validators::validateOptionalNumber(
+            $r['max_difficulty'],
+            'max_difficulty'
+        );
+        if (isset($r['difficulty_range'])) {
+            [$minDifficulty, $maxDifficulty] = explode(
+                ',',
+                strval(
+                    $r['difficulty_range']
+                )
+            );
+        } else {
+            $minDifficulty = intval($r['min_difficulty']);
+            $maxDifficulty = intval($r['max_difficulty']);
+        }
+        $difficultyRange = self::getDifficultyRange(
+            intval($minDifficulty),
+            intval($maxDifficulty)
+        );
+        if (isset($r['only_karel'])) {
+            $programmingLanguages = ['kp', 'kj'];
+        } elseif (isset($r['programming_languages'])) {
+            $programmingLanguages = explode(
+                ',',
+                strval(
+                    $r['programming_languages']
+                )
+            );
+        } else {
+            $programmingLanguages = [];
+        }
+
+        return [
+            'mode' => strval($r['mode']),
+            'page' => $r['page'],
+            'orderBy' => strval($r['order_by']),
+            'language' => strval($r['language']),
+            'tags' => $tags,
+            'keyword' => $keyword,
+            'requireAllTags' => !isset(
+                $r['require_all_tags']
+            ) ? !isset(
+                $r['some_tags']
+            ) : boolval($r['require_all_tags']),
+            'programmingLanguages' => $programmingLanguages,
+            'difficultyRange' => $difficultyRange,
+        ];
     }
 
     /**
@@ -2573,48 +2671,62 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Do nothing, we allow unauthenticated users to use this API
             /** @var null $r->identity */
         }
+        [
+            'offset' => $offset,
+            'rowcount' => $rowcount,
+        ] = self::validateList($r);
+        [
+            'mode' => $mode,
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'language' => $language,
+            'tags' => $tags,
+            'keyword' => $keyword,
+            'requireAllTags' => $requireAllTags,
+            'programmingLanguages' => $programmingLanguages,
+            'difficultyRange' => $difficultyRange,
+        ] = self::validateListParams($r);
 
-        self::validateList($r);
+        $response = self::getList(
+            $page ?: 1,
+            $language ?: 'all',
+            $orderBy ?: 'problem_id',
+            $mode ?: 'desc',
+            $offset,
+            $rowcount,
+            $tags,
+            $keyword,
+            $requireAllTags,
+            $programmingLanguages,
+            $difficultyRange,
+            $r->identity,
+            $r->user
+        );
+        $response['status'] = 'ok';
+        return $response;
+    }
 
-        // Filter results
-        $language = null; // Filter by language, all by default.
-        // "language" may be one of the allowed options, otherwise the default filter will be used.
-        if (
-            !is_null($r['language']) &&
-            in_array(
-                $r['language'],
-                \OmegaUp\Controllers\Problem::VALID_LANGUAGES
-            )
-        ) {
-            $language = $r['language'];
-        }
-
-        // Sort results
-        $orderBy = 'problem_id'; // Order by problem_id by default.
-        $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'problem_id'];
-        // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
-        if (
-            !is_null($r['order_by']) &&
-            in_array($r['order_by'], $sorting_options)
-        ) {
-            $orderBy = $r['order_by'];
-        }
-
-        // "mode" may be a valid one, for compatibility reasons 'descending' is the order by default.
-        if (
-            !is_null($r['mode']) &&
-            (
-                $r['mode'] === 'asc' ||
-                $r['mode'] === 'desc'
-            )
-        ) {
-            $order = $r['mode'];
-        } else {
-            $order = 'desc';
-        }
-
-        $response = [];
-        $response['results'] = [];
+    /**
+     * @param string|string[] $tags
+     * @param array{0: int, 1: int}|null $difficultyRange
+     * @param string[]|string $programmingLanguages
+     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: int, quality: float|null, quality_histogram: list<int>, ratio: float, score: int, tags: array{autogenerated: bool, name: string}[], title: string, visibility: int}[], total: int}
+     */
+    private static function getList(
+        int $page,
+        string $language,
+        string $orderBy,
+        string $mode,
+        ?int $offset,
+        ?int $rowcount,
+        $tags,
+        string $keyword,
+        bool $requireAllTags,
+        $programmingLanguages,
+        ?array $difficultyRange,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user
+    ) {
         $authorIdentityId = null;
         $authorUserId = null;
         // There are basically three types of users:
@@ -2622,16 +2734,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
         $identityType = IDENTITY_ANONYMOUS;
-        if (!is_null($r->identity)) {
-            $authorIdentityId = intval($r->identity->identity_id);
-            if (!is_null($r->user)) {
-                $authorUserId = intval($r->user->user_id);
+        if (!is_null($identity)) {
+            $authorIdentityId = intval($identity->identity_id);
+            if (!is_null($user)) {
+                $authorUserId = intval($user->user_id);
             }
 
             if (
-                \OmegaUp\Authorization::isSystemAdmin($r->identity) ||
+                \OmegaUp\Authorization::isSystemAdmin($identity) ||
                 \OmegaUp\Authorization::hasRole(
-                    $r->identity,
+                    $identity,
                     \OmegaUp\Authorization::SYSTEM_ACL,
                     \OmegaUp\Authorization::REVIEWER_ROLE
                 )
@@ -2642,47 +2754,37 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Search for problems whose title has $query as a substring.
-        $query = is_null($r['query']) ? null : $r['query'];
-
-        if (!is_null($r['offset']) && !is_null($r['rowcount'])) {
-            // Skips the first $offset rows of the result.
-            $offset = intval($r['offset']);
-
-            // Specifies the maximum number of rows to return.
-            $rowcount = intval($r['rowcount']);
-        } else {
-            $offset = (is_null($r['page']) ? 0 : intval($r['page']) - 1) *
-                PROBLEMS_PER_PAGE;
+        if (is_null($offset) || is_null($rowcount)) {
+            $offset = ($page - 1) * PROBLEMS_PER_PAGE;
             $rowcount = PROBLEMS_PER_PAGE;
         }
 
+        $minVisibility = is_null($difficultyRange) ?
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC :
+            $difficultyRange[0];
+
         $total = 0;
-        $response['results'] = \OmegaUp\DAO\Problems::byIdentityType(
+        $problems = \OmegaUp\DAO\Problems::byIdentityType(
             $identityType,
             $language,
             $orderBy,
-            $order,
+            $mode,
             $offset,
             $rowcount,
-            $query,
+            $keyword,
             $authorIdentityId,
             $authorUserId,
-            $r['tag'],
-            is_null(
-                $r['min_visibility']
-            ) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : intval(
-                $r['min_visibility']
-            ),
-            is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
-            $r['programming_languages'],
-            $r['difficulty_range'],
+            $tags,
+            $minVisibility,
+            $requireAllTags,
+            $programmingLanguages,
+            $difficultyRange,
             $total
         );
-        $response['total'] = $total;
-
-        $response['status'] = 'ok';
-        return $response;
+        return [
+            'total' => $total,
+            'results' => $problems,
+        ];
     }
 
     /**
@@ -2699,7 +2801,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $pageSize = (isset(
+            $r['page_size']
+        ) ? intval(
+            $r['page_size']
+        ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
 
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             $problems = \OmegaUp\DAO\Problems::getAll(
@@ -2743,13 +2849,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
-        self::validateList($r);
+        [
+            'offset' => $offset,
+            'rowcount' => $pageSize,
+        ] = self::validateList($r);
 
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = isset($r['page']) ? intval($r['page']) : 1;
 
         $problems = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
@@ -2974,11 +3082,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    /**
+     * @return array{isSysadmin: bool, privateProblemsAlert: bool}
+     */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
+        $privateProblemsAlert = false;
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+            $privateProblemsAlert = (
+                !isset($_SESSION['private_problems_alert']) &&
+                \OmegaUp\DAO\Problems::getPrivateCount($r->user) > 0
+            );
+        if ($privateProblemsAlert) {
+            $_SESSION['private_problems_alert'] = true;
+        }
+        }
         return [
             'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin($r->identity),
+            'privateProblemsAlert' => $privateProblemsAlert,
         ];
     }
 
@@ -3104,6 +3227,77 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: int, quality: float|null, quality_histogram: list<int>, ratio: float, score: int, tags: array{autogenerated: bool, name: string}[], title: string, visibility: int}[]}
+     */
+    public static function getProblemListForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+        [
+            'offset' => $offset,
+            'rowcount' => $rowcount,
+        ] = self::validateList($r);
+        [
+            'mode' => $mode,
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'language' => $language,
+            'tags' => $tags,
+            'keyword' => $keyword,
+            'requireAllTags' => $requireAllTags,
+            'programmingLanguages' => $programmingLanguages,
+            'difficultyRange' => $difficultyRange,
+        ] = self::validateListParams($r);
+
+        $response = self::getList(
+            $page ?: 1,
+            $language ?: 'all',
+            $orderBy ?: 'problem_id',
+            $mode ?: 'desc',
+            $offset,
+            $rowcount,
+            $tags,
+            $keyword,
+            $requireAllTags,
+            $programmingLanguages,
+            $difficultyRange,
+            $r->identity,
+            $r->user
+        );
+
+        $params = [
+            'query' => $keyword,
+            'language' => $language,
+            'order_by' => $orderBy,
+            'mode' => $mode,
+            'tag' => $tags
+        ];
+
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $response['total'],
+            $page ?: 1,
+            '/problem/list/',
+            5,
+            $params
+        );
+
+        return [
+            'KEYWORD' => $keyword,
+            'MODE' => $mode,
+            'ORDER_BY' => $orderBy,
+            'LANGUAGE' => $language,
+            'problems' => $response['results'],
+            'current_tags' => $tags,
+            'pager_items' => $pagerItems,
+        ];
+    }
+
+    /**
      * Returns true if the problem's solution exists, otherwise returns false.
      *
      * @param \OmegaUp\DAO\VO\Problems $problem The problem object.
@@ -3174,5 +3368,41 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return self::SOLUTION_UNLOCKED;
         }
         return self::SOLUTION_LOCKED;
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getTagList(
+        string $tags
+    ) {
+        // Still allow strings to be sent to avoid breaking permalinks.
+        if ($tags === '') {
+            return [];
+        }
+        $tags = explode(',', $tags);
+
+        return array_unique($tags);
+    }
+
+    /**
+     * @return null|array{0: int, 1: int}
+     */
+    private static function getDifficultyRange(
+        ?int $minDifficulty,
+        ?int $maxDifficulty
+    ) {
+        if (
+            is_null($minDifficulty) ||
+            is_null($maxDifficulty) ||
+            $minDifficulty > $maxDifficulty ||
+            $minDifficulty < 0 ||
+            $minDifficulty > 4 ||
+            $maxDifficulty < 0 ||
+            $maxDifficulty > 4
+        ) {
+            return null;
+        }
+        return [$minDifficulty, $maxDifficulty];
     }
 }
