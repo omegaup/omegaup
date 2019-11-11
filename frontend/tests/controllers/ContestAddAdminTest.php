@@ -17,7 +17,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $login = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
@@ -46,7 +46,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $login = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 

@@ -11,7 +11,7 @@ class SchoolsFactory {
     /**
      * Create a random school
      * @param  string $name
-     * @return array
+     * @return array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools}
      */
     public static function createSchool($name = null) {
         if (is_null($name)) {
@@ -27,22 +27,26 @@ class SchoolsFactory {
 
         // Call api
         $response = \OmegaUp\Controllers\School::apiCreate($r);
+        [$school] = \OmegaUp\DAO\Schools::findByName(strval($r['name']));
 
         return [
             'creator' => $identity,
             'request' => $r,
             'response' => $response,
-            'school' => \OmegaUp\DAO\Schools::findByName($r['name'])[0]
+            'school' => $school,
         ];
     }
 
     /**
      * Add user to school
-     * @param array $schoolData
-     * @param \OmegaUp\DAO\Users $user
+     * @param array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools} $schoolData
+     * @param \OmegaUp\DAO\VO\Identities $user
      */
-    public static function addUserToSchool($schoolData, $user) {
-        $login = OmegaupTestCase::login($user);
+    public static function addUserToSchool(
+        $schoolData,
+        $user
+    ): void {
+        $login = \OmegaupTestCase::login($user);
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolData['school']->school_id

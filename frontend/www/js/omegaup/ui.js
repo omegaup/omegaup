@@ -72,14 +72,21 @@ let UI = {
   },
 
   formatString: function(template, values) {
-    for (var key in values) {
-      if (!values.hasOwnProperty(key)) continue;
-      template = template.replace(
-        new RegExp('%\\(' + key + '\\)', 'g'),
-        values[key],
-      );
-    }
-    return template;
+    const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
+    return template.replace(re, (match, key, modifier) => {
+      if (!values.hasOwnProperty(key)) {
+        // If the array does not provide a replacement for the key, just return
+        // the original substring.
+        return match;
+      }
+      let replacement = values[key];
+      if (modifier === 'date') {
+        replacement = UI.formatDate(new Date(replacement * 1000));
+      } else if (modifier === 'timestamp') {
+        replacement = UI.formatDateTime(new Date(replacement * 1000));
+      }
+      return replacement;
+    });
   },
 
   contestUpdated: function(data, contestAlias) {
@@ -148,7 +155,11 @@ let UI = {
   },
 
   apiError: function(response) {
-    UI.error(((response && response.error) || 'error').toString());
+    UI.error(
+      response.hasOwnProperty('payload')
+        ? UI.formatString(response.error, response.payload)
+        : ((response && response.error) || 'error').toString(),
+    );
   },
 
   ignoreError: function(response) {},
@@ -529,7 +540,13 @@ let UI = {
     document
       .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
       .forEach(function(item, index) {
-        let inputValue = item.querySelector('pre').innerHTML;
+        let preElement = item.querySelector('pre');
+        if (!preElement) {
+          // This can only happen if a user messed up with the markdown of a
+          // problem.
+          return;
+        }
+        let inputValue = preElement.innerHTML;
 
         let clipboardButton = document.createElement('button');
         clipboardButton.title = T.copySampleCaseTooltip;

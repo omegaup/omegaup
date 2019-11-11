@@ -101,8 +101,8 @@ class ContestCloneTest extends OmegaupTestCase {
         // Create new user
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]));
 
         // Clone the contest

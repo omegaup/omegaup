@@ -48,9 +48,9 @@ class RunsFactory {
     /**
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
      *
-     * @param type $problemData
-     * @param type $courseAssignmentData
-     * @param type $participant
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
+     * @param \OmegaUp\DAO\VO\Identities $participant
      * @return \OmegaUp\Request
      */
     private static function createRequestCourseAssignmentCommon(
@@ -64,18 +64,15 @@ class RunsFactory {
             $login = OmegaupTestCase::login($participant);
         }
         // Build request
-        if (!is_null($courseAssignmentData)) {
-            return new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
-                'problem_alias' => $problemData['problem']->alias,
-                'language' => 'c',
-                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-            ]);
+        if (is_null($courseAssignmentData['assignment'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
         }
 
         return new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
             'problem_alias' => $problemData['problem']->alias,
             'language' => 'c',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
@@ -85,10 +82,10 @@ class RunsFactory {
     /**
      * Creates a run
      *
-     * @param type $problemData
-     * @param type $courseAssignmentData
-     * @param $participant
-     * @return array
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
+     * @param \OmegaUp\DAO\VO\Identities $participant
+     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
     public static function createCourseAssignmentRun(
         $problemData,

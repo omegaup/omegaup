@@ -142,7 +142,7 @@ class ContestRequestsTest extends OmegaupTestCase {
             $rejectedContestantByMainAdminAndAcceptedByTheSecondOne,
             $rejectedContestantAndThenAcceptedByTheSameAdmin,
             $nonAcceptedNorRejectedContestant,
-        ] = $contestants;
+        ] = $identities;
 
         // admin lists registrations
         $adminLogin = self::login($mainAdmin);
@@ -180,7 +180,7 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         $this->assertParamsInRequest(
             $numberOfContestants,
-            $contestants,
+            $identities,
             $result,
             $mainAdmin,
             $arbitratedUsers,
@@ -210,7 +210,7 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         $this->assertParamsInRequest(
             $numberOfContestants,
-            $contestants,
+            $identities,
             $result,
             $mainAdmin,
             $arbitratedUsers,

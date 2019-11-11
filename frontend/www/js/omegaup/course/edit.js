@@ -432,7 +432,7 @@ OmegaUp.on('ready', function() {
               .fail(omegaup.UI.apiError);
           },
           tags: function(tags) {
-            omegaup.API.Problem.list({ tag: tags })
+            omegaup.API.Problem.list({ tag: tags.join() })
               .then(function(data) {
                 problemList.taggedProblems = data.results;
               })
