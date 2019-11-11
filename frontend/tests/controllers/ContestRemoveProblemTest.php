@@ -152,7 +152,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = OmegaupTestCase::login($identity);
 
@@ -315,7 +315,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 
@@ -351,13 +351,13 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = UserFactory::createUser();
+        ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $secondaryAdmin->username,
+            'usernameOrEmail' => $secondaryIdentityAdmin->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
@@ -401,7 +401,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 
@@ -427,7 +427,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 
@@ -457,7 +457,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 
@@ -487,7 +487,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 
@@ -512,7 +512,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         ContestsFactory::addUser($contestData, $identity);
 

@@ -1,11 +1,14 @@
 <?php
 
-class DbConfigTest extends OmegaUpTestCase {
+class DbConfigTest extends OmegaupTestCase {
     public function testTimeSync() {
-        $db_time = Utils::GetDbDatetime();
-        $php_time = date('Y-m-d H:i:s', \OmegaUp\Time::get());
+        /** @var string|null */
+        $dbTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT NOW();'
+        );
+        $phpTime = date('Y-m-d H:i:s', \OmegaUp\Time::get());
 
-        $this->assertEquals($php_time, $db_time);
+        $this->assertEquals($phpTime, $dbTime);
     }
 
     public function testPhpUtc() {

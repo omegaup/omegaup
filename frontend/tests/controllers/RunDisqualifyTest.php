@@ -17,7 +17,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a new run
         $runData = RunsFactory::createRun(
@@ -51,8 +51,8 @@ class RunDisqualifyTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        ['user' => $contestant1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $contestant1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create new runs
         $runData1 = RunsFactory::createRun(
@@ -86,7 +86,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
 
         // Contestant 2 should not be changed
         $this->assertEquals(
-            $contestant2->username,
+            $identity2->username,
             $response['ranking'][0]['username']
         );
         $this->assertEquals(
@@ -96,7 +96,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
         // Contestant 1 should be changed
         $this->assertEquals(
-            $contestant1->username,
+            $identity1->username,
             $response['ranking'][1]['username']
         );
         $this->assertEquals(

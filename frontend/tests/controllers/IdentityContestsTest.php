@@ -52,7 +52,7 @@ class IdentityContestsTest extends OmegaupTestCase {
         [$problemData] = ContestsFactory::insertProblemsInContest($contestData);
 
         // Identity creator group member will upload csv file
-        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
             $creatorIdentity,
@@ -63,7 +63,7 @@ class IdentityContestsTest extends OmegaupTestCase {
         );
 
         // Set default password for all created identities
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([

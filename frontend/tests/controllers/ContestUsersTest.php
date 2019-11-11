@@ -17,7 +17,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
             ContestsFactory::addUser($contestData, $identities[$i]);
@@ -26,7 +26,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Create a n+1 user who will just join to the contest without being
         // added via API. For public contests, by entering to the contest, the user should be in
         // the list of contest's users.
-        ['user' => $nonRegisteredUser, 'identity' => $nonRegisteredIdentity] = UserFactory::createUser();
+        ['user' => $nonRegisteredUser, 'identity' => $nonRegisteredIdentity] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::openContest($contestData, $nonRegisteredIdentity);
 
         // Log in with the admin of the contest
@@ -47,7 +47,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::openContest($contestData, $identity);
 
         $userLogin = self::login($identity);
@@ -66,7 +66,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $response['events'][0]['username']
         );
         $this->assertEquals(0, $response['events'][0]['ip']);
@@ -82,7 +82,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $identity = [];
         for ($i = 0; $i < 3; $i++) {
             // Create users
-            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to our private contest
             ContestsFactory::addUser($contestData, $identity[$i]);
@@ -195,7 +195,7 @@ class ContestUsersTest extends OmegaupTestCase {
         ]));
 
         // Create and login a user to view the contest
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         $r = new \OmegaUp\Request([

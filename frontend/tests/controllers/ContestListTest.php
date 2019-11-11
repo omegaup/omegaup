@@ -39,7 +39,7 @@ class ContestListTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Log as a random contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -94,7 +94,7 @@ class ContestListTest extends OmegaupTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $identity);
@@ -131,12 +131,12 @@ class ContestListTest extends OmegaupTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $identity);
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
@@ -157,7 +157,7 @@ class ContestListTest extends OmegaupTestCase {
             )
         );
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
@@ -195,7 +195,7 @@ class ContestListTest extends OmegaupTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         ContestsFactory::addAdminUser($contestData, $identity);
@@ -235,8 +235,8 @@ class ContestListTest extends OmegaupTestCase {
         );
         $title = $contestData['request']['title'];
 
-        ['user' => $admin1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $admin2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $admin1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity1);
         $r = new \OmegaUp\Request([
@@ -292,8 +292,8 @@ class ContestListTest extends OmegaupTestCase {
         $author = $contestData['director'];
         $title = $contestData['request']['title'];
 
-        ['user' => $admin1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $admin2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $admin1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         $group = GroupsFactory::createGroup($author);
@@ -336,10 +336,10 @@ class ContestListTest extends OmegaupTestCase {
         ));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Turn recommended ON
-        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -388,7 +388,7 @@ class ContestListTest extends OmegaupTestCase {
         $recommendedContest[1] = ContestsFactory::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get list of contests
         $login = self::login($contestantIdentity);
@@ -410,7 +410,7 @@ class ContestListTest extends OmegaupTestCase {
         // phpcbf does not like a block just for scoping purposes and
         // messes up the alignment pretty badly.
         if (true) {
-            ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
             $login = self::login($identity);
             for ($i = 0; $i < 2; $i++) {
                 \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
@@ -459,7 +459,7 @@ class ContestListTest extends OmegaupTestCase {
         ));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contests
         ContestsFactory::addUser($currentContestData, $identity);
@@ -497,7 +497,7 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to two private contest
         $numberOfPrivateContests = 2;
@@ -552,7 +552,7 @@ class ContestListTest extends OmegaupTestCase {
         ];
 
         // Log as a random contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $loginContestant = self::login($identity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([

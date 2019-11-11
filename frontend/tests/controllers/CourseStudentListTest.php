@@ -42,7 +42,7 @@ class CourseStudentListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse();
 
         // Call apiStudentList by another random user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
@@ -56,7 +56,7 @@ class CourseStudentListTest extends OmegaupTestCase {
      */
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,

@@ -47,7 +47,12 @@ class BadgesTest extends BadgesTestCase {
                     $req['gradeResult']
                 ) ? $req['gradeResult']['points'] : 1;
                 $verdict = $req['gradeResult']['verdict'];
-                Utils::gradeRun(null, $fullResponse['guid'], $points, $verdict);
+                \OmegaUp\Test\Utils::gradeRun(
+                    null,
+                    $fullResponse['guid'],
+                    $points,
+                    $verdict
+                );
             }
         }
     }
@@ -74,10 +79,10 @@ class BadgesTest extends BadgesTestCase {
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
                             case 'update_user_rank.py':
-                                Utils::RunUpdateUserRank();
+                                \OmegaUp\Test\Utils::runUpdateUserRank();
                                 break;
                             case 'aggregate_feedback.py':
-                                Utils::RunAggregateFeedback();
+                                \OmegaUp\Test\Utils::runAggregateFeedback();
                                 break;
                             default:
                                 throw new Exception(
@@ -111,7 +116,7 @@ class BadgesTest extends BadgesTestCase {
             $this->createFileUploaderMock()
         );
         $content = json_decode(file_get_contents($testPath), true);
-        Utils::CleanupFilesAndDb();
+        \OmegaUp\Test\Utils::cleanupFilesAndDB();
         switch ($content['testType']) {
             case 'apicall':
                 self::apicallTest(
@@ -218,8 +223,8 @@ class BadgesTest extends BadgesTestCase {
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
-        ['user' => $userOne, 'identity' => $identityOne] = UserFactory::createUser();
-        ['user' => $userTwo, 'identity' => $identityTwo] = UserFactory::createUser();
+        ['user' => $userOne, 'identity' => $identityOne] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
         ProblemsFactory::createProblemWithAuthor($identityOne);
         ProblemsFactory::createProblemWithAuthor($identityTwo);
         ContestsFactory::createContest(
@@ -229,7 +234,7 @@ class BadgesTest extends BadgesTestCase {
         );
         $expectedUserOneResults = ['problemSetter'];
         $expectedUserTwoResults = ['contestManager', 'problemSetter'];
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
         {
             $login = self::login($identityOne);
             // Fetch badges through apiMyList
@@ -251,7 +256,7 @@ class BadgesTest extends BadgesTestCase {
 
             // Fetch badges through apiUserList
             $userTwoBadges = \OmegaUp\Controllers\Badge::apiUserList(new \OmegaUp\Request([
-                'target_username' => $userTwo->username,
+                'target_username' => $identityTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
             $this->assertEquals(
@@ -295,11 +300,11 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testGetAssignationTime() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
         $login = self::login($identity);
         $problemSetterResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
@@ -327,13 +332,13 @@ class BadgesTest extends BadgesTestCase {
     public function testBadgeDetails() {
         // Creates one owner for ContestManager Badge and no owner for
         // ContestManager, then checks badge details results.
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // For some reason, this method creates a new user also.
         ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
         // In total they must exist 4 users: admintest, test,
         // the user created by createProblemWithAuthor and $user

@@ -24,7 +24,7 @@
 					<div class="form-group">
 						<label for="birth_date" class="col-md-4 control-label">{#userEditBirthDate#}</label>
 						<div class="col-md-7">
-							<input id='birth_date' name='birth_date' value='' type='text' size ='10' class="form-control">
+							<input id='birth_date' name='birth_date' value='' readonly type='text' size ='10' class="form-control">
 						</div>
 					</div>
 
@@ -121,7 +121,7 @@
 					<div class="form-group">
 						<label for="graduation_date" class="col-md-4 control-label">{#userEditGraduationDate#}</label>
 						<div class="col-md-7">
-							<input id='graduation_date' name='graduation_date' value='' type='text' size ='10' class="form-control">
+							<input id='graduation_date' name='graduation_date' readonly value='' type='text' size ='10' class="form-control">
 						</div>
 					</div>
 

@@ -53,7 +53,7 @@ class UserRegistrationTest extends OmegaupTestCase {
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $username = 'X' . \OmegaUp\Time::get();
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
@@ -99,7 +99,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z' . $username,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
@@ -108,6 +108,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername('Z' . $username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has different username but the same email

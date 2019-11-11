@@ -8,7 +8,7 @@
 
 class ProblemsForfeitedTest extends OmegaupTestCase {
     public function testGetCounts() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         for (
@@ -34,7 +34,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
     }
 
     public function testGetSolution() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problems = [];
         for (
@@ -70,13 +70,13 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $this->assertTrue(
             \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
-                \OmegaUp\DAO\Identities::findByUsername($user->username)
+                \OmegaUp\DAO\Identities::findByUsername($identity->username)
             )
         );
     }
 
     public function testGetSolutionForbiddenAccessException() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = ProblemsFactory::createProblem()['problem'];
         try {

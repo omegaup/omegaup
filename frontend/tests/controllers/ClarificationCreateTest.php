@@ -26,7 +26,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        ['user' => $userContestant, 'identity' => $contestant] = UserFactory::createUser();
+        ['user' => $userContestant, 'identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call the API avoiding the broadcaster logic
         if ($isGraderExpectedToBeCalled) {
@@ -134,7 +134,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
             ContestsFactory::addUser($contestData, $identities[$i]);

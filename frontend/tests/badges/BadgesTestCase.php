@@ -17,7 +17,7 @@ class BadgesTestCase extends OmegaupTestCase {
     public function setUp() {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
-        Utils::CleanupDb();
+        \OmegaUp\Test\Utils::CleanupDb();
     }
 
     public static function getSortedResults(string $query) {

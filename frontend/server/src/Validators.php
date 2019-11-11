@@ -325,6 +325,54 @@ class Validators {
 
     /**
      *
+     * @param mixed     $parameter
+     * @param string    $parameterName
+     * @param int|null $lowerBound
+     * @param int|null $upperBound
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateTimestampInRange(
+        $parameter,
+        string $parameterName,
+        ?int $lowerBound,
+        ?int $upperBound
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, true)) {
+            return;
+        }
+        if (!is_numeric($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotADate',
+                $parameterName
+            );
+        }
+        $parameter = intval($parameter);
+        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooSmall',
+                $parameterName
+            );
+            $exception->addCustomMessageToArray(
+                'payload',
+                ['lower_bound' => $lowerBound]
+            );
+            throw $exception;
+        }
+        if (!is_null($upperBound) && $parameter > $upperBound) {
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooLarge',
+                $parameterName
+            );
+            $exception->addCustomMessageToArray(
+                'payload',
+                ['upper_bound' => $upperBound]
+            );
+            throw $exception;
+        }
+    }
+
+    /**
+     *
      * @param mixed  $parameter
      * @param string $parameterName
      * @psalm-assert int $parameter

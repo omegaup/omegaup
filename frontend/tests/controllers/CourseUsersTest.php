@@ -11,9 +11,9 @@ class CourseUsersTest extends OmegaupTestCase {
         // Create a course with 5 assignments
         $courseData = CoursesFactory::createCourseWithAssignments(5);
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $user);
+        CoursesFactory::addStudentToCourse($courseData, $identity);
 
         $userLogin = self::login($identity);
 
@@ -34,7 +34,7 @@ class CourseUsersTest extends OmegaupTestCase {
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $response['events'][0]['username']
         );
         $this->assertEquals(0, $response['events'][0]['ip']);

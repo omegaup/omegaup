@@ -11,7 +11,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Create a user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to contest
         ContestsFactory::addUser($contestData, $identity);
@@ -30,7 +30,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]);
         \OmegaUp\Controllers\Contest::apiRemoveUser($r);
 

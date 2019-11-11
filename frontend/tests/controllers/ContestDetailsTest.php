@@ -105,12 +105,12 @@ class ContestDetailsTest extends OmegaupTestCase {
         $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Assert the log is empty.
         $this->assertEquals(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
-            $contestant->main_identity_id
+            $identity->identity_id
         )));
 
         // Prepare our request
@@ -131,7 +131,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Assert the log is not empty.
         $this->assertEquals(1, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
-            $contestant->main_identity_id
+            $identity->identity_id
         )));
     }
 
@@ -154,7 +154,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -190,7 +190,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $identity);
@@ -225,7 +225,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -248,7 +248,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -295,7 +295,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -345,7 +345,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         ContestsFactory::addUser($contestData, $identity);
@@ -393,15 +393,13 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Set contest to not started yet
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(
-            \OmegaUp\Time::get() + 30
-        );
+        $contest->start_time = \OmegaUp\Time::get() + 30;
         \OmegaUp\DAO\Contests::update($contest);
 
         // Prepare our request
@@ -427,7 +425,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         );
 
         // Create our user not added to the contest
-        ['user' => $externalUser, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $originalContestAccessLog = \OmegaUp\DAO\ProblemsetAccessLog::getAll();
 
@@ -526,7 +524,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         );
 
         // Create our user not added to the contest
-        ['user' => $externalUser, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call details using token
         $login = self::login($identity);
@@ -607,10 +605,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < 3; $i++) {
-            ['user' => $contestants[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = UserFactory::createUser();
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
 
         $detourGrader = new ScopedGraderDetour();
@@ -675,7 +673,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $response['problems'][0]['alias']
         );
 
-        foreach ($contestants as $contestant) {
+        foreach ($identities as $contestant) {
             $found = false;
             foreach ($response['ranking'] as $rank) {
                 if ($rank['username'] == $contestant->username) {
@@ -702,7 +700,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -773,7 +771,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
-            ['user' => $contestants[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         $detourGrader = new ScopedGraderDetour();

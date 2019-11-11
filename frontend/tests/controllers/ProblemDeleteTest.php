@@ -14,7 +14,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -29,7 +29,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -55,7 +55,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testAnonymousUserCannotSeeDeletedProblems() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -107,7 +107,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testLoggedUserCannotSeeDeletedProblems() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -179,7 +179,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testSysadminCanSeeDeletedProblemsOnlyInAdminList() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(
@@ -196,7 +196,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         );
 
         // Get admin user
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
 
