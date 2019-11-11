@@ -606,17 +606,6 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/Controllers/Problem.php">
-    <ArgumentTypeCoercion occurrences="9">
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-      <code>$problem</code>
-    </ArgumentTypeCoercion>
     <InvalidArgument occurrences="1">
       <code>$r</code>
     </InvalidArgument>
@@ -631,11 +620,8 @@
       <code>JSON_OBJECT_AS_ARRAY</code>
       <code>JSON_OBJECT_AS_ARRAY</code>
     </InvalidScalarArgument>
-    <MissingParamType occurrences="1">
-      <code>$is_update</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="17">
-      <code>validateCreateOrUpdate</code>
+    <MissingParamType occurrences="1"/>
+    <MissingReturnType occurrences="16">
       <code>apiCreate</code>
       <code>validateRejudge</code>
       <code>apiRejudge</code>
@@ -653,13 +639,11 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="49">
+    <MixedArgument occurrences="48">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
       <code>$r['problem_alias']</code>
-      <code>$tag-&gt;tagname</code>
-      <code>$tag-&gt;public</code>
       <code>$r['problem']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
@@ -667,7 +651,6 @@
       <code>$r['group']</code>
       <code>$run</code>
       <code>$problem</code>
-      <code>$problem-&gt;commit</code>
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$problem-&gt;alias</code>
       <code>$updatePublished</code>
@@ -731,15 +714,11 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="43">
-      <code>$r['selected_tags']</code>
-      <code>$tag</code>
-      <code>$tag</code>
+    <MixedAssignment occurrences="34">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
       <code>$updatePublished</code>
-      <code>$oldVersion</code>
       <code>$run</code>
       <code>$distribSettings</code>
       <code>$updatePublished</code>
@@ -761,7 +740,6 @@
       <code>$run</code>
       <code>$group</code>
       <code>$case</code>
-      <code>$casesStats['last_submission_id']</code>
       <code>$problems</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
@@ -779,7 +757,7 @@
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedMethodCall occurrences="2">
+    <MixedMethodCall occurrences="1">
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
@@ -794,14 +772,8 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="27">
-      <code>$r['problem']-&gt;visibility</code>
+    <MixedPropertyFetch occurrences="18">
       <code>$r['problem']-&gt;deprecated</code>
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$tag-&gt;tagname</code>
-      <code>$tag-&gt;tagname</code>
-      <code>$tag-&gt;public</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;current_version</code>
@@ -819,11 +791,10 @@
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;alias</code>
       <code>$r['problem']-&gt;problem_id</code>
-      <code>$run-&gt;verdict</code>
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="18">
+    <PossiblyNullArgument occurrences="15">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -1818,13 +1789,12 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="12">
+    <MissingReturnType occurrences="11">
       <code>searchByAlias</code>
       <code>getPracticeDeadline</code>
       <code>getProblemsSolved</code>
       <code>getProblemsUnsolvedByIdentity</code>
       <code>getAllProblemsAdminedByIdentity</code>
-      <code>getAllProblemsOwnedByUser</code>
       <code>getAllProblems</code>
       <code>isVisible</code>
       <code>deleteProblem</code>
