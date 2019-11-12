@@ -21,6 +21,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
+    const VALID_SORTING_MODES = ['asc', 'desc'];
+    const VALID_SORTING_COLUMNS = [
+        'title',
+        'quality',
+        'difficulty',
+        'submissions',
+        'accepted',
+        'ratio',
+        'points',
+        'score',
+        'creation_date'
+    ];
 
     // Do not update the published branch.
     const UPDATE_PUBLISHED_NONE = 'none';
@@ -52,7 +64,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 1000;
+    const PAGE_SIZE = 100;
 
     /**
      * Validates a Create or Update Problem API request
@@ -2652,21 +2664,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['mode'],
             'mode',
-            ['asc', 'desc'],
+            array_merge(
+                [''],
+                \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
+            ),
             false
         );
         \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
         \OmegaUp\Validators::validateInEnum(
             $r['order_by'],
             'order_by',
-            ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'creation_date'],
+            array_merge(
+                [''],
+                \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
+            ),
             false
         );
         \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             array_merge(
-                ['all'],
+                ['all', ''],
                 \OmegaUp\Controllers\Problem::VALID_LANGUAGES
             ),
             false
@@ -2744,7 +2762,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
-            /** @var null $r->identity */
         }
         [
             'offset' => $offset,
