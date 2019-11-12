@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class UpdateProblemTest extends OmegaupTestCase {
+class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -74,7 +74,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set file upload context
         $login = self::login($problemData['author']);
@@ -215,7 +215,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -419,7 +419,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'nostmt.zip';
@@ -895,7 +895,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Change the problem to something completely different.
         {
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
@@ -935,7 +935,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // rejudges, but current_version should go back to the original.
         {
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
@@ -1129,7 +1129,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             $login = self::login($problemData['author']);
             // Change the problem to something completely different.
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,

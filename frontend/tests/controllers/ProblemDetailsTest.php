@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ProblemDetailsTest extends OmegaupTestCase {
+class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *
      */

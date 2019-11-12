@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestUsersTest extends OmegaupTestCase {
+class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
     public function testContestUsersValid() {
         // Get a contest
         $contestData = ContestsFactory::createContest();

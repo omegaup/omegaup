@@ -4,7 +4,7 @@
  *
  * @author joemmanuel
  */
-class UserUpdateTest extends OmegaupTestCase {
+class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic update test
      */

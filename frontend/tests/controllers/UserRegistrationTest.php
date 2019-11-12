@@ -5,7 +5,7 @@
  *
  * @author alanboy@omegaup.com
  */
-class UserRegistrationTest extends OmegaupTestCase {
+class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *  Scenario:
      *      user A creates a new native account :

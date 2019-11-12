@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp\Test;
+
 /**
  * Replaces some logic of ApiCaller to make it phpunit-safe
  *

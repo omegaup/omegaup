@@ -189,7 +189,7 @@ class ContestsFactory {
         $contestDirector = $contestData['director'];
 
         // Log in the user and set the auth token in the new request
-        $login = OmegaupTestCase::login($contestDirector);
+        $login = \OmegaUp\Test\ControllerTestCase::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
@@ -221,7 +221,9 @@ class ContestsFactory {
         $r = new \OmegaUp\Request();
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Build request
@@ -247,7 +249,9 @@ class ContestsFactory {
         $contestData
     ): array {
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
         $r = new \OmegaUp\Request(
             [
@@ -278,7 +282,7 @@ class ContestsFactory {
         $r = new \OmegaUp\Request();
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
         $r['auth_token'] = $login->auth_token;
 
         // Prepare our request
@@ -306,7 +310,7 @@ class ContestsFactory {
         $r['problem_alias'] = strval($problemData['request']['problem_alias']);
 
         // Log in the user
-        $login = OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -328,7 +332,9 @@ class ContestsFactory {
         $r['usernameOrEmail'] = $identity->username;
 
         // Log in the contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -350,7 +356,9 @@ class ContestsFactory {
         $r['usernameOrEmail'] = $identitiy->username;
 
         // Log in the contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -372,7 +380,9 @@ class ContestsFactory {
         $r['usernameOrEmail'] = $user->username;
 
         // Log in the contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -395,7 +405,9 @@ class ContestsFactory {
         ]);
 
         // Log in the contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api

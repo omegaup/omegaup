@@ -6,7 +6,7 @@
  * @author juan.pablo
  */
 
-class IdentityUpdateTest extends OmegaupTestCase {
+class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for updating a single identity
      */

@@ -1,6 +1,6 @@
 <?php
 
-class ContestCloneTest extends OmegaupTestCase {
+class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create clone of a contest
      */

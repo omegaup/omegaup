@@ -6,7 +6,7 @@
  *
  * @author juan.pablo@omegaup.com
  */
-class ContestRequestsTest extends OmegaupTestCase {
+class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function preparePublicContestWithRegistration(): array {
         // create a contest and its admin
         ['user' => $user, 'identity' => $contestAdmin] = \OmegaUp\Test\Factories\User::createUser();

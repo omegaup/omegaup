@@ -1,6 +1,6 @@
 <?php
 
-class AssignmentProblemsTest extends OmegaupTestCase {
+class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddProblemToAssignment() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);

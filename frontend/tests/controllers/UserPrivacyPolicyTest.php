@@ -4,7 +4,7 @@
  *
  * @author juan.pablo
  */
-class UserPrivacyPolicyTest extends OmegaupTestCase {
+class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * User reviews Privacy Consent Log
      */

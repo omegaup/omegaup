@@ -1,5 +1,5 @@
 <?php
-class ResetUpdateTest extends OmegaupTestCase {
+class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testShouldRequireAllParameters() {
         try {
             $r = new \OmegaUp\Request();

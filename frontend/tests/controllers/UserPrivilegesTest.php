@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserPrivilegesTest extends OmegaupTestCase {
+class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Test for the functions add/remove roles
      */

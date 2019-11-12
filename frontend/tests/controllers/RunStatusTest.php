@@ -3,7 +3,7 @@
 /**
  * Description of DetailsRunTest
  */
-class RunStatusTest extends OmegaupTestCase {
+class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test of viewing run details
      */

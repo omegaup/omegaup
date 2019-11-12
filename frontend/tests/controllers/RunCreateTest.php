@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class RunCreateTest extends OmegaupTestCase {
+class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private $contestData;
     private $contestant;
     private $contestantIdentity;
@@ -197,7 +197,7 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testNewRunValid() {
         $r = $this->setValidRequest();
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -240,7 +240,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = $this->setValidRequest(new ContestParams([
             'admissionMode' => 'private'
         ]));
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -304,7 +304,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
         $r = $this->setValidRequest();
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set submissions gap of 20 seconds
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
@@ -329,7 +329,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = $this->setValidRequest();
 
         // Prepare the Grader mock, validate that grade is called 2 times
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Add a second problem to the contest
         $problemData2 = ProblemsFactory::createProblem();
@@ -378,7 +378,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testMissingParameters() {
         // Set the context for the first contest
         $original_r = $this->setValidRequest();
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         $needed_keys = [
             'problem_alias',
@@ -413,7 +413,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testNewRunInWindowLengthPublicContest() {
         // Set the context for the first contest, with 20 minutes of window length
         $r = $this->setValidRequest(new ContestParams(['windowLength' => 20]));
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -449,7 +449,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testRunWhenContestNotStartedForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -498,7 +498,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGapForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -550,7 +550,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
@@ -692,7 +692,7 @@ class RunCreateTest extends OmegaupTestCase {
             ]);
 
             // Call API
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
             // Validate the run

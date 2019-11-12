@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class BadgesTest extends BadgesTestCase {
+class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getSortedExpectedResults(array $expected): array {
         $results = [];
         foreach ($expected as $username) {

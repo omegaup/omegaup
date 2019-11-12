@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateClarificationTest extends OmegaupTestCase {
+class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      */

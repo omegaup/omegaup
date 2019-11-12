@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserIdentityAssociationTest extends OmegaupTestCase {
+class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
     private function assertUsernameInArray($username, array $identities) {
         foreach ($identities as $identity) {
             if ($identity['username'] == $username) {

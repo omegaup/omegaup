@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestDetailsTest extends OmegaupTestCase {
+class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Checks the contest details response
      *
@@ -611,7 +611,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
         ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Create runs
         $runsData = [];
@@ -774,7 +774,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Create runs
         $runsData = [];

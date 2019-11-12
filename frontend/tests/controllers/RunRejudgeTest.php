@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class RunRejudgeTest extends OmegaupTestCase {
+class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test of rerun
      */
@@ -33,7 +33,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         // Grade the run
         RunsFactory::gradeRun($runData);
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Build request
         $login = self::login($contestData['director']);

@@ -3,7 +3,7 @@
 /**
  * Tests getting runs of a problem.
  */
-class ProblemRunsTest extends OmegaupTestCase {
+class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them.
      */

@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateContestTest extends OmegaupTestCase {
+class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic Create Contest scenario
      *

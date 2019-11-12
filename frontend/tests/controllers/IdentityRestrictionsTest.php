@@ -3,7 +3,7 @@
 /**
  * Tests API's where unassociated identities does not have access.
  */
-class IdentityRestrictionsTest extends OmegaupTestCase {
+class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Restricted Conests APIs for unassociated identities.
      */
@@ -173,7 +173,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
@@ -228,7 +228,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
@@ -263,7 +263,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
@@ -290,7 +290,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([

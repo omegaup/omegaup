@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UserProblemsTest extends OmegaupTestCase {
+class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testEditableProblems() {
         ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

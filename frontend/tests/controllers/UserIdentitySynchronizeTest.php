@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserIdentitySynchronizeTest extends OmegaupTestCase {
+class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates an omegaup user happily :)
      */

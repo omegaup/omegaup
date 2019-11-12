@@ -11,7 +11,7 @@ class GroupsFactory {
         string $name = null,
         string $description = null,
         string $alias = null,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
             ['user' => $user, 'identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
@@ -30,7 +30,7 @@ class GroupsFactory {
         }
 
         if (is_null($login)) {
-            $login = OmegaupTestCase::login($owner);
+            $login = \OmegaUp\Test\ControllerTestCase::login($owner);
         }
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -63,10 +63,12 @@ class GroupsFactory {
     public static function addUserToGroup(
         array $groupData,
         \OmegaUp\DAO\VO\Identities $identity,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ): void {
         if (is_null($login)) {
-            $login = OmegaupTestCase::login($groupData['owner']);
+            $login = \OmegaUp\Test\ControllerTestCase::login(
+                $groupData['owner']
+            );
         }
         \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -99,7 +101,7 @@ class GroupsFactory {
             $alias = \OmegaUp\Test\Utils::createRandomString();
         }
 
-        $login = OmegaupTestCase::login($groupData['owner']);
+        $login = \OmegaUp\Test\ControllerTestCase::login($groupData['owner']);
         $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
@@ -135,7 +137,7 @@ class GroupsFactory {
         int $onlyAC = 0,
         int $weight = 1
     ): void {
-        $login = OmegaupTestCase::login($groupData['owner']);
+        $login = \OmegaUp\Test\ControllerTestCase::login($groupData['owner']);
         \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],

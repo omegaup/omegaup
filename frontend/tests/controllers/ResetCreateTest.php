@@ -1,5 +1,5 @@
 <?php
-class ResetCreateTest extends OmegaupTestCase {
+class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
