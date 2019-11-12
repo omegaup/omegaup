@@ -1386,6 +1386,13 @@ class User extends \OmegaUp\Controllers\Controller {
             $coderOfTheMonthUserId = $users[0]['user_id'];
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
+            // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
+            foreach ($codersOfTheMonth as $coder) {
+                if (isset($coder->selected_by)) {
+                    $coderOfTheMonthUserId = $coder->user_id;
+                    break;
+                }
+            }
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
@@ -1467,20 +1474,20 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         foreach ($users as $index => $user) {
-            if ($user['username'] != $r['username']) {
-                continue;
-            }
-
-            // Save it
-            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+            $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $user['user_id'],
                 'time' => $dateToSelect,
                 'rank' => $index + 1,
-                'selected_by' => $r->identity->identity_id,
-            ]));
-
-            return ['status' => 'ok'];
+            ]);
+            // All users calculated as CoderOfTheMonth are going to be saved on database,
+            // the one selected by the mentor is gonna have the field 'selected_by' filled.
+            if ($user['username'] === $r['username']) {
+                $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
+            }
+            \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
         }
+
+        return ['status' => 'ok'];
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
@@ -2511,7 +2518,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
         /** @var \OmegaUp\DAO\VO\Identities $r->identity */
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (
+            is_null($r->identity) ||
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
