@@ -210,6 +210,43 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Submission should have same school_id than the submitter
+     */
+    public function testSubmissionSchool() {
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $problemData = ProblemsFactory::createProblem();
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+        // school_id on Submission, must be null
+        $this->assertNull($submission->school_id);
+
+        // Add user's school
+        $login = self::login($identity);
+        $school = SchoolsFactory::createSchool();
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school['school']->school_id,
+        ]));
+        $identityUpdated = \OmegaUp\DAO\Identities::getByPK(
+            $identity->identity_id
+        );
+
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+
+        // school_id from identity should be equal to submission's school_id
+        $this->assertEquals(
+            $identityUpdated->school_id,
+            $submission->school_id
+        );
+    }
+
+    /**
      * Cannot submit run when contest ended
      */
     public function testRunWhenContestExpired() {
