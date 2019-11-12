@@ -5,7 +5,7 @@
  * @author joemmanuel
  */
 
-class SchoolRankTest extends OmegaupTestCase {
+class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *  Helper to create runs with users inside a school
      *

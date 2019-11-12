@@ -6,7 +6,7 @@
  * @author juan.pablo
  */
 
-class IdentityCreateTest extends OmegaupTestCase {
+class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for users from identity creator group
      */

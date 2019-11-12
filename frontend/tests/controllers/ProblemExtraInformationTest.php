@@ -6,7 +6,7 @@
  * @author juan.pablo
  */
 
-class ProblemExtraInformationTest extends OmegaupTestCase {
+class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test reviewers can do some problem-related tasks.
      */

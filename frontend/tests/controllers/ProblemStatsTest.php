@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ProblemStatsTest extends OmegaupTestCase {
+class ProblemStatsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check stats are ok for WA, AC, PA and total counts
      * Also validates the max wait time guid

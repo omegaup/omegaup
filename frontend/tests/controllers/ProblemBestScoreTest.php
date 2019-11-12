@@ -4,7 +4,7 @@
  * @author joemmanuel
  */
 
-class ProblemBestScoreTest extends OmegaupTestCase {
+class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test apiBestScore for submits in a problem for current user
      */

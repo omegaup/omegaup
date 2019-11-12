@@ -5,7 +5,7 @@
  * @author @joemmanuel
  */
 
-class CourseStudentListTest extends OmegaupTestCase {
+class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentList test
      */

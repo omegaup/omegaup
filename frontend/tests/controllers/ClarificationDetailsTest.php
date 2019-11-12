@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class DetailsClarificationTest extends OmegaupTestCase {
+class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Validates a clarification given the clarification ID
      *

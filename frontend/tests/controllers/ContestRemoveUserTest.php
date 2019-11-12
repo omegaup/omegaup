@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ContestRemoveUserTest extends OmegaupTestCase {
+class ContestRemoveUserTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRemoveUser() {
         // Get a contest
         $contestData = ContestsFactory::createContest();

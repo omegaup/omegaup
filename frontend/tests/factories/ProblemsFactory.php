@@ -134,7 +134,7 @@ class ProblemsFactory {
 
     public static function createProblemWithAuthor(
         \OmegaUp\DAO\VO\Identities $author,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         return self::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
@@ -147,7 +147,7 @@ class ProblemsFactory {
      */
     public static function createProblem(
         ?ProblemParams $params = null,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($params)) {
             $params = new ProblemParams();
@@ -163,7 +163,9 @@ class ProblemsFactory {
 
         if (is_null($login)) {
             // Login user
-            $login = OmegaupTestCase::login($problemAuthorIdentity);
+            $login = \OmegaUp\Test\ControllerTestCase::login(
+                $problemAuthorIdentity
+            );
         }
         $r['auth_token'] = $login->auth_token;
 
@@ -217,7 +219,9 @@ class ProblemsFactory {
         $r['usernameOrEmail'] = $identity->username;
 
         // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -240,7 +244,9 @@ class ProblemsFactory {
         ]);
 
         // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api
@@ -263,7 +269,9 @@ class ProblemsFactory {
         ]);
 
         // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api

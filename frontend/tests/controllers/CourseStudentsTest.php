@@ -3,7 +3,7 @@
 /**
  * Tests that students' progress can be tracked.
  */
-class CourseStudentsTest extends OmegaupTestCase {
+class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentProgress test.
      */
@@ -33,7 +33,9 @@ class CourseStudentsTest extends OmegaupTestCase {
         // Add one run to one of the problems.
         $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
         {
-            $studentLogin = OmegaupTestCase::login($students[0]);
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
             $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $courseData['assignment']->problemset_id,

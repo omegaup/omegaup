@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UpdateContestTest extends OmegaupTestCase {
+class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Only update the contest title. Rest should stay the same
      */

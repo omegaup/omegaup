@@ -5,7 +5,7 @@
  *
  * @author SpaceWhite
  */
-class RunDisqualifyTest extends OmegaupTestCase {
+class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDisqualifyByAdmin() {
         // Get a problem
         $problemData = ProblemsFactory::createProblem();

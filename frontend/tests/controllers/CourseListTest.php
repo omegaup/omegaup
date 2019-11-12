@@ -5,7 +5,7 @@
  * @author pablo
  */
 
-class CourseListTest extends OmegaupTestCase {
+class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp() {
         parent::setUp();
         $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(

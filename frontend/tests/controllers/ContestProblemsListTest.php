@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestProblemsListTest extends OmegaupTestCase {
+class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Sets the context for a basic scoreboard test
      * @param  integer $numUsers

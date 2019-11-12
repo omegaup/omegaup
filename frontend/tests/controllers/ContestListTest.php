@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestListTest extends OmegaupTestCase {
+class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check request and response durations match.
      *

@@ -6,14 +6,14 @@ class CoursesFactory {
      */
     public static function createCourse(
         \OmegaUp\DAO\VO\Identities $admin = null,
-        ScopedLoginToken $adminLogin = null,
+        \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
-            $adminLogin = OmegaupTestCase::login($admin);
+            $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         }
         if ($public != false) {
             $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
@@ -62,7 +62,7 @@ class CoursesFactory {
      */
     public static function createCourseWithOneAssignment(
         \OmegaUp\DAO\VO\Identities $admin = null,
-        ScopedLoginToken $adminLogin = null,
+        \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
         bool $public = false,
         ?string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
@@ -70,7 +70,7 @@ class CoursesFactory {
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
-            $adminLogin = OmegaupTestCase::login($admin);
+            $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         }
 
         // Create the course
@@ -148,7 +148,7 @@ class CoursesFactory {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
         $admin = $courseFactoryResult['admin'];
-        $adminLogin = OmegaupTestCase::login($admin);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         $assignmentAlias = [];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
@@ -184,7 +184,7 @@ class CoursesFactory {
     public static function addStudentToCourse(
         $courseData,
         $student = null,
-        ?ScopedLoginToken $login = null
+        ?\OmegaUp\Test\ScopedLoginToken $login = null
     ): \OmegaUp\DAO\VO\Identities {
         if (is_null($student)) {
             ['user' => $user, 'identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
@@ -201,7 +201,9 @@ class CoursesFactory {
             );
         }
         if (is_null($login)) {
-            $login = OmegaupTestCase::login($courseData['admin']);
+            $login = \OmegaUp\Test\ControllerTestCase::login(
+                $courseData['admin']
+            );
         }
         \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -213,7 +215,7 @@ class CoursesFactory {
     }
 
     public static function addProblemsToAssignment(
-        ScopedLoginToken $login,
+        \OmegaUp\Test\ScopedLoginToken $login,
         $courseAlias,
         $assignmentAlias,
         $problems
@@ -253,7 +255,7 @@ class CoursesFactory {
             }
             $studentUsername = $student->username;
             $expectedScores[$studentUsername] = [];
-            $studentLogin = OmegaupTestCase::login($student);
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login($student);
 
             // Loop through all problems inside assignments created
             $p = 0;
@@ -327,7 +329,7 @@ class CoursesFactory {
         \OmegaUp\DAO\VO\Identities $user
     ): void {
         // Log in as course adminy
-        $login = OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
         // Call api
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -344,7 +346,7 @@ class CoursesFactory {
         \OmegaUp\DAO\VO\Identities $user
     ): void {
         // Log in as course adminy
-        $login = OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
         // Call api
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -364,7 +366,7 @@ class CoursesFactory {
         \OmegaUp\DAO\VO\Identities $user
     ): void {
         // Log in the user
-        $login = OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
         // Call api
         \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([

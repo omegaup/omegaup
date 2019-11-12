@@ -1,6 +1,6 @@
 <?php
 
-class ExperimentsTest extends OmegaupTestCase {
+class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
     const TEST = 'experiment_test';
 
     private static $kKnownExperiments = [

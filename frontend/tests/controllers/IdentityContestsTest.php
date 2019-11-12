@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class IdentityContestsTest extends OmegaupTestCase {
+class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function createRunWithIdentity(
         array $contestData,
         array $problemData,
@@ -26,7 +26,7 @@ class IdentityContestsTest extends OmegaupTestCase {
             $contestant
         );
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Create valid run
         $contestantLogin = self::login($contestant);

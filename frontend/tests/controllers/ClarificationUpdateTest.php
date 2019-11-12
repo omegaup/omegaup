@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class UpdateClarificationTest extends OmegaupTestCase {
+class UpdateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for answer
      *

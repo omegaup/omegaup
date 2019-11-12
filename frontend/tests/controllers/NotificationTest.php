@@ -6,7 +6,7 @@
  * @author carlosabcs
  */
 
-class NotificationTest extends OmegaupTestCase {
+class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testListUnreadNotifications() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([

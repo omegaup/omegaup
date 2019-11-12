@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestScoreboardTest extends OmegaupTestCase {
+class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Sets the context for a basic scoreboard test
      * @param  int     $nUsers
@@ -812,7 +812,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $isAdmin = false,
         $testApi = 'apiScoreboard'
     ) {
-        $scoreboardTestRun = new ScopedScoreboardTestRun();
+        $scoreboardTestRun = new \OmegaUp\Test\ScopedScoreboardTestRun();
 
         $runMap = [
             [

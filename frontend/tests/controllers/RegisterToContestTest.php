@@ -5,7 +5,7 @@
  *
  * @author alanboy@omegaup.com
  */
-class RegisterToContestTest extends OmegaupTestCase {
+class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
     // Intro is the page that you see just before joining a contest
     // listing all the contest details.
     public function testIntro() {

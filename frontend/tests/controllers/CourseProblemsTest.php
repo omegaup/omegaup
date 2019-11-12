@@ -1,6 +1,6 @@
 <?php
 
-class CourseProblemsTest extends OmegaupTestCase {
+class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testOrderProblems() {
         // Create a test course
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

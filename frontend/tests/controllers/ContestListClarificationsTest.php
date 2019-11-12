@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ListClarificationsContest extends OmegaupTestCase {
+class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for getting the list of clarifications of a contest.
      * Create 4 clarifications in a contest with one user, then another 3 clarifications

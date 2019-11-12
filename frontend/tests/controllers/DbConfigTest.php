@@ -1,6 +1,6 @@
 <?php
 
-class DbConfigTest extends OmegaupTestCase {
+class DbConfigTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeSync() {
         /** @var string|null */
         $dbTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
