@@ -22,39 +22,44 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @return \OmegaUp\Request
      */
     private function setValidRequest(
-        ?ContestParams $contestParams = null
+        ?\OmegaUp\Test\Factories\ContestParams $contestParams = null
     ): \OmegaUp\Request {
         if (is_null($contestParams)) {
-            $contestParams = new ContestParams();
+            $contestParams = new \OmegaUp\Test\Factories\ContestParams();
         }
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $this->contestData = ContestsFactory::createContest($contestParams);
+        $this->contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            $contestParams
+        );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $this->contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $this->contestData
+        );
 
         // Create our contestant
         ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // If the contest is private, add the user
         if ($contestParams->admissionMode === 'private') {
-            ContestsFactory::addUser(
+            \OmegaUp\Test\Factories\Contest::addUser(
                 $this->contestData,
                 $this->contestantIdentity
             );
         }
 
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest(
+        \OmegaUp\Test\Factories\Contest::openContest(
             $this->contestData,
             $this->contestantIdentity
         );
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $this->contestData,
             $problemData,
             $this->contestantIdentity
@@ -251,7 +256,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunWhenContestExpired() {
         $startTime = \OmegaUp\Time::get() - 60 * 60;
-        $r = $this->setValidRequest(new ContestParams([
+        $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'startTime' => $startTime,
             'finishTime' => $startTime + 2 * 60 * 60
         ]));
@@ -274,7 +279,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Test a valid submission to a private contest
      */
     public function testRunToValidPrivateContest() {
-        $r = $this->setValidRequest(new ContestParams([
+        $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'admissionMode' => 'private'
         ]));
         $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
@@ -293,7 +298,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunPrivateContestWithUserNotRegistred() {
-        $r = $this->setValidRequest(new ContestParams([
+        $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'admissionMode' => 'private'
         ]));
 
@@ -313,7 +318,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunWhenContestNotStarted() {
         $startTime = \OmegaUp\Time::get();
-        $r = $this->setValidRequest(new ContestParams([
+        $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'startTime' => $startTime,
             'finishTime' => $startTime + 2 * 60 * 60
         ]));
@@ -370,7 +375,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add a second problem to the contest
         $problemData2 = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData2, $this->contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $this->contestData
+        );
 
         // Set submissions gap of 20 seconds
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
@@ -449,7 +457,11 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testNewRunInWindowLengthPublicContest() {
         // Set the context for the first contest, with 20 minutes of window length
-        $r = $this->setValidRequest(new ContestParams(['windowLength' => 20]));
+        $r = $this->setValidRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['windowLength' => 20]
+            )
+        );
         $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
@@ -463,7 +475,11 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testNewRunOutWindowLengthPublicContest() {
         // Set the context for the first contest, with 20 minutes of window length
-        $r = $this->setValidRequest(new ContestParams(['windowLength' => 20]));
+        $r = $this->setValidRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['windowLength' => 20]
+            )
+        );
 
         // Alter time for testing such that contestant started
         // 21 minutes ago, this is, window length has expired by 1 minute
@@ -510,7 +526,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunWhenContestEndedForContestDirector() {
         $startTime = \OmegaUp\Time::get() - 60 * 60;
-        $r = $this->setValidRequest(new ContestParams([
+        $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'startTime' => $startTime,
             'finishTime' => $startTime + 2 * 60 * 60
         ]));
@@ -568,10 +584,13 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -631,23 +650,26 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['languages' => ['cpp']]
             )
         );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $identity
@@ -674,7 +696,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunToPrivateProblemWhileInsideAPublicContest() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create public problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -683,7 +705,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();

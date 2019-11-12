@@ -227,8 +227,8 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
         ProblemsFactory::createProblemWithAuthor($identityOne);
         ProblemsFactory::createProblemWithAuthor($identityTwo);
-        ContestsFactory::createContest(
-            new ContestParams(
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['contestDirector' => $identityTwo]
             )
         );

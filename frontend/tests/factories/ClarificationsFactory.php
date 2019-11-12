@@ -24,10 +24,10 @@ class ClarificationsFactory {
         $receiver = null
     ) {
         // Our contestant has to open the contest before sending a clarification
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant

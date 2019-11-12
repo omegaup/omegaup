@@ -45,7 +45,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Build request
         $directorLogin = self::login($contestData['director']);
@@ -76,7 +76,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         // Build request
         $directorLogin = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
@@ -101,7 +101,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create an empty request
         $directorLogin = self::login($contestData['director']);
@@ -127,7 +127,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Log in as another random user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -150,7 +150,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      * Add too many problems to a contest.
      */
     public function testAddTooManyProblemsToContest() {
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $login = self::login($contestData['director']);
 
         for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST; $i++) {
@@ -197,7 +197,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempt to add banned problems to a contest.
      */
     public function testAddBannedProblemToContest() {
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $contestData['director']

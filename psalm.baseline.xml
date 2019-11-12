@@ -2201,41 +2201,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/tests/factories/ContestsFactory.php">
-    <InvalidParamDefault occurrences="1">
-      <code>type</code>
-    </InvalidParamDefault>
-    <MissingReturnType occurrences="1">
-      <code>openProblemInContest</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="2">
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="4">
-      <code>$r['contest_alias']</code>
-      <code>$r['problem_alias']</code>
-      <code>$r['contest_alias']</code>
-      <code>$r['contest_alias']</code>
-      <code>$r['contest_alias']</code>
-    </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
-    <PossiblyNullArgument occurrences="2">
-      <code>$contest</code>
-      <code>$contest</code>
-    </PossiblyNullArgument>
-    <PossiblyNullPropertyAssignment occurrences="3">
-      <code>$contest</code>
-      <code>$contest</code>
-      <code>$contest</code>
-    </PossiblyNullPropertyAssignment>
-    <UndefinedDocblockClass occurrences="2">
-      <code>type</code>
-      <code>type</code>
-    </UndefinedDocblockClass>
-  </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
     <MissingParamType occurrences="7">
       <code>$public</code>

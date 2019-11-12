@@ -20,10 +20,13 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
         ['user' => $userContestant, 'identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
@@ -137,7 +140,10 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
-            ContestsFactory::addUser($contestData, $identities[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
 
         $messageToEveryone = ClarificationsFactory::createClarification(

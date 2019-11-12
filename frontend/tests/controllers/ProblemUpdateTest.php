@@ -43,10 +43,13 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -1080,18 +1083,24 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             RunsFactory::gradeRun($pastStandaloneRunData);
 
             // Create a contest in the past with one run.
-            $pastContestData = ContestsFactory::createContest(new ContestParams([
+            $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime - 5 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $pastContestData
             );
-            ContestsFactory::addUser($pastContestData, $identity);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $pastContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser($pastContestData, $contestAdmin);
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
+                    $pastContestData,
+                    $contestAdmin
+                );
             }
             $pastRunData = RunsFactory::createRun(
                 $problemData,
@@ -1101,18 +1110,21 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             RunsFactory::gradeRun($pastRunData);
 
             // Now create one in the present with one more run.
-            $presentContestData = ContestsFactory::createContest(new ContestParams([
+            $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime + 60 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $presentContestData
             );
-            ContestsFactory::addUser($presentContestData, $identity);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $presentContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser(
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
                     $presentContestData,
                     $contestAdmin
                 );

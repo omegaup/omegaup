@@ -22,11 +22,17 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         bool $runForDirector = true
     ) {
         $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problems to the contest
-        ContestsFactory::addProblemToContest($problemData[0], $contestData);
-        ContestsFactory::addProblemToContest($problemData[1], $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData[0],
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData[1],
+            $contestData
+        );
 
         // Create our contestants
         $contestants = [];
@@ -36,7 +42,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $contestDirector = $contestData['director'];
         ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $contestIdentityAdmin
+        );
 
         foreach ($runMap as $runDescription) {
             $runData = RunsFactory::createRun(
@@ -228,15 +237,21 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData2 = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['penaltyCalcPolicy' => 'max']
             )
         );
 
         // Add the problems to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $contestData
+        );
 
         // Create our contestants
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -287,13 +302,19 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Set 0% of scoreboard show
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -350,13 +371,19 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Set 0% of scoreboard show
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -413,12 +440,18 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get contests
-        $contestData = ContestsFactory::createContest();
-        $contestData2 = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData2 = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        ContestsFactory::addProblemToContest($problemData, $contestData2);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData2
+        );
 
         // Create our contestants
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -469,16 +502,22 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreboardUrl() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         );
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Create problem
         $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our user not added to the contest
         ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -486,7 +525,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Create our contestant, will submit 1 run
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
@@ -558,7 +597,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Call scoreboard api from the user
         $login = self::login($externalIdentity);
@@ -577,21 +616,27 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreboardUrlNoLogin() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         );
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Create problem
         $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant, will submit 1 run
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
