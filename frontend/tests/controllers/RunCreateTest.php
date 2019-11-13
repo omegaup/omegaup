@@ -86,7 +86,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create course and add user as a student
-        $this->courseData = CoursesFactory::createCourseWithOneAssignment(
+        $this->courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             null,
             null,
             false,
@@ -97,7 +97,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Student user
         ['user' => $this->student, 'identity' => $this->studentIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        CoursesFactory::addStudentToCourse(
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $this->courseData,
             $this->studentIdentity
         );

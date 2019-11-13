@@ -10,7 +10,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic apiAddStudent test
      */
     public function testAddStudentToCourse() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
@@ -40,7 +40,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * apiAddStudent test with a duplicate student.
      */
     public function testAddDuplicateStudentToCourse() {
-        $courseData = CoursesFactory::createCourse(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
             true,
@@ -125,7 +125,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic apiRemoveStudent test
      */
     public function testRemoveStudentFromCourse() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
@@ -163,7 +163,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddStudentNonAdmin() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $nonAdminUser, 'identity' => $nonAdminIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -182,7 +182,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testSelfAddStudentNoPublic() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
@@ -197,7 +197,11 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * Can self-register if course is Public
      */
     public function testSelfAddStudentPublic() {
-        $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            true /*public*/
+        );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
@@ -225,8 +229,12 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * Test showIntro with public and private contests
      */
     public function testShouldShowIntro() {
-        $courseDataPrivate = CoursesFactory::createCourse();
-        $courseDataPublic = CoursesFactory::createCourse(null, null, true);
+        $courseDataPrivate = \OmegaUp\Test\Factories\Course::createCourse();
+        $courseDataPublic = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            true
+        );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Before or after adding student to private course, intro should not show
@@ -285,7 +293,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
      * User accepts teacher
      */
     public function testUserAcceptsTeacher() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Admin adds user into the course

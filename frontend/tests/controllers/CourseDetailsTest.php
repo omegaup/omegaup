@@ -7,7 +7,7 @@
 
 class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
@@ -64,7 +64,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetCourseDetailsAsStudentValid() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
@@ -80,7 +80,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_type' => 'homework',
         ]));
 
-        $user = CoursesFactory::addStudentToCourse($courseData);
+        $user = \OmegaUp\Test\Factories\Course::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
         // Call the details API
@@ -114,7 +114,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMember() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
@@ -129,7 +129,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
-        $courseData = CoursesFactory::createCourse(null, null, true);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            true
+        );
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
@@ -140,7 +144,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
-        $courseData = CoursesFactory::createCourse(null, null, true);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            true
+        );
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
@@ -155,8 +163,8 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetCourseDetailsCourseMember() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
-        $user = CoursesFactory::addStudentToCourse($courseData);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $user = \OmegaUp\Test\Factories\Course::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -169,7 +177,7 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetAssignmentAsStudent() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that hasn't started yet.
         $adminLogin = self::login($courseData['admin']);
@@ -200,7 +208,10 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             // OK!
         }
 
-        CoursesFactory::addStudentToCourse($courseData, $identity);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identity
+        );
 
         // Call the details API for the assignment that's already started.
         $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([

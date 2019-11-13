@@ -165,7 +165,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testListCourseAssignments() {
         // Create 1 course with 1 assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
@@ -176,7 +176,9 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($response['assignments']));
 
         // Create another course with 5 assignment and list them
-        $courseData = CoursesFactory::createCourseWithAssignments(5);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            5
+        );
 
         $adminLogin = self::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
@@ -194,7 +196,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
 
         // Create the course number 1
-        $courseFactoryResult = CoursesFactory::createCourse(
+        $courseFactoryResult = \OmegaUp\Test\Factories\Course::createCourse(
             $identity,
             $adminLogin
         );
@@ -213,7 +215,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create the course number 2
-        $courseFactoryResult = CoursesFactory::createCourse(
+        $courseFactoryResult = \OmegaUp\Test\Factories\Course::createCourse(
             $identity,
             $adminLogin
         );
@@ -239,7 +241,10 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCreateAssignmentWithInvertedTimes() {
         ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
-        $courseData = CoursesFactory::createCourse($identity, $adminLogin);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $identity,
+            $adminLogin
+        );
 
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -318,11 +323,11 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         // Creating a course with one assignment and turning on show_scoreboard flag
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $adminLogin,
             false,
-            null,
+            'no',
             'true'
         );
         $group = \OmegaUp\DAO\Groups::getByPK(

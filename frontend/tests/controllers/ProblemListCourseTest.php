@@ -9,13 +9,13 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $num_users = 3;
         $num_problems = 3;
         // Create course
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
             $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
@@ -26,7 +26,10 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
             ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identity[$i]
+            );
         }
         // Create runs to problems directly
         $runs = [];
@@ -148,13 +151,13 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $num_users = 3;
         $num_problems = 3;
         // Create course
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
             $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
@@ -165,7 +168,10 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
             ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identity[$i]
+            );
         }
         // Create runs to problems directly
         $runs = [];
