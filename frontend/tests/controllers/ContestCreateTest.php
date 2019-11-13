@@ -159,7 +159,7 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create a valid contest Request object
         $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
@@ -187,7 +187,7 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicContestWithPrivateProblems() {
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
 
@@ -217,7 +217,7 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateContestWithWindowLength() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $originalTime = \OmegaUp\Time::get();
 

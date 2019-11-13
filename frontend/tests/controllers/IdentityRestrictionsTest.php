@@ -278,7 +278,10 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // try to create a problem
-            $problemData = ProblemsFactory::createProblem(null, $login);
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                null,
+                $login
+            );
             $this->fail("{$identityStatus} identity can not create problems");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());

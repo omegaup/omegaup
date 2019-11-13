@@ -7,7 +7,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testFullRankByProblemSolved() {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -46,7 +46,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         // Create one problem and a submission by the private user
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runDataPrivate = RunsFactory::createRunToProblem(
             $problemData,
             $identityPrivate
@@ -78,7 +78,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testFullRankByProblemSolvedNoPrivateProblems() {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -87,7 +87,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a user and sumbit a run with him
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
         $runDataPrivate = RunsFactory::createRunToProblem(
@@ -127,7 +127,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserRankByProblemsSolved() {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -174,7 +174,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $school = SchoolsFactory::createSchool();
         // Create a user with no country, state and school
         ['user' => $contestantWithNoCountry, 'identity' => $identityWithNoCountry] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runDataContestantWithNoCountry = RunsFactory::createRunToProblem(
             $problemData,
             $identityWithNoCountry
@@ -227,8 +227,8 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserRankWithStateCollision() {
         // Create two problems
-        $problemData[] = ProblemsFactory::createProblem();
-        $problemData[] = ProblemsFactory::createProblem();
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create two users from Maranhao, Brasil
         [
@@ -326,7 +326,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserRankingClassName() {
         // Create a user and sumbit a run with them
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
@@ -348,11 +348,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $firstPlaceUser, 'identity' => $firstPlaceIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($firstPlaceIdentity);
         $problems = [];
-        $extraProblem = ProblemsFactory::createProblem();
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problems[] = ProblemsFactory::createProblem();
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = RunsFactory::createRunToProblem(
                 $problems[$i],
                 $firstPlaceUser,

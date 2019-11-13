@@ -89,7 +89,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -196,7 +196,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
     private function createRunInContest($contestData) {
         // STEP 1: Create a problem and add it to the contest
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -321,7 +321,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
             'lastUpdated' => $originalTime,
             'finishTime' => $originalTime + 60 * 60,
         ]));
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -435,7 +435,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateWindowLength() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -621,7 +621,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateWindowLengthAtTheEndOfAContest() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $originalTime = \OmegaUp\Time::get();
 
@@ -680,7 +680,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateFinishTimeInAContestWithWindowLength() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $originalTime = \OmegaUp\Time::get();
 
@@ -745,7 +745,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testExtendTimeAtTheEndOfTheContest() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $originalTime = \OmegaUp\Time::get();
 
@@ -809,7 +809,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUpdateDisableWindowLength() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $originalTime = \OmegaUp\Time::get();
 

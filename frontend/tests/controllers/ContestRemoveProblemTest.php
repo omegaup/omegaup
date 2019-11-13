@@ -67,7 +67,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -95,7 +95,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -129,7 +129,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -163,7 +163,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -214,8 +214,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData1,
@@ -251,8 +251,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData1,
@@ -288,7 +288,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -314,8 +314,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData1,
@@ -352,7 +352,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -390,7 +390,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -446,7 +446,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -475,7 +475,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -508,7 +508,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -541,7 +541,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -569,7 +569,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 ['admissionMode' => 'private']
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData

@@ -171,7 +171,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
         \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contests[0]
@@ -214,7 +214,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
         \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contests[0]
@@ -250,8 +250,8 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         $contest = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $problemOne = ProblemsFactory::createProblem();
-        $problemTwo = ProblemsFactory::createProblem();
+        $problemOne = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemTwo = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemOne,
@@ -309,7 +309,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testStats() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($identity);
         {

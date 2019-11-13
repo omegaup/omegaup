@@ -2,8 +2,6 @@
 
 namespace OmegaUp\Test\Factories;
 
-use ProblemsFactory;
-
 class ContestParams {
     /**
      * @readonly
@@ -163,7 +161,7 @@ class Contest {
         /** @var list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}> */
         $problems = [];
         for ($i = 0; $i < $numOfProblems; $i++) {
-            $problem = ProblemsFactory::createProblem();
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problem,
                 $contestData

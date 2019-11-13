@@ -360,7 +360,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Create a problem to solve
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $contestsData[$i]
@@ -452,7 +452,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Create a problem to solve
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $contestsData[$i]

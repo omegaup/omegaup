@@ -15,7 +15,7 @@ class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testListPublicClarificationsForContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

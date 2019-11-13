@@ -10,7 +10,7 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testBestScoreInProblem() {
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -36,7 +36,7 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testBestScoreInsideContest() {
         // Create problem and contest
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -75,7 +75,7 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testBestScoreInProblemOtherUser() {
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();

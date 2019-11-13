@@ -2255,18 +2255,6 @@
       <code>$associatedIdentity</code>
     </PossiblyNullPropertyAssignment>
   </file>
-  <file src="frontend/tests/factories/ProblemsFactory.php">
-    <MissingReturnType occurrences="2">
-      <code>createProblemWithAuthor</code>
-      <code>addGroupAdmin</code>
-    </MissingReturnType>
-    <MixedArrayAssignment occurrences="1">
-      <code>$_FILES['problem_contents']['tmp_name']</code>
-    </MixedArrayAssignment>
-    <MixedAssignment occurrences="1">
-      <code>$r['problem_alias']</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/tests/factories/QualityNominationFactory.php">
     <MissingPropertyType occurrences="1">
       <code>$reviewers</code>

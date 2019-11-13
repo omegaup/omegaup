@@ -12,7 +12,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGetRunsForContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -81,7 +81,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testEditProblemsetPointsDuringAContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

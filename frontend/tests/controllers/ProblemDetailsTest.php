@@ -18,7 +18,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $authorUser, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $authorIdentity
         ]));
@@ -101,7 +101,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -143,7 +143,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testProblemDetailsNotInContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1
         ]));
 
@@ -178,7 +178,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
 
@@ -200,7 +200,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
 
@@ -215,7 +215,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreInDetailsOutsideContest() {
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -241,7 +241,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreInDetailsInsideContest() {
         // Create problem and contest
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -283,7 +283,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -328,7 +328,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testShowSolvers() {
         // Create problem and contest
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -375,7 +375,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      * Solutions that don't exist don't cause an exception.
      */
     public function testShowSolutionInexistent() {
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
         ]));
         $login = self::login($problemData['author']);
@@ -392,7 +392,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      * Solutions can be viewed by a problem admin.
      */
     public function testShowSolutionByAdmin() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         {
             $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -410,7 +410,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      * Solutions can be viewed by a user that has solved the problem.
      */
     public function testShowSolutionBySolver() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -446,7 +446,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAuthorizationController() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $runData = RunsFactory::createRunToProblem($problemData, $identity);

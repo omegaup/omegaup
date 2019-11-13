@@ -17,7 +17,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
         $isGraderExpectedToBeCalled = true
     ) {
          // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

@@ -42,7 +42,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestPositive() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -73,7 +73,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestInvalidProblem() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -98,7 +98,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestInvalidContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -124,7 +124,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestWithUnauthorizedUser() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -154,7 +154,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestData['director']);
 
         for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST; $i++) {
-            $problemData = ProblemsFactory::createProblemWithAuthor(
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
                 $contestData['director'],
                 $login
             );
@@ -172,7 +172,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Try to insert one more problem than is allowed, and it should fail this time.
-        $problemData = ProblemsFactory::createProblemWithAuthor(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
             $contestData['director'],
             $login
         );
@@ -198,7 +198,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddBannedProblemToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $contestData['director']
         ]));

@@ -13,7 +13,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
         CoursesFactory::addProblemsToAssignment(
             $adminLogin,
@@ -134,7 +134,7 @@ class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
         CoursesFactory::addProblemsToAssignment(
             $adminLogin,

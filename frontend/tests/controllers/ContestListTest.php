@@ -536,7 +536,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testLatestUpdatedPublicContests() {
         // Create a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create three PUBLIC contests
         $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
