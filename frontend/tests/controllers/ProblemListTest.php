@@ -1050,4 +1050,55 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             }
         }
     }
+
+    /**
+     * Test problem list from url, getting all the parameters
+     */
+    public function testProblemListPagerFromUrl() {
+        // Create a user and some problems with submissions for the tests.
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $request = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]);
+        // Call apiList to define the number of problems and pages
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList($request);
+        $total = $apiListResponse['total'];
+        $pages = intval(($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+
+        // Fetching every page to get all the problems, starting on page 1
+        $request['page'] = 1;
+        $problems = [];
+        for ($i = 1; $i <= $pages; $i++) {
+            $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+                $request
+            );
+            $nextPage = end($response['pager_items']);
+            $nextPageURL = $nextPage['url'];
+            $nextPageURLQuery = parse_url($nextPageURL);
+            // Getting all the parameters gotten by the url, even if some of them is empty
+            if (isset($nextPageURLQuery['query'])) {
+                parse_str($nextPageURLQuery['query'], $params);
+                foreach ($params as $param => $value) {
+                    $request[$param] = $value;
+                }
+            }
+
+            foreach ($response['problems'] as $problem) {
+                $problems[] = $problem['alias'];
+            }
+        }
+        // Asserting the number of non-repeated problems isthe same than the total
+        $this->assertEquals(
+            count(
+                array_unique(
+                    $problems
+                )
+            ),
+            count(
+                $apiListResponse['results']
+            )
+        );
+    }
 }
