@@ -294,7 +294,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         if ($originalSchool !== $identity->school_id) {
             \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
-                $identity
+                $identity,
+                null /* graduation_date */
             );
         }
 

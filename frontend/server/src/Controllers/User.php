@@ -1893,6 +1893,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity->country_id = $state->country_id;
         }
 
+        // Save previous values
+        $currentIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $r->identity
+        );
+        $currentGraduationDate = null;
+        $currentSchool = null;
+        if (!is_null($currentIdentitySchool)) {
+            $currentSchool = $currentIdentitySchool->school_id;
+            $currentGraduationDate = $currentIdentitySchool->graduation_date;
+        }
+
         if (!is_null($r['school_id'])) {
             if (is_numeric($r['school_id'])) {
                 $r['school'] = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
@@ -2016,6 +2027,32 @@ class User extends \OmegaUp\Controllers\Controller {
 
             // Update identity object
             \OmegaUp\DAO\Identities::update($r->identity);
+
+            if ($r->identity->school_id !== $currentSchool) {
+                // Update end time for current record and create a new one
+                \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                    $r->identity,
+                    $r->user->graduation_date
+                );
+            } elseif (
+                !is_null($r->identity->school_id)
+                && ($currentGraduationDate !== $r->user->graduation_date)
+            ) {
+                if (!is_null($currentIdentitySchool)) {
+                    // Only update the graduation date
+                    $currentIdentitySchool->graduation_date = $r->user->graduation_date;
+                    \OmegaUp\DAO\IdentitiesSchools::update(
+                        $currentIdentitySchool
+                    );
+                } else {
+                    // Create a new record
+                    \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
+                        'identity_id' => $r->identity->identity_id,
+                        'school_id' => $r->identity->school_id,
+                        'graduation_date' => $r->user->graduation_date,
+                    ]));
+                }
+            }
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
