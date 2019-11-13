@@ -89,6 +89,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
             // Save in DB
             self::saveIdentityGroup($identity, $group->group_id);
 
+            // Save IdentitySchool
+            \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
+                'identity_id' => $identity->identity_id,
+                'school_id' => $identity->school_id,
+            ]));
+
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -137,6 +143,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
 
                 self::saveIdentityGroup($identity, $group->group_id);
+
+                // Save IdentitySchool
+                \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
+                    'identity_id' => $identity->identity_id,
+                    'school_id' => $identity->school_id,
+                ]));
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -256,6 +268,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
+        $originalSchool = $originalIdentity->school_id;
 
         // Prepare DAOs
         $identity = self::updateIdentity(
@@ -278,6 +291,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username
         );
+
+        if ($originalSchool !== $identity->school_id) {
+            \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                $identity
+            );
+        }
 
         return [
             'status' => 'ok',

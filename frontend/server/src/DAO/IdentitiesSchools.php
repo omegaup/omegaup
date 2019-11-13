@@ -1,0 +1,56 @@
+<?php
+
+namespace OmegaUp\DAO;
+
+/**
+ * IdentitiesSchools Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Identities_Schools}.
+ *
+ * @author carlosabcs
+ * @access public
+ */
+class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
+    public static function createNewSchoolForIdentity(\OmegaUp\DAO\VO\Identities $identity): int {
+        // First get the current IdentitySchool and update its end_time
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        if (!is_null($identitySchool)) {
+            $identitySchool->end_time = \OmegaUp\Time::get();
+            \OmegaUp\DAO\IdentitiesSchools::update($identitySchool);
+        }
+
+        // Create new IdentitySchool and save it
+        return \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
+            'identity_id' => $identity->identity_id,
+            'school_id' => $identity->school_id,
+        ]));
+    }
+
+    /**
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @return null|\OmegaUp\DAO\VO\IdentitiesSchools
+     */
+    public static function getCurrentSchoolFromIdentity(\OmegaUp\DAO\VO\Identities $identity) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Identities_Schools
+                WHERE
+                    identity_id = ? AND end_time IS NULL
+                ORDER BY
+                    creation_time DESC;';
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id]
+        );
+        return is_null(
+            $row
+        ) ? null : new \OmegaUp\DAO\VO\IdentitiesSchools(
+            $row
+        );
+    }
+}
