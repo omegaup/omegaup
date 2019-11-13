@@ -221,10 +221,16 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        $runDataPA = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -252,17 +258,17 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem(
+        $runDataOutsideContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        $runDataInsideContest = RunsFactory::createRun(
+        $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataOutsideContest);
-        RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataOutsideContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -294,17 +300,17 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a user for our scenario
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $runDataOutOfContest = RunsFactory::createRunToProblem(
+        $runDataOutOfContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        $runDataInContest = RunsFactory::createRun(
+        $runDataInContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataOutOfContest);
-        RunsFactory::gradeRun($runDataInContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataOutOfContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInContest);
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -339,12 +345,12 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create an accepted run.
-        $runDataInsideContest = RunsFactory::createRun(
+        $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataInsideContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInsideContest);
 
         // Call API
         $login = self::login($identity);
@@ -429,8 +435,11 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         {
             $login = self::login($identity);
@@ -449,8 +458,11 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([
             'token' => OMEGAUP_GITSERVER_SECRET_TOKEN,

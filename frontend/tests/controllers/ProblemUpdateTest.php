@@ -55,20 +55,20 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData[0] = RunsFactory::createRun(
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runData[1] = RunsFactory::createRunToProblem(
+        $runData[1] = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData[0]);
-        RunsFactory::gradeRun($runData[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[1]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
         \OmegaUp\FileHandler::setFileUploaderForTesting(
@@ -188,11 +188,11 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $runData[0] = RunsFactory::createRunToProblem(
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        RunsFactory::gradeRun($runData[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
 
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
@@ -882,8 +882,11 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problem = $problemData['problem'];
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData, 1.0, 'AC');
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC');
 
         $login = self::login($problemData['author']);
         $originalVersionData = \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
@@ -913,7 +916,14 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->assertEquals(1, $detourGrader->getGraderCallCount());
         foreach ($detourGrader->getRuns() as $run) {
-            RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null,
+                0,
+                'WA',
+                null,
+                null,
+                $run->run_id
+            );
         }
         }
 
@@ -1076,11 +1086,11 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
             // Create a standalone run.
-            $pastStandaloneRunData = RunsFactory::createRunToProblem(
+            $pastStandaloneRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problemData,
                 $identity
             );
-            RunsFactory::gradeRun($pastStandaloneRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($pastStandaloneRunData);
 
             // Create a contest in the past with one run.
             $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
@@ -1102,12 +1112,12 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
                     $contestAdmin
                 );
             }
-            $pastRunData = RunsFactory::createRun(
+            $pastRunData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $pastContestData,
                 $identity
             );
-            RunsFactory::gradeRun($pastRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($pastRunData);
 
             // Now create one in the present with one more run.
             $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
@@ -1129,12 +1139,12 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
                     $contestAdmin
                 );
             }
-            $presentRunData = RunsFactory::createRun(
+            $presentRunData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $presentContestData,
                 $identity
             );
-            RunsFactory::gradeRun($presentRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($presentRunData);
 
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
 
@@ -1161,7 +1171,14 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 $detourGrader->getGraderCallCount()
             );
             foreach ($detourGrader->getRuns() as $run) {
-                RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+                \OmegaUp\Test\Factories\Run::gradeRun(
+                    null,
+                    0,
+                    'WA',
+                    null,
+                    null,
+                    $run->run_id
+                );
             }
 
             return [

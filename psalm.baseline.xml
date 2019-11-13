@@ -2250,43 +2250,6 @@
       <code>$qualityReviewerGroup-&gt;group_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/tests/factories/RunsFactory.php">
-    <MissingReturnType occurrences="1">
-      <code>createRunToProblem</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$guid</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="1">
-      <code>$runData['response']['guid']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$guid</code>
-    </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
-      <code>\OmegaUp\Request</code>
-      <code>\OmegaUp\Request</code>
-      <code>array</code>
-      <code>array</code>
-    </MixedInferredReturnType>
-    <PossiblyNullArrayAccess occurrences="1">
-      <code>$runData['response']</code>
-    </PossiblyNullArrayAccess>
-    <UndefinedDocblockClass occurrences="7">
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-    </UndefinedDocblockClass>
-  </file>
   <file src="frontend/www/arena/contest.php">
     <MixedArgument occurrences="1">
       <code>$_REQUEST['contest_alias'] ?? ''</code>

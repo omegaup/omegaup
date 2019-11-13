@@ -37,14 +37,14 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         CoursesFactory::addStudentToCourse($courseData, $participant);
 
         // Create a run for assignment
-        $runData = RunsFactory::createCourseAssignmentRun(
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemData,
             $courseData,
             $participant
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($courseData['admin']);

@@ -13,8 +13,11 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
             ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-            $runData = RunsFactory::createRunToProblem($problemData, $identity);
-            RunsFactory::gradeRun($runData);
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
             $contestants[] = $identity;
             $runs[] = $runData;
         }
@@ -87,8 +90,11 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id
         ));
         // Tried, but didn't solve the problem
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData, 0, 'WA', 60);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $this->assertFalse(\OmegaUp\DAO\Problems::isProblemSolved(
             $problemData['problem'],
             $identity->identity_id
@@ -98,8 +104,11 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id
         ));
         // Already tried and solved also
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
         $this->assertTrue(\OmegaUp\DAO\Problems::isProblemSolved(
             $problemData['problem'],
             $identity->identity_id

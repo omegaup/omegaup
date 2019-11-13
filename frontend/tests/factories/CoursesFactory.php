@@ -291,7 +291,7 @@ class CoursesFactory {
                             'language' => 'c',
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
-                        RunsFactory::gradeRun(
+                        \OmegaUp\Test\Factories\Run::gradeRun(
                             null /*runData*/,
                             0.5,
                             'PA',
@@ -309,7 +309,7 @@ class CoursesFactory {
                                 'language' => 'c',
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));
-                            RunsFactory::gradeRun(
+                            \OmegaUp\Test\Factories\Run::gradeRun(
                                 null /*runData*/,
                                 1,
                                 'AC',
