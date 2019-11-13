@@ -14,8 +14,6 @@ class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
-    /** @var null|\Facebook\Facebook */
-    private static $_facebook;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
     /** @var bool */
@@ -32,19 +30,9 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return \Facebook\Facebook
      */
     private static function getFacebookInstance() {
-        if (is_null(self::$_facebook)) {
-            require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-
-            {
-                $scopedFacebook = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStartFacebook();
-                self::$_facebook = new \Facebook\Facebook([
-                    'app_id' => OMEGAUP_FB_APPID,
-                    'app_secret' => OMEGAUP_FB_SECRET,
-                    'default_graph_version' => 'v2.5',
-                ]);
-            }
-        }
-        return self::$_facebook;
+        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
+        $scopedFacebook = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStartFacebook();
+        return $scopedFacebook->facebook;
     }
 
     public static function getFacebookLoginUrl(): string {
