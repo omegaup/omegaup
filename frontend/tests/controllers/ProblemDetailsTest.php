@@ -12,7 +12,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testViewProblemInAContestDetailsValid() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user to be the author
         ['user' => $authorUser, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -24,7 +24,10 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -95,13 +98,16 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function internalViewProblemStatement($type, $expected_text) {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -236,8 +242,11 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testScoreInDetailsInsideContest() {
         // Create problem and contest
         $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -271,13 +280,16 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testViewProblemHasCorrectRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -317,8 +329,11 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testShowSolvers() {
         // Create problem and contest
         $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

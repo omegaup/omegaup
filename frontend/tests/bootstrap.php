@@ -20,9 +20,9 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/BadgesTestCase.php');
     require_once(OMEGAUP_ROOT . '/tests/Utils.php');
     // Load Factories
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Contest.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/User.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/ProblemsFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/ContestsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/ClarificationsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/IdentityFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
