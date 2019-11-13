@@ -201,7 +201,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * Mentor can see the last coder of the month email
      */
     public function testMentorCanSeeLastCoderOfTheMonthEmail() {
-        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         $login = self::login($mentorIdentity);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
@@ -247,7 +247,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * already has a coder of the month selected
      */
     public function testMentorSelectsUserAsCoderOfTheMonth() {
-        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         // Setting time to the 15th of next month.
         $runCreationDate = new DateTimeImmutable(
@@ -346,7 +346,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(
             $response['userinfo']['username'],
-            $user3->username
+            $identity3->username
         );
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
             new \OmegaUp\Request()
@@ -385,7 +385,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->createRuns(null, null, 3);
         $this->createRuns(null, null, 2);
 
-        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         $login = self::login($mentorIdentity);
         $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));

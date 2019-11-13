@@ -127,16 +127,17 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUsernameUpdate() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $new_username = \OmegaUp\Test\Utils::createRandomString();
+        $newUsername = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //new username
-            'username' => $new_username
+            'username' => $newUsername
         ]);
         \OmegaUp\Controllers\User::apiUpdate($r);
-        $user_db = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $user = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $this->assertEquals($user_db->username, $new_username);
+        $this->assertEquals($identity->username, $newUsername);
     }
 
     /**
@@ -324,7 +325,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertNotEquals($response['token'], '');
 
-        $dbUser = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $dbUser = \OmegaUp\DAO\Users::FindByUsername($identity->username);
         $this->assertNotNull($dbUser->git_token);
         $this->assertTrue(
             \OmegaUp\SecurityTools::compareHashedStrings(

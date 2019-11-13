@@ -92,7 +92,9 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $identity->user_id
+        );
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

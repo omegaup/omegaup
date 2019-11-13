@@ -85,7 +85,7 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
         $experiments = new
             \OmegaUp\Experiments(
                 null,
-                $user,
+                $identity,
                 [],
                 self::$kKnownExperiments
             );
@@ -93,17 +93,17 @@ class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($experiments->getEnabledExperiments());
         $this->assertFalse($experiments->isEnabled(self::TEST));
 
-        // After adding the user-experiment relationship to the database, the
+        // After adding the identity-experiment relationship to the database, the
         // experiment should be enabled.
         \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
-            'user_id' => $user->user_id,
+            'user_id' => $identity->user_id,
             'experiment' => self::TEST,
         ]));
 
         $experiments = new
             \OmegaUp\Experiments(
                 null,
-                $user,
+                $identity,
                 [],
                 self::$kKnownExperiments
             );
