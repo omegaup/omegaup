@@ -12,7 +12,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $numberOfProblems = 3;
 
         for ($i = 0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem();
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
             \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData[$i],
                 $contestData
@@ -60,7 +60,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -93,7 +93,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

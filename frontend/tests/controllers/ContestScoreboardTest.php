@@ -21,7 +21,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         bool $runForAdmin = true,
         bool $runForDirector = true
     ) {
-        $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
+        $problemData = [\OmegaUp\Test\Factories\Problem::createProblem(), \OmegaUp\Test\Factories\Problem::createProblem()];
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problems to the contest
@@ -233,8 +233,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testMaxPolicyScoreboard() {
         // Get two problems
-        $problemData = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -299,7 +299,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreboardPercentajeForContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -368,7 +368,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreboardPercentageForContestAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -437,7 +437,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testScoreboardMerge() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get contests
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -513,7 +513,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -627,7 +627,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData

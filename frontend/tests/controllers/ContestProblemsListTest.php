@@ -20,7 +20,7 @@ class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = [];
         for ($i = 0; $i < $numProblems; $i++) {
             // Create the problems
-            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Problem ' . ($i + 1),
             ]));
 

@@ -149,7 +149,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get some problems into the contest
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'languages' => 'cpp,java,py'
         ]));
@@ -603,7 +603,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestDirector = $contestData['director'];
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblemWithAuthor(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
             $contestDirector
         );
 
@@ -777,7 +777,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestDirector = $contestData['director'];
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblemWithAuthor(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
             $contestDirector
         );
 

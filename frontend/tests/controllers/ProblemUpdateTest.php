@@ -9,7 +9,7 @@
 class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'title' => 'Problem Language'
         ]));
@@ -40,7 +40,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUpdateProblemTitleAndContents() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -185,7 +185,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUpdateProblemSettings() {
         // Get a problem with a run.
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $runData[0] = RunsFactory::createRunToProblem(
@@ -267,7 +267,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testUpdateProblemWithValidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'title' => 'valid-languages'
         ]));
 
@@ -300,7 +300,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($problemData['author']);
         $r = new \OmegaUp\Request([
@@ -319,7 +319,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemStatementUpdate() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -351,7 +351,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      * Test apiUpdateSolution
      */
     public function testProblemSolutionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Update solution
         $solution = 'La nueva solución \$x\$';
@@ -379,7 +379,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -414,7 +414,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateProblemFailed() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get File Uploader Mock and tell Omegaup API to use it
         \OmegaUp\FileHandler::setFileUploaderForTesting(
@@ -465,7 +465,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateProblemWithProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
         ['user' => $problemAdmin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -503,7 +503,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateProblemWithRemovedProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
         ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
@@ -545,7 +545,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemAdmins() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
         ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
@@ -586,7 +586,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'visibility' => 0
         ]));
@@ -646,7 +646,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemUpdateVisibility() {
         // Create a public problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
@@ -805,7 +805,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      * Tests tag operations.
      */
     public function testTags() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $this->assertEquals(
             [
@@ -879,7 +879,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      * Tests problem version update.
      */
     public function testProblemVersionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problem = $problemData['problem'];
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $identity);
@@ -1067,7 +1067,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     ) {
         $originalTime = \OmegaUp\Time::get();
         try {
-            $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'author' => $problemAuthor,
             ]));
             $problem = $problemData['problem'];

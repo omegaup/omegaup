@@ -225,8 +225,8 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         // - User 2 will receive: Problem Setter and Contest Manager badges
         ['user' => $userOne, 'identity' => $identityOne] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
-        ProblemsFactory::createProblemWithAuthor($identityOne);
-        ProblemsFactory::createProblemWithAuthor($identityTwo);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityOne);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityTwo);
         \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
                 ['contestDirector' => $identityTwo]
@@ -301,7 +301,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
 
     public function testGetAssignationTime() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        ProblemsFactory::createProblemWithAuthor($identity);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         \OmegaUp\Test\Utils::runAssignBadges();
@@ -335,7 +335,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($identity);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         \OmegaUp\Test\Utils::runAssignBadges();

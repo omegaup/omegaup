@@ -132,7 +132,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
                 ['contestDirector' => $contestIdentityAdmin]
             )
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData
@@ -222,7 +222,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData,
             $contestIdentityAdmin
         );
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
             $contestData

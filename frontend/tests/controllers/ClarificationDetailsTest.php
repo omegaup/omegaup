@@ -39,7 +39,7 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testShowClarificationAsContestDirector() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -82,7 +82,7 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testShowClarificationAsOriginalContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -126,7 +126,7 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testClarificationsCreatedPrivateAsDefault() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -165,7 +165,7 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testPublicClarificationsCanBeViewed() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

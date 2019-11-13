@@ -28,7 +28,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestParams = new \OmegaUp\Test\Factories\ContestParams();
         }
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $this->contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -83,7 +83,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     private function setUpAssignment($startTimeDelay = 0) {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create course and add user as a student
         $this->courseData = CoursesFactory::createCourseWithOneAssignment(
@@ -220,7 +220,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionSchool() {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $identity);
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $runData['response']['guid']
@@ -374,7 +374,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Add a second problem to the contest
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData2,
             $this->contestData
@@ -581,7 +581,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunToPublicProblemWhileInsideAContest() {
         // Create public problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -620,7 +620,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunInvalidProblemLanguage() {
         // Create public problem without C as an option.
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'languages' => 'cpp'
         ]));
@@ -647,7 +647,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunInvalidContestLanguage() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -699,7 +699,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create public problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0,
             'author' => $contestData['director']
         ]));
@@ -736,7 +736,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Run::$defaultSubmissionGap = 60;
         try {
             // Create public problem
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
             // Create our contestant
             ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -869,7 +869,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPubliclyBannedProblems() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
@@ -895,7 +895,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPrivatelyBannedProblems() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
@@ -921,7 +921,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunDetailsAfterSolving() {
         // Create public problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();

@@ -12,7 +12,7 @@ class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
         ['user' => $user101, 'identity' => $identity101] = \OmegaUp\Test\Factories\User::createUser();
         $problems = [];
         for ($i = 0; $i < 101; $i++) {
-            $newProblem = ProblemsFactory::createProblem();
+            $newProblem = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = RunsFactory::createRunToProblem($newProblem, $identity101);
             RunsFactory::gradeRun($run);
             $problems[] = $newProblem;
@@ -28,7 +28,7 @@ class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
     }
 
     public function test100RunsToSameProblem() {
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 101; $i++) {
             $run = RunsFactory::createRunToProblem($problem, $identity);

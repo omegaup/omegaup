@@ -12,7 +12,7 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGetStats() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -123,7 +123,7 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGetStatsNoWaitTime() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();

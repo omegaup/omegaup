@@ -8,7 +8,7 @@
 class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDisqualifyByAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -45,7 +45,7 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testDisqualifyScoreboard() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
