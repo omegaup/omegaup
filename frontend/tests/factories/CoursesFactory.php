@@ -238,14 +238,14 @@ class CoursesFactory {
      * @param array{course_alias: string} $courseData
      * @param \OmegaUp\DAO\VO\Identities[] $students
      * @param string[] $assignmentAliases
-     * @param array $problemAssignmentsMap
-     * @return array<string|null, array<string, int>>
+     * @param array<string, list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}>> $problemAssignmentsMap
+     * @return array<string, array<string, int>>
      */
     public static function submitRunsToAssignmentsInCourse(
-        array $courseData,
-        array $students,
-        array $assignmentAliases,
-        array $problemAssignmentsMap
+        $courseData,
+        $students,
+        $assignmentAliases,
+        $problemAssignmentsMap
     ) {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         if (is_null($course) || is_null($course->course_id)) {

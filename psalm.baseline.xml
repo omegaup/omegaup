@@ -2244,14 +2244,11 @@
     <MissingReturnType occurrences="1">
       <code>addProblemsToAssignment</code>
     </MissingReturnType>
-    <MixedArrayAccess occurrences="3">
+    <MixedArrayAccess occurrences="1">
       <code>$problem['problem']</code>
-      <code>$problemData['request']</code>
-      <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$problem</code>
-      <code>$problemData</code>
     </MixedAssignment>
     <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>
