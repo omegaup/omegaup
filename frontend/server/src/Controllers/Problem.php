@@ -64,7 +64,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 100;
+    const PAGE_SIZE = 1000;
 
     /**
      * Validates a Create or Update Problem API request
