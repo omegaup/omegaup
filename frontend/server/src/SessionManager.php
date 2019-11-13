@@ -14,17 +14,8 @@ class ScopedSession {
 }
 
 class ScopedFacebook {
-    /** @var \Facebook\Facebook */
-    public $_facebook;
-
     public function __construct() {
         new ScopedSession();
-
-        $this->_facebook = new \Facebook\Facebook([
-            'app_id' => OMEGAUP_FB_APPID,
-            'app_secret' => OMEGAUP_FB_SECRET,
-            'default_graph_version' => 'v2.5',
-        ]);
     }
 
     public function __destruct() {
@@ -93,9 +84,7 @@ class SessionManager {
         return new ScopedSession();
     }
 
-    public function sessionStartFacebook(): \Facebook\Facebook {
-        $session = new ScopedFacebook();
-
-        return $session->_facebook;
+    public function sessionStartFacebook(): ScopedFacebook {
+        return new ScopedFacebook();
     }
 }
