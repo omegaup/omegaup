@@ -178,7 +178,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @return array{time: string, username: string, country_id: string, email: string}[]
      */
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id', null, null, false);
+        $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
         if (is_null($school)) {
