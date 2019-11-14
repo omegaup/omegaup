@@ -39,11 +39,11 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         return \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
     }
 
-    /**
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return null|\OmegaUp\DAO\VO\IdentitiesSchools
-     */
-    public static function getCurrentSchoolFromIdentity(\OmegaUp\DAO\VO\Identities $identity) {
+    public static function getCurrentSchoolFromIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): ?\OmegaUp\DAO\VO\IdentitiesSchools {
+        // TODO: Remove this function and only use getByPK when
+        // current_identity_school_id is added to Identities
         $sql = 'SELECT
                     *
                 FROM
@@ -56,10 +56,10 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
             $sql,
             [$identity->identity_id]
         );
-        return is_null(
-            $row
-        ) ? null : new \OmegaUp\DAO\VO\IdentitiesSchools(
-            $row
-        );
+
+        if (is_null($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\IdentitiesSchools($row);
     }
 }
