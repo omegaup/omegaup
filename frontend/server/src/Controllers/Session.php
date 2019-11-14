@@ -483,14 +483,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
-            try {
-                $identity->password = \OmegaUp\SecurityTools::hashString(
-                    $r['password']
-                );
-                \OmegaUp\DAO\Identities::update($identity);
-            } catch (\Exception $e) {
-                throw $e;
-            }
+            $identity->password = \OmegaUp\SecurityTools::hashString(
+                $r['password']
+            );
+            \OmegaUp\DAO\Identities::update($identity);
         }
 
         self::$log->info(

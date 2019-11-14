@@ -464,11 +464,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $identity->password = $hashedPassword;
 
-        try {
-            \OmegaUp\DAO\Identities::update($identity);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        \OmegaUp\DAO\Identities::update($identity);
 
         return ['status' => 'ok'];
     }
@@ -1786,12 +1782,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
         $r->identity->password = $hashedPassword;
 
-        try {
-            // Update username and password for identity object
-            \OmegaUp\DAO\Identities::update($r->identity);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        // Update username and password for identity object
+        \OmegaUp\DAO\Identities::update($r->identity);
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(

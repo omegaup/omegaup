@@ -143,12 +143,8 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $identity->password = \OmegaUp\SecurityTools::hashString(
             $r['password']
         );
-        try {
-            \OmegaUp\DAO\Identities::update($identity);
-        } catch (\Exception $e) {
-            self::$log->error('Failed to reset password', $e);
-            throw $e;
-        }
+
+        \OmegaUp\DAO\Identities::update($identity);
 
         return [
             'status' => 'ok',
