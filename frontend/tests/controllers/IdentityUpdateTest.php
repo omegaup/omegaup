@@ -73,6 +73,101 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test for updating IdentitySchool on IdentityUpdate
+     */
+    public function testIdentitySchoolUpdate() {
+        // Identity creator group member will create an identity
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = GroupsFactory::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
+        $schoolName = \OmegaUp\Test\Utils::createRandomString();
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $identityName,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => $schoolName,
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $school = \OmegaUp\DAO\Schools::findByName($schoolName);
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertNull($identitySchool->end_time);
+
+        // Update the Identity, but preserve the same school
+        $newIdentityName = substr(
+            \OmegaUp\Test\Utils::createRandomString(),
+            - 10
+        );
+        \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $newIdentityName,
+            'country_id' => 'US',
+            'state_id' => 'CA',
+            'gender' => 'female',
+            'school_name' => $schoolName,
+            'group_alias' => $group['group']->alias,
+            'original_username' => $identity->username,
+        ]));
+
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertNull($identitySchool->end_time);
+
+        // Now update the school for Identity
+        $newSchoolName = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Identity::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $newIdentityName,
+            'country_id' => 'US',
+            'state_id' => 'CA',
+            'gender' => 'female',
+            'school_name' => $newSchoolName,
+            'group_alias' => $group['group']->alias,
+            'original_username' => $identity->username,
+        ]));
+
+        // Verify that the end time is not null from previous IdentitySchool record
+        $previousIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identitySchool->identity_school_id
+        );
+        $this->assertNotNull($previousIdentitySchool->end_time);
+
+        $newSchool = \OmegaUp\DAO\Schools::findByName($newSchoolName);
+
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals(
+            $newSchool[0]->school_id,
+            $identitySchool->school_id
+        );
+        $this->assertNull($identitySchool->end_time);
+    }
+
+    /**
      * Test for updating a no-main identity's username
      */
     public function testUpdateNoMainIdentityUsername() {

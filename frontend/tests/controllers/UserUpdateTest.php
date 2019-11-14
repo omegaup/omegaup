@@ -104,6 +104,69 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Testing the modifications on IdentitiesSchools
+     * on each user information update
+     */
+    public function testUpdateUserSchool() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // On user creation, no IdentitySchool is created
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertNull($identitySchool);
+
+        // Now update user, adding a new school without graduation_date
+        $school = SchoolsFactory::createSchool()['school'];
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school->school_id,
+        ]));
+
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertNull($identitySchool->graduation_date);
+        $this->assertNull($identitySchool->end_time);
+
+        // Now call API again but to assign graduation_date
+        $graduationDate = '2019-05-11';
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'graduation_date' => $graduationDate,
+        ]));
+
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertEquals($identitySchool->graduation_date, $graduationDate);
+        $this->assertNull($identitySchool->end_time);
+
+        // Now assign a new School to User
+        $newSchool = SchoolsFactory::createSchool()['school'];
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $newSchool->school_id,
+        ]));
+
+        // Previous IdentitySchool should have end_time filled.
+        $previousIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identitySchool->identity_school_id
+        );
+        $this->assertNotNull($previousIdentitySchool->end_time);
+
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($identitySchool->school_id, $newSchool->school_id);
+        $this->assertEquals($identitySchool->graduation_date, $graduationDate);
+        $this->assertNull($identitySchool->end_time);
+    }
+
+    /**
      * Value for the recruitment optin flag should be non-negative
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */

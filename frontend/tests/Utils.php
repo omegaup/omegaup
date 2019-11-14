@@ -203,6 +203,7 @@ class Utils {
             'Groups_Scoreboards_Problemsets',
             'Identities',
             'Identity_Login_Log',
+            'Identities_Schools',
             'Interviews',
             'Notifications',
             'PrivacyStatement_Consent_Log',
