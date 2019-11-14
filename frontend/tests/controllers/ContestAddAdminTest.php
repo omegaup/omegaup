@@ -8,7 +8,7 @@
 class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddContestAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -37,7 +37,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testIsContestAdminCheck() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -80,13 +80,13 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRemoveAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get users
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
-        ContestsFactory::addAdminUser($contestData, $identity);
-        ContestsFactory::addAdminUser($contestData, $identity2);
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity2);
 
         // Prepare request for remove one admin
         $login = self::login($contestData['director']);
@@ -118,7 +118,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddContestGroupAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -150,7 +150,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testIsContestGroupAdminCheck() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -197,7 +197,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRemoveGroupAdmin() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get users
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

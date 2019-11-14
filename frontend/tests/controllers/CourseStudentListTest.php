@@ -87,7 +87,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],

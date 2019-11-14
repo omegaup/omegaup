@@ -165,14 +165,17 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest();
-        $contests[1] = ContestsFactory::createContest();
+        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest();
+        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest();
 
-        ContestsFactory::addUser($contests[0], $identity);
-        ContestsFactory::addUser($contests[1], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contests[0]);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contests[0]
+        );
 
         $runData = RunsFactory::createRun(
             $problemData,
@@ -201,18 +204,21 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest(
-            new ContestParams(
+        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         );
-        $contests[1] = ContestsFactory::createContest();
+        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest();
 
-        ContestsFactory::addUser($contests[0], $identity);
-        ContestsFactory::addUser($contests[1], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contests[0]);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contests[0]
+        );
 
         $runData = RunsFactory::createRun(
             $problemData,
@@ -242,15 +248,21 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemsSolved() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $contest = ContestsFactory::createContest();
+        $contest = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $problemOne = ProblemsFactory::createProblem();
-        $problemTwo = ProblemsFactory::createProblem();
+        $problemOne = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemTwo = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ContestsFactory::addProblemToContest($problemOne, $contest);
-        ContestsFactory::addProblemToContest($problemTwo, $contest);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemOne,
+            $contest
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemTwo,
+            $contest
+        );
 
-        ContestsFactory::addUser($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         //Submission gap between runs must be 60 seconds
         $runs = [];
@@ -297,7 +309,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testStats() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($identity);
         {

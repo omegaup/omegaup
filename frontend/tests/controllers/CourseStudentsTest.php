@@ -13,7 +13,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Prepare assignment. Create problems
         $adminLogin = self::login($courseData['admin']);
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -84,7 +84,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Prepare assignment. Create problems
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,

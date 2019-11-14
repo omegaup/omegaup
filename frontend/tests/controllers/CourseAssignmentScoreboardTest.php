@@ -18,7 +18,7 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
             \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -94,8 +94,8 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem(
-                new ProblemParams(),
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams(),
                 $adminLogin
             );
 

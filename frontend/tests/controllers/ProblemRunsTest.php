@@ -8,7 +8,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
      * Contestant submits runs and admin is able to get them.
      */
     public function testGetRunsForProblem() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestants = [];
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
@@ -79,7 +79,7 @@ class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUserHasTriedToSolvedProblem() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(

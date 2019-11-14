@@ -156,10 +156,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         if (!$runCreationDate) {
             $runCreationDate = date('Y-m-d', \OmegaUp\Time::get());
         }
-        $contest = ContestsFactory::createContest();
-        $problem = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problem, $contest);
-        ContestsFactory::addUser($contest, $identity);
+        $contest = \OmegaUp\Test\Factories\Contest::createContest();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
+        \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         for ($i = 0; $i < $n; $i++) {
             $runData = RunsFactory::createRun($problem, $contest, $identity);

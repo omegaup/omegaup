@@ -247,8 +247,11 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddContestToScoreboard() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addAdminUser($contestData, $groupData['owner']);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $groupData['owner']
+        );
 
         $login = self::login($groupData['owner']);
         $response = \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
@@ -278,8 +281,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddContestToScoreboardNoContestAdmin() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         );
@@ -299,8 +302,11 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRemoveContestFromScoreboard() {
         $groupData = GroupsFactory::createGroup();
         $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addAdminUser($contestData, $groupData['owner']);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $groupData['owner']
+        );
 
         GroupsFactory::addContestToScoreboard(
             $contestData,
@@ -342,8 +348,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $n = 5;
 
         for ($i = 0; $i < $n; $i++) {
-            $contestsData[] = ContestsFactory::createContest();
-            ContestsFactory::addAdminUser(
+            $contestsData[] = \OmegaUp\Test\Factories\Contest::createContest();
+            \OmegaUp\Test\Factories\Contest::addAdminUser(
                 $contestsData[$i],
                 $groupData['owner']
             );
@@ -354,8 +360,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Create a problem to solve
-            $problemData = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest(
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $contestsData[$i]
             );
@@ -432,8 +438,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $n = 5;
 
         for ($i = 0; $i < $n; $i++) {
-            $contestsData[] = ContestsFactory::createContest();
-            ContestsFactory::addAdminUser(
+            $contestsData[] = \OmegaUp\Test\Factories\Contest::createContest();
+            \OmegaUp\Test\Factories\Contest::addAdminUser(
                 $contestsData[$i],
                 $groupData['owner']
             );
@@ -446,8 +452,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Create a problem to solve
-            $problemData = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest(
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $contestsData[$i]
             );
