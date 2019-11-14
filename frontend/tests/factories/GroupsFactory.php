@@ -32,7 +32,6 @@ class GroupsFactory {
         if (is_null($login)) {
             $login = \OmegaUp\Test\ControllerTestCase::login($owner);
         }
-
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $name,

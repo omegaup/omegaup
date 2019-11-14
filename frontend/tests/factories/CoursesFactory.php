@@ -191,7 +191,6 @@ class CoursesFactory {
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
-
         if (is_null($course) || is_null($course->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }

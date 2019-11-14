@@ -521,6 +521,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         // Expire profile cache
+
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::USER_PROFILE,
             strval($identity->username)

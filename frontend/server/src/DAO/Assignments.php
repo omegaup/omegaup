@@ -78,11 +78,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
-    /**
-     * @return null|\OmegaUp\DAO\VO\Assignments
-     */
     final public static function getByAliasAndCourse(
-        string $assignmentAlias,
+        ?string $assignmentAlias,
         int $courseId
     ): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT

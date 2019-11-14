@@ -109,7 +109,6 @@ class Contest {
     /**
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
-     *
      * @return array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
      */
     public static function getRequest(?ContestParams $params = null): array {
