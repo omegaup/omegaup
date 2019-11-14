@@ -7,7 +7,7 @@
  */
 class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      */
     public function testNativeLoginByUserPositive() {
@@ -24,7 +24,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password
@@ -48,7 +48,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test user login with valid credentials, email and password
+     * Test identity login with valid credentials, email and password
      *
      */
     public function testNativeLoginByEmailPositive() {
@@ -57,7 +57,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\UserParams(['email' => $email])
         );
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
             'password' => $identity->password
@@ -162,12 +162,12 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
      *
      */
     public function test2ConsecutiveLogins() {
-        // Create an user in omegaup
+        // Create an identity in omegaup
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'password' => $identity->password
         ]);
 
@@ -188,7 +188,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */

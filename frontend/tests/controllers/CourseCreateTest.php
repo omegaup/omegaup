@@ -329,10 +329,8 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData['request']['course']->group_id
         );
         // User not linked to course
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $identityUser = \OmegaUp\DAO\Identities::getByPK(
-            $user->main_identity_id
-        );
+        ['user' => $user, 'identity' => $identityUser] = \OmegaUp\Test\Factories\User::createUser();
+
         // User linked to course
         ['user' => $student, 'identity' => $identityStudent] = \OmegaUp\Test\Factories\User::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
