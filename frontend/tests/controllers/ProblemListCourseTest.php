@@ -4,7 +4,7 @@
  *
  * @author juan.pablo
  */
-class ProblemListCourseTest extends OmegaupTestCase {
+class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSolvedAndUnsolvedProblemByUsersOfACourse() {
         $num_users = 3;
         $num_problems = 3;
@@ -13,7 +13,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
         CoursesFactory::addProblemsToAssignment(
             $adminLogin,
@@ -25,7 +25,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $user = [];
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
             CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
         }
         // Create runs to problems directly
@@ -134,7 +134,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
         CoursesFactory::addProblemsToAssignment(
             $adminLogin,
@@ -146,7 +146,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $user = [];
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
             CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
         }
         // Create runs to problems directly

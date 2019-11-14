@@ -1,6 +1,6 @@
 <?php
 
-class ExperimentsTest extends OmegaupTestCase {
+class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
     const TEST = 'experiment_test';
 
     private static $kKnownExperiments = [
@@ -81,7 +81,7 @@ class ExperimentsTest extends OmegaupTestCase {
     }
 
     public function testUserExperiments() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $experiments = new
             \OmegaUp\Experiments(
                 null,

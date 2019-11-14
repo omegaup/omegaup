@@ -5,7 +5,7 @@
  *
  * @author alanboy@omegaup.com
  */
-class UserRegistrationTest extends OmegaupTestCase {
+class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *  Scenario:
      *      user A creates a new native account :
@@ -53,10 +53,9 @@ class UserRegistrationTest extends OmegaupTestCase {
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $username = 'X' . \OmegaUp\Time::get();
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged via google, facebook, linkedin does not have password
@@ -101,7 +100,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z' . $username,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);

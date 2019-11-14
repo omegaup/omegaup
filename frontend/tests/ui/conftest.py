@@ -265,7 +265,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             ON
                 `u`.`main_identity_id` = `i`.`identity_id`
             WHERE
-                `username` = '%s';
+                `i`.`username` = '%s';
             ''') % (user),
             dbname='omegaup', auth=self.mysql_auth())
         self.enable_experiment_identities_to_user(user_id)

@@ -1,6 +1,6 @@
 <?php
 
-class CourseCloneTest extends OmegaupTestCase {
+class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create clone of a course
      */
@@ -24,7 +24,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -43,14 +43,14 @@ class CourseCloneTest extends OmegaupTestCase {
             $studentsUsername[] = $studentsData->username;
         }
 
-        $courseAlias = Utils::CreateRandomString();
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
 
         // Clone the course
         $adminLogin = self::login($courseData['admin']);
         $courseClonedData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'start_time' => \OmegaUp\Time::get()
         ]));
@@ -111,7 +111,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -135,7 +135,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $courseClonedData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseData['course_alias'],
             'start_time' => \OmegaUp\Time::get()
         ]));
@@ -165,7 +165,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $assignmentProblemsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -223,12 +223,12 @@ class CourseCloneTest extends OmegaupTestCase {
             );
         }
 
-        $courseAlias = Utils::CreateRandomString();
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
 
         $clonedCourseData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'start_time' => \OmegaUp\Time::get()
         ]));

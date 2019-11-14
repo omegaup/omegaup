@@ -3,16 +3,16 @@
 /**
  * Tests getting runs of a problem.
  */
-class ProblemRunsTest extends OmegaupTestCase {
+class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them.
      */
     public function testGetRunsForProblem() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestants = [];
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
-            ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             $runData = RunsFactory::createRunToProblem($problemData, $identity);
             RunsFactory::gradeRun($runData);
             $contestants[] = $identity;
@@ -79,8 +79,8 @@ class ProblemRunsTest extends OmegaupTestCase {
     }
 
     public function testUserHasTriedToSolvedProblem() {
-        $problemData = ProblemsFactory::createProblem();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Never tried, never solved
         $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
             $problemData['problem'],

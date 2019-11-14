@@ -6,22 +6,25 @@
  * @author joemmanuel
  */
 
-class RunRejudgeTest extends OmegaupTestCase {
+class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test of rerun
      */
     public function testRejudgeWithoutCompileError() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -33,7 +36,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         // Grade the run
         RunsFactory::gradeRun($runData);
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Build request
         $login = self::login($contestData['director']);

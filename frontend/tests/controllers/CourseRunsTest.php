@@ -6,13 +6,13 @@
  * @author juan.pablo
  */
 
-class CourseRunsTest extends OmegaupTestCase {
+class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Participant submits runs and admin is able to get them
      */
     public function testGetRunsForCourse() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a course
         $courseData = CoursesFactory::createCourseWithOneAssignment();
@@ -31,7 +31,7 @@ class CourseRunsTest extends OmegaupTestCase {
         );
 
         // Create our participant
-        ['user' => $user, 'identity' => $participant] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
         CoursesFactory::addStudentToCourse($courseData, $participant);

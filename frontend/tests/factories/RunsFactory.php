@@ -19,11 +19,11 @@ class RunsFactory {
         $problemData,
         $contestData,
         $contestant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($login)) {
             // Login as contestant
-            $login = OmegaupTestCase::login($contestant);
+            $login = \OmegaUp\Test\ControllerTestCase::login($contestant);
         }
 
         // Build request
@@ -57,11 +57,11 @@ class RunsFactory {
         $problemData,
         $courseAssignmentData,
         $participant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($login)) {
             // Login as participant
-            $login = OmegaupTestCase::login($participant);
+            $login = \OmegaUp\Test\ControllerTestCase::login($participant);
         }
         // Build request
         if (is_null($courseAssignmentData['assignment'])) {
@@ -144,10 +144,10 @@ class RunsFactory {
      */
     public static function createRun($problemData, $contestData, $contestant) {
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant
@@ -177,7 +177,7 @@ class RunsFactory {
     public static function createRunToProblem(
         $problemData,
         $contestant,
-        ScopedLoginToken $login = null
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
@@ -213,6 +213,12 @@ class RunsFactory {
         ?int $runId = null
     ): void {
         $guid = is_null($runGuid) ? $runData['response']['guid'] : $runGuid;
-        Utils::gradeRun($runId, $guid, $points, $verdict, $submitDelay);
+        \OmegaUp\Test\Utils::gradeRun(
+            $runId,
+            $guid,
+            $points,
+            $verdict,
+            $submitDelay
+        );
     }
 }

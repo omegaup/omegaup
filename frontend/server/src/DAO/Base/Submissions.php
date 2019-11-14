@@ -40,7 +40,8 @@ abstract class Submissions {
                 `language` = ?,
                 `time` = ?,
                 `submit_delay` = ?,
-                `type` = ?
+                `type` = ?,
+                `school_id` = ?
             WHERE
                 (
                     `submission_id` = ?
@@ -73,6 +74,11 @@ abstract class Submissions {
             ),
             intval($Submissions->submit_delay),
             $Submissions->type,
+            (
+                is_null($Submissions->school_id) ?
+                null :
+                intval($Submissions->school_id)
+            ),
             intval($Submissions->submission_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -103,7 +109,8 @@ abstract class Submissions {
                 `Submissions`.`language`,
                 `Submissions`.`time`,
                 `Submissions`.`submit_delay`,
-                `Submissions`.`type`
+                `Submissions`.`type`,
+                `Submissions`.`school_id`
             FROM
                 `Submissions`
             WHERE
@@ -196,7 +203,8 @@ abstract class Submissions {
                 `Submissions`.`language`,
                 `Submissions`.`time`,
                 `Submissions`.`submit_delay`,
-                `Submissions`.`type`
+                `Submissions`.`type`,
+                `Submissions`.`school_id`
             FROM
                 `Submissions`
         ';
@@ -255,8 +263,10 @@ abstract class Submissions {
                     `language`,
                     `time`,
                     `submit_delay`,
-                    `type`
+                    `type`,
+                    `school_id`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -295,6 +305,11 @@ abstract class Submissions {
             ),
             intval($Submissions->submit_delay),
             $Submissions->type,
+            (
+                is_null($Submissions->school_id) ?
+                null :
+                intval($Submissions->school_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -5,15 +5,17 @@
  * @author @joemmanuel
  */
 
-class CourseStudentAddTest extends OmegaupTestCase {
+class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiAddStudent test
      */
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -44,11 +46,17 @@ class CourseStudentAddTest extends OmegaupTestCase {
             true,
             'optional'
         );
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
-        UserFactory::createPrivacyStatement('course_optional_consent');
-        UserFactory::createPrivacyStatement('course_required_consent');
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\User::createPrivacyStatement(
+            'course_optional_consent'
+        );
+        \OmegaUp\Test\Factories\User::createPrivacyStatement(
+            'course_required_consent'
+        );
 
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
         // Student is added to the course
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -57,7 +65,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         ]));
 
         // User was added to the course, but it is the first access
-        $userLogin = OmegaupTestCase::login($identity);
+        $userLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['request']['alias']
@@ -118,9 +126,11 @@ class CourseStudentAddTest extends OmegaupTestCase {
      */
     public function testRemoveStudentFromCourse() {
         $courseData = CoursesFactory::createCourse();
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -154,10 +164,12 @@ class CourseStudentAddTest extends OmegaupTestCase {
      */
     public function testAddStudentNonAdmin() {
         $courseData = CoursesFactory::createCourse();
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
-        ['user' => $nonAdminUser, 'identity' => $nonAdminIdentity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $nonAdminUser, 'identity' => $nonAdminIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $nonAdminLogin = OmegaupTestCase::login($nonAdminIdentity);
+        $nonAdminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $nonAdminIdentity
+        );
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $nonAdminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -171,9 +183,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
      */
     public function testSelfAddStudentNoPublic() {
         $courseData = CoursesFactory::createCourse();
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -186,9 +198,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
      */
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -215,10 +227,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testShouldShowIntro() {
         $courseDataPrivate = CoursesFactory::createCourse();
         $courseDataPublic = CoursesFactory::createCourse(null, null, true);
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Before or after adding student to private course, intro should not show
-        $studentLogin = OmegaupTestCase::login($identity);
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         try {
             \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
@@ -228,7 +240,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
             // OK!
         }
 
-        $adminLogin = OmegaupTestCase::login($courseDataPrivate['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseDataPrivate['admin']
+        );
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -236,7 +250,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
             ]));
 
         // Before or after adding student to private course, intro should not show
-        $studentLogin = OmegaupTestCase::login($identity);
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPrivate['course_alias']
@@ -244,14 +258,16 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals(false, $details['shouldShowResults']);
 
         // Before adding student to public course, intro should show
-        $studentLogin = OmegaupTestCase::login($identity);
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPublic['course_alias']
             ]));
         $this->assertEquals('ok', $details['status']);
 
-        $adminLogin = OmegaupTestCase::login($courseDataPublic['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseDataPublic['admin']
+        );
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -270,10 +286,12 @@ class CourseStudentAddTest extends OmegaupTestCase {
      */
     public function testUserAcceptsTeacher() {
         $courseData = CoursesFactory::createCourse();
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Admin adds user into the course
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
@@ -281,7 +299,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         ]));
 
         // User enters the course and intro details must be shown.
-        $studentLogin = OmegaupTestCase::login($identity);
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias'],

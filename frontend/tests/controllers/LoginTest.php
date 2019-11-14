@@ -5,14 +5,14 @@
  *
  * @author joemmanuel
  */
-class LoginTest extends OmegaupTestCase {
+class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test identity login with valid credentials, username and password
      *
      */
     public function testNativeLoginByUserPositive() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Assert the log is empty.
         $this->assertEquals(
@@ -52,9 +52,9 @@ class LoginTest extends OmegaupTestCase {
      *
      */
     public function testNativeLoginByEmailPositive() {
-        $email = Utils::CreateRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(['email' => $email])
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['email' => $email])
         );
 
         // Inflate request with identity data
@@ -76,7 +76,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByUserInvalidPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -111,9 +111,9 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
-        $email = Utils::CreateRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(['email' => $email])
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['email' => $email])
         );
 
         // Inflate request with user data
@@ -133,7 +133,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Set required context
         $_REQUEST['usernameOrEmail'] = $identity->username;
@@ -147,7 +147,10 @@ class LoginTest extends OmegaupTestCase {
 
         // Call api
         $_SERVER['REQUEST_URI'] = '/api/user/login';
-        $response = json_decode(ApiCallerMock::httpEntryPoint(), true);
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
 
         // Validate output
         $this->assertEquals('ok', $response['status']);
@@ -159,8 +162,8 @@ class LoginTest extends OmegaupTestCase {
      *
      */
     public function test2ConsecutiveLogins() {
-        // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        // Create an identity in omegaup
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Inflate request with identity data
         $r = new \OmegaUp\Request([
@@ -191,7 +194,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginWithOldPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $plainPassword = $identity->password;
         // Set old password
@@ -212,7 +215,7 @@ class LoginTest extends OmegaupTestCase {
 
     public function testDeleteTokenExpired() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -232,7 +235,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testLoginDisabled() {
         // User to be verified
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Force empty password
         $identity->password = '';

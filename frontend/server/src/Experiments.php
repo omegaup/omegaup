@@ -96,7 +96,7 @@ class Experiments {
         $this->loadExperimentsFromConfig($defines, $knownExperiments);
 
         if (!is_null($identity)) {
-            $this->loadExperimentsForUser($identity, $knownExperiments);
+            $this->loadExperimentsForIdentity($identity, $knownExperiments);
         }
 
         if (!is_null($requestExperiments)) {
@@ -126,12 +126,12 @@ class Experiments {
     }
 
     /**
-     * Loads experiments for a particular user.
+     * Loads experiments for a particular identity.
      * @param \OmegaUp\DAO\VO\Identities $identity The identity.
      * @param string[] $knownExperiments Typically
      * \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except in tests.
      */
-    private function loadExperimentsForUser(
+    private function loadExperimentsForIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
         array $knownExperiments
     ): void {

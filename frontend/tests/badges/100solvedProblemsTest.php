@@ -5,14 +5,14 @@
  *
  * @author carlosabcs
  */
-class OneHundredSolvedProblems extends BadgesTestCase {
+class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
     public function test100SolvedProblems() {
         // Creates two users, one solves 99 problems the other 101.
-        ['user' => $user99, 'identity' => $identity99] = UserFactory::createUser();
-        ['user' => $user101, 'identity' => $identity101] = UserFactory::createUser();
+        ['user' => $user99, 'identity' => $identity99] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user101, 'identity' => $identity101] = \OmegaUp\Test\Factories\User::createUser();
         $problems = [];
         for ($i = 0; $i < 101; $i++) {
-            $newProblem = ProblemsFactory::createProblem();
+            $newProblem = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = RunsFactory::createRunToProblem($newProblem, $identity101);
             RunsFactory::gradeRun($run);
             $problems[] = $newProblem;
@@ -28,8 +28,8 @@ class OneHundredSolvedProblems extends BadgesTestCase {
     }
 
     public function test100RunsToSameProblem() {
-        $problem = ProblemsFactory::createProblem();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 101; $i++) {
             $run = RunsFactory::createRunToProblem($problem, $identity);
             RunsFactory::gradeRun($run);

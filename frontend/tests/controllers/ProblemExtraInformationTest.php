@@ -6,13 +6,13 @@
  * @author juan.pablo
  */
 
-class ProblemExtraInformationTest extends OmegaupTestCase {
+class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test reviewers can do some problem-related tasks.
      */
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
         // Annonymus user is able to see the problem
@@ -26,7 +26,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $this->assertFalse($result['problem_admin']);
 
         // Normal user is able to see the problem.
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty($r);
@@ -37,8 +37,8 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
     }
 
     public function testQualityPayload() {
-        $problemData = ProblemsFactory::createProblem();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -134,7 +134,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
      * Test getProblemSolutionStatus
      */
     public function testProblemSolutionStatus() {
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -150,7 +150,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         );
 
         // Normal user should see the problem as locked
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -162,7 +162,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         );
 
         // Problem with no solutions should return NOT_FOUND
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip'
         ]));
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([

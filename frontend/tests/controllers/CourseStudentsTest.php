@@ -3,7 +3,7 @@
 /**
  * Tests that students' progress can be tracked.
  */
-class CourseStudentsTest extends OmegaupTestCase {
+class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentProgress test.
      */
@@ -13,7 +13,7 @@ class CourseStudentsTest extends OmegaupTestCase {
 
         // Prepare assignment. Create problems
         $adminLogin = self::login($courseData['admin']);
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -33,7 +33,9 @@ class CourseStudentsTest extends OmegaupTestCase {
         // Add one run to one of the problems.
         $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
         {
-            $studentLogin = OmegaupTestCase::login($students[0]);
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
             $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $courseData['assignment']->problemset_id,
@@ -72,7 +74,7 @@ class CourseStudentsTest extends OmegaupTestCase {
      */
     public function testAddIdentityStudentToCourse() {
         // Add a new user with identity groups creator privileges, and login
-        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
 
         // Create a course where course admin is a identity creator group member
@@ -82,7 +84,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         );
 
         // Prepare assignment. Create problems
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -97,7 +99,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         );
 
         // Create identities for a group
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [$_, $associatedIdentity] = IdentityFactory::createIdentitiesFromAGroup(
             $associatedGroup,
             $creatorLogin,

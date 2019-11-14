@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ListClarificationsContest extends OmegaupTestCase {
+class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for getting the list of clarifications of a contest.
      * Create 4 clarifications in a contest with one user, then another 3 clarifications
@@ -15,16 +15,19 @@ class ListClarificationsContest extends OmegaupTestCase {
      */
     public function testListPublicClarificationsForContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        ['user' => $contestant1, 'identity' => $identity1] = UserFactory::createUser();
+        ['user' => $contestant1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 4 clarifications with this contestant
         $clarificationData1 = [];
@@ -43,7 +46,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         ClarificationsFactory::answer($clarificationData1[2], $contestData);
 
         // Create another contestant
-        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 3 clarifications with this contestant
         $clarificationData2 = [];

@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateClarificationTest extends OmegaupTestCase {
+class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      */
@@ -17,16 +17,19 @@ class CreateClarificationTest extends OmegaupTestCase {
         $isGraderExpectedToBeCalled = true
     ) {
          // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        ['user' => $userContestant, 'identity' => $contestant] = UserFactory::createUser();
+        ['user' => $userContestant, 'identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call the API avoiding the broadcaster logic
         if ($isGraderExpectedToBeCalled) {
@@ -134,10 +137,13 @@ class CreateClarificationTest extends OmegaupTestCase {
         $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
-            ContestsFactory::addUser($contestData, $identities[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
 
         $messageToEveryone = ClarificationsFactory::createClarification(

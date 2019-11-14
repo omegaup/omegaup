@@ -5,7 +5,7 @@
  * @author @joemmanuel
  */
 
-class CourseStudentListTest extends OmegaupTestCase {
+class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentList test
      */
@@ -42,7 +42,7 @@ class CourseStudentListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse();
 
         // Call apiStudentList by another random user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
@@ -56,7 +56,7 @@ class CourseStudentListTest extends OmegaupTestCase {
      */
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
@@ -87,7 +87,7 @@ class CourseStudentListTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
