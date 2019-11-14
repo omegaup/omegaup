@@ -267,8 +267,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         for ($i = 0; $i < $n; $i++) {
-            $runData = RunsFactory::createRun($problem, $contest, $identity);
-            RunsFactory::gradeRun($runData);
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
             //sumbmission gap between runs must be 60 seconds
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 

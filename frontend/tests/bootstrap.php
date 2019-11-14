@@ -22,11 +22,11 @@ namespace {
     // Load Factories
     require_once(OMEGAUP_ROOT . '/tests/Factories/Contest.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/Problem.php');
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Run.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/User.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/ClarificationsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/IdentityFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
     require_once(

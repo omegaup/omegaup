@@ -8,11 +8,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -47,11 +47,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Create one problem and a submission by the private user
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runDataPrivate = RunsFactory::createRunToProblem(
+        $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identityPrivate
         );
-        RunsFactory::gradeRun($runDataPrivate);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -79,22 +79,22 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create a user and sumbit a run with him
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
-        $runDataPrivate = RunsFactory::createRunToProblem(
+        $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPrivate,
             $identity2
         );
-        RunsFactory::gradeRun($runDataPrivate);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -128,11 +128,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -175,11 +175,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user with no country, state and school
         ['user' => $contestantWithNoCountry, 'identity' => $identityWithNoCountry] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runDataContestantWithNoCountry = RunsFactory::createRunToProblem(
+        $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identityWithNoCountry
         );
-        RunsFactory::gradeRun($runDataContestantWithNoCountry);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantWithNoCountry);
 
         // Create a user with country, state and school
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -194,12 +194,12 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // create runs
-        $runDataContestant = RunsFactory::createRunToProblem(
+        $runDataContestant = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
-            $contestant,
+            $identity,
             $login
         );
-        RunsFactory::gradeRun($runDataContestant);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestant);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -244,18 +244,18 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create two runs of different problems
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+        $runDataContestantFromMaranhao1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMaranhao1,
+            $identityFromMaranhao1,
             $maranhao1Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
+        $runDataContestantFromMaranhao1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[1],
-            $contestantFromMaranhao1,
+            $identityFromMaranhao1,
             $maranhao1Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
 
         [
             'user' => $contestantFromMaranhao2,
@@ -270,12 +270,12 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create o run of one problem
-        $runDataContestantFromMaranhao2 = RunsFactory::createRunToProblem(
+        $runDataContestantFromMaranhao2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMaranhao2,
+            $identityFromMaranhao2,
             $maranhao2Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao2);
 
         // Create a user from Massachusetts, USA
         [
@@ -291,12 +291,14 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // create a run of one problem
-        $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem(
+        $runDataContestantFromMassachusetts = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMassachusetts,
+            $identityFromMassachusetts,
             $massachusettsLogin
         );
-        RunsFactory::gradeRun($runDataContestantFromMassachusetts);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantFromMassachusetts
+        );
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -327,8 +329,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with them
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();
@@ -353,31 +358,31 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = RunsFactory::createRunToProblem(
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],
-                $firstPlaceUser,
+                $firstPlaceIdentity,
                 $login
             );
-            RunsFactory::gradeRun($run);
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
-        $run = RunsFactory::createRunToProblem(
+        $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $extraProblem,
-            $firstPlaceUser,
+            $firstPlaceIdentity,
             $login
         );
-        RunsFactory::gradeRun($run);
+        \OmegaUp\Test\Factories\Run::gradeRun($run);
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $run = RunsFactory::createRunToProblem(
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],
-                $user,
+                $identity,
                 $login
             );
-            RunsFactory::gradeRun($run);
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -386,8 +391,12 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             'forfeit_problem' => true,
         ]));
 
-        $run = RunsFactory::createRunToProblem($extraProblem, $user, $login);
-        RunsFactory::gradeRun($run);
+        $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $extraProblem,
+            $identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run);
 
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateUserRank();

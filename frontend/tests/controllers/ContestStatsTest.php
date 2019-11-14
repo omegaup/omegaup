@@ -27,7 +27,7 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run that we will wait to grade it
-        $maxWaitRunData = RunsFactory::createRun(
+        $maxWaitRunData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
@@ -38,7 +38,7 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $pendingRunsCount = 10;
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
-            $pendingRunsData[$i] = RunsFactory::createRun(
+            $pendingRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
@@ -49,28 +49,28 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $ACRunsCount = 7;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun(
+            $ACRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
             );
 
             // Grade the run
-            RunsFactory::gradeRun($ACRunsData[$i]);
+            \OmegaUp\Test\Factories\Run::gradeRun($ACRunsData[$i]);
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $WARunsCount = 5;
         $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
-            $WARunsData[$i] = RunsFactory::createRun(
+            $WARunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
             );
 
             // Grade the run with WA
-            RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
+            \OmegaUp\Test\Factories\Run::gradeRun($WARunsData[$i], 0, 'WA');
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
@@ -140,14 +140,14 @@ class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
         $ACRunsCount = 2;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun(
+            $ACRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
             );
 
             // Grade the run
-            RunsFactory::gradeRun($ACRunsData[$i]);
+            \OmegaUp\Test\Factories\Run::gradeRun($ACRunsData[$i]);
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 

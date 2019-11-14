@@ -43,7 +43,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'language' => 'c',
                 'source' => $submissionSource,
             ]));
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 null /*runData*/,
                 0.5,
                 'PA',
@@ -122,7 +122,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create a valid run for assignment
-        $runData = RunsFactory::createCourseAssignmentRun(
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemData,
             $courseData,
             $associatedIdentity
@@ -131,7 +131,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // Create an invalid run for assignment, because identity is not a
             // member of the course group
-            $runData = RunsFactory::createCourseAssignmentRun(
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
                 $problemData,
                 $courseData,
                 $unassociatedIdentity
