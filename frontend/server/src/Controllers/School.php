@@ -174,6 +174,25 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
+     * @param \OmegaUp\Request $r
+     * @return array{time: string, username: string, country_id: string, email: string}[]
+     */
+    public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id', null, null, false);
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
+            intval($school->school_id)
+        );
+    }
+
+    /**
+     * Returns rank of best schools in last month
+     *
      * @param int $offset
      * @param int $rowCount
      * @param int $startTime

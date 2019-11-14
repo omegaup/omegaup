@@ -89,7 +89,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $val = [$startTime, $endTime, $endTime];
 
-        /** @var array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}> */
+        /** @var array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
@@ -150,7 +150,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
       ';
 
       /** @var array{time: string, username: string, country_id: string, email: string}[] */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $schoolId);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$schoolId]
+        );
     }
 
     /**
@@ -258,7 +261,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     }
 
     /**
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfMonthByGivenDate(
         string $date
