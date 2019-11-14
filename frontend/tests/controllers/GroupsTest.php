@@ -58,7 +58,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Add user to group
+     * Add identity to group
      */
     public function testAddUserToGroup() {
         $group = GroupsFactory::createGroup();
@@ -67,7 +67,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($group['owner']);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $group['group']->alias
         ]));
         $this->assertEquals('ok', $response['status']);

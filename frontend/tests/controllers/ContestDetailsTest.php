@@ -278,7 +278,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $firstAccessTime = $problemset_identity->access_time;
@@ -287,7 +287,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $this->assertEquals(
@@ -324,7 +324,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $firstAccessTime = $problemset_identity->access_time;
@@ -333,7 +333,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $this->assertEquals(
@@ -374,7 +374,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $firstAccessTime = $problemset_identity->access_time;
@@ -383,7 +383,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $contestant->main_identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         $this->assertEquals(

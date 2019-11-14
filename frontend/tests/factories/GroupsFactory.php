@@ -7,11 +7,11 @@ class GroupsFactory {
      * @return array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}}
      */
     public static function createGroup(
-        \OmegaUp\DAO\VO\Identities $owner = null,
-        string $name = null,
-        string $description = null,
-        string $alias = null,
-        \OmegaUp\Test\ScopedLoginToken $login = null
+        ?\OmegaUp\DAO\VO\Identities $owner = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
             ['user' => $user, 'identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
@@ -85,9 +85,9 @@ class GroupsFactory {
      */
     public static function createGroupScoreboard(
         array $groupData,
-        string $name = null,
-        string $description = null,
-        string $alias = null
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null
     ) {
         if (is_null($name)) {
             $name = \OmegaUp\Test\Utils::createRandomString();

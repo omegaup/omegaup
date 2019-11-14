@@ -1387,7 +1387,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="16">
+    <PossiblyNullArgument occurrences="15">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1409,22 +1409,19 @@
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
     </PossiblyNullArrayOffset>
-    <PossiblyNullPropertyAssignment occurrences="5">
+    <PossiblyNullPropertyAssignment occurrences="4">
       <code>$identity</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
       <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="7">
+    <PossiblyNullPropertyFetch occurrences="4">
       <code>$email-&gt;email</code>
       <code>$identity-&gt;password</code>
       <code>$user-&gt;main_identity_id</code>
       <code>$identity-&gt;username</code>
       <code>$user-&gt;main_identity_id</code>
-      <code>$r-&gt;user-&gt;main_email_id</code>
-      <code>$r-&gt;user-&gt;verified</code>
-      <code>$r-&gt;user-&gt;verification_id</code>
     </PossiblyNullPropertyFetch>
     <UndefinedDocblockClass occurrences="9">
       <code>$response</code>
@@ -1579,13 +1576,9 @@
       <code>$page</code>
       <code>$page</code>
     </MixedOperand>
-    <PossiblyNullArgument occurrences="2">
-      <code>$rs</code>
+    <PossiblyNullArgument occurrences="1">
       <code>$alias</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="1">
-      <code>$rs['total']</code>
-    </PossiblyNullArrayAccess>
     <PossiblyUndefinedVariable occurrences="11">
       <code>$params</code>
       <code>$params</code>
@@ -2202,7 +2195,7 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <MissingParamType occurrences="7">
+    <MissingParamType occurrences="6">
       <code>$public</code>
       <code>$requestsUserInformation</code>
       <code>$showScoreboard</code>
@@ -2212,25 +2205,15 @@
       <code>$courseAlias</code>
       <code>$assignmentAlias</code>
       <code>$problems</code>
-      <code>$courseData</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
+    <MissingReturnType occurrences="1">
       <code>addProblemsToAssignment</code>
-      <code>submitRunsToAssignmentsInCourse</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$courseData['course_alias']</code>
-      <code>$courseData['course_alias']</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="4">
+    <MixedArrayAccess occurrences="1">
       <code>$problem['problem']</code>
-      <code>$courseData['course_alias']</code>
-      <code>$problemData['request']</code>
-      <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$problem</code>
-      <code>$problemData</code>
     </MixedAssignment>
     <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>

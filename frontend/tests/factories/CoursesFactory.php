@@ -235,14 +235,17 @@ class CoursesFactory {
     }
 
     /**
+     * @param array{course_alias: string} $courseData
      * @param \OmegaUp\DAO\VO\Identities[] $students
      * @param string[] $assignmentAliases
+     * @param array<string, list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}>> $problemAssignmentsMap
+     * @return array<string, array<string, int>>
      */
     public static function submitRunsToAssignmentsInCourse(
         $courseData,
-        array $students,
-        array $assignmentAliases,
-        array $problemAssignmentsMap
+        $students,
+        $assignmentAliases,
+        $problemAssignmentsMap
     ) {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         if (is_null($course) || is_null($course->course_id)) {
@@ -251,7 +254,9 @@ class CoursesFactory {
         $expectedScores = [];
         foreach ($students as $s => $student) {
             if (is_null($student->username)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'userNotFound'
+                );
             }
             $studentUsername = $student->username;
             $expectedScores[$studentUsername] = [];
