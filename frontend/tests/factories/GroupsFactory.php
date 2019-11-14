@@ -40,7 +40,6 @@ class GroupsFactory {
         ]);
 
         $response = \OmegaUp\Controllers\Group::apiCreate($r);
-
         $group = \OmegaUp\DAO\Groups::findByAlias($alias);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
