@@ -18,7 +18,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfTheMonth(
         string $startTime,
@@ -29,6 +29,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             i.user_id,
             i.username,
             COALESCE(i.country_id, 'xx') AS country_id,
+            i.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
             (SELECT urc.classname FROM
@@ -120,6 +121,36 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         /** @var array{time: string, username: string, country_id: string, email: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
+
+    /**
+     * Gets all coders of the month from a certain school
+     * @param int $schoolId
+     * @return array{time: string, username: string, country_id: string, email: string}[]
+     */
+    final public static function getCodersOfTheMonthFromSchool(
+        int $schoolId
+    ): array {
+        $sql = '
+        SELECT
+          cm.time, i.username, COALESCE(i.country_id, "xx") AS country_id, e.email
+        FROM
+          Coder_Of_The_Month cm
+        INNER JOIN
+          Users u ON u.user_id = cm.user_id
+        INNER JOIN
+          Identities i ON i.identity_id = u.main_identity_id
+        LEFT JOIN
+          Emails e ON e.user_id = u.user_id
+        WHERE
+          (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
+          cm.school_id = ?
+        ORDER BY
+          cm.time DESC
+      ';
+
+      /** @var array{time: string, username: string, country_id: string, email: string}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $schoolId);
     }
 
     /**

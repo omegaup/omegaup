@@ -8,6 +8,15 @@
 class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCoderOfTheMonthCalc() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add a custom school
+        $login = self::login($identity);
+        $school = SchoolsFactory::createSchool()['school'];
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school->school_id,
+        ]));
+
         // Creating 10 AC runs for our user in the last month
         $runCreationDate = new DateTimeImmutable(date('Y-m-d'));
         $runCreationDate = $runCreationDate->modify('first day of last month');
@@ -33,6 +42,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $identity->username,
             $response['userinfo']['username']
+        );
+
+        // CoderOfTheMonth school_id should match with identity school_id
+        $this->assertEquals(
+            $school->school_id,
+            $response['userinfo']['school_id']
         );
     }
 
