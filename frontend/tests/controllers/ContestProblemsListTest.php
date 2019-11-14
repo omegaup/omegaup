@@ -15,17 +15,17 @@ class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     private function prepareContestData($numUsers = 3, $numProblems = 9) {
         // Create the contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         $problemData = [];
         for ($i = 0; $i < $numProblems; $i++) {
             // Create the problems
-            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Problem ' . ($i + 1),
             ]));
 
             // Add the problems to the contest
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData[$i],
                 $contestData
             );
@@ -38,11 +38,17 @@ class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
             ['user' => $contestants[], 'identity' => $identities[]]  = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to contest
-            ContestsFactory::addUser($contestData, $identities[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
         $contestDirector = $contestData['director'];
         ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin]  = \OmegaUp\Test\Factories\User::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $contestIdentityAdmin
+        );
 
         return [
             'problemData' => $problemData,

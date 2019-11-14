@@ -10,11 +10,14 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function preparePublicContestWithRegistration(): array {
         // create a contest and its admin
         ['user' => $user, 'identity' => $contestAdmin] = \OmegaUp\Test\Factories\User::createUser();
-        $contestData = ContestsFactory::createContest(new ContestParams([
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
             'contestDirector' => $contestAdmin,
         ]));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         $adminLogin = self::login($contestAdmin);
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
@@ -122,7 +125,10 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Adding secondary admin
         ['user' => $user, 'identity' => $secondaryAdminLogin] = \OmegaUp\Test\Factories\User::createUser();
-        ContestsFactory::addAdminUser($contestData, $secondaryAdminLogin);
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $secondaryAdminLogin
+        );
 
         // some users ask for contest
         $contestants = [];

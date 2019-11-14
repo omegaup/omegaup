@@ -22,7 +22,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
         SchoolsFactory::addUserToSchool($schoolsData[1], $identities[3]);
 
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = RunsFactory::createRunToProblem(
             $problemData,
             $identities[0]

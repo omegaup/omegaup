@@ -42,10 +42,10 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestPositive() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Build request
         $directorLogin = self::login($contestData['director']);
@@ -73,10 +73,10 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestInvalidProblem() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         // Build request
         $directorLogin = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
@@ -98,10 +98,10 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestInvalidContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create an empty request
         $directorLogin = self::login($contestData['director']);
@@ -124,10 +124,10 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddProblemToContestWithUnauthorizedUser() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Log in as another random user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -150,11 +150,11 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      * Add too many problems to a contest.
      */
     public function testAddTooManyProblemsToContest() {
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $login = self::login($contestData['director']);
 
         for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST; $i++) {
-            $problemData = ProblemsFactory::createProblemWithAuthor(
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
                 $contestData['director'],
                 $login
             );
@@ -172,7 +172,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Try to insert one more problem than is allowed, and it should fail this time.
-        $problemData = ProblemsFactory::createProblemWithAuthor(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
             $contestData['director'],
             $login
         );
@@ -197,8 +197,8 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempt to add banned problems to a contest.
      */
     public function testAddBannedProblemToContest() {
-        $contestData = ContestsFactory::createContest();
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $contestData['director']
         ]));

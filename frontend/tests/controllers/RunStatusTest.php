@@ -9,13 +9,16 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testShowRunDetailsValid() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -42,7 +45,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic test of downloading a full run.
      */
     public function testDownload() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(

@@ -14,12 +14,12 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problem = ProblemsFactory::createProblem();
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = RunsFactory::createRunToProblem($problem, $user, $login);
             RunsFactory::gradeRun($run);
         }
 
-        $problemForfeited = ProblemsFactory::createProblem();
+        $problemForfeited = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
@@ -40,7 +40,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problems[] = ProblemsFactory::createProblem();
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
             $run = RunsFactory::createRunToProblem(
                 $problems[$i],
                 $user,
@@ -49,7 +49,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             RunsFactory::gradeRun($run);
         }
 
-        $extraProblem = ProblemsFactory::createProblem();
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -78,7 +78,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetSolutionForbiddenAccessException() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problem = ProblemsFactory::createProblem()['problem'];
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

@@ -12,7 +12,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGetRunsForCourse() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a course
         $courseData = CoursesFactory::createCourseWithOneAssignment();

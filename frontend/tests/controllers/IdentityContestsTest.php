@@ -17,10 +17,10 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestant->password = $password;
 
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant
@@ -46,10 +46,12 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testIdentityJoinsContest() {
         // Get a public contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get some problems into the contest
-        [$problemData] = ContestsFactory::insertProblemsInContest($contestData);
+        [$problemData] = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
 
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();

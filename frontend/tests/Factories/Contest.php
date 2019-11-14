@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp\Test\Factories;
+
 class ContestParams {
     /**
      * @readonly
@@ -103,13 +105,7 @@ class ContestParams {
     }
 }
 
-/**
- * ContestsFactory
- *
- * @author joemmanuel
- */
-
-class ContestsFactory {
+class Contest {
     /**
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
@@ -154,19 +150,23 @@ class ContestsFactory {
     /**
      * Insert problems in a contest
      *
-     * @param type $contestData
-     * @param type $numOfProblems
-     * @return array array of problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param int $numOfProblems
+     * @return list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}>
      */
     public static function insertProblemsInContest(
-        $contestData,
-        $numOfProblems = 3
-    ) {
-        // Create problems
+        array $contestData,
+        int $numOfProblems = 3
+    ): array {
+        /** @var list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}> */
         $problems = [];
         for ($i = 0; $i < $numOfProblems; $i++) {
-            $problems[$i] = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest($problems[$i], $contestData);
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problem,
+                $contestData
+            );
+            $problems[] = $problem;
         }
 
         return $problems;
@@ -183,7 +183,9 @@ class ContestsFactory {
         $privateParams = clone $params;
         // Create a valid contest Request object
         $privateParams->admissionMode = 'private';
-        $contestData = ContestsFactory::getRequest($privateParams);
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            $privateParams
+        );
 
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -217,26 +219,19 @@ class ContestsFactory {
         $problemData,
         $contestData
     ): void {
-        // Create an empty request
-        $r = new \OmegaUp\Request();
-
         // Log in as contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
             $contestData['director']
         );
-        $r['auth_token'] = $login->auth_token;
-
-        // Build request
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['points'] = 100;
-        $r['order_in_contest'] = 1;
 
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
-
-        // Clean up
-        unset($_REQUEST);
+        \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'points' => 100,
+            'order_in_contest' => 1,
+        ]));
     }
 
     /**
@@ -253,21 +248,12 @@ class ContestsFactory {
             $contestData['director']
         );
 
-        $r = new \OmegaUp\Request(
-            [
-                'auth_token' => $login->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => $problemData['request']['problem_alias']
-            ]
-        );
-
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
-
-        // Clean up
-        unset($_REQUEST);
-
-        return $response;
+        return \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias']
+        ]));
     }
 
     /**
@@ -278,20 +264,12 @@ class ContestsFactory {
         $contestData,
         $user
     ): void {
-        // Create an empty request
-        $r = new \OmegaUp\Request();
-
-        // Log in as contest director
         $login = \OmegaUp\Test\ControllerTestCase::login($user);
-        $r['auth_token'] = $login->auth_token;
 
-        // Prepare our request
-        $r['contest_alias'] = $contestData['request']['alias'];
-
-        // Call api
-        \OmegaUp\Controllers\Contest::apiOpen($r);
-
-        unset($_REQUEST);
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
     }
 
     /**
@@ -303,20 +281,14 @@ class ContestsFactory {
         $contestData,
         $problemData,
         $user
-    ) {
-        // Prepare our request
-        $r = new \OmegaUp\Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = strval($problemData['request']['problem_alias']);
-
-        // Log in the user
+    ): void {
         $login = \OmegaUp\Test\ControllerTestCase::login($user);
-        $r['auth_token'] = $login->auth_token;
 
-        // Call api
-        \OmegaUp\Controllers\Problem::apiDetails($r);
-
-        unset($_REQUEST);
+        \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => strval($problemData['request']['problem_alias']),
+        ]));
     }
 
     /**
@@ -339,8 +311,6 @@ class ContestsFactory {
 
         // Call api
         \OmegaUp\Controllers\Contest::apiAddUser($r);
-
-        unset($_REQUEST);
     }
 
     /**
@@ -363,8 +333,6 @@ class ContestsFactory {
 
         // Call api
         \OmegaUp\Controllers\Contest::apiAddUser($r);
-
-        unset($_REQUEST);
     }
 
     /**
@@ -387,8 +355,6 @@ class ContestsFactory {
 
         // Call api
         \OmegaUp\Controllers\Contest::apiAddAdmin($r);
-
-        unset($_REQUEST);
     }
 
     /**
@@ -422,10 +388,17 @@ class ContestsFactory {
         ?int $lastUpdated = null
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
+            strval($contestData['request']['alias'])
         );
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
+            );
+        }
         $contest->admission_mode = 'public';
-        $contest->last_updated = $lastUpdated;
+        if (!is_null($lastUpdated)) {
+            $contest->last_updated = $lastUpdated;
+        }
         \OmegaUp\DAO\Contests::update($contest);
     }
 
@@ -433,12 +406,17 @@ class ContestsFactory {
      * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      */
     public static function setScoreboardPercentage(
-        $contestData,
+        array $contestData,
         int $percentage
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
-            $contestData['request']['alias']
+            strval($contestData['request']['alias'])
         );
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
+            );
+        }
         $contest->scoreboard = $percentage;
         \OmegaUp\DAO\Contests::update($contest);
     }

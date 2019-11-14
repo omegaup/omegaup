@@ -9,7 +9,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRestrictionsForContests() {
         // Create a contest with admin privileges (main identity can do that)
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a group, a set of identities, get one of them
         $password = \OmegaUp\Test\Utils::createRandomString();
@@ -213,7 +213,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         try {
-            ContestsFactory::createContest(new ContestParams([
+            \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $identity,
             ]));
             $this->fail('unassociated identity can not create contests');
@@ -278,7 +278,10 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // try to create a problem
-            $problemData = ProblemsFactory::createProblem(null, $login);
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                null,
+                $login
+            );
             $this->fail("{$identityStatus} identity can not create problems");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
