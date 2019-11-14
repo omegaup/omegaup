@@ -48,13 +48,13 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         foreach ($runMap as $runDescription) {
-            $runData = RunsFactory::createRun(
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[$runDescription['problem_idx']],
                 $contestData,
                 $identities[$runDescription['contestant_idx']]
             );
 
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 $runData,
                 $runDescription['points'],
                 $runDescription['verdict'],
@@ -64,21 +64,21 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         if ($runForDirector) {
-            $runDataDirector = RunsFactory::createRun(
+            $runDataDirector = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[0],
                 $contestData,
                 $contestDirector
             );
-            RunsFactory::gradeRun($runDataDirector);
+            \OmegaUp\Test\Factories\Run::gradeRun($runDataDirector);
         }
 
         if ($runForAdmin) {
-            $runDataAdmin = RunsFactory::createRun(
+            $runDataAdmin = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[0],
                 $contestData,
                 $contestIdentityAdmin
             );
-            RunsFactory::gradeRun($runDataAdmin);
+            \OmegaUp\Test\Factories\Run::gradeRun($runDataAdmin);
         }
 
         return [
@@ -257,20 +257,20 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create runs
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        $runData1 = RunsFactory::createRun(
+        $runData1 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData2,
             $contestData,
             $identity
         );
 
         // Grade the runs
-        RunsFactory::gradeRun($runData, 1, 'AC', 60);
-        RunsFactory::gradeRun($runData1, 1, 'AC', 200);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 60);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData1, 1, 'AC', 200);
 
         // Create request
         $login = self::login($identity);
@@ -320,14 +320,14 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($identity);
@@ -389,14 +389,14 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($contestData['director']);
@@ -458,26 +458,26 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        $runData2 = RunsFactory::createRun(
+        $runData2 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity2
         );
-        $runData3 = RunsFactory::createRun(
+        $runData3 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData2,
             $identity2
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runData2);
-        RunsFactory::gradeRun($runData3);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData3);
 
         // Create request
         $login = self::login($identity);
@@ -526,12 +526,12 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get the scoreboard url by using the MyList api being the
         // contest director
@@ -637,12 +637,12 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get the scoreboard url by using the AdminList api being the
         // contest director

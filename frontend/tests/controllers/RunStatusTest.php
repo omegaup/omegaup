@@ -24,7 +24,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
@@ -51,11 +51,11 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
             \OmegaUp\Controllers\Run::downloadSubmission(

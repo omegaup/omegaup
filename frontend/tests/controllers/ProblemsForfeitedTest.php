@@ -15,8 +15,12 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
             $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         $problemForfeited = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -41,12 +45,12 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = RunsFactory::createRunToProblem(
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],
-                $user,
+                $identity,
                 $login
             );
-            RunsFactory::gradeRun($run);
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();

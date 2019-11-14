@@ -16,10 +16,16 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        $runDataPA = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -47,17 +53,17 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem(
+        $runDataOutsideContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        $runDataInsideContest = RunsFactory::createRun(
+        $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataOutsideContest);
-        RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataOutsideContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -84,16 +90,16 @@ class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        $runDataPA = RunsFactory::createRunToProblem(
+        $runDataPA = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
         );
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);

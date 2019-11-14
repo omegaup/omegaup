@@ -1,26 +1,23 @@
 <?php
 
-/**
- * Description of RunsFactory
- *
- * @author joemmanuel
- */
+namespace OmegaUp\Test\Factories;
 
-class RunsFactory {
+use CoursesFactory;
+
+class Run {
     /**
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
      *
-     * @param type $problemData
-     * @param type $contestData
-     * @param type $contestant
-     * @return \OmegaUp\Request
+     * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
+     * @param ?array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param \OmegaUp\DAO\VO\Identities $contestant
      */
     private static function createRequestCommon(
-        $problemData,
-        $contestData,
+        array $problemData,
+        ?array $contestData,
         $contestant,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): \OmegaUp\Request {
         if (is_null($login)) {
             // Login as contestant
             $login = \OmegaUp\Test\ControllerTestCase::login($contestant);
@@ -117,9 +114,6 @@ class RunsFactory {
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
-        // Clean up
-        unset($_REQUEST);
-
         return [
             'request' => $r,
             'participant' => $participant,
@@ -130,12 +124,16 @@ class RunsFactory {
     /**
      * Creates a run
      *
-     * @param type $problemData
-     * @param type $contestData
+     * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $contestant
-     * @return array
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
-    public static function createRun($problemData, $contestData, $contestant) {
+    public static function createRun(
+        array $problemData,
+        array $contestData,
+        \OmegaUp\DAO\VO\Identities $contestant
+    ): array {
         // Our contestant has to open the contest before sending a run
         \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
@@ -151,9 +149,6 @@ class RunsFactory {
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
-        // Clean up
-        unset($_REQUEST);
-
         return [
             'request' => $r,
             'contestant' => $contestant,
@@ -164,21 +159,19 @@ class RunsFactory {
     /**
      * Creates a run to the given problem
      *
-     * @param type $problemData
-     * @param type $contestant
+     * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
+     * @param \OmegaUp\DAO\VO\Identities $contestant
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
     public static function createRunToProblem(
-        $problemData,
-        $contestant,
+        array $problemData,
+        \OmegaUp\DAO\VO\Identities $contestant,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): array {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
-
-        // Clean up
-        unset($_REQUEST);
 
         return [
             'request' => $r,
@@ -190,7 +183,7 @@ class RunsFactory {
     /**
      * Given a run, set a score to a given run
      *
-     * @param ?array  $runData     The run.
+     * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}  $runData     The run.
      * @param float   $points      The score of the run
      * @param string  $verdict     The verdict of the run.
      * @param ?int    $submitDelay The number of minutes worth of penalty.
@@ -205,7 +198,13 @@ class RunsFactory {
         ?string $runGuid = null,
         ?int $runId = null
     ): void {
-        $guid = is_null($runGuid) ? $runData['response']['guid'] : $runGuid;
+        if (!is_null($runGuid)) {
+            $guid = $runGuid;
+        } elseif (!is_null($runData)) {
+            $guid = $runData['response']['guid'];
+        } else {
+            $guid = null;
+        }
         \OmegaUp\Test\Utils::gradeRun(
             $runId,
             $guid,

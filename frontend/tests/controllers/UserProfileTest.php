@@ -177,12 +177,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             $contests[0]
         );
 
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contests[0],
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get ContestStats
         $login = self::login($identity);
@@ -220,12 +220,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             $contests[0]
         );
 
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contests[0],
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -266,15 +266,27 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Submission gap between runs must be 60 seconds
         $runs = [];
-        $runs[0] = RunsFactory::createRun($problemOne, $contest, $identity);
+        $runs[0] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemOne,
+            $contest,
+            $identity
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runs[1] = RunsFactory::createRun($problemTwo, $contest, $identity);
+        $runs[1] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemTwo,
+            $contest,
+            $identity
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runs[2] = RunsFactory::createRun($problemOne, $contest, $identity);
+        $runs[2] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemOne,
+            $contest,
+            $identity
+        );
 
-        RunsFactory::gradeRun($runs[0]);
-        RunsFactory::gradeRun($runs[1]);
-        RunsFactory::gradeRun($runs[2]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[2]);
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -313,16 +325,28 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run, 0.0, 'CE');
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0.0, 'CE');
         }
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run, 0.5, 'PA');
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0.5, 'PA');
         }
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         $response = \OmegaUp\Controllers\User::apiStats(new \OmegaUp\Request([

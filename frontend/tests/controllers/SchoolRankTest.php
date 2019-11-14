@@ -23,35 +23,35 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         SchoolsFactory::addUserToSchool($schoolsData[1], $identities[3]);
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[0]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[1]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[2]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[3]
         );
-        RunsFactory::gradeRun($runData, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.5, 'PA');
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[4]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
     }
 
     /**

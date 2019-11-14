@@ -346,12 +346,12 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
             // The run is sent 10 minutes after contest starts.
             \OmegaUp\Time::setTimeForTesting($originalTime + 10 * 60);
-            $runData = RunsFactory::createRun(
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
             );
-            RunsFactory::gradeRun($runData, 1.0, 'AC', 10);
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC', 10);
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
 
@@ -451,7 +451,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestantIdentity
@@ -470,7 +470,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity2
@@ -506,7 +506,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Trying to create a run out of contest time
-            RunsFactory::createRun(
+            \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $contestantIdentity
@@ -529,7 +529,7 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($windowLength, $contest['window_length']);
 
         // Trying to create a run inside contest time
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestantIdentity
@@ -663,7 +663,11 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $updatedTime = $updatedTime + 15 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $identity);
+            \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
             $this->fail(
                 'Contestant should not create a run after contest finishes'
             );
@@ -720,15 +724,23 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         // User creates a run 50 minutes later, it is ok
         $updatedTime = $originalTime + 50 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         // 20 minutes later is no longer available because window_length has
         // expired
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $identity);
+            \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
             $this->fail(
                 'Contestant should not create a run after window length expires'
             );
@@ -783,8 +795,12 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         // User creates a run 20 minutes later, it is ok
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         $directorLogin = self::login($contest['director']);
 
@@ -803,8 +819,12 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
     }
 
     public function testUpdateDisableWindowLength() {
@@ -847,14 +867,22 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         // User creates a run 20 minutes later, it is ok
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         // User tries to create another run 20 minutes later, it should fail
         $updatedTime = $updatedTime + 20 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $identity);
+            \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
             $this->fail(
                 'User should not be able to send runs beause window_length is over'
             );
@@ -875,14 +903,22 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // User tries to create run agaian, it should works fine
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         // User tries to create another run 30 minutes later, it should fail
         $updatedTime = $updatedTime + 30 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         try {
-            RunsFactory::createRun($problem, $contest, $identity);
+            \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
             $this->fail(
                 'User should not be able to send runs beause window_length is over'
             );
@@ -898,7 +934,11 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Now user can submit run until contest finishes
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
     }
 }

@@ -630,49 +630,49 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create runs
         $runsData = [];
-        $runsData[0] = RunsFactory::createRun(
+        $runsData[0] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identities[0]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[1] = RunsFactory::createRun(
+        $runsData[1] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identities[0]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[2] = RunsFactory::createRun(
+        $runsData[2] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identities[1]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[3] = RunsFactory::createRun(
+        $runsData[3] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identities[2]
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataDirector = RunsFactory::createRun(
+        $runDataDirector = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestDirector
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataAdmin = RunsFactory::createRun(
+        $runDataAdmin = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestIdentityAdmin
         );
 
         // Grade the runs
-        RunsFactory::gradeRun($runsData[0], 0, 'CE');
-        RunsFactory::gradeRun($runsData[1]);
-        RunsFactory::gradeRun($runsData[2], .9, 'PA');
-        RunsFactory::gradeRun($runsData[3], 1, 'AC', 180);
-        RunsFactory::gradeRun($runDataDirector, 1, 'AC', 120);
-        RunsFactory::gradeRun($runDataAdmin, 1, 'AC', 110);
+        \OmegaUp\Test\Factories\Run::gradeRun($runsData[0], 0, 'CE');
+        \OmegaUp\Test\Factories\Run::gradeRun($runsData[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runsData[2], .9, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runsData[3], 1, 'AC', 180);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataDirector, 1, 'AC', 120);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAdmin, 1, 'AC', 110);
 
         // Create API
         $login = self::login($contestDirector);
@@ -799,34 +799,34 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Create runs
         $runsData = [];
         {
-            $run = RunsFactory::createRun(
+            $run = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identities[0]
             );
-            RunsFactory::gradeRun($run, 0, 'CE');
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0, 'CE');
             $runsData[] = $run;
         }
 
         {
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-            $run = RunsFactory::createRun(
+            $run = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identities[0]
             );
-            RunsFactory::gradeRun($run, 1, 'AC', 60);
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 1, 'AC', 60);
             $runsData[] = $run;
         }
 
         {
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-            $run = RunsFactory::createRun(
+            $run = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identities[1]
             );
-            RunsFactory::gradeRun($run, .9, 'PA');
+            \OmegaUp\Test\Factories\Run::gradeRun($run, .9, 'PA');
             $runsData[] = $run;
         }
 

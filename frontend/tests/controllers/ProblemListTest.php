@@ -173,11 +173,11 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         for ($i = 0; $i < 5; $i++) {
             ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             for ($j = 0; $j <= $i; $j++) {
-                $runData = RunsFactory::createRunToProblem(
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData[$j],
                     $identities[$i]
                 );
-                RunsFactory::gradeRun($runData);
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
             }
             $login[] = self::login($identities[$i]);
         }
@@ -730,14 +730,17 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $problemDataNoRun = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemDataDecimal = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runDataDecimal = RunsFactory::createRunToProblem(
+        $runDataDecimal = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataDecimal,
             $identity
         );
-        RunsFactory::gradeRun($runDataDecimal, '.123456', 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataDecimal, '.123456', 'PA');
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -856,7 +859,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $runs = $i / 2;
             for ($r = 0; $r < $runs; $r++) {
-                $runData = RunsFactory::createRunToProblem(
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData[$i],
                     $identity
                 );
@@ -866,7 +869,11 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
                     $verdict = ($points == 100) ? 'AC' : 'PA';
                 }
 
-                RunsFactory::gradeRun($runData, $points / 100, $verdict);
+                \OmegaUp\Test\Factories\Run::gradeRun(
+                    $runData,
+                    $points / 100,
+                    $verdict
+                );
             }
         }
 
@@ -975,46 +982,52 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
 
         /*----------------- Different runs for each problem -----------------*/
         // problemDataWA will have only one run with a WA verdict
-        $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $identity);
-        RunsFactory::gradeRun($runDataWA, '0.0', 'WA');
+        $runDataWA = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemDataWA,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataWA, '0.0', 'WA');
 
         // problemDataAC will have two AC runs
-        $runDataAC1 = RunsFactory::createRunToProblem(
+        $runDataAC1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC1);
-        $runDataAC1_2 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC1);
+        $runDataAC1_2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC1_2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC1_2);
 
         // problemDataAC2 will have three runs, one AC, one PE and one TLE
-        $runDataAC2_1 = RunsFactory::createRunToProblem(
+        $runDataAC2_1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_1, '0.05', 'PE');
-        $runDataAC2_2 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_1, '0.05', 'PE');
+        $runDataAC2_2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_2, '0.04', 'TLE');
-        $runDataAC2_3 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_2, '0.04', 'TLE');
+        $runDataAC2_3 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_3);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_3);
 
         // problemDataPE will have two runs, one with a PE verdict and  the other with a TLE verdict.
-        $runDataPE = RunsFactory::createRunToProblem($problemDataPE, $identity);
-        RunsFactory::gradeRun($runDataPE, '0.10', 'PE');
-        $runDataTLE = RunsFactory::createRunToProblem(
+        $runDataPE = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPE,
             $identity
         );
-        RunsFactory::gradeRun($runDataTLE, '0.10', 'TLE');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPE, '0.10', 'PE');
+        $runDataTLE = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemDataPE,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataTLE, '0.10', 'TLE');
 
         // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
         $response = \OmegaUp\Controllers\User::apiListUnsolvedProblems(new \OmegaUp\Request([
