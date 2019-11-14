@@ -414,6 +414,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             SELECT LAST_INSERT_ID();
             ''') % (identity_id),
             dbname='omegaup', auth=self.mysql_auth())
+        util.database_utils.mysql(
+            ('''
+            UPDATE
+                Identities
+            SET
+                user_id = %s
+            WHERE
+                identity_id = %s;
+            ''') % (user_id, identity_id),
+            dbname='omegaup', auth=self.mysql_auth())
 
         # Enable experiment
         self.enable_experiment_identities_to_user(user_id)
