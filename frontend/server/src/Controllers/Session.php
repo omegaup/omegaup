@@ -49,8 +49,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getFacebookLoginUrl(): string {
-        $scopedFacebook = new ScopedFacebook();
-        $facebook = $scopedFacebook->facebook;
+        $facebook = ((new ScopedFacebook())->facebook);
 
         $helper = $facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
@@ -398,8 +397,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $scopedFacebook = new ScopedFacebook();
-        $facebook = $scopedFacebook->facebook;
+        $facebook = ((new ScopedFacebook())->facebook);
 
         $helper = $facebook->getRedirectLoginHelper();
         try {
