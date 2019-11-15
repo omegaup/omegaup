@@ -75,25 +75,48 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Prepare DAOs
+            $countryId = is_null(
+                $r['country_id']
+            ) ? null : strval(
+                $r['country_id']
+            );
+            $stateId = is_null($r['state_id']) ? null : strval($r['state_id']);
             $identity = self::createIdentity(
                 $r['username'],
                 $r['name'],
                 $r['password'],
-                is_null($r['country_id']) ? null : strval($r['country_id']),
-                is_null($r['state_id']) ? null : strval($r['state_id']),
+                $countryId,
+                $stateId,
                 $r['gender'],
-                $r['school_name'],
                 $r['group_alias']
             );
+
+            $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
+                $countryId,
+                $stateId
+            );
+            $schoolId = \OmegaUp\Controllers\School::createSchool(
+                trim(
+                    $r['school_name']
+                ),
+                $state
+            );
+            $identity->school_id = $schoolId; //TODO: remove this when removing school_id
 
             // Save in DB
             self::saveIdentityGroup($identity, $group->group_id);
 
-            // Save IdentitySchool
-            \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
+            // Create IdentitySchool
+            $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
                 'identity_id' => $identity->identity_id,
-                'school_id' => $identity->school_id,
-            ]));
+                'school_id' => $schoolId,
+            ]);
+
+            \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+            // Save current_identity_school_id on Identity
+            $identity->current_identity_school_id = $identitySchool->identity_school_id;
+            \OmegaUp\DAO\Identities::update($identity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -123,32 +146,51 @@ class Identity extends \OmegaUp\Controllers\Controller {
             /** @var array<string, string> $identity */
             foreach ($r['identities'] as $identity) {
                 // Prepare DAOs
-                $identity = self::createIdentity(
+                $countryId = empty(
+                    $identity['country_id']
+                ) ? null : strval(
+                    $identity['country_id']
+                );
+                $stateId = empty(
+                    $identity['state_id']
+                ) ? null : strval(
+                    $identity['state_id']
+                );
+                $newIdentity = self::createIdentity(
                     $identity['username'],
                     $identity['name'],
                     $identity['password'],
-                    empty(
-                        $identity['country_id']
-                    ) ? null : strval(
-                        $identity['country_id']
-                    ),
-                    empty(
-                        $identity['state_id']
-                    ) ? null : strval(
-                        $identity['state_id']
-                    ),
+                    $countryId,
+                    $stateId,
                     $identity['gender'],
-                    $identity['school_name'],
                     $r['group_alias']
                 );
 
-                self::saveIdentityGroup($identity, $group->group_id);
+                $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
+                    $countryId,
+                    $stateId
+                );
+                $schoolId = \OmegaUp\Controllers\School::createSchool(
+                    trim(
+                        $identity['school_name']
+                    ),
+                    $state
+                );
+                $newIdentity->school_id = $schoolId; //TODO: remove this when removing school_id
 
-                // Save IdentitySchool
-                \OmegaUp\DAO\IdentitiesSchools::create(new \OmegaUp\DAO\VO\IdentitiesSchools([
-                    'identity_id' => $identity->identity_id,
-                    'school_id' => $identity->school_id,
-                ]));
+                self::saveIdentityGroup($newIdentity, $group->group_id);
+
+                // Create IdentitySchool
+                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                    'identity_id' => $newIdentity->identity_id,
+                    'school_id' => $schoolId,
+                ]);
+
+                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+                // Save current_identity_school_id on Identity
+                $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
+                \OmegaUp\DAO\Identities::update($newIdentity);
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -422,21 +464,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?string $countryId,
         ?string $stateId,
         $gender,
-        $school,
         $aliasGroup
     ) {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
-
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
-        $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
-            $state
-        );
 
         // Check password
         \OmegaUp\SecurityTools::testStrongPassword($password);
@@ -449,7 +479,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'country_id' => $countryId,
             'state_id' => $stateId,
             'gender' => $gender,
-            'school_id' => $schoolId,
         ]);
     }
 
