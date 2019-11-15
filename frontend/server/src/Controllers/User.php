@@ -1380,6 +1380,7 @@ class User extends \OmegaUp\Controllers\Controller {
             // Only first place coder is saved
             \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $users[0]['user_id'],
+                'school_id' => $users[0]['school_id'],
                 'time' => $firstDay,
                 'rank' => 1,
             ]));
@@ -1476,6 +1477,7 @@ class User extends \OmegaUp\Controllers\Controller {
         foreach ($users as $index => $user) {
             $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $user['user_id'],
+                'school_id' => $user['school_id'],
                 'time' => $dateToSelect,
                 'rank' => $index + 1,
             ]);
