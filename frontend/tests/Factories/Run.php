@@ -2,8 +2,6 @@
 
 namespace OmegaUp\Test\Factories;
 
-use CoursesFactory;
-
 class Run {
     /**
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
@@ -90,16 +88,19 @@ class Run {
         $participant
     ) {
         // Our participant has to open the course before sending a run
-        CoursesFactory::openCourse($courseAssignmentData, $participant);
+        \OmegaUp\Test\Factories\Course::openCourse(
+            $courseAssignmentData,
+            $participant
+        );
 
         // Our participant has to open the assignment in a course before sending a run
-        CoursesFactory::openAssignmentCourse(
+        \OmegaUp\Test\Factories\Course::openAssignmentCourse(
             $courseAssignmentData,
             $participant
         );
 
         // Then we need to open the problem
-        CoursesFactory::openProblemInCourseAssignment(
+        \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
             $courseAssignmentData,
             $problemData,
             $participant

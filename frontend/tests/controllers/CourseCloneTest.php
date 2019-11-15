@@ -12,7 +12,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
@@ -39,7 +39,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $studentsUsername = [];
         $studentsData = null;
         for ($i = 0; $i < $studentCount; $i++) {
-            $studentsData = CoursesFactory::addStudentToCourse($courseData);
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
             $studentsUsername[] = $studentsData->username;
         }
 
@@ -99,7 +101,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
@@ -126,7 +128,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $studentsUsername = [];
         $studentsData = null;
         for ($i = 0; $i < $studentCount; $i++) {
-            $studentsData = CoursesFactory::addStudentToCourse($courseData);
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
             $studentsUsername[] = $studentsData->username;
         }
 
@@ -153,7 +157,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $assignmentProblemsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
