@@ -9,11 +9,16 @@
 class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCourseActivityReport() {
         // Create a course with 5 assignments
-        $courseData = CoursesFactory::createCourseWithAssignments(5);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            5
+        );
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $identity);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identity
+        );
 
         $userLogin = self::login($identity);
 

@@ -15,7 +15,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a course
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $courseAlias = $courseData['course_alias'];
         $assignmentAlias = $courseData['assignment_alias'];
 
@@ -23,7 +23,7 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($courseData['admin']);
 
         // Add the problem to the assignment
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -34,7 +34,10 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add student to course
-        CoursesFactory::addStudentToCourse($courseData, $participant);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
 
         // Create a run for assignment
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(

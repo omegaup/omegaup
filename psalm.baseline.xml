@@ -2194,31 +2194,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/tests/factories/CoursesFactory.php">
-    <MissingParamType occurrences="6">
-      <code>$public</code>
-      <code>$requestsUserInformation</code>
-      <code>$showScoreboard</code>
-      <code>$public</code>
-      <code>$requestsUserInformation</code>
-      <code>$showScoreboard</code>
-      <code>$courseAlias</code>
-      <code>$assignmentAlias</code>
-      <code>$problems</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>addProblemsToAssignment</code>
-    </MissingReturnType>
-    <MixedArrayAccess occurrences="1">
-      <code>$problem['problem']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$problem</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$problem['problem']-&gt;alias</code>
-    </MixedPropertyFetch>
-  </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
     <MixedArgument occurrences="2">
       <code>$unassociatedIdentity['username']</code>
