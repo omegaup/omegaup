@@ -3517,6 +3517,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'VISIBILITY' => '0',
             'LANGUAGES' => 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb',
             'SELECTED_TAGS' => '',
+            'IS_UPDATE' => false,
         ];
     }
 
