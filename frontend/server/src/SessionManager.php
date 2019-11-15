@@ -5,31 +5,13 @@ namespace OmegaUp;
 // An RAII wrapper to manage the lifetime of a session.
 class ScopedSession {
     public function __construct() {
-        session_start();
+        if (!session_id()) {
+            session_start();
+        }
     }
 
     public function __destruct() {
         session_write_close();
-    }
-}
-
-class ScopedFacebook {
-    /** @var ScopedSession */
-    public $scopedSession;
-    /** @var \Facebook\Facebook */
-    public $facebook;
-
-    public function __construct() {
-        $this->scopedSession = new ScopedSession();
-
-        $this->facebook = new \Facebook\Facebook([
-            'app_id' => OMEGAUP_FB_APPID,
-            'app_secret' => OMEGAUP_FB_SECRET,
-            'default_graph_version' => 'v2.5',
-        ]);
-    }
-
-    public function __destruct() {
     }
 }
 
@@ -92,9 +74,5 @@ class SessionManager {
 
     public function sessionStart(): ScopedSession {
         return new ScopedSession();
-    }
-
-    public function sessionStartFacebook(): ScopedFacebook {
-        return new ScopedFacebook();
     }
 }

@@ -2,6 +2,28 @@
 
  namespace OmegaUp\Controllers;
 
+class ScopedFacebook {
+    /** @var \OmegaUp\ScopedSession */
+    public $scopedSession;
+    /** @var \Facebook\Facebook */
+    public $facebook;
+
+    public function __construct() {
+        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
+
+        $this->scopedSession = new \OmegaUp\ScopedSession();
+
+        $this->facebook = new \Facebook\Facebook([
+            'app_id' => OMEGAUP_FB_APPID,
+            'app_secret' => OMEGAUP_FB_SECRET,
+            'default_graph_version' => 'v2.5',
+        ]);
+    }
+
+    public function __destruct() {
+    }
+}
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -26,17 +48,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         return self::$_sessionManager;
     }
 
-    /**
-     * @return \Facebook\Facebook
-     */
-    private static function getFacebookInstance() {
-        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-        $scopedFacebook = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStartFacebook();
-        return $scopedFacebook->facebook;
-    }
-
     public static function getFacebookLoginUrl(): string {
-        $facebook = self::getFacebookInstance();
+        $scopedFacebook = new ScopedFacebook();
+        $facebook = $scopedFacebook->facebook;
 
         $helper = $facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
@@ -384,7 +398,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $facebook = self::getFacebookInstance();
+        $scopedFacebook = new ScopedFacebook();
+        $facebook = $scopedFacebook->facebook;
 
         $helper = $facebook->getRedirectLoginHelper();
         try {
