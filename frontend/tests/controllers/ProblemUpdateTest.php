@@ -6,10 +6,10 @@
  * @author joemmanuel
  */
 
-class UpdateProblemTest extends OmegaupTestCase {
+class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'title' => 'Problem Language'
         ]));
@@ -40,32 +40,35 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemTitleAndContents() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData[0] = RunsFactory::createRun(
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runData[1] = RunsFactory::createRunToProblem(
+        $runData[1] = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData[0]);
-        RunsFactory::gradeRun($runData[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[1]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
         \OmegaUp\FileHandler::setFileUploaderForTesting(
@@ -74,7 +77,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set file upload context
         $login = self::login($problemData['author']);
@@ -182,14 +185,14 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemSettings() {
         // Get a problem with a run.
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData[0] = RunsFactory::createRunToProblem(
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        RunsFactory::gradeRun($runData[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
 
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
@@ -215,7 +218,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -264,7 +267,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemWithValidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'title' => 'valid-languages'
         ]));
 
@@ -297,7 +300,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($problemData['author']);
         $r = new \OmegaUp\Request([
@@ -316,7 +319,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdate() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -348,7 +351,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Test apiUpdateSolution
      */
     public function testProblemSolutionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Update solution
         $solution = 'La nueva solución \$x\$';
@@ -376,7 +379,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -411,7 +414,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemFailed() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get File Uploader Mock and tell Omegaup API to use it
         \OmegaUp\FileHandler::setFileUploaderForTesting(
@@ -419,7 +422,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set file upload context. This problem should fail
         $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'nostmt.zip';
@@ -462,10 +465,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemWithProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $problemAdmin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -500,10 +503,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemWithRemovedProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $user, 'identity' => $problemAdmin] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -542,10 +545,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemAdmins() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        ['user' => $user, 'identity' => $problemAdmin] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $login = self::login($problemData['author']);
@@ -583,13 +586,13 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'visibility' => 0
         ]));
 
         // Normal user shouldn't even be able to see the problem.
-        ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $reviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
@@ -602,7 +605,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Promote to reviewer, can see the problem now.
-        UserFactory::addSystemRole(
+        \OmegaUp\Test\Factories\User::addSystemRole(
             $reviewer,
             \OmegaUp\Authorization::REVIEWER_ROLE
         );
@@ -643,7 +646,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemUpdateVisibility() {
         // Create a public problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
@@ -802,7 +805,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Tests tag operations.
      */
     public function testTags() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $this->assertEquals(
             [
@@ -876,11 +879,14 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Tests problem version update.
      */
     public function testProblemVersionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problem = $problemData['problem'];
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData, 1.0, 'AC');
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC');
 
         $login = self::login($problemData['author']);
         $originalVersionData = \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
@@ -895,7 +901,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Change the problem to something completely different.
         {
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
@@ -910,7 +916,14 @@ class UpdateProblemTest extends OmegaupTestCase {
             ]));
             $this->assertEquals(1, $detourGrader->getGraderCallCount());
         foreach ($detourGrader->getRuns() as $run) {
-            RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null,
+                0,
+                'WA',
+                null,
+                null,
+                $run->run_id
+            );
         }
         }
 
@@ -935,7 +948,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // rejudges, but current_version should go back to the original.
         {
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
@@ -1064,72 +1077,81 @@ class UpdateProblemTest extends OmegaupTestCase {
     ) {
         $originalTime = \OmegaUp\Time::get();
         try {
-            $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'author' => $problemAuthor,
             ]));
             $problem = $problemData['problem'];
-            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
             \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
             // Create a standalone run.
-            $pastStandaloneRunData = RunsFactory::createRunToProblem(
+            $pastStandaloneRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problemData,
                 $identity
             );
-            RunsFactory::gradeRun($pastStandaloneRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($pastStandaloneRunData);
 
             // Create a contest in the past with one run.
-            $pastContestData = ContestsFactory::createContest(new ContestParams([
+            $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime - 5 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $pastContestData
             );
-            ContestsFactory::addUser($pastContestData, $identity);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $pastContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser($pastContestData, $contestAdmin);
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
+                    $pastContestData,
+                    $contestAdmin
+                );
             }
-            $pastRunData = RunsFactory::createRun(
+            $pastRunData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $pastContestData,
                 $identity
             );
-            RunsFactory::gradeRun($pastRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($pastRunData);
 
             // Now create one in the present with one more run.
-            $presentContestData = ContestsFactory::createContest(new ContestParams([
+            $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $originalTime - 60 * 60,
                 'finishTime' => $originalTime + 60 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData,
                 $presentContestData
             );
-            ContestsFactory::addUser($presentContestData, $identity);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $presentContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser(
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
                     $presentContestData,
                     $contestAdmin
                 );
             }
-            $presentRunData = RunsFactory::createRun(
+            $presentRunData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $presentContestData,
                 $identity
             );
-            RunsFactory::gradeRun($presentRunData);
+            \OmegaUp\Test\Factories\Run::gradeRun($presentRunData);
 
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
 
             $login = self::login($problemData['author']);
             // Change the problem to something completely different.
             $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
@@ -1149,7 +1171,14 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $detourGrader->getGraderCallCount()
             );
             foreach ($detourGrader->getRuns() as $run) {
-                RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+                \OmegaUp\Test\Factories\Run::gradeRun(
+                    null,
+                    0,
+                    'WA',
+                    null,
+                    null,
+                    $run->run_id
+                );
             }
 
             return [
@@ -1190,7 +1219,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
             $identity,
@@ -1239,7 +1268,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
             $identity,
@@ -1304,7 +1333,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
             $identity,
@@ -1410,7 +1439,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,
@@ -1434,7 +1463,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,

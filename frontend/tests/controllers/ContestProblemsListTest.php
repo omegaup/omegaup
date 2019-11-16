@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestProblemsListTest extends OmegaupTestCase {
+class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Sets the context for a basic scoreboard test
      * @param  integer $numUsers
@@ -15,17 +15,17 @@ class ContestProblemsListTest extends OmegaupTestCase {
      */
     private function prepareContestData($numUsers = 3, $numProblems = 9) {
         // Create the contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         $problemData = [];
         for ($i = 0; $i < $numProblems; $i++) {
             // Create the problems
-            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Problem ' . ($i + 1),
             ]));
 
             // Add the problems to the contest
-            ContestsFactory::addProblemToContest(
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData[$i],
                 $contestData
             );
@@ -35,14 +35,20 @@ class ContestProblemsListTest extends OmegaupTestCase {
         $identities = [];
         for ($i = 0; $i < $numUsers; $i++) {
             // Create our contestants
-            ['user' => $contestants[], 'identity' => $identities[]]  = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]]  = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to contest
-            ContestsFactory::addUser($contestData, $identities[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
         $contestDirector = $contestData['director'];
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin]  = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestIdentityAdmin);
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin]  = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $contestIdentityAdmin
+        );
 
         return [
             'problemData' => $problemData,

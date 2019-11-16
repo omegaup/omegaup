@@ -24,10 +24,10 @@ class ClarificationsFactory {
         $receiver = null
     ) {
         // Our contestant has to open the contest before sending a clarification
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant
@@ -37,7 +37,7 @@ class ClarificationsFactory {
         $r = new \OmegaUp\Request();
         $r['message'] = (
             is_null($message) ?
-            Utils::CreateRandomString() :
+            \OmegaUp\Test\Utils::createRandomString() :
             $message
         );
         $r['contest_alias'] = $contestData['request']['alias'];
@@ -46,7 +46,7 @@ class ClarificationsFactory {
         $r['public'] = '0';
 
         // Log in our user and set the auth_token properly
-        $login = OmegaupTestCase::login($contestant);
+        $login = \OmegaUp\Test\ControllerTestCase::login($contestant);
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
@@ -81,7 +81,9 @@ class ClarificationsFactory {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in the user
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Update answer

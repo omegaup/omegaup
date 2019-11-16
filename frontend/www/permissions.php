@@ -11,8 +11,14 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
 
 [
     'user' => $user,
+    'identity' => $identity,
 ] = \OmegaUp\Controllers\Session::getCurrentSession();
-if (is_null($user) || is_null($user->user_id)) {
+if (
+    is_null($user) ||
+    is_null($user->user_id) ||
+    is_null($identity) ||
+    is_null($identity->username)
+) {
     header('HTTP/1.1 404 Not found');
     die();
 }
@@ -42,7 +48,7 @@ foreach ($groups as $key => $group) {
 $payload = [
     'userSystemRoles' => $userSystemRoles,
     'userSystemGroups' => $userSystemGroups,
-    'username' => $user->username,
+    'username' => $identity->username,
 ];
 
 $smarty->assign('payload', $payload);

@@ -651,6 +651,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return intval(\OmegaUp\Time::get() + $submission_gap);
     }
 
+    /**
+     * @return \OmegaUp\DAO\VO\Runs[]
+     */
     final public static function searchWithRunIdGreaterThan(
         int $problemId,
         int $submissionId

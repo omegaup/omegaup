@@ -881,6 +881,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
     /**
      * Returns all problems owned by a user.
+     *
+     * @return \OmegaUp\DAO\VO\Problems[]
      */
     final public static function getAllProblemsOwnedByUser(
         $user_id,

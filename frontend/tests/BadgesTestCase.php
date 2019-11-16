@@ -1,11 +1,13 @@
 <?php
 
+namespace OmegaUp\Test;
+
 /**
  * Parent class of all Test cases for omegaUp badges
  *
  * @author carlosabcs
  */
-class BadgesTestCase extends OmegaupTestCase {
+class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
     const BADGES_TESTS_ROOT = OMEGAUP_ROOT . '/tests/badges';
     const MAX_BADGE_SIZE = 20 * 1024;
@@ -17,7 +19,7 @@ class BadgesTestCase extends OmegaupTestCase {
     public function setUp() {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
-        Utils::CleanupDb();
+        \OmegaUp\Test\Utils::CleanupDb();
     }
 
     public static function getSortedResults(string $query) {
