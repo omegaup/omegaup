@@ -41,28 +41,4 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
         return $newIdentitySchool;
     }
-
-    public static function getCurrentSchoolFromIdentity(
-        \OmegaUp\DAO\VO\Identities $identity
-    ): ?\OmegaUp\DAO\VO\IdentitiesSchools {
-        // TODO: Remove this function and only use getByPK when
-        // current_identity_school_id is added to Identities
-        $sql = 'SELECT
-                    *
-                FROM
-                    Identities_Schools
-                WHERE
-                    identity_id = ? AND end_time IS NULL
-                ORDER BY
-                    creation_time DESC;';
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
-            $sql,
-            [$identity->identity_id]
-        );
-
-        if (is_null($row)) {
-            return null;
-        }
-        return new \OmegaUp\DAO\VO\IdentitiesSchools($row);
-    }
 }

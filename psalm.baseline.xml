@@ -1300,7 +1300,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="40">
+    <MixedAssignment occurrences="39">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1333,8 +1333,6 @@
       <code>$problems</code>
       <code>$problem</code>
       <code>$identity</code>
-      <code>$r-&gt;identity-&gt;school_id</code>
-      <code>$r-&gt;identity-&gt;school_id</code>
       <code>$language</code>
       <code>$r-&gt;identity-&gt;language_id</code>
       <code>$r-&gt;identity-&gt;gender</code>
@@ -1346,11 +1344,10 @@
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="11">
+    <MixedPropertyFetch occurrences="10">
       <code>$user-&gt;main_identity_id</code>
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
-      <code>$r['school']-&gt;school_id</code>
       <code>$language-&gt;language_id</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['role']-&gt;role_id</code>
@@ -1365,7 +1362,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="15">
+    <PossiblyNullArgument occurrences="14">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1381,8 +1378,6 @@
       <code>$r-&gt;user-&gt;main_email_id</code>
       <code>$email</code>
       <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
