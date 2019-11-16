@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 $qualitynomination_id = isset(
     $_GET['qualitynomination_id']
-) ? $_GET['qualitynomination_id'] : null;
+) ? intval($_GET['qualitynomination_id']) : null;
 
 [
     'identity' => $identity,
