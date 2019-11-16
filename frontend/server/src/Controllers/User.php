@@ -1907,7 +1907,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $currentSchool = $currentIdentitySchool->school_id;
                 $currentGraduationDate = $currentIdentitySchool->graduation_date;
                 if (!is_null($currentGraduationDate)) {
-                    $currentGraduationDate = strtotime(
+                    $currentGraduationDate = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                         $currentGraduationDate
                     );
                 }
@@ -2081,10 +2081,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            // Update user object
             \OmegaUp\DAO\Users::update($r->user);
-
-            // Update identity object
             \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();

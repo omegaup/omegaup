@@ -300,12 +300,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
-        $originalSchool = null;
+        $originalSchoolId = null;
         if (!is_null($originalIdentity->current_identity_school_id)) {
             $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $originalIdentity->current_identity_school_id
             );
-            $originalSchool = !is_null(
+            $originalSchoolId = !is_null(
                 $originalIdentitySchool
             ) ? $originalIdentitySchool->school_id : null;
         }
@@ -337,7 +337,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         $identity->school_id = $schoolId; //TODO: Remove when removing school_id
 
-        if ($originalSchool !== $schoolId) {
+        if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
                 null /* graduation_date */
