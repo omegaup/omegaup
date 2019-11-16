@@ -599,11 +599,10 @@
       <code>JSON_OBJECT_AS_ARRAY</code>
     </InvalidScalarArgument>
     <MissingParamType occurrences="1"/>
-    <MissingReturnType occurrences="16">
+    <MissingReturnType occurrences="14">
       <code>apiCreate</code>
       <code>validateRejudge</code>
       <code>apiRejudge</code>
-      <code>apiUpdate</code>
       <code>setRestrictedTags</code>
       <code>apiDownload</code>
       <code>validateDownload</code>
@@ -613,7 +612,6 @@
       <code>validateRuns</code>
       <code>apiRuns</code>
       <code>apiClarifications</code>
-      <code>apiList</code>
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
@@ -772,7 +770,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="15">
+    <PossiblyNullArgument occurrences="14">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -2344,11 +2342,6 @@
     <MixedArrayAssignment occurrences="1">
       <code>$response['userinfo']['graduation_date']</code>
     </MixedArrayAssignment>
-  </file>
-  <file src="frontend/www/qualitynomination.php">
-    <MixedAssignment occurrences="1">
-      <code>$qualitynomination_id</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/www/rank.php">
     <MixedArgumentTypeCoercion occurrences="1">
