@@ -16,14 +16,16 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
     public static function createNewSchoolForIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
         ?string $graduationDate
-    ): int {
+    ): \OmegaUp\DAO\VO\IdentitiesSchools {
         // First get the current IdentitySchool and update its end_time
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
-        );
-        if (!is_null($identitySchool)) {
-            $identitySchool->end_time = \OmegaUp\Time::get();
-            \OmegaUp\DAO\IdentitiesSchools::update($identitySchool);
+        if (!is_null($identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $identitySchool->end_time = \OmegaUp\Time::get();
+                \OmegaUp\DAO\IdentitiesSchools::update($identitySchool);
+            }
         }
 
         $newIdentitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
@@ -36,7 +38,8 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         }
 
         // Create new IdentitySchool and save it
-        return \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
+        \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
+        return $newIdentitySchool;
     }
 
     public static function getCurrentSchoolFromIdentity(

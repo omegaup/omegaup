@@ -232,25 +232,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
     private static function updateIdentity(
         $username,
         $name,
-        ?string $countryId,
-        ?string $stateId,
+        ?\OmegaUp\DAO\VO\States $state,
         $gender,
-        $school,
         $aliasGroup,
-        $originalIdentity
-    ) {
+        \OmegaUp\DAO\VO\Identities $originalIdentity
+    ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
-
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
-        $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
-            $state
-        );
 
         return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
@@ -262,7 +249,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $state
             ) ? $state->state_id : $originalIdentity->state_id,
             'gender' => $gender ?? $originalIdentity->gender,
-            'school_id' => $schoolId,
+            'current_identity_school_id' => $originalIdentity->current_identity_school_id,
             'password' => $originalIdentity->password,
             'user_id' => $originalIdentity->user_id,
         ]);
@@ -310,21 +297,48 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
-        $originalSchool = $originalIdentity->school_id;
+
+        $originalSchool = null;
+        if (!is_null($originalIdentity->current_identity_school_id)) {
+            $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $originalIdentity->current_identity_school_id
+            );
+            $originalSchool = !is_null(
+                $originalIdentitySchool
+            ) ? $originalIdentitySchool->school_id : null;
+        }
 
         // Prepare DAOs
+        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
+            is_null($r['country_id']) ? null : strval($r['country_id']),
+            is_null($r['state_id']) ? null : strval($r['state_id'])
+        );
         $identity = self::updateIdentity(
             $r['username'],
             $r['name'],
-            is_null($r['country_id']) ? null : strval($r['country_id']),
-            is_null($r['state_id']) ? null : strval($r['state_id']),
+            $state,
             $r['gender'],
-            $r['school_name'],
             $r['group_alias'],
             $originalIdentity
         );
 
         $identity->identity_id = $originalIdentity->identity_id;
+
+        $schoolId = \OmegaUp\Controllers\School::createSchool(
+            trim(
+                $r['school_name']
+            ),
+            $state
+        );
+        $identity->school_id = $schoolId; //TODO: Remove when removing school_id
+
+        if ($originalSchool !== $schoolId) {
+            $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                $identity,
+                null /* graduation_date */
+            );
+            $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
+        }
 
         // Save in DB
         \OmegaUp\DAO\Identities::update($identity);
@@ -333,13 +347,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username
         );
-
-        if ($originalSchool !== $identity->school_id) {
-            \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
-                $identity,
-                null /* graduation_date */
-            );
-        }
 
         return [
             'status' => 'ok',
@@ -465,7 +472,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?string $stateId,
         $gender,
         $aliasGroup
-    ) {
+    ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
         // Check password
