@@ -4,11 +4,16 @@ namespace OmegaUp;
 
 // An RAII wrapper to manage the lifetime of a session.
 class ScopedSession {
-    /** @var bool */
+    /**
+     * @const
+     * @var bool
+     */
     private $_sessionStarted = false;
 
     public function __construct() {
         if (session_status() === PHP_SESSION_ACTIVE) {
+            // In case of nested sessions, we just let the
+            // outermost one manage the whole session.
             return;
         }
         session_start();
@@ -16,11 +21,12 @@ class ScopedSession {
     }
 
     public function __destruct() {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
+        if (!$this->_sessionStarted) {
+            // This instance did not start a session, so it
+            // should not close it either.
             return;
         }
         session_write_close();
-        $this->_sessionStarted = false;
     }
 }
 
