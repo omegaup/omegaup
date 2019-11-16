@@ -49,7 +49,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getFacebookLoginUrl(): string {
-        $helper = ((new ScopedFacebook())->facebook)->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
     }
 
@@ -395,7 +396,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $helper = ((new ScopedFacebook())->facebook)->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         try {
             $accessToken = $helper->getAccessToken();
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
@@ -416,7 +418,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            $fbResponse = ((new ScopedFacebook())->facebook)->get(
+            $fbResponse = $scopedFacebook->facebook->get(
                 '/me?fields=name,email',
                 $accessToken
             );
