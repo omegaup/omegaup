@@ -19,7 +19,7 @@ class SchoolsFactory {
         }
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -46,7 +46,7 @@ class SchoolsFactory {
         $schoolData,
         $user
     ): void {
-        $login = \OmegaupTestCase::login($user);
+        $login = \OmegaUp\Test\ControllerTestCase::login($user);
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolData['school']->school_id

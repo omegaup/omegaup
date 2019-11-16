@@ -6,7 +6,7 @@
  * @author carlosabcs
  */
 
-class ProblemsForfeitedTest extends OmegaupTestCase {
+class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCounts() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
@@ -14,12 +14,16 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problem = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run);
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
-        $problemForfeited = ProblemsFactory::createProblem();
+        $problemForfeited = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
@@ -40,16 +44,16 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problems[] = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem(
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],
-                $user,
+                $identity,
                 $login
             );
-            RunsFactory::gradeRun($run);
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
-        $extraProblem = ProblemsFactory::createProblem();
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -78,7 +82,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
     public function testGetSolutionForbiddenAccessException() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problem = ProblemsFactory::createProblem()['problem'];
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

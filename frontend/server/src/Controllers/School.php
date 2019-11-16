@@ -52,11 +52,22 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-
-        $state = self::getStateIdFromCountryAndState(
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['country_id'],
-            $r['state_id']
+            'country_id'
         );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['state_id'],
+            'country_id'
+        );
+
+        $state = null;
+        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                $r['country_id'],
+                $r['state_id']
+            );
+        }
 
         return [
             'status' => 'ok',
@@ -174,6 +185,25 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
+     * @param \OmegaUp\Request $r
+     * @return array{time: string, username: string, country_id: string, email: string}[]
+     */
+    public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
+            intval($school->school_id)
+        );
+    }
+
+    /**
+     * Returns rank of best schools in last month
+     *
      * @param int $offset
      * @param int $rowCount
      * @param int $startTime
@@ -246,16 +276,5 @@ class School extends \OmegaUp\Controllers\Controller {
             'availableFilters' => [],
         ];
         return $schoolsRank;
-    }
-
-    public static function getStateIdFromCountryAndState(
-        ?string $countryId,
-        ?string $stateId
-    ): ?\OmegaUp\DAO\VO\States {
-        if (is_null($countryId) || is_null($stateId)) {
-            // Both state and country must be specified together.
-            return null;
-        }
-        return \OmegaUp\DAO\States::getByPK($countryId, $stateId);
     }
 }

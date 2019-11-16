@@ -1,9 +1,11 @@
 <?php
 
-class CourseAssignmentsTest extends OmegaupTestCase {
+class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testOrderAssignments() {
         // Create a course with 5 assignments
-        $courseData = CoursesFactory::createCourseWithAssignments(5);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            5
+        );
 
         // Login admin and getting assignments list
         $adminLogin = self::login($courseData['admin']);

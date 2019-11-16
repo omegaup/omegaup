@@ -5,7 +5,7 @@
  * @author joemmanuel
  */
 
-class SchoolCreateTest extends OmegaupTestCase {
+class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create school happy path
      */

@@ -1,5 +1,4 @@
 -- Identities Schools table
-DROP TABLE IF EXISTS `Identities_Schools`;
 CREATE TABLE `Identities_Schools` (
     `identity_school_id` int(11) NOT NULL AUTO_INCREMENT,
     `identity_id` int(11) NOT NULL,
@@ -29,34 +28,3 @@ ON
     `u`.`user_id` = `i`.`user_id`
 WHERE
     `i`.`school_id` IS NOT NULL;
-
--- Add school_id to Submissions
-ALTER TABLE `Submissions`
-ADD COLUMN `school_id` int(11) DEFAULT NULL,
-ADD KEY `school_id` (`school_id`),
-ADD CONSTRAINT `fk_sc_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools`(`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- Fill school_id on Submissions table
-UPDATE
-    `Submissions` `s`
-SET
-    `s`.`school_id` = (
-        SELECT
-            `i`.`school_id`
-        FROM
-            `Identities` `i`
-        WHERE
-            `i`.`identity_id` = `s`.`identity_id`
-    );
-
--- Remove Users graduation_date
-ALTER TABLE `Users`
-DROP COLUMN `graduation_date`;
-
--- Rename Identities school_id
-ALTER TABLE `Identities`
-DROP FOREIGN KEY `fk_is_school_id`,
-CHANGE COLUMN `school_id` `current_school_id` int(11) DEFAULT NULL,
-ADD KEY `current_school_id` (`current_school_id`),
-ADD CONSTRAINT `fk_is_current_school_id` FOREIGN KEY (`current_school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-

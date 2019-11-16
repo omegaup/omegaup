@@ -5,17 +5,20 @@
  * @author pablo
  */
 
-class CourseListTest extends OmegaupTestCase {
+class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp() {
         parent::setUp();
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
         );
         $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
         ['user' => $this->other_user, 'identity' => $this->other_identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $this->other_identity);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $this->other_identity
+        );
     }
 
     protected $admin_user;

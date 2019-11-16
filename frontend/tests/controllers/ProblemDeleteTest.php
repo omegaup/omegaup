@@ -6,7 +6,7 @@
  * @author juan.pablo@omegaup.com
  */
 
-class ProblemDeleteTest extends OmegaupTestCase {
+class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Tests problem with submissions in a contest or a course can't be deleted anymore
      *
@@ -17,29 +17,32 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $identity
         ]));
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $login = self::login($problemData['author']);
 
@@ -58,12 +61,12 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
-        $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
+        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $identity
         ]));
 
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $identity
         ]));
@@ -110,11 +113,11 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
-        $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
+        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $identity
         ]));
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $identity
         ]));
@@ -182,13 +185,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
-        $deletedProblemData = ProblemsFactory::createProblem(
+        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
             null,
             null,
             \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             $userLogin
         );
-        $problemData = ProblemsFactory::createProblem(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             null,
             null,
             \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,

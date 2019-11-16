@@ -5,7 +5,7 @@
  * @author joemmanuel
  */
 
-class SchoolRankTest extends OmegaupTestCase {
+class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *  Helper to create runs with users inside a school
      *
@@ -22,36 +22,36 @@ class SchoolRankTest extends OmegaupTestCase {
         SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
         SchoolsFactory::addUserToSchool($schoolsData[1], $identities[3]);
 
-        $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[0]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[1]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[2]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[3]
         );
-        RunsFactory::gradeRun($runData, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.5, 'PA');
 
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identities[4]
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
     }
 
     /**

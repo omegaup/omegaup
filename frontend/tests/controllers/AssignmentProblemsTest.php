@@ -1,12 +1,12 @@
 <?php
 
-class AssignmentProblemsTest extends OmegaupTestCase {
+class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddProblemToAssignment() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -14,11 +14,11 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity
         ]), $login);
-        $response = CoursesFactory::addProblemsToAssignment(
+        $response = \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -53,7 +53,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -61,11 +61,11 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity,
         ]), $login);
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -95,7 +95,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -104,20 +104,20 @@ class AssignmentProblemsTest extends OmegaupTestCase {
 
         // Add multiple problems to the assignment
         $problems = [
-            ProblemsFactory::createProblem(new ProblemParams([
+            \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 1,
                 'author' => $identity
             ]), $login),
-            ProblemsFactory::createProblem(new ProblemParams([
+            \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 1,
                 'author' => $identity
             ]), $login),
-            ProblemsFactory::createProblem(new ProblemParams([
+            \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 1,
                 'author' => $identity
             ]), $login)
         ];
-        $responses = CoursesFactory::addProblemsToAssignment(
+        $responses = \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -172,13 +172,13 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     public function testAddProblemForbiddenAccess() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity
         ]), $login);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -188,7 +188,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Add one problem to the assignment with a normal user
         ['user' => $forbiddenUser, 'identity' => $forbiddenIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $forbiddenUserLogin = self::login($forbiddenIdentity);
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $forbiddenUserLogin,
             $courseAlias,
             $assignmentAlias,
@@ -204,13 +204,13 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     public function testAddProblemForbiddenAccessStudent() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity
         ]), $login);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -218,9 +218,11 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment with a student
-        $forbiddenUser = CoursesFactory::addStudentToCourse($courseData);
+        $forbiddenUser = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData
+        );
         $forbiddenUserLogin = self::login($forbiddenUser);
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $forbiddenUserLogin,
             $courseAlias,
             $assignmentAlias,
@@ -238,7 +240,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -246,11 +248,11 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity
         ]), $login);
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -278,7 +280,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -286,11 +288,11 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $identity
         ]), $login);
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -298,7 +300,9 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         );
 
         // Remove a problem from the assignment with a student
-        $forbiddenUser = CoursesFactory::addStudentToCourse($courseData);
+        $forbiddenUser = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData
+        );
         $forbiddenUserLogin = self::login($forbiddenUser);
         $removeProblemResponse = \OmegaUp\Controllers\Course::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $forbiddenUserLogin->auth_token,
@@ -318,7 +322,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );

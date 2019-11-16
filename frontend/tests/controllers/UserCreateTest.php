@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateUserTest extends OmegaupTestCase {
+class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates an omegaup user happily :)
      */
@@ -191,7 +191,10 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api
         $_SERVER['REQUEST_URI'] = '/api/user/create';
-        $response = json_decode(ApiCallerMock::httpEntryPoint(), true);
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
 
         $this->assertEquals('ok', $response['status']);
 

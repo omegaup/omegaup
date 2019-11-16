@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UserResetPasswordTest extends OmegaupTestCase {
+class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Reset my password
      */

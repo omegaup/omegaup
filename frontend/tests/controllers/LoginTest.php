@@ -5,9 +5,9 @@
  *
  * @author joemmanuel
  */
-class LoginTest extends OmegaupTestCase {
+class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      */
     public function testNativeLoginByUserPositive() {
@@ -24,7 +24,7 @@ class LoginTest extends OmegaupTestCase {
             )
         );
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password
@@ -48,7 +48,7 @@ class LoginTest extends OmegaupTestCase {
     }
 
     /**
-     * Test user login with valid credentials, email and password
+     * Test identity login with valid credentials, email and password
      *
      */
     public function testNativeLoginByEmailPositive() {
@@ -57,7 +57,7 @@ class LoginTest extends OmegaupTestCase {
             new \OmegaUp\Test\Factories\UserParams(['email' => $email])
         );
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
             'password' => $identity->password
@@ -147,7 +147,10 @@ class LoginTest extends OmegaupTestCase {
 
         // Call api
         $_SERVER['REQUEST_URI'] = '/api/user/login';
-        $response = json_decode(ApiCallerMock::httpEntryPoint(), true);
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
 
         // Validate output
         $this->assertEquals('ok', $response['status']);
@@ -159,12 +162,12 @@ class LoginTest extends OmegaupTestCase {
      *
      */
     public function test2ConsecutiveLogins() {
-        // Create an user in omegaup
+        // Create an identity in omegaup
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'password' => $identity->password
         ]);
 
@@ -185,7 +188,7 @@ class LoginTest extends OmegaupTestCase {
     }
 
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
