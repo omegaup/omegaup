@@ -91,14 +91,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $r['group_alias']
             );
 
-            $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-                $countryId,
-                $stateId
-            );
+            $state = null;
+            if (!is_null($countryId) && !is_null($stateId)) {
+                $state = \OmegaUp\DAO\States::getByPK(
+                    $countryId,
+                    $stateId
+                );
+            }
             $schoolId = \OmegaUp\Controllers\School::createSchool(
-                trim(
-                    $r['school_name']
-                ),
+                trim($r['school_name']),
                 $state
             );
             $identity->school_id = $schoolId; //TODO: remove this when removing school_id
@@ -166,14 +167,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $r['group_alias']
                 );
 
-                $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-                    $countryId,
-                    $stateId
-                );
+                $state = null;
+                if (!is_null($countryId) && !is_null($stateId)) {
+                    $state = \OmegaUp\DAO\States::getByPK(
+                        $countryId,
+                        $stateId
+                    );
+                }
                 $schoolId = \OmegaUp\Controllers\School::createSchool(
-                    trim(
-                        $identity['school_name']
-                    ),
+                    trim($identity['school_name']),
                     $state
                 );
                 $newIdentity->school_id = $schoolId; //TODO: remove this when removing school_id
@@ -309,10 +311,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         // Prepare DAOs
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            is_null($r['country_id']) ? null : strval($r['country_id']),
-            is_null($r['state_id']) ? null : strval($r['state_id'])
-        );
+        $state = null;
+        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                strval($r['country_id']),
+                strval($r['state_id'])
+            );
+        }
         $identity = self::updateIdentity(
             $r['username'],
             $r['name'],

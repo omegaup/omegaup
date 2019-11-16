@@ -1132,10 +1132,8 @@
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="8">
+    <MixedArgument occurrences="6">
       <code>$r[$param]</code>
-      <code>$r['country_id']</code>
-      <code>$r['state_id']</code>
       <code>$offset</code>
       <code>$rowCount</code>
       <code>$startTime</code>
