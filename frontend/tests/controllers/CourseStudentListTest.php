@@ -5,18 +5,20 @@
  * @author @joemmanuel
  */
 
-class CourseStudentListTest extends OmegaupTestCase {
+class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentList test
      */
     public function testCourseStudentList() {
         // Create a course
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Add some students to course
         $students = [];
         for ($i = 0; $i < 3; $i++) {
-            $students[$i] = CoursesFactory::addStudentToCourse($courseData);
+            $students[$i] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
         }
 
         // Call apiStudentList by an admin
@@ -39,7 +41,7 @@ class CourseStudentListTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCourseStudentListNonAdmin() {
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Call apiStudentList by another random user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -76,7 +78,7 @@ class CourseStudentListTest extends OmegaupTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 5, 'test' => 5]
         );
 
@@ -87,7 +89,7 @@ class CourseStudentListTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -101,12 +103,14 @@ class CourseStudentListTest extends OmegaupTestCase {
         // Create & add students to course
         $students = [];
         for ($i = 0; $i < $studentCount; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse($courseData);
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
         }
 
         // Submit runs - Simulate each student submitting runs to some problems and some others not.
         // Also, sometimes only PAs are sent, other times ACs.
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
             $students,
             $courseData['assignment_aliases'],
@@ -114,7 +118,9 @@ class CourseStudentListTest extends OmegaupTestCase {
         );
 
         // Adding a new student with no runs. Should show in progress
-        $studentWithNoRuns = CoursesFactory::addStudentToCourse($courseData);
+        $studentWithNoRuns = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData
+        );
 
         // Call API
         $adminLogin = self::login($courseData['admin']);

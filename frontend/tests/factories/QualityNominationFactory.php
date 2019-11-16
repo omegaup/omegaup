@@ -88,7 +88,7 @@ class QualityNominationFactory {
     }
 
     /**
-     * @param ScopedLoginToken $login
+     * @param \OmegaUp\Test\ScopedLoginToken $login
      * @param string $problemAlias
      * @param null|int $difficulty
      * @param null|int $quality

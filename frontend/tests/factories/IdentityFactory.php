@@ -52,7 +52,7 @@ class IdentityFactory {
 
     public static function createIdentitiesFromAGroup(
         \OmegaUp\DAO\VO\Groups $group,
-        ScopedLoginToken $adminLogin,
+        \OmegaUp\Test\ScopedLoginToken $adminLogin,
         string $password
     ): array {
         // Call api using identity creator group member

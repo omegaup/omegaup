@@ -6,7 +6,7 @@
  * @author juan.pablo
  */
 
-class IdentityCreateTest extends OmegaupTestCase {
+class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for users from identity creator group
      */
@@ -49,6 +49,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         );
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
+        $schoolName = \OmegaUp\Test\Utils::createRandomString();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -58,7 +59,7 @@ class IdentityCreateTest extends OmegaupTestCase {
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
-            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'school_name' => $schoolName,
             'group_alias' => $group['group']->alias,
         ]));
 
@@ -68,6 +69,17 @@ class IdentityCreateTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals(1, count($response['identities']));
+
+        // Check current school for Identity on IdentitiesSchools
+        $school = \OmegaUp\DAO\Schools::findByName($schoolName);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $response['identities'][0]['username']
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
+            $identity
+        );
+        $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
+        $this->assertNull($identitySchool->end_time);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp\Test\Factories;
+
 class ProblemParams {
     /**
      * @readonly
@@ -79,21 +81,16 @@ class FileUploaderMock extends \OmegaUp\FileUploader {
     }
 }
 
-/**
- * Description of ProblemsFactory
- *
- * @author joemmanuel
- */
-class ProblemsFactory {
+class Problem {
     /**
      * Returns a Request object with valid info to create a problem and the
      * author of the problem
      *
      * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, request: \OmegaUp\Request, zip_path: string}
      */
-    public static function getRequest(?ProblemParams $params = null) {
+    public static function getRequest(?\OmegaUp\Test\Factories\ProblemParams $params = null) {
         if (is_null($params)) {
-            $params = new ProblemParams();
+            $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
         $r = new \OmegaUp\Request([
             'title' => $params->title,
@@ -122,6 +119,7 @@ class ProblemsFactory {
         ]);
 
         // Set file upload context
+        /** @var array<string, array{tmp_name: string}> $_FILES */
         $_FILES['problem_contents']['tmp_name'] = $params->zipName;
 
         return [
@@ -132,11 +130,14 @@ class ProblemsFactory {
         ];
     }
 
+    /**
+     * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
+     */
     public static function createProblemWithAuthor(
         \OmegaUp\DAO\VO\Identities $author,
-        ScopedLoginToken $login = null
-    ) {
-        return self::createProblem(new ProblemParams([
+        \OmegaUp\Test\ScopedLoginToken $login = null
+    ): array {
+        return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $author,
         ]), $login);
@@ -146,11 +147,11 @@ class ProblemsFactory {
      * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
      */
     public static function createProblem(
-        ?ProblemParams $params = null,
-        ScopedLoginToken $login = null
+        ?\OmegaUp\Test\Factories\ProblemParams $params = null,
+        \OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($params)) {
-            $params = new ProblemParams();
+            $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
         $params->visibility = $params->visibility >= \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
             ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
@@ -163,7 +164,9 @@ class ProblemsFactory {
 
         if (is_null($login)) {
             // Login user
-            $login = OmegaupTestCase::login($problemAuthorIdentity);
+            $login = \OmegaUp\Test\ControllerTestCase::login(
+                $problemAuthorIdentity
+            );
         }
         $r['auth_token'] = $login->auth_token;
 
@@ -193,9 +196,6 @@ class ProblemsFactory {
             \OmegaUp\DAO\Problems::update($problem);
         }
 
-        // Clean up our mess
-        unset($_REQUEST);
-
         return  [
             'request' => $r,
             'author' => $problemAuthorIdentity,
@@ -211,19 +211,14 @@ class ProblemsFactory {
         $problemData,
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
-        // Prepare our request
-        $r = new \OmegaUp\Request();
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['usernameOrEmail'] = $identity->username;
-
-        // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Call api
-        \OmegaUp\Controllers\Problem::apiAddAdmin($r);
-
-        unset($_REQUEST);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
+        \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'usernameOrEmail' => $identity->username,
+            'auth_token' => $login->auth_token,
+        ]));
     }
 
     /**
@@ -232,19 +227,15 @@ class ProblemsFactory {
     public static function addGroupAdmin(
         $problemData,
         \OmegaUp\DAO\VO\Groups $group
-    ) {
-        // Prepare our request
-        $r = new \OmegaUp\Request([
+    ): void {
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
+        \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'group' => $group->alias,
-        ]);
-
-        // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Call api
-        \OmegaUp\Controllers\Problem::apiAddGroupAdmin($r);
+        ]));
     }
 
     /**
@@ -263,7 +254,9 @@ class ProblemsFactory {
         ]);
 
         // Log in the problem author
-        $login = OmegaupTestCase::login($problemData['author']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $problemData['author']
+        );
         $r['auth_token'] = $login->auth_token;
 
         // Call api

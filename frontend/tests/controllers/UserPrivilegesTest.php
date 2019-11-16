@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserPrivilegesTest extends OmegaupTestCase {
+class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Test for the functions add/remove roles
      */
@@ -92,7 +92,9 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $identity->user_id
+        );
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

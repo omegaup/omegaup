@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserSupportTest extends OmegaupTestCase {
+class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for users with support role
      */

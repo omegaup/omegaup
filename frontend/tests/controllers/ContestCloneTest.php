@@ -1,19 +1,19 @@
 <?php
 
-class ContestCloneTest extends OmegaupTestCase {
+class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create clone of a contest
      */
     public function testCreateContestClone() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add 3 problems to the contest
         $numberOfProblems = 3;
 
         for ($i = 0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest(
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
                 $problemData[$i],
                 $contestData
             );
@@ -60,13 +60,16 @@ class ContestCloneTest extends OmegaupTestCase {
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         $contestAlias = \OmegaUp\Test\Utils::createRandomString();
 
@@ -90,13 +93,16 @@ class ContestCloneTest extends OmegaupTestCase {
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create new user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

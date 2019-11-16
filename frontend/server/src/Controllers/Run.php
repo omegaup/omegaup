@@ -350,6 +350,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
+
+        if (!is_null($r->identity->school_id)) {
+            $submission->school_id = $r->identity->school_id;
+        }
+
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $r['problem']->current_version,
             'status' => 'new',

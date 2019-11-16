@@ -1,6 +1,6 @@
 <?php
 
-class CourseCloneTest extends OmegaupTestCase {
+class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create clone of a course
      */
@@ -12,7 +12,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
@@ -24,7 +24,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -39,7 +39,9 @@ class CourseCloneTest extends OmegaupTestCase {
         $studentsUsername = [];
         $studentsData = null;
         for ($i = 0; $i < $studentCount; $i++) {
-            $studentsData = CoursesFactory::addStudentToCourse($courseData);
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
             $studentsUsername[] = $studentsData->username;
         }
 
@@ -99,7 +101,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
@@ -111,7 +113,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $problemAssignmentsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -126,7 +128,9 @@ class CourseCloneTest extends OmegaupTestCase {
         $studentsUsername = [];
         $studentsData = null;
         for ($i = 0; $i < $studentCount; $i++) {
-            $studentsData = CoursesFactory::addStudentToCourse($courseData);
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
             $studentsUsername[] = $studentsData->username;
         }
 
@@ -153,7 +157,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $assignmentProblemsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
             'homework' => $homeworkCount,
             'test' => $testCount
         ]);
@@ -165,7 +169,7 @@ class CourseCloneTest extends OmegaupTestCase {
             $assignmentProblemsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = ProblemsFactory::createProblem();
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],

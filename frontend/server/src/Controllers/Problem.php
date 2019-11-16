@@ -21,6 +21,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
+    const VALID_SORTING_MODES = ['asc', 'desc'];
+    const VALID_SORTING_COLUMNS = [
+        'title',
+        'quality',
+        'difficulty',
+        'submissions',
+        'accepted',
+        'ratio',
+        'points',
+        'score',
+        'creation_date'
+    ];
 
     // Do not update the published branch.
     const UPDATE_PUBLISHED_NONE = 'none';
@@ -2661,21 +2673,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['mode'],
             'mode',
-            ['asc', 'desc'],
+            array_merge(
+                [''],
+                \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
+            ),
             false
         );
         \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
         \OmegaUp\Validators::validateInEnum(
             $r['order_by'],
             'order_by',
-            ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'creation_date'],
+            array_merge(
+                [''],
+                \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
+            ),
             false
         );
         \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             array_merge(
-                ['all'],
+                ['all', ''],
                 \OmegaUp\Controllers\Problem::VALID_LANGUAGES
             ),
             false

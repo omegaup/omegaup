@@ -3,7 +3,7 @@
 /**
  * Tests the /api/user/validateFilter/ API.
  */
-class UserFilterTest extends OmegaupTestCase {
+class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -88,7 +88,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testPublicProblemsetAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
@@ -99,7 +99,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
@@ -113,7 +113,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousPublicProblemsetAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
 
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -124,7 +124,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
 
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -135,8 +135,8 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousProblemsetAccess() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -150,8 +150,8 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -162,8 +162,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousProblemsetWithToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -179,8 +179,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -196,8 +196,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousProblemsetWithAdminToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -214,8 +214,8 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
             )
         )['contest'];
@@ -232,7 +232,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testPublicProblemAccess() {
-        $problem = ProblemsFactory::createProblem()['problem'];
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
@@ -244,7 +244,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousPublicProblemAccess() {
-        $problem = ProblemsFactory::createProblem()['problem'];
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problem/' . $problem->alias,
@@ -256,7 +256,7 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAnonymousProblemAccess() {
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]))['problem'];
 

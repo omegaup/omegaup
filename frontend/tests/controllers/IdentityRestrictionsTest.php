@@ -3,13 +3,13 @@
 /**
  * Tests API's where unassociated identities does not have access.
  */
-class IdentityRestrictionsTest extends OmegaupTestCase {
+class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Restricted Conests APIs for unassociated identities.
      */
     public function testRestrictionsForContests() {
         // Create a contest with admin privileges (main identity can do that)
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a group, a set of identities, get one of them
         $password = \OmegaUp\Test\Utils::createRandomString();
@@ -46,7 +46,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
      */
     public function testRestrictionsForCourses() {
         // Create a course with admin privileges (main identity can do that)
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Create a group, a set of identities, get one of them
         $password = \OmegaUp\Test\Utils::createRandomString();
@@ -173,7 +173,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
@@ -213,7 +213,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
 
         try {
-            ContestsFactory::createContest(new ContestParams([
+            \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $identity,
             ]));
             $this->fail('unassociated identity can not create contests');
@@ -228,7 +228,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
@@ -263,7 +263,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
@@ -278,7 +278,10 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         try {
             // try to create a problem
-            $problemData = ProblemsFactory::createProblem(null, $login);
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                null,
+                $login
+            );
             $this->fail("{$identityStatus} identity can not create problems");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
@@ -290,7 +293,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         string $identityStatus
     ): void {
         // Login with the identity recently created
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
             \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([
