@@ -199,14 +199,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
     ) {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
+        $state = null;
+        if (!is_null($countryId) && !is_null($stateId)) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                $countryId,
+                $stateId
+            );
+        }
         $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
+            trim($school),
             $state
         );
 
@@ -427,14 +428,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
     ) {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
+        $state = null;
+        if (!is_null($countryId) && !is_null($stateId)) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                $countryId,
+                $stateId
+            );
+        }
         $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
+            trim($school),
             $state
         );
 
