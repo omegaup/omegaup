@@ -75,8 +75,8 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $response['identities'][0]['username']
         );
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
