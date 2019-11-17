@@ -104,6 +104,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     s.`state_id` AS state_id,
                     sc.`name` AS school,
                     sc.`school_id` AS school_id,
+                    isc.`graduation_date` AS graduation_date,
                     e.`email`,
                     l.`name` AS locale
                 FROM

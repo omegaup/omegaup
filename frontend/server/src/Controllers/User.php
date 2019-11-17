@@ -1189,11 +1189,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 $user->birth_date
             ),
             'gender' => $identity->gender,
-            'graduation_date' => is_null(
-                $user->graduation_date
-            ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                $user->graduation_date
-            ),
             'scholar_degree' => $user->scholar_degree,
             'preferred_language' => $user->preferred_language,
             'is_private' => $user->is_private,
@@ -1207,6 +1202,11 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->user_id
         );
 
+        $response['userinfo']['graduation_date'] = is_null(
+            $userDb['graduation_date']
+        ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $userDb['graduation_date']
+        );
         $response['userinfo']['email'] = $userDb['email'];
         $response['userinfo']['country'] = $userDb['country'];
         $response['userinfo']['country_id'] = $userDb['country_id'];
@@ -1966,7 +1966,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 $graduationDate = strtotime($r['graduation_date']);
             }
             $newGraduationDate = $graduationDate;
-            $r['graduation_date'] = $graduationDate;
         }
         if (!is_null($r['birth_date'])) {
             if (is_numeric($r['birth_date'])) {
@@ -2017,9 +2016,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'username',
             'scholar_degree',
             'school_id',
-            'graduation_date' => ['transform' => function ($value) {
-                return gmdate('Y-m-d', $value);
-            }],
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
