@@ -351,8 +351,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             'type' => $type,
         ]);
 
-        if (!is_null($r->identity->school_id)) {
-            $submission->school_id = $r->identity->school_id;
+        if (!is_null($r->identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $r->identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $submission->school_id = $identitySchool->school_id;
+            }
         }
 
         $run = new \OmegaUp\DAO\VO\Runs([

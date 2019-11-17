@@ -63,9 +63,9 @@ abstract class Identities {
             $Identities->country_id,
             $Identities->state_id,
             (
-                is_null($Identities->current_school_id) ?
+                is_null($Identities->school_id) ?
                 null :
-                intval($Identities->current_school_id)
+                intval($Identities->school_id)
             ),
             $Identities->gender,
             (
@@ -288,9 +288,9 @@ abstract class Identities {
             $Identities->country_id,
             $Identities->state_id,
             (
-                is_null($Identities->current_school_id) ?
+                is_null($Identities->school_id) ?
                 null :
-                intval($Identities->current_school_id)
+                intval($Identities->school_id)
             ),
             $Identities->gender,
             (
