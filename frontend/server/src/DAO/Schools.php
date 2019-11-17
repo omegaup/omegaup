@@ -70,9 +70,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
               Submissions su ON su.identity_id = i.identity_id
             INNER JOIN
               Runs r ON r.run_id = su.current_run_id
-            LEFT JOIN
+            INNER JOIN
               Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
-            LEFT JOIN
+            INNER JOIN
               Schools s ON s.school_id = isc.school_id
             INNER JOIN
               Problems p ON p.problem_id = su.problem_id
