@@ -1358,7 +1358,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="14">
+    <PossiblyNullArgument occurrences="13">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1372,17 +1372,15 @@
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user-&gt;main_email_id</code>
-      <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
     </PossiblyNullArrayOffset>
-    <PossiblyNullPropertyAssignment occurrences="4">
+    <PossiblyNullPropertyAssignment occurrences="3">
       <code>$identity</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
-      <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
     <PossiblyNullPropertyFetch occurrences="4">

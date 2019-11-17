@@ -1395,6 +1395,13 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
+        if (is_null($coderOfTheMonthUserId)) {
+            return [
+                'status' => 'ok',
+                'userinfo' => null,
+                'problems' => null,
+            ];
+        }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
@@ -1925,7 +1932,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $newSchoolId = $school->school_id;
-                $r->identity->school_id = $school->school_id;
             } elseif (empty($r['school_name'])) {
                 $newSchoolId = null;
                 $r['school_id'] = null;
@@ -1940,7 +1946,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 ]));
                 $r['school_id'] = $response['school_id'];
                 $newSchoolId = $response['school_id'];
-                $r->identity->school_id = $response['school_id'];
             }
         }
 
@@ -2232,8 +2237,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
             // Update email
             $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
-            $email->email = $r['email'];
-            \OmegaUp\DAO\Emails::update($email);
+            if (!is_null($email)) {
+                $email->email = $r['email'];
+                \OmegaUp\DAO\Emails::update($email);
+            }
 
             // Add verification_id if not there
             if ($r->user->verified == '0') {
@@ -2727,9 +2734,19 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
         if ($filteredBy == 'school') {
+            $schoolId = null;
+            if (!is_null($identity->current_identity_school_id)) {
+                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                    $identity->current_identity_school_id
+                );
+                if (!is_null($identitySchool)) {
+                    $schoolId = $identitySchool->school_id;
+                }
+            }
+
             return [
                 'filteredBy' => $filteredBy,
-                'value' => $identity->school_id
+                'value' => $schoolId,
             ];
         }
         return ['filteredBy' => null, 'value' => null];
@@ -2955,7 +2972,17 @@ class User extends \OmegaUp\Controllers\Controller {
                         'wordsFilterByState'
                     );
             }
-            if (!is_null($identity->school_id)) {
+
+            $schoolId = null;
+            if (!is_null($identity->current_identity_school_id)) {
+                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                    $identity->current_identity_school_id
+                );
+                if (!is_null($identitySchool)) {
+                    $schoolId = $identitySchool->school_id;
+                }
+            }
+            if (!is_null($schoolId)) {
                 $availableFilters['school'] =
                     \OmegaUp\Translations::getInstance()->get(
                         'wordsFilterBySchool'

@@ -250,9 +250,19 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $runData['response']['guid']
         );
 
-        // school_id from identity should be equal to submission's school_id
+        // school_id from identity school should be equal to submission's school_id
+        $schoolId = null;
+        if (!is_null($identityUpdated->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identityUpdated->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $schoolId = $identitySchool->school_id;
+            }
+        }
+
         $this->assertEquals(
-            $identityUpdated->school_id,
+            $schoolId,
             $submission->school_id
         );
     }

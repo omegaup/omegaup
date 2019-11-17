@@ -70,8 +70,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
               Submissions su ON su.identity_id = i.identity_id
             INNER JOIN
               Runs r ON r.run_id = su.current_run_id
-            INNER JOIN
-              Schools s ON i.school_id = s.school_id
+            LEFT JOIN
+              Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            LEFT JOIN
+              Schools s ON s.school_id = isc.school_id
             INNER JOIN
               Problems p ON p.problem_id = su.problem_id
             WHERE
@@ -114,16 +116,18 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 (
                     SELECT
-                        i.school_id,
+                        isc.school_id,
                         COUNT(DISTINCT i.identity_id) AS distinct_identities
                     FROM
                         Submissions s
                     INNER JOIN
                         Identities i ON i.identity_id = s.identity_id
+                    LEFT JOIN
+                        Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
                     WHERE
                         s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
                     GROUP BY
-                        i.school_id
+                        isc.school_id
                     HAVING
                         distinct_identities >= 5
                 ) AS si;

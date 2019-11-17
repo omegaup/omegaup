@@ -209,7 +209,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 LEFT JOIN
                     States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON i.school_id = sc.school_id
+                    Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+                LEFT JOIN
+                    Schools sc ON sc.school_id = isc.school_id
                 LEFT JOIN
                     Languages l ON i.language_id = l.language_id
                 WHERE
