@@ -93,7 +93,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getExtendedProfileDataByPk($user_id) {
+    /**
+     * @param int $user_id
+     * @return null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string}
+     */
+    final public static function getExtendedProfileDataByPk(int $user_id): array {
         if (is_null($user_id)) {
             return null;
         }
@@ -128,11 +132,22 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LIMIT
                     1;';
         $params = [$user_id];
+        /** @var null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string} */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
-        return $rs;
+        return [
+            'country' => $rs['country'],
+            'country_id' => $rs['country_id'],
+            'state' => $rs['state'],
+            'state_id' => $rs['state_id'],
+            'school' => $rs['school'],
+            'school_id' => $rs['school_id'],
+            'graduation_date' => $rs['graduation_date'],
+            'email`' => $rs['email'],
+            'locale' => $rs['locale'],
+        ];
     }
 
     public static function getHideTags($identity_id) {

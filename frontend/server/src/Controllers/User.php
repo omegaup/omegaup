@@ -1202,6 +1202,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->user_id
         );
 
+        if (is_null($userDb)) {
+            return $response;
+        }
+
         $response['userinfo']['graduation_date'] = is_null(
             $userDb['graduation_date']
         ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -2040,7 +2044,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update IdentitiesSchools
-            if ($newSchoolId !== $currentSchoolId) {
+            if ($newSchoolId !== $currentSchoolId && !is_null($newSchoolId)) {
                 // Update end time for current record and create a new one
                 $graduationDate = !is_null(
                     $newGraduationDate
