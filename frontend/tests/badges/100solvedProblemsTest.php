@@ -13,13 +13,19 @@ class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
         $problems = [];
         for ($i = 0; $i < 101; $i++) {
             $newProblem = \OmegaUp\Test\Factories\Problem::createProblem();
-            $run = RunsFactory::createRunToProblem($newProblem, $identity101);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $newProblem,
+                $identity101
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
             $problems[] = $newProblem;
         }
         for ($i = 0; $i < 99; $i++) {
-            $run = RunsFactory::createRunToProblem($problems[$i], $identity99);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $identity99
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
@@ -31,8 +37,11 @@ class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 101; $i++) {
-            $run = RunsFactory::createRunToProblem($problem, $identity);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));

@@ -86,7 +86,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create course and add user as a student
-        $this->courseData = CoursesFactory::createCourseWithOneAssignment(
+        $this->courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             null,
             null,
             false,
@@ -97,7 +97,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Student user
         ['user' => $this->student, 'identity' => $this->studentIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        CoursesFactory::addStudentToCourse(
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $this->courseData,
             $this->studentIdentity
         );
@@ -221,7 +221,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $runData['response']['guid']
         );
@@ -239,7 +242,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->identity_id
         );
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
             $runData['response']['guid']
         );
@@ -927,12 +933,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($contestantIdentity);
-        $waRunData = RunsFactory::createRunToProblem(
+        $waRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
-            $contestant,
+            $contestantIdentity,
             $login
         );
-        RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
+        \OmegaUp\Test\Factories\Run::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
         $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
@@ -945,12 +951,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertFalse(array_key_exists('details', $response));
 
-        $acRunData = RunsFactory::createRunToProblem(
+        $acRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
-            $contestant,
+            $contestantIdentity,
             $login
         );
-        RunsFactory::gradeRun($acRunData, 1, 'AC', 65);
+        \OmegaUp\Test\Factories\Run::gradeRun($acRunData, 1, 'AC', 65);
 
         // Contestant should be able to view run and details after solving it.
         $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
@@ -969,12 +975,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // view.
         ['user' => $contestant2, 'identity' => $contestantIdentity2] = \OmegaUp\Test\Factories\User::createUser();
         $login2 = self::login($contestantIdentity2);
-        $runData = RunsFactory::createRunToProblem(
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
-            $contestant2,
+            $contestantIdentity2,
             $login2
         );
-        RunsFactory::gradeRun($runData, 1, 'AC', 30);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 30);
         try {
             \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
                 'run_alias' => $runData['response']['guid'],

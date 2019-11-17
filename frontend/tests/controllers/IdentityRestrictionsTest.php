@@ -46,7 +46,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRestrictionsForCourses() {
         // Create a course with admin privileges (main identity can do that)
-        $courseData = CoursesFactory::createCourse();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Create a group, a set of identities, get one of them
         $password = \OmegaUp\Test\Utils::createRandomString();

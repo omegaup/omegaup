@@ -8,7 +8,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -23,7 +23,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'author' => $identity,
             ]), $login);
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -94,11 +94,11 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a course with an assignment
         $adminLogin = self::login($identity);
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $adminLogin
         );
-        CoursesFactory::addStudentToCourse(
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identityStudent,
             $adminLogin
@@ -113,7 +113,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'author' => $identity,
             ]), $adminLogin);
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $course->alias,
             $assignment->alias,
@@ -130,7 +130,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'language' => 'c',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 null /*runData*/,
                 0.5,
                 'PA',
@@ -146,7 +146,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'language' => 'c',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 null /*runData*/,
                 1.0,
                 'AC',

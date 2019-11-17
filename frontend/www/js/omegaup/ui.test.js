@@ -4,6 +4,22 @@ require('../dist/commons.js');
 var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
+  describe('formatDateLocal', function() {
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual('2010-01-01');
+    });
+  });
+
+  describe('formatDateTimeLocal', function() {
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual('2010-01-01T11:22:33');
+    });
+  });
+
   describe('formatString', function() {
     it('Should handle strings without replacements', function() {
       expect(omegaup.UI.formatString('hello', {})).toEqual('hello');

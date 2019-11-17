@@ -106,8 +106,8 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $school = \OmegaUp\DAO\Schools::findByName($schoolName);
 
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
@@ -129,8 +129,9 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'original_username' => $identity->username,
         ]));
 
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($school[0]->school_id, $identitySchool->school_id);
         $this->assertNull($identitySchool->end_time);
@@ -150,6 +151,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Verify that the end time is not null from previous IdentitySchool record
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $previousIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
             $identitySchool->identity_school_id
         );
@@ -157,8 +159,9 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $newSchool = \OmegaUp\DAO\Schools::findByName($newSchoolName);
 
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals(
             $newSchool[0]->school_id,

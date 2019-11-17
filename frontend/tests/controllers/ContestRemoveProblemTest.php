@@ -361,7 +361,11 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $identity);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Add the sysadmin role to the contest director
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
@@ -412,12 +416,12 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiAddAdmin($r);
 
         // Add runs to the problem created by the contest admins
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $secondaryIdentityAdmin
@@ -455,7 +459,11 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $identity);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
@@ -484,12 +492,16 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $identity);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
@@ -518,7 +530,10 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
         // Create a run not related to the contest
-        RunsFactory::createRunToProblem($problemData, $identity);
+        \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
 
         // Remove problem, should succeed.
         $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
@@ -550,8 +565,15 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::createRun($problemData, $contestData, $identity);
+        \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
@@ -578,12 +600,16 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $identity);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
