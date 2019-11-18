@@ -4,18 +4,18 @@
  *
  * @author juan.pablo
  */
-class ProblemListCourseTest extends OmegaupTestCase {
+class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSolvedAndUnsolvedProblemByUsersOfACourse() {
         $num_users = 3;
         $num_problems = 3;
         // Create course
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
@@ -25,21 +25,39 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $user = [];
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identity[$i]
+            );
         }
         // Create runs to problems directly
         $runs = [];
-        $runs[0] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
-        $runs[1] = RunsFactory::createRunToProblem($problem[1], $identity[1]);
-        $runs[2] = RunsFactory::createRunToProblem($problem[2], $identity[2]);
-        $runs[3] = RunsFactory::createRunToProblem($problem[0], $identity[1]);
-        $runs[4] = RunsFactory::createRunToProblem($problem[0], $identity[2]);
-        RunsFactory::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
-        RunsFactory::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
-        RunsFactory::gradeRun($runs[2]); // run with a AC verdict
-        RunsFactory::gradeRun($runs[3]); // run with a AC verdict
-        RunsFactory::gradeRun($runs[4]); // run with a AC verdict
+        $runs[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[0]
+        );
+        $runs[1] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[1],
+            $identity[1]
+        );
+        $runs[2] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[2],
+            $identity[2]
+        );
+        $runs[3] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[1]
+        );
+        $runs[4] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[2]); // run with a AC verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[3]); // run with a AC verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[4]); // run with a AC verdict
         // Users must join course
         for ($i = 0; $i < $num_users; $i++) {
             $userLogin[$i] = self::login($identity[$i]);
@@ -107,8 +125,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
             )
         );
         // Now, identity[0] submit one run with AC verdict
-        $runs[5] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
-        RunsFactory::gradeRun($runs[5]);
+        $runs[5] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[5]);
         $solvedProblems = \OmegaUp\Controllers\Course::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
@@ -130,13 +151,13 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $num_users = 3;
         $num_problems = 3;
         // Create course
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $adminLogin = self::login($courseData['admin']);
         // Create problems and add to course
         for ($i = 0; $i < $num_problems; $i++) {
-            $problem[$i] = ProblemsFactory::createProblem();
+            $problem[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
@@ -146,21 +167,39 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $user = [];
         $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
-            CoursesFactory::addStudentToCourse($courseData, $identity[$i]);
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $identity[$i]
+            );
         }
         // Create runs to problems directly
         $runs = [];
-        $runs[0] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
-        $runs[1] = RunsFactory::createRunToProblem($problem[1], $identity[1]);
-        $runs[2] = RunsFactory::createRunToProblem($problem[2], $identity[2]);
-        $runs[3] = RunsFactory::createRunToProblem($problem[0], $identity[1]);
-        $runs[4] = RunsFactory::createRunToProblem($problem[0], $identity[2]);
-        RunsFactory::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
-        RunsFactory::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
-        RunsFactory::gradeRun($runs[2]); // run with a AC verdict
-        RunsFactory::gradeRun($runs[3]); // run with a AC verdict
-        RunsFactory::gradeRun($runs[4]); // run with a AC verdict
+        $runs[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[0]
+        );
+        $runs[1] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[1],
+            $identity[1]
+        );
+        $runs[2] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[2],
+            $identity[2]
+        );
+        $runs[3] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[1]
+        );
+        $runs[4] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem[0],
+            $identity[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[0], '0.0', 'WA'); // run with a WA verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[1], '0.0', 'WA'); // run with a WA verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[2]); // run with a AC verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[3]); // run with a AC verdict
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[4]); // run with a AC verdict
         $adminLogin = self::login($courseData['admin']);
         $solvedProblems = \OmegaUp\Controllers\Course::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,

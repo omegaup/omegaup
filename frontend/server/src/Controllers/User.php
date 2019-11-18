@@ -1380,12 +1380,20 @@ class User extends \OmegaUp\Controllers\Controller {
             // Only first place coder is saved
             \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $users[0]['user_id'],
+                'school_id' => $users[0]['school_id'],
                 'time' => $firstDay,
                 'rank' => 1,
             ]));
             $coderOfTheMonthUserId = $users[0]['user_id'];
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
+            // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
+            foreach ($codersOfTheMonth as $coder) {
+                if (isset($coder->selected_by)) {
+                    $coderOfTheMonthUserId = $coder->user_id;
+                    break;
+                }
+            }
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
@@ -1467,20 +1475,21 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         foreach ($users as $index => $user) {
-            if ($user['username'] != $r['username']) {
-                continue;
-            }
-
-            // Save it
-            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+            $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $user['user_id'],
+                'school_id' => $user['school_id'],
                 'time' => $dateToSelect,
                 'rank' => $index + 1,
-                'selected_by' => $r->identity->identity_id,
-            ]));
-
-            return ['status' => 'ok'];
+            ]);
+            // All users calculated as CoderOfTheMonth are going to be saved on database,
+            // the one selected by the mentor is gonna have the field 'selected_by' filled.
+            if ($user['username'] === $r['username']) {
+                $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
+            }
+            \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
         }
+
+        return ['status' => 'ok'];
     }
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
@@ -1886,17 +1895,39 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity->country_id = $state->country_id;
         }
 
+        // Save previous values
+        $currentIdentitySchool = null;
+        $currentGraduationDate = null;
+        $currentSchool = null;
+        if (!is_null($r->identity->current_identity_school_id)) {
+            $currentIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $r->identity->current_identity_school_id
+            );
+            if (!is_null($currentIdentitySchool)) {
+                $currentSchool = $currentIdentitySchool->school_id;
+                $currentGraduationDate = $currentIdentitySchool->graduation_date;
+                if (!is_null($currentGraduationDate)) {
+                    $currentGraduationDate = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                        $currentGraduationDate
+                    );
+                }
+            }
+        }
+
+        $newSchool = $currentSchool;
         if (!is_null($r['school_id'])) {
             if (is_numeric($r['school_id'])) {
-                $r['school'] = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
-                if (is_null($r['school'])) {
+                $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
+                if (is_null($school)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'school'
                     );
                 }
-                $r->identity->school_id = $r['school']->school_id;
+                $newSchool = $school->school_id;
+                $r->identity->school_id = $school->school_id;
             } elseif (empty($r['school_name'])) {
+                $newSchool = null;
                 $r['school_id'] = null;
             } else {
                 $response = \OmegaUp\Controllers\School::apiCreate(new \OmegaUp\Request([
@@ -1908,6 +1939,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'auth_token' => $r['auth_token'],
                 ]));
                 $r['school_id'] = $response['school_id'];
+                $newSchool = $response['school_id'];
                 $r->identity->school_id = $response['school_id'];
             }
         }
@@ -1917,6 +1949,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'scholar_degree'
         );
 
+        $newGraduationDate = $currentGraduationDate;
         if (!is_null($r['graduation_date'])) {
             if (is_numeric($r['graduation_date'])) {
                 $graduationDate = intval($r['graduation_date']);
@@ -1927,6 +1960,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
                 $graduationDate = strtotime($r['graduation_date']);
             }
+            $newGraduationDate = $graduationDate;
             $r['graduation_date'] = $graduationDate;
         }
         if (!is_null($r['birth_date'])) {
@@ -2004,10 +2038,50 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            // Update user object
-            \OmegaUp\DAO\Users::update($r->user);
+            // Update IdentitiesSchools
+            if ($newSchool !== $currentSchool) {
+                // Update end time for current record and create a new one
+                $graduationDate = !is_null(
+                    $newGraduationDate
+                ) ? gmdate(
+                    'Y-m-d',
+                    $newGraduationDate
+                ) : null;
+                $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                    $r->identity,
+                    $graduationDate
+                );
+                $r->identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
+            } elseif (
+                !is_null($newSchool)
+                && ($currentGraduationDate !== $newGraduationDate)
+            ) {
+                $graduationDate = !is_null(
+                    $newGraduationDate
+                ) ? gmdate(
+                    'Y-m-d',
+                    $newGraduationDate
+                ) : null;
+                if (!is_null($currentIdentitySchool)) {
+                    // Only update the graduation date
+                    $currentIdentitySchool->graduation_date = $graduationDate;
+                    \OmegaUp\DAO\IdentitiesSchools::update(
+                        $currentIdentitySchool
+                    );
+                } else {
+                    // Create a new record
+                    $newIdentitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                        'identity_id' => $r->identity->identity_id,
+                        'school_id' => $newSchool,
+                        'graduation_date' => $graduationDate,
+                    ]);
 
-            // Update identity object
+                    \OmegaUp\DAO\IdentitiesSchools::create($newIdentitySchool);
+                    $r->identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
+                }
+            }
+
+            \OmegaUp\DAO\Users::update($r->user);
             \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -2148,7 +2222,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiUpdateMainEmail(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateEmail($r['email'], 'email');
 
@@ -2373,6 +2447,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     private static function validateAddRemoveRole(\OmegaUp\Request $r) {
         if (
+            !is_null($r->identity) &&
             !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
         ) {
@@ -2511,7 +2586,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
         /** @var \OmegaUp\DAO\VO\Identities $r->identity */
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (
+            is_null($r->identity) ||
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 

@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class TimeTest extends OmegaupTestCase {
+class TimeTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeApi() {
         // Call API
         $response = \OmegaUp\Controllers\Time::apiGet();

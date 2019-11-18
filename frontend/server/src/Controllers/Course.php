@@ -658,9 +658,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Adds a problem to an assignment
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: 'ok'}
      */
-    public static function apiAddProblem(\OmegaUp\Request $r) {
+    public static function apiAddProblem(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }

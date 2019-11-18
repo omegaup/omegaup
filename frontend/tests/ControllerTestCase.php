@@ -1,23 +1,25 @@
 <?php
 
+namespace OmegaUp\Test;
+
 /**
- * Parent class of all Test cases for Omegaup
+ * Parent class of all controller test cases for omegaUp.
  * Implements common methods for setUp and asserts
  *
  * @author joemmanuel
  */
-class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
-    public $mockClarificationController = null;
+class ControllerTestCase extends \PHPUnit\Framework\TestCase {
+    /** @var \Logger|null */
     private static $logObj = null;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $scriptFilename = __DIR__ . '/gitserver-start.sh ' .
+        $scriptFilename = __DIR__ . '/controllers/gitserver-start.sh ' .
             OMEGAUP_GITSERVER_PORT . ' /tmp/omegaup/problems.git';
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
-            throw new Exception(
+            throw new \Exception(
                 "{$scriptFilename} failed with {$returnVar}:\n" .
                 implode("\n", $output)
             );
@@ -26,10 +28,10 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
-        $scriptFilename = __DIR__ . '/gitserver-stop.sh';
+        $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh';
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
-            throw new Exception(
+            throw new \Exception(
                 "{$scriptFilename} failed with {$returnVar}:\n" .
                 implode("\n", $output)
             );
@@ -405,7 +407,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function log($message) {
         if (is_null(self::$logObj)) {
-            self::$logObj = Logger::getLogger('tests');
+            self::$logObj = \Logger::getLogger('tests');
         }
 
         self::$logObj->info('[INFO] ' . $message);
@@ -421,13 +423,13 @@ class ScopedLoginToken {
      */
     public $auth_token = null;
 
-    public function __construct(string $auth_token) {
+    public function __construct(string $authToken) {
         \OmegaUp\Authorization::clearCacheForTesting();
-        $this->auth_token = $auth_token;
+        $this->auth_token = $authToken;
     }
 
     public function __destruct() {
-        OmegaupTestCase::logout();
+        \OmegaUp\Test\ControllerTestCase::logout();
         \OmegaUp\Authorization::clearCacheForTesting();
     }
 }
@@ -552,7 +554,7 @@ class NoOpGrader extends \OmegaUp\Grader {
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {
             if (!$missingOk) {
-                throw new Exception("Resource {$path} not found");
+                throw new \Exception("Resource {$path} not found");
             }
             return null;
         }
@@ -586,7 +588,7 @@ class NoOpGrader extends \OmegaUp\Grader {
  * Simple RAII class to detour grader calls to a mock instance.
  */
 class ScopedGraderDetour {
-    /** @var OmegaUp\Grader */
+    /** @var \OmegaUp\Grader */
     private $_originalInstance;
 
     /** @var NoOpGrader */

@@ -105,7 +105,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         WHERE
             admission_mode = \'private\' and a.owner_id = ?;';
         $params = [$user->user_id];
-
+        /** @var array{total: int} */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         if (!array_key_exists('total', $rs)) {

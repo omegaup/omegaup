@@ -96,10 +96,13 @@ CREATE TABLE `Coder_Of_The_Month` (
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
+  KEY `school_id` (`school_id`),
+  CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.';
@@ -304,6 +307,7 @@ CREATE TABLE `Identities` (
   `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
   `gender` enum('female','male','other','decline') DEFAULT NULL COMMENT 'Género de la identidad',
+  `current_identity_school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`identity_id`),
   UNIQUE KEY `username` (`username`),
   KEY `country_id` (`country_id`),
@@ -312,12 +316,31 @@ CREATE TABLE `Identities` (
   KEY `user_id` (`user_id`),
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
+  KEY `current_identity_school_id` (`current_identity_school_id`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_is_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_is_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_iu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Identidades registradas.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Identities_Schools` (
+  `identity_school_id` int(11) NOT NULL AUTO_INCREMENT,
+  `identity_id` int(11) NOT NULL,
+  `school_id` int(11) NOT NULL,
+  `graduation_date` date DEFAULT NULL,
+  `creation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `end_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`identity_school_id`),
+  UNIQUE KEY `identity_school_graduation_date` (`identity_id`,`school_id`,`graduation_date`),
+  KEY `identity_id` (`identity_id`),
+  KEY `school_id` (`school_id`),
+  CONSTRAINT `fk_isi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_iss_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Todas las escuelas por las que un usuario ha estudiado desde que se unió a omegaUp';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -811,16 +834,19 @@ CREATE TABLE `Submissions` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
   `type` enum('normal','test','disqualified') DEFAULT 'normal',
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`submission_id`),
   UNIQUE KEY `submissions_guid` (`guid`),
   KEY `problem_id` (`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_s_current_run_id` (`current_run_id`),
+  KEY `school_id` (`school_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ss_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

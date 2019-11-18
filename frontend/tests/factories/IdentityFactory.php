@@ -43,7 +43,7 @@ class IdentityFactory {
                 'state_id' => strval($data[3]),
                 'gender' => strval($data[4]),
                 'school_name' => strval($data[5]),
-                'password' => $password == '' ? Utils::CreateRandomString() : $password,
+                'password' => $password == '' ? \OmegaUp\Test\Utils::createRandomString() : $password,
             ]);
         }
         fclose($handle);
@@ -52,7 +52,7 @@ class IdentityFactory {
 
     public static function createIdentitiesFromAGroup(
         \OmegaUp\DAO\VO\Groups $group,
-        ScopedLoginToken $adminLogin,
+        \OmegaUp\Test\ScopedLoginToken $adminLogin,
         string $password
     ): array {
         // Call api using identity creator group member

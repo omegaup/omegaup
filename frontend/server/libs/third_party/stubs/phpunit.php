@@ -1,40 +1,12 @@
 <?php
+
 namespace PHPUnit\Framework;
+
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use Prophecy\Prophecy\ObjectProphecy;
-abstract class TestCase extends Assert implements Test, SelfDescribing
-{
-    /**
-     * @template T
-     * @param class-string<T> $class
-     * @return MockObject&T
-     */
-    public function createMock($class) {}
-    /**
-     * Returns a builder object to create mock objects using a fluent interface.
-     *
-     * @template T
-     * @param class-string<T> $className
-     *
-     * @return MockBuilder<T>
-     */
-    public function getMockBuilder(string $className) {}
-    /**
-     * @template T
-     * @param class-string<T> $classOrInterface
-     * @return ObjectProphecy<T>
-     */
-    public function prophesize($classOrInterface): ObjectProphecy {}
-    /**
-     * @param class-string<\Throwable> $exception
-     * @return void
-     */
-    public function expectException(string $exception) {}
-}
 
-abstract class Assert
-{
+abstract class Assert {
     /**
      * Asserts that a variable is of a given type.
      *
@@ -46,7 +18,8 @@ abstract class Assert
      * @psalm-param class-string<ExpectedType> $expected
      * @psalm-assert ExpectedType $actual
      */
-    public static function assertInstanceOf($expected, $actual, $message = '') {}
+    public static function assertInstanceOf($expected, $actual, $message = '');
+
     /**
      * Asserts that a variable is of a given type.
      *
@@ -58,7 +31,8 @@ abstract class Assert
      * @psalm-param class-string<ExpectedType> $expected
      * @psalm-assert !ExpectedType $actual
      */
-    public static function assertNotInstanceOf($expected, $actual, $message = '') {}
+    public static function assertNotInstanceOf($expected, $actual, $message = '');
+
     /**
      * Asserts that a condition is true.
      *
@@ -67,7 +41,8 @@ abstract class Assert
      *
      * @psalm-assert true $condition
      */
-    public static function assertTrue($condition, $message = '') {}
+    public static function assertTrue($condition, $message = '');
+
     /**
      * Asserts that a condition is not true.
      *
@@ -76,7 +51,8 @@ abstract class Assert
      *
      * @psalm-assert !true $condition
      */
-    public static function assertNotTrue($condition, $message = '') {}
+    public static function assertNotTrue($condition, $message = '');
+
     /**
      * Asserts that a condition is false.
      *
@@ -85,7 +61,8 @@ abstract class Assert
      *
      * @psalm-assert false $condition
      */
-    public static function assertFalse($condition, $message = '') {}
+    public static function assertFalse($condition, $message = '');
+
     /**
      * Asserts that a condition is not false.
      *
@@ -94,7 +71,8 @@ abstract class Assert
      *
      * @psalm-assert !false $condition
      */
-    public static function assertNotFalse($condition, $message = '') {}
+    public static function assertNotFalse($condition, $message = '');
+
     /**
      * Asserts that a variable is null.
      *
@@ -103,7 +81,8 @@ abstract class Assert
      *
      * @psalm-assert null $actual
      */
-    public static function assertNull($actual, $message = '') {}
+    public static function assertNull($actual, $message = '');
+
     /**
      * Asserts that a variable is not null.
      *
@@ -112,7 +91,8 @@ abstract class Assert
      *
      * @psalm-assert !null $actual
      */
-    public static function assertNotNull($actual, $message = '') {}
+    public static function assertNotNull($actual, $message = '');
+
     /**
      * Asserts that two variables are the same.
      *
@@ -123,12 +103,59 @@ abstract class Assert
      * @psalm-param ExpectedType $expected
      * @psalm-assert =ExpectedType $actual
      */
-    function assertSame($expected, $actual, $message = '') {}
+    function assertSame($expected, $actual, $message = '');
+
     /**
      * Asserts that two variables are not the same.
      *
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    function assertNotSame($expected, $actual, $message = '') {}
+    function assertNotSame($expected, $actual, $message = '');
+}
+
+interface Test extends \Countable {
+}
+
+
+/**
+ * @internal
+ */
+interface SelfDescribing {
+    /**
+     * Returns a string representation of the object.
+     */
+    public function toString(): string;
+}
+
+abstract class TestCase extends Assert implements Test, SelfDescribing {
+    /**
+     * @template T
+     * @param class-string<T> $class
+     * @return MockObject&T
+     */
+    public function createMock($class);
+
+    /**
+     * Returns a builder object to create mock objects using a fluent interface.
+     *
+     * @template T
+     * @param class-string<T> $className
+     *
+     * @return MockBuilder<T>
+     */
+    public function getMockBuilder(string $className);
+
+    /**
+     * @template T
+     * @param class-string<T> $classOrInterface
+     * @return ObjectProphecy<T>
+     */
+    public function prophesize($classOrInterface): ObjectProphecy;
+
+    /**
+     * @param class-string<\Throwable> $exception
+     * @return void
+     */
+    public function expectException(string $exception);
 }
