@@ -3,7 +3,7 @@
 
 <div class="container-fluid">
 	<div id="course-submissions-list"></div>
-	<script type="text/javascript" src="{version_hash src="/js/dist/course_submissions_list.js"}"></script>
+	{js_include entrypoint="course_submissions_list"}
 </div>
 
 {include file='footer.tpl' inline}

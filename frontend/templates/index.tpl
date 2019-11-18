@@ -10,7 +10,7 @@
 {else}
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
-<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}" async></script>
+{js_include entrypoint="coder_of_the_month_notice" async}
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -42,7 +42,7 @@
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}" async></script>
+					{js_include entrypoint="schools_rank" async}
 					<div id="omegaup-schools-rank"></div>
 					<div class="container-fluid">
 						<div class="col-xs-12 vertical-padding">

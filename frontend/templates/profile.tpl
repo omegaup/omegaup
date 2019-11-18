@@ -79,7 +79,7 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
-			<script type="text/javascript" src="{version_hash src="/js/dist/user_charts.js"}"></script>
+			{js_include entrypoint="user_charts"}
 			<div id="omegaup-user-charts"></div>
 		</div>
 

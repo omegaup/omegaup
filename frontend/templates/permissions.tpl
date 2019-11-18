@@ -4,5 +4,5 @@
 <script type="text/json" id="payload">{$payload|json_encode}</script>
 <div id="user-roles"></div>
 
-<script type="text/javascript" src="{version_hash src="/js/dist/admin_roles.js"}"></script>
+{js_include entrypoint="admin_roles"}
 {include file='footer.tpl' inline}

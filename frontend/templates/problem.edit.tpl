@@ -1,7 +1,7 @@
 {include file='redirect.tpl' inline}
 {include file='head.tpl' navbarSection='problems' htmlTitle="{#omegaupTitleProblemEdit#}" inline}
 
-<script src="{version_hash src="/js/dist/problem_edit.js"}" type="text/javascript"></script>
+{js_include entrypoint="problem_edit"}
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 

@@ -2,6 +2,6 @@
 {include file='head.tpl' navbarSection='schools' htmlTitle="{#omegaupTitleCourseNew#}" inline}
 
 <div id="course-details"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/course_new.js"}"></script>
+{js_include entrypoint="course_new"}
 
 {include file='footer.tpl' inline}

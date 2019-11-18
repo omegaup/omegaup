@@ -1,5 +1,5 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleOmegaUpForSchools#}" inline}
-<script type="text/javascript" src="{version_hash src="/js/dist/schools_intro.js"}"></script>
+{js_include entrypoint="schools_intro"}
 <div id="intro">
     <div></div>
 </div>

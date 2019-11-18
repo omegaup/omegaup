@@ -4,7 +4,7 @@
 <div id="problem-stats"></div>
 
 {if isset($smarty.get.problem)}
-<script type="text/javascript" src="{version_hash src="/js/dist/problem_stats.js"}"></script>
+{js_include entrypoint="problem_stats"}
 {/if}
 
 {include file='footer.tpl' inline}
