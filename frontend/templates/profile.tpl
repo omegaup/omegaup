@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}"}
+{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}" inline}
 
 {if !isset($STATUS_ERROR)}
 
@@ -20,7 +20,7 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{if $profile.userinfo.rankinfo.rank > 0}#{$profile.userinfo.rankinfo.rank} - {/if}{$profile.userinfo.username} {if isset($profile.userinfo.country_id)} <img src="/media/flags/{$profile.userinfo.country_id|lower}.png" width="16" height="11" title="{$profile.userinfo.country_id}"/> {/if}</h2>
 			</div>
-{include file='profile.basicinfo.tpl'}
+{include file='profile.basicinfo.tpl' inline}
 		</div>
 
 		<div class="panel panel-default">
@@ -94,4 +94,4 @@
 
 {/if}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
