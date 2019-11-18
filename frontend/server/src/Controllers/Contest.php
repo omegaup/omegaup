@@ -483,7 +483,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result['needsBasicInformation'] =
             $result['needsBasicInformation'] && (
                 !$identity->country_id || !$identity->state_id ||
-                !$identity->current_identity_school_id
+                is_null($identity->current_identity_school_id)
         );
 
         // Privacy Statement Information

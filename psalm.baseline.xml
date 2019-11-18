@@ -1354,7 +1354,6 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
-      <code>$r-&gt;user-&gt;main_email_id</code>
       <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">

@@ -97,10 +97,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
      * @param int $user_id
      * @return null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string}
      */
-    final public static function getExtendedProfileDataByPk(?int $user_id): ?array {
-        if (is_null($user_id)) {
-            return null;
-        }
+    final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
                     c.`country_id` AS country_id,

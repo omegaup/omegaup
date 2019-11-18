@@ -1203,7 +1203,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         if (is_null($userDb)) {
-            return $response;
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $response['userinfo']['graduation_date'] = is_null(
@@ -1400,11 +1400,9 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
         if (is_null($coderOfTheMonthUserId)) {
-            return [
-                'status' => 'ok',
-                'userinfo' => null,
-                'problems' => null,
-            ];
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'coderOfTheMonthNotFound'
+            );
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
@@ -2236,10 +2234,12 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
-            $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
-            if (!is_null($email)) {
-                $email->email = $r['email'];
-                \OmegaUp\DAO\Emails::update($email);
+            if (!is_null($r->user->main_email_id)) {
+                $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
+                if (!is_null($email)) {
+                    $email->email = $r['email'];
+                    \OmegaUp\DAO\Emails::update($email);
+                }
             }
 
             // Add verification_id if not there
