@@ -100,6 +100,12 @@ let config = [
           },
         },
       ]),
+      new HtmlWebpackPlugin({
+        inject: false,
+        chunks: ['omegaup'],
+        filename: 'tests/index.html',
+        template: path.resolve(__dirname, './stuff/webpack/tests.ejs'),
+      }),
       new VueLoaderPlugin(),
     ],
     optimization: {
@@ -107,11 +113,48 @@ let config = [
         name: 'commons',
       },
       splitChunks: {
+        maxInitialRequests: Infinity,
         cacheGroups: {
+          core_js: {
+            name: 'npm.core-js',
+            test: /\/node_modules\/core-js\//,
+            chunks: 'all',
+            priority: 20,
+          },
+          jszip: {
+            name: 'npm.jszip',
+            test: /\/node_modules\/jszip\//,
+            chunks: 'all',
+            priority: 20,
+          },
+          vendor: {
+            name: module => {
+              const packageName = module.context.match(
+                /\/node_modules\/([^@\/]+)/,
+              )[1];
+
+              return `npm.${packageName}`;
+            },
+            test: /\/node_modules\/[^@\/]+/,
+            chunks: 'initial',
+            minChunks: 2,
+            minSize: 50 * 1024,
+            priority: 10,
+          },
+          iso_3166_2_js: {
+            name: 'iso-3166-2.js',
+            test: /\/frontend\/www\/third_party\/js\/iso-3166-2.js\//,
+            chunks: 'all',
+            priority: 10,
+          },
           commons: {
             name: 'commons',
             chunks: 'initial',
             minChunks: 4,
+            priority: 1,
+          },
+          default: {
+            reuseExistingChunk: true,
           },
         },
       },
@@ -250,9 +293,12 @@ let config = [
 ];
 
 module.exports = (env, argv) => {
-  const mode = argv.mode;
+  if (argv.mode !== 'development') {
+    for (const entry of config) {
+      entry.devtool = 'source-map';
+    }
+  }
   for (const entry of config) {
-    entry.devtool = 'source-map';
     if (entry.name != 'frontend') {
       continue;
     }

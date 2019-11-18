@@ -4,7 +4,8 @@
     "**/*.test.js"
   ],
   "helpers": [
-    "**/*.test_helper.js"
+    "**/*.test_helper.js",
+    "dist/npm.*.js"
   ],
   "stopSpecOnExpectationFailure": false,
   "random": false
