@@ -4,6 +4,6 @@
 <div id="group_list"></div>
 
 <script type="text/json" id="payload">{$payload|json_encode}</script>
-<script type="text/javascript" src="{version_hash src="/js/dist/group_list.js"}"></script>
+{js_include entrypoint="group_list"}
 
 {include file='footer.tpl' inline}

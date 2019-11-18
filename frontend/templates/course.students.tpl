@@ -4,5 +4,5 @@
 <script type="text/json" id="payload">{$payload|json_encode}</script>
 <div id="view-progress"></div>
 
-<script type="text/javascript" src="{version_hash src="/js/dist/course_students.js"}"></script>
+{js_include entrypoint="course_students"}
 {include file='footer.tpl' inline}

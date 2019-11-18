@@ -100,7 +100,7 @@
     <script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
   {/if}
   {if $LOGGED_IN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/dist/notification_list.js"}"></script>
+    {js_include entrypoint="notification_list"}
   {/if}
   </div>
 </div>

@@ -59,12 +59,12 @@
       <div>
         <script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
         <div id="qualitynomination-demotionpopup"></div>
-        <script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_demotionpopup.js"}"></script>
+        {js_include entrypoint="qualitynomination_demotionpopup"}
       </div>
       <div id="qualitynomination">
         <script type="text/json" id="quality-payload">{$quality_payload|json_encode}</script>
         <div id="qualitynomination-popup"></div>
-        <script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
+        {js_include entrypoint="qualitynomination_popup"}
       </div>
       {include file='arena.runs.tpl' show_submit=true show_details=true inline}
       {if isset($histograms)}
@@ -73,7 +73,7 @@
         <script type="text/json" id="histograms">null</script>
       {/if}
       <div id="problem-feedback"></div>
-      <script type="text/javascript" src="{version_hash src="/js/dist/problem_feedback.js"}"></script>
+      {js_include entrypoint="problem_feedback"}
       <table class="best-solvers">
         <caption>{#wordsBestSolvers#}</caption>
         <thead>
@@ -105,7 +105,7 @@
   {include file='arena.clarification_list.tpl' contest=false inline}
   <div id="solution" class="tab">
     <div id="problem-solution"></div>
-    <script type="text/javascript" src="{version_hash src="/js/dist/problem_solution.js"}"></script>
+    {js_include entrypoint="problem_solution"}
   </div>
 </div>
 <div id="overlay">

@@ -3,5 +3,5 @@
 
 <div id="admin-support"></div>
 
-<script type="text/javascript" src="{version_hash src="/js/dist/admin_support.js"}"></script>
+{js_include entrypoint="admin_support"}
 {include file='footer.tpl' inline}

@@ -40,5 +40,5 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/dist/course_edit.js"}"></script>
+{js_include entrypoint="course_edit"}
 {include file='footer.tpl' inline}

@@ -3,6 +3,6 @@
 
 <script type="text/json" id="payload">{$payload|json_encode}</script>
 <div id="qualitynomination-list"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_list.js"}"></script>
+{js_include entrypoint="qualitynomination_list"}
 
 {include file='footer.tpl' inline}
