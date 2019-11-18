@@ -23,6 +23,9 @@
 
 		{js_include entrypoint="omegaup" runtime}
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
+{if isset($inArena) && $inArena}
+		{js_include entrypoint="arena"}
+{/if}
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
