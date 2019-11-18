@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}"}
+{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}" inline}
 
 {if !isset($STATUS_ERROR)}
 <script type="text/json" id="payload">{['profile' => $profile.userinfo, 'logged_in' => $LOGGED_IN == "1"]|json_encode}</script>
@@ -6,4 +6,4 @@
 <script type="text/javascript" src="{version_hash src="/js/dist/user_profile.js"}"></script>
 {/if}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

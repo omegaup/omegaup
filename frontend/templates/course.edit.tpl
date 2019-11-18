@@ -1,5 +1,5 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#omegaupTitleCourseEdit#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='schools' htmlTitle="{#omegaupTitleCourseEdit#}" inline}
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -41,4 +41,4 @@
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/dist/course_edit.js"}"></script>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

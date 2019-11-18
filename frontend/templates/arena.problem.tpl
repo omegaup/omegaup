@@ -1,4 +1,4 @@
-{include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true}
+{include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true inline}
 <script type="text/json" id="payload">{$payload|json_encode}</script>
   <ul class="tabs">
     <li><a href="#problems" class="active">{#wordsProblem#}</a></li>
@@ -66,7 +66,7 @@
         <div id="qualitynomination-popup"></div>
         <script type="text/javascript" src="{version_hash src="/js/dist/qualitynomination_popup.js"}"></script>
       </div>
-      {include file='arena.runs.tpl' show_submit=true show_details=true}
+      {include file='arena.runs.tpl' show_submit=true show_details=true inline}
       {if isset($histograms)}
         <script type="text/json" id="histograms">{$histograms|json_encode}</script>
       {else}
@@ -99,20 +99,20 @@
   </div>
   {if $problem_admin}
     <div id="runs" class="tab">
-      {include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true}
+      {include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true inline}
     </div>
   {/if}
-  {include file='arena.clarification_list.tpl' contest=false}
+  {include file='arena.clarification_list.tpl' contest=false inline}
   <div id="solution" class="tab">
     <div id="problem-solution"></div>
     <script type="text/javascript" src="{version_hash src="/js/dist/problem_solution.js"}"></script>
   </div>
 </div>
 <div id="overlay">
-  {include file='arena.runsubmit.tpl'}
+  {include file='arena.runsubmit.tpl' inline}
   <div id="run-details"></div>
 </div>
 <div id="footer"></div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 </body>
 </html>

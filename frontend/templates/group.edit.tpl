@@ -1,5 +1,5 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleGroupsEdit#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleGroupsEdit#}" inline}
 
 <span id="form-data" data-name="groups" data-page="edit" data-alias="{$smarty.get.group}"></span>
 <script src="{version_hash src="/js/groups.js"}"></script>
@@ -14,10 +14,10 @@
 
 <div class="tab-content">
 	<div class="tab-pane active" id="members">
-		{include file='group.edit.members.tpl'}
+		{include file='group.edit.members.tpl' inline}
 	</div>
 	<div class="tab-pane" id="scoreboards">
-		{include file='group.edit.scoreboards.tpl'}
+		{include file='group.edit.scoreboards.tpl' inline}
 	</div>
 	{if $IS_ORGANIZER}
 		<div class="tab-pane" id="identities">
@@ -27,4 +27,4 @@
 	{/if}
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
