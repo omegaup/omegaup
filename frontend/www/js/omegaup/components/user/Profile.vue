@@ -99,6 +99,11 @@
              v-bind:username="profile.username"
              v-if="charts"></omegaup-user-charts>
       </div>
+      <omegaup-profile-paginator
+        v-bind:data="['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']"
+        v-bind:columns="3"
+        v-bind:sizePerPage="9"
+      ></omegaup-profile-paginator>
     </div>
   </div>
 </template>
@@ -120,6 +125,7 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
+import user_ProfilePaginator from './ProfilePaginator.vue';
 
 @Component({
   components: {
@@ -127,6 +133,7 @@ import badge_List from '../badge/List.vue';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
+    'omegaup-profile-paginator': user_ProfilePaginator,
   },
 })
 export default class UserProfile extends Vue {
