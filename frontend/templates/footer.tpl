@@ -43,7 +43,7 @@
 		<!-- #content -->
 	</div>
 </div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 <!-- #root -->
 </body>
 </html>

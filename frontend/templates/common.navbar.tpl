@@ -51,7 +51,7 @@
         <ul class="nav navbar-nav navbar-right">
           {if $LOGGED_IN eq '1'}
             {if isset($inContest) && $inContest}
-              {include file='common.navbar.notifications.tpl'}
+              {include file='common.navbar.notifications.tpl' inline}
             {/if}
             <li id="notifications-list"></li>
             <li id="nav-user" class="dropdown{if isset($navbarSection) && $navbarSection === "users"} active{/if}">
@@ -100,7 +100,7 @@
     <script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
   {/if}
   {if $LOGGED_IN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/dist/notification_list.js"}"></script>
+    {js_include entrypoint="notification_list"}
   {/if}
   </div>
 </div>

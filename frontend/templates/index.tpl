@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}" inline}
 
 {if isset($coderOfTheMonthData)}
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
@@ -10,7 +10,7 @@
 {else}
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
-<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}" async></script>
+{js_include entrypoint="coder_of_the_month_notice" async}
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -35,14 +35,14 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload}
+				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload inline}
 			</div>
 
 			{if isset($schoolRankPayload)}
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}" async></script>
+					{js_include entrypoint="schools_rank" async}
 					<div id="omegaup-schools-rank"></div>
 					<div class="container-fluid">
 						<div class="col-xs-12 vertical-padding">
@@ -118,4 +118,4 @@
 
 <script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

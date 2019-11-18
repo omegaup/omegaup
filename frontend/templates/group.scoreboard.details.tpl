@@ -1,5 +1,5 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' jsfile={version_hash src='/js/groups.scoreboards.js'} inArena=true}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' jsfile={version_hash src='/js/groups.scoreboards.js'} inArena=true inline}
 
 <span id="form-data" data-name="group-scoreboards" data-page="details" data-alias="{$smarty.get.scoreboard}" data-group-alias="{$smarty.get.group}">
 </span>
@@ -29,6 +29,6 @@
 		</div>
 
 </div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 </body>
 </html>

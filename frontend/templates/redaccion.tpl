@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleRedaccion#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleRedaccion#}" inline}
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
@@ -21,4 +21,4 @@
 <div style='clear: both;'></div>
 </div>
 </div>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
