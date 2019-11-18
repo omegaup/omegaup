@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}" inline}
 
 {if isset($coderOfTheMonthData)}
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
@@ -35,7 +35,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload}
+				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload inline}
 			</div>
 
 			{if isset($schoolRankPayload)}
@@ -118,4 +118,4 @@
 
 <script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

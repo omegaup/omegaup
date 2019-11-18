@@ -51,7 +51,7 @@
         <ul class="nav navbar-nav navbar-right">
           {if $LOGGED_IN eq '1'}
             {if isset($inContest) && $inContest}
-              {include file='common.navbar.notifications.tpl'}
+              {include file='common.navbar.notifications.tpl' inline}
             {/if}
             <li id="notifications-list"></li>
             <li id="nav-user" class="dropdown{if isset($navbarSection) && $navbarSection === "users"} active{/if}">
