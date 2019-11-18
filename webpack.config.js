@@ -4,6 +4,7 @@ const webpack = require('webpack');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
@@ -250,8 +251,22 @@ let config = [
 
 module.exports = (env, argv) => {
   const mode = argv.mode;
-  for (let entry of config) {
+  for (const entry of config) {
     entry.devtool = 'source-map';
+    if (entry.name != 'frontend') {
+      continue;
+    }
+    // Generate the JSON dependency objects.
+    for (const entryname of Object.keys(entry.entry)) {
+      entry.plugins.push(
+        new HtmlWebpackPlugin({
+          inject: false,
+          chunks: [entryname],
+          filename: `js/dist/${entryname}.deps.json`,
+          template: path.resolve(__dirname, './stuff/webpack/deps.ejs'),
+        }),
+      );
+    }
   }
   return config;
 };
