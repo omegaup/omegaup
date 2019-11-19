@@ -52,43 +52,17 @@
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileSolvedProblems }} <span class="badge">{{
           solvedProblems.length }}</span></h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th colspan="3">{{ T.profileSolvedProblemsTableTitle }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="group in groupedSolvedProblems">
-              <td v-for="problem in group">
-                <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!groupedSolvedProblems"><img src="/media/wait.gif"></div>
+        </div><omegaup-problem-paginator v-bind:columns="3"
+             v-bind:problems="solvedProblems"
+             v-bind:problems-per-page="30"></omegaup-problem-paginator>
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
           unsolvedProblems.length }}</span></h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th colspan="3">{{ T.profileUnsolvedProblemsTableTitle }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="group in groupedUnsolvedProblems">
-              <td v-for="problem in group">
-                <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
+        </div><omegaup-problem-paginator v-bind:columns="3"
+             v-bind:problems="unsolvedProblems"
+             v-bind:problems-per-page="30"></omegaup-problem-paginator>
       </div><omegaup-badge-list v-bind:all-badges="profileBadges"
            v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
@@ -99,11 +73,6 @@
              v-bind:username="profile.username"
              v-if="charts"></omegaup-user-charts>
       </div>
-      <omegaup-profile-paginator
-        v-bind:data="['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']"
-        v-bind:columns="3"
-        v-bind:sizePerPage="9"
-      ></omegaup-profile-paginator>
     </div>
   </div>
 </template>
@@ -125,7 +94,7 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
-import user_ProfilePaginator from './ProfilePaginator.vue';
+import user_ProblemPaginator from './ProblemPaginator.vue';
 
 @Component({
   components: {
@@ -133,7 +102,7 @@ import user_ProfilePaginator from './ProfilePaginator.vue';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
-    'omegaup-profile-paginator': user_ProfilePaginator,
+    'omegaup-problem-paginator': user_ProblemPaginator,
   },
 })
 export default class UserProfile extends Vue {
@@ -148,25 +117,6 @@ export default class UserProfile extends Vue {
 
   T = T;
   columns = 3;
-
-  get groupedSolvedProblems(): omegaup.Problem[][] {
-    return this.groupElements(this.solvedProblems, this.columns);
-  }
-
-  get groupedUnsolvedProblems(): omegaup.Problem[][] {
-    return this.groupElements(this.unsolvedProblems, this.columns);
-  }
-
-  groupElements(
-    elements: omegaup.Problem[],
-    columns: number,
-  ): omegaup.Problem[][] {
-    const groups = [];
-    for (let i = 0; i < elements.length; i += columns) {
-      groups.push(elements.slice(i, i + columns));
-    }
-    return groups;
-  }
 }
 
 </script>
