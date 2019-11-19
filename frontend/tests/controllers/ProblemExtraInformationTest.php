@@ -55,8 +55,11 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($payload['solved']);
 
         // Now try to solved the problem, tried must be true
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData, 0, 'WA', 60);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -91,8 +94,11 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Solve the problem and send dismissal, before AC information
         // is not necessary anymore.
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
         $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,

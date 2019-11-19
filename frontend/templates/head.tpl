@@ -21,9 +21,11 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
-		<script type="text/javascript" src="{version_hash src="/js/dist/commons.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
+		{js_include entrypoint="omegaup" runtime}
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
+{if isset($inArena) && $inArena}
+		{js_include entrypoint="arena"}
+{/if}
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
@@ -94,8 +96,8 @@
 		{/if}
 {/if}
 		<div id="root">
-{include file='common.navbar.tpl'}
+{include file='common.navbar.tpl' inline}
 {if !isset($inArena) || !$inArena}
-{include file='mainmenu.tpl'}
+{include file='mainmenu.tpl' inline}
 {/if}
-{include file='status.tpl'}
+{include file='status.tpl' inline}

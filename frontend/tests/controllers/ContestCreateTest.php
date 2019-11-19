@@ -253,15 +253,23 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // User creates a run in a valid time
-        $run = RunsFactory::createRun($problem, $contest, $identity);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         try {
             // User tries to create a run 5 minutes after contest has finished
             $updatedTime = $updatedTime + 15 * 60;
             \OmegaUp\Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $identity);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $run = \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
             $this->fail(
                 'Contestant should not create a run after contest finishes'
             );

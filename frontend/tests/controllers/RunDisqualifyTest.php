@@ -23,13 +23,13 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a new run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
 
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $login = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
@@ -61,19 +61,19 @@ class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create new runs
-        $runData1 = RunsFactory::createRun(
+        $runData1 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity1
         );
-        $runData2 = RunsFactory::createRun(
+        $runData2 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity2
         );
 
-        RunsFactory::gradeRun($runData1);
-        RunsFactory::gradeRun($runData2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData1);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData2);
 
         // Disqualify run by contestant1
         $login = self::login($contestData['director']);

@@ -23,13 +23,13 @@ class RunsTotalsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run. Submission gap must be 60 seconds
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataOld = RunsFactory::createRun(
+        $runDataOld = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity

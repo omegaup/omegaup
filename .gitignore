@@ -76,9 +76,10 @@ frontend/.DS_Store
 frontend/www/apc.php
 frontend/www/coverage/
 frontend/www/img/
-frontend/www/pmamini.php
 frontend/www/phpminiadmin/
+frontend/www/pmamini.php
 frontend/www/templates/
+frontend/www/tests/index.html
 
 # Ignore sublime sftp config
 sftp-config.json

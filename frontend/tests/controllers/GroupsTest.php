@@ -367,18 +367,18 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Submit runs
-            $run1 = RunsFactory::createRun(
+            $run1 = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestsData[$i],
                 $identityInGroup
             );
-            $run2 = RunsFactory::createRun(
+            $run2 = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestsData[$i],
                 $identityNotInGroup
             );
-            RunsFactory::gradeRun($run1);
-            RunsFactory::gradeRun($run2);
+            \OmegaUp\Test\Factories\Run::gradeRun($run1);
+            \OmegaUp\Test\Factories\Run::gradeRun($run2);
         }
 
         $login = self::login($groupData['owner']);
@@ -459,18 +459,18 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // Submit runs
-            $run1 = RunsFactory::createRun(
+            $run1 = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestsData[$i],
                 $identityInGroup
             );
-            $run2 = RunsFactory::createRun(
+            $run2 = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestsData[$i],
                 $identityInGroupNoAc
             );
-            RunsFactory::gradeRun($run1);
-            RunsFactory::gradeRun($run2, 0.5, 'PA');
+            \OmegaUp\Test\Factories\Run::gradeRun($run1);
+            \OmegaUp\Test\Factories\Run::gradeRun($run2, 0.5, 'PA');
         }
 
         $login = self::login($groupData['owner']);

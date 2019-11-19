@@ -3,6 +3,9 @@ if (typeof require === 'undefined') {
     if (name.endsWith('omegaup.js')) {
       return omegaup;
     }
+    if (name.endsWith('arena.js')) {
+      return arena;
+    }
     if (name.endsWith('Markdown.Sanitizer.js')) {
       return Markdown;
     }
