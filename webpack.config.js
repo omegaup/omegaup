@@ -21,6 +21,7 @@ let config = [
         './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js',
       ],
+      arena: './frontend/www/js/omegaup/arena/arena.js',
       activity_feed: './frontend/www/js/omegaup/activity/feed.js',
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
@@ -102,7 +103,7 @@ let config = [
       ]),
       new HtmlWebpackPlugin({
         inject: false,
-        chunks: ['omegaup'],
+        chunks: ['omegaup', 'arena'],
         filename: 'tests/index.html',
         template: path.resolve(__dirname, './stuff/webpack/tests.ejs'),
       }),
