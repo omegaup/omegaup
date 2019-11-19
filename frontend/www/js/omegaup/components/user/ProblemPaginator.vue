@@ -20,7 +20,7 @@
              "btn btn-primary"
              type="button"
              v-bind:disabled=
-             "this.totalPagesCount === 1 || this.currentPageNumber >= this.totalPagesCount - 1"
+             "this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
              v-on:click="nextPage">{{ T.wordsNext }}</button>
       </div>
     </div>
