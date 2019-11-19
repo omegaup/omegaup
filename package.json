@@ -50,6 +50,7 @@
     "dev": "cross-env webpack --config-name=frontend --watch --mode=development",
     "build": "cross-env webpack --progress --hide-modules --mode=production",
     "build-development": "cross-env webpack --hide-modules --mode=development",
+    "build-development-frontend": "cross-env webpack --config-name=frontend --hide-modules --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
   },
   "dependencies": {
