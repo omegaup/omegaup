@@ -2,9 +2,10 @@
 
 require('../../dist/commons.js');
 var omegaup = require('../../dist/omegaup.js');
+var arena = require('../../dist/arena.js');
 var Markdown = require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
 
-describe('omegaup.arena', function() {
+describe('arena', function() {
   describe('FormatDelta', function() {
     it('Should handle zeroes', function() {
       expect(omegaup.UI.formatDelta(0)).toEqual('00:00:00');
@@ -19,7 +20,7 @@ describe('omegaup.arena', function() {
 
   describe('GetOptionsFromLocation', function() {
     it('Should detect normal contests', function() {
-      var options = omegaup.arena.GetOptionsFromLocation(
+      var options = arena.GetOptionsFromLocation(
         new window.URL('http://localhost/arena/test/'),
       );
       expect(options.contestAlias).toEqual('test');
@@ -34,7 +35,7 @@ describe('omegaup.arena', function() {
     });
 
     it('Should detect practice mode', function() {
-      var options = omegaup.arena.GetOptionsFromLocation(
+      var options = arena.GetOptionsFromLocation(
         new window.URL('http://localhost/arena/test/practice'),
       );
       expect(options.contestAlias).toEqual('test');
@@ -42,7 +43,7 @@ describe('omegaup.arena', function() {
     });
 
     it('Should detect only problems', function() {
-      var options = omegaup.arena.GetOptionsFromLocation(
+      var options = arena.GetOptionsFromLocation(
         new window.URL('http://localhost/arena/problem/test/'),
       );
       expect(options.contestAlias).toEqual(null);
@@ -51,7 +52,7 @@ describe('omegaup.arena', function() {
     });
 
     it('Should detect ws=off', function() {
-      var options = omegaup.arena.GetOptionsFromLocation(
+      var options = arena.GetOptionsFromLocation(
         new window.URL('http://localhost/arena/test/?ws=off'),
       );
       expect(options.disableSockets).toEqual(true);
@@ -68,9 +69,9 @@ describe('omegaup.arena', function() {
       if (typeof global !== 'undefined' && !global.Markdown) {
         global.Markdown = Markdown;
       }
-      var arena = new omegaup.arena.Arena({ contestAlias: 'test' });
-      expect(arena.options.contestAlias).toEqual('test');
-      expect(arena.problemsetAdmin).toEqual(false);
+      var arenaInstance = new arena.Arena({ contestAlias: 'test' });
+      expect(arenaInstance.options.contestAlias).toEqual('test');
+      expect(arenaInstance.problemsetAdmin).toEqual(false);
     });
   });
 });
