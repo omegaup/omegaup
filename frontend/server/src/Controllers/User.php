@@ -1203,7 +1203,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         if (is_null($userDb)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            return $response; //FIXME: Debe lanzar una excepción
         }
 
         $response['userinfo']['graduation_date'] = is_null(
