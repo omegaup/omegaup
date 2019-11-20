@@ -47,23 +47,15 @@
           </tbody>
         </table>
         <div v-show="!contests"><img src="/media/wait.gif"></div>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileSolvedProblems }} <span class="badge">{{
-          solvedProblems.length }}</span></h2>
-        </div><omegaup-problem-paginator v-bind:columns="3"
-             v-bind:problems="solvedProblems"
-             v-bind:problems-per-page="30"></omegaup-problem-paginator>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
-          unsolvedProblems.length }}</span></h2>
-        </div><omegaup-problem-paginator v-bind:columns="3"
-             v-bind:problems="unsolvedProblems"
-             v-bind:problems-per-page="30"></omegaup-problem-paginator>
-      </div><omegaup-badge-list v-bind:all-badges="profileBadges"
+      </div><omegaup-grid-paginator v-bind:columns="3"
+           v-bind:problems="solvedProblems"
+           v-bind:problems-per-page="30"
+           v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
+           v-bind:problems="unsolvedProblems"
+           v-bind:problems-per-page="30"
+           v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
+           <omegaup-badge-list v-bind:all-badges="profileBadges"
            v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
@@ -94,7 +86,7 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
-import user_ProblemPaginator from './ProblemPaginator.vue';
+import user_GridPaginator from './GridPaginator.vue';
 
 @Component({
   components: {
@@ -102,7 +94,7 @@ import user_ProblemPaginator from './ProblemPaginator.vue';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
-    'omegaup-problem-paginator': user_ProblemPaginator,
+    'omegaup-grid-paginator': user_GridPaginator,
   },
 })
 export default class UserProfile extends Vue {
