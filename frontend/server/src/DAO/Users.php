@@ -75,24 +75,6 @@ class Users extends \OmegaUp\DAO\Base\Users {
         ];
     }
 
-    public static function savePassword(\OmegaUp\DAO\VO\Users $Users): int {
-        $sql = '
-            UPDATE
-                `Users`
-            SET
-                `password` = ?,
-                `username` = ?
-            WHERE
-                `user_id` = ?;';
-        $params = [
-            $Users->password,
-            $Users->username,
-            $Users->user_id,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
-    }
-
     final public static function getExtendedProfileDataByPk($user_id) {
         if (is_null($user_id)) {
             return null;

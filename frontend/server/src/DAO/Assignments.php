@@ -79,7 +79,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     final public static function getByAliasAndCourse(
-        string $assignmentAlias,
+        ?string $assignmentAlias,
         int $courseId
     ): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT

@@ -196,21 +196,17 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $plainPassword = $user->password;
+        $plainPassword = $identity->password;
         // Set old password
-        $user->password = md5($plainPassword);
-        \OmegaUp\DAO\Users::update($user);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $identity->password = $user->password;
         \OmegaUp\DAO\Identities::update($identity);
 
         // Let's put back plain password
-        $user->password = $plainPassword;
+        $identity->password = $plainPassword;
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]);
 
         // Call the API
@@ -242,10 +238,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Force empty password
-        $user->password = '';
-        \OmegaUp\DAO\Users::update($user);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $identity->password = $user->password;
+        $identity->password = '';
         \OmegaUp\DAO\Identities::update($identity);
 
         try {
