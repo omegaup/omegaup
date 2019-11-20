@@ -53,9 +53,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param \OmegaUp\DAO\VO\Identities $user
-     * @param string $nominationType
      * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
@@ -608,12 +605,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param int     $assignee  The user id of the person assigned to review
      *                           nominations.  May be null.
      *
-     * @return array The response.
+     * @return array{status: string, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>} The response.
      */
     private static function getListImpl(
         \OmegaUp\Request $r,
-        $nominator,
-        $assignee
+        ?int $nominator,
+        ?int $assignee
     ) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
@@ -712,6 +709,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
+        return self::getMyList($r);
+    }
+
+    /**
+     * @return array{currentUser: string, myView: bool, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>}
+     * @return array{currentUser: string, myView: bool, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array<array-key, array{time: int, user: array{name: string, username: string}, vote: int}>}|null>}
+     * @return array{currentUser: null|string, myView: true, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array<array-key, array{time: int, user: array{name: string, username: string}, vote: int}>}|null>}
+     */
+    public static function getMyQualityNominationListForSmarty(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+
+        return [
+            'nominations' => self::getMyList($r)['nominations'],
+            'myView' => true,
+            'currentUser' => $r->identity->username,
+        ];
+    }
+
+    /**
+     * @return array{status: string, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>}
+     */
+    private static function getMyList(\OmegaUp\Request $r) {
         // Validate request
         $r->ensureMainUserIdentity();
 
@@ -730,30 +754,41 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
-
         // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $r->ensureInt('qualitynomination_id');
-        $response = \OmegaUp\DAO\QualityNominations::getByID(
-            intval(
-                $r['qualitynomination_id']
-            )
+
+        $response = self::getDetails(
+            $r->identity,
+            intval($r['qualitynomination_id'])
+        );
+        $response['status'] = 'ok';
+
+        return $response;
+    }
+
+    /**
+     * @return array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficultity?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: string, username: string}, original_contents?: array{source: null|string, statements: non-empty-array<string, array{images: array<string, string>, language: string, markdown: string}>|object, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}
+     */
+    private static function getDetails(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $qualityNominationId
+    ) {
+        $response = \OmegaUp\DAO\QualityNominations::getById(
+            $qualityNominationId
         );
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'qualityNominationNotFound'
             );
         }
-        if (is_null($r->user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        $currentUserIsNominator = ($r->identity->username == $response['nominator']['username']);
+        $currentUserIsNominator = ($identity->username === $response['nominator']['username']);
         $currentUserReviewer = \OmegaUp\Authorization::isQualityReviewer(
-            $r->identity
+            $identity
         );
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -786,17 +821,22 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            /**
-             * Pull original problem statements in every language the nominator is trying to override.
-             * @var string $language
-             * @var string $_
-            */
-            foreach ($response['contents']['statements'] as $language => $_) {
-                $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
-                    $problem,
-                    'published',
-                    $language
-                );
+            if (
+                isset($response['contents']) &&
+                isset($response['contents']['statements'])
+            ) {
+                /**
+                 * Pull original problem statements in every language the nominator is trying to override.
+                 * @var string $language
+                 * @var string $_
+                */
+                foreach ($response['contents']['statements'] as $language => $_) {
+                    $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
+                        $problem,
+                        'published',
+                        $language
+                    );
+                }
             }
             if (empty($response['original_contents']['statements'])) {
                 // Force 'statements' to be an object.
@@ -804,8 +844,52 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
         $response['nomination_status'] = $response['status'];
-        $response['status'] = 'ok';
-
         return $response;
+    }
+
+    /**
+     * @return array{smartyProperties: array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficultity?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: string, username: string}, original_contents?: array{source: null|string, statements: non-empty-array<string, array{images: array<string, string>, language: string, markdown: string}>|object, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|array{nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac: bool|null, difficultity: int|null, quality: int|null, rationale: null|string, reason: null|string, statements: array<string, string>|null, tags: list<string>|null}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>, myView: bool, currentUser: string}, template: string}
+     */
+    public static function getQualityNominationDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate request
+        try {
+            $r->ensureMainUserIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+
+        $r->ensureInt('qualitynomination_id', null, null, false);
+        /** @var int|null */
+        $qualityNominationId = $r['qualitynomination_id'];
+
+        if (!is_null($qualityNominationId)) {
+            $payload = \OmegaUp\Controllers\QualityNomination::getDetails(
+                $r->identity,
+                $qualityNominationId
+            );
+            $template = '../templates/quality.nomination.details.tpl';
+        } else {
+            self::validateMemberOfReviewerGroup($r);
+            $payload = [
+                'nominations' => self::getListImpl(
+                    $r,
+                    null /* nominator */,
+                    null /* assignee */
+                )['nominations'],
+                'myView' => false,
+                'currentUser' => $r->identity->username,
+            ];
+            $template = '../templates/quality.nomination.list.tpl';
+        }
+        return [
+            'smartyProperties' => $payload,
+            'template' => $template,
+        ];
     }
 }
