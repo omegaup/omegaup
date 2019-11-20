@@ -32,9 +32,7 @@ abstract class Users {
             UPDATE
                 `Users`
             SET
-                `username` = ?,
                 `facebook_user_id` = ?,
-                `password` = ?,
                 `git_token` = ?,
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
@@ -53,9 +51,7 @@ abstract class Users {
                     `user_id` = ?
                 );';
         $params = [
-            $Users->username,
             $Users->facebook_user_id,
-            $Users->password,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?
@@ -105,9 +101,7 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`username`,
                 `Users`.`facebook_user_id`,
-                `Users`.`password`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
@@ -205,9 +199,7 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`username`,
                 `Users`.`facebook_user_id`,
-                `Users`.`password`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
@@ -271,9 +263,7 @@ abstract class Users {
         $sql = '
             INSERT INTO
                 Users (
-                    `username`,
                     `facebook_user_id`,
-                    `password`,
                     `git_token`,
                     `main_email_id`,
                     `main_identity_id`,
@@ -301,14 +291,10 @@ abstract class Users {
                     ?,
                     ?,
                     ?,
-                    ?,
-                    ?,
                     ?
                 );';
         $params = [
-            $Users->username,
             $Users->facebook_user_id,
-            $Users->password,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?

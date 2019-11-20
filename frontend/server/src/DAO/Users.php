@@ -74,29 +74,10 @@ class Users extends \OmegaUp\DAO\Base\Users {
             'reset_sent_at' => $user->reset_sent_at
         ];
     }
-
-    public static function savePassword(\OmegaUp\DAO\VO\Users $Users): int {
-        $sql = '
-            UPDATE
-                `Users`
-            SET
-                `password` = ?,
-                `username` = ?
-            WHERE
-                `user_id` = ?;';
-        $params = [
-            $Users->password,
-            $Users->username,
-            $Users->user_id,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
-    }
-
     /**
      * @param int $user_id
      * @return null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string}
-     */
+    */
     final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,

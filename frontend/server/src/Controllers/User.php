@@ -89,22 +89,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $user = new \OmegaUp\DAO\VO\Users([
                 'user_id' => $identityByEmail->user_id,
-                'username' => $r['username'],
-                'password' => $hashedPassword
             ]);
 
             $identity = new \OmegaUp\DAO\VO\Identities([
                 'identity_id' => $identityByEmail->identity_id,
                 'username' => $r['username'],
-                'password' => $hashedPassword
+                'password' => $hashedPassword,
             ]);
             try {
-                \OmegaUp\DAO\DAO::transBegin();
-                \OmegaUp\DAO\Users::savePassword($user);
                 \OmegaUp\DAO\Identities::savePassword($identity);
-                \OmegaUp\DAO\DAO::transEnd();
             } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'usernameInUse',
@@ -132,8 +126,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'password' => $hashedPassword
         ];
         $userData = [
-            'username' => $r['username'],
-            'password' => $hashedPassword,
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
         ];
@@ -470,21 +462,9 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $user->password = $hashedPassword;
         $identity->password = $hashedPassword;
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
-            \OmegaUp\DAO\Users::update($user);
-
-            \OmegaUp\DAO\Identities::update($identity);
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        \OmegaUp\DAO\Identities::update($identity);
 
         return ['status' => 'ok'];
     }
@@ -1811,23 +1791,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
-        $r->user->password = $hashedPassword;
         $r->identity->password = $hashedPassword;
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
-            // Update username and password for user object
-            \OmegaUp\DAO\Users::update($r->user);
-
-            // Update username and password for identity object
-            \OmegaUp\DAO\Identities::update($r->identity);
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        // Update username and password for identity object
+        \OmegaUp\DAO\Identities::update($r->identity);
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(
