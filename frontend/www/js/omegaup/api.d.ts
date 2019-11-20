@@ -16,7 +16,7 @@ declare namespace omegaup {
     Required = 'required',
   }
 
-  interface GenericElement {
+  interface LinkableResource {
     toString(): string;
     getUrl(): string;
   }
@@ -294,7 +294,7 @@ declare namespace omegaup {
     classname: string;
   }
 
-  export class Problem implements GenericElement {
+  export interface Problem {
     accepted?: number;
     alias: string;
     commit?: string;
@@ -319,13 +319,6 @@ declare namespace omegaup {
     version?: string;
     visibility?: number;
     visits?: number;
-    // toString(): string {
-    //   return this.title;
-    // }
-
-    // getUrl(): string {
-    //   return `/arena/problem/${this.alias}`;
-    // }
   }
 
   export interface QueryParameters {

@@ -43,6 +43,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
+import { Problem } from '../../types';
+
 /**
   Creates a two-dimensional paginated table, with the number of columns passed
   as a prop and the number of rows being calculated taking into account the number
@@ -50,7 +52,7 @@ import omegaup from '../../api.js';
  */
 @Component
 export default class GridPaginator extends Vue {
-  @Prop() problems!: omegaup.Problem[];
+  @Prop() problems!: Problem[];
   @Prop() problemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
