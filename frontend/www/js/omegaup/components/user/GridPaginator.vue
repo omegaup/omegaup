@@ -4,7 +4,8 @@
       <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
       problems.length }}</span></h2>
     </div>
-    <table class="table table-striped" v-if="problems.length > 0">
+    <table class="table table-striped"
+           v-if="problems.length &gt; 0">
       <tbody>
         <tr v-for="group in paginatedProblems">
           <td v-for="problem in group">
@@ -14,7 +15,8 @@
       </tbody>
     </table>
     <div v-show="!paginatedProblems"><img src="/media/wait.gif"></div>
-    <div class="panel-footer" v-if="problems.length > 0">
+    <div class="panel-footer"
+         v-if="problems.length &gt; 0">
       <div class="btn-group"
            role="group">
         <button class="btn btn-primary"
