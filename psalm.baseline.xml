@@ -424,13 +424,11 @@
     <MismatchingDocblockReturnType occurrences="1">
       <code>type</code>
     </MismatchingDocblockReturnType>
-    <MissingParamType occurrences="18">
+    <MissingParamType occurrences="15">
       <code>$username</code>
       <code>$name</code>
       <code>$gender</code>
-      <code>$school</code>
       <code>$aliasGroup</code>
-      <code>$originalIdentity</code>
       <code>$groupId</code>
       <code>$username</code>
       <code>$name</code>
@@ -440,26 +438,19 @@
       <code>$name</code>
       <code>$password</code>
       <code>$gender</code>
-      <code>$school</code>
       <code>$aliasGroup</code>
       <code>$lang</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
+    <MissingReturnType occurrences="5">
       <code>validateGroupOwnership</code>
-      <code>updateIdentity</code>
       <code>saveIdentityGroup</code>
       <code>validateUpdateRequest</code>
       <code>validateIdentity</code>
-      <code>createIdentity</code>
       <code>convertToSupportedLanguage</code>
     </MissingReturnType>
-    <MixedArgument occurrences="19">
-      <code>$identity</code>
-      <code>$identity</code>
+    <MixedArgument occurrences="17">
       <code>$r['group_alias']</code>
-      <code>$school</code>
       <code>$r['original_username']</code>
-      <code>$identity</code>
       <code>$r['username']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -467,7 +458,6 @@
       <code>$username</code>
       <code>$name</code>
       <code>$gender</code>
-      <code>$school</code>
       <code>$password</code>
       <code>$_SERVER['HTTP_ACCEPT_LANGUAGE']</code>
       <code>$lang_parse[1]</code>
@@ -483,12 +473,9 @@
       <code>$extendedProfile['school']</code>
       <code>$extendedProfile['locale']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="8">
+    <MixedAssignment occurrences="5">
       <code>$group</code>
-      <code>$identity</code>
       <code>$group</code>
-      <code>$identity</code>
-      <code>$identity</code>
       <code>$extendedProfile</code>
       <code>$val</code>
       <code>$langWeight</code>
@@ -497,18 +484,9 @@
       <code>type</code>
       <code>string</code>
     </MixedInferredReturnType>
-    <MixedPropertyAssignment occurrences="1">
-      <code>$identity</code>
-    </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="8">
+    <MixedPropertyFetch occurrences="2">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
-      <code>$originalIdentity-&gt;name</code>
-      <code>$originalIdentity-&gt;country_id</code>
-      <code>$originalIdentity-&gt;state_id</code>
-      <code>$originalIdentity-&gt;gender</code>
-      <code>$originalIdentity-&gt;password</code>
-      <code>$originalIdentity-&gt;user_id</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="2">
       <code>self::convertToSupportedLanguage($_GET['lang'])</code>
@@ -621,11 +599,10 @@
       <code>JSON_OBJECT_AS_ARRAY</code>
     </InvalidScalarArgument>
     <MissingParamType occurrences="1"/>
-    <MissingReturnType occurrences="16">
+    <MissingReturnType occurrences="14">
       <code>apiCreate</code>
       <code>validateRejudge</code>
       <code>apiRejudge</code>
-      <code>apiUpdate</code>
       <code>setRestrictedTags</code>
       <code>apiDownload</code>
       <code>validateDownload</code>
@@ -635,7 +612,6 @@
       <code>validateRuns</code>
       <code>apiRuns</code>
       <code>apiClarifications</code>
-      <code>apiList</code>
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
@@ -794,7 +770,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="15">
+    <PossiblyNullArgument occurrences="14">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -1145,10 +1121,8 @@
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="8">
+    <MixedArgument occurrences="6">
       <code>$r[$param]</code>
-      <code>$r['country_id']</code>
-      <code>$r['state_id']</code>
       <code>$offset</code>
       <code>$rowCount</code>
       <code>$startTime</code>
@@ -1313,7 +1287,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="40">
+    <MixedAssignment occurrences="39">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1346,8 +1320,6 @@
       <code>$problems</code>
       <code>$problem</code>
       <code>$identity</code>
-      <code>$r-&gt;identity-&gt;school_id</code>
-      <code>$r-&gt;identity-&gt;school_id</code>
       <code>$language</code>
       <code>$r-&gt;identity-&gt;language_id</code>
       <code>$r-&gt;identity-&gt;gender</code>
@@ -1359,11 +1331,10 @@
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="11">
+    <MixedPropertyFetch occurrences="10">
       <code>$user-&gt;main_identity_id</code>
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
-      <code>$r['school']-&gt;school_id</code>
       <code>$language-&gt;language_id</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['role']-&gt;role_id</code>
@@ -1378,7 +1349,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="15">
+    <PossiblyNullArgument occurrences="14">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1394,8 +1365,6 @@
       <code>$r-&gt;user-&gt;main_email_id</code>
       <code>$email</code>
       <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>

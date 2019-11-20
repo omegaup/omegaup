@@ -112,10 +112,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         // On user creation, no IdentitySchool is created
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
-        );
-        $this->assertNull($identitySchool);
+        $this->assertNull($identity->current_identity_school_id);
 
         // Now update user, adding a new school without graduation_date
         $school = SchoolsFactory::createSchool()['school'];
@@ -124,8 +121,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'school_id' => $school->school_id,
         ]));
 
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($identitySchool->school_id, $school->school_id);
         $this->assertNull($identitySchool->graduation_date);
@@ -138,8 +138,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'graduation_date' => $graduationDate,
         ]));
 
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($identitySchool->school_id, $school->school_id);
         $this->assertEquals($identitySchool->graduation_date, $graduationDate);
@@ -158,8 +161,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertNotNull($previousIdentitySchool->end_time);
 
-        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getCurrentSchoolFromIdentity(
-            $identity
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
         );
         $this->assertEquals($identitySchool->school_id, $newSchool->school_id);
         $this->assertEquals($identitySchool->graduation_date, $graduationDate);

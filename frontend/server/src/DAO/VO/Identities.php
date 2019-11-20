@@ -26,6 +26,7 @@ class Identities extends \OmegaUp\DAO\VO\VO {
         'state_id' => true,
         'school_id' => true,
         'gender' => true,
+        'current_identity_school_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -86,6 +87,11 @@ class Identities extends \OmegaUp\DAO\VO\VO {
         if (isset($data['gender'])) {
             $this->gender = strval(
                 $data['gender']
+            );
+        }
+        if (isset($data['current_identity_school_id'])) {
+            $this->current_identity_school_id = intval(
+                $data['current_identity_school_id']
             );
         }
     }
@@ -161,4 +167,11 @@ class Identities extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $gender = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $current_identity_school_id = null;
 }

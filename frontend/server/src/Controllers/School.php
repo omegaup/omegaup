@@ -52,11 +52,22 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-
-        $state = self::getStateIdFromCountryAndState(
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['country_id'],
-            $r['state_id']
+            'country_id'
         );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['state_id'],
+            'country_id'
+        );
+
+        $state = null;
+        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                $r['country_id'],
+                $r['state_id']
+            );
+        }
 
         return [
             'status' => 'ok',
@@ -265,16 +276,5 @@ class School extends \OmegaUp\Controllers\Controller {
             'availableFilters' => [],
         ];
         return $schoolsRank;
-    }
-
-    public static function getStateIdFromCountryAndState(
-        ?string $countryId,
-        ?string $stateId
-    ): ?\OmegaUp\DAO\VO\States {
-        if (is_null($countryId) || is_null($stateId)) {
-            // Both state and country must be specified together.
-            return null;
-        }
-        return \OmegaUp\DAO\States::getByPK($countryId, $stateId);
     }
 }
