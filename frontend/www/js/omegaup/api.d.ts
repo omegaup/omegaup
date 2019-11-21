@@ -16,11 +16,6 @@ declare namespace omegaup {
     Required = 'required',
   }
 
-  interface LinkableResource {
-    toString(): string;
-    getUrl(): string;
-  }
-
   export interface Assignment {
     alias: string;
     assignment_type: string,

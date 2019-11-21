@@ -1,4 +1,5 @@
 import UI from './ui.js';
+import { Problem } from './types.ts';
 
 function _call(url, transform, defaultParams) {
   return function(params) {
@@ -635,9 +636,23 @@ export default {
 
     listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
-    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/', function(
+      data,
+    ) {
+      if (!data.hasOwnProperty('problems')) return data;
+      data.problems = data.problems.map(problem => {
+        return new Problem(problem);
+      });
+      return data;
+    }),
 
-    problemsSolved: _call('/api/user/problemssolved/'),
+    problemsSolved: _call('/api/user/problemssolved/', function(data) {
+      if (!data.hasOwnProperty('problems')) return data;
+      data.problems = data.problems.map(problem => {
+        return new Problem(problem);
+      });
+      return data;
+    }),
 
     profile: _call('/api/user/profile/', function(data) {
       if (data.userinfo.birth_date !== null) {

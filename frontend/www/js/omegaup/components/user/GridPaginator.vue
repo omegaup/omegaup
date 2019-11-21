@@ -8,12 +8,12 @@
       <tbody>
         <tr v-for="group in paginatedProblems">
           <td v-for="problem in group">
-            <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
+            <a v-bind:href="`/arena/problem/${problem.getUrl()}`">{{ problem.toString() }}</a>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer"
+    <div class="panel-footer text-center"
          v-if="problems.length &gt; 0">
       <div class="btn-group"
            role="group">
@@ -31,17 +31,11 @@
   </div>
 </template>
 
-<style>
-.panel-footer {
-  text-align: center;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
-import { LinkableResource } from '../../types';
+import { LinkableResource } from '../../types.ts';
 
 /**
   Creates a two-dimensional paginated table, with the number of columns passed

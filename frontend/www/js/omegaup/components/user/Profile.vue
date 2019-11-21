@@ -87,7 +87,7 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
 import user_GridPaginator from './GridPaginator.vue';
-import { Problem } from '../../types';
+import { Problem } from '../../types.ts';
 
 @Component({
   components: {
@@ -101,8 +101,8 @@ import { Problem } from '../../types';
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
   @Prop() contests!: omegaup.ContestResult[];
-  @Prop() solvedProblems!: omegaup.Problem[];
-  @Prop() unsolvedProblems!: omegaup.Problem[];
+  @Prop() solvedProblems!: Problem[];
+  @Prop() unsolvedProblems!: Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
   @Prop() profileBadges!: Set<string>;
