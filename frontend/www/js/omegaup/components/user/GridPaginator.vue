@@ -1,8 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
-      problems.length }}</span></h2>
+      <h2 class="panel-title">{{ title }} <span class="badge">{{ problems.length }}</span></h2>
     </div>
     <table class="table table-striped"
            v-if="problems.length &gt; 0">
@@ -43,7 +42,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
-import { Problem } from '../../types';
+import { LinkableResource } from '../../types';
 
 /**
   Creates a two-dimensional paginated table, with the number of columns passed
@@ -52,7 +51,7 @@ import { Problem } from '../../types';
  */
 @Component
 export default class GridPaginator extends Vue {
-  @Prop() problems!: Problem[];
+  @Prop() problems!: LinkableResource[];
   @Prop() problemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
@@ -77,7 +76,7 @@ export default class GridPaginator extends Vue {
     return Math.floor(this.problemsPerPage / this.columns);
   }
 
-  private get problemsRows(): omegaup.Problem[][] {
+  private get problemsRows(): LinkableResource[][] {
     const groups = [];
     for (let i = 0; i < this.problems.length; i += this.columns) {
       groups.push(this.problems.slice(i, i + this.columns));
@@ -85,7 +84,7 @@ export default class GridPaginator extends Vue {
     return groups;
   }
 
-  private get paginatedProblems(): omegaup.Problem[][] {
+  private get paginatedProblems(): LinkableResource[][] {
     const start = this.currentPageNumber * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.problemsRows.slice(start, end);
