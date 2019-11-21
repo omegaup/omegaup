@@ -29,7 +29,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             i.user_id,
             i.username,
             COALESCE(i.country_id, 'xx') AS country_id,
-            i.school_id,
+            isc.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
             (SELECT urc.classname FROM
@@ -65,6 +65,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
+          LEFT JOIN
+            Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
           LEFT JOIN
             (
               SELECT

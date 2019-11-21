@@ -1177,11 +1177,11 @@
       <code>$digits</code>
       <code>$r['school_id']</code>
     </InvalidScalarArgument>
-    <MissingClosureParamType occurrences="2">
+    <MissingClosureParamType occurrences="1">
       <code>$value</code>
       <code>$value</code>
     </MissingClosureParamType>
-    <MissingClosureReturnType occurrences="2">
+    <MissingClosureReturnType occurrences="1">
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
@@ -1222,7 +1222,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="25">
+    <MixedArgument occurrences="23">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1232,7 +1232,6 @@
       <code>$r['password']</code>
       <code>$user-&gt;main_identity_id</code>
       <code>$user</code>
-      <code>$response['userinfo']['email']</code>
       <code>$user_id</code>
       <code>$problemset_id</code>
       <code>$item</code>
@@ -1250,15 +1249,7 @@
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="21">
-      <code>$userDb['email']</code>
-      <code>$userDb['country']</code>
-      <code>$userDb['country_id']</code>
-      <code>$userDb['state']</code>
-      <code>$userDb['state_id']</code>
-      <code>$userDb['school']</code>
-      <code>$userDb['school_id']</code>
-      <code>$userDb['locale']</code>
+    <MixedArrayAccess occurrences="13">
       <code>$response['verified']</code>
       <code>$response['username']</code>
       <code>$response['userinfo']['email']</code>
@@ -1287,7 +1278,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="39">
+    <MixedAssignment occurrences="31">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1298,14 +1289,6 @@
       <code>$resetRequest['permission_key']</code>
       <code>$addUserRequest['auth_token']</code>
       <code>$addUserRequest['contest_alias']</code>
-      <code>$userDb</code>
-      <code>$response['userinfo']['email']</code>
-      <code>$response['userinfo']['country']</code>
-      <code>$response['userinfo']['country_id']</code>
-      <code>$response['userinfo']['state']</code>
-      <code>$response['userinfo']['state_id']</code>
-      <code>$response['userinfo']['school']</code>
-      <code>$response['userinfo']['school_id']</code>
       <code>$response['userinfo']['locale']</code>
       <code>$v</code>
       <code>$response</code>
@@ -1349,7 +1332,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="14">
+    <PossiblyNullArgument occurrences="11">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1362,18 +1345,15 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
-      <code>$r-&gt;user-&gt;main_email_id</code>
-      <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
     </PossiblyNullArrayOffset>
-    <PossiblyNullPropertyAssignment occurrences="4">
+    <PossiblyNullPropertyAssignment occurrences="2">
       <code>$identity</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
-      <code>$email</code>
       <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
     <PossiblyNullPropertyFetch occurrences="4">
@@ -2101,16 +2081,15 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Users.php">
-    <MissingParamType occurrences="5">
+    <MissingParamType occurrences="4">
       <code>$user_id</code>
       <code>$user_id</code>
       <code>$identity_id</code>
       <code>$verified</code>
       <code>$in_mailing_list</code>
     </MissingParamType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="4">
       <code>IsUserInterviewer</code>
-      <code>getExtendedProfileDataByPk</code>
       <code>getHideTags</code>
       <code>getVerified</code>
       <code>getUsersCount</code>

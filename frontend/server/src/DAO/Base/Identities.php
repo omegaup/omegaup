@@ -39,7 +39,6 @@ abstract class Identities {
                 `language_id` = ?,
                 `country_id` = ?,
                 `state_id` = ?,
-                `school_id` = ?,
                 `gender` = ?,
                 `current_identity_school_id` = ?
             WHERE
@@ -62,11 +61,6 @@ abstract class Identities {
             ),
             $Identities->country_id,
             $Identities->state_id,
-            (
-                is_null($Identities->school_id) ?
-                null :
-                intval($Identities->school_id)
-            ),
             $Identities->gender,
             (
                 is_null($Identities->current_identity_school_id) ?
@@ -102,7 +96,6 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
                 `Identities`.`gender`,
                 `Identities`.`current_identity_school_id`
             FROM
@@ -196,7 +189,6 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
                 `Identities`.`gender`,
                 `Identities`.`current_identity_school_id`
             FROM
@@ -256,11 +248,9 @@ abstract class Identities {
                     `language_id`,
                     `country_id`,
                     `state_id`,
-                    `school_id`,
                     `gender`,
                     `current_identity_school_id`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -287,11 +277,6 @@ abstract class Identities {
             ),
             $Identities->country_id,
             $Identities->state_id,
-            (
-                is_null($Identities->school_id) ?
-                null :
-                intval($Identities->school_id)
-            ),
             $Identities->gender,
             (
                 is_null($Identities->current_identity_school_id) ?

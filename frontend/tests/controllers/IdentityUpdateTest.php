@@ -69,7 +69,10 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotEquals($newIdentity->country_id, $identity->country_id);
         $this->assertNotEquals($newIdentity->state_id, $identity->state_id);
         $this->assertNotEquals($newIdentity->gender, $identity->gender);
-        $this->assertNotEquals($newIdentity->school_id, $identity->school_id);
+        $this->assertNotEquals(
+            $newIdentity->current_identity_school_id,
+            $identity->current_identity_school_id
+        );
     }
 
     /**
