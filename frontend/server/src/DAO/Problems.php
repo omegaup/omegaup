@@ -100,7 +100,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         $programmingLanguages,
-        $difficultyRange,
+        ?array $difficultyRange,
         int &$total
     ) {
         // Just in case.
@@ -139,7 +139,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 );
             }
         }
-        if (is_array($difficultyRange) && count($difficultyRange) == 2) {
+        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
             array_push(
                 $clauses,
                 [
