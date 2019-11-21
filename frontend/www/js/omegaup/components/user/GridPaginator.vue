@@ -13,7 +13,6 @@
         </tr>
       </tbody>
     </table>
-    <div v-show="!paginatedProblems"><img src="/media/wait.gif"></div>
     <div class="panel-footer"
          v-if="problems.length &gt; 0">
       <div class="btn-group"
