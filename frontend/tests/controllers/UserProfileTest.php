@@ -298,6 +298,63 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(2, count($response['problems']));
     }
 
+    /*
+     * Test the problems solved by user
+     */
+    public function testProblemsCreated() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $problems = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identity,
+                $login
+            );
+        }
+
+        // As all problems are public, this function should retrieve 10 records
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(count($problems), count($response['problems']));
+
+        // Now make one of those problems private, results must change
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problems[0]['problem']->alias,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'message' => 'public -> private',
+        ]));
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $expectedProblemCount = count($problems) - 1;
+        $this->assertEquals(
+            $expectedProblemCount,
+            count(
+                $response['problems']
+            )
+        );
+
+        // Now, as another user, request the problems created by initial user
+        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($otherIdentity);
+
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]));
+        $this->assertEquals(
+            $expectedProblemCount,
+            count(
+                $response['problems']
+            )
+        );
+    }
+
     /**
      * Test update main email api
      */
