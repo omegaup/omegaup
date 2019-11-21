@@ -713,7 +713,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{currentUser: string, myView: true, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>}}
+     * @return array{smartyProperties: array{payload: array{currentUser: string, myView: true, nominations: list<array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>}}, template: string}
      */
     public static function getMyQualityNominationListForSmarty(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -724,11 +724,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
 
         return [
-            'payload' => [
-                'nominations' => self::getMyList($r)['nominations'],
-                'myView' => true,
-                'currentUser' => $r->identity->username,
+            'smartyProperties' => [
+                'payload' => [
+                    'nominations' => self::getMyList($r)['nominations'],
+                    'myView' => true,
+                    'currentUser' => $r->identity->username,
+                ],
             ],
+            'template' => 'quality.nomination.list.tpl',
         ];
     }
 
