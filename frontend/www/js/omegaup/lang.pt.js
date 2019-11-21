@@ -82,6 +82,7 @@ const translations = {
 	coderOfTheMonthChooseAsCoder: "Escolha como Programador do M\u00eas",
 	coderOfTheMonthFullList: "Ver a lista completa",
 	coderOfTheMonthIsNotInPeriodToBeChosen: "O codificador do m\u00eas n\u00e3o est\u00e1 no per\u00edodo a ser escolhido",
+	coderOfTheMonthNotFound: "N\u00e3o foi encontrado o codificador do m\u00eas.",
 	coderOfTheMonthNotice: "Ol\u00e1 %(username)! Parab\u00e9ns por ser o Programador do M\u00eas! Temos um pr\u00eamio para voc\u00ea, entre em contato conosco mentores@omegaup.org",
 	coderOfTheMonthSelectedSuccessfully: "O codificador do m\u00eas foi selecionado com sucesso!",
 	codersOfTheMonth: "Programadores do M\u00eas",

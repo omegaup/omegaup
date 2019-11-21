@@ -80,6 +80,7 @@ coderOfTheMonthAlreadySelected = "El coder del mes ya ha sido seleccionado con a
 coderOfTheMonthChooseAsCoder = "Elegir como coder del mes"
 coderOfTheMonthFullList = "Ver listado completo"
 coderOfTheMonthIsNotInPeriodToBeChosen = "Coder del mes no está en periodo de ser elegido"
+coderOfTheMonthNotFound = "No se encontró coder del mes."
 coderOfTheMonthNotice = "¡Hola %(username)! ¡Felicidades por ser el ganador Coder del Mes! Tenemos un premio para tí, por favor contáctanos en mentores@omegaup.org"
 coderOfTheMonthSelectedSuccessfully = "¡Coder del mes ha sido seleccionado satisfactoriamente!"
 codersOfTheMonth = "Coders del Mes"

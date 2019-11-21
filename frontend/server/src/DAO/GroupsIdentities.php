@@ -47,7 +47,9 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             LEFT JOIN
                 Countries c ON c.country_id = s.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = i.school_id
+                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = isc.school_id
             LEFT JOIN
                 Users u ON u.user_id = i.user_id
             WHERE

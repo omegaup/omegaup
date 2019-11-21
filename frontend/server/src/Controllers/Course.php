@@ -1917,7 +1917,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 || !is_null(
                     $r->identity->state_id
                 ) || !is_null(
-                    $r->identity->school_id
+                    $r->identity->current_identity_school_id
                 ));
 
             // Privacy Statement Information

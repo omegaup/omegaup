@@ -770,7 +770,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             LEFT JOIN
                 Countries cn ON cn.country_id = i.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = i.school_id
+                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = isc.school_id
             INNER JOIN
                 Problemset_Identities pi ON pi.identity_id = i.identity_id
             INNER JOIN
