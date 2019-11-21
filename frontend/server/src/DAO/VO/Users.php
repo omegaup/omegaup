@@ -22,7 +22,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'main_email_id' => true,
         'main_identity_id' => true,
         'scholar_degree' => true,
-        'graduation_date' => true,
         'birth_date' => true,
         'verified' => true,
         'verification_id' => true,
@@ -72,11 +71,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = strval(
                 $data['scholar_degree']
-            );
-        }
-        if (isset($data['graduation_date'])) {
-            $this->graduation_date = strval(
-                $data['graduation_date']
             );
         }
         if (isset($data['birth_date'])) {
@@ -175,13 +169,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $scholar_degree = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var string|null
-     */
-    public $graduation_date = null;
 
     /**
      * [Campo no documentado]

@@ -74,11 +74,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
             'reset_sent_at' => $user->reset_sent_at
         ];
     }
-
-    final public static function getExtendedProfileDataByPk($user_id) {
-        if (is_null($user_id)) {
-            return null;
-        }
+    /**
+     * @param int $user_id
+     * @return null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string}
+    */
+    final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
                     c.`country_id` AS country_id,
@@ -86,6 +86,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     s.`state_id` AS state_id,
                     sc.`name` AS school,
                     sc.`school_id` AS school_id,
+                    isc.`graduation_date` AS graduation_date,
                     e.`email`,
                     l.`name` AS locale
                 FROM
@@ -99,7 +100,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LEFT JOIN
                     States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON i.school_id = sc.school_id
+                    Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+                LEFT JOIN
+                    Schools sc ON sc.school_id = isc.school_id
                 LEFT JOIN
                     Languages l ON i.language_id = l.language_id
                 WHERE
@@ -107,10 +110,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LIMIT
                     1;';
         $params = [$user_id];
+        /** @var null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string} */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (empty($rs)) {
-            return null;
-        }
         return $rs;
     }
 

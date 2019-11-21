@@ -24,7 +24,6 @@ class Identities extends \OmegaUp\DAO\VO\VO {
         'language_id' => true,
         'country_id' => true,
         'state_id' => true,
-        'school_id' => true,
         'gender' => true,
         'current_identity_school_id' => true,
     ];
@@ -77,11 +76,6 @@ class Identities extends \OmegaUp\DAO\VO\VO {
         if (isset($data['state_id'])) {
             $this->state_id = strval(
                 $data['state_id']
-            );
-        }
-        if (isset($data['school_id'])) {
-            $this->school_id = intval(
-                $data['school_id']
             );
         }
         if (isset($data['gender'])) {
@@ -153,13 +147,6 @@ class Identities extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $state_id = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var int|null
-     */
-    public $school_id = null;
 
     /**
      * Género de la identidad

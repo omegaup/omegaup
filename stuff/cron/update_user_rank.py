@@ -80,7 +80,7 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
             i.name,
             i.country_id,
             i.state_id,
-            i.school_id,
+            isc.school_id,
             up.identity_id,
             i.user_id,
             COUNT(p.problem_id) problems_solved_count,
@@ -103,6 +103,10 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
             Problems p ON p.problem_id = up.problem_id AND p.visibility > 0
         INNER JOIN
             Identities i ON i.identity_id = up.identity_id
+        LEFT JOIN
+            Identities_Schools isc
+        ON
+            isc.identity_school_id = i.current_identity_school_id
         INNER JOIN
             Users u ON u.user_id = i.user_id
         WHERE
