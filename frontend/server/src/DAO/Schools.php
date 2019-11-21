@@ -106,6 +106,65 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         return $result;
     }
 
+    public static function getUsersFromSchool(
+        int $schoolId
+    ): array {
+        $sql = '
+        SELECT
+            i.username,
+            (
+                SELECT urc.classname
+                FROM User_Rank_Cutoffs urc
+                WHERE
+                    urc.score <= (
+                        SELECT
+                            ur.score
+                        FROM
+                            User_Rank ur
+                        WHERE
+                            ur.user_id = i.user_id
+                    )
+                ORDER BY
+                    urc.percentile ASC
+                LIMIT 1
+            ) AS classname,
+            (
+                SELECT
+                    COUNT(DISTINCT p.problem_id)
+                FROM
+                    Problems p
+                INNER JOIN
+                    Submissions s ON s.problem_id = p.problem_id
+                INNER JOIN
+                    Runs r ON r.run_id = s.current_run_id
+                WHERE
+                    r.verdict = "AC" AND s.type = "normal" AND s.identity_id = i.identity_id
+            ) AS solved_problems,
+            (
+                SELECT
+                    COUNT(DISTINCT c.contest_id)
+                FROM
+                    Contests c
+                INNER JOIN
+                    ACLs a ON a.acl_id = c.acl_id
+                INNER JOIN
+                    Users u ON u.user_id = a.owner_id
+                INNER JOIN
+                    Problemsets p ON p.problemset_id = c.problemset_id
+                WHERE
+                    u.main_identity_id = i.identity_id
+            ) AS organized_contests,
+            // Falta created_problems
+        FROM
+            Schools sc
+        INNER JOIN
+            Identities_Schools isc ON isc.school_id = sc.school_id
+        INNER JOIN
+            Identities i ON i.current_identity_school_id = isc.identity_id
+        WHERE
+            sc.school_id = ?;';
+    }
+
     public static function countActiveSchools(
         int $startTimestamp,
         int $endTimestamp
