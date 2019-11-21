@@ -890,9 +890,6 @@
       <code>$contents</code>
       <code>$contents</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="1">
-      <code>$response['contents']['statements']</code>
-    </MixedArrayAccess>
     <MixedAssignment occurrences="4">
       <code>$newProblemVisibility</code>
       <code>$r['visibility']</code>
@@ -906,12 +903,6 @@
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
     </MixedPropertyFetch>
-    <NullArgument occurrences="4">
-      <code>null</code>
-      <code>null</code>
-      <code>null</code>
-      <code>null</code>
-    </NullArgument>
     <PossiblyNullArgument occurrences="2">
       <code>$qualitynominationlog-&gt;rationale</code>
       <code>$r-&gt;identity</code>
@@ -1925,8 +1916,7 @@
       <code>$contents</code>
       <code>$status</code>
     </MissingParamType>
-    <MissingReturnType occurrences="9">
-      <code>getNominations</code>
+    <MissingReturnType occurrences="8">
       <code>getAllNominations</code>
       <code>calculateGlobalDifficultyAndQuality</code>
       <code>getAllSuggestionsPerProblem</code>
@@ -1958,8 +1948,7 @@
       <code>$problemAggregates['tags'][$tag]</code>
       <code>$problemAggregates['tags'][$tag]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="18">
-      <code>$nomination['contents']</code>
+    <MixedAssignment occurrences="17">
       <code>$page</code>
       <code>$params[]</code>
       <code>$params[]</code>
