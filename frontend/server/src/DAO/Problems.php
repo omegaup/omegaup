@@ -542,7 +542,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param int $identityId
      * @return \OmegaUp\DAO\VO\Problems[]
      */
-    final public static function getProblemsCreatedByIdentity(
+    final public static function getPublicProblemsCreatedByIdentity(
         int $identityId
     ): array {
         $sql = '

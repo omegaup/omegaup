@@ -1685,7 +1685,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Get Problems created by user
      *
      * @param \OmegaUp\Request $r
-     * @return array{problems: \OmegaUp\DAO\VO\Problems[], status: string}
+     * @return array{problems: array{title: string, alias: string}[], status: string}
      */
     public static function apiProblemsCreated(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1694,24 +1694,27 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $problems = \OmegaUp\DAO\Problems::getProblemsCreatedByIdentity(
-            intval($identity->identity_id)
-        );
 
-        $response = [
-            'status' => 'ok',
-            'problems' => [],
-        ];
+        /** @var array{title: string, alias: string}[] */
+        $problems = [];
         $relevant_columns = ['title', 'alias'];
-        foreach ($problems as $problem) {
+        foreach (
+            \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
+                intval($identity->identity_id)
+            ) as $problem
+        ) {
             array_push(
-                $response['problems'],
+                $problems,
                 $problem->asFilteredArray(
                     $relevant_columns
                 )
             );
         }
-        return $response;
+
+        return [
+            'status' => 'ok',
+            'problems' => $problems,
+        ];
     }
 
     /**
