@@ -486,7 +486,7 @@ let UI = {
     // The expected format is yyyy-MM-dd in the local timezone, which is
     // why we cannot use date.toISOSTring().
     return (
-      String(date.getFullYear()) +
+      String(date.getFullYear()).padStart(4, '0') +
       '-' +
       // Months in JavaScript start at 0.
       String(date.getMonth() + 1).padStart(2, '0') +
