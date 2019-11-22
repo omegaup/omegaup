@@ -2,6 +2,8 @@
 
 namespace OmegaUp\Test\Factories;
 
+use OmegaUp\Exceptions\NotFoundException;
+
 class Run {
     /**
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
@@ -179,6 +181,27 @@ class Run {
             'contestant' => $contestant,
             'response' => $response
         ];
+    }
+
+    public static function updateRunTime(
+        string $runGuid,
+        int $time
+    ): void {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runGuid
+        );
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $submission->time = $time;
+        \OmegaUp\DAO\Submissions::update($submission);
+
+        $run = \OmegaUp\DAO\Runs::getByPK(intval($submission->current_run_id));
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $run->time = $time;
+        \OmegaUp\DAO\Runs::update($run);
     }
 
     /**

@@ -154,4 +154,151 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($originalResponse, $cachedResponse);
         $this->assertNotEquals($response, $cachedResponse);
     }
+
+    public function testApiMonthlySolvedProblemsCount() {
+        $schoolData = SchoolsFactory::createSchool();
+
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 5; $i++) {
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        SchoolsFactory::addUserToSchool($schoolData, $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolData, $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolData, $identities[2]);
+        SchoolsFactory::addUserToSchool($schoolData, $identities[3]);
+
+        $problems = [];
+        for ($i = 0; $i < 10; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $today = date('Y-m-d');
+        $runCreationDate = date_create($today);
+
+        // Two months ago, problems 0 and 1 have been solved by users 0 and 1 respectively.
+        // User 1 also tried problem 2 but failed. So 2 problems in total are expected
+        date_add(
+            $runCreationDate,
+            date_interval_create_from_date_string(
+                '-2 month'
+            )
+        );
+        $firstMonth = intval($runCreationDate->format('m'));
+        $runCreationDate = date_format($runCreationDate, 'Y-m-d');
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[2],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'WA');
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
+            'school_id' => $schoolData['school']->school_id,
+            'months_number' => 3,
+        ]));
+        $this->assertCount(1, $response);
+        $this->assertEquals($response[0]['month'], $firstMonth);
+        $this->assertEquals($response[0]['distinct_problems'], 2);
+
+        // One month ago, user 3 solved problem 0, 1 and 2 (3 problems in total)
+        // user 0 solves again problem 0, but doesn't count as it has been already solved
+        $runCreationDate = date_create($runCreationDate);
+        date_add(
+            $runCreationDate,
+            date_interval_create_from_date_string(
+                '1 month'
+            )
+        );
+        $secondMonth = intval($runCreationDate->format('m'));
+        $runCreationDate = date_format($runCreationDate, 'Y-m-d');
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[2],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
+
+        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
+            'school_id' => $schoolData['school']->school_id,
+            'months_number' => 3,
+        ]));
+        $this->assertCount(2, $response);
+        $this->assertEquals($response[0]['month'], $firstMonth);
+        $this->assertEquals($response[0]['distinct_problems'], 2);
+        $this->assertEquals($response[1]['month'], $secondMonth);
+        $this->assertEquals($response[1]['distinct_problems'], 3);
+
+        $currentMonth = intval(date_create($today)->format('m'));
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[2],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
+            'school_id' => $schoolData['school']->school_id,
+            'months_number' => 3,
+        ]));
+        print_r($response);
+    }
 }

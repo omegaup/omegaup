@@ -106,6 +106,44 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         return $result;
     }
 
+    /**
+     * @param int $schoolId
+     * @param int $monthsNumber
+     * @return array{year: int, month: int, distinct_problems: int}[]
+     */
+    public static function getMonthlySolvedProblemsCount(
+        int $schoolId,
+        int $monthsNumber
+    ): array {
+        $sql = '
+        SELECT
+            YEAR(su.time) AS year,
+            MONTH(su.time) AS month,
+            COUNT(DISTINCT su.problem_id) AS distinct_problems
+        FROM
+            Submissions su
+        INNER JOIN
+            Schools sc ON sc.school_id = su.school_id
+        INNER JOIN
+            Runs r ON r.run_id = su.current_run_id
+        INNER JOIN
+            Problems p ON p.problem_id = su.problem_id
+        WHERE
+            su.school_id = ? AND su.time >= CURDATE() - INTERVAL ? MONTH
+            AND r.verdict = "AC" AND p.visibility >= 1
+        GROUP BY
+            YEAR(su.time), MONTH(su.time);';
+
+        $params = [$schoolId, $monthsNumber];
+
+        /** @var array{year: int, month: int, distinct_problems: int}[] */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+        return $rs;
+    }
+
     public static function countActiveSchools(
         int $startTimestamp,
         int $endTimestamp
