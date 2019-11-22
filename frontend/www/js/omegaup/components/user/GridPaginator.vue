@@ -1,20 +1,20 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h2 class="panel-title">{{ title }} <span class="badge">{{ problems.length }}</span></h2>
+      <h2 class="panel-title">{{ title }} <span class="badge">{{ items.length }}</span></h2>
     </div>
     <table class="table table-striped"
-           v-if="problems.length &gt; 0">
+           v-if="items.length &gt; 0">
       <tbody>
-        <tr v-for="group in paginatedProblems">
-          <td v-for="problem in group">
-            <a v-bind:href="`/arena/problem/${problem.getUrl()}`">{{ problem.toString() }}</a>
+        <tr v-for="group in paginatedItems">
+          <td v-for="item in group">
+            <a v-bind:href="item.getUrl()">{{ item.toString() }}</a>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="panel-footer text-center"
-         v-if="problems.length &gt; 0">
+         v-if="items.length &gt; 0">
       <div class="btn-group"
            role="group">
         <button class="btn btn-primary"
@@ -40,12 +40,12 @@ import { LinkableResource } from '../../types.ts';
 /**
   Creates a two-dimensional paginated table, with the number of columns passed
   as a prop and the number of rows being calculated taking into account the number
-  of elements per page, total elements and the number of columns.
+  of items per page, total items and the number of columns.
  */
 @Component
 export default class GridPaginator extends Vue {
-  @Prop() problems!: LinkableResource[];
-  @Prop() problemsPerPage!: number;
+  @Prop() items!: LinkableResource[];
+  @Prop() itemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
 
@@ -61,26 +61,26 @@ export default class GridPaginator extends Vue {
   }
 
   private get totalPagesCount(): number {
-    const totalRows = Math.ceil(this.problems.length / this.columns);
+    const totalRows = Math.ceil(this.items.length / this.columns);
     return Math.ceil(totalRows / this.rowsPerPage);
   }
 
   private get rowsPerPage(): number {
-    return Math.floor(this.problemsPerPage / this.columns);
+    return Math.floor(this.itemsPerPage / this.columns);
   }
 
-  private get problemsRows(): LinkableResource[][] {
+  private get itemsRows(): LinkableResource[][] {
     const groups = [];
-    for (let i = 0; i < this.problems.length; i += this.columns) {
-      groups.push(this.problems.slice(i, i + this.columns));
+    for (let i = 0; i < this.items.length; i += this.columns) {
+      groups.push(this.items.slice(i, i + this.columns));
     }
     return groups;
   }
 
-  private get paginatedProblems(): LinkableResource[][] {
+  private get paginatedItems(): LinkableResource[][] {
     const start = this.currentPageNumber * this.rowsPerPage;
     const end = start + this.rowsPerPage;
-    return this.problemsRows.slice(start, end);
+    return this.itemsRows.slice(start, end);
   }
 }
 

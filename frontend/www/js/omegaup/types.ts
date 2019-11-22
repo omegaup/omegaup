@@ -1,8 +1,10 @@
 import omegaup from './api.js';
+import { Optional } from "typescript-optional";
 
 export interface LinkableResource {
   toString(): string;
   getUrl(): string;
+  getBadge(): Optional<string>;
 }
 
 export class Problem implements LinkableResource {
@@ -63,6 +65,10 @@ export class Problem implements LinkableResource {
   }
 
   getUrl(): string {
-    return `/arena/problem/${this.alias}`;
+    return `/arena/problem/${this.alias}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
   }
 }

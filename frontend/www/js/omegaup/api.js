@@ -640,9 +640,7 @@ export default {
       data,
     ) {
       if (!data.hasOwnProperty('problems')) return data;
-      data.problems = data.problems.map(problem => {
-        return new Problem(problem);
-      });
+      data.problems = data.problems.map(problem => new Problem(problem));
       return data;
     }),
 

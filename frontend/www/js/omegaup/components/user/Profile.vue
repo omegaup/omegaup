@@ -48,12 +48,12 @@
         </table>
         <div v-show="!contests"><img src="/media/wait.gif"></div>
       </div><omegaup-grid-paginator v-bind:columns="3"
-           v-bind:problems="solvedProblems"
-           v-bind:problems-per-page="30"
+           v-bind:items="solvedProblems"
+           v-bind:items-per-page="30"
            v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
            <omegaup-grid-paginator v-bind:columns="3"
-           v-bind:problems="unsolvedProblems"
-           v-bind:problems-per-page="30"
+           v-bind:items="unsolvedProblems"
+           v-bind:items-per-page="30"
            v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
            <omegaup-badge-list v-bind:all-badges="profileBadges"
            v-bind:show-all-badges-link="true"
