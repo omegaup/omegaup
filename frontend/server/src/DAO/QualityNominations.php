@@ -21,9 +21,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      */
     const CONFIDENCE = 5;
 
+    /**
+     * @return array{dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool}
+     */
     public static function getNominationStatusForProblem(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        ?\OmegaUp\DAO\VO\Identities $identity
     ): array {
         $response = [
             'nominated' => false,
@@ -31,6 +34,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             'nominatedBeforeAC' => false,
             'dismissedBeforeAC' => false,
         ];
+        if (is_null($identity) || is_null($identity->user_id)) {
+            return $response;
+        }
 
         $sql = "SELECT
                     qnn.contents

@@ -2338,7 +2338,52 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                 $letter++
             );
+            $problem['quality_payload'] = [
+                'solved' => false,
+                'tried' => false,
+                'nominated' => false,
+                'dismissed' => false,
+            ];
+            $problemObject = \OmegaUp\DAO\Problems::getByPK(
+                $problem['problem_id']
+            );
+            if (is_null($problemObject)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+            $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
+                $problemObject,
+                $r->identity
+            );
+            $nominationStatus['tried'] = false;
+            $nominationStatus['solved'] = false;
+            $details = \OmegaUp\Controllers\Problem::getProblemDetails(
+                $r,
+                $problemObject,
+                null,
+                '',
+                false
+            );
+            foreach ($details['runs'] ?? [] as $run) {
+                if ($run['verdict'] === 'AC') {
+                    $nominationStatus['solved'] = true;
+                    break;
+                } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'CE') {
+                    $nominationStatus['tried'] = true;
+                }
+            }
             unset($problem['problem_id']);
+
+            if (is_null($details)) {
+                $problem['quality_payload'] = $nominationStatus;
+                continue;
+            }
+
+            $nominationStatus['problem_alias'] = $details['alias'];
+            $nominationStatus['language'] = $details['statement']['language'];
+            $nominationStatus['can_nominate_problem'] = !is_null($r->user);
+            $problem['quality_payload'] = $nominationStatus;
         }
 
         $acl = \OmegaUp\DAO\ACLs::getByPK(
