@@ -230,7 +230,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
         // Filter 0:
-        // - Containing tag-0
+        // - Containing test-tag-0
         // - Only Karel problems
         // - No Difficulty Range - It must show all problems with the selected
         //                         tag and languages
