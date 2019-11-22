@@ -166,4 +166,30 @@ class UITools {
         self::$smarty = $smarty;
         return $smarty;
     }
+
+    /**
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
+     */
+    public static function render(callable $callback): void {
+        try {
+            [
+                'smartyProperties' => $smartyProperties,
+                'template' => $template
+            ] = $callback(new Request($_REQUEST));
+        } catch (\Exception $e) {
+                \OmegaUp\ApiCaller::handleException($e);
+        }
+        $smarty = self::getSmartyInstance();
+        /** @var mixed $value */
+        foreach ($smartyProperties as $key => $value) {
+                $smarty->assign($key, $value);
+        }
+        \OmegaUp\UITools::getSmartyInstance()->display(
+            sprintf(
+                '%s/templates/%s',
+                strval(OMEGAUP_ROOT),
+                $template
+            )
+        );
+    }
 }
