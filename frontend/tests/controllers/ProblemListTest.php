@@ -229,6 +229,18 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
+        // Filter 0:
+        // - Containing test-tag-0
+        // - Only Karel problems
+        // - No Difficulty Range - It must show all problems with the selected
+        //                         tag and languages
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => $login[0]->auth_token,
+            'tag' => 'test-tag-0',
+            'programming_languages' => 'kp,kj',
+        ]));
+        $this->assertCount(3, $response['results']);
+
         // Filter 1:
         // - Containing tag-0
         // - Only Karel problems
@@ -238,7 +250,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login[0]->auth_token,
             'tag' => 'test-tag-0',
             'programming_languages' => 'kp,kj',
-            'difficulty_range' => '0,2',
+            'difficulty_range' => '0,3',
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);

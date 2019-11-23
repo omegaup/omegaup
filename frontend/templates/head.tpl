@@ -44,9 +44,7 @@
 		<link rel="stylesheet" href="/third_party/css/reset.css" />
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
-        <!-- Social media button -->
-        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.12" charset="utf-8"></script>
-		<!-- Bootstrap from CDN -->
+		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
