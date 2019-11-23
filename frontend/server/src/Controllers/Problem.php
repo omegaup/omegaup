@@ -2667,7 +2667,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, mode: string, orderBy: string, page: int, programmingLanguages: string[]|string, requireAllTags: bool, tags: string[]}
+     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, mode: string, orderBy: string, page: int, programmingLanguages: string[]|string, requireAllTags: bool, tags: string[]}
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateInEnum(
@@ -2715,6 +2715,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['max_difficulty'],
             'max_difficulty'
         );
+        \OmegaUp\Validators::validateOptionalNumber(
+            $r['min_visibility'],
+            'min_visibility'
+        );
+        $minVisibility = empty(
+            $r['min_visibility']
+        ) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : intval(
+            $r['min_visibility']
+        );
+        $difficultyRange = null;
         if (isset($r['difficulty_range'])) {
             [$minDifficulty, $maxDifficulty] = explode(
                 ',',
@@ -2722,14 +2732,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $r['difficulty_range']
                 )
             );
-        } else {
-            $minDifficulty = intval($r['min_difficulty']);
-            $maxDifficulty = intval($r['max_difficulty']);
+            $difficultyRange = self::getDifficultyRange(
+                intval($minDifficulty),
+                intval($maxDifficulty)
+            );
         }
-        $difficultyRange = self::getDifficultyRange(
-            intval($minDifficulty),
-            intval($maxDifficulty)
-        );
         if (isset($r['only_karel'])) {
             $programmingLanguages = ['kp', 'kj'];
         } elseif (isset($r['programming_languages'])) {
@@ -2757,6 +2764,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) : boolval($r['require_all_tags']),
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
+            'minVisibility' => $minVisibility,
         ];
     }
 
@@ -2787,6 +2795,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
+            'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
         $response = self::getList(
@@ -2800,6 +2809,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
+            $minVisibility,
             $difficultyRange,
             $r->identity,
             $r->user
@@ -2825,6 +2835,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $keyword,
         bool $requireAllTags,
         $programmingLanguages,
+        int $minVisibility,
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user
@@ -2860,10 +2871,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $offset = ($page - 1) * PROBLEMS_PER_PAGE;
             $rowcount = PROBLEMS_PER_PAGE;
         }
-
-        $minVisibility = is_null($difficultyRange) ?
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC :
-            $difficultyRange[0];
 
         $total = 0;
         $problems = \OmegaUp\DAO\Problems::byIdentityType(
@@ -3354,6 +3361,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'requireAllTags' => $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
+            'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
         $response = self::getList(
@@ -3367,6 +3375,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $keyword,
             $requireAllTags,
             $programmingLanguages,
+            $minVisibility,
             $difficultyRange,
             $r->identity,
             $r->user
