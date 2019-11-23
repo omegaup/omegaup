@@ -136,9 +136,12 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     *
                 FROM
                     Submissions sub
+                INNER JOIN
+                    Runs ru ON ru.run_id = sub.current_run_id
                 WHERE
                     sub.problem_id = su.problem_id
                     AND sub.identity_id = su.identity_id
+                    AND ru.verdict = "AC"
                     AND sub.time < su.time
             )
         GROUP BY

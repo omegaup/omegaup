@@ -2,8 +2,6 @@
 
 namespace OmegaUp\Test\Factories;
 
-use OmegaUp\Exceptions\NotFoundException;
-
 class Run {
     /**
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate

@@ -178,6 +178,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         /**
          * Two months ago:
+         * user0 tries problem0 but fails
          * user0 => problem0 = 1 distinct problem
          * user1 => problem1 = 1 distinct problem
          * user1 tries (but fails) problem2
@@ -194,6 +195,16 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $firstMonthExpectedCount = 2;
 
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'WA');
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runCreationDate)
+        );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problems[0],
@@ -227,8 +238,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_number' => 3,
-        ]));
+            'months_count' => 3,
+        ]))['distinct_problems_solved'];
         $this->assertCount(1, $response); // one month, the first one
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
@@ -238,9 +249,10 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         /**
          * One month ago:
-         * user2 => problem0, problem1, problem2 = 3 distinct problems
+         * user2 => problem0, problem1 = 2 distinct problems
          * user0 => problem0 (the user has solved it the last month and also so it has
          *                      been solved by user3 this month) = 0 distinct problems
+         * user1 => problem2 = 1 distinct problem
          *
          * Total expected count: 3
          */
@@ -288,7 +300,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problems[2],
-            $identities[2]
+            $identities[1]
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
@@ -298,8 +310,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_number' => 3,
-        ]));
+            'months_count' => 3,
+        ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // two months (first and second)
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
@@ -315,7 +327,6 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         /**
          * This month:
          * user1 => problem1 (he has already solved it, doesn't count)
-         * user2 => problem2 (he has already solved it, doesn't count)
          *
          * Total expected count: 0, the month/year won't be retrieved as no distinct
          * problems are going to be found
@@ -328,16 +339,10 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problems[2],
-            $identities[2]
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_number' => 3,
-        ]));
+            'months_count' => 3,
+        ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // just two months (first and second)
     }
 }
