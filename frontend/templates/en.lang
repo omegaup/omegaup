@@ -313,7 +313,6 @@ demotionProblemEmailSubject = "Problem [%(problem_name)] has been reported as in
 duplicateTagsNotAllowed = "Duplicate tags are not allowed"
 editFieldRequired = "Missing required field"
 email = "E-Mail"
-emailInUse = "E-Mail already exists"
 emailNotVerified = "Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact omegaup-soporte@googlegroups.com for support."
 enterContest = "Enter Contest"
 enterCourse = "Enter course"
