@@ -210,12 +210,17 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $email->user_id = $user->user_id;
             \OmegaUp\DAO\Emails::create($email);
+            if (empty($email->email_id)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailInUse'
+                );
+            }
+            $user->main_email_id = $email->email_id;
 
             $identity->user_id = $user->user_id;
             \OmegaUp\DAO\Identities::create($identity);
-
-            $user->main_email_id = $email->email_id;
             $user->main_identity_id = $identity->identity_id;
+
             \OmegaUp\DAO\Users::update($user);
 
             $r['user'] = $user;
@@ -260,7 +265,7 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         } catch (\Exception $e) {
-            self::$log->warn('Email lookup failed: ' . $e->getMessage());
+            self::$log->warn('Email lookup failed', $e);
             return false;
         }
 
@@ -1183,7 +1188,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         if (is_null($userDb)) {
-            return $response; //FIXME: Debe lanzar una excepción
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $response['userinfo']['graduation_date'] = is_null(

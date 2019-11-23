@@ -315,7 +315,6 @@ const translations = {
 	duplicateTagsNotAllowed: "No se permiten etiquetas duplicadas",
 	editFieldRequired: "Falta un valor requerido",
 	email: "Correo electr\u00f3nico",
-	emailInUse: "Correo electr\u00f3nico en uso",
 	emailNotVerified: "Tu direcci\u00f3n de correo a\u00fan no ha sido verificada. Busca el correo de verificaci\u00f3n en tu bandeja de entrada o de spam. Si sigues teniendo problemas, escribe a omegaup-soporte@googlegroups.com para obtener ayuda.",
 	enterContest: "Entrar al concurso",
 	enterCourse: "Entrar al curso",
