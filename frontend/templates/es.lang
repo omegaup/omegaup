@@ -702,6 +702,7 @@ profileAddIdentitiesTooltip = "Agrega identidades utilizando el nombre de usuari
 profileContests = "Concursos participados"
 profileContestsTablePlace = "Lugar"
 profileCountry = "País / Región"
+profileCreatedProblems = "Problems creados"
 profileEdit = "Editar perfil"
 profileEmail = "Correo"
 profileGraduationDate = "Fecha de graduación"

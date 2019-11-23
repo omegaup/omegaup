@@ -704,6 +704,7 @@ const translations = {
 	profileContests: "Resultados dos concursos",
 	profileContestsTablePlace: "Lugar",
 	profileCountry: "Pa\u00eds / Regi\u00e3o",
+	profileCreatedProblems: "Problemas criados",
 	profileEdit: "Editar perfil",
 	profileEmail: "E-mail",
 	profileGraduationDate: "Data de forma\u00e7\u00e3o",
