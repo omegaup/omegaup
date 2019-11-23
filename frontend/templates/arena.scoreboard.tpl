@@ -1,6 +1,6 @@
-{include file='head.tpl' inArena=true}
+{include file='head.tpl' inArena=true inline}
 {if $titleClassName == 'course-title'}
-        <script type="text/javascript" src="{version_hash src="/js/dist/course_scoreboard.js"}"></script>
+        {js_include entrypoint="course_scoreboard"}
 {/if}
 		<div>
 			<div id="title">
@@ -14,6 +14,6 @@
 			</div>
 		</div>
 	</div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 </body>
 </html>

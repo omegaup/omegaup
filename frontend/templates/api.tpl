@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleApi#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleApi#}" inline}
 <div style="width: 920px; position: relative; margin: 0 auto 0 auto; ">
 	<table>
 	<tr>
@@ -44,5 +44,5 @@
 	</table>
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
 

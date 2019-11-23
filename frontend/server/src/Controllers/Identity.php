@@ -102,7 +102,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 trim($r['school_name']),
                 $state
             );
-            $identity->school_id = $schoolId; //TODO: remove this when removing school_id
 
             // Save in DB
             self::saveIdentityGroup($identity, $group->group_id);
@@ -178,7 +177,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     trim($identity['school_name']),
                     $state
                 );
-                $newIdentity->school_id = $schoolId; //TODO: remove this when removing school_id
 
                 self::saveIdentityGroup($newIdentity, $group->group_id);
 
@@ -335,11 +333,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
             ),
             $state
         );
-        $identity->school_id = $schoolId; //TODO: Remove when removing school_id
 
         if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
+                $schoolId, /* new school_id */
                 null /* graduation_date */
             );
             $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
@@ -578,6 +576,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        $schoolId = null;
+        if (!is_null($identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $schoolId = $identitySchool->school_id;
+            }
+        }
+
         return [
             'userinfo' => [
                 'username' => $identity->username,
@@ -588,7 +596,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'state' => $extendedProfile['state'],
                 'state_id' => $identity->state_id,
                 'school' => $extendedProfile['school'],
-                'school_id' => $identity->school_id,
+                'school_id' => $schoolId,
                 'is_private' => true,
                 'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
                     $extendedProfile['locale']

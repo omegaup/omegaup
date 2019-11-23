@@ -1,4 +1,4 @@
-{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}" loadMarkdown=true}
+{include file='head.tpl' jsfile={version_hash src='/js/contestintro.js'} htmlTitle="{#enterContest#}" loadMarkdown=true inline}
 
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">
@@ -86,5 +86,5 @@
 	</div><!-- panel-->
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
 

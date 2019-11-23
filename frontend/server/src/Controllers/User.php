@@ -89,22 +89,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $user = new \OmegaUp\DAO\VO\Users([
                 'user_id' => $identityByEmail->user_id,
-                'username' => $r['username'],
-                'password' => $hashedPassword
             ]);
 
             $identity = new \OmegaUp\DAO\VO\Identities([
                 'identity_id' => $identityByEmail->identity_id,
                 'username' => $r['username'],
-                'password' => $hashedPassword
+                'password' => $hashedPassword,
             ]);
             try {
-                \OmegaUp\DAO\DAO::transBegin();
-                \OmegaUp\DAO\Users::savePassword($user);
                 \OmegaUp\DAO\Identities::savePassword($identity);
-                \OmegaUp\DAO\DAO::transEnd();
             } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'usernameInUse',
@@ -132,8 +126,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'password' => $hashedPassword
         ];
         $userData = [
-            'username' => $r['username'],
-            'password' => $hashedPassword,
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
         ];
@@ -218,12 +210,17 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $email->user_id = $user->user_id;
             \OmegaUp\DAO\Emails::create($email);
+            if (empty($email->email_id)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailInUse'
+                );
+            }
+            $user->main_email_id = $email->email_id;
 
             $identity->user_id = $user->user_id;
             \OmegaUp\DAO\Identities::create($identity);
-
-            $user->main_email_id = $email->email_id;
             $user->main_identity_id = $identity->identity_id;
+
             \OmegaUp\DAO\Users::update($user);
 
             $r['user'] = $user;
@@ -268,7 +265,7 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         } catch (\Exception $e) {
-            self::$log->warn('Email lookup failed: ' . $e->getMessage());
+            self::$log->warn('Email lookup failed', $e);
             return false;
         }
 
@@ -470,21 +467,9 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $user->password = $hashedPassword;
         $identity->password = $hashedPassword;
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
-            \OmegaUp\DAO\Users::update($user);
-
-            \OmegaUp\DAO\Identities::update($identity);
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        \OmegaUp\DAO\Identities::update($identity);
 
         return ['status' => 'ok'];
     }
@@ -1189,11 +1174,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 $user->birth_date
             ),
             'gender' => $identity->gender,
-            'graduation_date' => is_null(
-                $user->graduation_date
-            ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                $user->graduation_date
-            ),
             'scholar_degree' => $user->scholar_degree,
             'preferred_language' => $user->preferred_language,
             'is_private' => $user->is_private,
@@ -1207,6 +1187,15 @@ class User extends \OmegaUp\Controllers\Controller {
             $user->user_id
         );
 
+        if (is_null($userDb)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $response['userinfo']['graduation_date'] = is_null(
+            $userDb['graduation_date']
+        ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $userDb['graduation_date']
+        );
         $response['userinfo']['email'] = $userDb['email'];
         $response['userinfo']['country'] = $userDb['country'];
         $response['userinfo']['country_id'] = $userDb['country_id'];
@@ -1394,6 +1383,11 @@ class User extends \OmegaUp\Controllers\Controller {
                     break;
                 }
             }
+        }
+        if (is_null($coderOfTheMonthUserId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'coderOfTheMonthNotFound'
+            );
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
@@ -1802,23 +1796,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
-        $r->user->password = $hashedPassword;
         $r->identity->password = $hashedPassword;
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
-            // Update username and password for user object
-            \OmegaUp\DAO\Users::update($r->user);
-
-            // Update username and password for identity object
-            \OmegaUp\DAO\Identities::update($r->identity);
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        // Update username and password for identity object
+        \OmegaUp\DAO\Identities::update($r->identity);
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(
@@ -1898,13 +1879,13 @@ class User extends \OmegaUp\Controllers\Controller {
         // Save previous values
         $currentIdentitySchool = null;
         $currentGraduationDate = null;
-        $currentSchool = null;
+        $currentSchoolId = null;
         if (!is_null($r->identity->current_identity_school_id)) {
             $currentIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $r->identity->current_identity_school_id
             );
             if (!is_null($currentIdentitySchool)) {
-                $currentSchool = $currentIdentitySchool->school_id;
+                $currentSchoolId = $currentIdentitySchool->school_id;
                 $currentGraduationDate = $currentIdentitySchool->graduation_date;
                 if (!is_null($currentGraduationDate)) {
                     $currentGraduationDate = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -1914,7 +1895,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $newSchool = $currentSchool;
+        $newSchoolId = $currentSchoolId;
         if (!is_null($r['school_id'])) {
             if (is_numeric($r['school_id'])) {
                 $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
@@ -1924,10 +1905,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         'school'
                     );
                 }
-                $newSchool = $school->school_id;
-                $r->identity->school_id = $school->school_id;
+                $newSchoolId = $school->school_id;
             } elseif (empty($r['school_name'])) {
-                $newSchool = null;
+                $newSchoolId = null;
                 $r['school_id'] = null;
             } else {
                 $response = \OmegaUp\Controllers\School::apiCreate(new \OmegaUp\Request([
@@ -1939,8 +1919,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'auth_token' => $r['auth_token'],
                 ]));
                 $r['school_id'] = $response['school_id'];
-                $newSchool = $response['school_id'];
-                $r->identity->school_id = $response['school_id'];
+                $newSchoolId = $response['school_id'];
             }
         }
 
@@ -1961,7 +1940,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 $graduationDate = strtotime($r['graduation_date']);
             }
             $newGraduationDate = $graduationDate;
-            $r['graduation_date'] = $graduationDate;
         }
         if (!is_null($r['birth_date'])) {
             if (is_numeric($r['birth_date'])) {
@@ -2012,9 +1990,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'username',
             'scholar_degree',
             'school_id',
-            'graduation_date' => ['transform' => function ($value) {
-                return gmdate('Y-m-d', $value);
-            }],
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
@@ -2039,7 +2014,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update IdentitiesSchools
-            if ($newSchool !== $currentSchool) {
+            if ($newSchoolId !== $currentSchoolId && !is_null($newSchoolId)) {
                 // Update end time for current record and create a new one
                 $graduationDate = !is_null(
                     $newGraduationDate
@@ -2049,11 +2024,12 @@ class User extends \OmegaUp\Controllers\Controller {
                 ) : null;
                 $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                     $r->identity,
+                    $newSchoolId,
                     $graduationDate
                 );
                 $r->identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
             } elseif (
-                !is_null($newSchool)
+                !is_null($newSchoolId)
                 && ($currentGraduationDate !== $newGraduationDate)
             ) {
                 $graduationDate = !is_null(
@@ -2072,7 +2048,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     // Create a new record
                     $newIdentitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
                         'identity_id' => $r->identity->identity_id,
-                        'school_id' => $newSchool,
+                        'school_id' => $newSchoolId,
                         'graduation_date' => $graduationDate,
                     ]);
 
@@ -2230,9 +2206,13 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
-            $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
-            $email->email = $r['email'];
-            \OmegaUp\DAO\Emails::update($email);
+            if (!is_null($r->user->main_email_id)) {
+                $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
+                if (!is_null($email)) {
+                    $email->email = $r['email'];
+                    \OmegaUp\DAO\Emails::update($email);
+                }
+            }
 
             // Add verification_id if not there
             if ($r->user->verified == '0') {
@@ -2726,9 +2706,19 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
         if ($filteredBy == 'school') {
+            $schoolId = null;
+            if (!is_null($identity->current_identity_school_id)) {
+                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                    $identity->current_identity_school_id
+                );
+                if (!is_null($identitySchool)) {
+                    $schoolId = $identitySchool->school_id;
+                }
+            }
+
             return [
                 'filteredBy' => $filteredBy,
-                'value' => $identity->school_id
+                'value' => $schoolId,
             ];
         }
         return ['filteredBy' => null, 'value' => null];
@@ -2954,7 +2944,17 @@ class User extends \OmegaUp\Controllers\Controller {
                         'wordsFilterByState'
                     );
             }
-            if (!is_null($identity->school_id)) {
+
+            $schoolId = null;
+            if (!is_null($identity->current_identity_school_id)) {
+                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                    $identity->current_identity_school_id
+                );
+                if (!is_null($identitySchool)) {
+                    $schoolId = $identitySchool->school_id;
+                }
+            }
+            if (!is_null($schoolId)) {
                 $availableFilters['school'] =
                     \OmegaUp\Translations::getInstance()->get(
                         'wordsFilterBySchool'

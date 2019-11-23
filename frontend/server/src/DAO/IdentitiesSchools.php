@@ -15,6 +15,7 @@ namespace OmegaUp\DAO;
 class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
     public static function createNewSchoolForIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
+        int $schoolId,
         ?string $graduationDate
     ): \OmegaUp\DAO\VO\IdentitiesSchools {
         // First get the current IdentitySchool and update its end_time
@@ -30,7 +31,7 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
 
         $newIdentitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
             'identity_id' => $identity->identity_id,
-            'school_id' => $identity->school_id,
+            'school_id' => $schoolId,
         ]);
 
         if (!is_null($graduationDate)) {
