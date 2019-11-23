@@ -131,6 +131,16 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         WHERE
             su.school_id = ? AND su.time >= CURDATE() - INTERVAL ? MONTH
             AND r.verdict = "AC" AND p.visibility >= 1
+            AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    Submissions sub
+                WHERE
+                    sub.problem_id = su.problem_id
+                    AND sub.identity_id = su.identity_id
+                    AND sub.time < su.time
+            )
         GROUP BY
             YEAR(su.time), MONTH(su.time);';
 

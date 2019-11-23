@@ -218,7 +218,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
             intval($r['school_id']),
-            intval($r['months_number']) - 1
+            intval($r['months_number'])
         );
     }
 
