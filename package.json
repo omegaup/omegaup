@@ -62,6 +62,7 @@
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "pako": "^1.0.7",
+    "typescript-optional": "^2.0.1",
     "v-tooltip": "^3.0.0-alpha.7",
     "vue": "^2.5.22",
     "vue-async-computed": "^3.5.1",

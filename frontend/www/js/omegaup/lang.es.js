@@ -1124,6 +1124,7 @@ const translations = {
 	wordsPractice: "Pr\u00e1ctica",
 	wordsPrevPage: "P\u00e1gina anterior",
 	wordsPreview: "Vista Previa",
+	wordsPrevious: "Anterior",
 	wordsPrivacyPolicy: "Pol\u00edtica de Privacidad",
 	wordsPrivacyPolicyAccepted: "Has aceptado la pol\u00edtica de privacidad",
 	wordsPrivate: "Privado",
