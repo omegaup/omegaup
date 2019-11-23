@@ -48,6 +48,10 @@
         </table>
         <div v-show="!contests"><img src="/media/wait.gif"></div>
       </div><omegaup-grid-paginator v-bind:columns="3"
+           v-bind:items="createdProblems"
+           v-bind:items-per-page="30"
+           v-bind:title="T.profileCreatedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
            v-bind:items="solvedProblems"
            v-bind:items-per-page="30"
            v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
@@ -103,6 +107,7 @@ export default class UserProfile extends Vue {
   @Prop() contests!: omegaup.ContestResult[];
   @Prop() solvedProblems!: Problem[];
   @Prop() unsolvedProblems!: Problem[];
+  @Prop() createdProblems!: Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
   @Prop() profileBadges!: Set<string>;
