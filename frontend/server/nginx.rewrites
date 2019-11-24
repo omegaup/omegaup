@@ -107,3 +107,18 @@ location ~ '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
   # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
   rewrite '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/template.php?problem_alias=$1&commit=$2&filename=$3? last;
 }
+
+# problem images
+location ~ '^/img/([a-zA-Z0-9_-]+)/([0-9a-f]{40})\.([a-zA-Z0-9._-]+)$' {
+  if (-f $request_filename) {
+    break;
+  }
+  if ($args != '') {
+    # The re-generation process was already run, and we still
+    # could not find that file. Give up to avoid infinitely
+    # redirecting.
+    return 404;
+  }
+  # Try re-generating the image. Once this is done, it will cause a redirect to nginx.
+  rewrite /problems/image.php?problem_alias=$1&object_id=$2&extension=$3? last;
+}
