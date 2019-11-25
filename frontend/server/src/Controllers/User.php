@@ -1687,6 +1687,42 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get Problems created by user
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{problems: array{title: string, alias: string}[], status: string}
+     */
+    public static function apiProblemsCreated(\OmegaUp\Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        /** @var array{title: string, alias: string}[] */
+        $problems = [];
+        $relevant_columns = ['title', 'alias'];
+        foreach (
+            \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
+                intval($identity->identity_id)
+            ) as $problem
+        ) {
+            array_push(
+                $problems,
+                $problem->asFilteredArray(
+                    $relevant_columns
+                )
+            );
+        }
+
+        return [
+            'status' => 'ok',
+            'problems' => $problems,
+        ];
+    }
+
+    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *

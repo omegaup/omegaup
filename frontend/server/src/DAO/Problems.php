@@ -539,6 +539,40 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Returns the list of problems created by a certain identity
+     * @param int $identityId
+     * @return \OmegaUp\DAO\VO\Problems[]
+     */
+    final public static function getPublicProblemsCreatedByIdentity(
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT DISTINCT
+                p.*
+            FROM
+                Identities i
+            INNER JOIN
+                Users u ON u.user_id = i.user_id
+            INNER JOIN
+                ACLs a ON a.owner_id = u.user_id
+            INNER JOIN
+                Problems p ON p.acl_id = a.acl_id
+            WHERE
+                p.visibility = ? AND
+                i.identity_id = ?;';
+
+        $params = [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $identityId];
+
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+
+        $problems = [];
+        foreach ($rs as $r) {
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($r));
+        }
+        return $problems;
+    }
+
+    /**
      * @return array{alias: string, title: string, username: string}[]
      */
     final public static function getSolvedProblemsByUsersOfCourse(

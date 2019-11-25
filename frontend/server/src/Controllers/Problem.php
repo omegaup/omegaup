@@ -3661,4 +3661,68 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [$minDifficulty, $maxDifficulty];
     }
+
+    public static function apiTemplate(\OmegaUp\Request $r): void {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['commit'],
+            'commit',
+            40,
+            40
+        );
+        if (
+            preg_match(
+                '/^[0-9a-f]{40}$/',
+                $r['commit']
+            ) !== 1
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'commit'
+            );
+        }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['filename'],
+            'filename'
+        );
+        if (
+            preg_match(
+                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
+                $r['filename']
+            ) !== 1
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'filename'
+            );
+        }
+
+        self::regenerateTemplates($r['problem_alias'], $r['commit']);
+
+        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
+        header(
+            'Location: ' . TEMPLATES_URL_PATH . "{$r['problem_alias']}/{$r['commit']}/{$r['filename']}?noredirect=1"
+        );
+        header('HTTP/1.1 303 See Other');
+        die();
+    }
+
+    public static function regenerateTemplates(
+        string $problemAlias,
+        string $commit
+    ): void {
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemAlias
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
+        $problemDeployer->generateLibinteractiveTemplates($commit);
+    }
 }
