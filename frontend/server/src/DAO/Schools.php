@@ -106,6 +106,13 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         return $result;
     }
 
+    /**
+     * Gets the users from school, and their number of problems created, solved and
+     * organized contests.
+     *
+     * @param int $schoolId
+     * @return array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]
+     */
     public static function getUsersFromSchool(
         int $schoolId
     ): array {
@@ -130,39 +137,69 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             ) AS classname,
             (
                 SELECT
-                    COUNT(DISTINCT p.problem_id)
+                    COUNT(DISTINCT Problems.problem_id)
                 FROM
-                    Problems p
+                    Users
                 INNER JOIN
-                    Submissions s ON s.problem_id = p.problem_id
+                    ACLs ON ACLs.owner_id = Users.user_id
                 INNER JOIN
-                    Runs r ON r.run_id = s.current_run_id
+                    Problems ON Problems.acl_id = ACLs.acl_id
                 WHERE
-                    r.verdict = "AC" AND s.type = "normal" AND s.identity_id = i.identity_id
+                    Problems.visibility = ? AND
+                    Users.main_identity_id = i.identity_id
+            ) AS created_problems,
+            (
+                SELECT
+                    COUNT(DISTINCT Problems.problem_id)
+                FROM
+                    Problems
+                INNER JOIN
+                    Submissions ON Submissions.problem_id = Problems.problem_id
+                INNER JOIN
+                    Runs ON Runs.run_id = Submissions.current_run_id
+                WHERE
+                    Runs.verdict = "AC"
+                    AND Submissions.identity_id = i.identity_id
+                    AND Submissions.type = "normal"
             ) AS solved_problems,
             (
                 SELECT
-                    COUNT(DISTINCT c.contest_id)
+                    COUNT(DISTINCT Contests.contest_id)
                 FROM
-                    Contests c
+                    Contests
                 INNER JOIN
-                    ACLs a ON a.acl_id = c.acl_id
+                    ACLs ON ACLs.acl_id = Contests.acl_id
                 INNER JOIN
-                    Users u ON u.user_id = a.owner_id
+                    Users ON Users.user_id = ACLs.owner_id
                 INNER JOIN
-                    Problemsets p ON p.problemset_id = c.problemset_id
+                    Problemsets ON Problemsets.problemset_id = Contests.problemset_id
                 WHERE
-                    u.main_identity_id = i.identity_id
-            ) AS organized_contests,
-            // Falta created_problems
+                    Users.main_identity_id = i.identity_id
+            ) AS organized_contests
         FROM
             Schools sc
         INNER JOIN
             Identities_Schools isc ON isc.school_id = sc.school_id
         INNER JOIN
-            Identities i ON i.current_identity_school_id = isc.identity_id
+            Identities i ON i.current_identity_school_id = isc.identity_school_id
         WHERE
             sc.school_id = ?;';
+
+        /** @var array{username: string, classname: string|null, created_problems: int, solved_problems: int, organized_contests: int}[] */
+        $records = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $schoolId]
+        );
+
+        $results = [];
+        foreach ($records as $rs) {
+            if (is_null($rs['classname'])) {
+                $rs['classname'] = 'user-rank-unranked';
+            }
+            $results[] = $rs;
+        }
+
+        return $results;
     }
 
     public static function countActiveSchools(

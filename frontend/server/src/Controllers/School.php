@@ -206,7 +206,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * with the number of created problems, solved problems and organized contests.
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, users: array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -216,9 +216,12 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        return \OmegaUp\DAO\Schools::getUsersFromSchool(
-            intval($school->school_id)
-        );
+        return [
+            'status' => 'ok',
+            'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
+                intval($school->school_id)
+            )
+        ];
     }
 
     /**
