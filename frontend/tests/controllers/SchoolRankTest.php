@@ -243,7 +243,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $response); // one month, the first one
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
-            $response[0]['distinct_problems'],
+            $response[0]['count'],
             $firstMonthExpectedCount
         );
 
@@ -315,12 +315,12 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $response); // two months (first and second)
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
-            $response[0]['distinct_problems'],
+            $response[0]['count'],
             $firstMonthExpectedCount
         );
         $this->assertEquals($response[1]['month'], $secondMonthNumber);
         $this->assertEquals(
-            $response[1]['distinct_problems'],
+            $response[1]['count'],
             $secondMonthExpectedCount
         );
 

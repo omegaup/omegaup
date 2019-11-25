@@ -205,7 +205,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the number of solved problems on the last X
      * months (including the current one)
      * @param \OmegaUp\Request $r
-     * @return array{distinct_problems_solved: array{year: int, month: int, distinct_problems: int}[], status: string}
+     * @return array{distinct_problems_solved: array{year: int, month: int, count: int}[], status: string}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');

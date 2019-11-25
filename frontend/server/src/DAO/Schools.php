@@ -109,7 +109,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
      * @param int $schoolId
      * @param int $monthsNumber
-     * @return array{year: int, month: int, distinct_problems: int}[]
+     * @return array{year: int, month: int, count: int}[]
      */
     public static function getMonthlySolvedProblemsCount(
         int $schoolId,
@@ -119,7 +119,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         SELECT
             YEAR(su.time) AS year,
             MONTH(su.time) AS month,
-            COUNT(DISTINCT su.problem_id) AS distinct_problems
+            COUNT(DISTINCT su.problem_id) AS `count`
         FROM
             Submissions su
         INNER JOIN
@@ -149,7 +149,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         $params = [$schoolId, $monthsNumber];
 
-        /** @var array{year: int, month: int, distinct_problems: int}[] */
+        /** @var array{year: int, month: int, count: int}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
