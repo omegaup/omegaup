@@ -6344,6 +6344,11 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
+typescript-optional@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/typescript-optional/-/typescript-optional-2.0.1.tgz#1dd4826bd751f78756e7eb3f96a16fbbeb3f7ee6"
+  integrity sha512-xuwmqsCjE4OeeMKxbNX3jjNcISGzYh5Q9R1rM5OyxEVNIr94CB5llCkfKW+1nZTKbbUV0axN3QAUuX2fus/DhQ==
+
 typescript@^3.5.1:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.2.tgz#27e489b95fa5909445e9fef5ee48d81697ad18fb"

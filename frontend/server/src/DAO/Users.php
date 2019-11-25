@@ -93,7 +93,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     Users u
                 INNER JOIN
                     Identities i ON u.main_identity_id = i.identity_id
-                INNER JOIN
+                LEFT JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
                     Countries c ON i.country_id = c.country_id

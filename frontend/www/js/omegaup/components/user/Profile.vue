@@ -47,49 +47,19 @@
           </tbody>
         </table>
         <div v-show="!contests"><img src="/media/wait.gif"></div>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileSolvedProblems }} <span class="badge">{{
-          solvedProblems.length }}</span></h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th colspan="3">{{ T.profileSolvedProblemsTableTitle }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="group in groupedSolvedProblems">
-              <td v-for="problem in group">
-                <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!groupedSolvedProblems"><img src="/media/wait.gif"></div>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileUnsolvedProblems }} <span class="badge">{{
-          unsolvedProblems.length }}</span></h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th colspan="3">{{ T.profileUnsolvedProblemsTableTitle }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="group in groupedUnsolvedProblems">
-              <td v-for="problem in group">
-                <a v-bind:href="`/arena/problem/${problem.alias}`">{{ problem.title }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
-      </div><omegaup-badge-list v-bind:all-badges="profileBadges"
+      </div><omegaup-grid-paginator v-bind:columns="3"
+           v-bind:items="createdProblems"
+           v-bind:items-per-page="30"
+           v-bind:title="T.profileCreatedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
+           v-bind:items="solvedProblems"
+           v-bind:items-per-page="30"
+           v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
+           v-bind:items="unsolvedProblems"
+           v-bind:items-per-page="30"
+           v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
+           <omegaup-badge-list v-bind:all-badges="profileBadges"
            v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
@@ -120,6 +90,8 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
+import user_GridPaginator from './GridPaginator.vue';
+import { Problem } from '../../types.ts';
 
 @Component({
   components: {
@@ -127,13 +99,15 @@ import badge_List from '../badge/List.vue';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
+    'omegaup-grid-paginator': user_GridPaginator,
   },
 })
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
   @Prop() contests!: omegaup.ContestResult[];
-  @Prop() solvedProblems!: omegaup.Problem[];
-  @Prop() unsolvedProblems!: omegaup.Problem[];
+  @Prop() solvedProblems!: Problem[];
+  @Prop() unsolvedProblems!: Problem[];
+  @Prop() createdProblems!: Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
   @Prop() profileBadges!: Set<string>;
@@ -141,25 +115,6 @@ export default class UserProfile extends Vue {
 
   T = T;
   columns = 3;
-
-  get groupedSolvedProblems(): omegaup.Problem[][] {
-    return this.groupElements(this.solvedProblems, this.columns);
-  }
-
-  get groupedUnsolvedProblems(): omegaup.Problem[][] {
-    return this.groupElements(this.unsolvedProblems, this.columns);
-  }
-
-  groupElements(
-    elements: omegaup.Problem[],
-    columns: number,
-  ): omegaup.Problem[][] {
-    const groups = [];
-    for (let i = 0; i < elements.length; i += columns) {
-      groups.push(elements.slice(i, i + columns));
-    }
-    return groups;
-  }
 }
 
 </script>
