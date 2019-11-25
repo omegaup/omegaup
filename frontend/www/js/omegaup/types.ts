@@ -14,7 +14,7 @@ export class Problem implements LinkableResource {
   difficulty?: number;
   languages?: string;
   letter?: string;
-  order: number = 0;
+  order?: number;
   penalty?: number;
   percent?: number;
   points?: number;

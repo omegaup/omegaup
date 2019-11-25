@@ -63,6 +63,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
         'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
 
+    const IMAGE_EXTENSIONS = [
+        'bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png', 'svg',
+        'svgz', 'tif', 'tiff',
+    ];
+
     // Number of rows shown in problems list
     const PAGE_SIZE = 1000;
 
@@ -1407,11 +1412,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Get all the images' mappings.
         $statementFiles = $problemArtifacts->lsTree($params['directory']);
-        $imageExtensions = ['bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png',
-                            'svg', 'svgz', 'tif', 'tiff'];
         foreach ($statementFiles as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            if (!in_array($extension, $imageExtensions)) {
+            if (!in_array($extension, self::IMAGE_EXTENSIONS)) {
                 continue;
             }
             $result['images'][$file['name']] = (
@@ -1422,9 +1425,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (!@file_exists($imagePath)) {
                 @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
-                file_put_contents($imagePath, $problemArtifacts->get(
-                    "{$params['directory']}/{$file['name']}"
-                ));
+                file_put_contents(
+                    $imagePath,
+                    $problemArtifacts->get(
+                        "{$params['directory']}/{$file['name']}"
+                    )
+                );
             }
         }
         return $result;
@@ -3660,5 +3666,138 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return null;
         }
         return [$minDifficulty, $maxDifficulty];
+    }
+
+    public static function apiTemplate(\OmegaUp\Request $r): void {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['commit'],
+            'commit',
+            40,
+            40
+        );
+        if (
+            preg_match(
+                '/^[0-9a-f]{40}$/',
+                $r['commit']
+            ) !== 1
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'commit'
+            );
+        }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['filename'],
+            'filename'
+        );
+        if (
+            preg_match(
+                '/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/',
+                $r['filename']
+            ) !== 1
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'filename'
+            );
+        }
+
+        self::regenerateTemplates($r['problem_alias'], $r['commit']);
+
+        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
+        header(
+            'Location: ' . TEMPLATES_URL_PATH . "{$r['problem_alias']}/{$r['commit']}/{$r['filename']}?noredirect=1"
+        );
+        header('HTTP/1.1 303 See Other');
+        die();
+    }
+
+    public static function regenerateTemplates(
+        string $problemAlias,
+        string $commit
+    ): void {
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemAlias
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
+        $problemDeployer->generateLibinteractiveTemplates($commit);
+    }
+
+    public static function apiImage(\OmegaUp\Request $r): void {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['object_id'],
+            'object_id',
+            40,
+            40
+        );
+        if (
+            preg_match(
+                '/^[0-9a-f]{40}$/',
+                $r['object_id']
+            ) !== 1
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'object_id'
+            );
+        }
+        \OmegaUp\Validators::validateInEnum(
+            $r['extension'],
+            'extension',
+            self::IMAGE_EXTENSIONS
+        );
+
+        self::regenerateImage(
+            $r['problem_alias'],
+            $r['object_id'],
+            strval($r['extension'])
+        );
+
+        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
+        header(
+            'Location: ' . IMAGES_URL_PATH . "{$r['problem_alias']}/{$r['object_id']}.{$r['extension']}?noredirect=1"
+        );
+        header('HTTP/1.1 303 See Other');
+        die();
+    }
+
+    public static function regenerateImage(
+        string $problemAlias,
+        string $objectId,
+        string $extension
+    ): void {
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemAlias
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias,
+            $objectId
+        );
+        $imagePath = (
+            IMAGES_PATH . "{$problem->alias}/{$objectId}.{$extension}"
+        );
+        @mkdir(IMAGES_PATH . $problem->alias, 0755, true);
+        file_put_contents(
+            $imagePath,
+            $problemArtifacts->getByRevision()
+        );
     }
 }

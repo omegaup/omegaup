@@ -639,14 +639,23 @@ export default {
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/', function(
       data,
     ) {
-      if (!data.hasOwnProperty('problems')) return data;
-      data.problems = data.problems.map(problem => new Problem(problem));
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(problem => new Problem(problem));
+      }
       return data;
     }),
 
     problemsSolved: _call('/api/user/problemssolved/', function(data) {
-      if (!data.hasOwnProperty('problems')) return data;
-      data.problems = data.problems.map(problem => new Problem(problem));
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(problem => new Problem(problem));
+      }
+      return data;
+    }),
+
+    problemsCreated: _call('/api/user/problemscreated', function(data) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(problem => new Problem(problem));
+      }
       return data;
     }),
 

@@ -15,6 +15,7 @@ OmegaUp.on('ready', function() {
           contests: this.contests,
           solvedProblems: this.solvedProblems,
           unsolvedProblems: this.unsolvedProblems,
+          createdProblems: this.createdProblems,
           visitorBadges: this.visitorBadges,
           profileBadges: this.profileBadges,
           rank: this.rank,
@@ -28,6 +29,7 @@ OmegaUp.on('ready', function() {
       profileBadges: new Set(),
       solvedProblems: [],
       unsolvedProblems: [],
+      createdProblems: [],
       visitorBadges: new Set(),
       charts: null,
     },
@@ -79,6 +81,12 @@ OmegaUp.on('ready', function() {
   API.User.listUnsolvedProblems({ username: profile.username })
     .then(function(data) {
       viewProfile.unsolvedProblems = data['problems'];
+    })
+    .fail(UI.apiError);
+
+  API.User.problemsCreated({ username: profile.username })
+    .then(function(data) {
+      viewProfile.createdProblems = data['problems'];
     })
     .fail(UI.apiError);
 
