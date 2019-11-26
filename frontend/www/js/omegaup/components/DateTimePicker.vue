@@ -80,7 +80,7 @@ export default class DateTimePicker extends Vue {
       // If the fallback was used, we don't need to update anything.
       return;
     }
-    this.$emit('input', new Date(newStringValue));
+    this.$emit('input', UI.parseDateTimeLocal(newStringValue));
   }
 
   @Watch('value')
