@@ -455,8 +455,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         );
 
         return [
-            'tried' => boolval($result[0]['type']),
-            'solved' => boolval($result[1]['type']),
+            'tried' => boolval($result[0]['total']),
+            'solved' => boolval($result[1]['total']),
         ];
     }
 
