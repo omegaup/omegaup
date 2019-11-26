@@ -1721,7 +1721,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Get the extra problem details with all the validations
      * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: string[], email_clarifications: bool, runs?: array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int, alias: string, username: string}[], admin?: bool, solvers?: array{username: string, language: string, runtime: float, memory: float, time: int}[], points: float, score: float}
      */
-    public static function getProblemDetails(
+    private static function getProblemDetails(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
@@ -1841,7 +1841,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (!is_null($problemset)) {
+        if (!is_null($problemset) && !is_null($r->identity)) {
             $result['admin'] = \OmegaUp\Authorization::isAdmin(
                 $r->identity,
                 $problemset
@@ -3281,12 +3281,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details['user'] = ['logged_in' => false, 'admin' => false];
         $result['payload'] = $details;
 
-        if (is_null($r->identity)) {
+        if (
+            is_null($r->identity)
+            || is_null($r->identity->user_id)
+            || is_null($problem->problem_id)
+        ) {
             return $result;
         }
         $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-            $problem,
-            $r->identity
+            $problem->problem_id,
+            $r->identity->user_id
         );
         $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,

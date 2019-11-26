@@ -2344,45 +2344,39 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'nominated' => false,
                 'dismissed' => false,
             ];
-            $problemObject = \OmegaUp\DAO\Problems::getByPK(
-                $problem['problem_id']
-            );
-            if (is_null($problemObject)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'problemNotFound'
+
+            if (
+                is_null($r->identity)
+                || is_null($r->identity->user_id)
+                || is_null($r->identity->identity_id)
+            ) {
+                $nominationStatus = [
+                    'nominated' => false,
+                    'dismissed' => false,
+                    'nominatedBeforeAC' => false,
+                    'dismissedBeforeAC' => false,
+                ];
+            } else {
+                $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
+                    $problem['problem_id'],
+                    $r->identity->user_id
                 );
-            }
-            $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-                $problemObject,
-                $r->identity
-            );
-            $nominationStatus['tried'] = false;
-            $nominationStatus['solved'] = false;
-            $details = \OmegaUp\Controllers\Problem::getProblemDetails(
-                $r,
-                $problemObject,
-                null,
-                '',
-                false
-            );
-            foreach ($details['runs'] ?? [] as $run) {
-                if ($run['verdict'] === 'AC') {
-                    $nominationStatus['solved'] = true;
-                    break;
-                } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'CE') {
-                    $nominationStatus['tried'] = true;
-                }
-            }
-            unset($problem['problem_id']);
 
-            if (is_null($details)) {
-                $problem['quality_payload'] = $nominationStatus;
-                continue;
-            }
+                [
+                    'tried' => $tried,
+                    'solved' => $solved,
+                ] = \OmegaUp\DAO\Runs::getSolvedAndTriedProblemByIdentity(
+                    $problem['problem_id'],
+                    $r->identity->identity_id
+                );
+                $nominationStatus['tried'] = $tried;
+                $nominationStatus['solved'] = $solved;
+                unset($problem['problem_id']);
 
-            $nominationStatus['problem_alias'] = $details['alias'];
-            $nominationStatus['language'] = $details['statement']['language'];
-            $nominationStatus['can_nominate_problem'] = !is_null($r->user);
+                $nominationStatus['problem_alias'] = $problem['alias'];
+                $nominationStatus['language'] = 'es';
+                $nominationStatus['can_nominate_problem'] = !is_null($r->user);
+            }
             $problem['quality_payload'] = $nominationStatus;
         }
 

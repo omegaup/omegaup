@@ -25,8 +25,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @return array{dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool}
      */
     public static function getNominationStatusForProblem(
-        \OmegaUp\DAO\VO\Problems $problem,
-        ?\OmegaUp\DAO\VO\Identities $identity
+        int $problemId,
+        int $userId
     ): array {
         $response = [
             'nominated' => false,
@@ -34,9 +34,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             'nominatedBeforeAC' => false,
             'dismissedBeforeAC' => false,
         ];
-        if (is_null($identity) || is_null($identity->user_id)) {
-            return $response;
-        }
 
         $sql = "SELECT
                     qnn.contents
@@ -52,7 +49,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var null|array{contents: string} $suggestion */
         $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$problem->problem_id, $identity->user_id]
+            [$problemId, $userId]
         );
         if (!is_null($suggestion)) {
             $response['nominated'] = true;
@@ -85,7 +82,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var null|array{contents: string} $dismissal */
         $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$problem->problem_id, $identity->user_id]
+            [$problemId, $userId]
         );
         if (!is_null($dismissal)) {
             $response['dismissed'] = true;

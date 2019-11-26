@@ -416,6 +416,51 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * @return array{solved: bool, tried: bool}
+     */
+    public static function getSolvedAndTriedProblemByIdentity(
+        int $problemId,
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT
+                \'tried\' AS type,
+                COUNT(1) AS total
+            FROM
+                Runs r
+            INNER JOIN
+                Submissions s ON s.submission_id = r.submission_id
+            WHERE
+                r.verdict NOT IN (\'CE\', \'JE\')
+                AND s.problem_id = ?
+                AND s.identity_id = ?
+            UNION ALL
+            SELECT
+                \'solved\' AS type,
+                COUNT(1) AS total
+            FROM
+                Runs r
+            INNER JOIN
+                Submissions s ON s.submission_id = r.submission_id
+            WHERE
+                r.verdict IN (\'AC\')
+                AND s.problem_id = ?
+                AND s.identity_id = ?;
+        ';
+
+        /** @var array{type: string, total: int}[] */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId, $identityId, $problemId, $identityId]
+        );
+
+        return [
+            'tried' => boolval($result[0]['type']),
+            'solved' => boolval($result[1]['type']),
+        ];
+    }
+
+    /**
      * @return array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[]
      */
     final public static function getProblemsetRuns(

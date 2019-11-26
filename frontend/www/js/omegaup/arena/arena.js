@@ -364,9 +364,7 @@ export class Arena {
     // Number of digits after the decimal point to show.
     self.digitsAfterDecimalPoint = 2;
 
-    self.qualityNominationForm = {};
-
-    self.qualityPayload = {};
+    self.qualityNominationForm = null;
   }
 
   installLibinteractiveHooks() {
@@ -1500,26 +1498,24 @@ export class Arena {
         }
 
         function showQualityNominationPopup() {
-          self.qualityPayload = self.currentProblem.quality_payload;
-          if (typeof self.qualityPayload === 'undefined') {
+          let qualityPayload = self.currentProblem.quality_payload;
+          if (typeof qualityPayload === 'undefined') {
             // Quality Nomination only works for Courses
             return;
           }
-          if (Object.keys(self.qualityNominationForm).length !== 0) {
-            self.qualityNominationForm.nominated =
-              self.qualityPayload.nominated;
+          if (self.qualityNominationForm !== null) {
+            self.qualityNominationForm.nominated = qualityPayload.nominated;
             self.qualityNominationForm.nominatedBeforeAC =
-              self.qualityPayload.nominatedBeforeAC;
-            self.qualityNominationForm.solved = self.qualityPayload.solved;
-            self.qualityNominationForm.tried = self.qualityPayload.tried;
-            self.qualityNominationForm.dismissed =
-              self.qualityPayload.dismissed;
+              qualityPayload.nominatedBeforeAC;
+            self.qualityNominationForm.solved = qualityPayload.solved;
+            self.qualityNominationForm.tried = qualityPayload.tried;
+            self.qualityNominationForm.dismissed = qualityPayload.dismissed;
             self.qualityNominationForm.dismissedBeforeAC =
-              self.qualityPayload.dismissedBeforeAC;
+              qualityPayload.dismissedBeforeAC;
             self.qualityNominationForm.canNominateProblem =
-              self.qualityPayload.canNominateProblem;
+              qualityPayload.canNominateProblem;
             self.qualityNominationForm.problemAlias =
-              self.qualityPayload.problemAlias;
+              qualityPayload.problemAlias;
             return;
           }
           self.qualityNominationForm = new Vue({
@@ -1538,32 +1534,28 @@ export class Arena {
                 },
                 on: {
                   submit: function(ev) {
-                    let contents = {};
-                    if (!ev.solved && ev.tried) {
-                      contents.before_ac = true;
-                    }
-                    if (ev.difficulty !== '') {
-                      contents.difficulty = Number.parseInt(ev.difficulty, 10);
-                    }
-                    if (ev.tags.length > 0) {
-                      contents.tags = ev.tags;
-                    }
-                    if (ev.quality !== '') {
-                      contents.quality = Number.parseInt(ev.quality, 10);
-                    }
+                    const contents = {
+                      before_ac: !ev.solved && ev.tried,
+                      difficulty:
+                        ev.difficulty !== ''
+                          ? Number.parseInt(ev.difficulty, 10)
+                          : 0,
+                      tags: ev.tags.length > 0 ? ev.tags : [],
+                      quality:
+                        ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
+                    };
                     API.QualityNomination.create({
-                      problem_alias: self.qualityPayload.problem_alias,
+                      problem_alias: qualityPayload.problem_alias,
                       nomination: 'suggestion',
                       contents: JSON.stringify(contents),
                     }).fail(UI.apiError);
                   },
                   dismiss: function(ev) {
-                    let contents = {};
-                    if (!ev.solved && ev.tried) {
-                      contents.before_ac = true;
-                    }
+                    const contents = {
+                      before_ac: !ev.solved && ev.tried,
+                    };
                     API.QualityNomination.create({
-                      problem_alias: self.qualityPayload.problem_alias,
+                      problem_alias: qualityPayload.problem_alias,
                       nomination: 'dismissal',
                       contents: JSON.stringify(contents),
                     })
@@ -1576,14 +1568,14 @@ export class Arena {
               });
             },
             data: {
-              nominated: self.qualityPayload.nominated,
-              nominatedBeforeAC: self.qualityPayload.nominatedBeforeAC,
-              solved: self.qualityPayload.solved,
-              tried: self.qualityPayload.tried,
-              dismissed: self.qualityPayload.dismissed,
-              dismissedBeforeAC: self.qualityPayload.dismissedBeforeAC,
-              canNominateProblem: self.qualityPayload.can_nominate_problem,
-              problemAlias: self.qualityPayload.problem_alias,
+              nominated: qualityPayload.nominated,
+              nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
+              solved: qualityPayload.solved,
+              tried: qualityPayload.tried,
+              dismissed: qualityPayload.dismissed,
+              dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
+              canNominateProblem: qualityPayload.can_nominate_problem,
+              problemAlias: qualityPayload.problem_alias,
             },
             components: {
               'qualitynomination-popup': qualitynomination_Popup,
