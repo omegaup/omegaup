@@ -1688,11 +1688,10 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="21">
+    <MissingParamType occurrences="20">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
-      <code>$difficultyRange</code>
       <code>$alias</code>
       <code>$id</code>
       <code>$identityId</code>

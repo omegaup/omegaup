@@ -60,6 +60,10 @@ class UITools {
         }
 
         $smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
+        $smarty->assign(
+            'ENABLE_SOCIAL_MEDIA_RESOURCES',
+            OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES
+        );
         $smarty->assign('LOGGED_IN', '0');
 
         /** @psalm-suppress RedundantCondition OMEGAUP_GA_TRACK may be defined differently. */
