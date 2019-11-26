@@ -2371,13 +2371,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
                 $nominationStatus['tried'] = $tried;
                 $nominationStatus['solved'] = $solved;
-                unset($problem['problem_id']);
 
                 $nominationStatus['problem_alias'] = $problem['alias'];
                 $nominationStatus['language'] = 'es';
                 $nominationStatus['can_nominate_problem'] = !is_null($r->user);
             }
             $problem['quality_payload'] = $nominationStatus;
+            unset($problem['problem_id']);
         }
 
         $acl = \OmegaUp\DAO\ACLs::getByPK(
