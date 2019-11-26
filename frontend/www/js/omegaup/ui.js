@@ -497,6 +497,33 @@ let UI = {
     );
   },
 
+  formatDateLocal: function(date) {
+    // The expected format is yyyy-MM-dd in the local timezone, which is
+    // why we cannot use date.toISOSTring().
+    return (
+      String(date.getFullYear()).padStart(4, '0') +
+      '-' +
+      // Months in JavaScript start at 0.
+      String(date.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(date.getDate()).padStart(2, '0')
+    );
+  },
+
+  formatDateTimeLocal: function(date) {
+    // The expected format is yyyy-MM-ddTHH:MM in the local timezone, which is
+    // why we cannot use date.toISOSTring().
+    return (
+      UI.formatDateLocal(date) +
+      'T' +
+      String(date.getHours()).padStart(2, '0') +
+      ':' +
+      String(date.getMinutes()).padStart(2, '0') +
+      ':' +
+      String(date.getSeconds()).padStart(2, '0')
+    );
+  },
+
   formatDateTime: function(date) {
     return date.toLocaleString(T.locale);
   },
