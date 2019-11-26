@@ -4,7 +4,31 @@ import { Optional } from "typescript-optional";
 export interface LinkableResource {
   toString(): string;
   getUrl(): string;
-  getBadge(): Optional<string>;
+  getBadge(): Optional<number>;
+}
+
+export class ContestResult implements LinkableResource {
+  alias: string = '';
+  title: string = '';
+  place: number = 0;
+
+  constructor(contestResult: omegaup.ContestResult) {
+    this.alias = contestResult.data.alias;
+    this.title = contestResult.data.title;
+    this.place = contestResult.place;
+  }
+
+  toString(): string {
+    return this.title;
+  }
+
+  getUrl(): string {
+    return `/arena/${this.alias}/`;
+  }
+
+  getBadge(): Optional<number> {
+    return Optional.ofNonNull(this.place);
+  }
 }
 
 export class Problem implements LinkableResource {
@@ -68,7 +92,7 @@ export class Problem implements LinkableResource {
     return `/arena/problem/${this.alias}/`;
   }
 
-  getBadge(): Optional<string> {
+  getBadge(): Optional<number> {
     return Optional.empty();
   }
 }

@@ -702,6 +702,7 @@ const translations = {
 	profile: "Nome",
 	profileAddIdentitiesTooltip: "Adicionar identidades usando seu nome de usu\u00e1rio omegaUp",
 	profileContests: "Resultados dos concursos",
+	profileContestsTableContest: "Concurso",
 	profileContestsTablePlace: "Lugar",
 	profileCountry: "Pa\u00eds / Regi\u00e3o",
 	profileCreatedProblems: "Problemas criados",

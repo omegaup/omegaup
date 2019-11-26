@@ -24,42 +24,27 @@
                width="16"></h2>
         </div><omegaup-user-basicinfo v-bind:profile="profile"
              v-bind:rank="rank"></omegaup-user-basicinfo>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileContests }} <span class="badge">{{ contests.length
-          }}</span></h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>{{ T.profileContestsTableContest }}</th>
-              <th>{{ T.profileContestsTablePlace }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="contest in contests">
-              <td>
-                <a v-bind:href="`/arena/${contest.data.alias}`">{{ contest.data.title }}</a>
-              </td>
-              <td><strong>{{ contest.place }}</strong></td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!contests"><img src="/media/wait.gif"></div>
-      </div><omegaup-grid-paginator v-bind:columns="3"
+      </div><omegaup-grid-paginator v-bind:columns="1"
+           v-bind:items="contests"
+           v-bind:items-per-page="15"
+           v-bind:title="T.profileContests"
+           v-bind:type="'contest'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
+           "3"
            v-bind:items="createdProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileCreatedProblems"></omegaup-grid-paginator>
-           <omegaup-grid-paginator v-bind:columns="3"
+           v-bind:title="T.profileCreatedProblems"
+           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
+           "3"
            v-bind:items="solvedProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
-           <omegaup-grid-paginator v-bind:columns="3"
+           v-bind:title="T.profileSolvedProblems"
+           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
+           "3"
            v-bind:items="unsolvedProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
-           <omegaup-badge-list v-bind:all-badges="profileBadges"
+           v-bind:title="T.profileUnsolvedProblems"
+           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-badge-list v-bind:all-badges=
+           "profileBadges"
            v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
@@ -91,7 +76,7 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
 import user_GridPaginator from './GridPaginator.vue';
-import { Problem } from '../../types.ts';
+import { Problem, ContestResult } from '../../types.ts';
 
 @Component({
   components: {
@@ -104,7 +89,7 @@ import { Problem } from '../../types.ts';
 })
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
-  @Prop() contests!: omegaup.ContestResult[];
+  @Prop() contests!: ContestResult[];
   @Prop() solvedProblems!: Problem[];
   @Prop() unsolvedProblems!: Problem[];
   @Prop() createdProblems!: Problem[];
