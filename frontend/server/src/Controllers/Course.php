@@ -2338,12 +2338,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                 $letter++
             );
-            $problem['quality_payload'] = [
-                'solved' => false,
-                'tried' => false,
-                'nominated' => false,
-                'dismissed' => false,
-            ];
 
             if (
                 is_null($r->identity)
@@ -2351,6 +2345,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 || is_null($r->identity->identity_id)
             ) {
                 $nominationStatus = [
+                    'solved' => false,
+                    'tried' => false,
                     'nominated' => false,
                     'dismissed' => false,
                     'nominatedBeforeAC' => false,
@@ -2363,14 +2359,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
 
                 [
-                    'tried' => $tried,
-                    'solved' => $solved,
+                    'tried' => $nominationStatus['tried'],
+                    'solved' => $nominationStatus['solved'],
                 ] = \OmegaUp\DAO\Runs::getSolvedAndTriedProblemByIdentity(
                     $problem['problem_id'],
                     $r->identity->identity_id
                 );
-                $nominationStatus['tried'] = $tried;
-                $nominationStatus['solved'] = $solved;
 
                 $nominationStatus['problem_alias'] = $problem['alias'];
                 $nominationStatus['language'] = 'es';

@@ -424,39 +424,21 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                \'tried\' AS type,
-                COUNT(1) AS total
-            FROM
-                Runs r
-            INNER JOIN
-                Submissions s ON s.submission_id = r.submission_id
-            WHERE
-                r.verdict NOT IN (\'CE\', \'JE\')
-                AND s.problem_id = ?
-                AND s.identity_id = ?
-            UNION ALL
-            SELECT
-                \'solved\' AS type,
-                COUNT(1) AS total
-            FROM
-                Runs r
-            INNER JOIN
-                Submissions s ON s.submission_id = r.submission_id
-            WHERE
-                r.verdict IN (\'AC\')
-                AND s.problem_id = ?
-                AND s.identity_id = ?;
+                (SELECT COUNT(1) AS total FROM Submissions s INNER JOIN Runs r ON s.current_run_id = r.run_id
+                 WHERE r.verdict NOT IN (\'CE\', \'JE\') AND s.problem_id = ? AND s.identity_id = ?) AS tried,
+                (SELECT COUNT(1) AS total FROM Submissions s INNER JOIN Runs r ON s.current_run_id = r.run_id
+                 WHERE r.verdict IN (\'AC\') AND s.problem_id = ? AND s.identity_id = ?) AS solved;
         ';
 
-        /** @var array{type: string, total: int}[] */
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var array{tried: int, solved: int} */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemId, $identityId, $problemId, $identityId]
         );
 
         return [
-            'tried' => boolval($result[0]['total']),
-            'solved' => boolval($result[1]['total']),
+            'tried' => boolval($result['tried']),
+            'solved' => boolval($result['solved']),
         ];
     }
 
