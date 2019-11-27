@@ -5,18 +5,13 @@
     </div>
     <table class="table table-striped"
            v-if="items.length &gt; 0">
-      <thead v-if="type === 'contest'">
-        <tr>
-          <th>{{ T.profileContestsTableContest }}</th>
-          <th>{{ T.profileContestsTablePlace }}</th>
-        </tr>
-      </thead>
+      <slot></slot>
       <tbody>
         <tr v-for="group in paginatedItems">
           <td v-for="item in group">
             <a v-bind:href="item.getUrl()">{{ item.toString() }}</a>
           </td>
-          <td v-if="type === 'contest'"><strong>{{ group[0].getBadge() }}</strong></td>
+          <td v-if="!group[0].getBadge().isEmpty()"><strong>{{ group[0].getBadge() }}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -55,7 +50,6 @@ export default class GridPaginator extends Vue {
   @Prop() itemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
-  @Prop({ default: 'problem' }) type!: string;
 
   private T = T;
   private currentPageNumber: number = 0;

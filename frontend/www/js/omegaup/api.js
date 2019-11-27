@@ -619,7 +619,8 @@ export default {
       let contests = [];
       for (let contestAlias in data.contests) {
         const now = new Date();
-        const currentTimestamp = data.contests[contestAlias].finish_time * 1000;
+        const currentTimestamp =
+          data.contests[contestAlias].data.finish_time * 1000;
         const end = OmegaUp.remoteTime(currentTimestamp);
         if (data.contests[contestAlias].place !== null && now > end) {
           contests.push(new ContestResult(data.contests[contestAlias]));

@@ -27,24 +27,25 @@
       </div><omegaup-grid-paginator v-bind:columns="1"
            v-bind:items="contests"
            v-bind:items-per-page="15"
-           v-bind:title="T.profileContests"
-           v-bind:type="'contest'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
-           "3"
+           v-bind:title="T.profileContests">
+      <thead>
+        <tr>
+          <th>{{ T.profileContestsTableContest }}</th>
+          <th>{{ T.profileContestsTablePlace }}</th>
+        </tr>
+      </thead></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns="3"
            v-bind:items="createdProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileCreatedProblems"
-           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
-           "3"
+           v-bind:title="T.profileCreatedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
            v-bind:items="solvedProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileSolvedProblems"
-           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns=
-           "3"
+           v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
+           <omegaup-grid-paginator v-bind:columns="3"
            v-bind:items="unsolvedProblems"
            v-bind:items-per-page="30"
-           v-bind:title="T.profileUnsolvedProblems"
-           v-bind:type="'problem'"></omegaup-grid-paginator> <omegaup-badge-list v-bind:all-badges=
-           "profileBadges"
+           v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
+           <omegaup-badge-list v-bind:all-badges="profileBadges"
            v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
