@@ -248,6 +248,29 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the list of current students registered in a certain school
+     * with the number of created problems, solved problems and organized contests.
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{status: string, users: array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]}
+     */
+    public static function apiUsers(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return [
+            'status' => 'ok',
+            'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
+                intval($school->school_id)
+            ),
+        ];
+    }
+
+    /**
      * Returns rank of best schools in last month
      *
      * @param int $offset
