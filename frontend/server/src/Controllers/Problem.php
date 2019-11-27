@@ -310,7 +310,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'input_limit' => $inputLimit,
             'submissions' => 0,
             'accepted' => 0,
-            'difficulty' => 0,
             'source' => $source,
             'order' => 'normal', /* defaulting to normal */
             'alias' => $problemAlias,
