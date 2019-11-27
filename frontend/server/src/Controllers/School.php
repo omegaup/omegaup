@@ -220,7 +220,7 @@ class School extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
                 intval($school->school_id)
-            )
+            ),
         ];
     }
 

@@ -119,8 +119,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $sql = '
         SELECT
             i.username,
-            (
-                SELECT urc.classname
+            COALESCE (
+                (SELECT urc.classname
                 FROM User_Rank_Cutoffs urc
                 WHERE
                     urc.score <= (
@@ -133,8 +133,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     )
                 ORDER BY
                     urc.percentile ASC
-                LIMIT 1
-            ) AS classname,
+                LIMIT 1)
+            , "user-rank-unranked") AS classname,
             (
                 SELECT
                     COUNT(DISTINCT Problems.problem_id)
@@ -185,21 +185,11 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         WHERE
             sc.school_id = ?;';
 
-        /** @var array{username: string, classname: string|null, created_problems: int, solved_problems: int, organized_contests: int}[] */
-        $records = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $schoolId]
         );
-
-        $results = [];
-        foreach ($records as $rs) {
-            if (is_null($rs['classname'])) {
-                $rs['classname'] = 'user-rank-unranked';
-            }
-            $results[] = $rs;
-        }
-
-        return $results;
     }
 
     public static function countActiveSchools(
