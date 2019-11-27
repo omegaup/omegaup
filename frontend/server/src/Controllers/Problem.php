@@ -3470,13 +3470,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $r->ensureMainUserIdentity();
-
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = $r['alias'];
 
             try {
+                $r->ensureMainUserIdentity();
                 self::createProblem(
                     $r,
                     isset($r['title']) ? strval($r['title']) : null,
@@ -3535,6 +3534,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'LANGUAGES' => strval($r['languages']),
                     'SELECTED_TAGS' => strval($r['selected_tags']),
                     'STATUS_ERROR' => $statusError,
+                    'IS_UPDATE' => false,
                 ];
             }
         }

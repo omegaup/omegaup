@@ -39,7 +39,8 @@ def test_create_group_with_identities_and_restrictions(driver):
             util.create_course(driver, course, school, has_privileges=False)
 
         # Trying to create a problem
-        with util.assert_js_errors(driver, message_list=('/problem/mine/',)):
+        with util.assert_js_errors(driver,
+                                   message_list=('/api/problem/create/',)):
             util.create_problem(driver, 'some_alias', has_privileges=False)
 
         # Trying to see the list of contests created by the identity
