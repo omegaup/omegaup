@@ -150,11 +150,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $params = [$schoolId, $monthsNumber];
 
         /** @var array{year: int, month: int, count: int}[] */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
         );
-        return $rs;
     }
 
     public static function countActiveSchools(
