@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium contest tests.'''
 
@@ -369,9 +370,10 @@ def add_students_bulk(driver, users):
             (By.XPATH, (
                 '//textarea[contains(@class, "contestants")]')))).send_keys(
                     ', '.join(users))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CLASS_NAME, ('user-add-bulk')))).click()
+    with util.dismiss_status(driver):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CLASS_NAME, ('user-add-bulk')))).click()
     for user in users:
         driver.wait.until(
             EC.visibility_of_element_located(
@@ -392,12 +394,19 @@ def add_problem_to_contest(driver, problem):
     driver.typeahead_helper('*[contains(@class, "problems-container")]',
                             problem)
     driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '.btn.add-problem'))).click()
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[contains(concat(" ", normalize-space(@class), " "), " '
+             'problem-points ")]'))).click()
+    with util.dismiss_status(driver):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '.btn.add-problem'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
-             '//*[contains(@class, "table")]//a[text()="%s"]' % problem)))
+             '//*[contains(concat(" ", normalize-space(@class), " "), " table'
+             ' ")]//a[text()="%s"]' % problem)))
 
 
 @util.annotate
@@ -456,9 +465,10 @@ def change_contest_admission_mode(driver, contest_admission_mode):
             (By.XPATH,
              '//select[@name = "admission-mode"]')))).select_by_visible_text(
                  contest_admission_mode)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()
+    with util.dismiss_status(driver):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()
 
 
 @util.annotate

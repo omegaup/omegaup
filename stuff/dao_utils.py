@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 '''A tool that helps update the DAOs.'''
 
 from __future__ import print_function
 
+import datetime
 import os
 from typing import NamedTuple, Text, Sequence
 
@@ -29,14 +31,16 @@ class Column:
         self.comment = tokens.get('comment', None)
         if 'tinyint' in self.type:
             self.php_primitive_type = 'bool'
+        elif 'timestamp' in self.type or 'datetime' in self.type:
+            self.php_primitive_type = 'int'
         elif 'int' in self.type:
             self.php_primitive_type = 'int'
         elif 'double' in self.type:
             self.php_primitive_type = 'float'
         else:
             self.php_primitive_type = 'string'
-        self.php_type = (
-            ('' if self.not_null else '?') + self.php_primitive_type)
+        self.php_type = (('' if self.default or self.auto_increment else '?') +
+                         self.php_primitive_type)
 
     def __repr__(self):
         return 'Column<name={}, type={}>'.format(self.name, self.type)
@@ -73,10 +77,10 @@ class Table:
 
     @property
     def fieldnames(self):
-        '''A quoted, comma-separated list of fields.'''
+        '''A quoted list of fields.'''
 
-        return ', '.join("`{}`.`{}`".format(self.name, column.name)
-                         for column in self.columns)
+        return ["`{}`.`{}`".format(self.name, column.name)
+                for column in self.columns]
 
     def __repr__(self):
         return 'Table<name={}, columns={}>'.format(self.name, self.columns)
@@ -155,10 +159,17 @@ def _listformat(value, format: Text = '', **kwargs):
     return [format.format(element, **kwargs) for element in value]
 
 
-DaoFile = NamedTuple('DaoFile', [('filename', Text), ('contents', Text)])
+def _parse_date(value):
+    return int(
+        datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S').replace(
+            tzinfo=datetime.timezone.utc).timestamp())
 
 
-def generate_dao(script: Text) -> Sequence[DaoFile]:
+File = NamedTuple('File', [('filename', Text), ('file_type', Text),
+                           ('contents', Text)])
+
+
+def generate_dao(script: Text) -> Sequence[File]:
     '''Generate all the DAO files.'''
 
     try:
@@ -173,13 +184,14 @@ def generate_dao(script: Text) -> Sequence[DaoFile]:
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), 'dao_templates')))
     env.filters['listformat'] = _listformat
+    env.filters['strtotime'] = _parse_date
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:
-        yield DaoFile('{}.vo.base.php'.format(table.name),
-                      vo_template.render(table=table))
-        yield DaoFile('{}.dao.base.php'.format(table.name),
-                      dao_template.render(table=table))
+        yield File('{}.php'.format(table.class_name), 'vo',
+                   vo_template.render(table=table))
+        yield File('{}.php'.format(table.class_name), 'dao',
+                   dao_template.render(table=table))
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

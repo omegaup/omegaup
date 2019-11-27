@@ -2,14 +2,11 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $session = SessionController::apiCurrentSession(
-        new Request($_REQUEST)
-    )['session'];
-    $smartyProperties = ProblemController::getProblemDetailsForSmarty(
-        new Request($_REQUEST)
+    $smartyProperties = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

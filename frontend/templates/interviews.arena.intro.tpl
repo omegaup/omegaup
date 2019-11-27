@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#enterContest#}"}
+{include file='head.tpl' htmlTitle="{#enterContest#}" inline}
 
 <div id="intro-page" class="contest">
 	<div class="panel panel-default">
@@ -53,5 +53,5 @@
 	</div><!-- panel panel-default -->
 
 <script src="{version_hash src="/js/interviews.arena.intro.js"}"></script>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
 

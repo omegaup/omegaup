@@ -1,25 +1,32 @@
 <?php
 
 /**
- * Tests of the ContestController::apiRemoveProblem
+ * Tests of the \OmegaUp\Controllers\Contest::apiRemoveProblem
  *
  * @author edhzsz
  */
 
-class ContestRemoveProblemTest extends OmegaupTestCase {
+class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check in DB that a problem does not exist on a contest
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    private function assertProblemRemovedFromContest($problemData, $contestData) {
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+    private function assertProblemRemovedFromContest(
+        $problemData,
+        $contestData
+    ) {
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
 
         // Get problem-contest and verify it does not exist
-        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $contest->problemset_id,
             $problem->problem_id
         );
@@ -32,13 +39,17 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     private function assertProblemExistsInContest($problemData, $contestData) {
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
 
-        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $contest->problemset_id,
             $problem->problem_id
         );
@@ -51,11 +62,18 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and problem should have been removed.
      */
     public function testRemoveProblemFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -69,18 +87,27 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes an inexistent problem from a private contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveInvalidProblemFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
         // Create a new request
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -88,23 +115,32 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
      * Removes a problem from an inexistent contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemFromInvalidContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Log in as contest director
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => 'this contest doesnt exists',
@@ -112,24 +148,31 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
      * Removes a problem from contest while loged in with a user that
      * is not a contest admin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = OmegaupTestCase::login($contestant);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -137,16 +180,18 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
      * Converts a private contest into a public contest
      */
     private function makeContestPublic($contestData) {
-        $login = OmegaupTestCase::login($contestData['director']);
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -155,7 +200,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -163,17 +208,27 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and contest should have a single problem.
      */
     public function testRemoveOldestProblemFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ContestsFactory::addProblemToContest($problemData1, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData1,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $contestData
+        );
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData1,
             $contestData
         );
@@ -190,17 +245,27 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Should not fail and contest should have a single problem.
      */
     public function testRemoveNewestProblemFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ContestsFactory::addProblemToContest($problemData1, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData1,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $contestData
+        );
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData2,
             $contestData
         );
@@ -215,16 +280,23 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes a single problem from a public contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -233,20 +305,30 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes all problems from a public contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
 
-        $problemData1 = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData1 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ContestsFactory::addProblemToContest($problemData1, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData1,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $contestData
+        );
 
         $this->makeContestPublic($contestData);
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData1,
             $contestData
         );
@@ -254,35 +336,45 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Validate
         $this->assertEquals('ok', $response['status']);
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData2,
             $contestData
         );
     }
 
     /**
-     * Removes a problem with runs from a private contest while loged in
+     * Removes a problem with runs from a private contest while logged in
      * with a user that is sysadmin.
-     *
      */
     public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Add the sysadmin role to the contest director
-        UserRolesDAO::create(new UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -297,33 +389,46 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * while logged in with a user that is sysadmin.
      */
     public function testRemoveProblemWithAdminRunsFromContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
-        $secondaryAdmin = UserFactory::createUser();
+        ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r = new Request([
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $secondaryAdmin->username,
+            'usernameOrEmail' => $secondaryIdentityAdmin->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
         // Add secondary admin
-        $response = ContestController::apiAddAdmin($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddAdmin($r);
 
         // Add runs to the problem created by the contest admins
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $secondaryAdmin);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $secondaryIdentityAdmin
+        );
 
         // remove the problem from the contest
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -337,19 +442,30 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs from a private contest while loged in
      * with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -359,24 +475,35 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs only from admins from a private contest while
      * loged in with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -388,18 +515,28 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      */
     public function testRemoveProblemWithRunsOutsideContestFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
         // Create a run not related to the contest
-        RunsFactory::createRunToProblem($problemData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
 
         // Remove problem, should succeed.
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -411,20 +548,34 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs made outside and inside the contest from a private contest
      * while logged in as Contest Admin. Should fail.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
@@ -435,27 +586,38 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * while logged in with a user that is not sysadmin.
      */
     public function testRemoveProblemWithMixedRunsFromContestBeingSysAdmin() {
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
-        RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $contestData['director']
         );
-        RunsFactory::createRun($problemData, $contestData, $contestant);
+        \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
-        UserRolesDAO::create(new UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
-        $response = ContestsFactory::removeProblemFromContest(
+        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );

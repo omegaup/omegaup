@@ -16,8 +16,16 @@ else
 	ARGS="fix ${MERGE_BASE}"
 fi
 
-exec /usr/bin/docker run --interactive --tty --rm \
+if [[ -t 0 ]]; then
+	# This is being run in an environment where stdin is connected to a TTY.
+	TTY_ARGS="--interactive --tty"
+else
+	TTY_ARGS=""
+fi
+
+exec /usr/bin/docker run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
-	omegaup/hook_tools:20190606 -j4 $ARGS
+	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
+	omegaup/hook_tools:20191021 $ARGS

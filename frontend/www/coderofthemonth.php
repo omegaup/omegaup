@@ -2,16 +2,17 @@
 
 require_once('../server/bootstrap_smarty.php');
 
+[
+    'identity' => $identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 try {
-    $session = SessionController::apiCurrentSession(
-        new Request($_REQUEST)
-    )['session'];
-    $smartyProperties = UserController::getCoderOfTheMonthDetailsForSmarty(
-        new Request($_REQUEST),
-        $session['identity']
+    $smartyProperties = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
+        new \OmegaUp\Request($_REQUEST),
+        $identity
     );
 } catch (Exception  $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

@@ -46,7 +46,7 @@
           <td>{{ problem.title }}</td>
           <td class="button-column">
             <a v-bind:title="T.courseAssignmentProblemRemove"
-                v-on:click="onRemove(problem)"><span aria-hidden="true"
+                v-on:click="$emit('remove', assignment, problem)"><span aria-hidden="true"
                   class="glyphicon glyphicon-remove"></span></a>
           </td>
         </tr>
@@ -106,9 +106,9 @@
             </div>
             <div class="row">
               <div class="form-group col-md-12">
-                <label>{{ T.wordsProblem }} <input autocomplete="off"
-                       class="typeahead form-control problems-dropdown"
-                       v-model="problemAlias"></label>
+                <label>{{ T.wordsProblem }} <omegaup-autocomplete class="form-control"
+                                      v-bind:init="el =&gt; UI.problemTypeahead(el)"
+                                      v-model="problemAlias"></omegaup-autocomplete></label>
                 <p class="help-block">{{ T.courseAddProblemsAssignmentsDesc }}</p>
               </div>
             </div>
@@ -116,10 +116,10 @@
               <button class="btn btn-primary"
                    type="submit"
                    v-bind:disabled="problemAlias.length == 0"
-                   v-on:click.prevent="onAddProblem">{{ T.courseAddProblemsAdd }}</button>
-                   <button class="btn btn-secondary"
+                   v-on:click.prevent="$emit('add-problem', assignment, problemAlias)">{{
+                   T.courseAddProblemsAdd }}</button> <button class="btn btn-secondary"
                    type="reset"
-                   v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+                   v-on:click.prevent="showForm = false">{{ T.wordsCancel }}</button>
             </div>
           </div>
         </div>
@@ -128,73 +128,74 @@
   </div><!-- panel -->
 </template>
 
-<script>
-import UI from '../../ui.js';
-
-export default {
-  props: {
-    T: Object,
-    assignments: Array,
-    assignmentProblems: Array,
-    taggedProblems: Array,
-  },
-  data: function() {
-    return {
-      assignment: {},
-      showForm: false,
-      level: 'intro',
-      topics: [],
-      taggedProblemAlias: '',
-      problemAlias: '',
-    };
-  },
-  computed: {
-    tags: function() {
-      var t = this.topics.slice();
-      t.push(this.level);
-      return t;
-    },
-  },
-  mounted: function() {
-    var self = this;
-    UI.problemTypeahead(
-        $('input.problems-dropdown', $(this.$el)),
-        function(event, item) { self.problemAlias = item.alias; });
-  },
-  methods: {
-    onAddProblem: function() {
-      this.$emit('add-problem', this.assignment, this.problemAlias);
-    },
-    onShowForm: function() {
-      this.showForm = true;
-      this.problemAlias = '';
-      this.level = 'intro';
-      this.topics = [];
-    },
-    onCancel: function() { this.showForm = false;},
-    onRemove: function(problem) {
-      this.$emit('remove', this.assignment, problem);
-    },
-    sort: function(event) {
-      this.assignmentProblems.splice(
-          event.newIndex, 0,
-          this.assignmentProblems.splice(event.oldIndex, 1)[0]);
-      this.$emit('sort', this.assignment, this.assignmentProblems);
-    }
-  },
-  watch: {
-    assignment: function(val) { this.$emit('assignment', val);},
-    taggedProblemAlias: function() {
-      this.problemAlias = this.taggedProblemAlias;
-    },
-    tags: function() { this.$emit('tags', this.tags);},
-  },
-};
-
-</script>
-
 <style>
 .omegaup-course-problemlist .form-group>label {
   width: 100%;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import Autocomplete from '../Autocomplete.vue';
+
+@Component({
+  components: {
+    'omegaup-autocomplete': Autocomplete,
+  },
+})
+export default class CourseProblemList extends Vue {
+  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() assignmentProblems!: omegaup.AssignmentProblem[];
+  @Prop() taggedProblems!: omegaup.Problem[];
+
+  UI = UI;
+  T = T;
+  assignment: Partial<omegaup.Assignment> = {};
+  showForm = false;
+  level = 'intro';
+  topics: string[] = [];
+  taggedProblemAlias = '';
+  problemAlias = '';
+
+  get tags(): string[] {
+    let t = this.topics.slice();
+    t.push(this.level);
+    return t;
+  }
+
+  onShowForm(): void {
+    this.showForm = true;
+    this.problemAlias = '';
+    this.level = 'intro';
+    this.topics = [];
+  }
+
+  sort(event: any) {
+    this.assignmentProblems.splice(
+      event.newIndex,
+      0,
+      this.assignmentProblems.splice(event.oldIndex, 1)[0],
+    );
+    this.$emit('sort', this.assignment, this.assignmentProblems);
+  }
+
+  @Watch('assignment')
+  onAssignmentChange(newVal: omegaup.Assignment): void {
+    this.$emit('assignment', newVal);
+  }
+
+  @Watch('taggedProblemAlias')
+  onTaggedProblemAliasChange() {
+    this.problemAlias = this.taggedProblemAlias;
+  }
+
+  @Watch('tags')
+  onTagsChange() {
+    this.$emit('tags', this.tags);
+  }
+}
+
+</script>

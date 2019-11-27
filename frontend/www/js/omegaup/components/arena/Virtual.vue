@@ -2,8 +2,8 @@
   <div class="contest panel">
     <div class="panel-body">
       <div class="text-center">
-        <h2>{{UI.formatString(T.virtualTitle, {title:
-        title})}}</h2><span>{{contestDurationString}}</span>
+        <h2>{{UI.formatString(T.virtualTitle, {title: title})}}</h2><span>{{
+        UI.formatDelta(finishTime - startTime) }}</span>
         <form class="form"
               v-on:submit.prevent="onSubmit">
           <div class="row">
@@ -25,46 +25,43 @@
       <div class="">
         <h1>{{T.registerForContestRules}}</h1>
         <ul>
-          <li>{{scoreboardTimeString}}</li>
-          <li>{{submissionGapString}}</li>
+          <li>{{ UI.formatString(T.contestIntroScoreboardTimePercent, {'window_length':
+          scoreboard}) }}</li>
+          <li>{{ UI.formatString(T.contestIntroSubmissionsSeparationDesc, {'window_length':
+          Math.floor(submissionsGap / 60)}) }}</li>
         </ul>
       </div>
     </div><!-- div contest-details -->
   </div>
 </template>
 
-<script>
-import {API, T, UI, OmegaUp} from '../../omegaup.js';
-import {Arena} from '../../arena/arena.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
 import DateTimePicker from '../DateTimePicker.vue';
 
-export default {
-  props: {
-    title: String,
-    description: String,
-    startTime: Date,
-    finishTime: Date,
-    scoreboard: String,
-    submissionGap: Number
+@Component({
+  components: {
+    'omegaup-datetimepicker': DateTimePicker,
   },
-  data: function() {
-    return { T: T, UI: UI, virtualContestStartTime: new Date(), }
-  },
-  computed: {
-    contestDurationString: function() {
-      return UI.formatDelta(this.finishTime - this.startTime);
-    },
-    scoreboardTimeString: function() {
-      return UI.formatString(T.contestIntroScoreboardTimePercent,
-                             {window_length: this.scoreboard});
-    },
-    submissionGapString: function() {
-      return UI.formatString(
-          T.contestIntroSubmissionsSeparationDesc,
-          {window_length: Math.floor(this.submissionsGap / 60)});
-    }
-  },
-  methods: {onSubmit: function() { this.$emit('submit', this);}},
-  components: {'omegaup-datetimepicker': DateTimePicker}
+})
+export default class ArenaVirtual extends Vue {
+  @Prop() title!: string;
+  @Prop() description!: string;
+  @Prop() startTime!: Date;
+  @Prop() finishTime!: Date;
+  @Prop() scoreboard!: string;
+  @Prop() submissionsGap!: number;
+
+  T = T;
+  UI = UI;
+  virtualContestStartTime = new Date();
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+  }
 }
+
 </script>

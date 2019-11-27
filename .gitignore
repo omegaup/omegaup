@@ -8,6 +8,7 @@ bin/mysql-connector-java-5.1.29.jar
 *.swo
 *.pyc
 .pytest_cache/
+.mypy_cache/
 .cache
 tags
 nohup.out
@@ -54,6 +55,7 @@ frontend/tests/controllers/gitserver.pid
 frontend/tests/controllers/grade/
 frontend/tests/controllers/img/
 frontend/tests/controllers/templates/
+frontend/tests/omegaup.db
 frontend/tests/ui/results/
 omegaup_test.log
 
@@ -74,10 +76,10 @@ frontend/.DS_Store
 frontend/www/apc.php
 frontend/www/coverage/
 frontend/www/img/
-frontend/www/js/google-analytics.js
-frontend/www/pmamini.php
 frontend/www/phpminiadmin/
+frontend/www/pmamini.php
 frontend/www/templates/
+frontend/www/tests/index.html
 
 # Ignore sublime sftp config
 sftp-config.json
@@ -86,7 +88,10 @@ sftp-config.json
 .remote-sync.json
 
 # Ignore node modules folder
-node_modules
+node_modules/
+
+# Ignore composer files
+vendor/
 
 # Ignore JavaScript build files.
 frontend/www/js/dist/
@@ -103,3 +108,6 @@ frontend/www/docs/pas
 
 # Ignore VS Code json
 .vscode/*
+
+# Ignore omegaup.db
+omegaup.db

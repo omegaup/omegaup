@@ -37,29 +37,6 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import DatePicker from '../DatePicker.vue';
-
-export default {
-  props: {initialAlias: String, initialName: String},
-  data: function() {
-    return {
-      T: T,
-      alias: this.initialAlias,
-      startTime: new Date(),
-      name: this.initialName
-    };
-  },
-  methods: {
-    onSubmit: function() { this.$emit('clone', this);},
-  },
-  components: {
-    'omegaup-datepicker': DatePicker,
-  },
-};
-</script>
-
 <style>
 .omegaup-course-clone .form-group>label {
   width: 100%;
@@ -68,3 +45,30 @@ export default {
   font-weight: bold;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+import DatePicker from '../DatePicker.vue';
+
+@Component({
+  components: {
+    'omegaup-datepicker': DatePicker,
+  },
+})
+export default class CourseClone extends Vue {
+  @Prop() initialAlias!: string;
+  @Prop() initialName!: string;
+
+  T = T;
+  alias = this.initialAlias;
+  startTime = new Date();
+  name = this.initialName;
+
+  onSubmit(): void {
+    this.$emit('clone', this);
+  }
+}
+
+</script>

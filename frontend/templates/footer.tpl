@@ -8,13 +8,15 @@
 					<h6><a href="mailto:hello@omegaup.com">hello@omegaup.com</a></h6>
 					<div class="row">
 						<div class="col-md-4">
+							{if $ENABLE_SOCIAL_MEDIA_RESOURCES}
 							<!-- Facebook like button -->
-							<div id="fb-root"></div>
-							<div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="20" data-show-faces="false" data-share="true"></div>
+							<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&width=137&layout=button_count&action=like&size=small&show_faces=false&share=true&height=46&appId" width="137" height="46" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allow="encrypted-media"></iframe>
 						</div>
 						<div class="col-md-4">
 							<!-- Twitter follow -->
 							<a href="https://twitter.com/omegaup?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-width="300px" data-height="20" data-show-screen-name="false" data-dnt="true" data-show-count="true">Follow @omegaup</a>
+							<script async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+							{/if}
 						</div>
 					</div>
 				</div>
@@ -42,7 +44,7 @@
 		<!-- #content -->
 	</div>
 </div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 <!-- #root -->
 </body>
 </html>

@@ -34,7 +34,9 @@ export default class {
     var self = this;
 
     self.button = $('.notification-button', element);
-    self.button.on('click', function() { self.unread(false); });
+    self.button.on('click', function() {
+      self.unread(false);
+    });
 
     self.onMarkAllAsRead = function() {
       self.notifications.removeAll();
@@ -56,9 +58,11 @@ export default class {
       // Update the pre-existing notification.
       var notification = self.notificationMapping[data.id];
       for (var key in data) {
-        if (!data.hasOwnProperty(key) ||
-            typeof(notification[key]) != 'function' ||
-            notification[key]() == data[key]) {
+        if (
+          !data.hasOwnProperty(key) ||
+          typeof notification[key] != 'function' ||
+          notification[key]() == data[key]
+        ) {
           continue;
         }
         notification[key](data[key]);
@@ -69,11 +73,13 @@ export default class {
       return;
     }
 
-    var lastModified = parseInt((typeof(localStorage) !== 'undefined' &&
-                                 localStorage.getItem(data.id)) ||
-                                    '0',
-                                10) ||
-                       0;
+    var lastModified =
+      parseInt(
+        (typeof localStorage !== 'undefined' &&
+          localStorage.getItem(data.id)) ||
+          '0',
+        10,
+      ) || 0;
     if (lastModified >= data.modificationTime) return;
 
     for (var key in data) {

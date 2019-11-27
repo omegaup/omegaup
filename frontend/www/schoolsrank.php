@@ -1,13 +1,17 @@
 <?php
 require_once('../server/bootstrap_smarty.php');
 
-// Fetch ranking
 try {
-    $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
-    // Show top 100 schools rank
-    $smarty->assign('schoolRankPayload', ['rowCount' => 100, 'rank' => $schoolRankPayload['rank']]);
+    $smartyProperties = \OmegaUp\Controllers\School::getSchoolsRankForSmarty(
+        /*$rowCount=*/ 100,
+        /*$isIndex=*/false
+    );
 } catch (Exception $e) {
-    // Oh, well...
+    \OmegaUp\ApiCaller::handleException($e);
+}
+
+foreach ($smartyProperties as $key => $value) {
+    $smarty->assign($key, $value);
 }
 
 $smarty->display('../templates/rank.schools.tpl');

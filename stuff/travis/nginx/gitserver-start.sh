@@ -13,7 +13,8 @@ cat > "/tmp/omegaup/gitserver.config.json" <<EOF
 	},
 	"Gitserver": {
 		"AllowDirectPushToMaster": true,
-		"RootPath": "/tmp/omegaup/problems.git"
+		"RootPath": "/tmp/omegaup/problems.git",
+		"FrontendAuthorizationProblemRequestURL": "http://localhost/api/authorization/problem/"
 	}
 }
 EOF

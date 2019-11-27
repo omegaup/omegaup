@@ -1,12 +1,13 @@
 import contest_Stats from '../components/contest/Stats.vue';
 import Vue from 'vue';
-import {API, OmegaUp} from '../omegaup.js';
+import { API, OmegaUp } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const contestAlias =
-      /\/contest\/([^\/]+)\/stats\/?.*/.exec(window.location.pathname)[1];
+  const contestAlias = /\/contest\/([^\/]+)\/stats\/?.*/.exec(
+    window.location.pathname,
+  )[1];
 
-  Highcharts.setOptions({global: {useUTC: false}});
+  Highcharts.setOptions({ global: { useUTC: false } });
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
@@ -37,14 +38,16 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-stats': contest_Stats,
     },
   });
-  let pendingChart = oGraph.pendingRuns(updatePendingRunsChartTimeout,
-                                        () => stats.stats.pending_runs.length);
+  let pendingChart = oGraph.pendingRuns(
+    updatePendingRunsChartTimeout,
+    () => stats.stats.pending_runs.length,
+  );
 
   function getStats() {
-    API.Contest.stats({contest_alias: contestAlias})
-        .then(s => Vue.set(stats, 'stats', s))
-        .fail(omegaup.UI.apiError);
-  };
+    API.Contest.stats({ contest_alias: contestAlias })
+      .then(s => Vue.set(stats, 'stats', s))
+      .fail(omegaup.UI.apiError);
+  }
 
   setInterval(() => getStats(), callStatsApiTimeout);
   getStats();

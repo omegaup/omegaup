@@ -1,28 +1,35 @@
 <?php
 
-class ExperimentsTest extends \PHPUnit\Framework\TestCase {
+class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
     const TEST = 'experiment_test';
 
     private static $kKnownExperiments = [
         self::TEST,
     ];
 
-    private static function getRequestForExperiments(array $experiments) {
+    private static function getRequestForExperiments(array $experiments): string {
         $kvp = [];
         foreach ($experiments as $name) {
-            $kvp[] = $name . '=' . Experiments::getExperimentHash($name);
+            $kvp[] = $name . '=' . \OmegaUp\Experiments::getExperimentHash(
+                $name
+            );
         }
-        return [
-            Experiments::EXPERIMENT_REQUEST_NAME => implode(',', $kvp),
-        ];
+        return implode(',', $kvp);
     }
 
     public function testConfigExperiments() {
         $defines = [
-            Experiments::EXPERIMENT_PREFIX . strtoupper(self::TEST) => true,
+            \OmegaUp\Experiments::EXPERIMENT_PREFIX . strtoupper(
+                self::TEST
+            ) => true,
         ];
         $experiments = new
-            Experiments([], null, $defines, self::$kKnownExperiments);
+            \OmegaUp\Experiments(
+                null,
+                null,
+                $defines,
+                self::$kKnownExperiments
+            );
 
         $this->assertEquals(
             self::$kKnownExperiments,
@@ -33,7 +40,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestExperiments() {
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 self::getRequestForExperiments([self::TEST]),
                 null,
                 [],
@@ -49,7 +56,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestUnknownExperiments() {
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 self::getRequestForExperiments(['foo']),
                 null,
                 [],
@@ -62,11 +69,8 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestInvalidExperiments() {
         $experiments = new
-            Experiments(
-                [
-                    Experiments::EXPERIMENT_REQUEST_NAME =>
-                        self::TEST . '=invalid_hash',
-                ],
+            \OmegaUp\Experiments(
+                self::TEST . '=invalid_hash',
                 null,
                 [],
                 self::$kKnownExperiments
@@ -77,11 +81,11 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testUserExperiments() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $experiments = new
-            Experiments(
-                [],
-                $user,
+            \OmegaUp\Experiments(
+                null,
+                $identity,
                 [],
                 self::$kKnownExperiments
             );
@@ -89,17 +93,17 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
         $this->assertEmpty($experiments->getEnabledExperiments());
         $this->assertFalse($experiments->isEnabled(self::TEST));
 
-        // After adding the user-experiment relationship to the database, the
+        // After adding the identity-experiment relationship to the database, the
         // experiment should be enabled.
-        UsersExperimentsDAO::create(new UsersExperiments([
-            'user_id' => $user->user_id,
+        \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
+            'user_id' => $identity->user_id,
             'experiment' => self::TEST,
         ]));
 
         $experiments = new
-            Experiments(
-                [],
-                $user,
+            \OmegaUp\Experiments(
+                null,
+                $identity,
                 [],
                 self::$kKnownExperiments
             );

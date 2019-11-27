@@ -21,9 +21,11 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
-		<script type="text/javascript" src="{version_hash src="/js/dist/commons.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
+		{js_include entrypoint="omegaup" runtime}
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
+{if isset($inArena) && $inArena}
+		{js_include entrypoint="arena"}
+{/if}
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
@@ -42,10 +44,7 @@
 		<link rel="stylesheet" href="/third_party/css/reset.css" />
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
-        <!-- Social media button -->
-        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.12" charset="utf-8"></script>
-        <script async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-		<!-- Bootstrap from CDN -->
+		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
@@ -95,8 +94,8 @@
 		{/if}
 {/if}
 		<div id="root">
-{include file='common.navbar.tpl'}
+{include file='common.navbar.tpl' inline}
 {if !isset($inArena) || !$inArena}
-{include file='mainmenu.tpl'}
+{include file='mainmenu.tpl' inline}
 {/if}
-{include file='status.tpl'}
+{include file='status.tpl' inline}

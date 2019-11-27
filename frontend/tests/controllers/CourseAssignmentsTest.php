@@ -1,13 +1,15 @@
 <?php
 
-class CourseAssignmentsTest extends OmegaupTestCase {
+class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testOrderAssignments() {
         // Create a course with 5 assignments
-        $courseData = CoursesFactory::createCourseWithAssignments(5);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            5
+        );
 
         // Login admin and getting assignments list
         $adminLogin = self::login($courseData['admin']);
-        $assignments = CourseController::apiListAssignments(new Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -17,14 +19,14 @@ class CourseAssignmentsTest extends OmegaupTestCase {
         foreach ($assignments['assignments'] as $index => $assignment) {
             $assignments['assignments'][$index]['order'] = $i++;
         }
-        CourseController::apiUpdateAssignmentsOrder(new Request([
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignments' => $assignments['assignments'],
         ]));
 
         // Getting one more time assignments list with original order
-        $assignments = CourseController::apiListAssignments(new Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -43,7 +45,10 @@ class CourseAssignmentsTest extends OmegaupTestCase {
                 'alias' => $assignments['assignments'][$index]['alias'],
                 'order' => $assignments['assignments'][$index]['order']
             ];
-            $this->assertEquals($assignments['assignments'][$index]['order'], $i++);
+            $this->assertEquals(
+                $assignments['assignments'][$index]['order'],
+                $i++
+            );
         }
 
         // Reordering assignments
@@ -52,12 +57,12 @@ class CourseAssignmentsTest extends OmegaupTestCase {
         $assignments['assignments'][2]['order'] = 1;
         $assignments['assignments'][3]['order'] = 2;
         $assignments['assignments'][4]['order'] = 4;
-        CourseController::apiUpdateAssignmentsOrder(new Request([
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignments' => $assignments['assignments'],
         ]));
-        $assignments = CourseController::apiListAssignments(new Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));

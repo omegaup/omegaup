@@ -33,18 +33,17 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    data: Object,
-  },
-  data: function() {
-    return {
-      T: T,
-      contest: this.data,
-    };
-  },
-};
+@Component({})
+export default class Links extends Vue {
+  @Prop() data!: omegaup.Contest;
+
+  T = T;
+  contest = this.data;
+}
+
 </script>

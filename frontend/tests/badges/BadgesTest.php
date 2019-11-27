@@ -1,20 +1,16 @@
 <?php
 
-require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
-require_once 'libs/FileHandler.php';
-require_once 'libs/FileUploader.php';
-
 /**
  * Test to ensure that all the badges are in the correct format.
  *
  * @author carlosabcs
  */
-class BadgesTest extends BadgesTestCase {
+class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getSortedExpectedResults(array $expected): array {
         $results = [];
         foreach ($expected as $username) {
             // From each username, obtaining its ID
-            $user = UsersDAO::FindByUsername($username);
+            $user = \OmegaUp\DAO\Users::FindByUsername($username);
             $results[] = $user->user_id;
         }
         asort($results);
@@ -22,7 +18,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     private static function RunRequest(array $apicall): void {
-        $login = self::login(new Identities([
+        $login = self::login(new \OmegaUp\DAO\VO\Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
         ]));
@@ -36,29 +32,41 @@ class BadgesTest extends BadgesTestCase {
             if (array_key_exists('files', $req)) {
                 $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
             }
-            if ($req['api'] === 'QualityNominationController::apiCreate') {
+            if ($req['api'] === '\\OmegaUp\\Controllers\\QualityNomination::apiCreate') {
                 $params['contents'] = json_encode($params['contents']);
             }
-            $r = new Request($params);
+            $r = new \OmegaUp\Request($params);
             $r->method = $req['api'];
-            $fullResponse = ApiCaller::call($r);
+            $fullResponse = \OmegaUp\ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
                 throw new Exception($fullResponse['error']);
             }
-            if ($r->method === 'RunController::apiCreate') {
-                $points = array_key_exists('points', $req['gradeResult']) ? $req['gradeResult']['points'] : 1;
+            if ($r->method === '\\OmegaUp\\Controllers\\Run::apiCreate') {
+                $points = array_key_exists(
+                    'points',
+                    $req['gradeResult']
+                ) ? $req['gradeResult']['points'] : 1;
                 $verdict = $req['gradeResult']['verdict'];
-                Utils::gradeRun(null, $fullResponse['guid'], $points, $verdict);
+                \OmegaUp\Test\Utils::gradeRun(
+                    null,
+                    $fullResponse['guid'],
+                    $points,
+                    $verdict
+                );
             }
         }
     }
 
-    public function apicallTest(array $actions, array $expectedResults, string $queryPath): void {
+    public function apicallTest(
+        array $actions,
+        array $expectedResults,
+        string $queryPath
+    ): void {
         foreach ($actions as $action) {
             switch ($action['type']) {
                 case 'changeTime':
                     $time = strtotime($action['time']);
-                    Time::setTimeForTesting($time);
+                    \OmegaUp\Time::setTimeForTesting($time);
                     break;
 
                 case 'apicalls':
@@ -71,24 +79,28 @@ class BadgesTest extends BadgesTestCase {
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
                             case 'update_user_rank.py':
-                                Utils::RunUpdateUserRank();
+                                \OmegaUp\Test\Utils::runUpdateUserRank();
                                 break;
                             case 'aggregate_feedback.py':
-                                Utils::RunAggregateFeedback();
+                                \OmegaUp\Test\Utils::runAggregateFeedback();
                                 break;
                             default:
-                                throw new Exception("Script {$script} doesn't exist.");
+                                throw new Exception(
+                                    "Script {$script} doesn't exist."
+                                );
                         }
                     }
                     break;
                 default:
-                    throw new Exception("Action {$action['type']} doesn't exist");
+                    throw new Exception(
+                        "Action {$action['type']} doesn't exist"
+                    );
             }
         }
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = self::getSortedExpectedResults($expectedResults);
         $this->assertEquals($results, $expected);
-        Time::setTimeForTesting(null);
+        \OmegaUp\Time::setTimeForTesting(null);
     }
 
     public function phpUnitTest($badge): void {
@@ -100,23 +112,36 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function runBadgeTest($testPath, $queryPath, $badge): void {
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
         $content = json_decode(file_get_contents($testPath), true);
-        Utils::CleanupFilesAndDb();
+        \OmegaUp\Test\Utils::cleanupFilesAndDB();
         switch ($content['testType']) {
             case 'apicall':
-                self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
+                self::apicallTest(
+                    $content['actions'],
+                    $content['expectedResults'],
+                    $queryPath
+                );
                 break;
             case 'phpunit':
                 self::phpUnitTest($badge);
                 break;
             default:
-                throw new Exception("Test type {$content['testType']} doesn't exist");
+                throw new Exception(
+                    "Test type {$content['testType']} doesn't exist"
+                );
         }
     }
 
     public function testAllBadges() {
-        $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
+        $aliases = array_diff(
+            scandir(
+                static::OMEGAUP_BADGES_ROOT
+            ),
+            ['..', '.', 'default_icon.svg']
+        );
         foreach ($aliases as $alias) {
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
 
@@ -124,7 +149,7 @@ class BadgesTest extends BadgesTestCase {
                 continue;
             }
 
-            if (!Validators::isValidAlias($alias)) {
+            if (!\OmegaUp\Validators::isValidAlias($alias)) {
                 throw new Exception('The alias for this badge is invalid.');
             }
 
@@ -182,7 +207,11 @@ class BadgesTest extends BadgesTestCase {
         $results = [];
         try {
             mkdir($newBadgePath);
-            $results = BadgeController::apiList(new Request([]));
+            $results = \OmegaUp\Controllers\Badge::apiList(
+                new \OmegaUp\Request(
+                    []
+                )
+            );
         } finally {
             rmdir($newBadgePath);
         }
@@ -194,18 +223,22 @@ class BadgesTest extends BadgesTestCase {
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
-        $userOne = UserFactory::createUser();
-        $userTwo = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($userOne);
-        ProblemsFactory::createProblemWithAuthor($userTwo);
-        ContestsFactory::createContest(new ContestParams(['contestDirector' => $userTwo]));
+        ['user' => $userOne, 'identity' => $identityOne] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityOne);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityTwo);
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['contestDirector' => $identityTwo]
+            )
+        );
         $expectedUserOneResults = ['problemSetter'];
         $expectedUserTwoResults = ['contestManager', 'problemSetter'];
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
         {
-            $login = self::login($userOne);
+            $login = self::login($identityOne);
             // Fetch badges through apiMyList
-            $userOneBadges = BadgeController::apiMyList(new Request([
+            $userOneBadges = \OmegaUp\Controllers\Badge::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
@@ -214,11 +247,16 @@ class BadgesTest extends BadgesTestCase {
                 count(array_intersect($expectedUserOneResults, $results)),
                 count($expectedUserOneResults)
             );
-            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+            $this->assertFalse(
+                in_array(
+                    'contestManager',
+                    $expectedUserOneResults
+                )
+            );
 
             // Fetch badges through apiUserList
-            $userTwoBadges = BadgeController::apiUserList(new Request([
-                'target_username' => $userTwo->username,
+            $userTwoBadges = \OmegaUp\Controllers\Badge::apiUserList(new \OmegaUp\Request([
+                'target_username' => $identityTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
             $this->assertEquals(
@@ -227,24 +265,33 @@ class BadgesTest extends BadgesTestCase {
             );
 
             // Now check if notifications have been created for both users
-            $userOneNotifications = NotificationController::apiMyList(new Request([
+            $userOneNotifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
-            $results = self::getBadgesFromNotificationContents($userOneNotifications['notifications']);
+            $results = self::getBadgesFromNotificationContents(
+                $userOneNotifications['notifications']
+            );
             $this->assertEquals(
                 count(array_intersect($expectedUserOneResults, $results)),
                 count($expectedUserOneResults)
             );
-            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+            $this->assertFalse(
+                in_array(
+                    'contestManager',
+                    $expectedUserOneResults
+                )
+            );
         }
         {
-            $login = self::login($userTwo);
-            $userTwoNotifications = NotificationController::apiMyList(new Request([
+            $login = self::login($identityTwo);
+            $userTwoNotifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
-            $results = self::getBadgesFromNotificationContents($userTwoNotifications['notifications']);
+            $results = self::getBadgesFromNotificationContents(
+                $userTwoNotifications['notifications']
+            );
             $this->assertEquals(
                 count(array_intersect($expectedUserTwoResults, $results)),
                 count($expectedUserTwoResults)
@@ -253,14 +300,14 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testGetAssignationTime() {
-        $user = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
-        $previousTime = Time::get();
-        Utils::RunAssignBadges();
+        $previousTime = \OmegaUp\Time::get();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
-        $login = self::login($user);
-        $problemSetterResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+        $login = self::login($identity);
+        $problemSetterResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
             'badge_alias' => 'problemSetter',
@@ -270,11 +317,11 @@ class BadgesTest extends BadgesTestCase {
             $problemSetterResult['assignation_time'],
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
-                $this->lessThanOrEqual(Time::get())
+                $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
 
-        $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+        $contestManagerResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
             'badge_alias' => 'contestManager',
@@ -285,18 +332,18 @@ class BadgesTest extends BadgesTestCase {
     public function testBadgeDetails() {
         // Creates one owner for ContestManager Badge and no owner for
         // ContestManager, then checks badge details results.
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($user);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
-        $previousTime = Time::get();
-        Utils::RunAssignBadges();
+        $previousTime = \OmegaUp\Time::get();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
         // In total they must exist 4 users: admintest, test,
         // the user created by createProblemWithAuthor and $user
 
-        $details = BadgeController::apiBadgeDetails(new Request([
+        $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'problemSetter',
         ]));
         $this->assertNotNull($details['first_assignation']);
@@ -304,12 +351,12 @@ class BadgesTest extends BadgesTestCase {
             $details['first_assignation'],
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
-                $this->lessThanOrEqual(Time::get())
+                $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
         $this->assertEquals(25, $details['owners_percentage']);
 
-        $details = BadgeController::apiBadgeDetails(new Request([
+        $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
         $this->assertEquals(0, $details['owners_percentage']);
@@ -318,11 +365,11 @@ class BadgesTest extends BadgesTestCase {
 
     public function testBadgeDetailsException() {
         try {
-            BadgeController::apiBadgeDetails(new Request([
+            \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
                 'badge_alias' => 'esteBadgeNoExiste',
             ]));
             $this->fail('Should have thrown a NotFoundException');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'badgeNotExist');
         }
     }

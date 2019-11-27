@@ -2,19 +2,23 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $r = new Request($_REQUEST);
+    $r = new \OmegaUp\Request($_REQUEST);
     $r->ensureBool('is_practice', false);
 
-    $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');
-    $shouldShowIntro = (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true')
-        && ContestController::shouldShowIntro($r, $contest);
-    $result = ContestController::getContestDetailsForSmarty(
+    $contest = \OmegaUp\Controllers\Contest::validateContest(
+        $_REQUEST['contest_alias'] ?? ''
+    );
+    $shouldShowIntro = (!isset(
+        $r['is_practice']
+    ) || $r['is_practice'] !== 'true')
+        && \OmegaUp\Controllers\Contest::shouldShowIntro($r, $contest);
+    $result = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
         $r,
         $contest,
         $shouldShowIntro
     );
 } catch (Exception $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($result as $key => $value) {

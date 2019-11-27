@@ -9,7 +9,7 @@
           "password": "testtesttest",
           "requests": [
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
@@ -17,7 +17,7 @@
               }
             },
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
@@ -31,7 +31,7 @@
           "password": "test_user_0",
           "requests": [
             {
-              "api": "ContestController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Contest::apiCreate",
               "params": {
                 "visibility": 1,
                 "title": "Prueba",
@@ -52,7 +52,7 @@
               }
             },
             {
-              "api": "ContestController::apiCreateVirtual",
+              "api": "\\OmegaUp\\Controllers\\Contest::apiCreateVirtual",
               "params": {
                 "alias": "prueba",
                 "start_time": "1560958990"

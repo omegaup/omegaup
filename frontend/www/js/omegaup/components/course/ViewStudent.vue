@@ -61,7 +61,7 @@
               </thead>
               <tbody>
                 <tr v-for="run in selectedProblem.runs">
-                  <td>{{ formatDateTime(run.time) }}</td>
+                  <td>{{ UI.formatDateTime(run.time) }}</td>
                   <td>{{ run.verdict }}</td>
                   <td class="numeric">{{ 100 * run.score }}</td>
                 </tr>
@@ -74,86 +74,103 @@
   </div><!-- panel -->
 </template>
 
-<script>
-import UI from '../../ui.js';
-
-export default {
-  props: {
-    T: Object,
-    assignments: Array,
-    course: Object,
-    initialStudent: Object,
-    problems: Array,
-    students: Array,
-  },
-  data: function() {
-    return {
-      selectedAssignment: null,
-      selectedProblem: null,
-      selectedStudent: this.initialStudent,
-    };
-  },
-  methods: {
-    bestRun: function(problem) {
-      var best = null;
-      for (let run of problem.runs) {
-        if (!best || best.score < run.score ||
-            best.score == run.score && best.penalty > run.penalty) {
-          best = run;
-        }
-      }
-      return best;
-    },
-    bestRunSource: function(problem) {
-      let best = this.bestRun(problem);
-      return (best && best.source) || '';
-    },
-    bestScore: function(problem) {
-      let best = this.bestRun(problem);
-      return (best && best.score) || 0.0;
-    },
-    formatDateTime: function(date) { return UI.formatDateTime(date);},
-    score: function(student, assignment) {
-      let score = student.progress[assignment.alias] || '0';
-      return parseFloat(score).toPrecision(2);
-    },
-  },
-  computed: {
-    courseUrl: function() { return '/course/' + this.course.alias + '/';},
-  },
-  mounted: function() {
-    let self = this;
-    window.addEventListener('popstate', function(ev) {
-      self.selectedStudent =
-          (ev.state && ev.state.student) || self.initialStudent;
-    });
-  },
-  watch: {
-    selectedStudent: function(student, oldStudent) {
-      this.$emit('update', this.selectedStudent, this.selectedAssignment);
-      if (student && oldStudent && student.username == oldStudent.username) {
-        return;
-      }
-      window.history.pushState({student: student}, document.title,
-                               '/course/' + this.course.alias + '/student/' +
-                                   student.username + '/');
-    },
-    selectedAssignment: function(assignment) {
-      this.$emit('update', this.selectedStudent, this.selectedAssignment);
-    },
-    problems: function(problems) {
-      if (problems.length == 0) {
-        this.selectedProblem = null;
-        return;
-      }
-      this.selectedProblem = problems[0];
-    },
-  },
-};
-</script>
-
 <style>
 .omegaup-course-viewstudent p.assignment-description {
   padding: 1em;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+
+@Component
+export default class CourseViewStudent extends Vue {
+  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() course!: omegaup.Course;
+  @Prop() initialStudent!: omegaup.CourseStudent;
+  @Prop() problems!: omegaup.CourseProblem[];
+  @Prop() students!: omegaup.CourseStudent[];
+
+  T = T;
+  UI = UI;
+  selectedAssignment: Partial<omegaup.Assignment> = {};
+  selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
+  selectedStudent: Partial<omegaup.CourseStudent> = this.initialStudent || {};
+
+  data(): { [name: string]: any } {
+    return {
+      selectedProblem: undefined,
+    };
+  }
+
+  mounted(): void {
+    let self = this;
+    window.addEventListener('popstate', function(ev: PopStateEvent): void {
+      self.selectedStudent =
+        (ev.state && ev.state.student) || self.initialStudent;
+    });
+  }
+
+  bestRun(problem: omegaup.CourseProblem): omegaup.CourseProblemRun | null {
+    let best = null;
+    for (let run of problem.runs) {
+      if (
+        !best ||
+        best.score < run.score ||
+        (best.score == run.score && best.penalty > run.penalty)
+      ) {
+        best = run;
+      }
+    }
+    return best;
+  }
+
+  bestRunSource(problem: omegaup.CourseProblem): string {
+    const best = this.bestRun(problem);
+    return (best && best.source) || '';
+  }
+
+  bestScore(problem: omegaup.CourseProblem): number {
+    const best = this.bestRun(problem);
+    return (best && best.score) || 0.0;
+  }
+
+  get courseUrl(): string {
+    return `/course/${this.course.alias}/`;
+  }
+
+  @Watch('selectedStudent')
+  onSelectedStudentChange(
+    newVal: omegaup.CourseStudent,
+    oldVal: omegaup.CourseStudent,
+  ) {
+    this.$emit('update', this.selectedStudent, this.selectedAssignment);
+    if (newVal && oldVal && newVal.username == oldVal.username) {
+      return;
+    }
+    window.history.pushState(
+      { student: newVal },
+      document.title,
+      `/course/${this.course.alias}/student/${newVal.username}/`,
+    );
+  }
+
+  @Watch('selectedAssignment')
+  onSelectedAssignmentChange(newVal: omegaup.Assignment) {
+    this.$emit('update', this.selectedStudent, this.selectedAssignment);
+  }
+
+  @Watch('problems')
+  onProblemsChange(newVal: omegaup.CourseProblem[]) {
+    if (newVal.length === 0) {
+      this.selectedProblem = undefined;
+      return;
+    }
+    this.selectedProblem = newVal[0];
+  }
+}
+
+</script>

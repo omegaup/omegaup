@@ -42,54 +42,48 @@
           <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'"><button class="btn btn-primary"
                   v-if="canChooseCoder &amp;&amp; !coderIsSelected"
                   v-on:click=
-                  "onSelectCoder(coder.username)">{{T.coderOfTheMonthChooseAsCoder}}</button></td>
+                  "$emit('select-coder', coder.username)">{{T.coderOfTheMonthChooseAsCoder}}</button></td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
 
-export default {
-  props: {
-    codersOfCurrentMonth: Array,
-    codersOfPreviousMonth: Array,
-    candidatesToCoderOfTheMonth: Array,
-    canChooseCoder: Boolean,
-    coderIsSelected: Boolean,
-    isMentor: Boolean,
-  },
-  computed: {
-    visibleCoders: function() {
-      switch (this.selectedTab) {
-        case 'codersOfTheMonth':
-        default:
-          return this.codersOfCurrentMonth;
-        case 'codersOfPreviousMonth':
-          return this.codersOfPreviousMonth;
-        case 'candidatesToCoderOfTheMonth':
-          return this.candidatesToCoderOfTheMonth;
-      }
-    },
-  },
-  data: function() {
-    return {
-      T: T,
-      selectedTab: 'codersOfTheMonth',
-    };
-  },
-  methods: {
-    onSelectCoder: function(coderUsername) {
-      this.$emit('select-coder', coderUsername);
-    },
-  },
+@Component({
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': country_Flag,
+  },
+})
+export default class CoderOfTheMonth extends Vue {
+  @Prop() codersOfCurrentMonth!: omegaup.CoderOfTheMonth[];
+  @Prop() codersOfPreviousMonth!: omegaup.CoderOfTheMonth[];
+  @Prop() candidatesToCoderOfTheMonth!: omegaup.CoderOfTheMonth[];
+  @Prop() canChooseCoder!: boolean;
+  @Prop() coderIsSelected!: boolean;
+  @Prop() isMentor!: boolean;
+
+  T = T;
+  selectedTab = 'codersOfTheMonth';
+
+  get visibleCoders(): omegaup.CoderOfTheMonth[] {
+    switch (this.selectedTab) {
+      case 'codersOfTheMonth':
+      default:
+        return this.codersOfCurrentMonth;
+      case 'codersOfPreviousMonth':
+        return this.codersOfPreviousMonth;
+      case 'candidatesToCoderOfTheMonth':
+        return this.candidatesToCoderOfTheMonth;
+    }
   }
-};
+}
+
 </script>

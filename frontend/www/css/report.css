@@ -1,11 +1,4 @@
 @media all {
-	body {
-		font-size: 10pt;
-		font-family: "Arial Narrow", sans-serif;
-		margin: 0;
-		padding: 0;
-	}
-
 	div.problem {
 		page-break-before: always;
 	}
@@ -106,9 +99,6 @@
 	figure {
 		text-align: center;
 		page-break-inside: avoid;
-	}
-	hr {
-		display: none;
 	}
 	div.libinteractive-download {
 		display: none;

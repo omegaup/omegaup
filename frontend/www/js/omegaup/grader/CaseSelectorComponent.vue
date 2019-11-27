@@ -77,12 +77,18 @@ export default {
   },
   computed: {
     summary: function() {
-      if (this.store.state.dirty || !this.store.state.results ||
-          !this.store.state.results.verdict) {
+      if (
+        this.store.state.dirty ||
+        !this.store.state.results ||
+        !this.store.state.results.verdict
+      ) {
         return '…';
       }
-      return (this.store.state.results.verdict + ' ' +
-              this.score(this.store.state.results));
+      return (
+        this.store.state.results.verdict +
+        ' ' +
+        this.score(this.store.state.results)
+      );
     },
     groups: function() {
       const flatCases = Util.vuexGet(this.store, this.storeMapping.cases);
@@ -120,7 +126,9 @@ export default {
       return result;
     },
     currentCase: {
-      get() { return Util.vuexGet(this.store, this.storeMapping.currentCase);},
+      get() {
+        return Util.vuexGet(this.store, this.storeMapping.currentCase);
+      },
       set(value) {
         Util.vuexSet(this.store, this.storeMapping.currentCase, value);
       },
@@ -175,15 +183,20 @@ export default {
     },
     score: function(result) {
       if (!result) return '…';
-      return (this.formatNumber(result.contest_score) + '/' +
-              this.formatNumber(result.max_score));
+      return (
+        this.formatNumber(result.contest_score) +
+        '/' +
+        this.formatNumber(result.max_score)
+      );
     },
     formatNumber: function(value) {
       let str = value.toFixed(2);
       if (str.endsWith('.00')) return str.substring(0, str.length - 3);
       return str;
     },
-    selectCase: function(name) { this.currentCase = name;},
+    selectCase: function(name) {
+      this.currentCase = name;
+    },
     createCase: function() {
       if (!this.newCaseName) return;
       this.store.commit('createCase', {
@@ -194,9 +207,12 @@ export default {
       this.newCaseWeight = 1;
       this.newCaseName = '';
     },
-    removeCase: function(name) { this.store.commit('removeCase', name);},
+    removeCase: function(name) {
+      this.store.commit('removeCase', name);
+    },
   },
 };
+
 </script>
 
 <style scoped>

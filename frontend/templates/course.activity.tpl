@@ -1,7 +1,7 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#wordsActivityReport#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='schools' htmlTitle="{#wordsActivityReport#}" inline}
 
 <div id="course-activity"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/activity_feed.js"}"></script>
+{js_include entrypoint="activity_feed"}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

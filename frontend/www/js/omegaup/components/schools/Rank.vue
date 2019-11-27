@@ -32,22 +32,6 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import UI from '../../ui.js';
-import CountryFlag from '../CountryFlag.vue';
-
-export default {
-  props: {rank: Array, rowCount: Number},
-  computed:
-      {rankFiltered: function() { return this.rank.slice(0, this.rowCount);}},
-  data: function() { return {T: T, UI: UI};},
-  components: {
-    'omegaup-countryflag': CountryFlag,
-  },
-};
-</script>
-
 <style>
 .table-rank {
   width: 100%;
@@ -64,3 +48,30 @@ export default {
   width: 15%;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+import UI from '../../ui.js';
+import CountryFlag from '../CountryFlag.vue';
+
+@Component({
+  components: {
+    'omegaup-countryflag': CountryFlag,
+  },
+})
+export default class Rank extends Vue {
+  @Prop() rank!: omegaup.SchoolsRank[];
+  @Prop() rowCount!: number;
+
+  T = T;
+  UI = UI;
+
+  get rankFiltered() {
+    return this.rank.slice(0, this.rowCount);
+  }
+}
+
+</script>

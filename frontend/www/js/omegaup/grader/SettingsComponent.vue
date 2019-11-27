@@ -160,8 +160,12 @@ export default {
   },
   computed: {
     timeLimit: {
-      get() { return this.store.state.request.input.limits.TimeLimit;},
-      set(value) { this.store.commit('TimeLimit', Number.parseFloat(value));},
+      get() {
+        return this.store.state.request.input.limits.TimeLimit;
+      },
+      set(value) {
+        this.store.commit('TimeLimit', Number.parseFloat(value));
+      },
     },
     overallWallTimeLimit: {
       get() {
@@ -172,46 +176,79 @@ export default {
       },
     },
     extraWallTime: {
-      get() { return this.store.state.request.input.limits.ExtraWallTime;},
+      get() {
+        return this.store.state.request.input.limits.ExtraWallTime;
+      },
       set(value) {
         this.store.commit('ExtraWallTime', Number.parseFloat(value));
       },
     },
     memoryLimit: {
-      get() { return this.store.state.request.input.limits.MemoryLimit;},
-      set(value) { this.store.commit('MemoryLimit', Number.parseInt(value));},
+      get() {
+        return this.store.state.request.input.limits.MemoryLimit;
+      },
+      set(value) {
+        this.store.commit('MemoryLimit', Number.parseInt(value));
+      },
     },
     outputLimit: {
-      get() { return this.store.state.request.input.limits.OutputLimit;},
-      set(value) { this.store.commit('OutputLimit', Number.parseInt(value));},
+      get() {
+        return this.store.state.request.input.limits.OutputLimit;
+      },
+      set(value) {
+        this.store.commit('OutputLimit', Number.parseInt(value));
+      },
     },
     validator: {
-      get() { return this.store.state.request.input.validator.name},
-      set(value) { this.store.commit('Validator', value);},
+      get() {
+        return this.store.state.request.input.validator.name;
+      },
+      set(value) {
+        this.store.commit('Validator', value);
+      },
     },
     tolerance: {
-      get() { return this.store.state.request.input.validator.tolerance;},
-      set(value) { this.store.commit('Tolerance', value);},
+      get() {
+        return this.store.state.request.input.validator.tolerance;
+      },
+      set(value) {
+        this.store.commit('Tolerance', value);
+      },
     },
     validatorLanguage: {
       get() {
         return this.store.state.request.input.validator.custom_validator
-            .language;
+          .language;
       },
-      set(value) { this.store.commit('ValidatorLanguage', value);},
+      set(value) {
+        this.store.commit('ValidatorLanguage', value);
+      },
     },
     interactive: {
-      get() { return this.store.getters.isInteractive;},
-      set(value) { this.store.commit('Interactive', value);},
+      get() {
+        return this.store.getters.isInteractive;
+      },
+      set(value) {
+        this.store.commit('Interactive', value);
+      },
     },
     interactiveLanguage: {
-      get() { return this.store.state.request.input.interactive.language;},
-      set(value) { this.store.commit('InteractiveLanguage', value);},
+      get() {
+        return this.store.state.request.input.interactive.language;
+      },
+      set(value) {
+        this.store.commit('InteractiveLanguage', value);
+      },
     },
     interactiveModuleName: {
-      get() { return this.store.state.request.input.interactive.module_name;},
-      set(value) { this.store.commit('InteractiveModuleName', value);},
+      get() {
+        return this.store.state.request.input.interactive.module_name;
+      },
+      set(value) {
+        this.store.commit('InteractiveModuleName', value);
+      },
     },
   },
 };
+
 </script>

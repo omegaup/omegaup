@@ -16,8 +16,10 @@ omegaup.OmegaUp.on('ready', function() {
 
     var recaptchaResponse = null;
     if (payload.validateRecaptcha) {
-      if (typeof(grecaptcha) === 'undefined' ||
-          grecaptcha.getResponse().length == 0) {
+      if (
+        typeof grecaptcha === 'undefined' ||
+        grecaptcha.getResponse().length == 0
+      ) {
         omegaup.UI.error(omegaup.T.unableToVerifyCaptcha);
         return false;
       }
@@ -25,19 +27,19 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     omegaup.API.User.create({
-                      email: $('#reg_email').val(),
-                      username: $('#reg_username').val(),
-                      password: $('#reg_pass').val(),
-                      recaptcha: recaptchaResponse,
-                    })
-        .then(function(data) {
-          // registration callback
-          $('#user').val($('#reg_email').val());
-          $('#pass').val($('#reg_pass').val());
-          $('#login_form').trigger('submit');
-        })
-        .fail(omegaup.UI.apiError);
-    return false;  // Prevent form submission
+      email: $('#reg_email').val(),
+      username: $('#reg_username').val(),
+      password: $('#reg_pass').val(),
+      recaptcha: recaptchaResponse,
+    })
+      .then(function(data) {
+        // registration callback
+        $('#user').val($('#reg_email').val());
+        $('#pass').val($('#reg_pass').val());
+        $('#login_form').trigger('submit');
+      })
+      .fail(omegaup.UI.apiError);
+    return false; // Prevent form submission
   }
 
   $('#register-form').on('submit', registerAndLogin);
@@ -45,10 +47,13 @@ omegaup.OmegaUp.on('ready', function() {
 
 function signInCallback(googleUser) {
   // Only log in if the user actually clicked the sign-in button.
-  omegaup.API.Session.googleLogin(
-                         {storeToken: googleUser.getAuthResponse().id_token})
-      .then(function(data) { window.location.reload(); })
-      .fail(omegaup.UI.apiError);
+  omegaup.API.Session.googleLogin({
+    storeToken: googleUser.getAuthResponse().id_token,
+  })
+    .then(function(data) {
+      window.location.reload();
+    })
+    .fail(omegaup.UI.apiError);
 }
 
 function signInFailure(error) {
@@ -58,10 +63,10 @@ function signInFailure(error) {
 // https://developers.google.com/+/web/signin/server-side-flow
 function renderButton() {
   gapi.signin2.render('google-signin', {
-    'scope': 'email',
-    'theme': 'dark',
-    'longtitle': false,
-    'onsuccess': signInCallback,
-    'onfailure': signInFailure,
+    scope: 'email',
+    theme: 'dark',
+    longtitle: false,
+    onsuccess: signInCallback,
+    onfailure: signInFailure,
   });
 }

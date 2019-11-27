@@ -5,28 +5,33 @@
  * @author pablo
  */
 
-class CourseListTest extends OmegaupTestCase {
+class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp() {
         parent::setUp();
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
         );
         $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
-        $this->other_user = UserFactory::createUser();
+        ['user' => $this->other_user, 'identity' => $this->other_identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $this->other_user);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $this->other_identity
+        );
     }
 
     protected $admin_user;
     protected $course_user;
     protected $other_user;
+    protected $identity_user;
+    protected $other_identity;
     protected $course_alias;
 
     public function testGetCourseForAdminUser() {
         // Call the details API
         $adminLogin = self::login($this->admin_user);
-        $response = CourseController::apiListCourses(new Request([
+        $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
@@ -36,18 +41,17 @@ class CourseListTest extends OmegaupTestCase {
 
         $this->assertEquals(1, count($response['admin']));
         $course_array = $response['admin'][0];
-        Validators::validateNumber(
+        \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);
     }
 
     public function testGetCourseListForNormalUser() {
-        $otherUserLogin = self::login($this->other_user);
-        $response = CourseController::apiListCourses(new Request([
+        $otherUserLogin = self::login($this->other_identity);
+        $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $otherUserLogin->auth_token,
         ]));
 
@@ -57,10 +61,9 @@ class CourseListTest extends OmegaupTestCase {
 
         $this->assertEquals(1, count($response['student']));
         $course_array = $response['student'][0];
-        Validators::validateNumber(
+        \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);

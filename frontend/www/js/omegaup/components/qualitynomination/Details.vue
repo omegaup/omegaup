@@ -71,10 +71,10 @@
           </div>
           <div class="col-sm-8">
             <button class="btn btn-danger"
-                 v-bind:disabled="!rationale ? '' : disabled"
+                 v-bind:disabled="!rationale"
                  v-on:click="markResolution(true)">{{ T.wordsBanProblem }}</button> <button class=
                  "btn btn-success"
-                 v-bind:disabled="!rationale ? '' : disabled"
+                 v-bind:disabled="!rationale"
                  v-on:click="markResolution(false)">{{ T.wordsKeepProblem }}</button>
           </div>
         </div>
@@ -83,35 +83,48 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    contents: Object,
-    nomination: String,
-    nominator: {username: String, name: String},
-    author: {username: String, name: String},
-    problem: {alias: String, title: String},
-    qualitynomination_id: Number,
-    reviewer: Boolean,
-    votes: Array,
-    initialRationale: String,
-    disabled: String
-  },
-  data: function() { return {T: T, rationale: this.initialRationale};},
-  methods: {
-    userUrl: function(alias) { return '/profile/' + alias + '/';},
-    problemUrl: function(alias) { return '/arena/problem/' + alias + '/';},
-    markResolution: function(banProblem) {
-      this.$emit('mark-resolution', this, banProblem);
-    },
+interface QualityNominationContents {
+  original: string;
+  rationale: string;
+  reason: string;
+}
+
+@Component
+export default class QualityNominationDetails extends Vue {
+  @Prop() author!: omegaup.User;
+  @Prop() contents!: QualityNominationContents;
+  @Prop() initialRationale!: string;
+  @Prop() nomination!: string;
+  @Prop() nominator!: omegaup.User;
+  @Prop() problem!: omegaup.Problem;
+  @Prop() qualitynomination_id!: number;
+  @Prop() reviewer!: boolean;
+  @Prop() votes!: omegaup.NominationVote[];
+
+  T = T;
+  rationale = this.initialRationale;
+
+  userUrl(alias: string): string {
+    return `/profile/${alias}/`;
   }
-};
+
+  problemUrl(alias: string): string {
+    return `/arena/problem/${alias}/`;
+  }
+
+  markResolution(banProblem: boolean): void {
+    this.$emit('mark-resolution', this, banProblem);
+  }
+}
+
 </script>
 
 <style>
-
 textarea {
   margin: 0 0 10px;
 }

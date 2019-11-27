@@ -2,7 +2,7 @@
   <div class="omegaup-course-addstudent panel">
     <div class="panel-body">
       <form class="form"
-            v-on:submit.prevent="onSubmit">
+            v-on:submit.prevent="$emit('add-student', {participant, participants})">
         <div class="form-group">
           <label>{{ T.wordsStudent }}</label> <span aria-hidden="true"
                class="glyphicon glyphicon-info-sign"
@@ -48,7 +48,7 @@
             </td>
             <td><button class="close"
                     type="button"
-                    v-on:click="onRemove(student)">×</button></td>
+                    v-on:click="$emit('remove-student', student)">×</button></td>
           </tr>
         </tbody>
       </table>
@@ -56,40 +56,37 @@
   </div>
 </template>
 
-<script>
-import UI from '../../ui.js';
-import Autocomplete from '../Autocomplete.vue';
-
-export default {
-  props: {
-    T: Object,
-    courseAlias: String,
-    students: Array,
-  },
-  data: function() {
-    return {
-      studentUsername: '',
-      participant: '',
-      participants: '',
-      UI: UI,
-    };
-  },
-  methods: {
-    onSubmit: function() { this.$emit('add-student', this);},
-    onRemove: function(student) { this.$emit('remove-student', student);},
-    studentProgressUrl: function(student) {
-      return '/course/' + this.courseAlias + '/student/' + student.username +
-             '/';
-    },
-  },
-  components: {
-    'omegaup-autocomplete': Autocomplete,
-  },
-};
-</script>
-
 <style>
 .omegaup-course-addstudent th.align-right {
   text-align: right;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
+import Autocomplete from '../Autocomplete.vue';
+
+@Component({
+  components: {
+    'omegaup-autocomplete': Autocomplete,
+  },
+})
+export default class CourseAddStudents extends Vue {
+  @Prop() courseAlias!: string;
+  @Prop() students!: omegaup.CourseStudent[];
+
+  T = T;
+  UI = UI;
+  studentUsername = '';
+  participant = '';
+  participants = '';
+
+  studentProgressUrl(student: omegaup.CourseStudent): string {
+    return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+}
+
+</script>

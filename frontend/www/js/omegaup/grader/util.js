@@ -14,7 +14,7 @@ export function vuexSet(store, name, value) {
 }
 
 export function parseDuration(value) {
-  if (typeof(value) === 'number') {
+  if (typeof value === 'number') {
     return value;
   }
 
@@ -23,8 +23,10 @@ export function parseDuration(value) {
     let scale = 1.0;
     if (chunk.indexOf('ns') === chunk.length - 2) {
       scale = 1e-9;
-    } else if (chunk.indexOf('us') === chunk.length - 2 ||
-               chunk.indexOf('µs') === chunk.length - 2) {
+    } else if (
+      chunk.indexOf('us') === chunk.length - 2 ||
+      chunk.indexOf('µs') === chunk.length - 2
+    ) {
       scale = 1e-6;
     } else if (chunk.indexOf('ms') === chunk.length - 2) {
       scale = 1e-3;

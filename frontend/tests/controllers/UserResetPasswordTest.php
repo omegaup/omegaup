@@ -5,56 +5,56 @@
  *
  * @author joemmanuel
  */
-class UserResetPasswordTest extends OmegaupTestCase {
+class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Reset my password
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $r = new Request([
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
-            'old_password' => $user->password,
+            'username' => $identity->username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'old_password' => $identity->password,
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
 
         // Try to login with old password, should fail
         try {
-            self::login($user);
+            self::login($identity);
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
         }
 
         // Set new password and try again, should succeed
-        $user->password = $r['password'];
-        self::login($user);
+        $identity->password = $r['password'];
+        self::login($identity);
     }
 
     /**
      * Reset my password
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $r = new Request([
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
+            'username' => $identity->username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'old_password' => 'bad old password',
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
     }
 }

@@ -1,12 +1,22 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+namespace OmegaUp;
 
-UITools::redirectToLoginIfNotLoggedIn();
+require_once('../../server/bootstrap.php');
 
-if (!Authorization::isSupportTeamMember($session['identity'])) {
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+
+[
+    'identity' => $identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+if (
+    is_null($identity) ||
+    !\OmegaUp\Authorization::isSupportTeamMember($identity)
+) {
     header('HTTP/1.1 404 Not found');
     die();
 }
 
-$smarty->display('../templates/admin.support.tpl');
+\OmegaUp\UITools::getSmartyInstance()->display(
+    '../templates/admin.support.tpl'
+);

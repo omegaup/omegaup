@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium course tests.'''
 
@@ -59,6 +60,10 @@ def test_user_ranking_course(driver):
                 (By.XPATH,
                  '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
                  assignment_alias))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
 
         run_user = driver.browser.find_element_by_xpath(
             '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
@@ -215,8 +220,9 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector('textarea').send_keys(
         'homework description')
 
-    new_assignment_form.find_element_by_css_selector(
-        'button[type=submit]').click()
+    with util.dismiss_status(driver):
+        new_assignment_form.find_element_by_css_selector(
+            'button[type=submit]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))

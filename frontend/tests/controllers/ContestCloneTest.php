@@ -1,44 +1,47 @@
 <?php
 
-class ContestCloneTest extends OmegaupTestCase {
+class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create clone of a contest
      */
     public function testCreateContestClone() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add 3 problems to the contest
         $numberOfProblems = 3;
 
         for ($i = 0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest($problemData[$i], $contestData);
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData[$i],
+                $contestData
+            );
         }
 
-        $contestAlias = Utils::CreateRandomString();
+        $contestAlias = \OmegaUp\Test\Utils::createRandomString();
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'title' => Utils::CreateRandomString(),
-            'description' => Utils::CreateRandomString(),
+            'title' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $contestAlias,
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
 
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
         // Call API
-        $clonedContestProblemsResponse = ContestController::apiProblems(new Request([
+        $clonedContestProblemsResponse = \OmegaUp\Controllers\Contest::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestAlias,
         ]));
 
-        $originalContestProblemsResponse = ContestController::apiProblems(new Request([
+        $originalContestProblemsResponse = \OmegaUp\Controllers\Contest::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -53,64 +56,70 @@ class ContestCloneTest extends OmegaupTestCase {
     /**
      * Creating a clone with the original contest alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
-        $contestAlias = Utils::CreateRandomString();
+        $contestAlias = \OmegaUp\Test\Utils::createRandomString();
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'title' => Utils::CreateRandomString(),
-            'description' => Utils::CreateRandomString(),
+            'title' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $contestData['request']['alias'],
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 
     /**
      * Creating a clone of a private contest without its access
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create new user
-        $user = UserFactory::createUser();
-        $login = UserController::apiLogin(new Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]));
 
         // Clone the contest
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
             'auth_token' => $login['auth_token'],
             'contest_alias' => $contestData['request']['alias'],
-            'title' => Utils::CreateRandomString(),
-            'description' => Utils::CreateRandomString(),
-            'alias' => Utils::CreateRandomString(),
+            'title' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 }

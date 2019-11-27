@@ -11,7 +11,7 @@
   }
 
   & .active {
-    a {
+    > a {
       background-color: $header-active-color;
     }
   }
