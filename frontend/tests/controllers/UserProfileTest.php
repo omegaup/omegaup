@@ -188,12 +188,29 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
-                    'auth_token' => $login->auth_token,
-                ]
+                'auth_token' => $login->auth_token,
+            ]
         ));
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
         $this->assertEquals(1, count($response['contests']));
+        $alias = $contests[0]['contest']->alias;
+        $this->assertEquals(
+            $alias,
+            $response['contests'][$alias]['data']['alias']
+        );
+        $this->assertArrayHasKey(
+            'title',
+            $response['contests'][$alias]['data']
+        );
+        $this->assertArrayNotHasKey(
+            'contest_id',
+            $response['contests'][$alias]['data']
+        );
+        $this->assertArrayNotHasKey(
+            'scoreboard_url_admin',
+            $response['contests'][$alias]['data']
+        );
     }
 
     /*

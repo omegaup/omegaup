@@ -40,7 +40,7 @@
           <tbody>
             <tr v-for="contest in contests">
               <td>
-                <a v-bind:href="`/arena/${contest.data.alias}`">{{ contest.data.title }}</a>
+                <a v-bind:href="`/arena/${contest.data.alias}/`">{{ contest.data.title }}</a>
               </td>
               <td><strong>{{ contest.place }}</strong></td>
             </tr>
