@@ -348,6 +348,8 @@ export class Arena {
       attached: false,
     };
 
+    window.history.replaceState({}, '', '#' + self.activeTab);
+
     // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
 
