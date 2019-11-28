@@ -1562,9 +1562,6 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiContestStats(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        $response = [];
-        $response['contests'] = [];
-
         $identity = self::resolveTargetIdentity($r);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -1587,27 +1584,27 @@ class User extends \OmegaUp\Controllers\Controller {
                 ])
             );
 
+            // Avoid divulging the scoreboard URL unnecessarily.
+            unset($contest['scoreboard_url_admin']);
+
+            $contests[$contest['alias']] = [
+                'data' => $contest,
+                'place' => null,
+            ];
+
             // Grab the place of the current identity in the given contest
-            $contests[$contest['alias']]['place'] = null;
             foreach ($scoreboardResponse['ranking'] as $identityData) {
                 if ($identityData['username'] == $identity->username) {
                     $contests[$contest['alias']]['place'] = $identityData['place'];
                     break;
                 }
             }
-            $contests[$contest['alias']]['data'] = $contest;
-            foreach ($contest as $key => $item) {
-                if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
-                    $contests[$contest['alias']][$key] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                        $item
-                    );
-                }
-            }
         }
 
-        $response['contests'] = $contests;
-        $response['status'] = 'ok';
-        return $response;
+        return [
+            'contests' => $contests,
+            'status' => 'ok',
+        ];
     }
 
     /**

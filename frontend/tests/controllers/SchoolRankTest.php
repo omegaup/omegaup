@@ -154,4 +154,97 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($originalResponse, $cachedResponse);
         $this->assertNotEquals($response, $cachedResponse);
     }
+
+    /**
+     * Tests School::apiUsers() in order to retrieve all
+     * users from school with their number of solved problems,
+     * created problems and organized contests
+     */
+    public function testSchoolApiUsers() {
+        /** Creates 3 users:
+         * user1 solves 0 problems, organizes 0 contests and creates 2 problems
+         * user2 solves 2 problems, organizes 0 contest and creates 1 problems
+         * user3 solves 1 problem, organizes 1 contests and creates 0 problem
+         */
+        $schoolData = SchoolsFactory::createSchool();
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 2; $i++) {
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        // User3 automatically organizes a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $identities[] = $contestData['director'];
+
+        SchoolsFactory::addUserToSchool($schoolData, $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolData, $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolData, $identities[2]);
+
+        // User 1
+        $login = self::login($identities[0]);
+        $problems = [];
+        for ($i = 0; $i < 2; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identities[0],
+                $login
+            );
+        }
+
+        // User 2
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($identities[1]);
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identities[1],
+            $login
+        );
+
+        // User 3
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $result = \OmegaUp\Controllers\School::apiUsers(new \OmegaUp\Request([
+            'school_id' => $schoolData['school']->school_id
+        ]));
+
+        $this->assertCount(3, $result['users']);
+
+        $this->assertEquals(
+            $identities[0]->username,
+            $result['users'][0]['username']
+        );
+        $this->assertEquals(0, $result['users'][0]['solved_problems']);
+        $this->assertEquals(0, $result['users'][0]['organized_contests']);
+        $this->assertEquals(2, $result['users'][0]['created_problems']);
+
+        $this->assertEquals(
+            $identities[1]->username,
+            $result['users'][1]['username']
+        );
+        $this->assertEquals(2, $result['users'][1]['solved_problems']);
+        $this->assertEquals(0, $result['users'][1]['organized_contests']);
+        $this->assertEquals(1, $result['users'][1]['created_problems']);
+
+        $this->assertEquals(
+            $identities[2]->username,
+            $result['users'][2]['username']
+        );
+        $this->assertEquals(1, $result['users'][2]['solved_problems']);
+        $this->assertEquals(1, $result['users'][2]['organized_contests']);
+        $this->assertEquals(0, $result['users'][2]['created_problems']);
+    }
 }
