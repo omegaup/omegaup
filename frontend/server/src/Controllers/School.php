@@ -55,7 +55,6 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        $template = 'school.profile.tpl';
         $smartyProperties = [
             'details' => [
                 'name' => strval($school->name),
@@ -87,7 +86,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => $smartyProperties,
-            'template' => $template,
+            'template' => 'school.profile.tpl',
         ];
     }
 
