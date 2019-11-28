@@ -803,7 +803,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $response['problem']['alias']
         );
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -835,7 +835,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                  */
                 foreach ($response['contents']['statements'] as $language => $_) {
                     $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
-                        $problem,
+                        $problem->alias,
                         'published',
                         $language
                     );

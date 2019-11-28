@@ -782,7 +782,6 @@
       <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
       <code>$problem-&gt;acl_id</code>
-      <code>$acl-&gt;owner_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>

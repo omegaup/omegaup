@@ -424,10 +424,34 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                (SELECT COUNT(1) AS total FROM Submissions s INNER JOIN Runs r ON s.current_run_id = r.run_id
-                 WHERE r.verdict NOT IN (\'CE\', \'JE\') AND s.problem_id = ? AND s.identity_id = ?) AS tried,
-                (SELECT COUNT(1) AS total FROM Submissions s INNER JOIN Runs r ON s.current_run_id = r.run_id
-                 WHERE r.verdict IN (\'AC\') AND s.problem_id = ? AND s.identity_id = ?) AS solved;
+                (
+                SELECT
+                    COUNT(1) AS total
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Runs r
+                ON
+                    s.current_run_id = r.run_id
+                WHERE
+                    r.verdict NOT IN (\'CE\', \'JE\')
+                    AND s.problem_id = ?
+                    AND s.identity_id = ?
+                ) AS tried,
+                (
+                SELECT
+                    COUNT(1) AS total
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Runs r
+                ON
+                    s.current_run_id = r.run_id
+                WHERE
+                    r.verdict IN (\'AC\')
+                    AND s.problem_id = ?
+                    AND s.identity_id = ?
+                ) AS solved;
         ';
 
         /** @var array{tried: int, solved: int} */
