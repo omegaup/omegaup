@@ -7,9 +7,9 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
     function (\OmegaUp\Request $r): array {
         return \OmegaUp\Controllers\User::getProfileDetailsForSmarty(
             $r,
-            /*$isProfileEdit=*/ false,
+            /*$isProfileEdit=*/ true,
             /*$isUserEmailEdit=*/ false,
-            /*$isResults=*/ true
+            /*$isResults=*/ false
         );
     }, /*$withStatusError=*/
     true

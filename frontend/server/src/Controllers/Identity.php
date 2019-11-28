@@ -494,26 +494,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get identity profile from cache
-     * Requires $r["identity"] to be an actual Identity
      *
-     * @param \OmegaUp\Request $r
-     * @param array $response
-     * @param \OmegaUp\Request $r
-     * @return type
+     * @return array{userinfo: array{birth_date: null|string, country: string, country_id: int|null, email: null|string, gender: null|string, graduation_date: null|string, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int, status?: string}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified: bool}}
      */
     public static function getProfile(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
         bool $omitRank
     ): array {
-        if (is_null($identity)) {
+        if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
-                'Identity'
+                'username'
             );
         }
-
+        /** @var array{userinfo: array{username: string, name: string, birth_date: string|null, gender: string|null, scholar_degree: string|null, preferred_language: string|null, is_private: bool, verified: bool, hide_problem_tags: bool, graduation_date: string|null, email: string|null, country: string, country_id: int|null, state: string|null, state_id: int|null, school: string|null, school_id: int|null, locale: string, gravatar_92: string}} */
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
@@ -533,7 +529,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         } else {
             $response['userinfo']['rankinfo'] =
                 \OmegaUp\Controllers\User::getRankByProblemsSolved(
-                    $r,
+                    $loggedIdentity,
                     '',
                     1,
                     100,
@@ -544,17 +540,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
         if (
-            !is_null($r->identity)
-            && (\OmegaUp\Authorization::isSystemAdmin($r->identity)
-                || $identity->identity_id == $r->identity->identity_id)
+            !is_null($loggedIdentity)
+            && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                || $identity->identity_id === $loggedIdentity->identity_id)
         ) {
             return $response;
         }
 
         // Mentors can see current coder of the month email.
         if (
-            !is_null($r->identity)
-            && \OmegaUp\Authorization::canViewEmail($r->identity)
+            !is_null($loggedIdentity)
+            && \OmegaUp\Authorization::canViewEmail($loggedIdentity)
             && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth(
                 $identity->username
             )

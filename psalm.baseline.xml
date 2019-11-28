@@ -421,9 +421,6 @@
     </MixedOperand>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>type</code>
-    </MismatchingDocblockReturnType>
     <MissingParamType occurrences="15">
       <code>$username</code>
       <code>$name</code>
@@ -480,8 +477,7 @@
       <code>$val</code>
       <code>$langWeight</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
-      <code>type</code>
+    <MixedInferredReturnType occurrences="1">
       <code>string</code>
     </MixedInferredReturnType>
     <MixedPropertyFetch occurrences="2">
@@ -1158,14 +1154,13 @@
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="6">
+    <InvalidReturnStatement occurrences="5">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="6">
-      <code>array{status: 'ok'}</code>
+    <InvalidReturnType occurrences="5">
       <code>response</code>
       <code>\OmegaUp\DAO\VO\Contests</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
@@ -1263,21 +1258,13 @@
       <code>$r2['contest_admin']</code>
       <code>$r2['contest_alias']</code>
     </MixedArrayAccess>
-    <MixedArrayAssignment occurrences="5">
-      <code>$response['userinfo'][$k]</code>
-      <code>$response['userinfo']['username']</code>
-      <code>$response['userinfo']['rankinfo']</code>
-      <code>$response['userinfo']['is_private']</code>
-      <code>$response['userinfo']['classname']</code>
-    </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="3">
-      <code>$response['userinfo'][$k]</code>
+    <MixedArrayOffset occurrences="2">
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="29">
+    <MixedAssignment occurrences="28">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1289,7 +1276,6 @@
       <code>$addUserRequest['auth_token']</code>
       <code>$addUserRequest['contest_alias']</code>
       <code>$response['userinfo']['locale']</code>
-      <code>$v</code>
       <code>$response</code>
       <code>$contestsParticipated</code>
       <code>$contest</code>
@@ -1308,9 +1294,7 @@
       <code>$r2</code>
       <code>$response['contest_admin'][]</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
+    <MixedInferredReturnType occurrences="1"/>
     <MixedPropertyFetch occurrences="10">
       <code>$user-&gt;main_identity_id</code>
       <code>$identity-&gt;username</code>
@@ -1360,15 +1344,7 @@
       <code>$identity-&gt;username</code>
       <code>$user-&gt;main_identity_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="9">
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
+    <UndefinedDocblockClass occurrences="1">
       <code>response</code>
     </UndefinedDocblockClass>
     <UndefinedMethod occurrences="2">
@@ -2226,14 +2202,6 @@
       <code>$show_intro</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/interviews/results.php">
-    <MixedArgument occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArgument>
-    <MixedArrayAssignment occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArrayAssignment>
-  </file>
   <file src="frontend/www/libinteractive/index.php">
     <MissingParamType occurrences="1">
       <code>$http_accept_language</code>
@@ -2291,22 +2259,6 @@
       <code>$systemGroups</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/profile.php">
-    <MixedArgument occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArgument>
-    <MixedArrayAssignment occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArrayAssignment>
-  </file>
-  <file src="frontend/www/profileedit.php">
-    <MixedArgument occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArgument>
-    <MixedArrayAssignment occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArrayAssignment>
-  </file>
   <file src="frontend/www/rank.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$key</code>
@@ -2322,13 +2274,5 @@
     <MixedAssignment occurrences="1">
       <code>$value</code>
     </MixedAssignment>
-  </file>
-  <file src="frontend/www/useremailedit.php">
-    <MixedArgument occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArgument>
-    <MixedArrayAssignment occurrences="1">
-      <code>$response['userinfo']['graduation_date']</code>
-    </MixedArrayAssignment>
   </file>
 </files>
