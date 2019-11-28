@@ -528,12 +528,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $response['userinfo']['rankinfo'] = [];
         } else {
             $response['userinfo']['rankinfo'] =
-                \OmegaUp\Controllers\User::getRankByProblemsSolved(
-                    $loggedIdentity,
+                \OmegaUp\Controllers\User::getFullRankByProblemsSolved(
+                    $identity,
                     '',
                     1,
-                    100,
-                    $identity
+                    100
                 );
         }
 

@@ -2,15 +2,11 @@
 namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
         return \OmegaUp\Controllers\User::getProfileDetailsForSmarty(
-            $r,
-            /*$isProfileEdit=*/ true,
-            /*$isUserEmailEdit=*/ false,
-            /*$isResults=*/ false
+            $r
         );
-    }, /*$withStatusError=*/
-    true
+    },
+    /*$withStatusError=*/ true
 );

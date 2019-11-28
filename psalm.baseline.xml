@@ -1165,7 +1165,6 @@
       <code>\OmegaUp\DAO\VO\Contests</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
-      <code>string</code>
     </InvalidReturnType>
     <InvalidScalarArgument occurrences="3">
       <code>$i</code>
@@ -1217,7 +1216,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="22">
+    <MixedArgument occurrences="19">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1237,9 +1236,6 @@
       <code>$r['password']</code>
       <code>$value</code>
       <code>$value</code>
-      <code>$r['filter'] ?? ''</code>
-      <code>$r['offset'] ?? 1</code>
-      <code>$r['rowcount'] ?? 100</code>
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
@@ -1264,7 +1260,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="28">
+    <MixedAssignment occurrences="26">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1292,7 +1288,6 @@
       <code>$response</code>
       <code>$r2['auth_token']</code>
       <code>$r2</code>
-      <code>$response['contest_admin'][]</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="1"/>
     <MixedPropertyFetch occurrences="10">
@@ -1307,9 +1302,7 @@
       <code>$r['group']-&gt;group_id</code>
       <code>$r['group']-&gt;group_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1">
-      <code>$response</code>
-    </MixedReturnStatement>
+    <MixedReturnStatement occurrences="1"/>
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
