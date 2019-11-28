@@ -2371,7 +2371,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $problem['alias'],
                     $problem['commit'],
                     \OmegaUp\Controllers\Identity::getPreferredLanguage($r)
-                );
+                )['language'];
                 $nominationStatus['can_nominate_problem'] = !is_null($r->user);
             }
             $problem['quality_payload'] = $nominationStatus;

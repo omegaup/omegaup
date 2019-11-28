@@ -1808,7 +1808,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) {
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
             if (is_null($acl->owner_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException();
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
             $problemsetter = \OmegaUp\DAO\Identities::findByUserId(
                 $acl->owner_id
