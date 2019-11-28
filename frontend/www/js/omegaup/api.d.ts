@@ -130,6 +130,11 @@ declare namespace omegaup {
     place: number;
   }
 
+  export interface Country {
+    country_id?: string;
+    country_name: string;
+  }
+
   export interface Course {
     alias: string;
     assignments: Assignment[];

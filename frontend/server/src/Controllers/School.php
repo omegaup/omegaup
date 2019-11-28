@@ -45,7 +45,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the basic details for school
      * @param \OmegaUp\Request $r
-     * @return array{template: string, smartyProperties: array{details: array{name: string, country_name: string|null, state_name: string|null}}}
+     * @return array{template: string, smartyProperties: array{details: array{name: string, country: array{country_id: string|null, country_name: string|null}, state_name: string|null}}}
      */
     public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -57,7 +57,10 @@ class School extends \OmegaUp\Controllers\Controller {
 
         $details = [
             'name' => strval($school->name),
-            'country_name' => null,
+            'country' => [
+                'country_id' => null,
+                'country_name' => null,
+            ],
             'state_name' => null,
         ];
 
@@ -68,7 +71,8 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country_name'] = $country->name;
+                $details['country']['country_id'] = $country->country_id;
+                $details['country']['country_name'] = $country->name;
             }
 
             if (!is_null($school->state_id)) {

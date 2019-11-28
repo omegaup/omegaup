@@ -10,7 +10,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-school-profile', {
         props: {
           name: payload.name,
-          country_name: payload.country_name,
+          country: payload.country,
           state_name: payload.state_name,
         },
       });
