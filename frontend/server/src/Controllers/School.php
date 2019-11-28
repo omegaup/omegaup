@@ -45,9 +45,9 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the basic details for school
      * @param \OmegaUp\Request $r
-     * @return array{status: string, details: array{name: string, country_name: string|null, state_name: string|null}}
+     * @return array{template: string, smartyProperties: array{details: array{name: string, country_name: string|null, state_name: string|null}}}
      */
-    public static function apiProfileDetails(\OmegaUp\Request $r): array {
+    public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
@@ -55,10 +55,13 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        $details = [
-            'name' => strval($school->name),
-            'country_name' => null,
-            'state_name' => null,
+        $template = 'school.profile.tpl';
+        $smartyProperties = [
+            'details' => [
+                'name' => strval($school->name),
+                'country_name' => null,
+                'state_name' => null,
+            ]
         ];
 
         if (!is_null($school->country_id)) {
@@ -68,7 +71,7 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country_name'] = $country->name;
+                $smartyProperties['details']['country_name'] = $country->name;
             }
 
             if (!is_null($school->state_id)) {
@@ -77,14 +80,14 @@ class School extends \OmegaUp\Controllers\Controller {
                     strval($school->state_id)
                 );
                 if (!is_null($state)) {
-                    $details['state_name'] = $state->name;
+                    $smartyProperties['details']['state_name'] = $state->name;
                 }
             }
         }
 
         return [
-            'status' => 'ok',
-            'details' => $details,
+            'smartyProperties' => $smartyProperties,
+            'template' => $template,
         ];
     }
 
