@@ -55,12 +55,10 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        $smartyProperties = [
-            'details' => [
-                'name' => strval($school->name),
-                'country_name' => null,
-                'state_name' => null,
-            ]
+        $details = [
+            'name' => strval($school->name),
+            'country_name' => null,
+            'state_name' => null,
         ];
 
         if (!is_null($school->country_id)) {
@@ -70,7 +68,7 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $smartyProperties['details']['country_name'] = $country->name;
+                $details['country_name'] = $country->name;
             }
 
             if (!is_null($school->state_id)) {
@@ -79,14 +77,16 @@ class School extends \OmegaUp\Controllers\Controller {
                     strval($school->state_id)
                 );
                 if (!is_null($state)) {
-                    $smartyProperties['details']['state_name'] = $state->name;
+                    $details['state_name'] = $state->name;
                 }
             }
         }
 
         return [
-            'smartyProperties' => $smartyProperties,
-            'template' => 'school.profile.tpl',
+            'smartyProperties' => [
+                'details' => $details
+            ],
+            'template' => 'school.profile.tpl'  ,
         ];
     }
 
