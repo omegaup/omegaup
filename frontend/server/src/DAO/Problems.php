@@ -141,14 +141,20 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             }
         }
         if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
+            $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
+            if ($difficultyRange[0] === 0) {
+                $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
+            }
+
             array_push(
                 $clauses,
                 [
-                    'p.difficulty >= ? AND p.difficulty <= ?',
+                    $conditions,
                     $difficultyRange,
                 ]
             );
         }
+
         if (!is_null($query)) {
             array_push(
                 $clauses,

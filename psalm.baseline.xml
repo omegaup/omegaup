@@ -1221,7 +1221,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="23">
+    <MixedArgument occurrences="22">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1233,7 +1233,6 @@
       <code>$user</code>
       <code>$user_id</code>
       <code>$problemset_id</code>
-      <code>$item</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$r[$param]</code>
@@ -1248,7 +1247,7 @@
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="13">
+    <MixedArrayAccess occurrences="12">
       <code>$response['verified']</code>
       <code>$response['username']</code>
       <code>$response['userinfo']['email']</code>
@@ -1270,14 +1269,14 @@
       <code>$response['userinfo']['is_private']</code>
       <code>$response['userinfo']['classname']</code>
     </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="5">
+    <MixedArrayOffset occurrences="3">
       <code>$response['userinfo'][$k]</code>
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="31">
+    <MixedAssignment occurrences="29">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1295,8 +1294,6 @@
       <code>$contest</code>
       <code>$identityData</code>
       <code>$contests[$contest['alias']]['place']</code>
-      <code>$contests[$contest['alias']]['data']</code>
-      <code>$item</code>
       <code>$problems</code>
       <code>$problem</code>
       <code>$problems</code>
