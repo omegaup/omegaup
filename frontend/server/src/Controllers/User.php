@@ -3121,6 +3121,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{profile: array{userinfo: array{birth_date: null|string, classname: string, country: string, country_id: int|null, email: null|string, gender: null|string, graduation_date: false|null|string, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: string, preferred_language: null|string, rankinfo: array{name: string, problems_solved: int, rank: int, status: string}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified: bool}}, SUPPORTED_LANGUAGES: list<string>, COUNTRIES: list<\OmegaUp\DAO\Countries>}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $response = self::getProfileDetails($r);
         $response['PROGRAMMING_LANGUAGES'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
         $response['COUNTRIES'] = \OmegaUp\DAO\Countries::getAll(
@@ -3128,17 +3129,12 @@ class User extends \OmegaUp\Controllers\Controller {
             100,
             'name'
         );
-        $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
-        $template = (is_null(
-            $currentSession['identity']
-        ) || is_null(
-            $currentSession['identity']->password
-        ))
-        ? 'user.basicedit.tpl' : 'user.edit.tpl';
 
         return [
             'smartyProperties' => $response,
-            'template' => $template,
+            'template' => is_null(
+                $r->identity->password
+            ) ? 'user.basicedit.tpl' : 'user.edit.tpl',
         ];
     }
 
@@ -3159,7 +3155,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{profile: array{userinfo: array{birth_date: null|string, classname: string, country: string, country_id: int|null, email: null|string, gender: null|string, graduation_date: false|null|string, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: string, preferred_language: null|string, rankinfo: array{name: string, problems_solved: int, rank: int, status: string}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified: bool}}, admin: bool, practice: bool}, template: string}
      */
-    public static function getResultsDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
         $response = self::getProfileDetails($r);
         $response['admin'] = true;
         $response['practice'] = false;

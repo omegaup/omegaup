@@ -187,8 +187,9 @@ class UITools {
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             if ($withStatusError) {
                 $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
+            } else {
+                \OmegaUp\ApiCaller::handleException($e);
             }
-            \OmegaUp\ApiCaller::handleException($e);
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
