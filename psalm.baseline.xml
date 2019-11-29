@@ -441,12 +441,11 @@
       <code>$aliasGroup</code>
       <code>$lang</code>
     </MissingParamType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="4">
       <code>validateGroupOwnership</code>
       <code>saveIdentityGroup</code>
       <code>validateUpdateRequest</code>
       <code>validateIdentity</code>
-      <code>convertToSupportedLanguage</code>
     </MissingReturnType>
     <MixedArgument occurrences="17">
       <code>$r['group_alias']</code>
@@ -480,17 +479,13 @@
       <code>$val</code>
       <code>$langWeight</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
+    <MixedInferredReturnType occurrences="1">
       <code>type</code>
-      <code>string</code>
     </MixedInferredReturnType>
     <MixedPropertyFetch occurrences="2">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="2">
-      <code>self::convertToSupportedLanguage($_GET['lang'])</code>
-    </MixedReturnStatement>
     <PossiblyNullArgument occurrences="1">
       <code>$identity-&gt;username</code>
     </PossiblyNullArgument>
@@ -1274,7 +1269,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="29">
+    <MixedAssignment occurrences="28">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1285,7 +1280,6 @@
       <code>$resetRequest['permission_key']</code>
       <code>$addUserRequest['auth_token']</code>
       <code>$addUserRequest['contest_alias']</code>
-      <code>$response['userinfo']['locale']</code>
       <code>$v</code>
       <code>$response</code>
       <code>$contestsParticipated</code>

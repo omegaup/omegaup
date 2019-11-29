@@ -1155,7 +1155,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @return array{userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}}
+     * @return array{userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}}
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1338,18 +1338,18 @@ class User extends \OmegaUp\Controllers\Controller {
      * date, calculate it and save it.
      *
      * @param \OmegaUp\Request $r
-     * @return array{problems?: null, status: string, userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{status: string, userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
-        $response = self::getCodersOfTheMonth($r);
+        $response = self::getCodersOfTheMonthList($r);
         $response['status'] = 'ok';
         return $response;
     }
 
     /**
-     * @return array{problems?: null, status?: string, userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
-    private static function getCodersOfTheMonth(\OmegaUp\Request $r) {
+    private static function getCodersOfTheMonthList(\OmegaUp\Request $r) {
         $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
             \OmegaUp\Validators::validateDate($r['date'], 'date');
@@ -1368,9 +1368,7 @@ class User extends \OmegaUp\Controllers\Controller {
             );
             if (is_null($users)) {
                 return [
-                    'status' => 'ok',
                     'userinfo' => null,
-                    'problems' => null,
                 ];
             }
 
@@ -2960,50 +2958,16 @@ class User extends \OmegaUp\Controllers\Controller {
             ['', 'country', 'state', 'school'],
             /*$required=*/false
         );
-        [
-            'identity' => $identity,
-        ] = \OmegaUp\Controllers\Session::getCurrentSession();
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
         $filter = strval($r['filter']);
 
         $availableFilters = [];
-        if (!is_null($identity)) {
-            if (!is_null($identity->country_id)) {
-                $availableFilters['country'] =
-                    \OmegaUp\Translations::getInstance()->get(
-                        'wordsFilterByCountry'
-                    );
-            }
-            if (!is_null($identity->state_id)) {
-                $availableFilters['state'] =
-                    \OmegaUp\Translations::getInstance()->get(
-                        'wordsFilterByState'
-                    );
-            }
 
-            $schoolId = null;
-            if (!is_null($identity->current_identity_school_id)) {
-                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                    $identity->current_identity_school_id
-                );
-                if (!is_null($identitySchool)) {
-                    $schoolId = $identitySchool->school_id;
-                }
-            }
-            if (!is_null($schoolId)) {
-                $availableFilters['school'] =
-                    \OmegaUp\Translations::getInstance()->get(
-                        'wordsFilterBySchool'
-                    );
-            }
-        }
-
-        return [
+        $response = [
             'smartyProperties' => [
                 'rankTablePayload' => [
-                    'isLogged' => !is_null($identity),
                     'page' => $page,
                     'length' => $length,
                     'filter' => $filter,
@@ -3013,22 +2977,65 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
             'template' => 'rank.tpl',
         ];
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $response['smartyProperties']['rankTablePayload']['isLogged'] = false;
+            return $response;
+        }
+
+        $response['smartyProperties']['rankTablePayload']['isLogged'] = true;
+        if (!is_null($r->identity->country_id)) {
+            $availableFilters['country'] =
+                \OmegaUp\Translations::getInstance()->get(
+                    'wordsFilterByCountry'
+                );
+        }
+        if (!is_null($r->identity->state_id)) {
+            $availableFilters['state'] =
+                \OmegaUp\Translations::getInstance()->get(
+                    'wordsFilterByState'
+                );
+        }
+
+        $schoolId = null;
+        if (!is_null($r->identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $r->identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $schoolId = $identitySchool->school_id;
+            }
+        }
+        if (!is_null($schoolId)) {
+            $availableFilters['school'] =
+                \OmegaUp\Translations::getInstance()->get(
+                    'wordsFilterBySchool'
+                );
+        }
+        return $response;
     }
 
     /**
-     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
-        $response = \OmegaUp\Controllers\School::getSchoolsRankForSmarty(
-            /*$rowCount=*/ 5,
-            /*$isIndex=*/ true
+        $response = [
+            'smartyProperties' => [
+                'coderOfTheMonthData' => self::getCodersOfTheMonthList(
+                    $r
+                )['userinfo'],
+            ],
+            'template' => 'index.tpl',
+        ];
+        $response['smartyProperties'] = array_merge(
+            $response['smartyProperties'],
+            \OmegaUp\Controllers\School::getSchoolsRankList(
+                /*$rowCount=*/ 5,
+                /*$isIndex=*/ true
+            )
         );
-
-        $response['smartyProperties']['coderOfTheMonthData'] = self::getCodersOfTheMonth(
-            $r
-        )['userinfo'];
-        $response['template'] = 'index.tpl';
-
         return $response;
     }
 

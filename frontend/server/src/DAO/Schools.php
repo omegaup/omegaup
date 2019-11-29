@@ -86,25 +86,11 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
               distinct_problems DESC
             LIMIT ?, ?;';
 
-        $args = [$startDate, $finishDate, $offset, $rowcount];
-
-        $result = [];
-        foreach (
-            /** @var list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $args
-            ) as $row
-        ) {
-            $result[] = [
-                'name' => strval($row['name']),
-                'country_id' => strval($row['country_id']),
-                'distinct_users' => intval($row['distinct_users']),
-                'distinct_problems' => intval($row['distinct_problems']),
-            ];
-        }
-
-        return $result;
+        /** @var list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$startDate, $finishDate, $offset, $rowcount]
+        );
     }
 
     /**

@@ -678,7 +678,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return 'es';
     }
 
-    public static function convertToSupportedLanguage($lang) {
+    public static function convertToSupportedLanguage($lang): string {
         switch ($lang) {
             case 'en':
             case 'en-us':

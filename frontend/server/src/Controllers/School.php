@@ -336,41 +336,48 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @return array{smartyProperties: array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
     public static function getSchoolsRankForSmarty(
         int $rowCount,
         bool $isIndex
     ): array {
-        $schoolsRank = [
-            'smartyProperties' => [
-                'schoolRankPayload' => [
-                    'rowCount' => $rowCount,
-                    'rank' => self::getSchoolsRank(
-                        /*$offset=*/0,
-                        $rowCount,
-                        /*$startTime=*/strtotime(
-                            'first day of this month',
-                            \OmegaUp\Time::get()
-                        ),
-                        /*$finishTime=*/strtotime(
-                            'first day of next month',
-                            \OmegaUp\Time::get()
-                        ),
-                        /*$canUseCache=*/true
-                    ),
-                ],
-            ],
+        return [
+            'smartyProperties' => self::getSchoolsRankList($rowCount, $isIndex),
             'template' => 'rank.schools.tpl'
         ];
-        if (!$isIndex) {
-            return $schoolsRank;
-        }
-        $schoolsRank['smartyProperties']['rankTablePayload'] = [
-            'length' => $rowCount,
-            'isIndex' => $isIndex,
-            'availableFilters' => [],
+    }
+
+    /**
+     * @return array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     */
+    public static function getSchoolsRankList(int $rowCount, bool $isIndex) {
+        $schoolsRank = [
+            'schoolRankPayload' => [
+                'rowCount' => $rowCount,
+                'rank' => self::getSchoolsRank(
+                    /*$offset=*/0,
+                    $rowCount,
+                    /*$startTime=*/strtotime(
+                        'first day of this month',
+                        \OmegaUp\Time::get()
+                    ),
+                    /*$finishTime=*/strtotime(
+                        'first day of next month',
+                        \OmegaUp\Time::get()
+                    ),
+                    /*$canUseCache=*/true
+                ),
+            ],
+            'rankTablePayload' => [
+                'length' => $rowCount,
+                'isIndex' => $isIndex,
+                'availableFilters' => [],
+            ],
         ];
+        if (!$isIndex) {
+            unset($schoolsRank['rankTablePayload']);
+        }
         return $schoolsRank;
     }
 }
