@@ -1,9 +1,11 @@
 <template>
-  <omegaup-arena-codemirror ref="cm-wrapper"
-        v-bind:options="editorOptions"
-        v-bind:value="value"
-        v-on:change="onChange"
-        v-on:input="onInput"></omegaup-arena-codemirror>
+  <omegaup-arena-codemirror
+    ref="cm-wrapper"
+    v-bind:options="editorOptions"
+    v-bind:value="value"
+    v-on:change="onChange"
+    v-on:input="onInput"
+  ></omegaup-arena-codemirror>
 </template>
 
 <script lang="ts">
@@ -87,5 +89,4 @@ export default class ArenaCodeView extends Vue {
     this.mode = languageModeMap[newLanguage];
   }
 }
-
 </script>

@@ -2,9 +2,11 @@
   <div class="panel badge-details-panel">
     <h1 class="text-center">{{ name }}</h1>
     <figure class="badge-info-grid">
-      <img class="badge-icon"
-              v-bind:class="{'badge-gray': !this.badge.assignation_time}"
-              v-bind:src="iconUrl">
+      <img
+        class="badge-icon"
+        v-bind:class="{ 'badge-gray': !this.badge.assignation_time }"
+        v-bind:src="iconUrl"
+      />
       <figcaption class="badge-description">
         {{ description }}
       </figcaption>
@@ -15,8 +17,8 @@
           {{ ownersPercentage }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">👥</span> {{ this.T['badgeOwnersPercentageMessage']
-          }}
+          <span class="badge-detail-text-icon">👥</span>
+          {{ this.T['badgeOwnersPercentageMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -24,16 +26,15 @@
           {{ firstAssignationDate }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">📅</span> {{ this.T['badgeFirstAssignationMessage']
-          }}
+          <span class="badge-detail-text-icon">📅</span>
+          {{ this.T['badgeFirstAssignationMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
         <div class="badge-detail-data">
           {{ assignationDate }}
         </div>
-        <div class="badge-detail-text"
-             v-html="ownedMessage"></div>
+        <div class="badge-detail-text" v-html="ownedMessage"></div>
       </div>
     </div>
   </div>
@@ -47,7 +48,7 @@
 .badge-details-grid {
   display: grid;
   justify-content: center;
-  justify-items:center;
+  justify-items: center;
   align-items: center;
   text-align: center;
   row-gap: 40px;
@@ -136,5 +137,4 @@ export default class BadgeDetails extends Vue {
       : '';
   }
 }
-
 </script>

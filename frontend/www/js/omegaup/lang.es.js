@@ -505,6 +505,7 @@ const translations = {
 	omegaupTitleProfile: "Perfil",
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redacci\u00f3n",
+	omegaupTitleSchoolProfile: "Perfil de Escuela",
 	omegaupTitleScoreboardmerge: "Scoreboard Merge",
 	omegaupTitleSupportDashboard: "Tablero de soporte",
 	omegaupTitleUpdatePrivileges: "Actualizar privilegios",

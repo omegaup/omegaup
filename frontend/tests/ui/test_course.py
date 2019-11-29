@@ -43,6 +43,12 @@ def test_user_ranking_course(driver):
         util.create_run(driver, problem, 'Main.cpp11')
         driver.update_score_in_course(problem, assignment_alias)
 
+        # When user has tried or solved a problem, feedback popup will be shown
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '.popup button.close'))).click()
+
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,

@@ -3,16 +3,19 @@
     <div class="panel-body">
       <div class="upload-csv">
         <div class="panel-heading">
-          {{ T.groupsUploadCsvFile }} <input name="identities"
-               type="file">
+          {{ T.groupsUploadCsvFile }} <input name="identities" type="file" />
         </div>
         <div class="panel-heading">
-          <a class="btn btn-primary"
-               v-on:click.prevent="readCsv">{{ T.groupsUploadCsvFile }}</a>
+          <a class="btn btn-primary" v-on:click.prevent="readCsv">{{
+            T.groupsUploadCsvFile
+          }}</a>
         </div>
-      </div><br>
-      <div class="panel panel-default no-bottom-margin"
-           v-show="identities.length &gt; 0">
+      </div>
+      <br />
+      <div
+        class="panel panel-default no-bottom-margin"
+        v-show="identities.length &gt; 0"
+      >
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
         </div>
@@ -30,7 +33,9 @@
           </thead>
           <tbody>
             <tr v-for="identity in identities">
-              <td class="username"><strong>{{ identity.username }}</strong></td>
+              <td class="username">
+                <strong>{{ identity.username }}</strong>
+              </td>
               <td>{{ identity.name }}</td>
               <td class="password">{{ identity.password }}</td>
               <td>{{ identity.country_id }}</td>
@@ -41,10 +46,13 @@
           </tbody>
         </table>
         <div class="panel-heading">
-          <button class="btn btn-primary"
-               name="create-identities"
-               v-on:click.prevent="$emit('bulk-identities', identities)">{{ T.groupCreateIdentities
-               }}</button>
+          <button
+            class="btn btn-primary"
+            name="create-identities"
+            v-on:click.prevent="$emit('bulk-identities', identities)"
+          >
+            {{ T.groupCreateIdentities }}
+          </button>
         </div>
         <div>
           {{ T.groupsIdentityWarning }}
@@ -80,5 +88,4 @@ export default class Identities extends Vue {
     this.$emit('read-csv', this, fileUpload);
   }
 }
-
 </script>

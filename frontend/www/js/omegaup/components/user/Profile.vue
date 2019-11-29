@@ -3,10 +3,13 @@
     <div class="col-md-2 no-right-padding">
       <div class="panel panel-default">
         <div class="panel-body">
-          <div class="thumbnail bottom-margin"><img v-bind:src="profile.gravatar_92"></div>
+          <div class="thumbnail bottom-margin">
+            <img v-bind:src="profile.gravatar_92" />
+          </div>
           <div v-if="profile.email">
-            <a class="btn btn-default"
-                 href="/profile/edit/">{{ T.profileEdit }}</a>
+            <a class="btn btn-default" href="/profile/edit/">{{
+              T.profileEdit
+            }}</a>
           </div>
         </div>
       </div>
@@ -14,46 +17,74 @@
     <div class="col-md-10 no-right-padding">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title">{{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank} - `:
-          '' }} <omegaup-user-username v-bind:classname="profile.classname"
-                                 v-bind:username="profile.username"></omegaup-user-username>
-                                 <img height="11"
-               v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
-               v-bind:title="profile.country_id"
-               v-if="profile.country_id"
-               width="16"></h2>
-        </div><omegaup-user-basicinfo v-bind:profile="profile"
-             v-bind:rank="rank"></omegaup-user-basicinfo>
-      </div><omegaup-grid-paginator v-bind:columns="1"
-           v-bind:items="contests"
-           v-bind:items-per-page="15"
-           v-bind:title="T.profileContests">
-      <thead>
-        <tr>
-          <th>{{ T.profileContestsTableContest }}</th>
-          <th>{{ T.profileContestsTablePlace }}</th>
-        </tr>
-      </thead></omegaup-grid-paginator> <omegaup-grid-paginator v-bind:columns="3"
-           v-bind:items="createdProblems"
-           v-bind:items-per-page="30"
-           v-bind:title="T.profileCreatedProblems"></omegaup-grid-paginator>
-           <omegaup-grid-paginator v-bind:columns="3"
-           v-bind:items="solvedProblems"
-           v-bind:items-per-page="30"
-           v-bind:title="T.profileSolvedProblems"></omegaup-grid-paginator>
-           <omegaup-grid-paginator v-bind:columns="3"
-           v-bind:items="unsolvedProblems"
-           v-bind:items-per-page="30"
-           v-bind:title="T.profileUnsolvedProblems"></omegaup-grid-paginator>
-           <omegaup-badge-list v-bind:all-badges="profileBadges"
-           v-bind:show-all-badges-link="true"
-           v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
+          <h2 class="panel-title">
+            {{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank} - `:
+          '' }}
+            <omegaup-user-username
+              v-bind:classname="profile.classname"
+              v-bind:username="profile.username"
+            ></omegaup-user-username>
+            <img
+              height="11"
+              v-bind:src="
+                `/media/flags/${profile.country_id.toLowerCase()}.png`
+              "
+              v-bind:title="profile.country_id"
+              v-if="profile.country_id"
+              width="16"
+            />
+          </h2>
+        </div>
+        <omegaup-user-basicinfo
+          v-bind:profile="profile"
+          v-bind:rank="rank"
+        ></omegaup-user-basicinfo>
+      </div>
+      <omegaup-grid-paginator
+        v-bind:columns="1"
+        v-bind:items="contests"
+        v-bind:items-per-page="15"
+        v-bind:title="T.profileContests"
+      >
+        <thead>
+          <tr>
+            <th>{{ T.profileContestsTableContest }}</th>
+            <th>{{ T.profileContestsTablePlace }}</th>
+          </tr>
+        </thead></omegaup-grid-paginator
+      >
+      <omegaup-grid-paginator
+        v-bind:columns="3"
+        v-bind:items="createdProblems"
+        v-bind:items-per-page="30"
+        v-bind:title="T.profileCreatedProblems"
+      ></omegaup-grid-paginator>
+      <omegaup-grid-paginator
+        v-bind:columns="3"
+        v-bind:items="solvedProblems"
+        v-bind:items-per-page="30"
+        v-bind:title="T.profileSolvedProblems"
+      ></omegaup-grid-paginator>
+      <omegaup-grid-paginator
+        v-bind:columns="3"
+        v-bind:items="unsolvedProblems"
+        v-bind:items-per-page="30"
+        v-bind:title="T.profileUnsolvedProblems"
+      ></omegaup-grid-paginator>
+      <omegaup-badge-list
+        v-bind:all-badges="profileBadges"
+        v-bind:show-all-badges-link="true"
+        v-bind:visitor-badges="visitorBadges"
+      ></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileStatistics }}</h2>
-        </div><omegaup-user-charts v-bind:data="charts"
-             v-bind:username="profile.username"
-             v-if="charts"></omegaup-user-charts>
+        </div>
+        <omegaup-user-charts
+          v-bind:data="charts"
+          v-bind:username="profile.username"
+          v-if="charts"
+        ></omegaup-user-charts>
       </div>
     </div>
   </div>
@@ -102,5 +133,4 @@ export default class UserProfile extends Vue {
   T = T;
   columns = 3;
 }
-
 </script>

@@ -1,7 +1,10 @@
 <template>
-  <span v-if="linkify"><a v-bind:class="classname"
-     v-bind:href="`/profile/${username}/`">{{ username }}</a></span> <span v-bind:class="classname"
-        v-else="">{{ username }}</span>
+  <span v-if="linkify"
+    ><a v-bind:class="classname" v-bind:href="`/profile/${username}/`">{{
+      username
+    }}</a></span
+  >
+  <span v-bind:class="classname" v-else="">{{ username }}</span>
 </template>
 
 <style>
@@ -14,23 +17,23 @@
 }
 
 .user-rank-beginner {
-   color: #919191;
+  color: #919191;
 }
 
 .user-rank-specialist {
-  color: #598C4C;
+  color: #598c4c;
 }
 
 .user-rank-expert {
-  color: #1C52C7;
+  color: #1c52c7;
 }
 
 .user-rank-master {
-  color: #F0C245;
+  color: #f0c245;
 }
 
 .user-rank-international-master {
-  color: #CB000A;
+  color: #cb000a;
 }
 </style>
 
@@ -43,5 +46,4 @@ export default class UserName extends Vue {
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
 }
-
 </script>
