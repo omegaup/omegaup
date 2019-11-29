@@ -1,6 +1,6 @@
 <template>
   <div class="qualitynomination-popup">
-    <a href="#"
+    <a v-bind:href="suggestLink"
          v-on:click="onShowSuggestion"
          v-show="showSuggestLink">{{ T.qualityNominationRateProblem }}</a>
     <transition name="fade">
@@ -192,6 +192,7 @@ export default class QualityNominationPopup extends Vue {
   @Prop() dismissed!: boolean;
   @Prop() dismissedBeforeAC!: boolean;
   @Prop() canNominateProblem!: boolean;
+  @Prop() problemAlias!: boolean;
 
   T = T;
   UI = UI;
@@ -273,6 +274,14 @@ export default class QualityNominationPopup extends Vue {
     return topics.sort((a: ProblemTopic, b: ProblemTopic): number => {
       return a.text.localeCompare(b.text, self.T.lang);
     });
+  }
+
+  get suggestLink(): string {
+    let self = this;
+    if (!self.problemAlias) {
+      return '#';
+    }
+    return `#problems/${self.problemAlias}`;
   }
 
   onHide(isDismissed: boolean): void {
