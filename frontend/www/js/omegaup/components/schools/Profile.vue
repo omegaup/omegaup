@@ -13,7 +13,7 @@
               v-bind:country="country.country_id"></omegaup-country-flag>
             </li>
             <li class="list-group-item">
-              <strong>Estado:</strong> {{ state_name }}
+              <strong>Estado:</strong> {{ stateName }}
             </li>
           </ul>
         </div>
@@ -21,7 +21,8 @@
           <!-- Acá irán los Coders del Mes paginados -->
         </div>
       </div>
-      <div class="col-md-8"></div>
+      <div class="col-md-8">
+      </div>
     </div>
   </div>
 </template>
@@ -39,16 +40,25 @@ import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import countryFlag from '../CountryFlag.vue';
+import TrendChart from 'vue-trend-chart';
+
+interface ProblemsSolvedCount {
+  year: number,
+  month: number,
+  count: number,
+}
 
 @Component({
   components: {
     'omegaup-country-flag': countryFlag,
+    'trend-chart': TrendChart,
   }
 })
 export default class SchoolProfile extends Vue {
   @Prop() name!: string;
   @Prop() country!: omegaup.Country;
-  @Prop() state_name!: string;
+  @Prop() stateName!: string;
+  @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];
 
   T = T;
   UI = UI;

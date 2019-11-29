@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { API, OmegaUp, T } from '../omegaup.js';
+import { API, OmegaUp, UI } from '../omegaup.js';
 import school_Profile from '../components/schools/Profile.vue';
 
 OmegaUp.on('ready', function() {
@@ -9,14 +9,28 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-school-profile', {
         props: {
-          name: payload.name,
-          country: payload.country,
-          state_name: payload.state_name,
+          name: this.name,
+          country: this.country,
+          stateName: this.stateName,
+          monthlySolvedProblemsCount: this.monthlySolvedProblemsCount,
         },
       });
+    },
+    data: {
+      name: payload.school_name,
+      country: payload.country,
+      stateName: payload.state_name,
+      monthlySolvedProblemsCount: [],
     },
     components: {
       'omegaup-school-profile': school_Profile,
     },
   });
+
+  API.School.monthlySolvedProblemsCount({
+    school_id: payload.school_id,
+    months_count: 6,
+  }).then(function(data) {
+    schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;
+  }).fail(UI.apiError);
 });

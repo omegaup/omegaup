@@ -145,7 +145,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     AND sub.time < su.time
             )
         GROUP BY
-            YEAR(su.time), MONTH(su.time);';
+            YEAR(su.time), MONTH(su.time)
+        ORDER BY
+            YEAR(su.time) ASC, MONTH(su.time) ASC;';
 
         $params = [$schoolId, $monthsNumber];
 

@@ -573,6 +573,8 @@ export default {
     list: _call('/api/school/list/'),
 
     rank: _call('/api/school/rank/'),
+
+    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
   },
 
   Session: {
