@@ -1,10 +1,11 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h2 class="panel-title">{{ title }} <span class="badge">{{ items.length }}</span></h2>
+      <h2 class="panel-title">
+        {{ title }} <span class="badge">{{ items.length }}</span>
+      </h2>
     </div>
-    <table class="table table-striped"
-           v-if="items.length &gt; 0">
+    <table class="table table-striped" v-if="items.length &gt; 0">
       <tbody>
         <tr v-for="group in paginatedItems">
           <td v-for="item in group">
@@ -13,19 +14,26 @@
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer text-center"
-         v-if="items.length &gt; 0">
-      <div class="btn-group"
-           role="group">
-        <button class="btn btn-primary"
-             type="button"
-             v-bind:disabled="this.totalPagesCount === 1 || this.currentPageNumber === 0"
-             v-on:click="previousPage">{{ T.wordsPrevious }}</button> <button class=
-             "btn btn-primary"
-             type="button"
-             v-bind:disabled=
-             "this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
-             v-on:click="nextPage">{{ T.wordsNext }}</button>
+    <div class="panel-footer text-center" v-if="items.length &gt; 0">
+      <div class="btn-group" role="group">
+        <button
+          class="btn btn-primary"
+          type="button"
+          v-bind:disabled="
+            this.totalPagesCount === 1 || this.currentPageNumber === 0
+          "
+          v-on:click="previousPage"
+        >
+          {{ T.wordsPrevious }}
+        </button>
+        <button
+          class="btn btn-primary"
+          type="button"
+          v-bind:disabled="this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
+          v-on:click="nextPage"
+        >
+          {{ T.wordsNext }}
+        </button>
       </div>
     </div>
   </div>
@@ -83,5 +91,4 @@ export default class GridPaginator extends Vue {
     return this.itemsRows.slice(start, end);
   }
 }
-
 </script>

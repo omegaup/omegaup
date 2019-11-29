@@ -1,19 +1,26 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h2 class="panel-title">{{ title }} <span class="badge">{{ badges.length }}</span> <a class=
-      "badges-link"
-         href="/badge/list/"
-         v-if="this.showAllBadgesLink">{{ this.T.wordsBadgesSeeAll }}</a></h2>
+      <h2 class="panel-title">
+        {{ title }} <span class="badge">{{ badges.length }}</span>
+        <a
+          class="badges-link"
+          href="/badge/list/"
+          v-if="this.showAllBadgesLink"
+          >{{ this.T.wordsBadgesSeeAll }}</a
+        >
+      </h2>
     </div>
     <div class="panel-body">
       <div class="badges-container">
-        <omegaup-badge v-bind:badge="badge"
-             v-bind:key="badge.badge_alias"
-             v-for="badge in badges"></omegaup-badge>
+        <omegaup-badge
+          v-bind:badge="badge"
+          v-bind:key="badge.badge_alias"
+          v-for="badge in badges"
+        ></omegaup-badge>
       </div>
     </div>
-    <div v-show="!badges"><img src="/media/wait.gif"></div>
+    <div v-show="!badges"><img src="/media/wait.gif" /></div>
   </div>
 </template>
 
@@ -78,5 +85,4 @@ export default class BadgeList extends Vue {
     return this.T[`badge_${alias}_name`];
   }
 }
-
 </script>

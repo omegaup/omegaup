@@ -1,7 +1,9 @@
 <template>
-  <input class="typeahead form-control"
-        ref="input"
-        v-on:change="onUpdateInput">
+  <input
+    class="typeahead form-control"
+    ref="input"
+    v-on:change="onUpdateInput"
+  />
 </template>
 
 <script lang="ts">
@@ -27,5 +29,4 @@ export default class Autocomplete extends Vue {
     this.input.value = newValue;
   }
 }
-
 </script>

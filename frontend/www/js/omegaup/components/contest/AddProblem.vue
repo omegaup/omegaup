@@ -1,68 +1,94 @@
 <template>
   <div class="panel panel-primary problems-container">
     <div class="panel-body">
-      <form class="form"
-            v-on:submit.prevent="onSubmit">
+      <form class="form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsProblem}}</label> <span class="label label-info">{{
-          T.selectProblemToGetVersions }}</span> <omegaup-autocomplete v-bind:init=
-          "el =&gt; UI.problemTypeahead(el)"
-               v-model="alias"></omegaup-autocomplete>
+          <label>{{ T.wordsProblem }}</label>
+          <span class="label label-info">{{
+            T.selectProblemToGetVersions
+          }}</span>
+          <omegaup-autocomplete
+            v-bind:init="el =&gt; UI.problemTypeahead(el)"
+            v-model="alias"
+          ></omegaup-autocomplete>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary get-versions"
-               type="submit">{{T.wordsGetVersions}}</button>
+          <button class="btn btn-primary get-versions" type="submit">
+            {{ T.wordsGetVersions }}
+          </button>
         </div>
         <div class="form-group">
-          <label>{{T.contestAddproblemProblemPoints}}</label> <input class=
-          "form-control problem-points"
-               size="3"
-               v-model="points">
+          <label>{{ T.contestAddproblemProblemPoints }}</label>
+          <input
+            class="form-control problem-points"
+            size="3"
+            v-model="points"
+          />
         </div>
         <div class="form-group">
-          <label>{{T.contestAddproblemContestOrder}}</label> <input class="form-control"
-               max="100"
-               size="2"
-               type="number"
-               v-model="order">
-        </div><omegaup-problem-versions v-bind:log="versionLog"
-              v-bind:published-revision="publishedRevision"
-              v-bind:show-footer="false"
-              v-model="selectedRevision"
-              v-on:runs-diff="onRunsDiff"></omegaup-problem-versions>
+          <label>{{ T.contestAddproblemContestOrder }}</label>
+          <input
+            class="form-control"
+            max="100"
+            size="2"
+            type="number"
+            v-model="order"
+          />
+        </div>
+        <omegaup-problem-versions
+          v-bind:log="versionLog"
+          v-bind:published-revision="publishedRevision"
+          v-bind:show-footer="false"
+          v-model="selectedRevision"
+          v-on:runs-diff="onRunsDiff"
+        ></omegaup-problem-versions>
       </form>
       <div class="form-group">
-        <button class="btn btn-primary add-problem"
-             type="submit"
-             v-on:click.prevent="onAddProblem"
-             v-show="selectedRevision.commit !== ''">{{addProblemButtonLabel}}</button>
+        <button
+          class="btn btn-primary add-problem"
+          type="submit"
+          v-on:click.prevent="onAddProblem"
+          v-show="selectedRevision.commit !== ''"
+        >
+          {{ addProblemButtonLabel }}
+        </button>
       </div>
     </div>
     <table class="table table-striped">
       <thead>
         <tr>
           <th></th>
-          <th>{{T.contestAddproblemContestOrder}}</th>
-          <th>{{T.contestAddproblemProblemName}}</th>
-          <th>{{T.contestAddproblemProblemPoints}}</th>
-          <th>{{T.contestAddproblemProblemRemove}}</th>
+          <th>{{ T.contestAddproblemContestOrder }}</th>
+          <th>{{ T.contestAddproblemProblemName }}</th>
+          <th>{{ T.contestAddproblemProblemPoints }}</th>
+          <th>{{ T.contestAddproblemProblemRemove }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="problem.alias"
-            v-for="problem in problems">
-          <td><button class="btn btn-default"
-                  type="button"
-                  v-bind:aria-label="T.wordsEdit"
-                  v-on:click.prevent="onEdit(problem)"><span aria-hidden="true"
-                class="glyphicon glyphicon-pencil"></span></button></td>
-          <td>{{problem.order}}</td>
+        <tr v-bind:key="problem.alias" v-for="problem in problems">
           <td>
-            <a v-bind:href="`/arena/problem/${problem.alias}/`">{{problem.alias}}</a>
+            <button
+              class="btn btn-default"
+              type="button"
+              v-bind:aria-label="T.wordsEdit"
+              v-on:click.prevent="onEdit(problem)"
+            >
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-pencil"
+              ></span>
+            </button>
           </td>
-          <td>{{problem.points}}</td>
-          <td><button class="close"
-                  v-on:click="onRemove(problem)">×</button></td>
+          <td>{{ problem.order }}</td>
+          <td>
+            <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+              problem.alias
+            }}</a>
+          </td>
+          <td>{{ problem.points }}</td>
+          <td>
+            <button class="close" v-on:click="onRemove(problem)">×</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -167,5 +193,4 @@ export default class AddProblem extends Vue {
     this.$emit('emit-change-alias', this, newProblemAlias);
   }
 }
-
 </script>

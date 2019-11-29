@@ -430,10 +430,7 @@ export class Arena {
         // Try the next uri.
         index++;
         if (index < uris.length) {
-          connect(
-            uris,
-            index,
-          );
+          connect(uris, index);
         } else {
           // Out of options. Falling back to polls.
           self.socket = null;
@@ -445,11 +442,7 @@ export class Arena {
     }
 
     self.elements.socketStatus.html('↻').css('color', '#888');
-    connect(
-      uris,
-      0,
-      10,
-    );
+    connect(uris, 0, 10);
   }
 
   setupPolls() {

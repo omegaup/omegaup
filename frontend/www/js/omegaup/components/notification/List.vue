@@ -1,32 +1,42 @@
 <template>
   <li class="dropdown hide">
-    <a aria-expanded="true"
-        aria-haspopup="true"
-        class="notification-btn dropdown-toggle"
-        data-toggle="dropdown"
-        href="#"
-        role="button"><span class="glyphicon glyphicon-bell"></span> <span class=
-        "label label-danger count-label"
-          v-show="!!notifications.length">{{ notifications.length }}</span></a>
+    <a
+      aria-expanded="true"
+      aria-haspopup="true"
+      class="notification-btn dropdown-toggle"
+      data-toggle="dropdown"
+      href="#"
+      role="button"
+      ><span class="glyphicon glyphicon-bell"></span>
+      <span
+        class="label label-danger count-label"
+        v-show="!!notifications.length"
+        >{{ notifications.length }}</span
+      ></a
+    >
     <ul class="dropdown-menu notification-dropdown">
-      <li class="text-center"
-          v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
+      <li class="text-center" v-if="notifications.length === 0">
+        {{ this.T.notificationsNoNewNotifications }}
+      </li>
       <li v-else="">
-        <a role="button"
-            v-on:click="$emit('read', notifications)">{{ this.T.notificationsMarkAllAsRead }}
-            ✔️</a>
-      </li><transition-group name="list"><omegaup-notification v-bind:key=
-      "notification.notification_id"
-                            v-bind:notification="notification"
-                            v-for="notification in notifications"
-                            v-on:remove=
-                            "$emit('read', [notification])"></omegaup-notification></transition-group>
+        <a role="button" v-on:click="$emit('read', notifications)"
+          >{{ this.T.notificationsMarkAllAsRead }} ✔️</a
+        >
+      </li>
+      <transition-group name="list"
+        ><omegaup-notification
+          v-bind:key="notification.notification_id"
+          v-bind:notification="notification"
+          v-for="notification in notifications"
+          v-on:remove="$emit('read', [notification])"
+        ></omegaup-notification
+      ></transition-group>
     </ul>
   </li>
 </template>
 
 <style>
-.nav>li>a.notification-btn {
+.nav > li > a.notification-btn {
   padding: 12px 4px 0 0;
 }
 
@@ -50,11 +60,13 @@
 }
 
 /* Transitions */
-.list-enter-active, .list-leave-active {
-  transition: all .75s;
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.75s;
 }
 
-.list-enter, .list-leave-to {
+.list-enter,
+.list-leave-to {
   opacity: 0;
 }
 </style>
@@ -74,5 +86,4 @@ export default class NotificationList extends Vue {
   @Prop() notifications!: omegaup.Notification[];
   T = T;
 }
-
 </script>

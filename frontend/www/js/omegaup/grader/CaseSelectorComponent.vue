@@ -5,56 +5,83 @@
     </div>
     <div class="filenames">
       <div class="list-group">
-        <button class="list-group-item list-group-item-action disabled"
-             type="button"
-             v-if="!groups"><em>Empty</em></button>
-        <template v-bind:title="name"
-                  v-else=""
-                  v-for="group in groups">
-          <div class="list-group-item list-group-item-secondary"
-               v-if="group.explicit">
+        <button
+          class="list-group-item list-group-item-action disabled"
+          type="button"
+          v-if="!groups"
+        >
+          <em>Empty</em>
+        </button>
+        <template v-bind:title="name" v-else="" v-for="group in groups">
+          <div
+            class="list-group-item list-group-item-secondary"
+            v-if="group.explicit"
+          >
             <div>
-              <span class="verdict"
-                   v-bind:class="verdictClass(groupResult(group.name))"
-                   v-bind:title="verdictTooltip(groupResult(group.name))">{{
-                   verdictLabel(groupResult(group.name)) }}<span class="score">{{
-                   score(groupResult(group.name)) }}</span></span> <span v-bind:title=
-                   "group.name">{{ group.name }}</span>
+              <span
+                class="verdict"
+                v-bind:class="verdictClass(groupResult(group.name))"
+                v-bind:title="verdictTooltip(groupResult(group.name))"
+                >{{ verdictLabel(groupResult(group.name))
+                }}<span class="score">{{
+                  score(groupResult(group.name))
+                }}</span></span
+              >
+              <span v-bind:title="group.name">{{ group.name }}</span>
             </div>
-          </div><button class=
-          "list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                    type="button"
-                    v-bind:class="{ 'in-group': group.explicit, active: currentCase == item.name }"
-                    v-for="item in group.cases"
-                    v-on:click="selectCase(item.name)">
-          <div class="case-item">
-            <span class="verdict"
-                 v-bind:class="verdictClass(item.name)"
-                 v-bind:title="verdictTooltip(caseResult(item.name))">{{
-                 verdictLabel(caseResult(item.name)) }}<span class="score">{{
-                 score(caseResult(item.name)) }}</span></span> <span v-bind:title="item.name">{{
-                 item.name }}</span>
-          </div><button aria-label="Close"
-                  class="close"
-                  type="button"
-                  v-if="item.name != 'sample'"
-                  v-on:click.prevent.stop="removeCase(item.name)"><span aria-hidden=
-                  "true">×</span></button></button>
+          </div>
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            type="button"
+            v-bind:class="{
+              'in-group': group.explicit,
+              active: currentCase == item.name,
+            }"
+            v-for="item in group.cases"
+            v-on:click="selectCase(item.name)"
+          >
+            <div class="case-item">
+              <span
+                class="verdict"
+                v-bind:class="verdictClass(item.name)"
+                v-bind:title="verdictTooltip(caseResult(item.name))"
+                >{{ verdictLabel(caseResult(item.name))
+                }}<span class="score">{{
+                  score(caseResult(item.name))
+                }}</span></span
+              >
+              <span v-bind:title="item.name">{{ item.name }}</span>
+            </div>
+            <button
+              aria-label="Close"
+              class="close"
+              type="button"
+              v-if="item.name != 'sample'"
+              v-on:click.prevent.stop="removeCase(item.name)"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </button>
         </template>
       </div>
     </div>
     <form v-on:submit.prevent="createCase()">
       <div class="input-group">
-        <input class="form-control case-weight"
-             type="text"
-             v-model="newCaseWeight"> <input class="form-control"
-             type="text"
-             v-model="newCaseName">
+        <input
+          class="form-control case-weight"
+          type="text"
+          v-model="newCaseWeight"
+        />
+        <input class="form-control" type="text" v-model="newCaseName" />
         <div class="input-group-append">
-          <button class="btn btn-secondary"
-               type="submit"
-               v-bind:disabled="newCaseName.length == 1"
-               v-on:click="createCase()">+</button>
+          <button
+            class="btn btn-secondary"
+            type="submit"
+            v-bind:disabled="newCaseName.length == 1"
+            v-on:click="createCase()"
+          >
+            +
+          </button>
         </div>
       </div>
     </form>
@@ -212,7 +239,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>
@@ -220,7 +246,7 @@ button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
 }
-button[type="submit"] {
+button[type='submit'] {
   width: 2em;
 }
 div.summary {
