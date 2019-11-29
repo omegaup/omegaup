@@ -2,64 +2,83 @@
   <form>
     <div class="form-row">
       <div class="form-group col-md-4">
-        <label for="inputTimeLimit">Time Limit</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputTimeLimit"
-             max="5.0"
-             min="0.1"
-             step="0.1"
-             type="number"
-             v-model="timeLimit"> <!-- id-lint on -->
+        <label for="inputTimeLimit">Time Limit</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputTimeLimit"
+          max="5.0"
+          min="0.1"
+          step="0.1"
+          type="number"
+          v-model="timeLimit"
+        />
+        <!-- id-lint on -->
       </div>
       <div class="form-group col-md-4">
-        <label for="inputOverallWallTimeLimit">Overall Wall Time Limit</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputOverallWallTimeLimit"
-             max="5.0"
-             min="0.1"
-             step="0.1"
-             type="number"
-             v-model="overallWallTimeLimit"> <!-- id-lint on -->
+        <label for="inputOverallWallTimeLimit">Overall Wall Time Limit</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputOverallWallTimeLimit"
+          max="5.0"
+          min="0.1"
+          step="0.1"
+          type="number"
+          v-model="overallWallTimeLimit"
+        />
+        <!-- id-lint on -->
       </div>
       <div class="form-group col-md-4">
-        <label for="inputExtraWallTime">Extra Wall Time</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputExtraWallTime"
-             max="5.0"
-             min="0.0"
-             step="0.1"
-             type="number"
-             v-model="extraWallTime"> <!-- id-lint on -->
+        <label for="inputExtraWallTime">Extra Wall Time</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputExtraWallTime"
+          max="5.0"
+          min="0.0"
+          step="0.1"
+          type="number"
+          v-model="extraWallTime"
+        />
+        <!-- id-lint on -->
       </div>
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="inputMemoryLimit">Memory Limit</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputMemoryLimit"
-             max="1073741824"
-             min="33554432"
-             step="1048576"
-             type="number"
-             v-model="memoryLimit"> <!-- id-lint on -->
+        <label for="inputMemoryLimit">Memory Limit</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputMemoryLimit"
+          max="1073741824"
+          min="33554432"
+          step="1048576"
+          type="number"
+          v-model="memoryLimit"
+        />
+        <!-- id-lint on -->
       </div>
       <div class="form-group col-md-6">
-        <label for="inputOutputLimit">Output Limit</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputOutputLimit"
-             max="104857600"
-             min="0"
-             step="1024"
-             type="number"
-             v-model="outputLimit"> <!-- id-lint on -->
+        <label for="inputOutputLimit">Output Limit</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputOutputLimit"
+          max="104857600"
+          min="0"
+          step="1024"
+          type="number"
+          v-model="outputLimit"
+        />
+        <!-- id-lint on -->
       </div>
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="inputValidator">Validator</label> <!-- id-lint off -->
-         <select class="form-control"
-             id="inputValidator"
-             v-model="validator">
+        <label for="inputValidator">Validator</label>
+        <!-- id-lint off -->
+        <select class="form-control" id="inputValidator" v-model="validator">
           <!-- id-lint on -->
           <option value="custom">
             Custom
@@ -78,22 +97,27 @@
           </option>
         </select>
       </div>
-      <div class="form-group col-md-6"
-           v-if="validator == 'token-numeric'">
-        <label for="inputTolerance">Tolerance</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputTolerance"
-             max="1"
-             min="0"
-             type="number"
-             v-model="tolerance"> <!-- id-lint on -->
+      <div class="form-group col-md-6" v-if="validator == 'token-numeric'">
+        <label for="inputTolerance">Tolerance</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputTolerance"
+          max="1"
+          min="0"
+          type="number"
+          v-model="tolerance"
+        />
+        <!-- id-lint on -->
       </div>
-      <div class="form-group col-md-6"
-           v-if="validator == 'custom'">
-        <label for="inputValidatorLanguage">Language</label> <!-- id-lint off -->
-         <select class="form-control"
-             id="inputValidatorLanguage"
-             v-model="validatorLanguage">
+      <div class="form-group col-md-6" v-if="validator == 'custom'">
+        <label for="inputValidatorLanguage">Language</label>
+        <!-- id-lint off -->
+        <select
+          class="form-control"
+          id="inputValidatorLanguage"
+          v-model="validatorLanguage"
+        >
           <!-- id-lint on -->
           <option value="cpp">
             C++
@@ -106,10 +130,13 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-4">
-        <label for="inputInteractive">Interactive</label> <!-- id-lint off -->
-         <select class="form-control"
-             id="inputInteractive"
-             v-model="interactive">
+        <label for="inputInteractive">Interactive</label>
+        <!-- id-lint off -->
+        <select
+          class="form-control"
+          id="inputInteractive"
+          v-model="interactive"
+        >
           <!-- id-lint on -->
           <option v-bind:value="false">
             No
@@ -119,19 +146,24 @@
           </option>
         </select>
       </div>
-      <div class="form-group col-md-4"
-           v-if="interactive">
-        <label for="inputInteractiveModuleName">Module Name</label> <!-- id-lint off -->
-         <input class="form-control"
-             id="inputInteractiveModuleName"
-             v-model="interactiveModuleName"> <!-- id-lint on -->
+      <div class="form-group col-md-4" v-if="interactive">
+        <label for="inputInteractiveModuleName">Module Name</label>
+        <!-- id-lint off -->
+        <input
+          class="form-control"
+          id="inputInteractiveModuleName"
+          v-model="interactiveModuleName"
+        />
+        <!-- id-lint on -->
       </div>
-      <div class="form-group col-md-4"
-           v-if="interactive">
-        <label for="inputInteractiveLanguage">Language</label> <!-- id-lint off -->
-         <select class="form-control"
-             id="inputInteractiveLanguage"
-             v-model="interactiveLanguage">
+      <div class="form-group col-md-4" v-if="interactive">
+        <label for="inputInteractiveLanguage">Language</label>
+        <!-- id-lint off -->
+        <select
+          class="form-control"
+          id="inputInteractiveLanguage"
+          v-model="interactiveLanguage"
+        >
           <!-- id-lint on -->
           <option value="cpp11">
             C++
@@ -250,5 +282,4 @@ export default {
     },
   },
 };
-
 </script>
