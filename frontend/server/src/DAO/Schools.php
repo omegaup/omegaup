@@ -108,6 +108,56 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
+     * @param int $schoolId
+     * @param int $monthsNumber
+     * @return array{year: int, month: int, count: int}[]
+     */
+    public static function getMonthlySolvedProblemsCount(
+        int $schoolId,
+        int $monthsNumber
+    ): array {
+        $sql = '
+        SELECT
+            YEAR(su.time) AS year,
+            MONTH(su.time) AS month,
+            COUNT(DISTINCT su.problem_id) AS `count`
+        FROM
+            Submissions su
+        INNER JOIN
+            Schools sc ON sc.school_id = su.school_id
+        INNER JOIN
+            Runs r ON r.run_id = su.current_run_id
+        INNER JOIN
+            Problems p ON p.problem_id = su.problem_id
+        WHERE
+            su.school_id = ? AND su.time >= CURDATE() - INTERVAL ? MONTH
+            AND r.verdict = "AC" AND p.visibility >= 1
+            AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    Submissions sub
+                INNER JOIN
+                    Runs ru ON ru.run_id = sub.current_run_id
+                WHERE
+                    sub.problem_id = su.problem_id
+                    AND sub.identity_id = su.identity_id
+                    AND ru.verdict = "AC"
+                    AND sub.time < su.time
+            )
+        GROUP BY
+            YEAR(su.time), MONTH(su.time);';
+
+        $params = [$schoolId, $monthsNumber];
+
+        /** @var array{year: int, month: int, count: int}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+    }
+
+    /**
      * Gets the users from school, and their number of problems created, solved and
      * organized contests.
      *
