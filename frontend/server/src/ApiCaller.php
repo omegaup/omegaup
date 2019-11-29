@@ -67,7 +67,6 @@ class ApiCaller {
      * Handles main API workflow. All HTTP API calls start here.
      */
     public static function httpEntryPoint(): string {
-        $r = null;
         /** @var null|\OmegaUp\Exceptions\ApiException */
         $apiException = null;
         try {
@@ -76,6 +75,12 @@ class ApiCaller {
             }
             $r = self::createRequest();
             $response = $r->execute();
+            if (
+                self::isAssociativeArray($response) &&
+                !isset($response['status'])
+            ) {
+                $response['status'] = 'ok';
+            }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (\Exception $e) {
@@ -109,7 +114,7 @@ class ApiCaller {
         $i = 0;
         /** @var mixed $_ */
         foreach ($array as $key => $_) {
-            if ($key != $i++) {
+            if ($key !== $i++) {
                 return true;
             }
         }

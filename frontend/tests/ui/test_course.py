@@ -316,7 +316,7 @@ def update_scoreboard_for_assignment(driver, assignment_alias, course_alias):
         (urllib.parse.quote(assignment_alias, safe=''),
          urllib.parse.quote(course_alias, safe='')))
     driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
+    assert '"status":"ok"' in driver.browser.page_source
 
 
 @util.annotate
