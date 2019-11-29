@@ -6,10 +6,14 @@
       </h2>
     </div>
     <table class="table table-striped" v-if="items.length &gt; 0">
+      <slot></slot>
       <tbody>
         <tr v-for="group in paginatedItems">
           <td v-for="item in group">
             <a v-bind:href="item.getUrl()">{{ item.toString() }}</a>
+          </td>
+          <td v-if="!group[0].getBadge().isEmpty()">
+            <strong>{{ group[0].getBadge() }}</strong>
           </td>
         </tr>
       </tbody>

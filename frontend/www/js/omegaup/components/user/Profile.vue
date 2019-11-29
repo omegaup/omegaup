@@ -40,35 +40,19 @@
           v-bind:rank="rank"
         ></omegaup-user-basicinfo>
       </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">
-            {{ T.profileContests }}
-            <span class="badge">{{ contests.length }}</span>
-          </h2>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>{{ T.profileContestsTableContest }}</th>
-              <th>{{ T.profileContestsTablePlace }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="contest in contests">
-              <td>
-                <a v-bind:href="`/arena/${contest.data.alias}/`">{{
-                  contest.data.title
-                }}</a>
-              </td>
-              <td>
-                <strong>{{ contest.place }}</strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-show="!contests"><img src="/media/wait.gif" /></div>
-      </div>
+      <omegaup-grid-paginator
+        v-bind:columns="1"
+        v-bind:items="contests"
+        v-bind:items-per-page="15"
+        v-bind:title="T.profileContests"
+      >
+        <thead>
+          <tr>
+            <th>{{ T.profileContestsTableContest }}</th>
+            <th>{{ T.profileContestsTablePlace }}</th>
+          </tr>
+        </thead></omegaup-grid-paginator
+      >
       <omegaup-grid-paginator
         v-bind:columns="3"
         v-bind:items="createdProblems"
@@ -124,7 +108,7 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
 import user_GridPaginator from './GridPaginator.vue';
-import { Problem } from '../../types.ts';
+import { Problem, ContestResult } from '../../types.ts';
 
 @Component({
   components: {
@@ -137,7 +121,7 @@ import { Problem } from '../../types.ts';
 })
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
-  @Prop() contests!: omegaup.ContestResult[];
+  @Prop() contests!: ContestResult[];
   @Prop() solvedProblems!: Problem[];
   @Prop() unsolvedProblems!: Problem[];
   @Prop() createdProblems!: Problem[];
