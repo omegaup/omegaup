@@ -50,7 +50,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @param  int $finishTime
      * @param  int $offset
      * @param  int $rowcount
-     * @return array
+     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     public static function getRankByUsersAndProblemsWithAC(
         int $startDate,
@@ -90,16 +90,17 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         $result = [];
         foreach (
+            /** @var list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 $args
             ) as $row
         ) {
             $result[] = [
-                'name' => $row['name'],
-                'country_id' => $row['country_id'],
-                'distinct_users' => $row['distinct_users'],
-                'distinct_problems' => $row['distinct_problems'],
+                'name' => strval($row['name']),
+                'country_id' => strval($row['country_id']),
+                'distinct_users' => intval($row['distinct_users']),
+                'distinct_problems' => intval($row['distinct_problems']),
             ];
         }
 

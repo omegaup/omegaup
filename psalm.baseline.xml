@@ -1129,9 +1129,7 @@
       <code>$finishTime</code>
       <code>$canUseCache</code>
     </MixedArgument>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
+    <MixedInferredReturnType occurrences="1"/>
     <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
@@ -1248,10 +1246,9 @@
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="12">
+    <MixedArrayAccess occurrences="11">
       <code>$response['verified']</code>
       <code>$response['username']</code>
-      <code>$response['userinfo']['email']</code>
       <code>$contest['alias']</code>
       <code>$contest['scoreboard_url_admin']</code>
       <code>$contest['alias']</code>
@@ -2213,14 +2210,6 @@
       <code>$value</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/index.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/interviews/arena.php">
     <MixedAssignment occurrences="1">
       <code>$show_intro</code>
@@ -2306,22 +2295,6 @@
     <MixedArrayAssignment occurrences="1">
       <code>$response['userinfo']['graduation_date']</code>
     </MixedArrayAssignment>
-  </file>
-  <file src="frontend/www/rank.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/schoolsrank.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/www/useremailedit.php">
     <MixedArgument occurrences="1">

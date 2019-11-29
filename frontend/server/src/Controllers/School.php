@@ -232,7 +232,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return array
+     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -264,36 +264,37 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @param int $rowCount
-     * @param bool $isIndex
-     * @return array
+     * @return array{smartyProperties: array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
     public static function getSchoolsRankForSmarty(
         int $rowCount,
         bool $isIndex
     ): array {
         $schoolsRank = [
-            'schoolRankPayload' => [
-                'rowCount' => $rowCount,
-                'rank' => self::getSchoolsRank(
-                    /*$offset=*/0,
-                    $rowCount,
-                    /*$startTime=*/strtotime(
-                        'first day of this month',
-                        \OmegaUp\Time::get()
+            'smartyProperties' => [
+                'schoolRankPayload' => [
+                    'rowCount' => $rowCount,
+                    'rank' => self::getSchoolsRank(
+                        /*$offset=*/0,
+                        $rowCount,
+                        /*$startTime=*/strtotime(
+                            'first day of this month',
+                            \OmegaUp\Time::get()
+                        ),
+                        /*$finishTime=*/strtotime(
+                            'first day of next month',
+                            \OmegaUp\Time::get()
+                        ),
+                        /*$canUseCache=*/true
                     ),
-                    /*$finishTime=*/strtotime(
-                        'first day of next month',
-                        \OmegaUp\Time::get()
-                    ),
-                    /*$canUseCache=*/true
-                ),
-            ]
+                ],
+            ],
+            'template' => 'rank.schools.tpl'
         ];
         if (!$isIndex) {
             return $schoolsRank;
         }
-        $schoolsRank['rankTablePayload'] = [
+        $schoolsRank['smartyProperties']['rankTablePayload'] = [
             'length' => $rowCount,
             'isIndex' => $isIndex,
             'availableFilters' => [],

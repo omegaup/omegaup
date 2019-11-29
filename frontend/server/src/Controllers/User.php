@@ -1155,8 +1155,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @param \OmegaUp\DAO\VO\Users $user
-     * @return array
+     * @return array{userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}}
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1339,9 +1338,18 @@ class User extends \OmegaUp\Controllers\Controller {
      * date, calculate it and save it.
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{problems?: null, status: string, userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
+        $response = self::getCodersOfTheMonth($r);
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
+     * @return array{problems?: null, status?: string, userinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     */
+    private static function getCodersOfTheMonth(\OmegaUp\Request $r) {
         $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
             \OmegaUp\Validators::validateDate($r['date'], 'date');
@@ -1398,7 +1406,6 @@ class User extends \OmegaUp\Controllers\Controller {
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
 
-        $response['status'] = 'ok';
         return $response;
     }
 
@@ -2117,7 +2124,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return string
      */
-
     public static function apiRankByProblemsSolved(\OmegaUp\Request $r) {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
@@ -2942,14 +2948,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
-     * @param \OmegaUp\Request $r
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return array
+     *
+     * @return array{smartyProperties: array{rankTablePayload: array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}}, template: string}
      */
-    public static function getRankDetailsForSmarty(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity
-    ): array {
+    public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
         \OmegaUp\Validators::validateInEnum(
@@ -2958,6 +2960,9 @@ class User extends \OmegaUp\Controllers\Controller {
             ['', 'country', 'state', 'school'],
             /*$required=*/false
         );
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Controllers\Session::getCurrentSession();
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
@@ -2996,15 +3001,35 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'rankTablePayload' => [
-                'isLogged' => !is_null($identity),
-                'page' => $page,
-                'length' => $length,
-                'filter' => $filter,
-                'availableFilters' => $availableFilters,
-                'isIndex' => false,
+            'smartyProperties' => [
+                'rankTablePayload' => [
+                    'isLogged' => !is_null($identity),
+                    'page' => $page,
+                    'length' => $length,
+                    'filter' => $filter,
+                    'availableFilters' => $availableFilters,
+                    'isIndex' => false,
+                ],
             ],
+            'template' => 'rank.tpl',
         ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: mixed, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     */
+    public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
+        $response = \OmegaUp\Controllers\School::getSchoolsRankForSmarty(
+            /*$rowCount=*/ 5,
+            /*$isIndex=*/ true
+        );
+
+        $response['smartyProperties']['coderOfTheMonthData'] = self::getCodersOfTheMonth(
+            $r
+        )['userinfo'];
+        $response['template'] = 'index.tpl';
+
+        return $response;
     }
 
     /**
