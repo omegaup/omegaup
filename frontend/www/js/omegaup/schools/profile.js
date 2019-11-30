@@ -30,21 +30,27 @@ OmegaUp.on('ready', function() {
   });
 
   API.School.schoolCodersOfTheMonth({
-    school_id: payload.school_id
-  }).then(function (data) {
-    console.log(data);
-  }).fail(UI.apiError);
+    school_id: payload.school_id,
+  })
+    .then(function(data) {
+      console.log(data);
+    })
+    .fail(UI.apiError);
 
   API.School.users({
-    school_id: payload.school_id
-  }).then(function (data) {
+    school_id: payload.school_id,
+  })
+    .then(function(data) {
       schoolProfile.users = data.users;
-  }).fail(UI.apiError);
+    })
+    .fail(UI.apiError);
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,
     months_count: 6,
-  }).then(function(data) {
-    schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;
-  }).fail(UI.apiError);
+  })
+    .then(function(data) {
+      schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;
+    })
+    .fail(UI.apiError);
 });
