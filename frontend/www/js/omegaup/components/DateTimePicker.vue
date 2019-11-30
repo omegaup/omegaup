@@ -1,9 +1,11 @@
 <template>
-  <input class="form-control"
-        readonly
-        size="16"
-        type="text"
-        v-bind:disabled="!enabled">
+  <input
+    class="form-control"
+    readonly
+    size="16"
+    type="text"
+    v-bind:disabled="!enabled"
+  />
 </template>
 
 <script lang="ts">
@@ -59,5 +61,4 @@ export default class DateTimePicker extends Vue {
       .setDate(newValue);
   }
 }
-
 </script>

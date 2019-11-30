@@ -58,17 +58,7 @@ OmegaUp.on('ready', function() {
 
   API.User.contestStats({ username: profile.username })
     .then(function(data) {
-      let contests = [];
-      for (var contest_alias in data['contests']) {
-        var now = new Date();
-        var currentTimestamp =
-          data.contests[contest_alias].data.finish_time * 1000;
-        var end = OmegaUp.remoteTime(currentTimestamp);
-        if (data.contests[contest_alias]['place'] != null && now > end) {
-          contests.push(data.contests[contest_alias]);
-        }
-      }
-      viewProfile.contests = contests;
+      viewProfile.contests = data;
     })
     .fail(UI.apiError);
 

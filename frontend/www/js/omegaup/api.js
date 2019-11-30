@@ -1,5 +1,6 @@
 import UI from './ui.js';
-import { Problem } from './types.ts';
+import { Problem, ContestResult } from './types.ts';
+import { OmegaUp } from './omegaup.js';
 
 function _call(url, transform, defaultParams) {
   return function(params) {
@@ -616,7 +617,19 @@ export default {
 
     changePassword: _call('/api/user/changepassword/'),
 
-    contestStats: _call('/api/user/conteststats/'),
+    contestStats: _call('/api/user/conteststats/', function(data) {
+      let contests = [];
+      for (let contestAlias in data.contests) {
+        const now = new Date();
+        const currentTimestamp =
+          data.contests[contestAlias].data.finish_time * 1000;
+        const end = OmegaUp.remoteTime(currentTimestamp);
+        if (data.contests[contestAlias].place !== null && now > end) {
+          contests.push(new ContestResult(data.contests[contestAlias]));
+        }
+      }
+      return contests;
+    }),
 
     coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
