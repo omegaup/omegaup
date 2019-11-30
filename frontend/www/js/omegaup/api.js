@@ -573,9 +573,13 @@ export default {
 
     list: _call('/api/school/list/'),
 
+    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
+
     rank: _call('/api/school/rank/'),
 
-    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
+    schoolCodersOfTheMonth: _call('/api/school/schoolcodersofthemonth'),
+
+    users: _call('/api/school/users/'),
   },
 
   Session: {

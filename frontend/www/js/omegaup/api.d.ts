@@ -402,6 +402,13 @@ declare namespace omegaup {
     source_url?: string;
   }
 
+  export interface SchoolUser extends User {
+    classname: string;
+    created_problems: number;
+    organized_contests: number;
+    solved_problems: number;
+  }
+
   export interface SchoolsRank {
     country_id: string;
     distinct_problems: number;
@@ -441,7 +448,7 @@ declare namespace omegaup {
   }
 
   export interface User {
-    name: string;
+    name?: string;
     username: string;
   }
 

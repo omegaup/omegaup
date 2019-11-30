@@ -13,6 +13,7 @@ OmegaUp.on('ready', function() {
           country: this.country,
           stateName: this.stateName,
           monthlySolvedProblemsCount: this.monthlySolvedProblemsCount,
+          users: this.users,
         },
       });
     },
@@ -21,11 +22,24 @@ OmegaUp.on('ready', function() {
       country: payload.country,
       stateName: payload.state_name,
       monthlySolvedProblemsCount: [],
+      users: [],
     },
     components: {
       'omegaup-school-profile': school_Profile,
     },
   });
+
+  API.School.schoolCodersOfTheMonth({
+    school_id: payload.school_id
+  }).then(function (data) {
+    console.log(data);
+  }).fail(UI.apiError);
+
+  API.School.users({
+    school_id: payload.school_id
+  }).then(function (data) {
+      schoolProfile.users = data.users;
+  }).fail(UI.apiError);
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,

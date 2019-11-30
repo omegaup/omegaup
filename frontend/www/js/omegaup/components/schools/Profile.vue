@@ -59,6 +59,7 @@ export default class SchoolProfile extends Vue {
   @Prop() country!: omegaup.Country;
   @Prop() stateName!: string;
   @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];
+  @Prop() users!: omegaup.SchoolUser[];
 
   T = T;
   UI = UI;
