@@ -66,7 +66,6 @@
     "v-tooltip": "^3.0.0-alpha.7",
     "vue": "^2.5.22",
     "vue-async-computed": "^3.5.1",
-    "vue-slider-component": "^3.0.25",
-    "vue-trend-chart": "^0.15.1"
+    "vue-slider-component": "^3.0.25"
   }
 }

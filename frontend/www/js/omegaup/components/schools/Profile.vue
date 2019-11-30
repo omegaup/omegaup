@@ -27,31 +27,42 @@
       </div>
       <div class="col-md-8">
         <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2 class="panel-title text-center">
-              Envíos mensuales de los usuarios
-            </h2>
-          </div>
           <div class="panel-body">
-            <trend-chart
-              v-bind:datasets="[
+            <omegaup-school-barchart
+              v-bind:data="[
                 {
-                  data: [10, 50, 20, 100, 40, 60, 80],
-                  smooth: true,
-                  showPoints: true,
-                  fill: true,
+                  year: '2019',
+                  month: '5',
+                  count: '20',
+                },
+                {
+                  year: '2019',
+                  month: '6',
+                  count: '25',
+                },
+                {
+                  year: '2019',
+                  month: '7',
+                  count: '25',
+                },
+                {
+                  year: '2019',
+                  month: '8',
+                  count: '60',
+                },
+                {
+                  year: '2019',
+                  month: '9',
+                  count: '200',
+                },
+                {
+                  year: '2019',
+                  month: '10',
+                  count: '100',
                 },
               ]"
-              v-bind:grid="{
-                verticalLines: true,
-                horizontalLines: true,
-              }"
-              v-bind:labels="{
-                xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                yLabels: 5,
-              }"
-              v-bind:min="0"
-            ></trend-chart>
+              v-bind:school="name"
+            ></omegaup-school-barchart>
           </div>
         </div>
       </div>
@@ -72,7 +83,7 @@ import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import countryFlag from '../CountryFlag.vue';
-import TrendChart from 'vue-trend-chart';
+import schoolBarchart from './Barchart.vue';
 
 interface ProblemsSolvedCount {
   year: number;
@@ -83,7 +94,7 @@ interface ProblemsSolvedCount {
 @Component({
   components: {
     'omegaup-country-flag': countryFlag,
-    'trend-chart': TrendChart,
+    'omegaup-school-barchart': schoolBarchart,
   },
 })
 export default class SchoolProfile extends Vue {
@@ -96,17 +107,17 @@ export default class SchoolProfile extends Vue {
   T = T;
   UI = UI;
 
-  get solvedProblemsCountData(): number[] {
-    return this.monthlySolvedProblemsCount.map(
-      solvedProblemsCount => solvedProblemsCount.count,
-    );
-  }
+  // get solvedProblemsCountData(): number[] {
+  //   return this.monthlySolvedProblemsCount.map(
+  //     solvedProblemsCount => solvedProblemsCount.count,
+  //   );
+  // }
 
-  get solvedProblemsCountLabels(): string[] {
-    return this.monthlySolvedProblemsCount.map(
-      solvedProblemsCount =>
-        `${solvedProblemsCount.year}-${solvedProblemsCount.month}`,
-    );
-  }
+  // get solvedProblemsCountLabels(): string[] {
+  //   return this.monthlySolvedProblemsCount.map(
+  //     solvedProblemsCount =>
+  //       `${solvedProblemsCount.year}-${solvedProblemsCount.month}`,
+  //   );
+  // }
 }
 </script>

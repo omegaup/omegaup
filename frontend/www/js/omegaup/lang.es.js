@@ -722,6 +722,7 @@ const translations = {
 	profileRankSpecialist: "\u039f",
 	profileRankUnrated: "Sin clasificaci\u00f3n",
 	profileSchool: "Escuela",
+	profileSchoolMonthlySolvedProblemsCount: "Total de problemas resueltos mensualmente por los usuarios de %(school)",
 	profileSolvedProblems: "Problemas resueltos",
 	profileState: "Estado",
 	profileStatistics: "Estad\u00edsticas",
