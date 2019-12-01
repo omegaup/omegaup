@@ -33,32 +33,32 @@
                 {
                   year: '2019',
                   month: '5',
-                  count: '20',
+                  count: 20,
                 },
                 {
                   year: '2019',
                   month: '6',
-                  count: '25',
+                  count: 25,
                 },
                 {
                   year: '2019',
                   month: '7',
-                  count: '25',
+                  count: 25,
                 },
                 {
                   year: '2019',
                   month: '8',
-                  count: '60',
+                  count: 60,
                 },
                 {
                   year: '2019',
                   month: '9',
-                  count: '200',
+                  count: 200,
                 },
                 {
                   year: '2019',
                   month: '10',
-                  count: '100',
+                  count: 100,
                 },
               ]"
               v-bind:school="name"
