@@ -438,12 +438,11 @@
       <code>$aliasGroup</code>
       <code>$lang</code>
     </MissingParamType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="4">
       <code>validateGroupOwnership</code>
       <code>saveIdentityGroup</code>
       <code>validateUpdateRequest</code>
       <code>validateIdentity</code>
-      <code>convertToSupportedLanguage</code>
     </MissingReturnType>
     <MixedArgument occurrences="17">
       <code>$r['group_alias']</code>
@@ -464,29 +463,16 @@
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$langCode</code>
     </MixedArgumentTypeCoercion>
-    <MixedArrayAccess occurrences="4">
-      <code>$extendedProfile['country']</code>
-      <code>$extendedProfile['state']</code>
-      <code>$extendedProfile['school']</code>
-      <code>$extendedProfile['locale']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="5">
+    <MixedAssignment occurrences="4">
       <code>$group</code>
       <code>$group</code>
-      <code>$extendedProfile</code>
       <code>$val</code>
       <code>$langWeight</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>string</code>
-    </MixedInferredReturnType>
     <MixedPropertyFetch occurrences="2">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="2">
-      <code>self::convertToSupportedLanguage($_GET['lang'])</code>
-    </MixedReturnStatement>
     <PossiblyNullArgument occurrences="1">
       <code>$identity-&gt;username</code>
     </PossiblyNullArgument>
@@ -1239,10 +1225,9 @@
       <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="12">
+    <MixedArrayAccess occurrences="11">
       <code>$response['verified']</code>
       <code>$response['username']</code>
-      <code>$response['userinfo']['email']</code>
       <code>$contest['alias']</code>
       <code>$contest['scoreboard_url_admin']</code>
       <code>$contest['alias']</code>
@@ -1260,7 +1245,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="26">
+    <MixedAssignment occurrences="25">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
@@ -1271,7 +1256,6 @@
       <code>$resetRequest['permission_key']</code>
       <code>$addUserRequest['auth_token']</code>
       <code>$addUserRequest['contest_alias']</code>
-      <code>$response['userinfo']['locale']</code>
       <code>$response</code>
       <code>$contestsParticipated</code>
       <code>$contest</code>
@@ -1578,9 +1562,8 @@
       <code>$userId</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="4">
       <code>isVerified</code>
-      <code>getExtendedProfileDataByPk</code>
       <code>isUserAssociatedWithIdentityOfGroup</code>
       <code>getAssociatedIdentities</code>
       <code>associateIdentityWithUser</code>

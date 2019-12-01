@@ -8,6 +8,7 @@
  * @author joemmanuel
  */
 class Run extends \OmegaUp\Controllers\Controller {
+    /** @var array{c: string, cat: string, cpp11: string, cpp: string, cs: string, hs: string, java: string, kj: string, kp: string, lua: string, pas: string, pl: string, py: string, rb: string} */
     public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',

@@ -495,7 +495,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{userinfo: array{birth_date: null|string, country: string, country_id: int|null, email: null|string, gender: null|string, graduation_date: null|string, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int, status?: string}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified: bool}}
+     * @return array{birth_date?: null|string, country: string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: null|string, gravatar_92: string, hide_problem_tags?: bool, is_private?: bool, locale: string, name: string, preferred_language?: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified?: bool}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -509,7 +509,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
-        /** @var array{userinfo: array{username: string, name: string, birth_date: string|null, gender: string|null, scholar_degree: string|null, preferred_language: string|null, is_private: bool, verified: bool, hide_problem_tags: bool, graduation_date: string|null, email: string|null, country: string, country_id: int|null, state: string|null, state_id: int|null, school: string|null, school_id: int|null, locale: string, gravatar_92: string}} */
+        /** @var array{username: string, name: string, birth_date?: string|null, gender?: string|null, scholar_degree?: string|null, preferred_language?: string|null, is_private?: bool, verified?: bool, hide_problem_tags?: bool, graduation_date: string|null, email: string|null, country: string, country_id: int|null, state: string|null, state_id: int|null, school: string|null, school_id: int|null, locale: string, gravatar_92: string} */
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
@@ -525,9 +525,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
 
         if ($omitRank) {
-            $response['userinfo']['rankinfo'] = [];
+            $response['rankinfo'] = [];
         } else {
-            $response['userinfo']['rankinfo'] =
+            $response['rankinfo'] =
                 \OmegaUp\Controllers\User::getFullRankByProblemsSolved(
                     $identity,
                     '',
@@ -556,7 +556,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ) {
             return $response;
         }
-        unset($response['userinfo']['email']);
+        unset($response['email']);
         return $response;
     }
 
@@ -564,7 +564,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Returns the profile of the identity given
      *
      * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return array
+     * @return array{country: string, country_id: null|string, is_private: true, locale: string, name: null|string, preferred_language: null, school: string, school_id: int|null, state: string, state_id: null|string, username: null|string}
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
@@ -582,21 +582,19 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'userinfo' => [
-                'username' => $identity->username,
-                'name' => $identity->name,
-                'preferred_language' => null,
-                'country' => $extendedProfile['country'],
-                'country_id' => $identity->country_id,
-                'state' => $extendedProfile['state'],
-                'state_id' => $identity->state_id,
-                'school' => $extendedProfile['school'],
-                'school_id' => $schoolId,
-                'is_private' => true,
-                'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
-                    $extendedProfile['locale']
-                ),
-            ]
+            'username' => $identity->username,
+            'name' => $identity->name,
+            'preferred_language' => null,
+            'country' => $extendedProfile['country'] ?? '',
+            'country_id' => $identity->country_id,
+            'state' => $extendedProfile['state'] ?? '',
+            'state_id' => $identity->state_id,
+            'school' => $extendedProfile['school'] ?? '',
+            'school_id' => $schoolId,
+            'is_private' => true,
+            'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
+                $extendedProfile['locale'] ?? ''
+            ),
         ];
     }
 
@@ -673,7 +671,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return 'es';
     }
 
-    public static function convertToSupportedLanguage($lang) {
+    public static function convertToSupportedLanguage($lang): string {
         switch ($lang) {
             case 'en':
             case 'en-us':

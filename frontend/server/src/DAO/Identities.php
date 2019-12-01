@@ -188,6 +188,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return $rs['verified'];
     }
 
+    /**
+     * @return array{country: string, state: string, school: string, email: string, locale: string}|null
+     */
     final public static function getExtendedProfileDataByPk($identity_id) {
         if (is_null($identity_id)) {
             return null;
@@ -219,6 +222,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 LIMIT
                     1;';
         $params = [$identity_id];
+        /** @var array{country: string, state: string, school: string, email: string, locale: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
