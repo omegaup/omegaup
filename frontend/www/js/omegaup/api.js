@@ -1,5 +1,5 @@
 import UI from './ui.js';
-import { Problem, ContestResult } from './types.ts';
+import * as types from './types.ts';
 import { OmegaUp } from './omegaup.js';
 
 function _call(url, transform, defaultParams) {
@@ -577,7 +577,14 @@ export default {
 
     rank: _call('/api/school/rank/'),
 
-    schoolCodersOfTheMonth: _call('/api/school/schoolcodersofthemonth'),
+    schoolCodersOfTheMonth: _call(
+      '/api/school/schoolcodersofthemonth',
+      function(data) {
+        return data.map(
+          coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
+        );
+      },
+    ),
 
     users: _call('/api/school/users/'),
   },
@@ -629,7 +636,7 @@ export default {
           data.contests[contestAlias].data.finish_time * 1000;
         const end = OmegaUp.remoteTime(currentTimestamp);
         if (data.contests[contestAlias].place !== null && now > end) {
-          contests.push(new ContestResult(data.contests[contestAlias]));
+          contests.push(new types.ContestResult(data.contests[contestAlias]));
         }
       }
       return contests;
@@ -659,21 +666,27 @@ export default {
       data,
     ) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),
 
     problemsSolved: _call('/api/user/problemssolved/', function(data) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),
 
     problemsCreated: _call('/api/user/problemscreated', function(data) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),

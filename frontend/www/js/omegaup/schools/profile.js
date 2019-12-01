@@ -9,19 +9,21 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-school-profile', {
         props: {
-          name: this.name,
+          codersOfTheMonth: this.codersOfTheMonth,
           country: this.country,
-          stateName: this.stateName,
           monthlySolvedProblemsCount: this.monthlySolvedProblemsCount,
+          name: this.name,
+          stateName: this.stateName,
           users: this.users,
         },
       });
     },
     data: {
-      name: payload.school_name,
+      codersOfTheMonth: [],
       country: payload.country,
-      stateName: payload.state_name,
       monthlySolvedProblemsCount: [],
+      name: payload.school_name,
+      stateName: payload.state_name,
       users: [],
     },
     components: {
@@ -33,7 +35,7 @@ OmegaUp.on('ready', function() {
     school_id: payload.school_id,
   })
     .then(function(data) {
-      console.log(data);
+      schoolProfile.codersOfTheMonth = data;
     })
     .fail(UI.apiError);
 

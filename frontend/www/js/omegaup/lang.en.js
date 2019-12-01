@@ -1095,6 +1095,7 @@ const translations = {
 	wordsMode: "Mode",
 	wordsModeAsc: "Ascending",
 	wordsModeDesc: "Descending",
+	wordsMonths: "Months",
 	wordsMultipleUser: "Multiple users (Separated by commas)",
 	wordsMyScore: "My score",
 	wordsName: "Name",

@@ -402,6 +402,12 @@ declare namespace omegaup {
     source_url?: string;
   }
 
+  export interface SchoolCoderOfTheMonth {
+    classname: string;
+    time: string;
+    username: string;
+  }
+
   export interface SchoolUser extends User {
     classname: string;
     created_problems: number;
