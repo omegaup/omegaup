@@ -765,7 +765,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="14">
+    <PossiblyNullArgument occurrences="13">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -777,7 +777,6 @@
       <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
       <code>$problem-&gt;acl_id</code>
-      <code>$acl-&gt;owner_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>

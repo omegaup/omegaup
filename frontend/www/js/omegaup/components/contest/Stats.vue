@@ -4,10 +4,15 @@
       <h1>{{ T.liveStatistics }}</h1>
       <div>
         {{ totalRuns }}
-      </div><omegaup-verdict-chart v-bind:stats="stats"
-           v-bind:title="contestAlias"></omegaup-verdict-chart>
-           <omegaup-distribution-chart v-bind:stats="stats"
-           v-bind:title="contestAlias"></omegaup-distribution-chart>
+      </div>
+      <omegaup-verdict-chart
+        v-bind:stats="stats"
+        v-bind:title="contestAlias"
+      ></omegaup-verdict-chart>
+      <omegaup-distribution-chart
+        v-bind:stats="stats"
+        v-bind:title="contestAlias"
+      ></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
   </div>
@@ -37,5 +42,4 @@ export default class Stats extends Vue {
     return UI.formatString(T.totalRuns, { numRuns: this.stats.total_runs });
   }
 }
-
 </script>

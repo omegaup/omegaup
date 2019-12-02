@@ -3,10 +3,11 @@
     <div class="page-header">
       <h1>{{ T.qualityNomination }}</h1>
     </div>
-    <div class="pull-right"
-         v-if="!myView">
-      <label><input type="checkbox"
-             v-model="showAll"> {{ T.qualityNominationShowAll }}</label>
+    <div class="pull-right" v-if="!myView">
+      <label
+        ><input type="checkbox" v-model="showAll" />
+        {{ T.qualityNominationShowAll }}</label
+      >
     </div>
     <div>
       <table class="table table-striped">
@@ -26,30 +27,39 @@
           <tr v-for="nomination in visibleNominations">
             <td>{{ nomination.nomination }}</td>
             <td>
-              <a v-bind:href="problemUrl(nomination.problem.alias)">{{ nomination.problem.title
+              <a v-bind:href="problemUrl(nomination.problem.alias)">{{
+                nomination.problem.title
               }}</a>
             </td>
             <td>
               <a v-bind:href="userUrl(nomination.nominator.username)">{{
-              nomination.nominator.username }}</a>
+                nomination.nominator.username
+              }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{ nomination.author.username
+              <a v-bind:href="userUrl(nomination.author.username)">{{
+                nomination.author.username
               }}</a>
             </td>
             <td>{{ nomination.time.format('long') }}</td>
             <td><!-- TODO: Judges aren't returned from the API yet --></td>
             <td>{{ nomination.status }}</td>
             <td>
-              <a v-bind:href="nominationDetailsUrl(nomination.qualitynomination_id)">{{
-              T.wordsDetails }}</a>
+              <a
+                v-bind:href="
+                  nominationDetailsUrl(nomination.qualitynomination_id)
+                "
+                >{{ T.wordsDetails }}</a
+              >
             </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div>
-      <a href="/group/omegaup:quality-reviewer/edit/#members">{{ T.addUsersToReviewerGroup }}</a>
+      <a href="/group/omegaup:quality-reviewer/edit/#members">{{
+        T.addUsersToReviewerGroup
+      }}</a>
     </div>
   </div>
 </template>
@@ -90,5 +100,4 @@ export default class QualityNominationList extends Vue {
     return `/nomination/${nominationId}/`;
   }
 }
-
 </script>

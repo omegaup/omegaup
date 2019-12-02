@@ -1,8 +1,10 @@
 <template>
   <div class="root d-flex flex-row h-100">
-    <textarea class="col px-0"
-         v-bind:disabled="readOnly"
-         v-model="contents"></textarea>
+    <textarea
+      class="col px-0"
+      v-bind:disabled="readOnly"
+      v-model="contents"
+    ></textarea>
   </div>
 </template>
 
@@ -48,14 +50,14 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>
 textarea {
-	background: #222222;
-	border: 0px;
-	font-family: "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	color: #d4d4d4;
+  background: #222222;
+  border: 0px;
+  font-family: 'Droid Sans Mono', 'Courier New', monospace,
+    'Droid Sans Fallback';
+  color: #d4d4d4;
 }
 </style>

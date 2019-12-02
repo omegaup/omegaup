@@ -1,8 +1,10 @@
 <template>
-  <input class="form-control"
-        size="16"
-        type="text"
-        v-bind:disabled="!enabled">
+  <input
+    class="form-control"
+    size="16"
+    type="text"
+    v-bind:disabled="!enabled"
+  />
 </template>
 
 <script lang="ts">
@@ -35,5 +37,4 @@ export default class DatePicker extends Vue {
     $(this.$el).datepicker('setValue', newValue);
   }
 }
-
 </script>
