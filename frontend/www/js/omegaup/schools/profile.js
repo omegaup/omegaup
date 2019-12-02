@@ -35,7 +35,7 @@ OmegaUp.on('ready', function() {
     school_id: payload.school_id,
   })
     .then(function(data) {
-      schoolProfile.codersOfTheMonth = data;
+      schoolProfile.codersOfTheMonth = data.coders;
     })
     .fail(UI.apiError);
 

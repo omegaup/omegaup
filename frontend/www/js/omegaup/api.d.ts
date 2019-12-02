@@ -131,8 +131,8 @@ declare namespace omegaup {
   }
 
   export interface Country {
-    country_id?: string;
-    country_name: string;
+    id: string;
+    name: string;
   }
 
   export interface Course {

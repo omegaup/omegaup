@@ -9,9 +9,9 @@
           <ul class="list-group">
             <li class="list-group-item">
               <strong>{{ T.wordsCountry }}:</strong>
-              {{ country.country_name }}
+              {{ country.name }}
               <omegaup-country-flag
-                v-bind:country="country.country_id"
+                v-bind:country="country.id"
               ></omegaup-country-flag>
             </li>
             <li class="list-group-item">

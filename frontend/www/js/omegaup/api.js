@@ -580,9 +580,10 @@ export default {
     schoolCodersOfTheMonth: _call(
       '/api/school/schoolcodersofthemonth',
       function(data) {
-        return data.map(
+        data.coders = data.coders.map(
           coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
         );
+        return data;
       },
     ),
 

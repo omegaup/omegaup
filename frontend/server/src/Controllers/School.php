@@ -45,7 +45,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the basic details for school
      * @param \OmegaUp\Request $r
-     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, country: array{country_id: string|null, country_name: string|null}, state_name: string|null}}}
+     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, country: array{id: string|null, name: string|null}, state_name: string|null}}}
      */
     public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -59,8 +59,8 @@ class School extends \OmegaUp\Controllers\Controller {
             'school_id' => intval($school->school_id),
             'school_name' => strval($school->name),
             'country' => [
-                'country_id' => null,
-                'country_name' => null,
+                'id' => null,
+                'name' => null,
             ],
             'state_name' => null,
         ];
@@ -72,8 +72,8 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country']['country_id'] = $country->country_id;
-                $details['country']['country_name'] = $country->name;
+                $details['country']['id'] = $country->country_id;
+                $details['country']['name'] = $country->name;
             }
 
             if (!is_null($school->state_id)) {
@@ -239,7 +239,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns rank of best schools in last month
      *
      * @param \OmegaUp\Request $r
-     * @return array{time: string, username: string, classname: string}[]
+     * @return array{coders: array{time: string, username: string, classname: string}[]}
      */
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -249,9 +249,11 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        return \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
-            intval($school->school_id)
-        );
+        return [
+            'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
+                intval($school->school_id)
+            )
+        ];
     }
 
     /**
