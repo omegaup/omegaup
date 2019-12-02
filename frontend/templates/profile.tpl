@@ -6,8 +6,8 @@
 	<div class="col-md-2 no-right-padding" id="userbox">
 		<div class="panel panel-default" id="userbox-inner">
 			<div class="panel-body">
-				<div class="thumbnail bottom-margin"> <img src="{$profile.userinfo.gravatar_92}"/></div>
-				{if isset($profile.userinfo.email)}
+				<div class="thumbnail bottom-margin"> <img src="{$profile.gravatar_92}"/></div>
+				{if isset($profile.email)}
 				<div id="profile-edit"><a href="/profile/edit/" class="btn btn-default">{#profileEdit#}</a></div>
 				{/if}
 			</div>
@@ -18,7 +18,7 @@
 	<div class="col-md-10 no-right-padding">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title">{if $profile.userinfo.rankinfo.rank > 0}#{$profile.userinfo.rankinfo.rank} - {/if}{$profile.userinfo.username} {if isset($profile.userinfo.country_id)} <img src="/media/flags/{$profile.userinfo.country_id|lower}.png" width="16" height="11" title="{$profile.userinfo.country_id}"/> {/if}</h2>
+				<h2 class="panel-title">{if $profile.rankinfo.rank > 0}#{$profile.rankinfo.rank} - {/if}{$profile.username} {if isset($profile.country_id)} <img src="/media/flags/{$profile.country_id|lower}.png" width="16" height="11" title="{$profile.country_id}"/> {/if}</h2>
 			</div>
 {include file='profile.basicinfo.tpl' inline}
 		</div>
@@ -87,7 +87,7 @@
 	{/block}
 
 </div>
-<div id="username" style="display:none" data-username="{$profile.userinfo.username|replace:"\\":""}"></div>
+<div id="username" style="display:none" data-username="{$profile.username|replace:"\\":""}"></div>
 
 <script src="{version_hash src="/js/profile.js"}"></script>
 <script src="{version_hash src="/third_party/js/iso-3166-2.js/iso3166.min.js"}"></script>

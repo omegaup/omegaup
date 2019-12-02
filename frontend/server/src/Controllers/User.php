@@ -3133,7 +3133,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: string, country_id: int|null, email: null|string, gender: null|string, graduation_date: false|null|string, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: string, preferred_language: null|string, rankinfo: array{name: string, problems_solved: int, rank: int, status: string}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: string, verified: bool}}, template: string}
+     * @return array{smartyProperties: array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
