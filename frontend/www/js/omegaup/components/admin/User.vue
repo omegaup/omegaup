@@ -1,35 +1,45 @@
 <template>
   <div class="omegaup-admin-user panel-primary panel">
     <div class="panel-heading">
-      <h2 class="panel-title">{{ T.omegaupTitleAdminUsers }} — {{ username }}</h2>
+      <h2 class="panel-title">
+        {{ T.omegaupTitleAdminUsers }} — {{ username }}
+      </h2>
     </div>
     <div class="panel-body">
-      <form class="form bottom-margin"
-            v-on:submit.prevent="onChangePassword">
+      <form class="form bottom-margin" v-on:submit.prevent="onChangePassword">
         <div class="row">
           <div class="col-md-12">
-            <button class="btn btn-default btn-block"
-                 type="button"
-                 v-bind:disabled="verified"
-                 v-on:click.prevent="onVerifyUser"><span v-if="verified"><span aria-hidden="true"
-                  class="glyphicon glyphicon-ok"></span> {{ T.userVerified }}</span><span v-else=
-                  "">{{ T.userVerify }}</span></button>
+            <button
+              class="btn btn-default btn-block"
+              type="button"
+              v-bind:disabled="verified"
+              v-on:click.prevent="onVerifyUser"
+            >
+              <span v-if="verified"
+                ><span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
+                {{ T.userVerified }}</span
+              ><span v-else="">{{ T.userVerify }}</span>
+            </button>
           </div>
         </div>
       </form>
       <h4>{{ T.userEmails }}</h4>
       <ul class="list-group">
-        <li class="list-group-item"
-            v-for="email in emails">{{ email }}</li>
+        <li class="list-group-item" v-for="email in emails">{{ email }}</li>
       </ul>
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
           <tr v-for="role in roleNames">
-            <td><input type="checkbox"
-                   v-bind:checked="hasRole(role.name)"
-                   v-bind:disabled="role == 'Admin'"
-                   v-on:change.prevent="onChangeRole($event, role)"></td>
+            <td>
+              <input
+                type="checkbox"
+                v-bind:checked="hasRole(role.name)"
+                v-bind:disabled="role == 'Admin'"
+                v-on:change.prevent="onChangeRole($event, role)"
+              />
+            </td>
+
             <td>{{ role.name }}</td>
           </tr>
         </tbody>
@@ -38,10 +48,17 @@
       <table class="table">
         <tbody>
           <tr v-for="experiment in systemExperiments">
-            <td><input type="checkbox"
-                   v-bind:checked="experiment.config || hasExperiment(experiment.name)"
-                   v-bind:disabled="experiment.config"
-                   v-on:change.prevent="onChangeExperiment($event, experiment)"></td>
+            <td>
+              <input
+                type="checkbox"
+                v-bind:checked="
+                  experiment.config || hasExperiment(experiment.name)
+                "
+                v-bind:disabled="experiment.config"
+                v-on:change.prevent="onChangeExperiment($event, experiment)"
+              />
+            </td>
+
             <td>{{ experiment.name }}</td>
             <td>{{ experiment.hash }}</td>
           </tr>
@@ -102,5 +119,4 @@ export default class User extends Vue {
     this.$emit('verify-user');
   }
 }
-
 </script>

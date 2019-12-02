@@ -205,4 +205,14 @@ class UITools {
             )
         );
     }
+
+    public static function renderWithEmptyResponse(string $template): void {
+        \OmegaUp\UITools::getSmartyInstance()->display(
+            sprintf(
+                '%s/templates/%s',
+                strval(OMEGAUP_ROOT),
+                $template
+            )
+        );
+    }
 }
