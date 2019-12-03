@@ -107,6 +107,77 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
+     * Returns the rank of schools based on the sum of the score of each problem solved by the users of each school
+     *
+     * @param  int $startTime
+     * @param  int $finishTime
+     * @param  int $offset
+     * @param  int $rowcount
+     * @return array
+     */
+    public static function getRankByProblemsScore(
+        int $startDate,
+        int $finishDate,
+        int $offset,
+        int $rowcount
+    ): array {
+        $sql = '
+            SELECT
+                s.name,
+                s.country_id,
+                SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+            FROM
+                Schools s
+            INNER JOIN
+                Submissions su ON su.school_id = s.school_id
+            INNER JOIN
+                Runs r ON r.run_id = su.current_run_id
+            INNER JOIN
+              Problems p ON p.problem_id = su.problem_id
+            WHERE
+                su.school_id = ?
+                AND r.verdict = "AC"
+                AND p.visibility >= 1
+                AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                AND NOT EXISTS (
+                    SELECT
+                        *
+                    FROM
+                        Submissions sub
+                    INNER JOIN
+                        Runs ru ON ru.run_id = sub.current_run_id
+                    WHERE
+                        sub.problem_id = su.problem_id
+                        AND sub.identity_id = su.identity_id
+                        AND ru.verdict = "AC"
+                        AND sub.time < su.time
+                )
+            GROUP BY
+              s.school_id
+            ORDER BY
+              score DESC
+            LIMIT ?, ?;';
+
+        $args = [$startDate, $finishDate, $offset, $rowcount];
+
+        $result = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $args
+            ) as $row
+        ) {
+            $result[] = [
+                'name' => $row['name'],
+                'country_id' => $row['country_id'],
+                'score' => $row['score'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * @param int $schoolId
      * @param int $monthsNumber
      * @return array{year: int, month: int, count: int}[]
