@@ -334,6 +334,43 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the rank of schools in last month
+     *
+     * @param int $offset
+     * @param int $rowCount
+     * @param int $startTime
+     * @param int $finishTime
+     * @param bool $canUseCache
+     * @return array
+     */
+    public static function getRank(
+        int $offset,
+        int $rowCount,
+        int $startTime,
+        int $finishTime,
+        bool $canUseCache
+    ): array {
+        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
+            return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
+                $startTime,
+                $finishTime,
+                $offset,
+                $rowCount
+            );
+        };
+
+        if ($canUseCache) {
+            return \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::SCHOOL_RANK,
+                "{$offset}-{$rowCount}",
+                $fetch,
+                60 * 60 * 24 // 1 day
+            );
+        }
+        return $fetch();
+    }
+
+    /**
      * Gets the rank of best schools in last month with smarty format
      *
      * @param int $rowCount
