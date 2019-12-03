@@ -26,6 +26,11 @@ def test_create_group_with_identities_and_restrictions(driver):
         identity, *_ = util.add_identities_group(driver, group_alias)
 
     with driver.login(identity.username, identity.password):
+        # Trying to create a problem
+        with util.assert_js_errors(driver,
+                                   message_list=('/api/problem/create/',)):
+            util.create_problem(driver, 'some_alias', has_privileges=False)
+
         # Trying to create a contest
         with util.assert_js_errors(driver,
                                    message_list=('/api/contest/create/',)):
@@ -37,11 +42,6 @@ def test_create_group_with_identities_and_restrictions(driver):
         with util.assert_js_errors(driver,
                                    message_list=('/api/course/create/',)):
             util.create_course(driver, course, school, has_privileges=False)
-
-        # Trying to create a problem
-        with util.assert_js_errors(driver,
-                                   message_list=('/api/problem/create/',)):
-            util.create_problem(driver, 'some_alias', has_privileges=False)
 
         # Trying to see the list of contests created by the identity
         driver.wait.until(
