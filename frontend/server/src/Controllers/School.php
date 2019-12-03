@@ -304,7 +304,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return array
+     * @return array{school_id: int, name: string, country_id: string, score: float}[]
      */
     private static function getSchoolsRank(
         int $offset,
@@ -323,6 +323,9 @@ class School extends \OmegaUp\Controllers\Controller {
         };
 
         if ($canUseCache) {
+            /**
+             * @var array{school_id: int, name: string, country_id: string, score: float}[]
+             */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOL_RANK,
                 "{$offset}-{$rowCount}",
@@ -338,7 +341,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param int $rowCount
      * @param bool $isIndex
-     * @return array
+     * @return array{schoolRankPayload: array{rowCount: int, rank: array{school_id: int, name: string, country_id: string, score: float}[]}, rankTablePayload?: array{length: int, isIndex: boolean, availableFilters: string[]}}
      */
     public static function getSchoolsRankForSmarty(
         int $rowCount,

@@ -1114,9 +1114,6 @@
     <DocblockTypeContradiction occurrences="1">
       <code>is_null($schools)</code>
     </DocblockTypeContradiction>
-    <MissingClosureReturnType occurrences="1">
-      <code>function () use ($offset, $rowCount, $startTime, $finishTime) {</code>
-    </MissingClosureReturnType>
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
@@ -1128,10 +1125,6 @@
       <code>$finishTime</code>
       <code>$canUseCache</code>
     </MixedArgument>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
-    <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
@@ -2212,14 +2205,6 @@
       <code>$value</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/index.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/interviews/arena.php">
     <MixedAssignment occurrences="1">
       <code>$show_intro</code>
@@ -2307,14 +2292,6 @@
     </MixedArrayAssignment>
   </file>
   <file src="frontend/www/rank.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/schoolsrank.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$key</code>
     </MixedArgumentTypeCoercion>

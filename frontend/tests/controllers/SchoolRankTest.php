@@ -97,7 +97,6 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
-        print_r($response);
 
         // Only runs of this month should be considered for the rank
         $expectedSchools = [
@@ -145,7 +144,6 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             'start_time' => $start_time,
             'finish_time' => $end_time
         ]));
-        print_r($response);
 
         $this->assertEquals(4, count($response['rank']));
 
