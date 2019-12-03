@@ -113,7 +113,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @param  int $finishTime
      * @param  int $offset
      * @param  int $rowcount
-     * @return array
+     * @return array{school_id: int, name: string, country_id: string, score: float}[]
      */
     public static function getRankByProblemsScore(
         int $startDate,
@@ -123,9 +123,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
             SELECT
+                s.school_id,
                 s.name,
                 s.country_id,
-                SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score
+                SUM(ROUND(100 / LOG(2, p.accepted+1), 0)) AS score
             FROM
                 Schools s
             INNER JOIN
@@ -135,10 +136,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             INNER JOIN
               Problems p ON p.problem_id = su.problem_id
             WHERE
-                su.school_id = ?
-                AND r.verdict = "AC"
+                r.verdict = "AC"
                 AND p.visibility >= 1
-                AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
                 AND NOT EXISTS (
                     SELECT
                         *
@@ -148,10 +147,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                         Runs ru ON ru.run_id = sub.current_run_id
                     WHERE
                         sub.problem_id = su.problem_id
-                        AND sub.identity_id = su.identity_id
                         AND ru.verdict = "AC"
                         AND sub.time < su.time
                 )
+                AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
             GROUP BY
               s.school_id
             ORDER BY
@@ -160,21 +159,11 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
-        $result = [];
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var array{school_id: int, name: string, country_id: string, score: float}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 $args
-            ) as $row
-        ) {
-            $result[] = [
-                'name' => $row['name'],
-                'country_id' => $row['country_id'],
-                'score' => $row['score'],
-            ];
-        }
-
-        return $result;
+        );
     }
 
     /**

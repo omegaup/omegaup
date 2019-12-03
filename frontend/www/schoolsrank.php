@@ -10,6 +10,7 @@ try {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
+print_r($smartyProperties);
 foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);
 }
