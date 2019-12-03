@@ -336,23 +336,22 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @return array{smartyProperties: array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsRankForSmarty(
-        int $rowCount,
-        bool $isIndex
-    ): array {
+    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
         return [
-            'smartyProperties' => self::getSchoolsRankList($rowCount, $isIndex),
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
+                $rowCount
+            ),
             'template' => 'rank.schools.tpl'
         ];
     }
 
     /**
-     * @return array{rankTablePayload?: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     * @return array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
      */
-    public static function getSchoolsRankList(int $rowCount, bool $isIndex) {
-        $schoolsRank = [
+    public static function getSchoolsRankList(int $rowCount) {
+        return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
                 'rank' => self::getSchoolsRank(
@@ -369,15 +368,6 @@ class School extends \OmegaUp\Controllers\Controller {
                     /*$canUseCache=*/true
                 ),
             ],
-            'rankTablePayload' => [
-                'length' => $rowCount,
-                'isIndex' => $isIndex,
-                'availableFilters' => [],
-            ],
         ];
-        if (!$isIndex) {
-            unset($schoolsRank['rankTablePayload']);
-        }
-        return $schoolsRank;
     }
 }

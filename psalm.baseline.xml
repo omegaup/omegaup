@@ -1185,8 +1185,7 @@
       <code>$sendEmailOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="27">
-      <code>sendVerificationEmail</code>
+    <MissingReturnType occurrences="26">
       <code>apiLogin</code>
       <code>apiMailingListBackfill</code>
       <code>omiPrepareUser</code>
@@ -1214,7 +1213,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="22">
+    <MixedArgument occurrences="21">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1237,7 +1236,6 @@
       <code>$r['filter'] ?? ''</code>
       <code>$r['offset'] ?? 1</code>
       <code>$r['rowcount'] ?? 100</code>
-      <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
     <MixedArrayAccess occurrences="11">
