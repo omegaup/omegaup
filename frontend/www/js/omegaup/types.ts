@@ -4,7 +4,7 @@ import { Optional } from 'typescript-optional';
 export interface LinkableResource {
   toString(): string;
   getUrl(): string;
-  getBadge(): Optional<number>|Optional<string>;
+  getBadge(): Optional<string>;
 }
 
 export class ContestResult implements LinkableResource {
@@ -26,8 +26,8 @@ export class ContestResult implements LinkableResource {
     return `/arena/${this.alias}/`;
   }
 
-  getBadge(): Optional<number> {
-    return Optional.ofNonNull(this.place);
+  getBadge(): Optional<string> {
+    return Optional.ofNonNull(`${this.place}`);
   }
 }
 
@@ -92,7 +92,7 @@ export class Problem implements LinkableResource {
     return `/arena/problem/${this.alias}/`;
   }
 
-  getBadge(): Optional<number> {
+  getBadge(): Optional<string> {
     return Optional.empty();
   }
 }

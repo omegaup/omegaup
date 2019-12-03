@@ -69,8 +69,10 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country']['id'] = strval($country->country_id);
-                $details['country']['name'] = strval($country->name);
+                $details['country'] = [
+                    'id' => strval($country->country_id),
+                    'name' => strval($country->name),
+                ];
             }
 
             if (!is_null($school->state_id)) {

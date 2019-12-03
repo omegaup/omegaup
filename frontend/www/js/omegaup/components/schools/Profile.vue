@@ -59,9 +59,9 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
-import countryFlag from '../CountryFlag.vue';
-import schoolChart from './Chart.vue';
-import gridPaginator from '../GridPaginator.vue';
+import CountryFlag from '../CountryFlag.vue';
+import SchoolChart from './Chart.vue';
+import GridPaginator from '../GridPaginator.vue';
 import { SchoolCoderOfTheMonth } from '../../types.ts';
 
 interface ProblemsSolvedCount {
@@ -72,9 +72,9 @@ interface ProblemsSolvedCount {
 
 @Component({
   components: {
-    'omegaup-country-flag': countryFlag,
-    'omegaup-school-chart': schoolChart,
-    'omegaup-grid-paginator': gridPaginator,
+    'omegaup-country-flag': CountryFlag,
+    'omegaup-school-chart': SchoolChart,
+    'omegaup-grid-paginator': GridPaginator,
   },
 })
 export default class SchoolProfile extends Vue {
