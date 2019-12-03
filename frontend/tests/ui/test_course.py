@@ -43,6 +43,12 @@ def test_user_ranking_course(driver):
         util.create_run(driver, problem, 'Main.cpp11')
         driver.update_score_in_course(problem, assignment_alias)
 
+        # When user has tried or solved a problem, feedback popup will be shown
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '.popup button.close'))).click()
+
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
@@ -279,7 +285,7 @@ def update_scoreboard_for_assignment(driver, assignment_alias, course_alias):
         (urllib.parse.quote(assignment_alias, safe=''),
          urllib.parse.quote(course_alias, safe='')))
     driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
+    assert '"status":"ok"' in driver.browser.page_source
 
 
 @util.annotate

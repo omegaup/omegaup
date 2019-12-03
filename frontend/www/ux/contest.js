@@ -83,7 +83,8 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     if (!foundHash) {
-      window.location.hash = '#' + arenaInstance.activeTab;
+      // Change the URL to the deafult tab but don't break the back button.
+      window.history.replaceState({}, '', '#' + arenaInstance.activeTab);
     }
 
     if (arenaInstance.activeTab == 'problems') {

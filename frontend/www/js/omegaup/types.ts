@@ -1,10 +1,34 @@
 import omegaup from './api.js';
-import { Optional } from "typescript-optional";
+import { Optional } from 'typescript-optional';
 
 export interface LinkableResource {
   toString(): string;
   getUrl(): string;
   getBadge(): Optional<string>;
+}
+
+export class ContestResult implements LinkableResource {
+  alias: string = '';
+  title: string = '';
+  place: number = 0;
+
+  constructor(contestResult: omegaup.ContestResult) {
+    this.alias = contestResult.data.alias;
+    this.title = contestResult.data.title;
+    this.place = contestResult.place;
+  }
+
+  toString(): string {
+    return this.title;
+  }
+
+  getUrl(): string {
+    return `/arena/${this.alias}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.ofNonNull(`${this.place}`);
+  }
 }
 
 export class Problem implements LinkableResource {
@@ -70,5 +94,29 @@ export class Problem implements LinkableResource {
 
   getBadge(): Optional<string> {
     return Optional.empty();
+  }
+}
+
+export class SchoolCoderOfTheMonth implements LinkableResource {
+  classname: string = '';
+  time: string = '';
+  username: string = '';
+
+  constructor(coderOfTheMonth: omegaup.SchoolCoderOfTheMonth) {
+    this.classname = coderOfTheMonth.classname;
+    this.time = coderOfTheMonth.time;
+    this.username = coderOfTheMonth.username;
+  }
+
+  toString(): string {
+    return this.username;
+  }
+
+  getUrl(): string {
+    return `/profile/${this.username}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.ofNonNull(this.time);
   }
 }

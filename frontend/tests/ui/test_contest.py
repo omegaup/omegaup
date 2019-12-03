@@ -315,7 +315,7 @@ def update_scoreboard_for_contest(driver, contest_alias):
         '/api/scoreboard/refresh/alias/%s/token/secret' %
         urllib.parse.quote(contest_alias, safe=''))
     driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
+    assert '"status":"ok"' in driver.browser.page_source
 
 
 @util.annotate

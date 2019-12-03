@@ -1,5 +1,6 @@
 import UI from './ui.js';
-import { Problem } from './types.ts';
+import * as types from './types.ts';
+import { OmegaUp } from './omegaup.js';
 
 function _call(url, transform, defaultParams) {
   return function(params) {
@@ -572,7 +573,21 @@ export default {
 
     list: _call('/api/school/list/'),
 
+    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
+
     rank: _call('/api/school/rank/'),
+
+    schoolCodersOfTheMonth: _call(
+      '/api/school/schoolcodersofthemonth',
+      function(data) {
+        data.coders = data.coders.map(
+          coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
+        );
+        return data;
+      },
+    ),
+
+    users: _call('/api/school/users/'),
   },
 
   Session: {
@@ -614,7 +629,19 @@ export default {
 
     changePassword: _call('/api/user/changepassword/'),
 
-    contestStats: _call('/api/user/conteststats/'),
+    contestStats: _call('/api/user/conteststats/', function(data) {
+      let contests = [];
+      for (let contestAlias in data.contests) {
+        const now = new Date();
+        const currentTimestamp =
+          data.contests[contestAlias].data.finish_time * 1000;
+        const end = OmegaUp.remoteTime(currentTimestamp);
+        if (data.contests[contestAlias].place !== null && now > end) {
+          contests.push(new types.ContestResult(data.contests[contestAlias]));
+        }
+      }
+      return contests;
+    }),
 
     coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
@@ -640,21 +667,27 @@ export default {
       data,
     ) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),
 
     problemsSolved: _call('/api/user/problemssolved/', function(data) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),
 
     problemsCreated: _call('/api/user/problemscreated', function(data) {
       if (data.hasOwnProperty('problems')) {
-        data.problems = data.problems.map(problem => new Problem(problem));
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
       }
       return data;
     }),

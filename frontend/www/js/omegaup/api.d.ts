@@ -130,6 +130,11 @@ declare namespace omegaup {
     place: number;
   }
 
+  export interface Country {
+    id: string;
+    name: string;
+  }
+
   export interface Course {
     alias: string;
     assignments: Assignment[];
@@ -397,6 +402,19 @@ declare namespace omegaup {
     source_url?: string;
   }
 
+  export interface SchoolCoderOfTheMonth {
+    classname: string;
+    time: string;
+    username: string;
+  }
+
+  export interface SchoolUser extends User {
+    classname: string;
+    created_problems: number;
+    organized_contests: number;
+    solved_problems: number;
+  }
+
   export interface SchoolsRank {
     country_id: string;
     distinct_problems: number;
@@ -436,7 +454,7 @@ declare namespace omegaup {
   }
 
   export interface User {
-    name: string;
+    name?: string;
     username: string;
   }
 
