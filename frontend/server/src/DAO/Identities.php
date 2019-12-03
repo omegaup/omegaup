@@ -221,13 +221,11 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        $params = [$identity_id];
         /** @var array{country: string, state: string, school: string, email: string, locale: string}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (empty($rs)) {
-            return null;
-        }
-        return $rs;
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity_id]
+        );
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(

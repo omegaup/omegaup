@@ -564,7 +564,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Returns the profile of the identity given
      *
      * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return array{country: string, country_id: null|string, is_private: true, locale: string, name: null|string, preferred_language: null, school: string, school_id: int|null, state: string, state_id: null|string, username: null|string}
+     * @return array{country: null|string, country_id: null|string, is_private: true, locale: string, name: null|string, preferred_language: null, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string}
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
@@ -585,11 +585,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'username' => $identity->username,
             'name' => $identity->name,
             'preferred_language' => null,
-            'country' => $extendedProfile['country'] ?? '',
+            'country' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['country'] : null,
             'country_id' => $identity->country_id,
-            'state' => $extendedProfile['state'] ?? '',
+            'state' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['state'] : null,
             'state_id' => $identity->state_id,
-            'school' => $extendedProfile['school'] ?? '',
+            'school' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['school'] : null,
             'school_id' => $schoolId,
             'is_private' => true,
             'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(

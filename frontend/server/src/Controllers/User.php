@@ -3127,7 +3127,9 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         return [
-            'smartyProperties' => self::getProfileDetails($r),
+            'smartyProperties' => [
+                'profile' => self::getProfileDetails($r),
+            ],
             'template' => 'user.profile.tpl',
         ];
     }
@@ -3137,16 +3139,16 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        $response = self::getProfileDetails($r);
-        $response['PROGRAMMING_LANGUAGES'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
-        $response['COUNTRIES'] = \OmegaUp\DAO\Countries::getAll(
-            null,
-            100,
-            'name'
-        );
-
         return [
-            'smartyProperties' => $response,
+            'smartyProperties' => [
+                'profile' => self::getProfileDetails($r),
+                'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
+                    null,
+                    100,
+                    'name'
+                ),
+            ],
             'template' => is_null(
                 $r->identity->password
             ) ? 'user.basicedit.tpl' : 'user.edit.tpl',
@@ -3157,12 +3159,15 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
-        $response = self::getProfileDetails($r);
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
-        $response['payload']['email'] = $currentSession['email'];
 
         return [
-            'smartyProperties' => $response,
+            'smartyProperties' => [
+                'payload' => [
+                    'email' => $currentSession['email'],
+                ],
+                'profile' => self::getProfileDetails($r),
+            ],
             'template' => 'user.email.edit.tpl',
         ];
     }
@@ -3171,29 +3176,27 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
-        $response = self::getProfileDetails($r);
-        $response['admin'] = true;
-        $response['practice'] = false;
-
         return [
-            'smartyProperties' => $response,
+            'smartyProperties' => [
+                'profile' => self::getProfileDetails($r),
+                'admin' => true,
+                'practice' => false,
+            ],
             'template' => 'interviews.results.tpl',
         ];
     }
 
     /**
-     * @return array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}
+     * @return array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}
      */
     private static function getProfileDetails(\OmegaUp\Request $r) {
-        $response = [
-            'profile' => self::getUserProfile($r),
-        ];
-        $response['profile']['graduation_date'] = empty(
-            $response['profile']['graduation_date']
+        $response = self::getUserProfile($r);
+        $response['graduation_date'] = empty(
+            $response['graduation_date']
         ) ? null : gmdate(
             'Y-m-d',
             intval(
-                $response['profile']['graduation_date']
+                $response['graduation_date']
             )
         );
 
