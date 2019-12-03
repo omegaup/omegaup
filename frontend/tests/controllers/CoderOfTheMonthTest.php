@@ -148,7 +148,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Get all usernames and verify that only identity_1 username
         // and identity_2 username are part of results
         $resultCoders = [];
-        foreach ($result as $res) {
+        foreach ($result['coders'] as $res) {
             $resultCoders[] = $res['username'];
         }
 

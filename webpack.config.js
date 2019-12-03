@@ -58,6 +58,7 @@ let config = [
       problem_stats: './frontend/www/js/omegaup/problem/stats.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
+      school_profile: './frontend/www/js/omegaup/schools/profile.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       qualitynomination_popup:
