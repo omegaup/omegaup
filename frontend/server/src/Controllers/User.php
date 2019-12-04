@@ -1400,17 +1400,18 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getCoderOfTheMonthFirstDay(?string $date): string {
-        if (!empty($date)) {
-            if (strtotime($date) === false) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'date'
-                );
-            }
-            return date('Y-m-01', strtotime($date));
+        if (empty($date)) {
+            // Get first day of the current month
+            return date('Y-m-01', \OmegaUp\Time::get());
         }
-        // Get first day of the current month
-        return date('Y-m-01', \OmegaUp\Time::get());
+        $date = strtotime($date);
+        if ($date === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'date'
+            );
+        }
+        return date('Y-m-01', $date);
     }
 
     /**
