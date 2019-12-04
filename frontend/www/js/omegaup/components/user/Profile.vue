@@ -107,7 +107,7 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
-import user_GridPaginator from './GridPaginator.vue';
+import gridPaginator from '../GridPaginator.vue';
 import { Problem, ContestResult } from '../../types.ts';
 
 @Component({
@@ -116,7 +116,7 @@ import { Problem, ContestResult } from '../../types.ts';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
-    'omegaup-grid-paginator': user_GridPaginator,
+    'omegaup-grid-paginator': gridPaginator,
   },
 })
 export default class UserProfile extends Vue {
