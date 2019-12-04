@@ -781,7 +781,6 @@
       <code>$problem</code>
       <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
-      <code>$problem-&gt;acl_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -906,9 +905,6 @@
       <code>$qualitynominationlog-&gt;rationale</code>
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="1">
-      <code>$r-&gt;user-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">

@@ -867,7 +867,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{rejudged: bool}
      */
-    public static function updateProblem(\OmegaUp\Request $r) {
+    public static function updateProblem(
+        \OmegaUp\Request $r,
+        bool $updateProblemDeployer = true
+    ) {
         $r->ensureMainUserIdentity();
 
         [
@@ -907,56 +910,58 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $updatePublished = $r['update_published'];
         }
         $updatedStatementLanguages = [];
+        $response['rejudged'] = false;
 
         try {
             //Begin transaction
             \OmegaUp\DAO\DAO::transBegin();
 
-            $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
-            if (
-                isset($_FILES['problem_contents'])
-                && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                    $_FILES['problem_contents']['tmp_name']
-                )
-            ) {
-                $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
-            }
-            $problemDeployer = new \OmegaUp\ProblemDeployer(
-                $problem->alias,
-                $acceptsSubmissions,
-                $updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE
-            );
-            $problemDeployer->commit(
-                $r['message'],
-                $r->identity,
-                $operation,
-                $problemSettings
-            );
-
-            $response['rejudged'] = false;
-            $needsUpdate = false;
-            if (!is_null($problemDeployer->publishedCommit)) {
-                $oldCommit = $problem->commit;
-                $oldVersion = $problem->current_version;
-                [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
-                    $problem,
-                    $problemDeployer->publishedCommit
-                );
-                $response['rejudged'] = ($oldVersion != $problem->current_version);
-                $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
-            }
-
-            if ($needsUpdate) {
-                \OmegaUp\DAO\Runs::createRunsForVersion($problem);
-                \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-                if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                    \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
-                        $problem,
-                        $r->user,
-                        $updatePublished
-                    );
+            if ($updateProblemDeployer) {
+                $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
+                if (
+                    isset($_FILES['problem_contents'])
+                    && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
+                        $_FILES['problem_contents']['tmp_name']
+                    )
+                ) {
+                    $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
                 }
-                $updatedStatementLanguages = $problemDeployer->getUpdatedLanguages();
+                $problemDeployer = new \OmegaUp\ProblemDeployer(
+                    $problem->alias,
+                    $acceptsSubmissions,
+                    $updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE
+                );
+                $problemDeployer->commit(
+                    $r['message'],
+                    $r->identity,
+                    $operation,
+                    $problemSettings
+                );
+
+                $needsUpdate = false;
+                if (!is_null($problemDeployer->publishedCommit)) {
+                    $oldCommit = $problem->commit;
+                    $oldVersion = $problem->current_version;
+                    [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
+                        $problem,
+                        $problemDeployer->publishedCommit
+                    );
+                    $response['rejudged'] = ($oldVersion != $problem->current_version);
+                    $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
+                }
+
+                if ($needsUpdate) {
+                    \OmegaUp\DAO\Runs::createRunsForVersion($problem);
+                    \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
+                    if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                        \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
+                            $problem,
+                            $r->user,
+                            $updatePublished
+                        );
+                    }
+                    $updatedStatementLanguages = $problemDeployer->getUpdatedLanguages();
+                }
             }
 
             // Save the contest object with data sent by user to the database
@@ -1805,6 +1810,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problems::isVisible($problem) ||
             \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
         ) {
+            if (is_null($problem->acl_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
             if (is_null($acl->owner_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');

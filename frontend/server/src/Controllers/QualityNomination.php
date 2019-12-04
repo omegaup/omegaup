@@ -456,7 +456,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
 
         // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
 
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
@@ -467,12 +467,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'qualitynominationNotFound'
             );
         }
-        if ($qualitynomination->nomination != 'demotion') {
+        if ($qualitynomination->nomination !== 'demotion') {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'onlyDemotionsSupported'
             );
         }
-        if ($r['status'] == $qualitynomination->status) {
+        if ($r['status'] === $qualitynomination->status) {
             return ['status' => 'ok'];
         }
 
@@ -484,17 +484,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $newProblemVisibility = $r['problem']->visibility;
         switch ($r['status']) {
             case 'approved':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE) {
+                if ($r['problem']->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE) {
                     $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC) {
+                } elseif ($r['problem']->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC) {
                     $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+                if ($r['problem']->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
                     // If banning is reverted, problem will become private.
                     $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
+                } elseif ($r['problem']->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
                     $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
                 }
@@ -504,7 +504,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $r['message'] = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $r['visibility'] = $newProblemVisibility;
 
@@ -520,7 +520,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $response = [];
-            \OmegaUp\Controllers\Problem::apiUpdate($r);
+            \OmegaUp\Controllers\Problem::updateProblem(
+                $r,
+                /*$updateProblemDeployer=*/ false
+            );
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
