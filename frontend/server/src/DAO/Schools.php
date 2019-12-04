@@ -161,8 +161,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         /** @var array{school_id: int, name: string, country_id: string, score: float}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $args
+            $sql,
+            $args
         );
     }
 

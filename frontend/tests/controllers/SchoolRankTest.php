@@ -56,63 +56,137 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Basic test for school rank
-     *
      */
     public function testSchoolRankPositive() {
-        $currentTime = \OmegaUp\Time::get();
-        $pastMonthTime = strtotime(
-            'first day of last month',
-            \OmegaUp\Time::get()
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+        ];
+
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 4; $i++) {
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        $problems = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Prepare setup:
+        // school0: user0=>problem0, user1=>problem1
+        // school1: user2=>problem0, user2=>problem1, user2=>problem2
+        // school2: user3=>problem0
+        // The rank should be: school1, school0, school2
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
+        SchoolsFactory::addUserToSchool($schoolsData[2], $identities[3]);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[0]
         );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        \OmegaUp\Time::setTimeForTesting($pastMonthTime);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
-        // 1 in school #2 but PA, 1 with no school for the past month
-        $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool()
-        ];
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $this->createRunsWithSchool($schoolsData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        \OmegaUp\Time::setTimeForTesting($currentTime);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[2],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
-        // 1 in school #2 but PA, 1 with no school for the current time
-        $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool()
-        ];
-
-        $this->createRunsWithSchool($schoolsData);
-
-        // Call API
-        ['user' => $rankViewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $rankViewerLogin = self::login($identity);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Setting p.accepted value
         \OmegaUp\Test\Utils::runUpdateUserRank();
 
+        $rankViewerLogin = self::login($identities[0]);
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
-
-        // Only runs of this month should be considered for the rank
-        $expectedSchools = [
+        $this->assertCount(3, $response['rank']);
+        $this->assertEquals(
+            $schoolsData[1]['request']['name'],
+            $response['rank'][0]['name']
+        );
+        $this->assertEquals(
             $schoolsData[0]['request']['name'],
-            $schoolsData[1]['request']['name']
-        ];
-
-        $this->assertEquals(count($expectedSchools), count($response['rank']));
-        $this->assertContains($response['rank'][0]['name'], $expectedSchools);
-        $this->assertContains($response['rank'][1]['name'], $expectedSchools);
+            $response['rank'][1]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[2]['request']['name'],
+            $response['rank'][2]['name']
+        );
 
         $cachedResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
         $this->assertEquals($response, $cachedResponse);
+
+        // Now solve more problems:
+        // user0=>problem1, user1=>problem0 the school0 might be the first one now, but as the problems solved
+        // are counted just once, the ranking is not affected
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[1],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Setting p.accepted value
+        \OmegaUp\Test\Utils::runUpdateUserRank();
+
+        $start_time = strtotime('-1 day');
+        $end_time = strtotime('+1 day');
+        $rankViewerLogin = self::login($identities[0]);
+        $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+            'auth_token' => $rankViewerLogin->auth_token,
+            'start_time' => $start_time,
+            'finish_time' => $end_time,
+        ]));
+        $this->assertCount(3, $response['rank']);
+        $this->assertEquals(
+            $schoolsData[1]['request']['name'],
+            $response['rank'][0]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[0]['request']['name'],
+            $response['rank'][1]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[2]['request']['name'],
+            $response['rank'][2]['name']
+        );
     }
 
     /**
@@ -145,13 +219,13 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             'finish_time' => $end_time
         ]));
 
-        $this->assertEquals(4, count($response['rank']));
+        $this->assertEquals(5, count($response['rank']));
 
         $cachedResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
-        // start_time/finish_time path should not be the one cached..
+        // start_time/finish_time path should not be the one cached.
         $this->assertEquals($originalResponse, $cachedResponse);
         $this->assertNotEquals($response, $cachedResponse);
     }

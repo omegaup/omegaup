@@ -319,7 +319,12 @@ class School extends \OmegaUp\Controllers\Controller {
         int $finishTime,
         bool $canUseCache
     ): array {
-        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime): array {
+        $fetch = function () use (
+            $offset,
+            $rowCount,
+            $startTime,
+            $finishTime
+): array {
             return \OmegaUp\DAO\Schools::getRankByProblemsScore(
                 $startTime,
                 $finishTime,
