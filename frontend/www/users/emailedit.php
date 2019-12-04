@@ -5,7 +5,7 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
-        return \OmegaUp\Controllers\User::getInterviewResultsDetailsForSmarty(
+        return \OmegaUp\Controllers\User::getEmailEditDetailsForSmarty(
             $r
         );
     },
