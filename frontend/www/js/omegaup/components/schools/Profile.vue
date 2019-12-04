@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="row">
     <div class="page-header">
       <h1 class="text-center">{{ name }}</h1>
     </div>
@@ -25,13 +25,15 @@
           v-bind:items-per-page="5"
           v-bind:title="T.codersOfTheMonth"
         >
-          <thead>
-            <tr>
-              <th>{{ T.codersOfTheMonthUser }}</th>
-              <th>{{ T.codersOfTheMonthDate }}</th>
-            </tr>
-          </thead></omegaup-grid-paginator
-        >
+          <template slot="table-header">
+            <thead>
+              <tr>
+                <th>{{ T.codersOfTheMonthUser }}</th>
+                <th class="numericColumn">{{ T.codersOfTheMonthDate }}</th>
+              </tr>
+            </thead>
+          </template>
+        </omegaup-grid-paginator>
       </div>
       <div class="col-md-8">
         <div class="panel panel-default">
@@ -42,6 +44,29 @@
             ></omegaup-school-chart>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <omegaup-grid-paginator
+          v-bind:columns="1"
+          v-bind:include-place="true"
+          v-bind:items="schoolUsers"
+          v-bind:items-per-page="30"
+          v-bind:title="T.schoolUsers"
+          v-bind:sort-options="sortOptions"
+          v-on:sort-option-change="updateUsers"
+        >
+          <template slot="table-header">
+            <thead>
+              <tr>
+                <th class="text-center">{{ T.profileContestsTablePlace }}</th>
+                <th>{{ T.username }}</th>
+                <th class="numericColumn">{{ sortByTableTitle }}</th>
+              </tr>
+            </thead>
+          </template>
+        </omegaup-grid-paginator>
       </div>
     </div>
   </div>
@@ -62,7 +87,7 @@ import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
-import { SchoolCoderOfTheMonth } from '../../types.ts';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
 
 interface ProblemsSolvedCount {
   year: number;
@@ -87,5 +112,49 @@ export default class SchoolProfile extends Vue {
 
   T = T;
   UI = UI;
+  sortBy = 'solved_problems';
+  sortOptions = [
+    {
+      title: T.profileSolvedProblems,
+      value: 'solved_problems',
+    },
+    {
+      title: T.profileCreatedProblems,
+      value: 'created_problems',
+    },
+    {
+      title: T.profileOrganizedContests,
+      value: 'organized_contests',
+    },
+  ];
+
+  get schoolUsers(): SchoolUser[] {
+    let users: SchoolUser[] = this.users.map(
+      (user: omegaup.SchoolUser) =>
+        new SchoolUser(user.classname, user.username, user[this.sortBy]),
+    );
+    return users.sort((userA, userB) => {
+      if (userA.data < userB.data) return 1;
+      if (userA.data > userB.data) return -1;
+      return 0;
+    });
+  }
+
+  get sortByTableTitle(): string {
+    switch (this.sortBy) {
+      case 'solved_problems':
+        return T.profileSolvedProblems;
+      case 'created_problems':
+        return T.profileCreatedProblems;
+      case 'organized_contests':
+        return T.profileOrganizedContests;
+      default:
+        return '';
+    }
+  }
+
+  updateUsers(newSortBy: string): void {
+    this.sortBy = newSortBy;
+  }
 }
 </script>

@@ -413,6 +413,7 @@ declare namespace omegaup {
     created_problems: number;
     organized_contests: number;
     solved_problems: number;
+    [index: string]: any;
   }
 
   export interface SchoolsRank {

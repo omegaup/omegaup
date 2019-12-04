@@ -120,3 +120,28 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
     return Optional.ofNonNull(this.time);
   }
 }
+
+export class SchoolUser implements LinkableResource {
+  classname: string = '';
+  username: string = '';
+  data: number = 0;
+
+  constructor(classname: string, username: string, data: number) {
+    this.classname = classname;
+    this.username = username;
+    this.data = data;
+  }
+
+  toString(): string {
+    return this.username;
+  }
+
+  getUrl(): string {
+    return `/profile/${this.username}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.ofNonNull(`${this.data}`);
+  }
+}
+
