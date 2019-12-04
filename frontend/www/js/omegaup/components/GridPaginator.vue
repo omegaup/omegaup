@@ -13,7 +13,7 @@
             <a v-bind:href="item.getUrl()">{{ item.toString() }}</a>
           </td>
           <td v-if="!group[0].getBadge().isEmpty()">
-            <strong>{{ group[0].getBadge() }}</strong>
+            <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
       </tbody>
@@ -45,9 +45,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
-import { LinkableResource } from '../../types.ts';
+import { T } from '../omegaup.js';
+import omegaup from '../api.js';
+import { LinkableResource } from '../types.ts';
 
 /**
   Creates a two-dimensional paginated table, with the number of columns passed

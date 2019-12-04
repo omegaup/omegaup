@@ -71,14 +71,15 @@ rewrite ^/problem/mine/?$ /problems/mine.php last;
 rewrite ^/problem/new/?$ /problems/new.php last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problems/edit.php?problem=$1 last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problems/stats.php?problem=$1 last;
-rewrite ^/profile/?$ /profile.php last;
-rewrite ^/profile/edit/?$ /profileedit.php last;
-rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
+rewrite ^/profile/?$ /profile/index.php last;
+rewrite ^/profile/edit/?$ /profile/edit.php last;
+rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolsrank/?$ /rank/schools.php last;
 rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
+rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/redirecttointerview/([a-zA-Z0-9_+-]+)/?$ /userverifyemail.php?id=$1&redirecttointerview=$2 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
 
