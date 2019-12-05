@@ -296,22 +296,26 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
+     * Test problem update with invalid languages
      */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($problemData['author']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'languages' => 'cows,hs,java,pl',
-            'problem_alias' => $problemData['request']['alias'],
-            'message' => 'Changed invalid languages',
-        ]);
-
-        //Call API
-        $response = \OmegaUp\Controllers\Problem::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'languages' => 'cows,hs,java,pl',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed invalid languages',
+            ]));
+            $this->fail(
+                'Should not have been able to update the problem, because of invalid languages'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterNotInExpectedSet');
+        }
     }
 
     /**
