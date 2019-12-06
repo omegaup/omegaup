@@ -1099,13 +1099,8 @@
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="6">
+    <MixedArgument occurrences="1">
       <code>$r[$param]</code>
-      <code>$offset</code>
-      <code>$rowCount</code>
-      <code>$startTime</code>
-      <code>$finishTime</code>
-      <code>$canUseCache</code>
     </MixedArgument>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
@@ -1165,8 +1160,7 @@
       <code>$sendEmailOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="27">
-      <code>sendVerificationEmail</code>
+    <MissingReturnType occurrences="26">
       <code>apiLogin</code>
       <code>apiMailingListBackfill</code>
       <code>omiPrepareUser</code>
@@ -1194,7 +1188,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="19">
+    <MixedArgument occurrences="18">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1214,7 +1208,6 @@
       <code>$r['password']</code>
       <code>$value</code>
       <code>$value</code>
-      <code>$r['user']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
     <MixedArrayAccess occurrences="11">
@@ -2217,14 +2210,6 @@
     </MixedArgument>
     <MixedAssignment occurrences="1">
       <code>$systemGroups</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/rank.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
     </MixedAssignment>
   </file>
 </files>

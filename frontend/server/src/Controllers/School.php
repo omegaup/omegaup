@@ -225,11 +225,11 @@ class School extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'rank' => self::getSchoolsRank(
-                $offset,
-                $rowCount,
-                $startTime,
-                $finishTime,
-                $canUseCache
+                intval($offset),
+                intval($rowCount),
+                intval($startTime),
+                intval($finishTime),
+                boolval($canUseCache)
             ),
         ];
     }
@@ -310,7 +310,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return array{school_id: int, name: string, country_id: string, score: float}[]
+     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -324,7 +324,7 @@ class School extends \OmegaUp\Controllers\Controller {
             $rowCount,
             $startTime,
             $finishTime
-): array {
+        ): array {
             return \OmegaUp\DAO\Schools::getRankByProblemsScore(
                 $startTime,
                 $finishTime,
@@ -335,7 +335,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         if ($canUseCache) {
             /**
-             * @var array{school_id: int, name: string, country_id: string, score: float}[]
+             * @var list<array{school_id: int, name: string, country_id: string, score: float}>
              */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOL_RANK,
@@ -350,15 +350,22 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @param int $rowCount
-     * @param bool $isIndex
-     * @return array{schoolRankPayload: array{rowCount: int, rank: array{school_id: int, name: string, country_id: string, score: float}[]}, rankTablePayload?: array{length: int, isIndex: boolean, availableFilters: string[]}}
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsRankForSmarty(
-        int $rowCount,
-        bool $isIndex
-    ): array {
-        $schoolsRank = [
+    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
+        return [
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
+                $rowCount
+            ),
+            'template' => 'rank.schools.tpl'
+        ];
+    }
+
+    /**
+     * @return array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}
+     */
+    public static function getSchoolsRankList(int $rowCount) {
+        return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
                 'rank' => self::getSchoolsRank(
@@ -374,16 +381,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     ),
                     /*$canUseCache=*/true
                 ),
-            ]
+            ],
         ];
-        if (!$isIndex) {
-            return $schoolsRank;
-        }
-        $schoolsRank['rankTablePayload'] = [
-            'length' => $rowCount,
-            'isIndex' => $isIndex,
-            'availableFilters' => [],
-        ];
-        return $schoolsRank;
     }
 }

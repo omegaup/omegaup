@@ -50,7 +50,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @param  int $finishTime
      * @param  int $offset
      * @param  int $rowcount
-     * @return array
+     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     public static function getRankByUsersAndProblemsWithAC(
         int $startDate,
@@ -86,34 +86,17 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
               distinct_problems DESC
             LIMIT ?, ?;';
 
-        $args = [$startDate, $finishDate, $offset, $rowcount];
-
-        $result = [];
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $args
-            ) as $row
-        ) {
-            $result[] = [
-                'name' => $row['name'],
-                'country_id' => $row['country_id'],
-                'distinct_users' => $row['distinct_users'],
-                'distinct_problems' => $row['distinct_problems'],
-            ];
-        }
-
-        return $result;
+        /** @var list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$startDate, $finishDate, $offset, $rowcount]
+        );
     }
 
     /**
      * Returns the rank of schools based on the sum of the score of each problem solved by the users of each school
      *
-     * @param  int $startTime
-     * @param  int $finishTime
-     * @param  int $offset
-     * @param  int $rowcount
-     * @return array{school_id: int, name: string, country_id: string, score: float}[]
+     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     public static function getRankByProblemsScore(
         int $startDate,
@@ -134,7 +117,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             INNER JOIN
                 Runs r ON r.run_id = su.current_run_id
             INNER JOIN
-              Problems p ON p.problem_id = su.problem_id
+                Problems p ON p.problem_id = su.problem_id
             WHERE
                 r.verdict = "AC"
                 AND p.visibility >= 1
@@ -146,20 +129,21 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     INNER JOIN
                         Runs ru ON ru.run_id = sub.current_run_id
                     WHERE
-                        sub.problem_id = su.problem_id
+                        sub.school_id = su.school_id
+                        AND sub.problem_id = su.problem_id
                         AND ru.verdict = "AC"
                         AND sub.time < su.time
                 )
                 AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
             GROUP BY
-              s.school_id
+                s.school_id
             ORDER BY
-              score DESC
+                score DESC
             LIMIT ?, ?;';
 
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
-        /** @var array{school_id: int, name: string, country_id: string, score: float}[] */
+        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $args
