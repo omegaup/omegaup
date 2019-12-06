@@ -105,7 +105,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         WHERE
             admission_mode = \'private\' and a.owner_id = ?;';
         $params = [$user->user_id];
-
+        /** @var array{total: int} */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         if (!array_key_exists('total', $rs)) {
@@ -126,8 +126,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     public static function getContestsParticipated($identity_id) {
         $sql = '
             SELECT
-                c.*,
-                p.scoreboard_url,
+                c.contest_id,
+                c.alias,
+                c.title,
+                UNIX_TIMESTAMP(c.start_time) AS start_time,
+                UNIX_TIMESTAMP(c.finish_time) AS finish_time,
+                UNIX_TIMESTAMP(c.last_updated) AS last_updated,
                 p.scoreboard_url_admin
             FROM
                 Contests c
@@ -149,9 +153,20 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             )
             ORDER BY
                 contest_id DESC;';
-        $params = [$identity_id];
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identity_id]
+        );
+        foreach ($result as &$row) {
+            // We need to get contest_id just to be able to ORDER BY it, but we
+            // should not return it to users.
+            unset($row['contest_id']);
+            $row['start_time'] = intval($row['start_time']);
+            $row['finish_time'] = intval($row['finish_time']);
+            $row['last_updated'] = intval($row['last_updated']);
+        }
+        return $result;
     }
 
     /**
@@ -770,7 +785,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             LEFT JOIN
                 Countries cn ON cn.country_id = i.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = i.school_id
+                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = isc.school_id
             INNER JOIN
                 Problemset_Identities pi ON pi.identity_id = i.identity_id
             INNER JOIN

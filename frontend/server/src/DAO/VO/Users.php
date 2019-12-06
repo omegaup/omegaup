@@ -17,14 +17,11 @@ namespace OmegaUp\DAO\VO;
 class Users extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
-        'username' => true,
         'facebook_user_id' => true,
-        'password' => true,
         'git_token' => true,
         'main_email_id' => true,
         'main_identity_id' => true,
         'scholar_degree' => true,
-        'graduation_date' => true,
         'birth_date' => true,
         'verified' => true,
         'verification_id' => true,
@@ -51,19 +48,9 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 $data['user_id']
             );
         }
-        if (isset($data['username'])) {
-            $this->username = strval(
-                $data['username']
-            );
-        }
         if (isset($data['facebook_user_id'])) {
             $this->facebook_user_id = strval(
                 $data['facebook_user_id']
-            );
-        }
-        if (isset($data['password'])) {
-            $this->password = strval(
-                $data['password']
             );
         }
         if (isset($data['git_token'])) {
@@ -84,11 +71,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = strval(
                 $data['scholar_degree']
-            );
-        }
-        if (isset($data['graduation_date'])) {
-            $this->graduation_date = strval(
-                $data['graduation_date']
             );
         }
         if (isset($data['birth_date'])) {
@@ -154,25 +136,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
     public $user_id = 0;
 
     /**
-     * [Campo no documentado]
-     *
-     * @var string|null
-     */
-    public $username = null;
-
-    /**
      * Facebook ID for this user.
      *
      * @var string|null
      */
     public $facebook_user_id = null;
-
-    /**
-     * Contraseña del usuario, usando Argon2i o Blowfish
-     *
-     * @var string|null
-     */
-    public $password = null;
 
     /**
      * Token de acceso para git, usando Argon2i
@@ -201,13 +169,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $scholar_degree = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var string|null
-     */
-    public $graduation_date = null;
 
     /**
      * [Campo no documentado]

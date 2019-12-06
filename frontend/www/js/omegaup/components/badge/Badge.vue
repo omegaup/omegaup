@@ -1,10 +1,11 @@
 <template>
-  <figure class="badge-container"
-          v-tooltip="description">
-    <a class="badge-icon"
-            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:class=
-            "{'badge-gray': !this.badge.unlocked}"
-         v-bind:src="this.iconUrl"></a>
+  <figure class="badge-container" v-tooltip="description">
+    <a class="badge-icon" v-bind:href="`/badge/${this.badge.badge_alias}/`"
+      ><img
+        v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
+        v-bind:src="this.iconUrl"
+    /></a>
+
     <figcaption class="badge-name">
       {{ this.name }}
     </figcaption>
@@ -64,5 +65,4 @@ export default class Badge extends Vue {
     return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 }
-
 </script>

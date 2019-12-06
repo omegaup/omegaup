@@ -257,11 +257,15 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         user_id = util.database_utils.mysql(
             ('''
             SELECT
-                `user_id`
+                `u`.`user_id`
             FROM
-                `Users`
+                `Users` `u`
+            INNER JOIN
+                `Identities` `i`
+            ON
+                `u`.`main_identity_id` = `i`.`identity_id`
             WHERE
-                `username` = '%s';
+                `i`.`username` = '%s';
             ''') % (user),
             dbname='omegaup', auth=self.mysql_auth())
         self.enable_experiment_identities_to_user(user_id)
@@ -392,38 +396,38 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         # Add the user directly to the database to make this fast and avoid UI
         # flake.
+        identity_id = util.database_utils.mysql(
+            ('''
+            INSERT INTO
+                Identities(`username`, `password`, `name`)
+            VALUES
+                ('%s', '%s', '%s');
+            SELECT LAST_INSERT_ID();
+            ''') % (username, password, username),
+            dbname='omegaup', auth=self.mysql_auth())
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
-                Users(`username`, `password`, `verified`)
+                Users(`main_identity_id`, `verified`)
             VALUES
-                ('%s', '%s', 1);
+                (%s, 1);
             SELECT LAST_INSERT_ID();
-            ''') % (username, password),
+            ''') % (identity_id),
+            dbname='omegaup', auth=self.mysql_auth())
+        util.database_utils.mysql(
+            ('''
+            UPDATE
+                Identities
+            SET
+                user_id = %s
+            WHERE
+                identity_id = %s;
+            ''') % (user_id, identity_id),
             dbname='omegaup', auth=self.mysql_auth())
 
         # Enable experiment
         self.enable_experiment_identities_to_user(user_id)
 
-        identity_id = util.database_utils.mysql(
-            ('''
-            INSERT INTO
-                Identities(`username`, `password`, `name`, `user_id`)
-            VALUES
-                ('%s', '%s', '%s', %s);
-            SELECT LAST_INSERT_ID();
-            ''') % (username, password, username, user_id),
-            dbname='omegaup', auth=self.mysql_auth())
-        util.database_utils.mysql(
-            ('''
-            UPDATE
-                Users
-            SET
-                main_identity_id = %s
-            WHERE
-                user_id = %s;
-            ''') % (identity_id, user_id),
-            dbname='omegaup', auth=self.mysql_auth())
         if admin:
             util.database_utils.mysql(
                 ('''

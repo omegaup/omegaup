@@ -43,20 +43,83 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the basic details for school
+     * @param \OmegaUp\Request $r
+     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, country: array{id: string, name: string}|null, state_name: string|null}}}
+     */
+    public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        $details = [
+            'school_id' => intval($school->school_id),
+            'school_name' => strval($school->name),
+            'country' => null,
+            'state_name' => null,
+        ];
+
+        if (!is_null($school->country_id)) {
+            $country = \OmegaUp\DAO\Countries::getByPK(
+                strval(
+                    $school->country_id
+                )
+            );
+            if (!is_null($country)) {
+                $details['country'] = [
+                    'id' => strval($country->country_id),
+                    'name' => strval($country->name),
+                ];
+            }
+
+            if (!is_null($school->state_id)) {
+                $state = \OmegaUp\DAO\States::getByPK(
+                    strval($school->country_id),
+                    strval($school->state_id)
+                );
+                if (!is_null($state)) {
+                    $details['state_name'] = $state->name;
+                }
+            }
+        }
+
+        return [
+            'smartyProperties' => [
+                'details' => $details
+            ],
+            'template' => 'school.profile.tpl'  ,
+        ];
+    }
+
+    /**
      * Api to create new school
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, school_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-
-        $state = self::getStateIdFromCountryAndState(
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['country_id'],
-            $r['state_id']
+            'country_id'
         );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['state_id'],
+            'country_id'
+        );
+
+        $state = null;
+        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                $r['country_id'],
+                $r['state_id']
+            );
+        }
 
         return [
             'status' => 'ok',
@@ -174,12 +237,80 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
+     * @param \OmegaUp\Request $r
+     * @return array{coders: array{time: string, username: string, classname: string}[]}
+     */
+    public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return [
+            'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
+                intval($school->school_id)
+            )
+        ];
+    }
+
+    /**
+     * Returns the number of solved problems on the last X
+     * months (including the current one)
+     * @param \OmegaUp\Request $r
+     * @return array{distinct_problems_solved: array{year: int, month: int, count: int}[], status: string}
+     */
+    public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $r->ensureInt('months_count');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return [
+            'distinct_problems_solved' => \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
+                intval($r['school_id']),
+                intval($r['months_count'])
+            ),
+            'status' => 'ok'
+        ];
+    }
+
+    /**
+     * Returns the list of current students registered in a certain school
+     * with the number of created problems, solved problems and organized contests.
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{status: string, users: array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]}
+     */
+    public static function apiUsers(\OmegaUp\Request $r): array {
+        $r->ensureInt('school_id');
+        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        return [
+            'status' => 'ok',
+            'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
+                intval($school->school_id)
+            ),
+        ];
+    }
+
+    /**
+     * Returns rank of best schools in last month
+     *
      * @param int $offset
      * @param int $rowCount
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return array
+     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -211,15 +342,22 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @param int $rowCount
-     * @param bool $isIndex
-     * @return array
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsRankForSmarty(
-        int $rowCount,
-        bool $isIndex
-    ): array {
-        $schoolsRank = [
+    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
+        return [
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
+                $rowCount
+            ),
+            'template' => 'rank.schools.tpl'
+        ];
+    }
+
+    /**
+     * @return array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     */
+    public static function getSchoolsRankList(int $rowCount) {
+        return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
                 'rank' => self::getSchoolsRank(
@@ -235,27 +373,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     ),
                     /*$canUseCache=*/true
                 ),
-            ]
+            ],
         ];
-        if (!$isIndex) {
-            return $schoolsRank;
-        }
-        $schoolsRank['rankTablePayload'] = [
-            'length' => $rowCount,
-            'isIndex' => $isIndex,
-            'availableFilters' => [],
-        ];
-        return $schoolsRank;
-    }
-
-    public static function getStateIdFromCountryAndState(
-        ?string $countryId,
-        ?string $stateId
-    ): ?\OmegaUp\DAO\VO\States {
-        if (is_null($countryId) || is_null($stateId)) {
-            // Both state and country must be specified together.
-            return null;
-        }
-        return \OmegaUp\DAO\States::getByPK($countryId, $stateId);
     }
 }

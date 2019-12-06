@@ -1,17 +1,9 @@
 <?php
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-try {
-    $smartyProperties = \OmegaUp\Controllers\School::getSchoolsRankForSmarty(
-        /*$rowCount=*/ 100,
-        /*$isIndex=*/false
-    );
-} catch (Exception $e) {
-    \OmegaUp\ApiCaller::handleException($e);
-}
-
-foreach ($smartyProperties as $key => $value) {
-    $smarty->assign($key, $value);
-}
-
-$smarty->display(OMEGAUP_ROOT . '/templates/rank.schools.tpl');
+\OmegaUp\UITools::render(
+    function (): array {
+        return \OmegaUp\Controllers\School::getSchoolsRankForSmarty();
+    }
+);

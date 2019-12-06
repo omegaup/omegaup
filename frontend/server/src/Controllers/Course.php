@@ -658,9 +658,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Adds a problem to an assignment
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: 'ok'}
      */
-    public static function apiAddProblem(\OmegaUp\Request $r) {
+    public static function apiAddProblem(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -1917,7 +1917,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 || !is_null(
                     $r->identity->state_id
                 ) || !is_null(
-                    $r->identity->school_id
+                    $r->identity->current_identity_school_id
                 ));
 
             // Privacy Statement Information
@@ -2338,6 +2338,43 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                 $letter++
             );
+
+            if (
+                is_null($r->identity)
+                || is_null($r->identity->user_id)
+                || is_null($r->identity->identity_id)
+            ) {
+                $nominationStatus = [
+                    'solved' => false,
+                    'tried' => false,
+                    'nominated' => false,
+                    'dismissed' => false,
+                    'nominatedBeforeAC' => false,
+                    'dismissedBeforeAC' => false,
+                ];
+            } else {
+                $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
+                    $problem['problem_id'],
+                    $r->identity->user_id
+                );
+
+                [
+                    'tried' => $nominationStatus['tried'],
+                    'solved' => $nominationStatus['solved'],
+                ] = \OmegaUp\DAO\Runs::getSolvedAndTriedProblemByIdentity(
+                    $problem['problem_id'],
+                    $r->identity->identity_id
+                );
+
+                $nominationStatus['problem_alias'] = $problem['alias'];
+                $nominationStatus['language'] = \OmegaUp\Controllers\Problem::getProblemStatement(
+                    $problem['alias'],
+                    $problem['commit'],
+                    \OmegaUp\Controllers\Identity::getPreferredLanguage($r)
+                )['language'];
+                $nominationStatus['can_nominate_problem'] = !is_null($r->user);
+            }
+            $problem['quality_payload'] = $nominationStatus;
             unset($problem['problem_id']);
         }
 

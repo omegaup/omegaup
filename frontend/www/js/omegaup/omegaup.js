@@ -1,12 +1,11 @@
 import API from './api.js';
 import UI from './ui.js';
-import * as arena from './arena/arena.js';
 import * as lang_en from './lang.en.js';
 import * as lang_es from './lang.es.js';
 import * as lang_pt from './lang.pt.js';
 import * as lang_pseudo from './lang.pseudo.js';
 
-export { API, UI, arena };
+export { API, UI };
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {

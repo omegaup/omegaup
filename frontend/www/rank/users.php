@@ -1,21 +1,11 @@
 <?php
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-[
-    'identity' => $identity,
-] = \OmegaUp\Controllers\Session::getCurrentSession();
-
-try {
-    $smartyProperties = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
-        new \OmegaUp\Request($_REQUEST),
-        $identity
-    );
-} catch (Exception  $e) {
-    \OmegaUp\ApiCaller::handleException($e);
-}
-
-foreach ($smartyProperties as $key => $value) {
-    $smarty->assign($key, $value);
-}
-
-$smarty->display(OMEGAUP_ROOT . '/templates/rank.tpl');
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+            $r
+        );
+    }
+);

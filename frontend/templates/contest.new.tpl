@@ -1,8 +1,8 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleContestNew#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleContestNew#}" inline}
 
-{include file='contest.new.form.tpl'}
+{include file='contest.new.form.tpl' inline}
 
 <script type="text/javascript" src="{version_hash src="/js/contest.new.js"}"></script>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

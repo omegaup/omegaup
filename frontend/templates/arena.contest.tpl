@@ -1,4 +1,4 @@
-{include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true}
+{include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true inline}
 
 {if $admin}
 			<audio id="notification-audio">
@@ -114,19 +114,22 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
+					<div id="qualitynomination">
+						<div id="qualitynomination-popup"></div>
+					</div>
 {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
 					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
 {/if}
 {if $showPoints}
-{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
+{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true inline}
 {else}
-{include file='arena.runs.tpl' show_submit=true show_details=true}
+{include file='arena.runs.tpl' show_submit=true show_details=true inline}
 {/if}
 				</div>
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true show_disqualify=true}
+{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true show_disqualify=true inline}
 			</div>
 {/if}
 {if $showRanking}
@@ -134,13 +137,13 @@
 				<div></div>
 			</div>
 {/if}
-{include file='arena.clarification_list.tpl' contest=true}
+{include file='arena.clarification_list.tpl' contest=true inline}
 		</div>
 		<div id="overlay">
-{include file='arena.runsubmit.tpl' payload=$payload}
-{include file='arena.clarification.tpl' admin=$admin}
+{include file='arena.runsubmit.tpl' payload=$payload inline}
+{include file='arena.clarification.tpl' admin=$admin inline}
 			<div id="run-details"></div>
 		</div>
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 	</body>
 </html>

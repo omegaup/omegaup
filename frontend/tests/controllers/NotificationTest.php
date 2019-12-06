@@ -6,9 +6,9 @@
  * @author carlosabcs
  */
 
-class NotificationTest extends OmegaupTestCase {
+class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testListUnreadNotifications() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
@@ -40,7 +40,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotifications() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -91,7 +91,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsExceptions() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
@@ -116,7 +116,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -125,7 +125,7 @@ class NotificationTest extends OmegaupTestCase {
         ]);
         \OmegaUp\DAO\Notifications::create($notification);
 
-        ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = UserFactory::createUser();
+        ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($maliciousIdentity);
 
         try {

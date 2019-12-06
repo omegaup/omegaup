@@ -1,35 +1,42 @@
 <template>
   <div class="omegaup-course-viewprogress panel">
     <div class="page-header">
-      <h2><a v-bind:href="courseUrl">{{ course.name }}</a></h2>
+      <h2>
+        <a v-bind:href="courseUrl">{{ course.name }}</a>
+      </h2>
     </div>
     <div class="panel-body">
       <table class="table table-striped">
         <thead>
           <tr>
             <th>{{ T.wordsName }}</th>
-            <th class="score"
-                v-for="assignment in assignments">{{ assignment.name }}</th>
+            <th class="score" v-for="assignment in assignments">
+              {{ assignment.name }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="student in students">
             <td>
-              <a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username
+              <a v-bind:href="studentProgressUrl(student)">{{
+                student.name || student.username
               }}</a>
             </td>
-            <td class="score"
-                v-for="assignment in assignments">{{ Math.round(score(student, assignment)) }}</td>
+            <td class="score" v-for="assignment in assignments">
+              {{ Math.round(score(student, assignment)) }}
+            </td>
           </tr>
         </tbody>
       </table>
-    </div><!-- panel-body -->
-    <div class="panel-footer">
-      {{ T.courseStudentsProgressExportToSpreadsheet }}: <a v-bind:download="csvFilename"
-           v-bind:href="csvDataUrl">.csv</a> <a v-bind:download="odsFilename"
-           v-bind:href="odsDataUrl">.ods</a>
     </div>
-  </div><!-- panel -->
+    <!-- panel-body -->
+    <div class="panel-footer">
+      {{ T.courseStudentsProgressExportToSpreadsheet }}:
+      <a v-bind:download="csvFilename" v-bind:href="csvDataUrl">.csv</a>
+      <a v-bind:download="odsFilename" v-bind:href="odsDataUrl">.ods</a>
+    </div>
+  </div>
+  <!-- panel -->
 </template>
 
 <script>
@@ -229,7 +236,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style>

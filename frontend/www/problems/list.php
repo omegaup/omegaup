@@ -1,83 +1,24 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-function getTagList() {
-    if (!isset($_GET['tag'])) {
-        return null;
-    }
-    $tags = $_GET['tag'];
-    // Still allow strings to be sent to avoid breaking permalinks.
-    if ($tags === '') {
-        $tags = [];
-    }
-    if (!is_array($tags)) {
-        $tags = explode(',', strval($tags));
-    }
-    return array_unique($tags);
+try {
+    $result = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+        new \OmegaUp\Request($_REQUEST)
+    );
+} catch (\Exception $e) {
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
-function getDifficultyRange() {
-    if (empty($_GET['min_difficulty']) || empty($_GET['max_difficulty'])) {
-        return null;
-    }
-    $minDifficulty = intval($_GET['min_difficulty']);
-    $maxDifficulty = intval($_GET['max_difficulty']);
-    if ($minDifficulty > $maxDifficulty || $minDifficulty < 0 || $minDifficulty > 4 || $maxDifficulty < 0 || $maxDifficulty > 4) {
-        return null;
-    }
-    return [$minDifficulty, $maxDifficulty];
+foreach ($result as $key => $value) {
+    \OmegaUp\UITools::getSmartyInstance()->assign($key, $value);
 }
 
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
-$r = new \OmegaUp\Request();
-$mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$order_by = isset($_GET['order_by']) ? $_GET['order_by'] : 'title';
-$language = isset($_GET['language']) ? $_GET['language'] : null;
-$tags = getTagList();
-
-$r['page'] = $page;
-$r['language'] = $language;
-$r['order_by'] = $order_by;
-$r['mode'] = $mode;
-$r['tag'] = $tags;
-$r['require_all_tags'] = isset($_GET['some_tags']) ? false : null;
-$r['programming_languages'] = isset($_GET['only_karel']) ? ['kp', 'kj'] : null;
-$r['difficulty_range'] = getDifficultyRange();
-
-$keyword = '';
-if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
-    $keyword = substr($_GET['query'], 0, 256);
-    $r['query'] = $keyword;
-}
-$response = \OmegaUp\Controllers\Problem::apiList($r);
-
-$params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode, 'tag' => $tags];
-
-$pager_items = \OmegaUp\Pager::paginate(
-    $response['total'],
-    $page,
-    '/problem/list/',
-    5,
-    $params
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/problems.tpl',
+        strval(
+            OMEGAUP_ROOT
+        )
+    )
 );
-
-foreach ($response['results'] as $key => $problem) {
-    $response['results'][$key]['difficulty'] = $response['results'][$key]['difficulty'] ? floatval(
-        $problem['difficulty']
-    ) : null;
-    $response['results'][$key]['quality'] = $response['results'][$key]['quality'] ? floatval(
-        $problem['quality']
-    ) : null;
-    $response['results'][$key]['points'] = floatval($problem['points']);
-    $response['results'][$key]['ratio'] = floatval($problem['ratio']);
-    $response['results'][$key]['score'] = floatval($problem['score']);
-}
-
-$smarty->assign('KEYWORD', $keyword);
-$smarty->assign('MODE', $mode);
-$smarty->assign('ORDER_BY', $order_by);
-$smarty->assign('LANGUAGE', $language);
-$smarty->assign('problems', $response['results']);
-$smarty->assign('current_tags', $tags);
-$smarty->assign('pager_items', $pager_items);
-$smarty->display(OMEGAUP_ROOT . '/templates/problems.tpl');

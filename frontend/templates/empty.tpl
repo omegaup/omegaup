@@ -1,3 +1,3 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}" inline}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

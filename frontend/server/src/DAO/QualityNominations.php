@@ -21,9 +21,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      */
     const CONFIDENCE = 5;
 
+    /**
+     * @return array{dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool}
+     */
     public static function getNominationStatusForProblem(
-        \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        int $problemId,
+        int $userId
     ): array {
         $response = [
             'nominated' => false,
@@ -46,7 +49,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var null|array{contents: string} $suggestion */
         $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$problem->problem_id, $identity->user_id]
+            [$problemId, $userId]
         );
         if (!is_null($suggestion)) {
             $response['nominated'] = true;
@@ -79,7 +82,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var null|array{contents: string} $dismissal */
         $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$problem->problem_id, $identity->user_id]
+            [$problemId, $userId]
         );
         if (!is_null($dismissal)) {
             $response['dismissed'] = true;
@@ -172,7 +175,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * instead of as a flat array.
      *
      * @param null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination
-     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[]}|null
+     * @return array{qualitynomination_id: int, nomination: string, contents?: array{statements?: array<string, string>, rationale?: string, reason?: string, before_ac?: bool, quality?: int, tags?: list<string>, difficulty?: int}, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[]}|null
      */
     private static function processNomination($nomination) {
         if (is_null($nomination) || empty($nomination)) {
@@ -207,6 +210,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         );
 
         if (isset($nomination['contents'])) {
+            /** @var array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>} */
             $nomination['contents'] = json_decode(
                 $nomination['contents'],
                 true /*assoc*/
@@ -223,6 +227,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * (user id of person who made the nomination) or $assignee (user id of
      * person assigned to review the nomination). If both are null, the
      * complete list of nominations is returned.
+     *
+     * @return list<array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null>
      */
     public static function getNominations(
         $nominator,
@@ -325,7 +331,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Gets a single nomination by ID.
      *
-     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[]}|null
+     * @return array{author: array{name: string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int, user: array{name: string, username: string}, vote: int}[]}|null
      */
     public static function getById(int $qualitynomination_id) {
         $sql = '

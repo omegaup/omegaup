@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="libinteractive"}
+{include file='head.tpl' htmlTitle="libinteractive" inline}
 
 <div class="panel panel-default">
   <div class="panel-body">
@@ -37,4 +37,4 @@
 {/if}
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

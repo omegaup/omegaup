@@ -178,6 +178,10 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
             if 'WebSocket' in entry['message']:
                 # Travis does not have broadcaster yet.
                 continue
+            if 'https://www.facebook.com/' in entry['message']:
+                # Let's not block submissions when Facebook is
+                # having a bad day.
+                continue
             if is_path_whitelisted(entry['message'], path_whitelist):
                 continue
             if is_message_whitelisted(entry['message'], message_whitelist):

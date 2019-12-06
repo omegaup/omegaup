@@ -1,10 +1,10 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemStats#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemStats#}" inline}
 
 <div id="problem-stats"></div>
 
 {if isset($smarty.get.problem)}
-<script type="text/javascript" src="{version_hash src="/js/dist/problem_stats.js"}"></script>
+{js_include entrypoint="problem_stats"}
 {/if}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

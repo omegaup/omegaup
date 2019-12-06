@@ -18,7 +18,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfTheMonth(
         string $startTime,
@@ -29,6 +29,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             i.user_id,
             i.username,
             COALESCE(i.country_id, 'xx') AS country_id,
+            isc.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
             (SELECT urc.classname FROM
@@ -65,6 +66,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
           LEFT JOIN
+            Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+          LEFT JOIN
             (
               SELECT
                 user_id,
@@ -88,7 +91,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $val = [$startTime, $endTime, $endTime];
 
-        /** @var array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}> */
+        /** @var array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
@@ -120,6 +123,56 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         /** @var array{time: string, username: string, country_id: string, email: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
+
+    /**
+     * Gets all coders of the month from a certain school
+     * @param int $schoolId
+     * @return array{time: string, username: string, classname: string}[]
+     */
+    final public static function getCodersOfTheMonthFromSchool(
+        int $schoolId
+    ): array {
+        $sql = '
+        SELECT
+          cm.time,
+          i.username,
+          COALESCE (
+            (SELECT urc.classname
+            FROM User_Rank_Cutoffs urc
+            WHERE
+                urc.score <= (
+                    SELECT
+                        ur.score
+                    FROM
+                        User_Rank ur
+                    WHERE
+                        ur.user_id = i.user_id
+                )
+            ORDER BY
+                urc.percentile ASC
+            LIMIT 1)
+        , "user-rank-unranked") AS classname
+        FROM
+          Coder_Of_The_Month cm
+        INNER JOIN
+          Users u ON u.user_id = cm.user_id
+        INNER JOIN
+          Identities i ON i.identity_id = u.main_identity_id
+        LEFT JOIN
+          Emails e ON e.user_id = u.user_id
+        WHERE
+          (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
+          cm.school_id = ?
+        ORDER BY
+          cm.time DESC
+      ';
+
+      /** @var array{time: string, username: string, classname: string}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$schoolId]
+        );
     }
 
     /**
@@ -205,7 +258,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         return $coders;
     }
 
-    final public static function getByTime($time) {
+    /**
+     * @param string $time
+     * @return \OmegaUp\DAO\VO\CoderOfTheMonth[]
+     */
+    final public static function getByTime(string $time): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -223,7 +280,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     }
 
     /**
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfMonthByGivenDate(
         string $date

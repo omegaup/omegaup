@@ -2,6 +2,24 @@
 
  namespace OmegaUp\Controllers;
 
+class ScopedFacebook {
+    /** @var \OmegaUp\ScopedSession */
+    public $scopedSession;
+    /** @var \Facebook\Facebook */
+    public $facebook;
+
+    public function __construct() {
+        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
+
+        $this->scopedSession = new \OmegaUp\ScopedSession();
+        $this->facebook = new \Facebook\Facebook([
+            'app_id' => OMEGAUP_FB_APPID,
+            'app_secret' => OMEGAUP_FB_SECRET,
+            'default_graph_version' => 'v2.5',
+        ]);
+    }
+}
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -14,8 +32,6 @@ class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
-    /** @var null|\Facebook\Facebook */
-    private static $_facebook;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
     /** @var bool */
@@ -28,26 +44,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         return self::$_sessionManager;
     }
 
-    /**
-     * @return \Facebook\Facebook
-     */
-    private static function getFacebookInstance() {
-        if (is_null(self::$_facebook)) {
-            require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-
-            self::$_facebook = new \Facebook\Facebook([
-                'app_id' => OMEGAUP_FB_APPID,
-                'app_secret' => OMEGAUP_FB_SECRET,
-                'default_graph_version' => 'v2.5',
-            ]);
-        }
-        return self::$_facebook;
-    }
-
     public static function getFacebookLoginUrl(): string {
-        $facebook = self::getFacebookInstance();
-
-        $helper = $facebook->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
     }
 
@@ -393,9 +392,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $facebook = self::getFacebookInstance();
-
-        $helper = $facebook->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         try {
             $accessToken = $helper->getAccessToken();
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
@@ -416,7 +414,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            $fbResponse = $facebook->get('/me?fields=name,email', $accessToken);
+            $fbResponse = $scopedFacebook->facebook->get(
+                '/me?fields=name,email',
+                $accessToken
+            );
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
@@ -483,27 +484,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
-            try {
-                \OmegaUp\DAO\DAO::transBegin();
-                $identity->password = \OmegaUp\SecurityTools::hashString(
-                    $r['password']
-                );
-                \OmegaUp\DAO\Identities::update($identity);
-                if (!is_null($identity->user_id)) {
-                    $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-                    if (is_null($user)) {
-                        throw new \OmegaUp\Exceptions\NotFoundException(
-                            'userNotExist'
-                        );
-                    }
-                    $user->password = $identity->password;
-                    \OmegaUp\DAO\Users::update($user);
-                }
-                \OmegaUp\DAO\DAO::transEnd();
-            } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
-                throw $e;
-            }
+            $identity->password = \OmegaUp\SecurityTools::hashString(
+                $r['password']
+            );
+            \OmegaUp\DAO\Identities::update($identity);
         }
 
         self::$log->info(

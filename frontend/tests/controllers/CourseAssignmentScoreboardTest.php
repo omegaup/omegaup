@@ -5,12 +5,12 @@
  * @author @joemmanuel
  */
 
-class CourseAssignmentScoreboardTest extends OmegaupTestCase {
+class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Get score of a given assignment happy path
      */
     public function testGetAssignmentScoreboard() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
 
@@ -18,7 +18,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
             \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -33,11 +33,13 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse($courseData);
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
         }
 
         // Generate runs
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
             $students,
             [$courseData['assignment_alias']],
@@ -86,7 +88,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
      * Get scoreboard events of a given assignment happy path
      */
     public function testGetAssignmentScoreboardEvents() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
 
@@ -94,8 +96,8 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem(
-                new ProblemParams(),
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams(),
                 $adminLogin
             );
 
@@ -112,7 +114,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse(
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
                 $courseData,
                 null,
                 $adminLogin
@@ -120,7 +122,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         }
 
         // Generate runs
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
             $students,
             [$courseData['assignment_alias']],

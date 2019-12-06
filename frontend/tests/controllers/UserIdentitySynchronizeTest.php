@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserIdentitySynchronizeTest extends OmegaupTestCase {
+class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates an omegaup user happily :)
      */
@@ -13,9 +13,9 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -29,7 +29,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $this->assertNotNull($user);
-        $this->assertEquals($identity->password, $user->password);
     }
 
     /**
@@ -37,14 +36,14 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
-            'old_password' => $user->password,
+            'username' => $identity->username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'old_password' => $identity->password,
         ]);
 
         // Call api
@@ -62,9 +61,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $identity->password = $r['password'];
         self::login($identity);
 
-        $user = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $this->assertEquals($identity->password, $user->password);
     }
 
     /**
@@ -72,7 +70,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -80,7 +78,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => 'new_username',
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
             'scholar_degree' => 'master',
@@ -96,6 +94,15 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
         );
+        $graduationDate = null;
+        if (!is_null($identityDb->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identityDb->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $graduationDate = $identitySchool->graduation_date;
+            }
+        }
 
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
@@ -108,19 +115,14 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             ),
             $userDb->birth_date
         );
-        $this->assertEquals(
-            gmdate(
-                'Y-m-d',
-                $r['graduation_date']
-            ),
-            $userDb->graduation_date
-        );
+        // Graduation date without school is not saved on database.
+        $this->assertNull($graduationDate);
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
         $states = \OmegaUp\DAO\States::getByCountry('US');
-        $newName = Utils::CreateRandomString();
+        $newName = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $newName,
@@ -139,6 +141,16 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
         );
+        $graduationDate = null;
+        if (!is_null($identityDb->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identityDb->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $graduationDate = $identitySchool->graduation_date;
+            }
+        }
+
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
@@ -150,13 +162,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             ),
             $userDb->birth_date
         );
-        $this->assertEquals(
-            gmdate(
-                'Y-m-d',
-                $r['graduation_date']
-            ),
-            $userDb->graduation_date
-        );
+        // Graduation date without school is not saved on database.
+        $this->assertNull($graduationDate);
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
@@ -177,11 +184,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdateBasicInfo() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $newUsername = 'new_username_basic_info';
-        $newPassword = Utils::CreateRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $newUsername,

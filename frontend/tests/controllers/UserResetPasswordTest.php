@@ -5,20 +5,20 @@
  *
  * @author joemmanuel
  */
-class UserResetPasswordTest extends OmegaupTestCase {
+class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Reset my password
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
-            'old_password' => $user->password,
+            'username' => $identity->username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'old_password' => $identity->password,
         ]);
 
         // Call api
@@ -44,13 +44,13 @@ class UserResetPasswordTest extends OmegaupTestCase {
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username,
-            'password' => Utils::CreateRandomString(),
+            'username' => $identity->username,
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'old_password' => 'bad old password',
         ]);
 
