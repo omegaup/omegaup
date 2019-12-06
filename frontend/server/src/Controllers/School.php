@@ -310,7 +310,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return array
+     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -342,15 +342,22 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @param int $rowCount
-     * @param bool $isIndex
-     * @return array
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsRankForSmarty(
-        int $rowCount,
-        bool $isIndex
-    ): array {
-        $schoolsRank = [
+    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
+        return [
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
+                $rowCount
+            ),
+            'template' => 'rank.schools.tpl'
+        ];
+    }
+
+    /**
+     * @return array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     */
+    public static function getSchoolsRankList(int $rowCount) {
+        return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
                 'rank' => self::getSchoolsRank(
@@ -366,16 +373,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     ),
                     /*$canUseCache=*/true
                 ),
-            ]
+            ],
         ];
-        if (!$isIndex) {
-            return $schoolsRank;
-        }
-        $schoolsRank['rankTablePayload'] = [
-            'length' => $rowCount,
-            'isIndex' => $isIndex,
-            'availableFilters' => [],
-        ];
-        return $schoolsRank;
     }
 }
