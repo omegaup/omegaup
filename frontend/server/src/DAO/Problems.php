@@ -865,6 +865,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
     /**
      * Returns all problems that an identity can manage.
+     *
+     * @return array<int, \OmegaUp\DAO\VO\Problems>
      */
     final public static function getAllProblemsAdminedByIdentity(
         $identity_id,
