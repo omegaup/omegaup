@@ -639,7 +639,7 @@
       <code>$problemSettings['validator']['limits']</code>
       <code>$problemSettings['validator']['limits']</code>
     </MixedArrayAssignment>
-    <MixedAssignment occurrences="27">
+    <MixedAssignment occurrences="26">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -656,7 +656,6 @@
       <code>$updatePublished</code>
       <code>$problemSettings</code>
       <code>$run</code>
-      <code>$run['alias']</code>
       <code>$clarifications</code>
       <code>$clar</code>
       <code>$response['clarifications']</code>
@@ -683,7 +682,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="9">
+    <MixedPropertyFetch occurrences="7">
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;problem_id</code>
@@ -694,12 +693,10 @@
       <code>$run-&gt;run_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['problem']-&gt;alias</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['problem']-&gt;alias</code>
       <code>$r['problem']-&gt;problem_id</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>

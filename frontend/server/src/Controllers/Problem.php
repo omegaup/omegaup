@@ -2549,7 +2549,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($r['problem']->problem_id),
+                intval($problem->problem_id),
                 null,
                 intval($r->identity->identity_id)
             );
@@ -2561,7 +2561,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $run['time'] = intval($run['time']);
                     $run['contest_score'] = floatval($run['contest_score']);
                     $run['username'] = $r->identity->username;
-                    $run['alias'] = $r['problem']->alias;
+                    $run['alias'] = $problem->alias;
                     array_push($response['runs'], $run);
                 }
             }
@@ -2621,7 +2621,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Validate request
         $problem = self::validateRuns(strval($r['problem_alias']));
 
-        // We need to check that the user has priviledges on the problem
+        // We need to check that the user has privileges on the problem
         if (
             !\OmegaUp\Authorization::isProblemAdmin(
                 $r->identity,
@@ -2688,7 +2688,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 /*missingOk=*/true
             );
             if (!is_null($detailsJson)) {
-                /** @var null|array{verdict: string, compile_meta: array{Main: array{verdict: string, time: float, sys_time: float, wall_time: float, memory: int}}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: array{group: string, score: float, contest_score: int, max_score: int, cases: array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}}[]}[]} */
+                /** @var null|array{verdict: string, compile_meta: array{Main: array{verdict: string, time: float, sys_time: float, wall_time: float, memory: int}}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}}>}>} */
                 $details = json_decode($detailsJson, /*associative=*/true);
                 if (!is_array($details)) {
                     self::$log->error(
@@ -2701,6 +2701,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         continue;
                     }
                     foreach ($item as $group) {
+                        if (!isset($group['cases'])) {
+                            continue;
+                        }
                         foreach ($group['cases'] as $case) {
                             if (
                                 !array_key_exists(
