@@ -34,7 +34,9 @@ abstract class Schools {
             SET
                 `country_id` = ?,
                 `state_id` = ?,
-                `name` = ?
+                `name` = ?,
+                `rank` = ?,
+                `score` = ?
             WHERE
                 (
                     `school_id` = ?
@@ -43,6 +45,8 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
+            intval($Schools->rank),
+            floatval($Schools->score),
             intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -67,7 +71,9 @@ abstract class Schools {
                 `Schools`.`school_id`,
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
-                `Schools`.`name`
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
             FROM
                 `Schools`
             WHERE
@@ -154,7 +160,9 @@ abstract class Schools {
                 `Schools`.`school_id`,
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
-                `Schools`.`name`
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
             FROM
                 `Schools`
         ';
@@ -207,8 +215,12 @@ abstract class Schools {
                 Schools (
                     `country_id`,
                     `state_id`,
-                    `name`
+                    `name`,
+                    `rank`,
+                    `score`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?
@@ -217,6 +229,8 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
+            intval($Schools->rank),
+            floatval($Schools->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
