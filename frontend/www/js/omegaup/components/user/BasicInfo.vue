@@ -65,7 +65,7 @@
               <strong>{{ T.profileSchool }}</strong>
             </div>
             <div class="fbSettingsListItemContent fcg">
-              <a v-bind:href="`/schools/profile/${profile.school_id}`"
+              <a v-bind:href="`/schools/profile/${profile.school_id}/`"
                 ><strong>{{ profile.school }}</strong></a
               >
             </div>
