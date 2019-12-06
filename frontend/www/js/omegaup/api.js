@@ -587,7 +587,10 @@ export default {
       },
     ),
 
-    users: _call('/api/school/users/'),
+    users: _call('/api/school/users/', function(data) {
+      data.users = data.users.map(user => new types.SchoolUser(user));
+      return data;
+    }),
   },
 
   Session: {

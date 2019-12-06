@@ -124,12 +124,18 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
 export class SchoolUser implements LinkableResource {
   classname: string = '';
   username: string = '';
-  data: number = 0;
+  created_problems: number = 0;
+  organized_contests: number = 0;
+  solved_problems: number = 0;
+  sortBy: string = 'solved_problems';
+  [index: string]: any;
 
-  constructor(classname: string, username: string, data: number) {
-    this.classname = classname;
-    this.username = username;
-    this.data = data;
+  constructor(schoolUser: omegaup.SchoolUser) {
+    this.classname = schoolUser.classname;
+    this.username = schoolUser.username;
+    this.created_problems = schoolUser.created_problems;
+    this.solved_problems = schoolUser.solved_problems;
+    this.organized_contests = schoolUser.organized_contests;
   }
 
   toString(): string {
@@ -141,7 +147,7 @@ export class SchoolUser implements LinkableResource {
   }
 
   getBadge(): Optional<string> {
-    return Optional.ofNonNull(`${this.data}`);
+    return Optional.ofNonNull(`${this[this.sortBy]}`);
   }
 }
 

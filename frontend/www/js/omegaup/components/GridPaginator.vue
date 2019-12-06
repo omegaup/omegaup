@@ -22,7 +22,7 @@
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems">
-          <td v-if="includePlace" class="text-center">
+          <td v-if="showPageOffset" class="text-center">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </td>
           <td v-for="item in group">
@@ -81,7 +81,7 @@ export default class GridPaginator extends Vue {
   @Prop() itemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
-  @Prop({ default: false }) includePlace!: boolean;
+  @Prop({ default: false }) showPageOffset!: boolean;
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
 
   private T = T;

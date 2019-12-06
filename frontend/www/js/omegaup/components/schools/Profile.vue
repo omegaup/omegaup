@@ -50,7 +50,7 @@
       <div class="col-md-12">
         <omegaup-grid-paginator
           v-bind:columns="1"
-          v-bind:include-place="true"
+          v-bind:show-page-offset="true"
           v-bind:items="schoolUsers"
           v-bind:items-per-page="30"
           v-bind:title="T.schoolUsers"
@@ -107,7 +107,7 @@ export default class SchoolProfile extends Vue {
   @Prop() country!: omegaup.Country;
   @Prop() stateName!: string;
   @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];
-  @Prop() users!: omegaup.SchoolUser[];
+  @Prop() users!: SchoolUser[];
   @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
 
   T = T;
@@ -129,13 +129,9 @@ export default class SchoolProfile extends Vue {
   ];
 
   get schoolUsers(): SchoolUser[] {
-    let users: SchoolUser[] = this.users.map(
-      (user: omegaup.SchoolUser) =>
-        new SchoolUser(user.classname, user.username, user[this.sortBy]),
-    );
-    return users.sort((userA, userB) => {
-      if (userA.data < userB.data) return 1;
-      if (userA.data > userB.data) return -1;
+    return this.users.sort((userA, userB) => {
+      if (userA[this.sortBy] < userB[this.sortBy]) return 1;
+      if (userA[this.sortBy] > userB[this.sortBy]) return -1;
       return 0;
     });
   }
@@ -154,6 +150,7 @@ export default class SchoolProfile extends Vue {
   }
 
   updateUsers(newSortBy: string): void {
+    this.users.forEach(user => (user.sortBy = newSortBy));
     this.sortBy = newSortBy;
   }
 }
