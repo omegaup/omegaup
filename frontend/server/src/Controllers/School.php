@@ -160,7 +160,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Ensures that all the numeric parameters have valid values.
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{offset: int, rowcount: int, start_time: int, finish_time: int, can_use_cache: bool}
      */
     private static function validateRankDetails(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
@@ -188,14 +188,14 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'offset' => $r['offset'] ?: 0,
-            'rowcount' => $r['rowcount'] ?: 100,
-            'start_time' => $r['start_time'] ?:
+            'offset' => intval($r['offset']) ?: 0,
+            'rowcount' => intval($r['rowcount']) ?: 100,
+            'start_time' => intval($r['start_time']) ?:
                             strtotime(
                                 'first day of this month',
                                 \OmegaUp\Time::get()
                             ),
-            'finish_time' => $r['finish_time'] ?:
+            'finish_time' => intval($r['finish_time']) ?:
                             strtotime(
                                 'first day of next month',
                                 \OmegaUp\Time::get()
@@ -225,11 +225,11 @@ class School extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'rank' => self::getSchoolsRank(
-                intval($offset),
-                intval($rowCount),
-                intval($startTime),
-                intval($finishTime),
-                boolval($canUseCache)
+                $offset,
+                $rowCount,
+                $startTime,
+                $finishTime,
+                $canUseCache
             ),
         ];
     }
