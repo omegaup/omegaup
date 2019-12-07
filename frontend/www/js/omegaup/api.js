@@ -587,7 +587,19 @@ export default {
       },
     ),
 
-    users: _call('/api/school/users/'),
+    users: _call('/api/school/users/', function(data) {
+      data.users = data.users.map(
+        user =>
+          new types.SchoolUser(
+            user.classname,
+            user.username,
+            user.created_problems,
+            user.solved_problems,
+            user.organized_contests,
+          ),
+      );
+      return data;
+    }),
   },
 
   Session: {
