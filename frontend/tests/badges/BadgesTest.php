@@ -78,7 +78,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 case 'scripts':
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
-                            case 'update_user_rank.py':
+                            case 'update_ranks.py':
                                 \OmegaUp\Test\Utils::runUpdateUserRank();
                                 break;
                             case 'aggregate_feedback.py':

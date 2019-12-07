@@ -281,7 +281,7 @@ class Utils {
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         shell_exec('python3 ' . escapeshellarg(
             strval(OMEGAUP_ROOT)
-        ) . '/../stuff/cron/update_user_rank.py' .
+        ) . '/../stuff/cron/update_ranks.py' .
         ' --quiet ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
         ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .

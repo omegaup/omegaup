@@ -25,10 +25,9 @@ class Cutoff(NamedTuple):
     classname: str
 
 
-def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
-    '''Updates the user ranking.'''
+def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the problem accepted stats'''
 
-    cur.execute('DELETE FROM `User_Rank`;')
     logging.info('Updating accepted stats for problems...')
     cur.execute('''
         UPDATE
@@ -73,6 +72,12 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
                     )
             );
     ''')
+
+
+def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
+    '''Updates the user ranking.'''
+
+    cur.execute('DELETE FROM `User_Rank`;')
     logging.info('Updating user rank...')
     cur.execute('''
         SELECT
@@ -195,6 +200,7 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
+            update_problem_accepted_stats(cur)
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
         dbconn.commit()
