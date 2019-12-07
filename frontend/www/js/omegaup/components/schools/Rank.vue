@@ -16,10 +16,7 @@
             <tr>
               <th>#</th>
               <th colspan="2">{{ T.profileSchool }}</th>
-              <th class="numericColumn data-rank">{{ T.activeUsers }}</th>
-              <th class="numericColumn data-rank">
-                {{ T.profileSolvedProblems }}
-              </th>
+              <th class="numericColumn data-rank">{{ T.wordsScore }}</th>
             </tr>
           </thead>
           <tbody>
@@ -36,10 +33,7 @@
                 {{ school.name }}
               </td>
               <td class="numericColumn data-rank">
-                {{ school.distinct_users }}
-              </td>
-              <td class="numericColumn data-rank">
-                {{ school.distinct_problems }}
+                {{ school.score }}
               </td>
             </tr>
           </tbody>

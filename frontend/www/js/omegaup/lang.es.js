@@ -1158,6 +1158,7 @@ const translations = {
 	wordsRuns: "Env\u00edos",
 	wordsRuntime: "Tiempo",
 	wordsSaveChanges: "Guardar cambios",
+	wordsScore: "Puntaje",
 	wordsScoreboard: "Lista de estudiantes",
 	wordsSearch: "Buscar",
 	wordsSeeSolution: "Ver Soluci\u00f3n",
