@@ -130,8 +130,8 @@ export default class SchoolProfile extends Vue {
 
   get schoolUsers(): SchoolUser[] {
     return this.users.sort((userA, userB) => {
-      if (userA[this.sortBy] < userB[this.sortBy]) return 1;
-      if (userA[this.sortBy] > userB[this.sortBy]) return -1;
+      if (userA.getDisplayValue() < userB.getDisplayValue()) return 1;
+      if (userA.getDisplayValue() > userB.getDisplayValue()) return -1;
       return 0;
     });
   }
@@ -150,7 +150,7 @@ export default class SchoolProfile extends Vue {
   }
 
   updateUsers(newSortBy: string): void {
-    this.users.forEach(user => (user.sortBy = newSortBy));
+    this.users.forEach(user => (user.displayField = newSortBy));
     this.sortBy = newSortBy;
   }
 }
