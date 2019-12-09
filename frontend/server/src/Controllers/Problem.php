@@ -310,7 +310,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'input_limit' => $inputLimit,
             'submissions' => 0,
             'accepted' => 0,
-            'difficulty' => 0,
             'source' => $source,
             'order' => 'normal', /* defaulting to normal */
             'alias' => $problemAlias,
@@ -1439,28 +1438,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the problem statement from the gitserver.
      *
-     * @param \OmegaUp\DAO\VO\Problems $problem  The problem.
-     * @param string   $commit   The git commit at which to get the statement.
-     * @param string   $language The language of the problem. Will default to
+     * @param string $alias    The problem alias.
+     * @param string $commit   The git commit at which to get the statement.
+     * @param string $language The language of the problem. Will default to
      *                           Spanish if not found.
      *
      * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
-        \OmegaUp\DAO\VO\Problems $problem,
+        string $alias,
         string $commit,
         string $language
     ): array {
         /** @var array{language: string, images: array<string, string>, markdown: string} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
-            "{$problem->alias}-{$commit}-{$language}-markdown",
+            "{$alias}-{$commit}-{$language}-markdown",
             /** @return array{language: string, images: array<string, string>, markdown: string} */
-            function () use ($problem, $commit, $language) {
+            function () use ($alias, $commit, $language) {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'statements',
-                    'alias' => strval($problem->alias),
+                    'alias' => $alias,
                     'commit' => $commit,
                     'language' => $language,
                 ]);
@@ -1752,7 +1751,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
-            $problem,
+            $problem->alias,
             $commit,
             $statementLanguage
         );
@@ -1807,6 +1806,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
         ) {
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+            if (is_null($acl->owner_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             $problemsetter = \OmegaUp\DAO\Identities::findByUserId(
                 $acl->owner_id
             );
@@ -1847,7 +1849,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (!is_null($problemset)) {
+        if (!is_null($problemset) && !is_null($r->identity)) {
             $result['admin'] = \OmegaUp\Authorization::isAdmin(
                 $r->identity,
                 $problemset
@@ -3294,12 +3296,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details['user'] = ['logged_in' => false, 'admin' => false];
         $result['payload'] = $details;
 
-        if (is_null($r->identity)) {
+        if (
+            is_null($r->identity)
+            || is_null($r->identity->user_id)
+            || is_null($problem->problem_id)
+        ) {
             return $result;
         }
         $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-            $problem,
-            $r->identity
+            $problem->problem_id,
+            $r->identity->user_id
         );
         $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,

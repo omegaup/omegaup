@@ -5,8 +5,10 @@
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileSolvedProblems }}</h2>
         </div>
-        <table class="table table-striped"
-               v-for="(problems, user) in groupedSolvedProblems">
+        <table
+          class="table table-striped"
+          v-for="(problems, user) in groupedSolvedProblems"
+        >
           <thead>
             <tr>
               <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
@@ -15,19 +17,23 @@
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{ problem.title }}</a>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                  problem.title
+                }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!solvedProblems"><img src="/media/wait.gif"></div>
+        <div v-show="!solvedProblems"><img src="/media/wait.gif" /></div>
       </div>
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileUnsolvedProblems }}</h2>
         </div>
-        <table class="table table-striped"
-               v-for="(problems, user) in groupedUnsolvedProblems">
+        <table
+          class="table table-striped"
+          v-for="(problems, user) in groupedUnsolvedProblems"
+        >
           <thead>
             <tr>
               <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
@@ -36,12 +42,14 @@
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{ problem.title }}</a>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                  problem.title
+                }}</a>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-show="!unsolvedProblems"><img src="/media/wait.gif"></div>
+        <div v-show="!unsolvedProblems"><img src="/media/wait.gif" /></div>
       </div>
     </div>
   </div>
@@ -93,5 +101,4 @@ export default class ActivitySubmissionsList extends Vue {
     return groups;
   }
 }
-
 </script>

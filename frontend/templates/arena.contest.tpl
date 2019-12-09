@@ -114,6 +114,9 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
+					<div id="qualitynomination">
+						<div id="qualitynomination-popup"></div>
+					</div>
 {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
 					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
 {/if}

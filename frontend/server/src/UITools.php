@@ -174,20 +174,39 @@ class UITools {
     /**
      * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
      */
-    public static function render(callable $callback): void {
+    public static function render(
+        callable $callback,
+        bool $withStatusError = false
+    ): void {
+        $smarty = self::getSmartyInstance();
         try {
             [
                 'smartyProperties' => $smartyProperties,
                 'template' => $template
             ] = $callback(new Request($_REQUEST));
-        } catch (\Exception $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            if ($withStatusError) {
+                $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
+            } else {
                 \OmegaUp\ApiCaller::handleException($e);
+            }
+        } catch (\Exception $e) {
+            \OmegaUp\ApiCaller::handleException($e);
         }
-        $smarty = self::getSmartyInstance();
         /** @var mixed $value */
         foreach ($smartyProperties as $key => $value) {
                 $smarty->assign($key, $value);
         }
+        \OmegaUp\UITools::getSmartyInstance()->display(
+            sprintf(
+                '%s/templates/%s',
+                strval(OMEGAUP_ROOT),
+                $template
+            )
+        );
+    }
+
+    public static function renderWithEmptyResponse(string $template): void {
         \OmegaUp\UITools::getSmartyInstance()->display(
             sprintf(
                 '%s/templates/%s',

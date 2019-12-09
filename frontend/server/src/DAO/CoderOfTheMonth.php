@@ -128,14 +128,31 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     /**
      * Gets all coders of the month from a certain school
      * @param int $schoolId
-     * @return array{time: string, username: string, country_id: string, email: string}[]
+     * @return array{time: string, username: string, classname: string}[]
      */
     final public static function getCodersOfTheMonthFromSchool(
         int $schoolId
     ): array {
         $sql = '
         SELECT
-          cm.time, i.username, COALESCE(i.country_id, "xx") AS country_id, e.email
+          cm.time,
+          i.username,
+          COALESCE (
+            (SELECT urc.classname
+            FROM User_Rank_Cutoffs urc
+            WHERE
+                urc.score <= (
+                    SELECT
+                        ur.score
+                    FROM
+                        User_Rank ur
+                    WHERE
+                        ur.user_id = i.user_id
+                )
+            ORDER BY
+                urc.percentile ASC
+            LIMIT 1)
+        , "user-rank-unranked") AS classname
         FROM
           Coder_Of_The_Month cm
         INNER JOIN
@@ -151,7 +168,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           cm.time DESC
       ';
 
-      /** @var array{time: string, username: string, country_id: string, email: string}[] */
+      /** @var array{time: string, username: string, classname: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$schoolId]
