@@ -5,6 +5,7 @@ export interface LinkableResource {
   toString(): string;
   getUrl(): string;
   getBadge(): Optional<string>;
+  getClassname(): Optional<string>;
 }
 
 export class ContestResult implements LinkableResource {
@@ -28,6 +29,10 @@ export class ContestResult implements LinkableResource {
 
   getBadge(): Optional<string> {
     return Optional.ofNonNull(`${this.place}`);
+  }
+
+  getClassname(): Optional<string> {
+    return Optional.empty();
   }
 }
 
@@ -95,6 +100,10 @@ export class Problem implements LinkableResource {
   getBadge(): Optional<string> {
     return Optional.empty();
   }
+
+  getClassname(): Optional<string> {
+    return Optional.empty();
+  }
 }
 
 export class SchoolCoderOfTheMonth implements LinkableResource {
@@ -118,6 +127,10 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
 
   getBadge(): Optional<string> {
     return Optional.ofNonNull(this.time);
+  }
+
+  getClassname(): Optional<string> {
+    return Optional.empty();
   }
 }
 
@@ -147,6 +160,10 @@ export class SchoolUser implements LinkableResource {
     return this.username;
   }
 
+  getClassname(): Optional<string> {
+    return Optional.ofNonNull(`${this.classname}`);
+  }
+
   getUrl(): string {
     return `/profile/${this.username}/`;
   }
@@ -167,4 +184,3 @@ export class SchoolUser implements LinkableResource {
     return Optional.ofNonNull(`${this.getDisplayValue()}`);
   }
 }
-
