@@ -186,6 +186,62 @@ def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                      cutoff.percentile, cutoff.classname))
 
 
+def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the school rank'''
+
+    logging.info('Updating school rank...')
+    cur.execute('''
+        SELECT
+            s.school_id,
+            SUM(ROUND(100 / LOG(2, p.accepted+1), 0)) AS score
+        FROM
+            Schools s
+        INNER JOIN
+            Submissions su ON su.school_id = s.school_id
+        INNER JOIN
+            Runs r ON r.run_id = su.current_run_id
+        INNER JOIN
+            Problems p ON p.problem_id = su.problem_id
+        WHERE
+            r.verdict = "AC"
+            AND p.visibility >= 1
+            AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    Submissions sub
+                INNER JOIN
+                    Runs ru ON ru.run_id = sub.current_run_id
+                WHERE
+                    sub.school_id = su.school_id
+                    AND sub.problem_id = su.problem_id
+                    AND ru.verdict = "AC"
+                    AND sub.time < su.time
+            )
+        GROUP BY
+            s.school_id
+        ORDER BY
+            score DESC;
+    ''')
+
+    rank = 0
+    prev_score = None
+
+    for row in cur:
+        if row['score'] != prev_score:
+            rank += 1
+        prev_score = row['score']
+        cur.execute('''
+                    UPDATE
+                        Schools s
+                    SET
+                        s.rank = %s,
+                        s.score = %s
+                    WHERE
+                        s.school_id = %s;
+                    ''', (rank, row['score'], row['school_id']))
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
@@ -201,11 +257,17 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            scores = update_user_rank(cur)
-            update_user_rank_cutoffs(cur, scores)
-        dbconn.commit()
-    except:  # noqa: bare-except
-        logging.exception('Failed to update user ranking')
+            try:
+                scores = update_user_rank(cur)
+                update_user_rank_cutoffs(cur, scores)
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception('Failed to update user ranking')
+
+            try:
+                update_school_rank(cur)
+            except:  # noqa: bare-except
+                logging.exception('Failed to update school ranking')
     finally:
         dbconn.close()
         logging.info('Done')
