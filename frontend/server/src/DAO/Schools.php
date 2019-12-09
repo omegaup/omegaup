@@ -94,63 +94,6 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
-     * Returns the rank of schools based on the sum of the score of each problem solved by the users of each school
-     *
-     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
-     */
-    public static function getRankByProblemsScore(
-        int $startDate,
-        int $finishDate,
-        int $offset,
-        int $rowcount
-    ): array {
-        $sql = '
-            SELECT
-                s.school_id,
-                s.name,
-                s.country_id,
-                SUM(ROUND(100 / LOG(2, p.accepted+1), 0)) AS score
-            FROM
-                Schools s
-            INNER JOIN
-                Submissions su ON su.school_id = s.school_id
-            INNER JOIN
-                Runs r ON r.run_id = su.current_run_id
-            INNER JOIN
-                Problems p ON p.problem_id = su.problem_id
-            WHERE
-                r.verdict = "AC"
-                AND p.visibility >= 1
-                AND NOT EXISTS (
-                    SELECT
-                        *
-                    FROM
-                        Submissions sub
-                    INNER JOIN
-                        Runs ru ON ru.run_id = sub.current_run_id
-                    WHERE
-                        sub.school_id = su.school_id
-                        AND sub.problem_id = su.problem_id
-                        AND ru.verdict = "AC"
-                        AND sub.time < su.time
-                )
-                AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
-            GROUP BY
-                s.school_id
-            ORDER BY
-                score DESC
-            LIMIT ?, ?;';
-
-        $args = [$startDate, $finishDate, $offset, $rowcount];
-
-        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            $args
-        );
-    }
-
-    /**
      * @param int $schoolId
      * @param int $monthsNumber
      * @return array{year: int, month: int, count: int}[]

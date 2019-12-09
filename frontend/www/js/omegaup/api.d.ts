@@ -410,7 +410,8 @@ declare namespace omegaup {
 
   export interface SchoolsRank {
     country_id: string;
-    score: number;
+    distinct_problems: number;
+    distinct_users: number;
     name: string;
   }
 
