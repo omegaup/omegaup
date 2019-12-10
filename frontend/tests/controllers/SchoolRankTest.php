@@ -438,4 +438,35 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, $result['users'][2]['organized_contests']);
         $this->assertEquals(0, $result['users'][2]['created_problems']);
     }
+
+    /**
+     * Tests the historical rank of schools, based on the current
+     * criteria: distinct active users and distinct problems solved
+     */
+    public function testSchoolRankHistorical() {
+        // Four schools:
+        // First one: two active users, solving two problems
+        // Second one: one active user, solving two problems
+        // Third one: one active user, solving one problem
+        // Fourth one: one active user, solving one problem
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool()
+        ];
+
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 5; $i++) {
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        $problemsData = [];
+        for ($i = 0; $i < 4; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Aquí falta hacer los envíos y ya.
+    }
 }
