@@ -592,9 +592,8 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="48">
+    <MixedArgument occurrences="18">
       <code>$r['problem']</code>
-      <code>$r['selected_tags']</code>
       <code>$r['problem_alias']</code>
       <code>$r['problem']</code>
       <code>$r['usernameOrEmail']</code>
@@ -700,7 +699,7 @@
       <code>$r['problem']-&gt;problem_id</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="13">
+    <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -709,7 +708,6 @@
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$problem</code>
-      <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>

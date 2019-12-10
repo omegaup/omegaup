@@ -2,6 +2,149 @@
 
  namespace OmegaUp\Controllers;
 
+class ProblemParams {
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $problemAlias;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $title;
+
+    /**
+     * @var int|null
+     */
+    public $visibility;
+
+    /**
+     * @readonly
+     * @var null|string|array<int, string>
+     */
+    public $languages;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $updatePublished;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $selectedTagsAsJSON;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $source;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $validator;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $timeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $validatorTimeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $overallWallTimeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $extraWallTime;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $memoryLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $outputLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $inputLimit;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $emailClarifications;
+
+    /**
+     * @param array{email_clarifications: bool, extra_wall_time: int|null, input_limit: int|null, languages: array<int, string>|null|string, memory_limit: int|null, output_limit: int|null, overall_wall_time_limit: int|null, problem_alias: null|string, selected_tags: null|string, source: null|string, time_limit: int|null, title: null|string, update_published: string, validator: null|string, validator_time_limit: int|null, visibility: int|null} $params
+     */
+    public function __construct($params) {
+        $this->problemAlias = isset(
+            $params['problem_alias']
+        ) ? $params['problem_alias'] : null;
+        $this->title = isset($params['title']) ? $params['title'] : null;
+        $this->visibility = isset(
+            $params['visibility']
+        ) ? $params['visibility'] : null;
+        $this->languages = isset(
+            $params['languages']
+        ) ? $params['languages'] : null;
+        $this->updatePublished = $params['update_published'] ?? \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $this->selectedTagsAsJSON = isset(
+            $params['selected_tags']
+        ) ? $params['selected_tags'] : null;
+        $this->source = isset($params['source']) ? $params['source'] : null;
+        $this->validator = isset(
+            $params['validator']
+        ) ? $params['validator'] : null;
+        $this->timeLimit = isset(
+            $params['time_limit']
+        ) ? $params['time_limit'] : null;
+        $this->validatorTimeLimit = isset(
+            $params['validator_time_limit']
+        ) ? $params['validator_time_limit'] : null;
+        $this->overallWallTimeLimit = isset(
+            $params['overall_wall_time_limit']
+        ) ? $params['overall_wall_time_limit'] : null;
+        $this->extraWallTime = isset(
+            $params['extra_wall_time']
+        ) ? $params['extra_wall_time'] : null;
+        $this->memoryLimit = isset(
+            $params['memory_limit']
+        ) ? $params['memory_limit'] : null;
+        $this->outputLimit = isset(
+            $params['output_limit']
+        ) ? $params['output_limit'] : null;
+        $this->inputLimit = isset(
+            $params['input_limit']
+        ) ? $params['input_limit'] : null;
+        $this->emailClarifications = $params['email_clarifications'] ?? false;
+    }
+}
+
 /**
  * ProblemsController
  */
@@ -80,21 +223,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function validateCreateOrUpdate(
         \OmegaUp\DAO\VO\Identities $identity,
-        string $problemAlias,
-        ?int $visibility,
-        ?string $updatePublished,
-        ?string $selectedTagsAsJSON,
-        ?string $title,
-        ?string $source,
-        ?string $validator,
-        ?int $timeLimit,
-        ?int $validatorTimeLimit,
-        ?int $overallWallTimeLimit,
-        ?int $extraWallTime,
-        ?int $memoryLimit,
-        ?int $outputLimit,
-        ?int $inputLimit,
-        $languages,
+        \OmegaUp\Controllers\ProblemParams $params,
         bool $isUpdate = false
     ) {
         $isRequired = true;
@@ -110,7 +239,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if ($isUpdate) {
             $isRequired = false;
 
-            $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+            $problem = \OmegaUp\DAO\Problems::getByAlias($params->problemAlias);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
@@ -131,8 +260,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (
                 ($problem->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
                   $problem->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) &&
-                    !is_null($visibility) &&
-                    $problem->visibility !== $visibility &&
+                    !is_null($params->visibility) &&
+                    $problem->visibility !== $params->visibility &&
                     !\OmegaUp\Authorization::isQualityReviewer($identity)
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -147,7 +276,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (!is_null($visibility) && $problem->visibility !== $visibility) {
+            if (
+                !is_null($params->visibility)
+                && $problem->visibility !== $params->visibility
+            ) {
                 if ($problem->visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'qualityNominationProblemHasBeenPromoted',
@@ -155,7 +287,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 } else {
                     \OmegaUp\Validators::validateInEnum(
-                        $visibility,
+                        $params->visibility,
                         'visibility',
                         [
                             \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
@@ -167,7 +299,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
             \OmegaUp\Validators::validateInEnum(
-                $updatePublished,
+                $params->updatePublished,
                 'update_published',
                 [
                     \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
@@ -178,19 +310,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 false
             );
         } else {
-            if (\OmegaUp\Validators::isRestrictedAlias($problemAlias)) {
+            if (\OmegaUp\Validators::isRestrictedAlias($params->problemAlias)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'aliasInUse'
                 );
             }
-            if (!\OmegaUp\Validators::isValidAlias($problemAlias)) {
+            if (!\OmegaUp\Validators::isValidAlias($params->problemAlias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalidAlias',
                     'problem_alias'
                 );
             }
             \OmegaUp\Validators::validateInEnum(
-                $visibility,
+                $params->visibility,
                 'visibility',
                 [
                     \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
@@ -198,7 +330,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ]
             );
             /** @var array{tagname: string, public: bool}[]|null */
-            $selectedTags = json_decode($selectedTagsAsJSON, /*assoc=*/true);
+            $selectedTags = json_decode(
+                $params->selectedTagsAsJSON, /*assoc=*/
+                true
+            );
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
                     if (empty($tag['tagname'])) {
@@ -211,77 +346,79 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (empty($title) && $isRequired) {
+        if (empty($params->title) && $isRequired) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'title'
             );
         }
-        if (empty($source) && $isRequired) {
+        if (empty($params->source) && $isRequired) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'source'
             );
         }
         \OmegaUp\Validators::validateInEnum(
-            $validator,
+            $params->validator,
             'validator',
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $timeLimit,
+            $params->timeLimit,
             'time_limit',
             0,
             null,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $validatorTimeLimit,
+            $params->validatorTimeLimit,
             'validator_time_limit',
             0,
             null,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $overallWallTimeLimit,
+            $params->overallWallTimeLimit,
             'overall_wall_time_limit',
             0,
             60000,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $extraWallTime,
+            $params->extraWallTime,
             'extra_wall_time',
             0,
             5000,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $memoryLimit,
+            $params->memoryLimit,
             'memory_limit',
             0,
             null,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $outputLimit,
+            $params->outputLimit,
             'output_limit',
             0,
             null,
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $inputLimit,
+            $params->inputLimit,
             'input_limit',
             0,
             null,
             $isRequired
         );
-
-        if (!is_null($languages)) {
-            if (is_array($languages)) {
-                $languages = implode(',', $languages);
+        $languages = null;
+        if (!is_null($params->languages)) {
+            if (is_array($params->languages)) {
+                $languages = implode(',', $params->languages);
+            } else {
+                $languages = strval($params->languages);
             }
         }
         \OmegaUp\Validators::validateValidSubset(
@@ -309,24 +446,82 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         self::createProblem(
             $r,
-            $r['title'],
-            $r['problem_alias'],
-            $r['validator'],
-            $r['time_limit'],
-            $r['validator_time_limit'],
-            $r['overall_wall_time_limit'],
-            $r['extra_wall_time'],
-            $r['memory_limit'],
-            $r['output_limit'],
-            $r['input_limit'],
-            $r['source'],
-            $r['email_clarifications'],
-            $r['visibility'],
-            $r['update_published'],
-            $r['selected_tags'],
-            $r['languages'],
             $r->user,
-            $r->identity
+            $r->identity,
+            new \OmegaUp\Controllers\ProblemParams([
+                'title' => isset($r['title']) ? strval($r['title']) : null,
+                'problem_alias' => isset(
+                    $r['problem_alias']
+                ) ? strval(
+                    $r['problem_alias']
+                ) : null,
+                'validator' => isset(
+                    $r['validator']
+                ) ? strval(
+                    $r['validator']
+                ) : null,
+                'time_limit' => isset(
+                    $r['time_limit']
+                ) ? intval(
+                    $r['time_limit']
+                ) : null,
+                'validator_time_limit' => isset(
+                    $r['validator_time_limit']
+                ) ? intval(
+                    $r['validator_time_limit']
+                ) : null,
+                'overall_wall_time_limit' => isset(
+                    $r['overall_wall_time_limit']
+                ) ? intval(
+                    $r['overall_wall_time_limit']
+                ) : null,
+                'extra_wall_time' => isset(
+                    $r['extra_wall_time']
+                ) ? intval(
+                    $r['extra_wall_time']
+                ) : null,
+                'memory_limit' => isset(
+                    $r['memory_limit']
+                ) ? intval(
+                    $r['memory_limit']
+                ) : null,
+                'output_limit' => isset(
+                    $r['output_limit']
+                ) ? intval(
+                    $r['output_limit']
+                ) : null,
+                'input_limit' => isset(
+                    $r['input_limit']
+                ) ? intval(
+                    $r['input_limit']
+                ) : null,
+                'source' => isset($r['source']) ? strval($r['source']) : null,
+                'email_clarifications' => isset(
+                    $r['email_clarifications']
+                ) ? boolval(
+                    $r['email_clarifications']
+                ) : false,
+                'visibility' => isset(
+                    $r['visibility']
+                ) ? intval(
+                    $r['visibility']
+                ) : null,
+                'update_published' => isset(
+                    $r['update_published']
+                ) ? strval(
+                    $r['update_published']
+                ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                'selected_tags' => isset(
+                    $r['selected_tags']
+                ) ? strval(
+                    $r['selected_tags']
+                ) : null,
+                'languages' => isset(
+                    $r['languages']
+                ) ? strval(
+                    $r['languages']
+                ) : null,
+            ])
         );
         return [
             'status' => 'ok',
@@ -335,24 +530,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     private static function createProblem(
         \OmegaUp\Request $r,
-        ?string $title,
-        string $problemAlias,
-        ?string $validator,
-        ?int $timeLimit,
-        int $validatorTimeLimit,
-        int $overallWallTimeLimit,
-        int $extraWallTime,
-        ?int $memoryLimit,
-        int $outputLimit,
-        int $inputLimit,
-        ?string $source,
-        ?string $emailClarifications,
-        int $visibility,
-        ?string $updatePublished,
-        ?string $selectedTagsAsJSON,
-        ?string $languages,
         \OmegaUp\DAO\VO\Users $user,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\Controllers\ProblemParams $params
     ): void {
         // Validates request
         [
@@ -360,41 +540,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'languages' => $languages,
         ] = self::validateCreateOrUpdate(
             $identity,
-            $problemAlias,
-            $visibility,
-            $updatePublished,
-            $selectedTagsAsJSON,
-            $title,
-            $source,
-            $validator,
-            $timeLimit,
-            $validatorTimeLimit,
-            $overallWallTimeLimit,
-            $extraWallTime,
-            $memoryLimit,
-            $outputLimit,
-            $inputLimit,
-            $languages
+            $params
         );
 
         // Populate a new Problem object
         $problem = new \OmegaUp\DAO\VO\Problems([
-            'visibility' => $visibility, /* private by default */
-            'title' => $title,
+            'visibility' => $params->visibility,
+            'title' => $params->title,
             'visits' => 0,
-            'input_limit' => $inputLimit,
+            'input_limit' => $params->inputLimit,
             'submissions' => 0,
             'accepted' => 0,
-            'source' => $source,
+            'source' => $params->source,
             'order' => 'normal', /* defaulting to normal */
-            'alias' => $problemAlias,
-            'languages' => $languages,
-            'email_clarifications' => $emailClarifications,
+            'alias' => $params->problemAlias,
+            'languages' => $params->languages,
+            'email_clarifications' => $params->emailClarifications,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
         self::updateProblemSettings($problemSettings, $r);
-        $acceptsSubmissions = $languages !== '';
+        $acceptsSubmissions = $params->languages !== '';
 
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $user->user_id;
@@ -405,7 +571,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             // Commit at the very end
             $problemDeployer = new \OmegaUp\ProblemDeployer(
-                $problemAlias,
+                $params->problemAlias,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
@@ -933,7 +1099,83 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
-        $response = self::updateProblem($r);
+        $response = self::updateProblem(
+            $r,
+            new \OmegaUp\Controllers\ProblemParams([
+                'title' => isset($r['title']) ? strval($r['title']) : null,
+                'problem_alias' => isset(
+                    $r['problem_alias']
+                ) ? strval(
+                    $r['problem_alias']
+                ) : null,
+                'validator' => isset(
+                    $r['validator']
+                ) ? strval(
+                    $r['validator']
+                ) : null,
+                'time_limit' => isset(
+                    $r['time_limit']
+                ) ? intval(
+                    $r['time_limit']
+                ) : null,
+                'validator_time_limit' => isset(
+                    $r['validator_time_limit']
+                ) ? intval(
+                    $r['validator_time_limit']
+                ) : null,
+                'overall_wall_time_limit' => isset(
+                    $r['overall_wall_time_limit']
+                ) ? intval(
+                    $r['overall_wall_time_limit']
+                ) : null,
+                'extra_wall_time' => isset(
+                    $r['extra_wall_time']
+                ) ? intval(
+                    $r['extra_wall_time']
+                ) : null,
+                'memory_limit' => isset(
+                    $r['memory_limit']
+                ) ? intval(
+                    $r['memory_limit']
+                ) : null,
+                'output_limit' => isset(
+                    $r['output_limit']
+                ) ? intval(
+                    $r['output_limit']
+                ) : null,
+                'input_limit' => isset(
+                    $r['input_limit']
+                ) ? intval(
+                    $r['input_limit']
+                ) : null,
+                'source' => isset($r['source']) ? strval($r['source']) : null,
+                'email_clarifications' => isset(
+                    $r['email_clarifications']
+                ) ? boolval(
+                    $r['email_clarifications']
+                ) : false,
+                'visibility' => isset(
+                    $r['visibility']
+                ) ? intval(
+                    $r['visibility']
+                ) : null,
+                'update_published' => isset(
+                    $r['update_published']
+                ) ? strval(
+                    $r['update_published']
+                ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                'selected_tags' => isset(
+                    $r['selected_tags']
+                ) ? strval(
+                    $r['selected_tags']
+                ) : null,
+                'languages' => isset(
+                    $r['languages']
+                ) ? strval(
+                    $r['languages']
+                ) : null,
+            ])
+        );
         // All clear
         $response['status'] = 'ok';
         return $response;
@@ -942,7 +1184,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{rejudged: bool}
      */
-    private static function updateProblem(\OmegaUp\Request $r) {
+    private static function updateProblem(
+        \OmegaUp\Request $r,
+        \OmegaUp\Controllers\ProblemParams $params
+    ) {
         $r->ensureMainUserIdentity();
 
         [
@@ -950,21 +1195,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'languages' => $languages,
         ] = self::validateCreateOrUpdate(
             $r->identity,
-            $r['problem_alias'],
-            $r['visibility'],
-            $r['update_published'] ?? \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            /*$selectedTagsAsJSON=*/ null,
-            $r['title'],
-            $r['source'],
-            $r['validator'],
-            $r['time_limit'],
-            $r['validator_time_limit'],
-            $r['overall_wall_time_limit'],
-            $r['extra_wall_time'],
-            $r['memory_limit'],
-            $r['output_limit'],
-            $r['input_limit'],
-            $r['languages'],
+            $params,
             /*$isUpdate=*/ true
         );
 
@@ -1775,7 +2006,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem' => $problem,
             'problemset' => $problemset,
         ] = $result;
-        if (!$problemExisits) {
+        if (is_null($problem)) {
             return $result;
         }
         $details = self::getProblemDetails(
@@ -1849,6 +2080,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $version = strval($problemsetProblem->version);
         }
 
+        if (is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
             $problem->alias,
             $commit,
@@ -1863,7 +2097,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $request = new \OmegaUp\Request(
             ['omit_rank' => true, 'auth_token' => $r['auth_token']]
         );
-        if (!is_null($r->identity)) {
+        if (!is_null($r->identity) && !is_null($r->identity->username)) {
             $userData = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::USER_PROFILE,
                 $r->identity->username,
@@ -1902,7 +2136,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // problem source and alias of owner.
         if (
             \OmegaUp\DAO\Problems::isVisible($problem) ||
-            \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
+            (
+                !is_null($r->identity) &&
+                \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
+            )
         ) {
             if (is_null($problem->acl_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -3534,23 +3771,87 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ];
         }
         if ($r['request'] === 'submit') {
-            self::updateProblem(new \OmegaUp\Request([
-                'problem_alias' => $r['problem_alias'] ?? null,
-                'title' => $r['title'] ?? null,
-                'message' => $r['message'] ?? null,
-                'validator' => $r['validator'] ?? null,
-                'time_limit' => $r['time_limit'] ?? null,
-                'validator_time_limit' => $r['validator_time_limit'] ?? null,
-                'overall_wall_time_limit' => $r['overall_wall_time_limit'] ?? null,
-                'extra_wall_time' => $r['extra_wall_time'] ?? null,
-                'memory_limit' => $r['memory_limit'] ?? null,
-                'output_limit' => $r['output_limit'] ?? null,
-                'input_limit' => $r['input_limit'] ?? null,
-                'source' => $r['source'] ?? null,
-                'visibility' => $r['visibility'] ?? null,
-                'languages' => $r['languages'] ?? null,
-                'email_clarifications' => $r['email_clarifications'] ?? null,
-            ]));
+            self::updateProblem(
+                $r,
+                new \OmegaUp\Controllers\ProblemParams([
+                    'title' => isset($r['title']) ? strval($r['title']) : null,
+                    'problem_alias' => isset(
+                        $r['problem_alias']
+                    ) ? strval(
+                        $r['problem_alias']
+                    ) : null,
+                    'validator' => isset(
+                        $r['validator']
+                    ) ? strval(
+                        $r['validator']
+                    ) : null,
+                    'time_limit' => isset(
+                        $r['time_limit']
+                    ) ? intval(
+                        $r['time_limit']
+                    ) : null,
+                    'validator_time_limit' => isset(
+                        $r['validator_time_limit']
+                    ) ? intval(
+                        $r['validator_time_limit']
+                    ) : null,
+                    'overall_wall_time_limit' => isset(
+                        $r['overall_wall_time_limit']
+                    ) ? intval(
+                        $r['overall_wall_time_limit']
+                    ) : null,
+                    'extra_wall_time' => isset(
+                        $r['extra_wall_time']
+                    ) ? intval(
+                        $r['extra_wall_time']
+                    ) : null,
+                    'memory_limit' => isset(
+                        $r['memory_limit']
+                    ) ? intval(
+                        $r['memory_limit']
+                    ) : null,
+                    'output_limit' => isset(
+                        $r['output_limit']
+                    ) ? intval(
+                        $r['output_limit']
+                    ) : null,
+                    'input_limit' => isset(
+                        $r['input_limit']
+                    ) ? intval(
+                        $r['input_limit']
+                    ) : null,
+                    'source' => isset(
+                        $r['source']
+                    ) ? strval(
+                        $r['source']
+                    ) : null,
+                    'email_clarifications' => isset(
+                        $r['email_clarifications']
+                    ) ? boolval(
+                        $r['email_clarifications']
+                    ) : false,
+                    'visibility' => isset(
+                        $r['visibility']
+                    ) ? intval(
+                        $r['visibility']
+                    ) : null,
+                    'update_published' => isset(
+                        $r['update_published']
+                    ) ? strval(
+                        $r['update_published']
+                    ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                    'selected_tags' => isset(
+                        $r['selected_tags']
+                    ) ? strval(
+                        $r['selected_tags']
+                    ) : null,
+                    'languages' => isset(
+                        $r['languages']
+                    ) ? strval(
+                        $r['languages']
+                    ) : null,
+                ])
+            );
         } elseif ($r['request'] === 'markdown') {
             self::updateStatement(new \OmegaUp\Request([
                 'problem_alias' => $r['problem_alias'] ?? null,
@@ -3585,44 +3886,90 @@ class Problem extends \OmegaUp\Controllers\Controller {
             try {
                 self::createProblem(
                     $r,
-                    isset($r['title']) ? strval($r['title']) : null,
-                    strval($r['problem_alias']),
-                    isset($r['validator']) ? strval($r['validator']) : null,
-                    isset($r['time_limit']) ? intval($r['time_limit']) : null,
-                    intval($r['validator_time_limit']),
-                    intval($r['overall_wall_time_limit']),
-                    intval($r['extra_wall_time']),
-                    isset(
-                        $r['memory_limit']
-                    ) ? intval(
-                        $r['memory_limit']
-                    ) : null,
-                    intval($r['output_limit']),
-                    intval($r['input_limit']),
-                    isset($r['source']) ? strval($r['source']) : null,
-                    isset(
-                        $r['email_clarifications']
-                    ) ? strval(
-                        $r['email_clarifications']
-                    ) : null,
-                    intval($r['visibility']),
-                    isset(
-                        $r['update_published']
-                    ) ? strval(
-                        $r['update_published']
-                    ) : null,
-                    isset(
-                        $r['selected_tags']
-                    ) ? strval(
-                        $r['selected_tags']
-                    ) : null,
-                    isset(
-                        $r['languages']
-                    ) ? strval(
-                        $r['languages']
-                    ) : null,
                     $r->user,
-                    $r->identity
+                    $r->identity,
+                    new \OmegaUp\Controllers\ProblemParams([
+                        'title' => isset(
+                            $r['title']
+                        ) ? strval(
+                            $r['title']
+                        ) : null,
+                        'problem_alias' => isset(
+                            $r['problem_alias']
+                        ) ? strval(
+                            $r['problem_alias']
+                        ) : null,
+                        'validator' => isset(
+                            $r['validator']
+                        ) ? strval(
+                            $r['validator']
+                        ) : null,
+                        'time_limit' => isset(
+                            $r['time_limit']
+                        ) ? intval(
+                            $r['time_limit']
+                        ) : null,
+                        'validator_time_limit' => isset(
+                            $r['validator_time_limit']
+                        ) ? intval(
+                            $r['validator_time_limit']
+                        ) : null,
+                        'overall_wall_time_limit' => isset(
+                            $r['overall_wall_time_limit']
+                        ) ? intval(
+                            $r['overall_wall_time_limit']
+                        ) : null,
+                        'extra_wall_time' => isset(
+                            $r['extra_wall_time']
+                        ) ? intval(
+                            $r['extra_wall_time']
+                        ) : null,
+                        'memory_limit' => isset(
+                            $r['memory_limit']
+                        ) ? intval(
+                            $r['memory_limit']
+                        ) : null,
+                        'output_limit' => isset(
+                            $r['output_limit']
+                        ) ? intval(
+                            $r['output_limit']
+                        ) : null,
+                        'input_limit' => isset(
+                            $r['input_limit']
+                        ) ? intval(
+                            $r['input_limit']
+                        ) : null,
+                        'source' => isset(
+                            $r['source']
+                        ) ? strval(
+                            $r['source']
+                        ) : null,
+                        'email_clarifications' => isset(
+                            $r['email_clarifications']
+                        ) ? boolval(
+                            $r['email_clarifications']
+                        ) : false,
+                        'visibility' => isset(
+                            $r['visibility']
+                        ) ? intval(
+                            $r['visibility']
+                        ) : null,
+                        'update_published' => isset(
+                            $r['update_published']
+                        ) ? strval(
+                            $r['update_published']
+                        ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                        'selected_tags' => isset(
+                            $r['selected_tags']
+                        ) ? strval(
+                            $r['selected_tags']
+                        ) : null,
+                        'languages' => isset(
+                            $r['languages']
+                        ) ? strval(
+                            $r['languages']
+                        ) : null,
+                    ])
                 );
                 header("Location: /problem/{$r['problem_alias']}/edit/");
                 die();
