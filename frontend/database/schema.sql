@@ -772,7 +772,7 @@ CREATE TABLE `Runs` (
   `judged_by` char(32) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_versions` (`submission_id`,`version`),
-  UNIQUE KEY `submission_id` (`submission_id`),
+  KEY `submission_id` (`submission_id`),
   CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
