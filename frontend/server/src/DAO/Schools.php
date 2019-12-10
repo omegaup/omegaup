@@ -63,18 +63,14 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 s.school_id,
                 s.name,
                 s.country_id,
-                COUNT(DISTINCT i.identity_id) as distinct_users,
+                COUNT(DISTINCT su.identity_id) as distinct_users,
                 COUNT(DISTINCT p.problem_id) AS distinct_problems
             FROM
-                Identities i
-            INNER JOIN
-                Submissions su ON su.identity_id = i.identity_id
+                Submissions su
             INNER JOIN
                 Runs r ON r.run_id = su.current_run_id
             INNER JOIN
-                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
-            INNER JOIN
-                Schools s ON s.school_id = isc.school_id
+                Schools s ON s.school_id = su.school_id
             INNER JOIN
                 Problems p ON p.problem_id = su.problem_id
             WHERE
