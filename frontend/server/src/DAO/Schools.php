@@ -50,7 +50,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @param  int $finishTime
      * @param  int $offset
      * @param  int $rowcount
-     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
+     * @return list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     public static function getRankByUsersAndProblemsWithAC(
         int $startDate,
@@ -60,33 +60,34 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
             SELECT
-              s.name,
-              s.country_id,
-              COUNT(DISTINCT i.identity_id) as distinct_users,
-              COUNT(DISTINCT p.problem_id) AS distinct_problems
+                s.school_id,
+                s.name,
+                s.country_id,
+                COUNT(DISTINCT i.identity_id) as distinct_users,
+                COUNT(DISTINCT p.problem_id) AS distinct_problems
             FROM
-              Identities i
+                Identities i
             INNER JOIN
-              Submissions su ON su.identity_id = i.identity_id
+                Submissions su ON su.identity_id = i.identity_id
             INNER JOIN
-              Runs r ON r.run_id = su.current_run_id
+                Runs r ON r.run_id = su.current_run_id
             INNER JOIN
-              Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
             INNER JOIN
-              Schools s ON s.school_id = isc.school_id
+                Schools s ON s.school_id = isc.school_id
             INNER JOIN
-              Problems p ON p.problem_id = su.problem_id
+                Problems p ON p.problem_id = su.problem_id
             WHERE
-              r.verdict = "AC" AND p.visibility >= 1 AND
-              su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                r.verdict = "AC" AND p.visibility >= 1 AND
+                su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
             GROUP BY
-              s.school_id
+                s.school_id
             ORDER BY
-              distinct_users DESC,
-              distinct_problems DESC
+                distinct_users DESC,
+                distinct_problems DESC
             LIMIT ?, ?;';
 
-        /** @var list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
+        /** @var list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$startDate, $finishDate, $offset, $rowcount]
