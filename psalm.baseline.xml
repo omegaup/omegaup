@@ -1096,12 +1096,22 @@
     <DocblockTypeContradiction occurrences="1">
       <code>is_null($schools)</code>
     </DocblockTypeContradiction>
+    <MissingClosureReturnType occurrences="1">
+      <code>function () use ($offset, $rowCount, $startTime, $finishTime) {</code>
+    </MissingClosureReturnType>
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
+    <MixedArgument occurrences="6">
       <code>$r[$param]</code>
+      <code>$offset</code>
+      <code>$rowCount</code>
+      <code>$startTime</code>
+      <code>$finishTime</code>
+      <code>$canUseCache</code>
     </MixedArgument>
+    <MixedInferredReturnType occurrences="1"/>
+    <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
