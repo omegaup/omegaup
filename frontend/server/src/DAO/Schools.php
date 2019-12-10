@@ -110,32 +110,26 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 s.school_id,
                 s.name,
                 s.country_id,
-                SUM(ROUND(100 / LOG(2, p.accepted+1), 0)) AS score
+                SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0)) AS score
             FROM
                 Schools s
             INNER JOIN
-                Submissions su ON su.school_id = s.school_id
-            INNER JOIN
-                Runs r ON r.run_id = su.current_run_id
-            INNER JOIN
-                Problems p ON p.problem_id = su.problem_id
-            WHERE
-                r.verdict = "AC"
-                AND p.visibility >= 1
-                AND NOT EXISTS (
+                (
                     SELECT
-                        *
+                        su.school_id, p.problem_id, p.accepted
                     FROM
-                        Submissions sub
+                        Submissions su
                     INNER JOIN
-                        Runs ru ON ru.run_id = sub.current_run_id
+                        Runs r ON r.run_id = su.current_run_id
+                    INNER JOIN
+                        Problems p ON p.problem_id = su.problem_id
                     WHERE
-                        sub.school_id = su.school_id
-                        AND sub.problem_id = su.problem_id
-                        AND ru.verdict = "AC"
-                        AND sub.time < su.time
-                )
-                AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                        r.verdict = "AC"
+                        AND p.visibility >= 1
+                        AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                ) AS distinct_school_problems
+            ON
+                distinct_school_problems.school_id = s.school_id
             GROUP BY
                 s.school_id
             ORDER BY
