@@ -160,7 +160,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Ensures that all the numeric parameters have valid values.
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{offset: int, rowcount: int, start_time: int, finish_time: int, can_use_cache: bool}
      */
     private static function validateRankDetails(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
@@ -188,14 +188,14 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'offset' => $r['offset'] ?: 0,
-            'rowcount' => $r['rowcount'] ?: 100,
-            'start_time' => $r['start_time'] ?:
+            'offset' => intval($r['offset']) ?: 0,
+            'rowcount' => intval($r['rowcount']) ?: 100,
+            'start_time' => intval($r['start_time']) ?:
                             strtotime(
                                 'first day of this month',
                                 \OmegaUp\Time::get()
                             ),
-            'finish_time' => $r['finish_time'] ?:
+            'finish_time' => intval($r['finish_time']) ?:
                             strtotime(
                                 'first day of next month',
                                 \OmegaUp\Time::get()
@@ -310,7 +310,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
+     * @return list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -319,7 +319,12 @@ class School extends \OmegaUp\Controllers\Controller {
         int $finishTime,
         bool $canUseCache
     ): array {
-        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
+        $fetch = function () use (
+            $offset,
+            $rowCount,
+            $startTime,
+            $finishTime
+        ): array {
             return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
                 $startTime,
                 $finishTime,
@@ -329,6 +334,7 @@ class School extends \OmegaUp\Controllers\Controller {
         };
 
         if ($canUseCache) {
+            /** @var list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOL_RANK,
                 "{$offset}-{$rowCount}",
@@ -342,7 +348,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
      */
     public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
         return [
@@ -354,7 +360,7 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     * @return array{schoolRankPayload: array{rank: list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
      */
     public static function getSchoolsRankList(int $rowCount) {
         return [

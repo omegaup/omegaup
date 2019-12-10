@@ -33,7 +33,9 @@
                 <omegaup-countryflag
                   v-bind:country="school.country_id"
                 ></omegaup-countryflag>
-                {{ school.name }}
+                <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+                  school.name
+                }}</a>
               </td>
               <td class="numericColumn data-rank">
                 {{ school.distinct_users }}
