@@ -44,53 +44,6 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
-     * Returns rank of schools by # of distinct users with at least one AC and # of distinct problems solved.
-     *
-     * @param  int $startTime
-     * @param  int $finishTime
-     * @param  int $offset
-     * @param  int $rowcount
-     * @return list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>
-     */
-    public static function getRankByUsersAndProblemsWithAC(
-        int $startDate,
-        int $finishDate,
-        int $offset,
-        int $rowcount
-    ): array {
-        $sql = '
-            SELECT
-                s.school_id,
-                s.name,
-                s.country_id,
-                COUNT(DISTINCT su.identity_id) as distinct_users,
-                COUNT(DISTINCT p.problem_id) AS distinct_problems
-            FROM
-                Submissions su
-            INNER JOIN
-                Runs r ON r.run_id = su.current_run_id
-            INNER JOIN
-                Schools s ON s.school_id = su.school_id
-            INNER JOIN
-                Problems p ON p.problem_id = su.problem_id
-            WHERE
-                r.verdict = "AC" AND p.visibility >= 1 AND
-                su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
-            GROUP BY
-                s.school_id
-            ORDER BY
-                distinct_users DESC,
-                distinct_problems DESC
-            LIMIT ?, ?;';
-
-        /** @var list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$startDate, $finishDate, $offset, $rowcount]
-        );
-    }
-
-    /**
      * Returns the rank of schools based on the sum of the score of each problem solved by the users of each school
      *
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
@@ -112,7 +65,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             INNER JOIN
                 (
                     SELECT
-                        su.school_id, p.problem_id, p.accepted
+                        DISTINCT su.school_id, p.problem_id, p.accepted
                     FROM
                         Submissions su
                     INNER JOIN
