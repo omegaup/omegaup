@@ -785,6 +785,8 @@ CREATE TABLE `Schools` (
   `name` varchar(128) NOT NULL,
   `rank` int(11) NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
+  `distinct_users` int(11) NOT NULL DEFAULT '0',
+  `distinct_problems` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_id`),
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
