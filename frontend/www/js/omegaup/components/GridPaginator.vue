@@ -26,13 +26,11 @@
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </td>
           <td v-for="item in group">
-            <a
-              v-bind:href="item.getUrl()"
-              v-bind:class="
-                !item.getClassname().isEmpty() ? item.getClassname().get() : ''
-              "
-              >{{ item.toString() }}</a
-            >
+            <slot name="item-data" v-bind:item="item">
+              <a v-bind:href="item.getUrl()">
+                {{ item.toString() }}
+              </a>
+            </slot>
           </td>
           <td class="numericColumn" v-if="!group[0].getBadge().isEmpty()">
             <strong>{{ group[0].getBadge().get() }}</strong>

@@ -66,6 +66,13 @@
               </tr>
             </thead>
           </template>
+          <template slot="item-data" slot-scope="slotProps">
+            <omegaup-username
+              v-bind:username="slotProps.item.toString()"
+              v-bind:classname="slotProps.item.classname"
+              v-bind:linkify="true"
+            ></omegaup-username>
+          </template>
         </omegaup-grid-paginator>
       </div>
     </div>
@@ -87,6 +94,7 @@ import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
+import UserName from '../user/Username.vue';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
 
 interface ProblemsSolvedCount {
@@ -100,6 +108,7 @@ interface ProblemsSolvedCount {
     'omegaup-country-flag': CountryFlag,
     'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
+    'omegaup-username': UserName,
   },
 })
 export default class SchoolProfile extends Vue {
