@@ -1160,6 +1160,7 @@ const translations = {
 	wordsRuns: "Submissions",
 	wordsRuntime: "Runtime",
 	wordsSaveChanges: "Save changes",
+	wordsScore: "Score",
 	wordsScoreboard: "Scoreboard",
 	wordsSearch: "Search",
 	wordsSeeSolution: "See Solution",

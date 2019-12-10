@@ -1160,6 +1160,7 @@ const translations = {
 	wordsRuns: "(Submi55i0n5)",
 	wordsRuntime: "(Run7im3)",
 	wordsSaveChanges: "(Sav3 chang35)",
+	wordsScore: "(Sc0r3)",
 	wordsScoreboard: "(Sc0r3b0ard)",
 	wordsSearch: "(S3arch)",
 	wordsSeeSolution: "(S33 S01u7i0n)",
