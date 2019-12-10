@@ -1305,7 +1305,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
 
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
         $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(

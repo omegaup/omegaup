@@ -193,53 +193,56 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     cur.execute('''
         SELECT
             s.school_id,
-            SUM(ROUND(100 / LOG(2, p.accepted+1), 0)) AS score
+            COUNT(DISTINCT i.identity_id) as distinct_users,
+            COUNT(DISTINCT p.problem_id) as distinct_problems
         FROM
-            Schools s
+            Identities i
         INNER JOIN
-            Submissions su ON su.school_id = s.school_id
+            Submissions su ON su.identity_id = i.identity_id
         INNER JOIN
             Runs r ON r.run_id = su.current_run_id
+        INNER JOIN
+            Identities_Schools isc
+            ON isc.identity_school_id = i.current_identity_school_id
+        INNER JOIN
+            Schools s ON s.school_id = isc.school_id
         INNER JOIN
             Problems p ON p.problem_id = su.problem_id
         WHERE
             r.verdict = "AC"
             AND p.visibility >= 1
-            AND NOT EXISTS (
-                SELECT
-                    *
-                FROM
-                    Submissions sub
-                INNER JOIN
-                    Runs ru ON ru.run_id = sub.current_run_id
-                WHERE
-                    sub.school_id = su.school_id
-                    AND sub.problem_id = su.problem_id
-                    AND ru.verdict = "AC"
-                    AND sub.time < su.time
-            )
         GROUP BY
             s.school_id
         ORDER BY
-            score DESC;
+            distinct_users DESC,
+            distinct_problems DESC;
     ''')
 
     rank = 0
-    prev_score = None
+    prev_distinct_users = None
+    prev_distinct_problems = None
 
     for row in cur:
-        if row['score'] != prev_score:
+        logging.info(row)
+        if (row['distinct_users'] != prev_distinct_users or
+                row['distinct_problems'] != prev_distinct_problems):
             rank += 1
-        prev_score = row['score']
+        prev_distinct_users = row['distinct_users']
+        prev_distinct_problems = row['distinct_problems']
         cur.execute('''
-                    UPDATE
-                        Schools s
-                    SET
-                        s.rank = %s,
-                        s.score = %s
-                    WHERE
-                        s.school_id = %s;
-                    ''', (rank, row['score'], row['school_id']))
+                        UPDATE
+                            Schools as s
+                        SET
+                            s.distinct_users = %s,
+                            s.distinct_problems = %s,
+                            s.rank = %s
+                        WHERE
+                            s.school_id = %s;
+                    ''',
+                    (
+                        row['distinct_users'], row['distinct_problems'],
+                        rank, row['school_id']
+                    ))
 
 
 def main() -> None:
@@ -266,6 +269,7 @@ def main() -> None:
 
             try:
                 update_school_rank(cur)
+                dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update school ranking')
     finally:

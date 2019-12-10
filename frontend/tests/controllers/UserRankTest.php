@@ -15,7 +15,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
@@ -54,7 +54,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
@@ -97,7 +97,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
@@ -135,7 +135,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
@@ -154,7 +154,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
@@ -202,7 +202,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runDataContestant);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
@@ -301,7 +301,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
@@ -336,7 +336,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
@@ -399,7 +399,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
         // Refresh Rank
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $firstPlaceUserRank = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
             'username' => $firstPlaceIdentity->username

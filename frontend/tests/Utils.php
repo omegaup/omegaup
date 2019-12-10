@@ -273,7 +273,7 @@ class Utils {
         self::commit();
     }
 
-    public static function runUpdateUserRank(): void {
+    public static function runUpdateRanks(): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
@@ -282,7 +282,7 @@ class Utils {
         shell_exec('python3 ' . escapeshellarg(
             strval(OMEGAUP_ROOT)
         ) . '/../stuff/cron/update_ranks.py' .
-        ' --quiet ' .
+        ' --verbose ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
         ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
         ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
