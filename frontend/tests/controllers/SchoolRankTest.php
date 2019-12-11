@@ -90,7 +90,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Call API
         ['user' => $rankViewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $rankViewerLogin = self::login($identity);
-        $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
@@ -109,7 +109,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(1, $response['rank'][1]['distinct_users']);
 
-        $cachedResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+        $cachedResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
@@ -126,7 +126,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $rankViewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $rankViewerLogin = self::login($identity);
-        $originalResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+        $originalResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
@@ -135,7 +135,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
 
-        $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
             'start_time' => $start_time,
             'finish_time' => $end_time
@@ -146,7 +146,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(2, $response['rank'][0]['distinct_users']);
         $this->assertEquals(1, $response['rank'][2]['distinct_users']);
 
-        $cachedResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+        $cachedResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
