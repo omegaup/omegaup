@@ -36,9 +36,7 @@ abstract class Schools {
                 `state_id` = ?,
                 `name` = ?,
                 `rank` = ?,
-                `score` = ?,
-                `distinct_users` = ?,
-                `distinct_problems` = ?
+                `score` = ?
             WHERE
                 (
                     `school_id` = ?
@@ -49,8 +47,6 @@ abstract class Schools {
             $Schools->name,
             intval($Schools->rank),
             floatval($Schools->score),
-            intval($Schools->distinct_users),
-            intval($Schools->distinct_problems),
             intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -77,9 +73,7 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`rank`,
-                `Schools`.`score`,
-                `Schools`.`distinct_users`,
-                `Schools`.`distinct_problems`
+                `Schools`.`score`
             FROM
                 `Schools`
             WHERE
@@ -168,9 +162,7 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`rank`,
-                `Schools`.`score`,
-                `Schools`.`distinct_users`,
-                `Schools`.`distinct_problems`
+                `Schools`.`score`
             FROM
                 `Schools`
         ';
@@ -225,12 +217,8 @@ abstract class Schools {
                     `state_id`,
                     `name`,
                     `rank`,
-                    `score`,
-                    `distinct_users`,
-                    `distinct_problems`
+                    `score`
                 ) VALUES (
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -243,8 +231,6 @@ abstract class Schools {
             $Schools->name,
             intval($Schools->rank),
             floatval($Schools->score),
-            intval($Schools->distinct_users),
-            intval($Schools->distinct_problems),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
