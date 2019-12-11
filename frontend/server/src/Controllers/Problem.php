@@ -2,6 +2,158 @@
 
  namespace OmegaUp\Controllers;
 
+class ProblemParams {
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $problemAlias;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $title;
+
+    /**
+     * @var int|null
+     */
+    public $visibility;
+
+    /**
+     * @readonly
+     * @var null|string|array<int, string>
+     */
+    public $languages;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $updatePublished;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $selectedTagsAsJSON;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $source;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $validator;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $timeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $validatorTimeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $overallWallTimeLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $extraWallTime;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $memoryLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $outputLimit;
+
+    /**
+     * @readonly
+     * @var int|null
+     */
+    public $inputLimit;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $emailClarifications;
+
+    public function __construct(\OmegaUp\Request $params) {
+        $this->problemAlias = isset(
+            $params['problem_alias']
+        ) ? strval($params['problem_alias']) : null;
+        $this->title = isset(
+            $params['title']
+        ) ? strval(
+            $params['title']
+        ) : null;
+        $this->visibility = isset(
+            $params['visibility']
+        ) ? intval($params['visibility']) : null;
+        $this->languages = isset(
+            $params['languages']
+        ) ? strval($params['languages']) : null;
+        $this->updatePublished = isset(
+            $params['update_published']
+        ) ? strval(
+            $params['update_published']
+        ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $this->selectedTagsAsJSON = isset(
+            $params['selected_tags']
+        ) ? strval($params['selected_tags']) : null;
+        $this->source = isset($params['source']) ? $params['source'] : null;
+        $this->validator = isset(
+            $params['validator']
+        ) ? strval($params['validator']) : null;
+        $this->timeLimit = isset(
+            $params['time_limit']
+        ) ? intval($params['time_limit']) : null;
+        $this->validatorTimeLimit = isset(
+            $params['validator_time_limit']
+        ) ? intval($params['validator_time_limit']) : null;
+        $this->overallWallTimeLimit = isset(
+            $params['overall_wall_time_limit']
+        ) ? intval($params['overall_wall_time_limit']) : null;
+        $this->extraWallTime = isset(
+            $params['extra_wall_time']
+        ) ? intval($params['extra_wall_time']) : null;
+        $this->memoryLimit = isset(
+            $params['memory_limit']
+        ) ? intval($params['memory_limit']) : null;
+        $this->outputLimit = isset(
+            $params['output_limit']
+        ) ? intval($params['output_limit']) : null;
+        $this->inputLimit = isset(
+            $params['input_limit']
+        ) ? intval($params['input_limit']) : null;
+        $this->emailClarifications = isset(
+            $params['email_clarifications']
+        ) ? boolval(
+            $params['email_clarifications']
+        ) : false;
+    }
+}
+
 /**
  * ProblemsController
  */
@@ -3513,6 +3665,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 header("Location: /problem/{$r['problem_alias']}/edit/");
                 die();
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
                     $statusError = '{error}';
