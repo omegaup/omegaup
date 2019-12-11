@@ -3,6 +3,18 @@
 namespace OmegaUp;
 
 class UITools {
+    /** @var bool */
+    public static $isLoggedIn = false;
+    /** @var bool */
+    public static $isAdmin = false;
+    /** @var string[] */
+    public static $contestPages = [
+        'arena/admin.php',
+        'arena/contest.php',
+        'course/assignment.php',
+        'arena/contest.php',
+        'arena/courseadmin.php',
+    ];
     /** @var ?\Smarty */
     private static $smarty = null;
 
@@ -81,9 +93,10 @@ class UITools {
             'email' => $email,
             'identity' => $identity,
             'user' => $user,
-            'is_admin' => $isAdmin,
+            'is_admin' => self::$isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        if (!is_null($identity)) {
+        self::$isLoggedIn = !is_null($identity);
+        if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
 
             $smarty->assign(
@@ -95,34 +108,26 @@ class UITools {
                 'CURRENT_USER_IS_EMAIL_VERIFIED',
                 empty($user) || $user->verified
             );
-            $smarty->assign('CURRENT_USER_IS_ADMIN', $isAdmin);
+            $smarty->assign('CURRENT_USER_IS_ADMIN', self::$isAdmin);
             $smarty->assign(
                 'CURRENT_USER_IS_REVIEWER',
                 \OmegaUp\Authorization::isQualityReviewer($identity)
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=92">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '128')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_16',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=16">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '16')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_32',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=32">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '32')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_51',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=51">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '51')
             );
 
             $smarty->assign(
@@ -134,11 +139,11 @@ class UITools {
         } else {
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
-                '<img src="/media/avatar_92.png">'
+                '/media/avatar_92.png'
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_16',
-                '<img src="/media/avatar_16.png">'
+                '/media/avatar_16.png'
             );
         }
 
@@ -162,6 +167,28 @@ class UITools {
         );
         $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
+        $path = explode('/', getcwd());
+        $directory = end($path);
+        $inContest = false;
+        $scriptRelativePath = implode(
+            '/',
+            array_slice(explode('/', $_SERVER['SCRIPT_FILENAME']), -2)
+        );
+        if (in_array($scriptRelativePath, \OmegaUp\UITools::$contestPages)) {
+            if (isset($_SERVER['QUERY_STRING'])) {
+                parse_str($_SERVER['QUERY_STRING'], $output);
+                $inContest = isset(
+                    $output['is_practice']
+                ) ? $output['is_practice'] !== 'true' : true;
+            }
+        }
+        \OmegaUp\UITools::getSmartyNavbarHeader(
+            $smarty,
+            $identity,
+            $email,
+            $directory,
+            $inContest
+        );
 
         $smarty->assign(
             'ENABLED_EXPERIMENTS',
@@ -169,6 +196,47 @@ class UITools {
         );
         self::$smarty = $smarty;
         return $smarty;
+    }
+
+    public static function getFormattedGravatarURL(
+        string $hashedEmail,
+        string $size
+    ): string {
+        return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
+
+    public static function getSmartyNavbarHeader(
+        \Smarty $smarty,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?string $email,
+        string $navbarSection,
+        bool $inContest
+    ): void {
+        $smarty->assign(
+            'headerPayload',
+            [
+                'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
+                'inContest' => $inContest,
+                'isLoggedIn' => self::$isLoggedIn,
+                'isReviewer' => !is_null(
+                    $identity
+                ) ? \OmegaUp\Authorization::isQualityReviewer(
+                    $identity
+                ) : false,
+                'gravatarURL51' => is_null($email) ? '' :
+                  self::getFormattedGravatarURL(md5($email), '51'),
+                'currentUsername' =>
+                    !is_null(
+                        $identity
+                    ) && !is_null(
+                        $identity->username
+                    ) ? $identity->username :
+                    '',
+                'isAdmin' => self::$isAdmin,
+                'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
+                'navbarSection' => $navbarSection,
+            ]
+        );
     }
 
     /**

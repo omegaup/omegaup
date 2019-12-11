@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='problems' inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload inline}
 
 <script type="text/json" id="payload">{$payload|json_encode}</script>
 <div id="qualitynomination-list"></div>

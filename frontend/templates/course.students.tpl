@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#courseStudentsProgress#}" inline}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#courseStudentsProgress#}" inline}
 
 <script type="text/json" id="payload">{$payload|json_encode}</script>
 <div id="view-progress"></div>

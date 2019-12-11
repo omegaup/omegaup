@@ -56,7 +56,7 @@
             <li id="notifications-list"></li>
             <li id="nav-user" class="dropdown{if isset($navbarSection) && $navbarSection === "users"} active{/if}">
               <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
-                {$CURRENT_USER_GRAVATAR_URL_51}
+                <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
                   <span class="grader-count badge">…</span>
@@ -85,7 +85,10 @@
             {if $LOGGED_IN eq '1'}
               <li id="notifications-list"></li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
+                  <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
+                  <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span>
+                </a>
                 <ul class="dropdown-menu">
                   <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 </ul>
