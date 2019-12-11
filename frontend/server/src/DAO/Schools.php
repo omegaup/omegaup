@@ -65,7 +65,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             INNER JOIN
                 (
                     SELECT
-                        DISTINCT su.school_id, p.problem_id, p.accepted
+                        su.school_id,
+                        p.accepted,
+                        MIN(su.time) AS first_ac_time
                     FROM
                         Submissions su
                     INNER JOIN
@@ -75,7 +77,12 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     WHERE
                         r.verdict = "AC"
                         AND p.visibility >= 1
-                        AND su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                        AND su.school_id IS NOT NULL
+                    GROUP BY
+                        su.school_id,
+                        su.problem_id
+                    HAVING
+                        first_ac_time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
                 ) AS distinct_school_problems
             ON
                 distinct_school_problems.school_id = s.school_id
