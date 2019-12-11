@@ -14,7 +14,7 @@ class Controller {
     /**
      * List of verdicts
      *
-     * @var array
+     * @var list<string>
      */
     public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
 

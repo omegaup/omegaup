@@ -783,6 +783,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!is_string($detailsJson)) {
             return;
         }
+        /** @var array{verdict: string, contest_score: int, score: int, judged_by: string} */
         $details = json_decode($detailsJson, true);
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];

@@ -144,7 +144,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="63">
+    <MixedArgument occurrences="62">
       <code>$r['active']</code>
       <code>$r['recommended']</code>
       <code>$r['participating']</code>
@@ -205,7 +205,6 @@
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
-      <code>$verdict</code>
       <code>$problemStats[$key]['cases_stats']</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="9">
@@ -219,7 +218,7 @@
       <code>$clar['time']</code>
       <code>$results['total']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="35">
+    <MixedAssignment occurrences="34">
       <code>$contests</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -249,7 +248,6 @@
       <code>$response['clarifications']</code>
       <code>$request-&gt;extra_note</code>
       <code>$contest-&gt;admission_mode</code>
-      <code>$verdict</code>
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
@@ -592,7 +590,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="18">
+    <MixedArgument occurrences="16">
       <code>$r['problem']</code>
       <code>$r['problem_alias']</code>
       <code>$r['problem']</code>
@@ -612,7 +610,6 @@
       <code>$r['problem']</code>
       <code>$r['problem']</code>
       <code>$problem-&gt;alias</code>
-      <code>$container</code>
       <code>$r['contest_alias']</code>
       <code>$r['lang']</code>
       <code>$updatePublished</code>
@@ -638,7 +635,7 @@
       <code>$problemSettings['validator']['limits']</code>
       <code>$problemSettings['validator']['limits']</code>
     </MixedArrayAssignment>
-    <MixedAssignment occurrences="26">
+    <MixedAssignment occurrences="24">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -650,15 +647,12 @@
       <code>$lang</code>
       <code>$problem</code>
       <code>$userData</code>
-      <code>$container</code>
       <code>$logEntry['tree'][$treeEntry['path']]</code>
       <code>$updatePublished</code>
-      <code>$problemSettings</code>
       <code>$run</code>
       <code>$clarifications</code>
       <code>$clar</code>
       <code>$response['clarifications']</code>
-      <code>$verdict</code>
       <code>$run</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
@@ -903,7 +897,7 @@
       <code>getGraderResourcePassthru</code>
       <code>validateList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="44">
+    <MixedArgument occurrences="43">
       <code>$r['problem']-&gt;languages</code>
       <code>$r['contest']-&gt;languages</code>
       <code>$r['problem']</code>
@@ -948,7 +942,7 @@
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="10">
+    <MixedArrayAccess occurrences="9">
       <code>$filtered['time']</code>
       <code>$filtered['score']</code>
       <code>$filtered['runtime']</code>
@@ -958,9 +952,8 @@
       <code>$filtered['contest_score']</code>
       <code>$filtered['contest_score']</code>
       <code>$response['admin']</code>
-      <code>$details['compile_error']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="13">
+    <MixedAssignment occurrences="11">
       <code>$r['container']</code>
       <code>$problemset_id</code>
       <code>$r['container']</code>
@@ -971,9 +964,7 @@
       <code>$gzippedLogs</code>
       <code>$response['judged_by']</code>
       <code>$detailsJson</code>
-      <code>$details</code>
       <code>$response['compile_error']</code>
-      <code>$response['details']</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="3">
       <code>array</code>
@@ -1762,12 +1753,11 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/server/src/DAO/Problemsets.php">
-    <MissingParamType occurrences="2">
+    <MissingParamType occurrences="1">
       <code>$problemset_id</code>
       <code>$problemset_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>getProblemsetContainer</code>
+    <MissingReturnType occurrences="1">
       <code>getWithTypeByPK</code>
     </MissingReturnType>
     <MixedAssignment occurrences="3">
