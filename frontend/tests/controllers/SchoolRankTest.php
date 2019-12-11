@@ -444,13 +444,14 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
      * criteria: distinct active users and distinct problems solved
      */
     public function testSchoolRankHistorical() {
-        // Four schools:
-        // First one: two active users, solving two problems
-        // Second one: one active user, solving two problems
-        // Third one: one active user, solving one problem
-        // Fourth one: one active user, solving one problem
+        // Three schools:
+        // School0: two distinct problems solved
+        // School1: three distinct problems solved
+        // School2: two distinct problems solved
+        // => School0 and School2 must have same rank and score
+        // => School1 must have a better (lower) rank than School0 and School2
+
         $schoolsData = [
-            SchoolsFactory::createSchool(),
             SchoolsFactory::createSchool(),
             SchoolsFactory::createSchool(),
             SchoolsFactory::createSchool()
@@ -458,15 +459,87 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $users = [];
         $identities = [];
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         $problemsData = [];
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 3; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
 
-        // Aquí falta hacer los envíos y ya.
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
+        SchoolsFactory::addUserToSchool($schoolsData[2], $identities[3]);
+
+        // School 0
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // School 1
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[2],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // School 2
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Refresh Rank
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $school0 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[0]['school']->school_id
+        );
+        $school1 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[1]['school']->school_id
+        );
+        $school2 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[2]['school']->school_id
+        );
+
+        $this->assertEquals($school0->rank, $school2->rank);
+        $this->assertEquals($school0->score, $school0->score);
+        $this->assertGreaterThan($school1->rank, $school0->rank);
+        $this->assertGreaterThan($school0->score, $school1->score);
     }
 }

@@ -193,56 +193,55 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     cur.execute('''
         SELECT
             s.school_id,
-            COUNT(DISTINCT i.identity_id) as distinct_users,
-            COUNT(DISTINCT p.problem_id) as distinct_problems
+            SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0))
+            AS score
         FROM
-            Identities i
+            Schools s
         INNER JOIN
-            Submissions su ON su.identity_id = i.identity_id
-        INNER JOIN
-            Runs r ON r.run_id = su.current_run_id
-        INNER JOIN
-            Identities_Schools isc
-            ON isc.identity_school_id = i.current_identity_school_id
-        INNER JOIN
-            Schools s ON s.school_id = isc.school_id
-        INNER JOIN
-            Problems p ON p.problem_id = su.problem_id
-        WHERE
-            r.verdict = "AC"
-            AND p.visibility >= 1
+            (
+                SELECT
+                    su.school_id,
+                    p.accepted,
+                    MIN(su.time)
+                FROM
+                    Submissions su
+                INNER JOIN
+                    Runs r ON r.run_id = su.current_run_id
+                INNER JOIN
+                    Problems p ON p.problem_id = su.problem_id
+                WHERE
+                    r.verdict = "AC"
+                    AND p.visibility >= 1
+                    AND su.school_id IS NOT NULL
+                GROUP BY
+                    su.school_id,
+                    su.problem_id
+            ) AS distinct_school_problems
+        ON
+            distinct_school_problems.school_id = s.school_id
         GROUP BY
             s.school_id
         ORDER BY
-            distinct_users DESC,
-            distinct_problems DESC;
+            score DESC;
     ''')
 
     rank = 0
-    prev_distinct_users = None
-    prev_distinct_problems = None
+    prev_score = None
 
     for row in cur:
-        logging.info(row)
-        if (row['distinct_users'] != prev_distinct_users or
-                row['distinct_problems'] != prev_distinct_problems):
+        if row['score'] != prev_score:
             rank += 1
-        prev_distinct_users = row['distinct_users']
-        prev_distinct_problems = row['distinct_problems']
+        prev_score = row['score']
         cur.execute('''
                         UPDATE
                             Schools as s
                         SET
-                            s.distinct_users = %s,
-                            s.distinct_problems = %s,
+                            s.score = %s,
                             s.rank = %s
                         WHERE
                             s.school_id = %s;
                     ''',
-                    (
-                        row['distinct_users'], row['distinct_problems'],
-                        rank, row['school_id']
-                    ))
+                    (row['score'], rank, row['school_id']))
 
 
 def main() -> None:
