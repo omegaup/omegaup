@@ -1,10 +1,11 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  const headerPayload =
-      JSON.parse(document.getElementById('header-payload').innerText);
+  const headerPayload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
   let commonNavbar = new Vue({
     el: '#common-navbar',
     render: function(createElement) {
@@ -24,9 +25,9 @@ OmegaUp.on('ready', function() {
 
   if (headerPayload.isAdmin) {
     API.Notification.myList({})
-        .then(function(data) {
-          commonNavbar.notifications = data.notifications;
-        })
-        .fail(UI.apiError);
+      .then(function(data) {
+        commonNavbar.notifications = data.notifications;
+      })
+      .fail(UI.apiError);
   }
 });

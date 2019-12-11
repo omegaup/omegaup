@@ -1,17 +1,24 @@
 <?php
-
-require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 try {
-    $smartyProperties = \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
+    $result = \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
-} catch (Exception $e) {
+} catch (\Exception $e) {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
-foreach ($smartyProperties as $key => $value) {
-    $smarty->assign($key, $value);
+foreach ($result as $key => $value) {
+    \OmegaUp\UITools::getSmartyInstance()->assign($key, $value);
 }
 
-$smarty->display('../templates/problem.mine.tpl');
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/problem.mine.tpl',
+        strval(
+            OMEGAUP_ROOT
+        )
+    )
+);
