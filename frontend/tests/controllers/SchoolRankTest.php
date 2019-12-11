@@ -438,4 +438,23 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, $result['users'][2]['organized_contests']);
         $this->assertEquals(0, $result['users'][2]['created_problems']);
     }
+
+    /**
+     * Tests historical schools rank
+     */
+    public function testHistoricalRank() {
+        // Just create three schools, and see that they are returned
+        //TODO: Verify the return order is right, when the cronjob update PR is accepted
+        $school0 = SchoolsFactory::createSchool();
+        $school1 = SchoolsFactory::createSchool();
+        $school2 = SchoolsFactory::createSchool();
+
+        $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
+            'offset' => 1,
+            'rowcount' => 100,
+        ]));
+        $this->assertEquals('ok', $response['status']);
+        // Could exist more than 3 schools as previously created schools are not deleted
+        $this->assertGreaterThanOrEqual(3, count($response['rank']));
+    }
 }
