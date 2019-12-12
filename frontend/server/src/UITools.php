@@ -3,18 +3,6 @@
 namespace OmegaUp;
 
 class UITools {
-    /** @var bool */
-    public static $isLoggedIn = false;
-    /** @var bool */
-    public static $isAdmin = false;
-    /** @var string[] */
-    public static $contestPages = [
-        'arena/admin.php',
-        'arena/contest.php',
-        'course/assignment.php',
-        'arena/contest.php',
-        'arena/courseadmin.php',
-    ];
     /** @var ?\Smarty */
     private static $smarty = null;
 
@@ -93,9 +81,8 @@ class UITools {
             'email' => $email,
             'identity' => $identity,
             'user' => $user,
-            'is_admin' => self::$isAdmin,
+            'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        self::$isLoggedIn = !is_null($identity);
         if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
 
@@ -108,7 +95,7 @@ class UITools {
                 'CURRENT_USER_IS_EMAIL_VERIFIED',
                 empty($user) || $user->verified
             );
-            $smarty->assign('CURRENT_USER_IS_ADMIN', self::$isAdmin);
+            $smarty->assign('CURRENT_USER_IS_ADMIN', $isAdmin);
             $smarty->assign(
                 'CURRENT_USER_IS_REVIEWER',
                 \OmegaUp\Authorization::isQualityReviewer($identity)
@@ -174,7 +161,18 @@ class UITools {
             '/',
             array_slice(explode('/', $_SERVER['SCRIPT_FILENAME']), -2)
         );
-        if (in_array($scriptRelativePath, \OmegaUp\UITools::$contestPages)) {
+        if (
+            in_array(
+                $scriptRelativePath,
+                [
+                    'arena/admin.php',
+                    'arena/contest.php',
+                    'course/assignment.php',
+                    'arena/contest.php',
+                    'arena/courseadmin.php',
+                ]
+            )
+        ) {
             if (isset($_SERVER['QUERY_STRING'])) {
                 parse_str($_SERVER['QUERY_STRING'], $output);
                 $inContest = isset(
@@ -187,7 +185,8 @@ class UITools {
             $identity,
             $email,
             $directory,
-            $inContest
+            $inContest,
+            $isAdmin
         );
 
         $smarty->assign(
@@ -210,14 +209,15 @@ class UITools {
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $email,
         string $navbarSection,
-        bool $inContest
+        bool $inContest,
+        bool $isAdmin
     ): void {
         $smarty->assign(
             'headerPayload',
             [
                 'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
                 'inContest' => $inContest,
-                'isLoggedIn' => self::$isLoggedIn,
+                'isLoggedIn' => !is_null($identity),
                 'isReviewer' => !is_null(
                     $identity
                 ) ? \OmegaUp\Authorization::isQualityReviewer(
@@ -232,7 +232,7 @@ class UITools {
                         $identity->username
                     ) ? $identity->username :
                     '',
-                'isAdmin' => self::$isAdmin,
+                'isAdmin' => $isAdmin,
                 'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
                 'navbarSection' => $navbarSection,
             ]
