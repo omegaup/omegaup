@@ -672,7 +672,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="34">
+    <MixedAssignment occurrences="33">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>

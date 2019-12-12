@@ -22,7 +22,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var null|string|array<int, string>
+     * @var null|list<string>
      */
     public $languages;
 
@@ -98,59 +98,56 @@ class ProblemParams {
      */
     public $emailClarifications;
 
-    public function __construct(\OmegaUp\Request $params) {
+    /**
+     * @param array{email_clarifications: bool, extra_wall_time: int|null, input_limit: int|null, languages: list<string>|null|string, memory_limit: int|null, output_limit: int|null, overall_wall_time_limit: int|null, problem_alias: null|string, selected_tags: null|string, source: null|string, time_limit: int|null, title: null|string, update_published: string, validator: null|string, validator_time_limit: int|null, visibility: int|null} $params
+     */
+    public function __construct($params) {
         $this->problemAlias = isset(
             $params['problem_alias']
-        ) ? strval($params['problem_alias']) : null;
-        $this->title = isset(
-            $params['title']
-        ) ? strval(
-            $params['title']
-        ) : null;
+        ) ? $params['problem_alias'] : null;
+        $this->title = isset($params['title']) ? $params['title'] : null;
         $this->visibility = isset(
             $params['visibility']
-        ) ? intval($params['visibility']) : null;
-        $this->languages = isset(
-            $params['languages']
-        ) ? strval($params['languages']) : null;
-        $this->updatePublished = isset(
-            $params['update_published']
-        ) ? strval(
-            $params['update_published']
-        ) : \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        ) ? $params['visibility'] : null;
+        if (!isset($params['languages'])) {
+            $this->languages = null;
+        } else {
+            if (is_string($params['languages'])) {
+                $this->languages = explode(',', $params['languages']);
+            } else {
+                $this->languages = $params['languages'];
+            }
+        }
+        $this->updatePublished = $params['update_published'] ?? \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         $this->selectedTagsAsJSON = isset(
             $params['selected_tags']
-        ) ? strval($params['selected_tags']) : null;
+        ) ? $params['selected_tags'] : null;
         $this->source = isset($params['source']) ? $params['source'] : null;
         $this->validator = isset(
             $params['validator']
-        ) ? strval($params['validator']) : null;
+        ) ? $params['validator'] : null;
         $this->timeLimit = isset(
             $params['time_limit']
-        ) ? intval($params['time_limit']) : null;
+        ) ? $params['time_limit'] : null;
         $this->validatorTimeLimit = isset(
             $params['validator_time_limit']
-        ) ? intval($params['validator_time_limit']) : null;
+        ) ? $params['validator_time_limit'] : null;
         $this->overallWallTimeLimit = isset(
             $params['overall_wall_time_limit']
-        ) ? intval($params['overall_wall_time_limit']) : null;
+        ) ? $params['overall_wall_time_limit'] : null;
         $this->extraWallTime = isset(
             $params['extra_wall_time']
-        ) ? intval($params['extra_wall_time']) : null;
+        ) ? $params['extra_wall_time'] : null;
         $this->memoryLimit = isset(
             $params['memory_limit']
-        ) ? intval($params['memory_limit']) : null;
+        ) ? $params['memory_limit'] : null;
         $this->outputLimit = isset(
             $params['output_limit']
-        ) ? intval($params['output_limit']) : null;
+        ) ? $params['output_limit'] : null;
         $this->inputLimit = isset(
             $params['input_limit']
-        ) ? intval($params['input_limit']) : null;
-        $this->emailClarifications = isset(
-            $params['email_clarifications']
-        ) ? boolval(
-            $params['email_clarifications']
-        ) : false;
+        ) ? $params['input_limit'] : null;
+        $this->emailClarifications = $params['email_clarifications'] ?? false;
     }
 }
 
