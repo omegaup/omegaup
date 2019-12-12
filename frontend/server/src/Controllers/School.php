@@ -310,7 +310,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param int $startTime
      * @param int $finishTime
      * @param bool $canUseCache
-     * @return list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>
+     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     private static function getSchoolsRank(
         int $offset,
@@ -325,7 +325,7 @@ class School extends \OmegaUp\Controllers\Controller {
             $startTime,
             $finishTime
         ): array {
-            return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
+            return \OmegaUp\DAO\Schools::getRankByProblemsScore(
                 $startTime,
                 $finishTime,
                 $offset,
@@ -334,7 +334,9 @@ class School extends \OmegaUp\Controllers\Controller {
         };
 
         if ($canUseCache) {
-            /** @var list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}> */
+            /**
+             * @var list<array{school_id: int, name: string, country_id: string, score: float}>
+             */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOL_RANK,
                 "{$offset}-{$rowCount}",
@@ -348,7 +350,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the rank of best schools in last month with smarty format
      *
-     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
      */
     public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
         return [
@@ -360,7 +362,7 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{schoolRankPayload: array{rank: list<array{school_id: int, country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
+     * @return array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}
      */
     public static function getSchoolsRankList(int $rowCount) {
         return [
