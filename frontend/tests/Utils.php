@@ -228,6 +228,7 @@ class Utils {
             'Submission_Log',
             'Tags',
             'User_Roles',
+            'User_Rank',
             'Users',
             'Users_Badges',
             'Users_Experiments',
