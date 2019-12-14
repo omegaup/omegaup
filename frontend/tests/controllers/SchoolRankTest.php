@@ -122,7 +122,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $rankViewerLogin = self::login($identities[0]);
         $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
@@ -164,7 +164,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
@@ -211,7 +211,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $end_time = strtotime('+1 day');
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
@@ -514,22 +514,119 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $result['users'][2]['created_problems']);
     }
 
-    /**
-     * Tests historical schools rank
+        /**
+     * Tests the historical rank of schools, based on the current
+     * criteria: distinct active users and distinct problems solved
      */
-    public function testHistoricalRank() {
-        // Just create three schools, and see that they are returned
-        //TODO: Verify the return order is right, when the cronjob update PR is accepted
-        $school0 = SchoolsFactory::createSchool();
-        $school1 = SchoolsFactory::createSchool();
-        $school2 = SchoolsFactory::createSchool();
+    public function testSchoolRankHistorical() {
+        // Three schools:
+        // School0: two distinct problems solved
+        // School1: three distinct problems solved
+        // School2: two distinct problems solved
+        // => School0 and School2 must have same rank and score
+        // => School1 must have a better (lower) rank than School0 and School2
 
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool()
+        ];
+
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 4; $i++) {
+            ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
+        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
+        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
+        SchoolsFactory::addUserToSchool($schoolsData[2], $identities[3]);
+
+        // School 0
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // School 1
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[2],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // School 2
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identities[3]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Refresh Rank
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $school0 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[0]['school']->school_id
+        );
+        $school1 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[1]['school']->school_id
+        );
+        $school2 = \Omegaup\DAO\Schools::getByPK(
+            $schoolsData[2]['school']->school_id
+        );
+
+        $this->assertEquals($school0->score, $school0->score);
+        $this->assertEquals($school0->rank, $school2->rank);
+        $this->assertGreaterThan($school1->rank, $school0->rank);
+        $this->assertGreaterThan($school0->score, $school1->score);
+
+        // Test apiRank
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'offset' => 1,
             'rowcount' => 100,
         ]));
         $this->assertEquals('ok', $response['status']);
-        // Could exist more than 3 schools as previously created schools are not deleted
         $this->assertGreaterThanOrEqual(3, count($response['rank']));
+        $this->assertGreaterThanOrEqual(
+            $response['rank'][0]['rank'],
+            $response['rank'][1]['rank']
+        ); /** is sorted */
     }
 }

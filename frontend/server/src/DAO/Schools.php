@@ -174,7 +174,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             ORDER BY
-                s.rank DESC
+                s.rank ASC
             LIMIT ?, ?;';
 
         /** @var list<array{school_id: int, rank: int, score: float, name: string}> */
