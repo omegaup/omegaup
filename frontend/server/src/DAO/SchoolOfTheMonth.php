@@ -13,5 +13,4 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
-
 }
