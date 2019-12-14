@@ -572,32 +572,23 @@ class Session extends \OmegaUp\Controllers\Controller {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
 
-            // I have a problem with this:
             $username = self::getUniqueUsernameFromEmail($email);
-            // Even if the user gave us their email, we should not
-            // just go ahead and assume its ok to share with the world
-            // maybe we could do:
-            // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
-            \OmegaUp\Controllers\User::$permissionKey = uniqid();
-
-            $r = new \OmegaUp\Request([
-                'name' => (!is_null($name) ? $name : $username),
-                'username' => $username,
-                'email' => $email,
-                'password' => null,
-                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
-                'ignore_password' => true
-            ]);
 
             try {
-                $res = \OmegaUp\Controllers\User::apiCreate($r);
+                \OmegaUp\Controllers\User::createUser(
+                    new \OmegaUp\CreateUserParams([
+                        'name' => (!is_null($name) ? $name : $username),
+                        'username' => $username,
+                        'email' => $email,
+                    ]),
+                    /*ignorePassword=*/true,
+                    /*forceVerification=*/true
+                );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = \OmegaUp\DAO\Identities::findByUsername(
-                $res['username']
-            );
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
