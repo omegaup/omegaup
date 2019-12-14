@@ -264,12 +264,14 @@ def main() -> None:
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update user ranking')
+                raise
 
             try:
                 update_school_rank(cur)
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update school ranking')
+                raise
     finally:
         dbconn.close()
         logging.info('Done')
