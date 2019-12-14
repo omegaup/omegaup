@@ -139,11 +139,11 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
             score DESC;
     ''')
     prev_score = None
+    rank = 0
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores = []
     for index, row in enumerate(cur):
-        rank = index
         if row['score'] != prev_score:
             rank = index + 1
         scores.append(row['score'])
@@ -225,9 +225,9 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
             score DESC;
     ''')
     prev_score = None
+    rank = 0
 
     for index, row in enumerate(cur):
-        rank = index
         if row['score'] != prev_score:
             rank = index + 1
         prev_score = row['score']
