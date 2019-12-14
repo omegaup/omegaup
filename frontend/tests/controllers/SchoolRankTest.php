@@ -612,8 +612,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[2]['school']->school_id
         );
 
-        $this->assertEquals($school0->rank, $school2->rank);
         $this->assertEquals($school0->score, $school0->score);
+        $this->assertEquals($school0->rank, $school2->rank);
         $this->assertGreaterThan($school1->rank, $school0->rank);
         $this->assertGreaterThan($school0->score, $school1->score);
     }
