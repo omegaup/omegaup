@@ -122,7 +122,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $rankViewerLogin = self::login($identities[0]);
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
@@ -164,7 +164,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
@@ -211,7 +211,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $end_time = strtotime('+1 day');
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
