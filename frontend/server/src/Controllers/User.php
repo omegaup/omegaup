@@ -63,58 +63,37 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         // Does username or email already exists?
-        $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
+        $userByEmail = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         $identityByEmail = \OmegaUp\DAO\Identities::findByEmail($r['email']);
 
         if (!is_null($identityByEmail)) {
             if (!is_null($identityByEmail->password)) {
                 // Check if the same user had already tried to create this account.
                 if (
-                    !is_null($identity)
-                    && $identity->user_id === $identityByEmail->user_id
-                    && \OmegaUp\SecurityTools::compareHashedStrings(
+                    is_null($userByEmail)
+                    || $userByEmail->user_id !== $identityByEmail->user_id
+                    || !\OmegaUp\SecurityTools::compareHashedStrings(
                         $r['password'],
-                        strval($identity->password)
+                        strval($identityByEmail->password)
                     )
                 ) {
-                    return [
-                        'status' => 'ok',
-                        'username' => strval($identity->username),
-                    ];
-                }
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'mailInUse'
-                );
-            }
-
-            $user = new \OmegaUp\DAO\VO\Users([
-                'user_id' => $identityByEmail->user_id,
-            ]);
-
-            $identity = new \OmegaUp\DAO\VO\Identities([
-                'identity_id' => $identityByEmail->identity_id,
-                'username' => $r['username'],
-                'password' => $hashedPassword,
-            ]);
-            try {
-                \OmegaUp\DAO\Identities::savePassword($identity);
-            } catch (\Exception $e) {
-                if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                        'usernameInUse',
-                        $e
+                        'mailInUse'
+                    );
+                } elseif (!is_null($userByEmail->provider_user_id)) {
+                    throw new \OmegaUp\Exceptions\LoginDisabledException(
+                        'loginThroughThirdParty'
                     );
                 }
-                throw $e;
             }
 
             return [
                 'status' => 'ok',
-                'username' => strval($identity->username),
+                'username' => strval($identityByEmail->username),
             ];
         }
 
-        if (!is_null($identity)) {
+        if (!is_null($userByEmail)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'usernameInUse'
             );
@@ -138,8 +117,8 @@ class User extends \OmegaUp\Controllers\Controller {
         if (isset($r['gender'])) {
             $identityData['gender'] = $r['gender'];
         }
-        if (isset($r['facebook_user_id'])) {
-            $userData['facebook_user_id'] = $r['facebook_user_id'];
+        if (isset($r['provider_user_id'])) {
+            $userData['provider_user_id'] = intval($r['provider_user_id']);
         }
         if (
             !is_null(self::$permissionKey) &&

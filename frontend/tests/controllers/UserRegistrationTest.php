@@ -75,8 +75,8 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
-        // Users logged in native mode must have password
-        $this->assertNotNull($identity->password);
+        // Users can not login because they don't have password
+        $this->assertNull($identity->password);
     }
 
     /**
@@ -105,15 +105,19 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\User::apiCreate($r);
+        // Call API to create new user
+        \OmegaUp\Controllers\User::apiCreate($r);
 
-        $user = \OmegaUp\DAO\Users::FindByUsername('Z' . $username);
-        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
-        $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+        try {
+            // Try to login
+            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+                'usernameOrEmail' => $identity->username,
+                'password' => $r['password'],
+            ]));
 
-        // Asserts that user has different username but the same email
-        $this->assertNotEquals($identity->username, $username);
-        $this->assertEquals($email, $email_user->email);
+            $this->fail('User should have not been able to log in');
+        } catch (\OmegaUp\Exceptions\LoginDisabledException $e) {
+            $this->assertEquals('loginThroughThirdParty', $e->getMessage());
+        }
     }
 }

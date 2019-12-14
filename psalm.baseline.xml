@@ -1230,11 +1230,10 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="25">
+    <MixedAssignment occurrences="24">
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
-      <code>$userData['facebook_user_id']</code>
       <code>$usersMissing</code>
       <code>$user</code>
       <code>$resetRequest['auth_token']</code>
