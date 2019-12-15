@@ -3163,24 +3163,31 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'user.profile.tpl',
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
                 'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
@@ -3188,7 +3195,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     100,
                     'name'
                 ),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => is_null(
                 $r->identity->password
             ) ? 'user.basicedit.tpl' : 'user.edit.tpl',
@@ -3196,32 +3210,46 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'payload' => [
                     'email' => $currentSession['email'],
                 ],
                 'profile' => self::getProfileDetails($r),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'user.email.edit.tpl',
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
                 'admin' => true,
                 'practice' => false,
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'interviews.results.tpl',
         ];
     }
