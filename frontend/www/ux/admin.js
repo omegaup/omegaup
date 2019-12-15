@@ -136,8 +136,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#submit select[name="language"]').on('change', function(e) {
     var lang = $('#submit select[name="language"]').val();
-    if (lang == 'cpp11') {
+    if (lang.startsWith('cpp')) {
       $('#submit-filename-extension').text('.cpp');
+    } else if (lang.startsWith('c-')) {
+      $('#submit-filename-extension').text('.c');
+    } else if (lang.startsWith('py')) {
+      $('#submit-filename-extension').text('.py');
     } else if (lang && lang != 'cat') {
       $('#submit-filename-extension').text('.' + lang);
     } else {
