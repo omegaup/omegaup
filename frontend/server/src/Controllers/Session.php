@@ -370,8 +370,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         return self::LoginViaGoogle(
             $payload['email'],
-            (isset($payload['name']) ? $payload['name'] : null),
-            (isset($payload['sub']) ? intval($payload['sub']) : null)
+            (isset($payload['name']) ? $payload['name'] : null)
         );
     }
 
@@ -380,10 +379,9 @@ class Session extends \OmegaUp\Controllers\Controller {
      */
     public static function LoginViaGoogle(
         string $email,
-        ?string $name = null,
-        ?int $userId = null
+        ?string $name = null
     ): array {
-        return self::ThirdPartyLogin('Google', $email, $name, $userId);
+        return self::ThirdPartyLogin('Google', $email, $name);
     }
 
     /**
@@ -441,8 +439,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         return self::ThirdPartyLogin(
             'Facebook',
             strval($fbUserProfile->getEmail()),
-            $fbUserProfile->getName(),
-            intval($fbUserProfile->getId())
+            $fbUserProfile->getName()
         );
     }
 
@@ -521,7 +518,6 @@ class Session extends \OmegaUp\Controllers\Controller {
             isset($_GET['redirect']) ? strval($_GET['redirect']) : null
         );
     }
-
     public static function getLinkedInLoginUrl(): string {
         return self::getLinkedInInstance()->getLoginUrl();
     }
@@ -549,7 +545,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             return self::ThirdPartyLogin(
                 'LinkedIn',
                 $profile['emailAddress'],
-                "{$profile['firstName']} {$profile['lastName']}"
+                $profile['firstName'] . ' ' . $profile['lastName']
             );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error("Unable to login via LinkedIn: $e");
@@ -563,8 +559,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function ThirdPartyLogin(
         string $provider,
         string $email,
-        ?string $name = null,
-        ?int $providerUserId = null
+        ?string $name = null
     ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");

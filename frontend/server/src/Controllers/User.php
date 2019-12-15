@@ -93,6 +93,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'mailInUse'
                 );
+            } elseif (!is_null($identity) && is_null($identity->password)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'mailInUse'
+                );
             }
 
             $user = new \OmegaUp\DAO\VO\Users([
@@ -104,6 +108,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username' => $createUserParams->username,
                 'password' => $hashedPassword,
             ]);
+
             try {
                 \OmegaUp\DAO\Identities::savePassword($identity);
             } catch (\Exception $e) {
@@ -111,16 +116,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'mailInUse'
                     );
-                } elseif (!is_null($userByEmail->provider_user_id)) {
-                    throw new \OmegaUp\Exceptions\LoginDisabledException(
-                        'loginThroughThirdParty'
-                    );
                 }
             }
             return;
         }
 
-        if (!is_null($userByEmail)) {
+        if (!is_null($identity)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'usernameInUse'
             );

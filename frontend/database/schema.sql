@@ -924,7 +924,7 @@ CREATE TABLE `User_Roles` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `provider_user_id` varchar(20) DEFAULT NULL COMMENT 'Provider ID for this user.',
+  `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
   `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',

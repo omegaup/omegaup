@@ -4,7 +4,7 @@ require_once('../server/bootstrap_smarty.php');
 $triedToLogin = false;
 $emailVerified = true;
 
-if (isset($_POST['request']) && ($_POST['request'] === 'login')) {
+if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
     try {
         $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([

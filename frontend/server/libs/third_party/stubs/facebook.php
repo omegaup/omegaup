@@ -44,7 +44,6 @@ namespace Facebook\GraphNodes {
 class GraphUser {
     public function getEmail() : ?string {}
     public function getName() : ?string {}
-    public function getId() : ?string {}
 }
 
 }  // namespace Facebook\GraphNodes

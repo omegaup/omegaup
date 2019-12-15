@@ -17,7 +17,7 @@ namespace OmegaUp\DAO\VO;
 class Users extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
-        'provider_user_id' => true,
+        'facebook_user_id' => true,
         'git_token' => true,
         'main_email_id' => true,
         'main_identity_id' => true,
@@ -48,9 +48,9 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 $data['user_id']
             );
         }
-        if (isset($data['provider_user_id'])) {
-            $this->provider_user_id = strval(
-                $data['provider_user_id']
+        if (isset($data['facebook_user_id'])) {
+            $this->facebook_user_id = strval(
+                $data['facebook_user_id']
             );
         }
         if (isset($data['git_token'])) {
@@ -136,11 +136,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
     public $user_id = 0;
 
     /**
-     * Provider ID for this user.
+     * Facebook ID for this user.
      *
      * @var string|null
      */
-    public $provider_user_id = null;
+    public $facebook_user_id = null;
 
     /**
      * Token de acceso para git, usando Argon2i

@@ -70,13 +70,13 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\User::apiCreate($r);
-
-        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-
-        // Users can not login because they don't have password
-        $this->assertNull($identity->password);
+        try {
+            // Try to create new user
+            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            $this->fail('User should have not been able to be created because the email already exists in the data base');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('mailInUse', $e->getMessage());
+        }
     }
 
     /**
@@ -105,19 +105,15 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
-        // Call API to create new user
-        \OmegaUp\Controllers\User::apiCreate($r);
+        // Call API
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
-        try {
-            // Try to login
-            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
-                'usernameOrEmail' => $identity->username,
-                'password' => $r['password'],
-            ]));
+        $user = \OmegaUp\DAO\Users::FindByUsername('Z' . $username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
+        $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
-            $this->fail('User should have not been able to log in');
-        } catch (\OmegaUp\Exceptions\LoginDisabledException $e) {
-            $this->assertEquals('loginThroughThirdParty', $e->getMessage());
-        }
+        // Asserts that user has different username but the same email
+        $this->assertNotEquals($identity->username, $username);
+        $this->assertEquals($email, $email_user->email);
     }
 }

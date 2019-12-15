@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
+<files psalm-version="3.7.2@d9cae720c1af31db9ba27c2bc1fcf9b0dd092fb0">
   <file src="frontend/server/src/Controllers/ACL.php">
     <MissingParamType occurrences="12">
       <code>$acl_id</code>
@@ -58,7 +58,7 @@
       <code>validateDetails</code>
       <code>validateUpdate</code>
     </MissingReturnType>
-    <MixedArgument occurrences="13">
+    <MixedArgument occurrences="12">
       <code>$r['contest']-&gt;problemset_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['clarification']</code>
@@ -444,7 +444,7 @@
       <code>validateUpdateRequest</code>
       <code>validateIdentity</code>
     </MissingReturnType>
-    <MixedArgument occurrences="17">
+    <MixedArgument occurrences="16">
       <code>$r['group_alias']</code>
       <code>$r['original_username']</code>
       <code>$r['username']</code>
@@ -597,7 +597,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="48">
+    <MixedArgument occurrences="47">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -639,23 +639,19 @@
       <code>$verdict</code>
       <code>$r['problem']-&gt;alias</code>
       <code>$run</code>
-      <code>$case['name']</code>
       <code>$casesStats['counts']</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="12">
+    <MixedArrayAccess occurrences="9">
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$userData['userinfo']['preferred_language']</code>
       <code>$clar['time']</code>
       <code>$casesStats['last_submission_id']</code>
       <code>$group['cases']</code>
-      <code>$case['name']</code>
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
-      <code>$case['name']</code>
-      <code>$case['name']</code>
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
     </MixedArrayAccess>
@@ -669,9 +665,6 @@
       <code>$problemSettings['validator']['limits']</code>
       <code>$problemSettings['validator']['limits']</code>
     </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="1">
-      <code>$casesStats['counts'][$case['name']]</code>
-    </MixedArrayOffset>
     <MixedAssignment occurrences="34">
       <code>$response['tags']</code>
       <code>$run</code>
@@ -730,7 +723,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="18">
+    <MixedPropertyFetch occurrences="17">
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;problem_id</code>
@@ -749,7 +742,6 @@
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;alias</code>
       <code>$r['problem']-&gt;problem_id</code>
-      <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
     <PossiblyNullArgument occurrences="13">
@@ -799,7 +791,7 @@
       <code>updateProblemsetProblem</code>
       <code>wrapRequest</code>
     </MissingReturnType>
-    <MixedArgument occurrences="3">
+    <MixedArgument occurrences="2">
       <code>$r['tokens']</code>
       <code>$run['guid']</code>
     </MixedArgument>
@@ -937,9 +929,6 @@
       <code>rand()</code>
       <code>$run-&gt;run_id</code>
     </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="1">
-      <code>type</code>
-    </MismatchingDocblockReturnType>
     <MissingParamType occurrences="1">
       <code>$response</code>
     </MissingParamType>
@@ -958,7 +947,7 @@
       <code>getGraderResourcePassthru</code>
       <code>validateList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="44">
+    <MixedArgument occurrences="43">
       <code>$r['problem']-&gt;languages</code>
       <code>$r['contest']-&gt;languages</code>
       <code>$r['problem']</code>

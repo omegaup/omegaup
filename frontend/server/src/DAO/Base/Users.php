@@ -32,7 +32,7 @@ abstract class Users {
             UPDATE
                 `Users`
             SET
-                `provider_user_id` = ?,
+                `facebook_user_id` = ?,
                 `git_token` = ?,
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
@@ -51,7 +51,7 @@ abstract class Users {
                     `user_id` = ?
                 );';
         $params = [
-            $Users->provider_user_id,
+            $Users->facebook_user_id,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?
@@ -101,7 +101,7 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`provider_user_id`,
+                `Users`.`facebook_user_id`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
@@ -199,7 +199,7 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`provider_user_id`,
+                `Users`.`facebook_user_id`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
@@ -263,7 +263,7 @@ abstract class Users {
         $sql = '
             INSERT INTO
                 Users (
-                    `provider_user_id`,
+                    `facebook_user_id`,
                     `git_token`,
                     `main_email_id`,
                     `main_identity_id`,
@@ -294,7 +294,7 @@ abstract class Users {
                     ?
                 );';
         $params = [
-            $Users->provider_user_id,
+            $Users->facebook_user_id,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?
