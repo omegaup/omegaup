@@ -1242,19 +1242,28 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     const allowedLanguages = [
-      { language: 'cpp11', name: 'C++11' },
-      { language: 'cpp', name: 'C++' },
-      { language: 'c', name: 'C' },
-      { language: 'cs', name: 'C#' },
-      { language: 'hs', name: 'Haskell' },
-      { language: 'java', name: 'Java' },
-      { language: 'pas', name: 'Pascal' },
-      { language: 'py', name: 'Python' },
-      { language: 'rb', name: 'Ruby' },
-      { language: 'lua', name: 'Lua' },
       { language: 'kp', name: 'Karel (Pascal)' },
       { language: 'kj', name: 'Karel (Java)' },
-      { language: 'cat', name: T.wordsJustOutput },
+      { language: 'c', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
+      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
+      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
+      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
+      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
+      { language: 'java', name: 'Java (openjdk 11.0)' },
+      { language: 'py', name: 'Python 2.7' },
+      { language: 'py2', name: 'Python 2.7' },
+      { language: 'py3', name: 'Python 3.6' },
+      { language: 'rb', name: 'Ruby (2.5)' },
+      { language: 'pl', name: 'Perl (5.26)' },
+      { language: 'cs', name: 'C# (dotnet 2.2)' },
+      { language: 'pas', name: 'Pascal (fpc 3.0)' },
+      { language: 'cat', name: 'Output Only' },
+      { language: 'hs', name: 'Haskell (ghc 8.0)' },
+      { language: 'lua', name: 'Lua (5.2)' },
     ];
 
     let self = this;
@@ -1829,8 +1838,12 @@ export class Arena {
     let self = this;
     let lang = $(e.target).val();
     let ext = $('.submit-filename-extension', self.elements.submitForm);
-    if (lang == 'cpp11') {
+    if (lang.startsWith('cpp')) {
       ext.text('.cpp');
+    } else if (lang.startsWith('c-')) {
+      ext.text('.c');
+    } else if (lang.startsWith('py')) {
+      ext.text('.py');
     } else if (lang && lang != 'cat') {
       ext.text('.' + lang);
     } else {

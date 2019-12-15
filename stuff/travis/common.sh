@@ -9,6 +9,7 @@ init_submodules() {
 		frontend/server/libs/third_party/log4php \
 		frontend/server/libs/third_party/paseto \
 		frontend/server/libs/third_party/phpmailer \
+		frontend/server/libs/third_party/prometheus_client_php \
 		frontend/server/libs/third_party/smarty \
 		frontend/server/libs/third_party/sodium_compat
 }

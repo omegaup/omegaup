@@ -103,9 +103,6 @@ def main() -> None:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             process_badges(cur)  # type: ignore
         dbconn.commit()
-    except:  # noqa: bare-except
-        logging.exception(
-            'Failed to assign all badges and create notifications.')
     finally:
         dbconn.close()
         logging.info('Finished')

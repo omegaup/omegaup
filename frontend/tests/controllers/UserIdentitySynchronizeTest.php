@@ -23,7 +23,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);

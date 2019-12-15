@@ -202,7 +202,7 @@
     {
       "type": "scripts",
       "scripts": [
-        "update_user_rank.py"
+        "update_ranks.py"
       ]
     }
   ],

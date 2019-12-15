@@ -1188,7 +1188,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="18">
+    <MixedArgument occurrences="15">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1230,10 +1230,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="24">
-      <code>$userData['is_private']</code>
-      <code>$identityData['name']</code>
-      <code>$identityData['gender']</code>
+    <MixedAssignment occurrences="21">
       <code>$usersMissing</code>
       <code>$user</code>
       <code>$resetRequest['auth_token']</code>
@@ -1285,9 +1282,6 @@
       <code>$user</code>
       <code>$identity</code>
       <code>$user-&gt;main_identity_id</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
