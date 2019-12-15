@@ -31,6 +31,12 @@ class Request extends \ArrayObject {
     public $method = null;
 
     /**
+     * The name of the method that will be called.
+     * @var null|string
+     */
+    public $methodName = null;
+
+    /**
      * A global per-request unique(-ish) ID.
      * @var string
      */
