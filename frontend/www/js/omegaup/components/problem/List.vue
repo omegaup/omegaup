@@ -135,7 +135,6 @@ import problem_FinderWizard from './FinderWizard.vue';
 export default class ProblemList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
-
   @Prop() currentTags!: string[];
   @Prop() wizardTags!: omegaup.Tag[];
 
