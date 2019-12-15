@@ -140,10 +140,12 @@ class Utils {
     public static function setUpDefaultDataConfig(): void {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'username' => 'admintest',
-            'password' => 'testtesttest',
-        ]));
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'admintest',
+                'password' => 'testtesttest',
+            ])
+        );
         \OmegaUp\DAO\ACLs::create(new \OmegaUp\DAO\VO\ACLs([
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,

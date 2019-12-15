@@ -4,16 +4,23 @@
 					{#wordsLanguage#}
 					<select name="language">
 						<option value="" default="default"></option>
-						<option value="cpp11">C++11</option>
-						<option value="cpp">C++</option>
-						<option value="c">C</option>
-						<option value="cs">C#</option>
-						<option value="hs">Haskell</option>
-						<option value="java">Java</option>
-						<option value="pas">Pascal</option>
-						<option value="py">Python</option>
-						<option value="rb">Ruby</option>
-						<option value="lua">Lua</option>
+						<option value="cpp17-gcc">C++17 (g++ 7.4)</option>
+						<option value="cpp17-clang">C++17 (clang++ 6.0)</option>
+						<option value="cpp">C++11 (g++ 7.4)</option>
+						<option value="cpp11-gcc">C++11 (g++ 7.4)</option>
+						<option value="cpp11-clang">C++11 (clang++ 6.0)</option>
+						<option value="c">C (gcc 7.4)</option>
+						<option value="c11-gcc">C (gcc 7.4)</option>
+						<option value="c11-clang">C (clang 6.0)</option>
+						<option value="cs">C# (dotnet 2.2)</option>
+						<option value="hs">Haskell (ghc 8.0)</option>
+						<option value="java">Java (openjdk 11.0)</option>
+						<option value="pas">Pascal (fpc 3.0)</option>
+						<option value="py">Python 2.7</option>
+						<option value="py3">Python 3.6</option>
+						<option value="py2">Python 2.7</option>
+						<option value="rb">Ruby (2.5)</option>
+						<option value="lua">Lua (5.2)</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
 						<option value="cat">{#wordsJustOutput#}</option>

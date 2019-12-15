@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  *  UserController
@@ -35,36 +35,47 @@ class User extends \OmegaUp\Controllers\Controller {
      * Entry point for Create a User API
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
-     * @return array{status: string, username: string}
+     * @return array{username: string}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        // Validate request
-        \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
-
-        \OmegaUp\Validators::validateEmail($r['email'], 'email');
-
-        if (empty($r['scholar_degree'])) {
-            $r['scholar_degree'] = 'none';
-        }
-
-        \OmegaUp\Validators::validateInEnum(
-            $r['scholar_degree'],
-            'scholar_degree',
-            \OmegaUp\Controllers\User::ALLOWED_SCHOLAR_DEGREES
+        /**
+         * @psalm-suppress ArgumentTypeCoercion this tries to convert
+         * array<string, string> to array{...?: string}, which is okay.
+         */
+        $createUserParams = new \OmegaUp\CreateUserParams($r->toStringArray());
+        self::createUser(
+            $createUserParams,
+            /*ignorePassword=*/false,
+            /*forceVerification=*/false
         );
+        return [
+            'username' => strval($createUserParams->username),
+        ];
+    }
 
+    public static function createUser(
+        \OmegaUp\CreateUserParams $createUserParams,
+        bool $ignorePassword,
+        bool $forceVerification
+    ): void {
         // Check password
         $hashedPassword = null;
-        if (!isset($r['ignore_password'])) {
-            \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+        if (!$ignorePassword) {
+            \OmegaUp\SecurityTools::testStrongPassword(
+                $createUserParams->password
+            );
             $hashedPassword = \OmegaUp\SecurityTools::hashString(
-                $r['password']
+                $createUserParams->password
             );
         }
 
         // Does username or email already exists?
-        $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
-        $identityByEmail = \OmegaUp\DAO\Identities::findByEmail($r['email']);
+        $identity = \OmegaUp\DAO\Identities::findByUsername(
+            $createUserParams->username
+        );
+        $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
+            $createUserParams->email
+        );
 
         if (!is_null($identityByEmail)) {
             if (!is_null($identityByEmail->password)) {
@@ -73,14 +84,11 @@ class User extends \OmegaUp\Controllers\Controller {
                     !is_null($identity)
                     && $identity->user_id === $identityByEmail->user_id
                     && \OmegaUp\SecurityTools::compareHashedStrings(
-                        $r['password'],
+                        $createUserParams->password,
                         strval($identity->password)
                     )
                 ) {
-                    return [
-                        'status' => 'ok',
-                        'username' => strval($identity->username),
-                    ];
+                    return;
                 }
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'mailInUse'
@@ -93,7 +101,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $identity = new \OmegaUp\DAO\VO\Identities([
                 'identity_id' => $identityByEmail->identity_id,
-                'username' => $r['username'],
+                'username' => $createUserParams->username,
                 'password' => $hashedPassword,
             ]);
             try {
@@ -108,10 +116,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw $e;
             }
 
-            return [
-                'status' => 'ok',
-                'username' => strval($identity->username),
-            ];
+            return;
         }
 
         if (!is_null($identity)) {
@@ -122,33 +127,28 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Prepare DAOs
         $identityData = [
-            'username' => $r['username'],
-            'password' => $hashedPassword
+            'username' => $createUserParams->username,
+            'password' => $hashedPassword,
         ];
         $userData = [
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
+            'is_private' => $createUserParams->isPrivate,
         ];
-        if (isset($r['is_private'])) {
-            $userData['is_private'] = $r['is_private'];
+        if (!is_null($createUserParams->name)) {
+            $identityData['name'] = $createUserParams->name;
         }
-        if (isset($r['name'])) {
-            $identityData['name'] = $r['name'];
+        if (!is_null($createUserParams->gender)) {
+            $identityData['gender'] = $createUserParams->gender;
         }
-        if (isset($r['gender'])) {
-            $identityData['gender'] = $r['gender'];
+        if (!is_null($createUserParams->facebookUserId)) {
+            $userData['facebook_user_id'] = $createUserParams->facebookUserId;
         }
-        if (isset($r['facebook_user_id'])) {
-            $userData['facebook_user_id'] = $r['facebook_user_id'];
-        }
-        if (
-            !is_null(self::$permissionKey) &&
-            self::$permissionKey == $r['permission_key']
-        ) {
+        if ($forceVerification) {
             $userData['verified'] = 1;
         } elseif (OMEGAUP_VALIDATE_CAPTCHA) {
             // Validate captcha
-            if (!isset($r['recaptcha'])) {
+            if (empty($createUserParams->recaptcha)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterNotFound',
                     'recaptcha'
@@ -158,7 +158,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
-                'response' => $r['recaptcha'],
+                'response' => $createUserParams->recaptcha,
                 'remoteip' => $_SERVER['REMOTE_ADDR']];
 
             // use key 'http' even if you send the request to https://...
@@ -181,7 +181,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $resultAsJson = json_decode($result, /*assoc=*/true);
             if (is_null($resultAsJson)) {
                 self::$log->error('Captcha response was not a json');
-                self::$log->error('Here is the result:' . $result);
+                self::$log->error("Here is the result: {$result}");
                 throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
             }
 
@@ -199,7 +199,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = new \OmegaUp\DAO\VO\Identities($identityData);
 
         $email = new \OmegaUp\DAO\VO\Emails([
-            'email' => $r['email'],
+            'email' => $createUserParams->email,
         ]);
 
         // Save objects into DB
@@ -223,7 +223,6 @@ class User extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Users::update($user);
 
-            $r['user'] = $user;
             if ($user->verified) {
                 self::$log->info(
                     "Identity {$identity->username} created, trusting e-mail"
@@ -241,11 +240,6 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
-
-        return [
-            'status' => 'ok',
-            'username' => strval($identity->username),
-        ];
     }
 
     /**
@@ -1564,11 +1558,13 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $user = self::resolveTargetUser($r);
-        if (is_null($user)) {
+        if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        /** @var \OmegaUp\DAO\VO\Identities */
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         return [
             'status' => 'ok',
@@ -1886,7 +1882,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         if (isset($r['username'])) {
             \OmegaUp\Validators::validateValidUsername(
@@ -3167,24 +3163,31 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'user.profile.tpl',
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
                 'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
@@ -3192,7 +3195,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     100,
                     'name'
                 ),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => is_null(
                 $r->identity->password
             ) ? 'user.basicedit.tpl' : 'user.edit.tpl',
@@ -3200,32 +3210,46 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'payload' => [
                     'email' => $currentSession['email'],
                 ],
                 'profile' => self::getProfileDetails($r),
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'user.email.edit.tpl',
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
-        return [
-            'smartyProperties' => [
+        try {
+            $smartyProperties = [
                 'profile' => self::getProfileDetails($r),
                 'admin' => true,
                 'practice' => false,
-            ],
+            ];
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $smartyProperties = [
+                'STATUS_ERROR' => $e->getErrorMessage(),
+            ];
+        }
+        return [
+            'smartyProperties' => $smartyProperties,
             'template' => 'interviews.results.tpl',
         ];
     }

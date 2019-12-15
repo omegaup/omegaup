@@ -30,6 +30,10 @@ class ApiCaller {
             ) {
                 $response['status'] = 'ok';
             }
+            \OmegaUp\Metrics::getInstance()->apiStatus(
+                strval($request->methodName),
+                200
+            );
             return $response;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
@@ -40,6 +44,10 @@ class ApiCaller {
         }
 
         self::$log->error($apiException);
+        \OmegaUp\Metrics::getInstance()->apiStatus(
+            strval($request->methodName),
+            intval($apiException->getCode())
+        );
         if (
             extension_loaded('newrelic') &&
             $apiException->getCode() == 500
@@ -189,11 +197,11 @@ class ApiCaller {
         $controllerName = str_replace(chr(0), '', $controllerName);
         $methodName = str_replace(chr(0), '', $args[3]);
 
-        $controllerName = "\\OmegaUp\\Controllers\\{$controllerName}";
+        $controllerFqdn = "\\OmegaUp\\Controllers\\{$controllerName}";
 
-        if (!class_exists($controllerName)) {
+        if (!class_exists($controllerFqdn)) {
             self::$log->error(
-                "Controller name was not found: {$controllerName}"
+                "Controller name was not found: {$controllerFqdn}"
             );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -202,12 +210,12 @@ class ApiCaller {
         $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
-        $methodName = "api{$methodName}";
+        $apiMethodName = "api{$methodName}";
 
         // Check the method
-        if (!method_exists($controllerName, $methodName)) {
+        if (!method_exists($controllerFqdn, $apiMethodName)) {
             self::$log->error(
-                "Method name was not found: {$controllerName}::{$methodName}"
+                "Method name was not found: {$controllerFqdn}::{$apiMethodName}"
             );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -224,7 +232,8 @@ class ApiCaller {
             $request[$args[$i]] = urldecode($args[$i + 1]);
         }
 
-        $request->method = "{$controllerName}::{$methodName}";
+        $request->methodName = strtolower("{$controllerName}.{$methodName}");
+        $request->method = "{$controllerFqdn}::{$apiMethodName}";
 
         return $request;
     }

@@ -31,6 +31,12 @@ class Request extends \ArrayObject {
     public $method = null;
 
     /**
+     * The name of the method that will be called.
+     * @var null|string
+     */
+    public $methodName = null;
+
+    /**
      * A global per-request unique(-ish) ID.
      * @var string
      */
@@ -271,6 +277,21 @@ class Request extends \ArrayObject {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+    }
+
+    /**
+     * Returns a real array from the Request values. This is useful to build
+     * Params objects.
+     *
+     * @return array<string, string>
+     */
+    public function toStringArray(): array {
+        $result = [];
+        /** @var mixed $value */
+        foreach ($this as $key => $value) {
+            $result[strval($key)] = strval($value);
+        }
+        return $result;
     }
 }
 
