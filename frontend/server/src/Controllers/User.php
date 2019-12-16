@@ -78,45 +78,24 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         if (!is_null($identityByEmail)) {
-            if (!is_null($identityByEmail->password)) {
                 // Check if the same user had already tried to create this account.
-                if (
-                    !is_null($identity)
-                    && $identity->user_id === $identityByEmail->user_id
-                    && \OmegaUp\SecurityTools::compareHashedStrings(
-                        $createUserParams->password,
-                        strval($identity->password)
-                    )
-                ) {
-                    return;
-                }
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'mailInUse'
-                );
+            if (
+                !is_null($identityByEmail->password) &&
+                !is_null($identity) &&
+                $identity->user_id === $identityByEmail->user_id &&
+                \OmegaUp\SecurityTools::compareHashedStrings(
+                    $createUserParams->password,
+                    strval($identity->password)
+                )
+            ) {
+                return;
             }
-
-            $user = new \OmegaUp\DAO\VO\Users([
-                'user_id' => $identityByEmail->user_id,
-            ]);
-
-            $identity = new \OmegaUp\DAO\VO\Identities([
-                'identity_id' => $identityByEmail->identity_id,
-                'username' => $createUserParams->username,
-                'password' => $hashedPassword,
-            ]);
-            try {
-                \OmegaUp\DAO\Identities::savePassword($identity);
-            } catch (\Exception $e) {
-                if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                    throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                        'usernameInUse',
-                        $e
-                    );
-                }
-                throw $e;
-            }
-
-            return;
+            // Given that the user has already been created, and we
+            // have no way of validating if this request was made by
+            // the same person, let's just bail out.
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'mailInUse'
+            );
         }
 
         if (!is_null($identity)) {

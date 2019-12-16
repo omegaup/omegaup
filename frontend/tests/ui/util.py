@@ -14,7 +14,7 @@ import sys
 import traceback
 
 from urllib.parse import urlparse
-from typing import NamedTuple, Text
+from typing import Iterator, List, NamedTuple, Text, Sequence
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
@@ -167,6 +167,54 @@ def annotate(f):
 
 
 @contextlib.contextmanager
+def assert_js_errors(driver,
+                     *,
+                     expected_paths: Sequence[str] = (),
+                     expected_messages: Sequence[str] = ()) -> Iterator[None]:
+    '''Shows in a list unexpected errors in javascript console'''
+    driver.log_collector.push()
+    try:
+        yield
+    finally:
+        unexpected_errors = []
+        seen_paths: List[bool] = [False] * len(expected_paths)
+        seen_messages: List[bool] = [False] * len(expected_messages)
+        for entry in driver.log_collector.pop():
+            if 'WebSocket' in entry['message']:
+                # Travis does not have broadcaster yet.
+                continue
+            if 'https://www.facebook.com/' in entry['message']:
+                # Let's not block submissions when Facebook is
+                # having a bad day.
+                continue
+            matched = False
+            for i, path in enumerate(expected_paths):
+                if not path_matches(entry['message'], (path, )):
+                    continue
+                matched = True
+                seen_paths[i] = True
+            for i, message in enumerate(expected_messages):
+                if not message_matches(entry['message'], (message, )):
+                    continue
+                matched = True
+                seen_messages[i] = True
+            if matched:
+                continue
+            unexpected_errors.append(entry['message'])
+
+        missed_paths = [
+            path for path, seen in zip(expected_paths, seen_paths) if not seen
+        ]
+        missed_messages = [
+            message for message, seen in zip(expected_messages, seen_messages)
+            if not seen
+        ]
+        assert not missed_paths, '\n'.join(missed_paths)
+        assert not missed_messages, '\n'.join(missed_messages)
+        assert not unexpected_errors, '\n'.join(unexpected_errors)
+
+
+@contextlib.contextmanager
 def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     '''Shows in a list unexpected errors in javascript console'''
     driver.log_collector.push()
@@ -182,16 +230,17 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
                 # Let's not block submissions when Facebook is
                 # having a bad day.
                 continue
-            if is_path_whitelisted(entry['message'], path_whitelist):
+            if path_matches(entry['message'], path_whitelist + PATH_WHITELIST):
                 continue
-            if is_message_whitelisted(entry['message'], message_whitelist):
+            if message_matches(entry['message'],
+                               message_whitelist + MESSAGE_WHITELIST):
                 continue
             unexpected_errors.append(entry['message'])
         assert not unexpected_errors, '\n'.join(unexpected_errors)
 
 
-def is_path_whitelisted(message, path_whitelist):
-    '''Checks whether URL in message is whitelisted.'''
+def path_matches(message, path_list):
+    '''Checks whether URL in message matches the expected list.'''
 
     match = re.search(r'(https?://[^\s\'"]+)', message)
     url = urlparse(match.group(1))
@@ -199,27 +248,34 @@ def is_path_whitelisted(message, path_whitelist):
     if not url:
         return False
 
-    for whitelisted_path in path_whitelist + PATH_WHITELIST:
+    for whitelisted_path in path_list:
         if url.path == whitelisted_path:  # Compares params in the url
             return True
 
     return False
 
 
-def is_message_whitelisted(message, message_whitelist):
+def message_matches(message, message_list):
     '''Checks whether string in message is whitelisted.
 
-    It only compares strings between double or single quotes.
+    It compares strings between double or single quotes, or the trailing part
+    of the message. This last part is needed because SauceLabs for some reason
+    sometimes does not quote messages that are manually injected through
+    console.error().
     '''
 
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
+    if match:
+        quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
+        for whitelisted_message in message_list:
+            if quoted_string == whitelisted_message:
+                return True
 
-    if not match:
         return False
 
-    quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
-    for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if quoted_string == whitelisted_message:
+    # No quoted messages found, so let's try to do a suffix match.
+    for whitelisted_message in message_list:
+        if message.endswith(whitelisted_message):
             return True
 
     return False
