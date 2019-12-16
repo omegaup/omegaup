@@ -3101,7 +3101,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
         $response['smartyProperties'] = array_merge(
             $response['smartyProperties'],
-            \OmegaUp\Controllers\School::getTemporaryRankList($rowCount)
+            \OmegaUp\Controllers\School::getSchoolsOfTheMonthList($rowCount)
         );
         return $response;
     }

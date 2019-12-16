@@ -125,7 +125,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks();
 
         $rankViewerLogin = self::login($identities[0]);
-        $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
         $this->assertCount(3, $response['rank']);
@@ -142,7 +142,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $response['rank'][2]['name']
         );
 
-        $cachedResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $cachedResponse = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
@@ -169,7 +169,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
         $rankViewerLogin = self::login($identities[0]);
-        $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
             'start_time' => $start_time,
             'finish_time' => $end_time,
@@ -201,7 +201,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $rankViewerLogin = self::login($identity);
 
         // Setting p.accepted value
-        $originalResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $originalResponse = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
@@ -213,7 +213,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Setting p.accepted value
         \OmegaUp\Test\Utils::runUpdateRanks();
 
-        $response = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
             'start_time' => $start_time,
             'finish_time' => $end_time
@@ -221,7 +221,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(5, count($response['rank']));
 
-        $cachedResponse = \OmegaUp\Controllers\School::apiTemporaryRank(new \OmegaUp\Request([
+        $cachedResponse = \OmegaUp\Controllers\School::apiGetSchoolsOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
