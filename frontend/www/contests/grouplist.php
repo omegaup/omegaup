@@ -1,7 +1,7 @@
 <?php
 namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
-$result = [];
+
 try {
     $result = \OmegaUp\Controllers\Group::getGroupListForSmarty(
         new \OmegaUp\Request($_REQUEST)

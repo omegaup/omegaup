@@ -2,7 +2,7 @@
 namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
-$result = [];
+
 try {
     $result = \OmegaUp\Controllers\Contest::getContestReportDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)

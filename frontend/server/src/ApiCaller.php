@@ -233,7 +233,6 @@ class ApiCaller {
         }
 
         $request->methodName = strtolower("{$controllerName}.{$methodName}");
-        /** @psalm-suppress InvalidPropertyAssignmentValue Still don't know how to solve this error. */
         $request->method = "{$controllerFqdn}::{$apiMethodName}";
 
         return $request;

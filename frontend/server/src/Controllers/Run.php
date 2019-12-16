@@ -971,10 +971,9 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Get total of last 6 months
      *
      * @param \OmegaUp\Request $r
-     * @return array{ac: array<string, int>, total: array<string, int>}
+     * @return type
      */
     public static function apiCounts(\OmegaUp\Request $r): array {
-        /** @var array{ac: array<string, int>, total: array<string, int>} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::RUN_COUNTS,
             '',
@@ -990,11 +989,6 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
 
                 foreach ($runCounts as $runCount) {
-                    if (is_null($runCount->date)) {
-                        throw new \OmegaUp\Exceptions\NotFoundException(
-                            'runNotFound'
-                        );
-                    }
                     $totals['total'][$runCount->date] = $runCount->total;
                     $totals['ac'][$runCount->date] = $runCount->ac_count;
                 }

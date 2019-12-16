@@ -176,8 +176,6 @@ class UITools {
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
-        $smartyProperties = [];
-        $template = '';
         try {
             [
                 'smartyProperties' => $smartyProperties,

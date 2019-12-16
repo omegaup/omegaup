@@ -2,8 +2,7 @@
 namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
-$smartyProperties = [];
-$template = '';
+
 try {
     [
         'smartyProperties' => $smartyProperties,

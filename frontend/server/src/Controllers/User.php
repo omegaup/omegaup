@@ -81,6 +81,7 @@ class User extends \OmegaUp\Controllers\Controller {
             if (!is_null($identityByEmail->password)) {
                 // Check if the same user had already tried to create this account.
                 if (
+                    !is_null($identityByEmail->password)
                     !is_null($identity)
                     && $identity->user_id === $identityByEmail->user_id
                     && \OmegaUp\SecurityTools::compareHashedStrings(
@@ -90,10 +91,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 ) {
                     return;
                 }
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'mailInUse'
-                );
-            } elseif (!is_null($identity) && is_null($identity->password)) {
+                // Given that the user has already been created, and we
+                // have no way of validating if this request was made by
+                // the same person, let's just bail out.
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'mailInUse'
                 );
@@ -108,16 +108,18 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username' => $createUserParams->username,
                 'password' => $hashedPassword,
             ]);
-
             try {
                 \OmegaUp\DAO\Identities::savePassword($identity);
             } catch (\Exception $e) {
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                        'mailInUse'
+                        'usernameInUse',
+                        $e
                     );
                 }
+                throw $e;
             }
+
             return;
         }
 
@@ -1729,20 +1731,19 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        /** @var array{title: string, alias: string}[] */
         $problems = [];
         $relevant_columns = ['title', 'alias'];
-        /** @var \OmegaUp\DAO\VO\Problems[] */
-        $publicProblems = \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
-            intval($identity->identity_id)
-        );
-        foreach ($publicProblems as $problem) {
-            /** @var array{title: string, alias: string} */
-            $problemWithOnlyRelevantColumns = $problem->asFilteredArray(
-                $relevant_columns
-            );
+        foreach (
+            \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
+                intval($identity->identity_id)
+            ) as $problem
+        ) {
             array_push(
                 $problems,
-                $problemWithOnlyRelevantColumns
+                $problem->asFilteredArray(
+                    $relevant_columns
+                )
             );
         }
 

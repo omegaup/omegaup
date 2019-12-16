@@ -1,6 +1,6 @@
 <?php
 require_once('../../server/bootstrap_smarty.php');
-$smartyProperties = [];
+
 try {
     $smartyProperties = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)

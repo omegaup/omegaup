@@ -1,7 +1,6 @@
 <?php
 require_once('../../server/bootstrap_smarty.php');
-$result = [];
-$shouldShowIntro = false;
+
 try {
     $r = new \OmegaUp\Request($_REQUEST);
     $r->ensureBool('is_practice', false);
