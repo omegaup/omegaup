@@ -1096,22 +1096,12 @@
     <DocblockTypeContradiction occurrences="1">
       <code>is_null($schools)</code>
     </DocblockTypeContradiction>
-    <MissingClosureReturnType occurrences="1">
-      <code>function () use ($offset, $rowCount, $startTime, $finishTime) {</code>
-    </MissingClosureReturnType>
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="6">
+    <MixedArgument occurrences="1">
       <code>$r[$param]</code>
-      <code>$offset</code>
-      <code>$rowCount</code>
-      <code>$startTime</code>
-      <code>$finishTime</code>
-      <code>$canUseCache</code>
     </MixedArgument>
-    <MixedInferredReturnType occurrences="1"/>
-    <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
@@ -1198,7 +1188,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="18">
+    <MixedArgument occurrences="15">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1240,11 +1230,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="25">
-      <code>$userData['is_private']</code>
-      <code>$identityData['name']</code>
-      <code>$identityData['gender']</code>
-      <code>$userData['facebook_user_id']</code>
+    <MixedAssignment occurrences="21">
       <code>$usersMissing</code>
       <code>$user</code>
       <code>$resetRequest['auth_token']</code>
@@ -1296,9 +1282,6 @@
       <code>$user</code>
       <code>$identity</code>
       <code>$user-&gt;main_identity_id</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>

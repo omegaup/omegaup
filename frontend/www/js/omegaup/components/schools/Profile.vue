@@ -1,7 +1,10 @@
 <template>
   <div class="row">
     <div class="page-header">
-      <h1 class="text-center">{{ name }}</h1>
+      <h1 class="text-center">
+        <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
+        {{ name }}
+      </h1>
     </div>
     <div class="row">
       <div class="col-md-4">
@@ -66,6 +69,13 @@
               </tr>
             </thead>
           </template>
+          <template slot="item-data" slot-scope="slotProps">
+            <omegaup-username
+              v-bind:username="slotProps.item.toString()"
+              v-bind:classname="slotProps.item.classname"
+              v-bind:linkify="true"
+            ></omegaup-username>
+          </template>
         </omegaup-grid-paginator>
       </div>
     </div>
@@ -77,6 +87,10 @@
   display: inline-block;
   width: 60px;
 }
+
+.rank-number {
+  color: gray;
+}
 </style>
 
 <script lang="ts">
@@ -87,6 +101,7 @@ import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
+import UserName from '../user/Username.vue';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
 
 interface ProblemsSolvedCount {
@@ -100,10 +115,12 @@ interface ProblemsSolvedCount {
     'omegaup-country-flag': CountryFlag,
     'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
+    'omegaup-username': UserName,
   },
 })
 export default class SchoolProfile extends Vue {
   @Prop() name!: string;
+  @Prop() rank!: number;
   @Prop() country!: omegaup.Country;
   @Prop() stateName!: string;
   @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];

@@ -167,4 +167,3 @@ export class SchoolUser implements LinkableResource {
     return Optional.ofNonNull(`${this.getDisplayValue()}`);
   }
 }
-

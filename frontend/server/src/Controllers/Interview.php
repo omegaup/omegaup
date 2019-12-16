@@ -165,16 +165,18 @@ class Interview extends \OmegaUp\Controllers\Controller {
                 'Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']
             );
 
-            $newUserRequest = new \OmegaUp\Request($r);
-            $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = \OmegaUp\Controllers\User::makeUsernameFromEmail(
+            $username = \OmegaUp\Controllers\User::makeUsernameFromEmail(
                 $r['usernameOrEmail']
             );
+            $newUserRequest = new \OmegaUp\Request($r);
+            $newUserRequest['email'] = $r['usernameOrEmail'];
+            $newUserRequest['username'] = $username;
             $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(
                 8
             );
 
             \OmegaUp\Controllers\User::apiCreate($newUserRequest);
+            $r['user'] = \OmegaUp\DAO\Users::findByUsername($username);
 
             // Email to new OmegaUp users
             $body = \OmegaUp\Translations::getInstance()->get(
