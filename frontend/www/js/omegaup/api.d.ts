@@ -408,17 +408,10 @@ declare namespace omegaup {
     username: string;
   }
 
-  export interface SchoolUser extends User {
-    classname: string;
-    created_problems: number;
-    organized_contests: number;
-    solved_problems: number;
-  }
-
   export interface SchoolsRank {
+    school_id: number;
     country_id: string;
-    distinct_problems: number;
-    distinct_users: number;
+    score: number;
     name: string;
   }
 

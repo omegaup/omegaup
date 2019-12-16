@@ -44,15 +44,11 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
-     * Returns rank of schools by # of distinct users with at least one AC and # of distinct problems solved.
+     * Returns the rank of schools based on the sum of the score of each problem solved by the users of each school
      *
-     * @param  int $startTime
-     * @param  int $finishTime
-     * @param  int $offset
-     * @param  int $rowcount
-     * @return array
+     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
-    public static function getRankByUsersAndProblemsWithAC(
+    public static function getRankByProblemsScore(
         int $startDate,
         int $finishDate,
         int $offset,
@@ -60,50 +56,49 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
             SELECT
-              s.name,
-              s.country_id,
-              COUNT(DISTINCT i.identity_id) as distinct_users,
-              COUNT(DISTINCT p.problem_id) AS distinct_problems
+                s.school_id,
+                s.name,
+                s.country_id,
+                SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0)) AS score
             FROM
-              Identities i
+                Schools s
             INNER JOIN
-              Submissions su ON su.identity_id = i.identity_id
-            INNER JOIN
-              Runs r ON r.run_id = su.current_run_id
-            INNER JOIN
-              Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
-            INNER JOIN
-              Schools s ON s.school_id = isc.school_id
-            INNER JOIN
-              Problems p ON p.problem_id = su.problem_id
-            WHERE
-              r.verdict = "AC" AND p.visibility >= 1 AND
-              su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                (
+                    SELECT
+                        su.school_id,
+                        p.accepted,
+                        MIN(su.time) AS first_ac_time
+                    FROM
+                        Submissions su
+                    INNER JOIN
+                        Runs r ON r.run_id = su.current_run_id
+                    INNER JOIN
+                        Problems p ON p.problem_id = su.problem_id
+                    WHERE
+                        r.verdict = "AC"
+                        AND p.visibility >= 1
+                        AND su.school_id IS NOT NULL
+                    GROUP BY
+                        su.school_id,
+                        su.problem_id
+                    HAVING
+                        first_ac_time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
+                ) AS distinct_school_problems
+            ON
+                distinct_school_problems.school_id = s.school_id
             GROUP BY
-              s.school_id
+                s.school_id
             ORDER BY
-              distinct_users DESC,
-              distinct_problems DESC
+                score DESC
             LIMIT ?, ?;';
 
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
-        $result = [];
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $args
-            ) as $row
-        ) {
-            $result[] = [
-                'name' => $row['name'],
-                'country_id' => $row['country_id'],
-                'distinct_users' => $row['distinct_users'],
-                'distinct_problems' => $row['distinct_problems'],
-            ];
-        }
-
-        return $result;
+        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $args
+        );
     }
 
     /**

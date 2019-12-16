@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 @util.annotate
-@util.no_javascript_errors(path_whitelist=('/problem/mine/',))
+@util.no_javascript_errors()
 def test_create_group_with_identities_and_restrictions(driver):
     '''Tests creation of a group with identities.'''
 
@@ -28,19 +28,21 @@ def test_create_group_with_identities_and_restrictions(driver):
     with driver.login(identity.username, identity.password):
         # Trying to create a problem
         with util.assert_js_errors(driver,
-                                   message_list=('/api/problem/create/',)):
+                                   expected_messages=('/api/problem/create/',)
+                                   ):
             util.create_problem(driver, 'some_alias', has_privileges=False)
 
         # Trying to create a contest
         with util.assert_js_errors(driver,
-                                   message_list=('/api/contest/create/',)):
+                                   expected_messages=('/api/contest/create/',)
+                                   ):
             util.create_contest(driver, 'some_alias', has_privileges=False)
 
         # Trying to create a course
         course = 'curse_alias'
         school = 'school_alias'
         with util.assert_js_errors(driver,
-                                   message_list=('/api/course/create/',)):
+                                   expected_messages=('/api/course/create/',)):
             util.create_course(driver, course, school, has_privileges=False)
 
         # Trying to see the list of contests created by the identity
