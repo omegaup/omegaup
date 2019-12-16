@@ -73,6 +73,7 @@ class SecurityTools {
      * @return string
      */
     public static function hashString(string $string): string {
+        $hashedString = null;
         if (!defined('PASSWORD_ARGON2ID')) {
             $hashedString = sodium_crypto_pwhash_str(
                 $string,
@@ -82,11 +83,11 @@ class SecurityTools {
         } else {
             $hashedString = password_hash(
                 $string,
-                PASSWORD_ARGON2ID,
+                intval(PASSWORD_ARGON2ID),
                 self::PASSWORD_HASH_OPTIONS
             );
         }
-        if ($hashedString === false) {
+        if (empty($hashedString)) {
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 new \Exception('Hash function returned false')
             );
@@ -119,7 +120,7 @@ class SecurityTools {
         }
         return password_needs_rehash(
             $hashedPassword,
-            PASSWORD_ARGON2ID,
+            intval(PASSWORD_ARGON2ID),
             self::PASSWORD_HASH_OPTIONS
         );
     }

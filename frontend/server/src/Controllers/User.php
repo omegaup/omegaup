@@ -1729,19 +1729,20 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        /** @var array{title: string, alias: string}[] */
         $problems = [];
         $relevant_columns = ['title', 'alias'];
-        foreach (
-            \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
-                intval($identity->identity_id)
-            ) as $problem
-        ) {
+        /** @var \OmegaUp\DAO\VO\Problems[] */
+        $publicProblems = \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
+            intval($identity->identity_id)
+        );
+        foreach ($publicProblems as $problem) {
+            /** @var array{title: string, alias: string} */
+            $problemWithOnlyRelevantColumns = $problem->asFilteredArray(
+                $relevant_columns
+            );
             array_push(
                 $problems,
-                $problem->asFilteredArray(
-                    $relevant_columns
-                )
+                $problemWithOnlyRelevantColumns
             );
         }
 

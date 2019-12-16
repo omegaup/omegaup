@@ -582,10 +582,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
+            $r
+        );
         try {
-            $session = \OmegaUp\Controllers\Session::getCurrentSession(
-                $r
-            );
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);

@@ -5,7 +5,7 @@ require_once('../server/bootstrap_smarty.php');
 [
     'identity' => $identity,
 ] = \OmegaUp\Controllers\Session::getCurrentSession();
-
+$smartyProperties = [];
 try {
     $smartyProperties = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST),

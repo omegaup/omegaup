@@ -2615,7 +2615,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         ) {
                             $casesStats['counts'][$case['name']] = 0;
                         }
-                        if ($case->score == 0) {
+                        if ($case['score'] == 0) {
                             continue;
                         }
                         $casesStats['counts'][$case['name']]++;

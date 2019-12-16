@@ -73,7 +73,9 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             // Try to create new user
             $response = \OmegaUp\Controllers\User::apiCreate($r);
-            $this->fail('User should have not been able to be created because the email already exists in the data base');
+            $this->fail(
+                'User should have not been able to be created because the email already exists in the data base'
+            );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
         }
