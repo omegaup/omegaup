@@ -16,10 +16,7 @@
             <tr>
               <th>#</th>
               <th colspan="2">{{ T.profileSchool }}</th>
-              <th class="numericColumn data-rank">{{ T.activeUsers }}</th>
-              <th class="numericColumn data-rank">
-                {{ T.profileSolvedProblems }}
-              </th>
+              <th class="numericColumn data-rank">{{ T.wordsScore }}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,13 +30,12 @@
                 <omegaup-countryflag
                   v-bind:country="school.country_id"
                 ></omegaup-countryflag>
-                {{ school.name }}
+                <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+                  school.name
+                }}</a>
               </td>
               <td class="numericColumn data-rank">
-                {{ school.distinct_users }}
-              </td>
-              <td class="numericColumn data-rank">
-                {{ school.distinct_problems }}
+                {{ school.score }}
               </td>
             </tr>
           </tbody>

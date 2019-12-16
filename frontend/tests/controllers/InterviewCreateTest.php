@@ -80,7 +80,7 @@ class InterviewCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Interview::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
-            'usernameOrEmailsCSV' => $email1 . ',' . $email2,
+            'usernameOrEmailsCSV' => "{$email1},{$email2}",
         ]));
         $this->assertEquals('ok', $response['status']);
 

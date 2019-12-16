@@ -8,6 +8,7 @@
 </template>
 
 <style>
+.user-rank-unranked,
 .user-rank-beginner,
 .user-rank-specialist,
 .user-rank-expert,

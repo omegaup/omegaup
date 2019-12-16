@@ -120,3 +120,50 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
     return Optional.ofNonNull(this.time);
   }
 }
+
+export class SchoolUser implements LinkableResource {
+  classname: string = '';
+  username: string = '';
+  created_problems: number = 0;
+  organized_contests: number = 0;
+  solved_problems: number = 0;
+  displayField: string = 'solved_problems';
+
+  constructor(
+    classname: string,
+    username: string,
+    created_problems: number,
+    solved_problems: number,
+    organized_contests: number
+  ) {
+    this.classname = classname;
+    this.username = username;
+    this.created_problems = created_problems;
+    this.solved_problems = solved_problems;
+    this.organized_contests = organized_contests;
+  }
+
+  toString(): string {
+    return this.username;
+  }
+
+  getUrl(): string {
+    return `/profile/${this.username}/`;
+  }
+
+  getDisplayValue(): number {
+    switch(this.displayField) {
+      case 'solved_problems':
+        return this.solved_problems;
+      case 'organized_contests':
+        return this.organized_contests;
+      case 'created_problems':
+        return this.created_problems;
+      default: return 0;
+    }
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.ofNonNull(`${this.getDisplayValue()}`);
+  }
+}
