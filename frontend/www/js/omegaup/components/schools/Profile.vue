@@ -8,7 +8,7 @@
     </div>
     <div class="row">
       <div class="col-md-4">
-        <div class="panel panel-default">
+        <div class="panel panel-default" v-if="country">
           <ul class="list-group">
             <li class="list-group-item">
               <strong>{{ T.wordsCountry }}:</strong>
