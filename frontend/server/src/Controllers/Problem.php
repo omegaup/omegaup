@@ -45,24 +45,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // edit privileges.
     const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
-    const VALIDATOR_TOKEN = 'token';
-
-    const VALIDATOR_TOKEN_CASELESS = 'token-caseless';
-
-    const VALIDATOR_TOKEN_NUMERIC = 'token-numeric';
-
-    const VALIDATOR_LITERAL = 'literal';
-
-    const VALIDATOR_CUSTOM = 'custom';
-
-    const LANGUAGES_ALL = 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cs,hs,java,lua,pas,py2,py3,rb';
-
-    const LANGUAGES_KAREL = 'kj,kp';
-
-    const LANGUAGES_JUST_OUTPUT = 'cat';
-
-    const LANGUAGES_NO_SUMBISSIONS = '';
-
     // ISO 639-1 langs
     const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
         'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',

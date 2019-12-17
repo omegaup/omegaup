@@ -3,6 +3,21 @@
 namespace OmegaUp;
 
 class ProblemParams {
+    // Token by token validator
+    const VALIDATOR_TOKEN = 'token';
+
+    // Token by token, ignoring uppercase/lowercase validator
+    const VALIDATOR_TOKEN_CASELESS = 'token-caseless';
+
+    // Numeric token with tolerance 1e-9 validator
+    const VALIDATOR_TOKEN_NUMERIC = 'token-numeric';
+
+    // Interpret stdout as score validator
+    const VALIDATOR_LITERAL = 'literal';
+
+    // Custom validator
+    const VALIDATOR_CUSTOM = 'custom';
+
     /**
      * @readonly
      * @var string
