@@ -742,4 +742,51 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
     }
+
+    public function testProblemParams() {
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+
+        // Asserting all default values
+        $this->assertEquals(0, $problemParams->visibility);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
+            $problemParams->validator
+        );
+        $this->assertEquals(1000, $problemParams->timeLimit);
+        $this->assertEquals(1000, $problemParams->validatorTimeLimit);
+        $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
+        $this->assertEquals(0, $problemParams->extraWallTime);
+        $this->assertEquals(32768, $problemParams->memoryLimit);
+        $this->assertEquals(10240, $problemParams->outputLimit);
+        $this->assertEquals(10240, $problemParams->inputLimit);
+        $this->assertFalse($problemParams->emailClarifications);
+
+        // New object with custom values
+        $titleAlias = \OmegaUp\Test\Utils::createRandomString();
+        $overallWallTimeLimit = 50000;
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => $titleAlias,
+            'title' => $titleAlias,
+            'update_published' => \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+            'overall_wall_time_limit' => $overallWallTimeLimit,
+            'email_clarifications' => true,
+        ]);
+
+        $this->assertEquals($titleAlias, $problemParams->title);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(
+            $overallWallTimeLimit,
+            $problemParams->overallWallTimeLimit
+        );
+        $this->assertTrue($problemParams->emailClarifications);
+    }
 }
