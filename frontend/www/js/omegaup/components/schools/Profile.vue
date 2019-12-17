@@ -17,7 +17,7 @@
                 v-bind:country="country.id"
               ></omegaup-country-flag>
             </li>
-            <li class="list-group-item">
+            <li class="list-group-item" v-if="stateName">
               <strong>{{ T.profileState }}:</strong> {{ stateName }}
             </li>
           </ul>
