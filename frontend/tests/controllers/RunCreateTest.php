@@ -893,7 +893,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
              'message' => 'public_banned',
         ]));
 
@@ -919,7 +919,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED,
+             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
              'message' => 'private_banned',
         ]));
 

@@ -751,7 +751,7 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         // Asserting all default values
         $this->assertEquals(0, $problemParams->visibility);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $problemParams->updatePublished
         );
         $this->assertEquals(
@@ -773,14 +773,14 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $problemParams = new \OmegaUp\ProblemParams([
             'problem_alias' => $titleAlias,
             'title' => $titleAlias,
-            'update_published' => \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+            'update_published' => \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
             'overall_wall_time_limit' => $overallWallTimeLimit,
             'email_clarifications' => true,
         ]);
 
         $this->assertEquals($titleAlias, $problemParams->title);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
             $problemParams->updatePublished
         );
         $this->assertEquals(

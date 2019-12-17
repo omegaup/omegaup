@@ -3,6 +3,25 @@
 namespace OmegaUp;
 
 class ProblemParams {
+    // Constants for problem visibility.
+    const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
+    const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
+    const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
+    const VISIBILITY_PRIVATE = 0;
+    const VISIBILITY_PUBLIC = 1;
+    const VISIBILITY_PROMOTED = 2;
+
+    // Do not update the published branch.
+    const UPDATE_PUBLISHED_NONE = 'none';
+    // Update only non-problemset runs.
+    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
+    // Update non-problemset runs and running problemsets that are owned by the
+    // author.
+    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
+    // Update non-problemset runs and running problemsets that the author has
+    // edit privileges.
+    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
+
     // Token by token validator
     const VALIDATOR_TOKEN = 'token';
 
@@ -31,9 +50,9 @@ class ProblemParams {
     public $title;
 
     /**
-     * @var \OmegaUp\Controllers\Problem::VISIBILITY_DELETED|\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED|\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED|\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE|\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC|\OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+     * @var \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED
      */
-    public $visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
+    public $visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
 
     /**
      * @readonly
@@ -43,9 +62,9 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+     * @var \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
      */
-    public $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+    public $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
 
     /**
      * @readonly
@@ -114,7 +133,7 @@ class ProblemParams {
     public $emailClarifications = false;
 
     /**
-     * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN|\OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_CASELESS|\OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\Controllers\Problem::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\Controllers\Problem::VISIBILITY_DELETED|\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED|\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED|\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE|\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC|\OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED} $params
+     * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params) {
         $isRequired = true;

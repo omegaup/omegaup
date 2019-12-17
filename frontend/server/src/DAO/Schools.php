@@ -237,7 +237,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         /** @var array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $schoolId]
+            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $schoolId]
         );
     }
 

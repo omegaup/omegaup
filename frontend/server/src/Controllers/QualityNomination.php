@@ -484,19 +484,19 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $newProblemVisibility = $r['problem']->visibility;
         switch ($r['status']) {
             case 'approved':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE) {
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC) {
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
+                if ($r['problem']->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($r['problem']->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+                if ($r['problem']->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
                     // If banning is reverted, problem will become private.
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                } elseif ($r['problem']->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
                 }
                 break;
             case 'open':
@@ -525,8 +525,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
             if (
-                $newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED  ||
-                $newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED  ||
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
             ) {
                 $response = self::sendDemotionEmail(
                     $r,

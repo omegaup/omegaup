@@ -1798,8 +1798,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+            $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+            || $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'problemIsBanned'
