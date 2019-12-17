@@ -9,6 +9,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCoderOfTheMonthCalc() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
+        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
         // Add a custom school
         $login = self::login($identity);
         $school = SchoolsFactory::createSchool()['school'];
@@ -23,6 +25,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $runCreationDate = $runCreationDate->format('Y-m-d');
 
         $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
+        $this->createRuns($extraIdentity, $runCreationDate, 5 /*numRuns*/);
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request()
@@ -48,6 +51,20 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $school->school_id,
             $response['userinfo']['school_id']
+        );
+
+        // Now check if the other user has been saved on database too
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'date' => date('Y-m-d', \OmegaUp\Time::get())
+        ]));
+        $this->assertEquals(
+            $identity->username,
+            $response['coders'][0]['username']
+        );
+        $this->assertEquals(
+            $extraIdentity->username,
+            $response['coders'][1]['username']
         );
     }
 
