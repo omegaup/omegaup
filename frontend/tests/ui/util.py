@@ -209,9 +209,13 @@ def assert_js_errors(driver,
             message for message, seen in zip(expected_messages, seen_messages)
             if not seen
         ]
-        assert not missed_paths, '\n'.join(missed_paths)
-        assert not missed_messages, '\n'.join(missed_messages)
-        assert not unexpected_errors, '\n'.join(unexpected_errors)
+        assert not missed_paths, 'Paths are missing:\n\t' + '\n\t'.join(
+            missed_paths)
+        assert not missed_messages, 'Messages are missing:\n\t' + '\n\t'.join(
+            missed_messages)
+        assert not unexpected_errors, 'Unexpected errors:\n\t' + '\n\t'.join(
+            unexpected_errors) + '\n\nExpected errors:\n\t' + '\n\t'.join(
+                expected_paths) + '\n\t'.join(expected_messages)
 
 
 @contextlib.contextmanager

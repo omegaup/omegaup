@@ -27,14 +27,14 @@ def test_create_group_with_identities_and_restrictions(driver):
 
     with driver.login(identity.username, identity.password):
         # Trying to create a problem
-        with util.assert_js_errors(driver,
-                                   expected_messages=('/api/problem/create/',)
-                                   ):
+        with util.assert_js_errors(driver):
             util.create_problem(driver, 'some_alias', has_privileges=False)
 
         # Trying to create a contest
         with util.assert_js_errors(driver,
-                                   expected_messages=('/api/contest/create/',)
+                                   expected_paths=('/api/contest/create/',
+                                                   '/js/dist/commons.js',
+                                                   '/js/error_handler.js')
                                    ):
             util.create_contest(driver, 'some_alias', has_privileges=False)
 
@@ -42,7 +42,10 @@ def test_create_group_with_identities_and_restrictions(driver):
         course = 'curse_alias'
         school = 'school_alias'
         with util.assert_js_errors(driver,
-                                   expected_messages=('/api/course/create/',)):
+                                   expected_paths=('/api/course/create/',
+                                                   '/js/dist/commons.js',
+                                                   '/js/error_handler.js')
+                                   ):
             util.create_course(driver, course, school, has_privileges=False)
 
         # Trying to see the list of contests created by the identity
