@@ -287,11 +287,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['validator'],
             'validator',
             [
-                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
-                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_CASELESS,
-                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_NUMERIC,
-                \OmegaUp\Controllers\Problem::VALIDATOR_LITERAL,
-                \OmegaUp\Controllers\Problem::VALIDATOR_CUSTOM,
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS,
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC,
+                \OmegaUp\ProblemParams::VALIDATOR_LITERAL,
+                \OmegaUp\ProblemParams::VALIDATOR_CUSTOM,
             ],
             $isRequired
         );
@@ -3212,7 +3212,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'TimeLimit' => '1s',
             ],
             'validator' => [
-                'name' => \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
+                'name' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
                 'tolerance' => 1e-9,
                 'limits' => [
                     'ExtraWallTime' => '0s',
@@ -3629,7 +3629,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'TITLE' => '',
             'ALIAS' => '',
-            'VALIDATOR' => \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
+            'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
             'TIME_LIMIT' => '1000',
             'VALIDATOR_TIME_LIMIT' => '1000',
             'OVERALL_WALL_TIME_LIMIT' => '60000',

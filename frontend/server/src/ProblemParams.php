@@ -61,9 +61,9 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN|\OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_CASELESS|\OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\Controllers\Problem::VALIDATOR_LITERAL
+     * @var \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL
      */
-    public $validator = \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN;
+    public $validator = \OmegaUp\ProblemParams::VALIDATOR_TOKEN;
 
     /**
      * @readonly

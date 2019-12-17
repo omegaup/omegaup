@@ -755,7 +755,7 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemParams->updatePublished
         );
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
             $problemParams->validator
         );
         $this->assertEquals(1000, $problemParams->timeLimit);
