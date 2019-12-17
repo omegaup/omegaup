@@ -154,39 +154,11 @@ class UITools {
         );
         $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
-        $path = explode('/', getcwd());
-        $directory = end($path);
-        $inContest = false;
-        $scriptRelativePath = implode(
-            '/',
-            array_slice(explode('/', $_SERVER['SCRIPT_FILENAME']), -2)
-        );
-        if (
-            in_array(
-                $scriptRelativePath,
-                [
-                    'arena/admin.php',
-                    'arena/contest.php',
-                    'course/assignment.php',
-                    'arena/contest.php',
-                    'arena/courseadmin.php',
-                ]
-            )
-        ) {
-            if (isset($_SERVER['QUERY_STRING'])) {
-                parse_str($_SERVER['QUERY_STRING'], $output);
-                $inContest = isset(
-                    $output['is_practice']
-                ) ? $output['is_practice'] !== 'true' : true;
-            }
-        }
-        \OmegaUp\UITools::getSmartyNavbarHeader(
+
+        // TODO: It should be removed when all templates call render function
+        \OmegaUp\UITools::assignSmartyNavbarHeader(
             $smarty,
-            $identity,
-            $email,
-            $directory,
-            $inContest,
-            $isAdmin
+            /*$inContest=*/false
         );
 
         $smarty->assign(
@@ -204,14 +176,17 @@ class UITools {
         return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
     }
 
-    public static function getSmartyNavbarHeader(
+    private static function assignSmartyNavbarHeader(
         \Smarty $smarty,
-        ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $email,
-        string $navbarSection,
-        bool $inContest,
-        bool $isAdmin
+        bool $inContest
     ): void {
+        [
+            'email' => $email,
+            'identity' => $identity,
+            'is_admin' => $isAdmin,
+        ] = \OmegaUp\Controllers\Session::getCurrentSession();
+        $path = explode('/', getcwd());
+        $directory = end($path);
         $smarty->assign(
             'headerPayload',
             [
@@ -234,7 +209,7 @@ class UITools {
                     '',
                 'isAdmin' => $isAdmin,
                 'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
-                'navbarSection' => $navbarSection,
+                'navbarSection' => $directory,
             ]
         );
     }
@@ -244,6 +219,10 @@ class UITools {
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
+        \OmegaUp\UITools::assignSmartyNavbarHeader(
+            $smarty,
+            /*$inContest=*/false
+        );
         try {
             [
                 'smartyProperties' => $smartyProperties,
@@ -256,7 +235,47 @@ class UITools {
         foreach ($smartyProperties as $key => $value) {
                 $smarty->assign($key, $value);
         }
-        \OmegaUp\UITools::getSmartyInstance()->display(
+        self::displayTemplate($template, $smarty);
+    }
+
+    /**
+     * @param null|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
+     */
+    public static function renderContest(
+        ?callable $callback,
+        string $template = null
+    ): void {
+        $smarty = self::getSmartyInstance();
+        $r = new Request($_REQUEST);
+        $r->ensureBool('is_practice', false);
+        $inContest = !isset($r['is_practice']) || $r['is_practice'] !== true;
+
+        \OmegaUp\UITools::assignSmartyNavbarHeader($smarty, $inContest);
+
+        if (is_null($callback)) {
+            self::displayTemplate(strval($template), $smarty);
+            return;
+        }
+        try {
+            [
+                'smartyProperties' => $smartyProperties,
+                'template' => $template,
+            ] = $callback($r);
+        } catch (\Exception $e) {
+            \OmegaUp\ApiCaller::handleException($e);
+        }
+        /** @var mixed $value */
+        foreach ($smartyProperties as $key => $value) {
+                $smarty->assign($key, $value);
+        }
+        self::displayTemplate(strval($template), $smarty);
+    }
+
+    public static function displayTemplate(
+        string $template,
+        \Smarty $smarty
+    ): void {
+        $smarty->display(
             sprintf(
                 '%s/templates/%s',
                 strval(OMEGAUP_ROOT),

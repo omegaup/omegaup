@@ -206,7 +206,6 @@
       <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
       <code>$verdict</code>
-      <code>$problemStats[$key]['cases_stats']</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="9">
       <code>$contestInfo['window_length']</code>
@@ -2089,15 +2088,7 @@
     </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/www/arena/contest.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['contest_alias'] ?? ''</code>
-    </MixedArgument>
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
+    <MixedArgumentTypeCoercion occurrences="1"/>
   </file>
   <file src="frontend/www/arena/contestprint.php">
     <MixedArrayAccess occurrences="1">

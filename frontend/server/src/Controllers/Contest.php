@@ -438,32 +438,46 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get all the properties for smarty.
-     * @param \OmegaUp\Request $r
-     * @param \OmegaUp\DAO\VO\Contests $contest
      * @return array
      */
     public static function getContestDetailsForSmarty(
-        \OmegaUp\Request $r,
-        \OmegaUp\DAO\VO\Contests $contest,
-        bool $shouldShowIntro
+        \OmegaUp\Request $r
     ): array {
-        // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
+        $r->ensureBool('is_practice', false);
+
+        $contest = \OmegaUp\Controllers\Contest::validateContest(
+            $r['contest_alias'] ?? ''
         );
+
+        $isPractice = isset($r['is_practice']) && $r['is_practice'] === true;
+
+        $shouldShowIntro = !$isPractice && \OmegaUp\Controllers\Contest::shouldShowIntro(
+            $r,
+            $contest
+        );
+
+        // Half-authenticate, in case there is no session in place.
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         if (!$shouldShowIntro) {
-            return ['payload' => [
-                'shouldShowFirstAssociatedIdentityRunWarning' =>
-                    !is_null($session['identity']) &&
-                    !is_null($session['user']) &&
-                    !\OmegaUp\Controllers\User::isMainIdentity(
-                        $session['user'],
-                        $session['identity']
-                    )
-                    && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                        $session['user']
-                    ),
-            ]];
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'shouldShowFirstAssociatedIdentityRunWarning' =>
+                            !is_null($session['identity']) &&
+                            !is_null($session['user']) &&
+                            !\OmegaUp\Controllers\User::isMainIdentity(
+                                $session['user'],
+                                $session['identity']
+                            ) &&
+                            \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                                $session['user']
+                            ),
+                    ],
+                ],
+                'template' => $isPractice ?
+                    'arena.contest.practice.tpl' :
+                    'arena.contest.contestant.tpl',
+            ];
         }
         $result = [
             'needsBasicInformation' => false,
@@ -471,7 +485,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
         if (is_null($session['identity'])) {
             // No session, show the intro if public, so that they can login.
-            return $result;
+
+            return [
+                'smartyProperties' => $result,
+                'template' => 'arena.contest.intro.tpl',
+            ];
         }
 
         [
@@ -507,7 +525,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        return $result;
+        return [
+            'smartyProperties' => $result,
+            'template' => 'arena.contest.intro.tpl',
+        ];
     }
 
     /**
@@ -3304,6 +3325,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 if (
                     empty($problemData['run_details']['cases'])
                 ) {
+                    /** @psalm-suppress MixedArgument */
                     for (
                         $i = 0; $i < count(
                             $problemStats[$key]['cases_stats']
