@@ -98,6 +98,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
   `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`coder_of_the_month_id`),
+  UNIQUE KEY `rank_time` (`rank`,`time`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
