@@ -340,7 +340,7 @@ class School extends \OmegaUp\Controllers\Controller {
              */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
-                "{$offset}-{$rowCount}",
+                "{$startTime}-{$finishTime}",
                 $fetch,
                 60 * 60 * 24 // 1 day
             );
@@ -384,7 +384,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{rankTablePayload: array{page: int, length: int}}, template: string}
      */
-    public static function getHistoricalRankForSmarty(\OmegaUp\Request $r): array {
+    public static function getRankForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
 
@@ -407,9 +407,9 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsOfTheMonthForSmarty(int $rowCount = 100): array {
+    public static function getSchoolOfTheMonthForSmarty(int $rowCount = 100): array {
         return [
-            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsOfTheMonthList(
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolOfTheMonthList(
                 $rowCount
             ),
             'template' => 'rank.schools.tpl'
@@ -419,7 +419,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}
      */
-    public static function getSchoolsOfTheMonthList(int $rowCount) {
+    public static function getSchoolOfTheMonthList(int $rowCount) {
         return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,

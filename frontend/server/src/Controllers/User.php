@@ -3080,7 +3080,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
         $response['smartyProperties'] = array_merge(
             $response['smartyProperties'],
-            \OmegaUp\Controllers\School::getSchoolsOfTheMonthList($rowCount)
+            \OmegaUp\Controllers\School::getSchoolOfTheMonthList($rowCount)
         );
         return $response;
     }

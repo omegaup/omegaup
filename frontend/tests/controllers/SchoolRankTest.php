@@ -514,11 +514,11 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $result['users'][2]['created_problems']);
     }
 
-        /**
+    /**
      * Tests the historical rank of schools, based on the current
      * criteria: distinct active users and distinct problems solved
      */
-    public function testSchoolRankHistorical() {
+    public function testSchoolRank() {
         // Three schools:
         // School0: two distinct problems solved
         // School1: three distinct problems solved
