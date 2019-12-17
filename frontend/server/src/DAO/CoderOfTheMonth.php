@@ -182,7 +182,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     final public static function getMonthlyList(string $firstDay): array {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
-          SELECT DISTINCT
+          SELECT
             cm.time,
             cm.rank,
             i.username,
@@ -194,9 +194,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Users u ON u.user_id = cm.user_id
           INNER JOIN
-            Identities i ON u.user_id = i.user_id
+            Identities i ON u.main_identity_id = i.identity_id
           LEFT JOIN
-            Emails e ON e.user_id = u.user_id
+            Emails e ON e.email_id = u.main_email_id
           WHERE
             cm.time = ?
           ORDER BY
