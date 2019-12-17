@@ -163,7 +163,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return array{offset: int, rowcount: int, start_time: int, finish_time: int, can_use_cache: bool}
      */
-    private static function validateRankDetails(\OmegaUp\Request $r): array {
+    private static function validateSchoolsOfTheMonthDetails(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
@@ -215,17 +215,17 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiRank(\OmegaUp\Request $r) {
+    public static function apiGetSchoolsOfTheMonth(\OmegaUp\Request $r) {
         [
             'offset' => $offset,
             'rowcount' => $rowCount,
             'start_time' => $startTime,
             'finish_time' => $finishTime,
             'can_use_cache' => $canUseCache,
-        ] = self::validateRankDetails($r);
+        ] = self::validateSchoolsOfTheMonthDetails($r);
         return [
             'status' => 'ok',
-            'rank' => self::getSchoolsRank(
+            'rank' => self::getSchoolsOfTheMonth(
                 $offset,
                 $rowCount,
                 $startTime,
@@ -304,7 +304,7 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns rank of best schools in last month
+     * Returns the best schools in last month
      *
      * @param int $offset
      * @param int $rowCount
@@ -313,7 +313,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param bool $canUseCache
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
-    private static function getSchoolsRank(
+    private static function getSchoolsOfTheMonth(
         int $offset,
         int $rowCount,
         int $startTime,
@@ -339,7 +339,7 @@ class School extends \OmegaUp\Controllers\Controller {
              * @var list<array{school_id: int, name: string, country_id: string, score: float}>
              */
             return \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SCHOOL_RANK,
+                \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
                 "{$offset}-{$rowCount}",
                 $fetch,
                 60 * 60 * 24 // 1 day
@@ -349,13 +349,67 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the historical rank of schools
+     *
+     * @return array{status: string, rank: list<array{school_id: int, rank: int, score: float, name: string}>}
+     */
+    public static function apiRank(\OmegaUp\Request $r) {
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        /** @var list<array{school_id: int, rank: int, score: float, name: string}> */
+        $rank = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_RANK,
+            "{$offset}-{$rowCount}",
+            function () use (
+                $offset,
+                $rowCount
+            ): array {
+                return \OmegaUp\DAO\Schools::getRank($offset, $rowCount);
+            },
+            60 * 60 * 24 // 1 day
+        );
+
+        return [
+            'status' => 'ok',
+            'rank' => $rank,
+        ];
+    }
+
+    /**
+     * Gets the details for historical rank of schools with pagination
+     *
+     * @return array{smartyProperties: array{rankTablePayload: array{page: int, length: int}}, template: string}
+     */
+    public static function getHistoricalRankForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'rankTablePayload' => [
+                    'page' => $page,
+                    'length' => $length,
+                ],
+            ],
+            'template' => 'rank.schools.tpl',
+        ];
+    }
+
+    /**
      * Gets the rank of best schools in last month with smarty format
      *
      * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
      */
-    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
+    public static function getSchoolsOfTheMonthForSmarty(int $rowCount = 100): array {
         return [
-            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
+            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsOfTheMonthList(
                 $rowCount
             ),
             'template' => 'rank.schools.tpl'
@@ -365,11 +419,11 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}
      */
-    public static function getSchoolsRankList(int $rowCount) {
+    public static function getSchoolsOfTheMonthList(int $rowCount) {
         return [
             'schoolRankPayload' => [
                 'rowCount' => $rowCount,
-                'rank' => self::getSchoolsRank(
+                'rank' => self::getSchoolsOfTheMonth(
                     /*$offset=*/0,
                     $rowCount,
                     /*$startTime=*/strtotime(
