@@ -2,155 +2,6 @@
 
  namespace OmegaUp\Controllers;
 
-class ProblemParams {
-    /**
-     * @readonly
-     * @var null|string
-     */
-    public $problemAlias;
-
-    /**
-     * @readonly
-     * @var null|string
-     */
-    public $title;
-
-    /**
-     * @var int|null
-     */
-    public $visibility;
-
-    /**
-     * @readonly
-     * @var null|list<string>
-     */
-    public $languages;
-
-    /**
-     * @readonly
-     * @var string
-     */
-    public $updatePublished;
-
-    /**
-     * @readonly
-     * @var null|string
-     */
-    public $selectedTagsAsJSON;
-
-    /**
-     * @readonly
-     * @var null|string
-     */
-    public $source;
-
-    /**
-     * @readonly
-     * @var null|string
-     */
-    public $validator;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $timeLimit;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $validatorTimeLimit;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $overallWallTimeLimit;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $extraWallTime;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $memoryLimit;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $outputLimit;
-
-    /**
-     * @readonly
-     * @var int|null
-     */
-    public $inputLimit;
-
-    /**
-     * @readonly
-     * @var bool
-     */
-    public $emailClarifications;
-
-    /**
-     * @param array{email_clarifications: bool, extra_wall_time: int|null, input_limit: int|null, languages: list<string>|null|string, memory_limit: int|null, output_limit: int|null, overall_wall_time_limit: int|null, problem_alias: null|string, selected_tags: null|string, source: null|string, time_limit: int|null, title: null|string, update_published: string, validator: null|string, validator_time_limit: int|null, visibility: int|null} $params
-     */
-    public function __construct($params) {
-        $this->problemAlias = isset(
-            $params['problem_alias']
-        ) ? $params['problem_alias'] : null;
-        $this->title = isset($params['title']) ? $params['title'] : null;
-        $this->visibility = isset(
-            $params['visibility']
-        ) ? $params['visibility'] : null;
-        if (!isset($params['languages'])) {
-            $this->languages = null;
-        } else {
-            if (is_string($params['languages'])) {
-                $this->languages = explode(',', $params['languages']);
-            } else {
-                $this->languages = $params['languages'];
-            }
-        }
-        $this->updatePublished = $params['update_published'] ?? \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
-        $this->selectedTagsAsJSON = isset(
-            $params['selected_tags']
-        ) ? $params['selected_tags'] : null;
-        $this->source = isset($params['source']) ? $params['source'] : null;
-        $this->validator = isset(
-            $params['validator']
-        ) ? $params['validator'] : null;
-        $this->timeLimit = isset(
-            $params['time_limit']
-        ) ? $params['time_limit'] : null;
-        $this->validatorTimeLimit = isset(
-            $params['validator_time_limit']
-        ) ? $params['validator_time_limit'] : null;
-        $this->overallWallTimeLimit = isset(
-            $params['overall_wall_time_limit']
-        ) ? $params['overall_wall_time_limit'] : null;
-        $this->extraWallTime = isset(
-            $params['extra_wall_time']
-        ) ? $params['extra_wall_time'] : null;
-        $this->memoryLimit = isset(
-            $params['memory_limit']
-        ) ? $params['memory_limit'] : null;
-        $this->outputLimit = isset(
-            $params['output_limit']
-        ) ? $params['output_limit'] : null;
-        $this->inputLimit = isset(
-            $params['input_limit']
-        ) ? $params['input_limit'] : null;
-        $this->emailClarifications = $params['email_clarifications'] ?? false;
-    }
-}
-
 /**
  * ProblemsController
  */
@@ -194,6 +45,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // edit privileges.
     const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
+    const VALIDATOR_TOKEN = 'token';
+
+    const VALIDATOR_TOKEN_CASELESS = 'token-caseless';
+
+    const VALIDATOR_TOKEN_NUMERIC = 'token-numeric';
+
+    const VALIDATOR_LITERAL = 'literal';
+
+    const VALIDATOR_CUSTOM = 'custom';
+
+    const LANGUAGES_ALL = 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cs,hs,java,lua,pas,py2,py3,rb';
+
+    const LANGUAGES_KAREL = 'kj,kp';
+
+    const LANGUAGES_JUST_OUTPUT = 'cat';
+
+    const LANGUAGES_NO_SUMBISSIONS = '';
+
     // ISO 639-1 langs
     const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
         'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',
@@ -219,6 +88,80 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     // Number of rows shown in problems list
     const PAGE_SIZE = 1000;
+
+    /**
+     * Returns a ProblemParams instance from the Request values.
+     *
+     */
+    private static function convertRequestToProblemParams(
+        \OmegaUp\Request $r
+    ): \OmegaUp\ProblemParams {
+        // We need to check problem_alias
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+
+        $params = [
+            'problem_alias' => $r['problem_alias'],
+        ];
+        if (!is_null($r['email_clarifications'])) {
+            $params['email_clarifications'] = boolval(
+                $r['email_clarifications']
+            );
+        }
+        if (!is_null($r['extra_wall_time'])) {
+            $params['extra_wall_time'] = intval($r['extra_wall_time']);
+        }
+        if (!is_null($r['input_limit'])) {
+            $params['input_limit'] = intval($r['input_limit']);
+        }
+        if (!is_null($r['languages'])) {
+            if (is_array($r['languages'])) {
+                $params['languages'] = implode(',', $r['languages']);
+            } else {
+                $params['languages'] = strval($r['languages']);
+            }
+        }
+        if (!is_null($r['memory_limit'])) {
+            $params['memory_limit'] = intval($r['memory_limit']);
+        }
+        if (!is_null($r['output_limit'])) {
+            $params['output_limit'] = intval($r['output_limit']);
+        }
+        if (!is_null($r['overall_wall_time_limit'])) {
+            $params['overall_wall_time_limit'] = intval(
+                $r['overall_wall_time_limit']
+            );
+        }
+        if (!is_null($r['selected_tags'])) {
+            $params['selected_tags'] = strval($r['selected_tags']);
+        }
+        if (!is_null($r['source'])) {
+            $params['source'] = strval($r['source']);
+        }
+        if (!is_null($r['time_limit'])) {
+            $params['time_limit'] = intval($r['time_limit']);
+        }
+        if (!is_null($r['title'])) {
+            $params['title'] = strval($r['title']);
+        }
+        if (!is_null($r['update_published'])) {
+            $params['update_published'] = strval($r['update_published']);
+        }
+        if (!is_null($r['validator'])) {
+            $params['validator'] = strval($r['validator']);
+        }
+        if (!is_null($r['validator_time_limit'])) {
+            $params['validator_time_limit'] = intval(
+                $r['validator_time_limit']
+            );
+        }
+        if (!is_null($r['visibility'])) {
+            $params['visibility'] = intval($r['visibility']);
+        }
+        return new \OmegaUp\ProblemParams($params);
+    }
 
     /**
      * Validates a Create or Update Problem API request
@@ -361,7 +304,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['validator'],
             'validator',
-            ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
+            [
+                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
+                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_CASELESS,
+                \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN_NUMERIC,
+                \OmegaUp\Controllers\Problem::VALIDATOR_LITERAL,
+                \OmegaUp\Controllers\Problem::VALIDATOR_CUSTOM,
+            ],
             $isRequired
         );
         $r->ensureInt('time_limit', 0, null, $isRequired);
@@ -3281,7 +3230,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'TimeLimit' => '1s',
             ],
             'validator' => [
-                'name' => 'token-caseless',
+                'name' => \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
                 'tolerance' => 1e-9,
                 'limits' => [
                     'ExtraWallTime' => '0s',
@@ -3698,7 +3647,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'TITLE' => '',
             'ALIAS' => '',
-            'VALIDATOR' => 'token-caseless',
+            'VALIDATOR' => \OmegaUp\Controllers\Problem::VALIDATOR_TOKEN,
             'TIME_LIMIT' => '1000',
             'VALIDATOR_TIME_LIMIT' => '1000',
             'OVERALL_WALL_TIME_LIMIT' => '60000',
