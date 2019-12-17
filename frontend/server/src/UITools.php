@@ -242,22 +242,13 @@ class UITools {
     /**
      * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
      */
-    public static function render(
-        callable $callback,
-        bool $withStatusError = false
-    ): void {
+    public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
         try {
             [
                 'smartyProperties' => $smartyProperties,
-                'template' => $template
+                'template' => $template,
             ] = $callback(new Request($_REQUEST));
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            if ($withStatusError) {
-                $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
-            } else {
-                \OmegaUp\ApiCaller::handleException($e);
-            }
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }

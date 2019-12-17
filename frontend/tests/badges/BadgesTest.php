@@ -39,7 +39,10 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             $r->method = $req['api'];
             $fullResponse = \OmegaUp\ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
-                throw new Exception($fullResponse['error']);
+                throw new Exception(
+                    'request=' . json_encode($req) .
+                    "\nresponse=" . json_encode($fullResponse)
+                );
             }
             if ($r->method === '\\OmegaUp\\Controllers\\Run::apiCreate') {
                 $points = array_key_exists(
@@ -78,8 +81,8 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 case 'scripts':
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
-                            case 'update_user_rank.py':
-                                \OmegaUp\Test\Utils::runUpdateUserRank();
+                            case 'update_ranks.py':
+                                \OmegaUp\Test\Utils::runUpdateRanks();
                                 break;
                             case 'aggregate_feedback.py':
                                 \OmegaUp\Test\Utils::runAggregateFeedback();
@@ -180,7 +183,11 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            self::runBadgeTest($testPath, $queryPath, $alias);
+            try {
+                self::runBadgeTest($testPath, $queryPath, $alias);
+            } catch (Exception $e) {
+                $this->fail("For badge {$alias}: $e");
+            }
         }
     }
 

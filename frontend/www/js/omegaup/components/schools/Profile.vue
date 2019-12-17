@@ -1,7 +1,10 @@
 <template>
   <div class="row">
     <div class="page-header">
-      <h1 class="text-center">{{ name }}</h1>
+      <h1 class="text-center">
+        <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
+        {{ name }}
+      </h1>
     </div>
     <div class="row">
       <div class="col-md-4">
@@ -84,6 +87,10 @@
   display: inline-block;
   width: 60px;
 }
+
+.rank-number {
+  color: gray;
+}
 </style>
 
 <script lang="ts">
@@ -113,6 +120,7 @@ interface ProblemsSolvedCount {
 })
 export default class SchoolProfile extends Vue {
   @Prop() name!: string;
+  @Prop() rank!: number;
   @Prop() country!: omegaup.Country;
   @Prop() stateName!: string;
   @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];

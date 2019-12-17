@@ -140,10 +140,12 @@ class Utils {
     public static function setUpDefaultDataConfig(): void {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'username' => 'admintest',
-            'password' => 'testtesttest',
-        ]));
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'admintest',
+                'password' => 'testtesttest',
+            ])
+        );
         \OmegaUp\DAO\ACLs::create(new \OmegaUp\DAO\VO\ACLs([
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
@@ -228,6 +230,7 @@ class Utils {
             'Submission_Log',
             'Tags',
             'User_Roles',
+            'User_Rank',
             'Users',
             'Users_Badges',
             'Users_Experiments',
@@ -273,20 +276,30 @@ class Utils {
         self::commit();
     }
 
-    public static function runUpdateUserRank(): void {
-        // Ensure all suggestions are written to the database before invoking
-        // the external script.
-        self::commit();
-
+    private static function shellExec(string $command): void {
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
-        shell_exec('python3 ' . escapeshellarg(
-            strval(OMEGAUP_ROOT)
-        ) . '/../stuff/cron/update_user_rank.py' .
-        ' --quiet ' .
-        ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-        ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-        ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-        ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        $proc = proc_open(
+            $command,
+            [
+                 0 => ['file', '/dev/null', 'r'],
+                 1 => ['pipe', 'w'],
+                 2 => ['pipe', 'w'],
+            ],
+            $pipes
+        );
+        if (!is_resource($proc)) {
+            throw new \Exception("Failed to run `{$command}`");
+        }
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $processStatus = proc_close($proc);
+        if ($processStatus != 0) {
+            throw new \Exception(
+                "Failed to run `{$command}`: status={$processStatus}\nstdout={$stdout}\nstderr={$stderr}"
+            );
+        }
     }
 
     public static function commit(): void {
@@ -297,33 +310,50 @@ class Utils {
         }
     }
 
+    public static function runUpdateRanks(): void {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+        self::shellExec(
+            ('python3 ' .
+             escapeshellarg(strval(OMEGAUP_ROOT)) .
+             '/../stuff/cron/update_ranks.py' .
+             ' --verbose ' .
+             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+            ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
+    }
+
     public static function runAggregateFeedback(): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
-
-        /** @psalm-suppress ForbiddenCode this only runs in tests. */
-        shell_exec('python3 ' . escapeshellarg(
-            strval(OMEGAUP_ROOT)
-        ) . '/../stuff/cron/aggregate_feedback.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        self::shellExec(
+            ('python3 ' .
+             escapeshellarg(strval(OMEGAUP_ROOT)) .
+             '/../stuff/cron/aggregate_feedback.py' .
+             ' --verbose ' .
+             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
     }
 
     public static function runAssignBadges(): void {
         // Ensure everything is commited before invoking external script
         self::commit();
-        /** @psalm-suppress ForbiddenCode this only runs in tests. */
-        shell_exec('python3 ' . escapeshellarg(
-            strval(OMEGAUP_ROOT)
-        ) . '/../stuff/cron/assign_badges.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+        self::shellExec(
+            ('python3 ' .
+             escapeshellarg(strval(OMEGAUP_ROOT)) .
+             '/../stuff/cron/assign_badges.py' .
+             ' --verbose ' .
+             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
     }
 }

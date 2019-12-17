@@ -40,11 +40,17 @@ export function parseDuration(value) {
 
 export const languageMonacoModelMapping = {
   cpp11: 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
   cpp: 'cpp',
   cs: 'csharp',
   java: 'java',
   lua: 'lua',
   py: 'python',
+  py2: 'python',
+  py3: 'python',
   rb: 'ruby',
 
   // Fake languages.
@@ -56,11 +62,17 @@ export const languageMonacoModelMapping = {
 
 export const languageExtensionMapping = {
   cpp11: 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
   cpp: 'cpp',
   cs: 'cs',
   java: 'java',
   lua: 'lua',
   py: 'py',
+  py2: 'py',
+  py3: 'py',
   rb: 'rb',
 
   // Fake languages.
