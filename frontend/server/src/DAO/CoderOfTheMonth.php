@@ -85,7 +85,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           GROUP BY
             up.identity_id
           ORDER BY
-            score DESC
+            score DESC,
+            ProblemsSolved DESC
           LIMIT 100
         ";
 

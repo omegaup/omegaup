@@ -1354,15 +1354,22 @@ class User extends \OmegaUp\Controllers\Controller {
                 ];
             }
 
-            // First place of list is going to be returned
-            $coderOfTheMonthUserId = $users[0]['user_id'];
-            foreach ($users as $index => $user) {
-                \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                    'user_id' => $user['user_id'],
-                    'school_id' => $user['school_id'],
-                    'time' => $firstDay,
-                    'rank' => $index + 1,
-                ]));
+            try {
+                \OmegaUp\DAO\DAO::transBegin();
+                // First place of list is going to be returned
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+                foreach ($users as $index => $user) {
+                    \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                        'user_id' => $user['user_id'],
+                        'school_id' => $user['school_id'],
+                        'time' => $firstDay,
+                        'rank' => $index + 1,
+                    ]));
+                }
+                \OmegaUp\DAO\DAO::transEnd();
+            } catch (\Exception $e) {
+                \OmegaUp\DAO\DAO::transRollback();
+                throw $e;
             }
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;

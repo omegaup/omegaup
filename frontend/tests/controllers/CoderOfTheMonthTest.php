@@ -19,13 +19,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'school_id' => $school->school_id,
         ]));
 
-        // Creating 10 AC runs for our user in the last month
+        // First user solves two problems, second user solves just one
         $runCreationDate = new DateTimeImmutable(date('Y-m-d'));
         $runCreationDate = $runCreationDate->modify('first day of last month');
         $runCreationDate = $runCreationDate->format('Y-m-d');
 
-        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
-        $this->createRuns($extraIdentity, $runCreationDate, 5 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request()
@@ -78,13 +79,15 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
 
-        $this->assertCount(0, $response['coders']);
+        // Just one Coder of The Month, the one calculated on the previous test.
+        $this->assertCount(1, $response['coders']);
 
         // Adding parameter date should return the same value, it helps
-        // to test getMonthlyList function, which never was tested
+        // to test getMonthlyList function.
+        // It should return two users (the ones that got stored on the previous test)
         $r['date'] = date('Y-m-d', \OmegaUp\Time::get());
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
-        $this->assertCount(0, $response['coders']);
+        $this->assertCount(2, $response['coders']);
     }
 
     public function testCodersOfTheMonthBySchool() {
