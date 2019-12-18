@@ -1475,19 +1475,26 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('noCoders');
         }
 
-        foreach ($users as $index => $user) {
-            $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                'user_id' => $user['user_id'],
-                'school_id' => $user['school_id'],
-                'time' => $dateToSelect,
-                'rank' => $index + 1,
-            ]);
-            // All users calculated as CoderOfTheMonth are going to be saved on database,
-            // the one selected by the mentor is gonna have the field 'selected_by' filled.
-            if ($user['username'] === $r['username']) {
-                $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            foreach ($users as $index => $user) {
+                $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'school_id' => $user['school_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                ]);
+                // All users calculated as CoderOfTheMonth are going to be saved on database,
+                // the one selected by the mentor is gonna have the field 'selected_by' filled.
+                if ($user['username'] === $r['username']) {
+                    $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
+                }
+                \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
             }
-            \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return ['status' => 'ok'];
