@@ -71,7 +71,7 @@
     <div class="panel-footer" v-show="showForm">
       <form>
         <div class="row">
-          <div class="col-md-4" v-show="canSeeTopicsAndLevel">
+          <div class="col-md-4" v-show="showTopicsAndLevel">
             <div class="form-group">
               <label
                 >{{ T.wordsTopics }}
@@ -110,7 +110,7 @@
             </div>
           </div>
           <div class="col-md-8">
-            <div class="row" v-show="canSeeTopicsAndLevel">
+            <div class="row" v-show="showTopicsAndLevel">
               <div class="form-group col-md-12">
                 <label
                   >{{ T.wordsProblems }}
@@ -203,7 +203,7 @@ export default class CourseProblemList extends Vue {
   topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
-  canSeeTopicsAndLevel = false;
+  showTopicsAndLevel = false;
 
   get tags(): string[] {
     let t = this.topics.slice();
