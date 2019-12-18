@@ -1354,14 +1354,23 @@ class User extends \OmegaUp\Controllers\Controller {
                 ];
             }
 
-            // Only first place coder is saved
-            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                'user_id' => $users[0]['user_id'],
-                'school_id' => $users[0]['school_id'],
-                'time' => $firstDay,
-                'rank' => 1,
-            ]));
-            $coderOfTheMonthUserId = $users[0]['user_id'];
+            try {
+                \OmegaUp\DAO\DAO::transBegin();
+                // First place of list is going to be returned
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+                foreach ($users as $index => $user) {
+                    \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                        'user_id' => $user['user_id'],
+                        'school_id' => $user['school_id'],
+                        'time' => $firstDay,
+                        'rank' => $index + 1,
+                    ]));
+                }
+                \OmegaUp\DAO\DAO::transEnd();
+            } catch (\Exception $e) {
+                \OmegaUp\DAO\DAO::transRollback();
+                throw $e;
+            }
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
@@ -1372,15 +1381,16 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
+
         if (is_null($coderOfTheMonthUserId)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'coderOfTheMonthNotFound'
             );
         }
-        $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Get the profile of the coder of the month
+        $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $response = [
             'userinfo' => \OmegaUp\Controllers\User::getProfileImpl(
                 $user,
@@ -3087,7 +3097,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
         $response['smartyProperties'] = array_merge(
             $response['smartyProperties'],
-            \OmegaUp\Controllers\School::getSchoolsRankList($rowCount)
+            \OmegaUp\Controllers\School::getSchoolOfTheMonthList($rowCount)
         );
         return $response;
     }
@@ -3258,7 +3268,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param array{time: string, username: string, country_id: string, email: string}[] $coders
+     * @param array{time: string, username: string, rank?: int, country_id: string, email: string}[] $coders
      * @return array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}[]
      */
     private static function processCodersList(array $coders): array {

@@ -194,6 +194,7 @@ export default class CourseProblemList extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() assignmentProblems!: omegaup.AssignmentProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
+  @Prop() selectedAssignment!: omegaup.Assignment;
 
   UI = UI;
   T = T;
@@ -230,6 +231,11 @@ export default class CourseProblemList extends Vue {
   @Watch('assignment')
   onAssignmentChange(newVal: omegaup.Assignment): void {
     this.$emit('assignment', newVal);
+  }
+
+  @Watch('selectedAssignment')
+  onSelectedAssignmentChange(newVal: omegaup.Assignment): void {
+    this.assignment = newVal;
   }
 
   @Watch('taggedProblemAlias')
