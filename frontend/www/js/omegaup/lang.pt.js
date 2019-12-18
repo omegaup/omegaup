@@ -467,6 +467,8 @@ const translations = {
 	navRanking: "Ranking",
 	navRecent: "\u00daltima atividade",
 	navSchools: "Escolas",
+	navSchoolsRanking: "Ranking de escolas",
+	navUsersRanking: "Ranking de usu\u00e1rios",
 	navViewProfile: "Meu perfil",
 	noCoders: "Nenhum programador.",
 	notRegisteredInContest: "Voc\u00ea n\u00e3o est\u00e1 registrado para este concurso.",
