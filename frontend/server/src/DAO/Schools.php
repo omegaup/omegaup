@@ -156,6 +156,35 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
+     * Gets the schools ordered by rank and score
+     *
+     * @return list<array{school_id: int, rank: int, score: float, name: string}>
+     */
+    public static function getRank(
+        int $page,
+        int $rowsPerPage
+    ): array {
+        $offset = ($page - 1) * $rowsPerPage;
+        $sql = '
+            SELECT
+                s.school_id,
+                s.name,
+                s.rank,
+                s.score
+            FROM
+                Schools s
+            ORDER BY
+                s.rank ASC
+            LIMIT ?, ?;';
+
+        /** @var list<array{school_id: int, rank: int, score: float, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$offset, $rowsPerPage]
+        );
+    }
+
+    /**
      * Gets the users from school, and their number of problems created, solved and
      * organized contests.
      *
