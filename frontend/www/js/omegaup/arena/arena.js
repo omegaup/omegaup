@@ -650,7 +650,11 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      clock = UI.formatDelta(countdownTime.getTime() - now);
+      if ($('#title .human-readable').is(':checked')) {
+        clock = UI.formatDeltaHumanReadable(countdownTime.getTime() - now);
+      } else {
+        clock = UI.formatDelta(countdownTime.getTime() - now);
+      }
     }
     self.elements.clock.text(clock);
   }

@@ -64,6 +64,10 @@ legend {
 	text-align: center;
 	font-size: 2em;
 }
+#title label {
+	text-align: center;
+	width: 100%;
+}
 #practice #title .clock {
 	font-size: 6em;
 	line-height: .4em;
