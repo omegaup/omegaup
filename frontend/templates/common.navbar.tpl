@@ -43,8 +43,8 @@
             <li class="dropdown {if isset($navbarSection) && $navbarSection === "rank"} active{/if}" id="nav-rank">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#navRanking#}</span><span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="/rank/">{#navUsersRanking#}</a></li>
-                <li><a href="/rank/schools/">{#navSchoolsRanking#}</a></li>
+                <li><a href="/rank/">{#navUserRanking#}</a></li>
+                <li><a href="/rank/schools/">{#navSchoolRanking#}</a></li>
               </ul>
             </li>
           {else}

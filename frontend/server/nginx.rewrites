@@ -78,7 +78,7 @@ rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
 rewrite ^/rank/schools/?$ /rank/schools.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
-rewrite ^/schoolsrank/?$ /rank/schools redirect;
+rewrite ^/schoolsrank/?$ /rank/schools/ permanent;
 rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
