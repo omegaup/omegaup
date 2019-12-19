@@ -1331,7 +1331,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
-        $firstDay = self::getCoderOfTheMonthFirstDay($date);
+        $firstDay = self::getCurrentMonthFirstDay($date);
         $response = self::getCodersOfTheMonth($firstDay);
         $response['status'] = 'ok';
         return $response;
@@ -1402,21 +1402,6 @@ class User extends \OmegaUp\Controllers\Controller {
         unset($response['userinfo']['email']);
 
         return $response;
-    }
-
-    private static function getCoderOfTheMonthFirstDay(?string $date): string {
-        if (empty($date)) {
-            // Get first day of the current month
-            return date('Y-m-01', \OmegaUp\Time::get());
-        }
-        $date = strtotime($date);
-        if ($date === false) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'date'
-            );
-        }
-        return date('Y-m-01', $date);
     }
 
     /**
@@ -3080,7 +3065,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
-        $firstDay = self::getCoderOfTheMonthFirstDay($date);
+        $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
         $response = [
             'smartyProperties' => [

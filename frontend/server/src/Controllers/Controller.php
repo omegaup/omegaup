@@ -98,6 +98,24 @@ class Controller {
     }
 
     /**
+     * Gets the current month's first day date.
+     */
+    protected static function getCurrentMonthFirstDay(?string $date): string {
+        if (empty($date)) {
+            // Get first day of the current month
+            return date('Y-m-01', \OmegaUp\Time::get());
+        }
+        $date = strtotime($date);
+        if ($date === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'date'
+            );
+        }
+        return date('Y-m-01', $date);
+    }
+
+    /**
      * Update properties of $object based on what is provided in $request.
      * $properties can have 'simple' and 'complex' properties.
      * - A simple property is just a name using underscores, and it's getter and setter methods should

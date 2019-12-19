@@ -439,4 +439,42 @@ class School extends \OmegaUp\Controllers\Controller {
             ],
         ];
     }
+
+    /**
+     * Returns the first school of the previous month or the one selected by
+     * the mentor, if it has already been stored. Otherwise, calculates and
+     * saves the new schools of the month, and returns the first one of them.
+     */
+    public static function getSchoolsOfTheMonth(string $firstDay) {
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime($firstDay);
+
+        if (empty($schoolsOfTheMonth)) {
+            // Calculate and store new schools of the month
+        } else {
+            $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
+            foreach ($schoolsOfTheMonth as $school) {
+                if (isset($school->selected_by)) {
+                    $schoolOfTheMonthId = $school->school_id;
+                }
+            }
+        }
+
+        if (is_null($schoolOfTheMonthId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'schoolOfTheMonthNotFound'
+            );
+        }
+
+        // Now get the info of school
+
+    }
+
+    /**
+     * Returns the school selected for the previous month.
+     */
+    public static function apiSchoolOfTheMonth(\Omegaup\Request $r) {
+        $firstDay = \OmegaUp\Controllers\User::getCurrentMonthFirstDay(null);
+        $response = self::getSchoolsOfTheMonth($firstDay);
+        $response['status'] = 'ok';
+    }
 }
