@@ -3,7 +3,9 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
-    function (): array {
-        return \OmegaUp\Controllers\School::getSchoolOfTheMonthForSmarty();
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\School::getRankForSmarty(
+            $r
+        );
     }
 );

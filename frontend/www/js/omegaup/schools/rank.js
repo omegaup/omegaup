@@ -15,6 +15,7 @@ OmegaUp.on('ready', function() {
           length: this.length,
           isIndex: this.isIndex,
           rank: this.rank,
+          totalRows: this.totalRows,
         },
       });
     },
@@ -23,6 +24,7 @@ OmegaUp.on('ready', function() {
       length: payload.length,
       isIndex: payload.isIndex,
       rank: [],
+      totalRows: 0,
     },
     components: {
       'omegaup-schools-rank': schools_Rank,
@@ -32,11 +34,18 @@ OmegaUp.on('ready', function() {
   if (payload.isIndex) {
     API.School.getTopFiveSchoolsOfTheMonth()
       .then(data => {
-        console.log(data);
         schoolsRank.rank = data.rank;
       })
       .catch(UI.apiError);
   } else {
-    console.log('No es index, procede hacer algo distinto');
+    API.School.rank({
+      offset: schoolsRank.page,
+      rowcount: schoolsRank.length,
+    })
+      .then(data => {
+        schoolsRank.totalRows = data.totalRows;
+        schoolsRank.rank = data.rank;
+      })
+      .catch(UI.apiError);
   }
 });
