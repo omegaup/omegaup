@@ -46,7 +46,7 @@
 					<div id="omegaup-schools-rank"></div>
 					<div class="container-fluid">
 						<div class="col-xs-12 vertical-padding">
-							<a href="/schoolsrank/">{#rankViewFull#}</a>
+							<a href="/rank/schools/">{#rankViewFull#}</a>
 						</div>
 					</div>
 				</div>
