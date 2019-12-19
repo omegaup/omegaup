@@ -159,15 +159,21 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return array
+     * @return list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>
      */
-    public static function getLastThirtyDaysSubmissions(): array {
+    public static function getLastThirtyDaysSubmissions(
+        int $page,
+        int $rowcount
+    ): array {
+        $offset = ($page - 1) * $rowcount;
+        //TODO: Incluir ranking classname
+        //TODO: Filtrar solo submissions públicos
         $sql = '
             SELECT
                 UNIX_TIMESTAMP(s.time) as time,
                 i.username,
                 s.school_id,
-                sc.name,
+                sc.name as school_name,
                 p.alias,
                 p.title,
                 s.language,
@@ -178,6 +184,39 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 Submissions s
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
-        ';
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Users u ON u.main_identity_id = i.identity_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = s.school_id
+            LEFT JOIN
+                Problemsets ps ON ps.problemset_id = s.problemset_id
+            LEFT JOIN
+                Contests c ON c.contest_id = ps.contest_id
+            WHERE
+                s.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY)
+                AND u.is_private = 0
+                AND p.visibility = "public"
+                AND (
+                    s.problemset_id = NULL
+                    OR ps.access_mode = "public"
+                )
+                AND (
+                    c.contest_id = NULL
+                    OR c.finish_time < s.time
+                )
+            ORDER BY
+                s.time DESC
+            LIMIT
+                ?, ?;';
+
+        /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$offset, $rowcount]
+        );
     }
 }
