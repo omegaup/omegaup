@@ -157,4 +157,27 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             [$startTimestamp, $endTimestamp]
         );
     }
+
+    /**
+     * @return array
+     */
+    public static function getLastThirtyDaysSubmissions(): array {
+        $sql = '
+            SELECT
+                UNIX_TIMESTAMP(s.time) as time,
+                i.username,
+                s.school_id,
+                sc.name,
+                p.alias,
+                p.title,
+                s.language,
+                r.verdict,
+                r.runtime,
+                r.memory
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+        ';
+    }
 }
