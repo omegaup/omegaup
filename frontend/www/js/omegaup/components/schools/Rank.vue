@@ -1,9 +1,17 @@
 <template>
-  <div class="panel panel-default omegaup-schools-rank">
+  <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">
+      <h3 v-if="isIndex" class="panel-title">
         {{
           UI.formatString(T.schoolRankHeader, { count: rank ? rank.length : 0 })
+        }}
+      </h3>
+      <h3 v-else="">
+        {{
+          UI.formatString(T.schoolRankRangeHeader, {
+            lowCount: (page - 1) * length + 1,
+            highCount: page * length,
+          })
         }}
       </h3>
     </div>
@@ -20,7 +28,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(school, index) in rankFiltered">
+            <tr v-for="(school, index) in rank">
               <td>{{ index + 1 }}</td>
               <td
                 class="cell-school-name"
@@ -76,14 +84,12 @@ import CountryFlag from '../CountryFlag.vue';
   },
 })
 export default class Rank extends Vue {
+  @Prop() page!: number;
+  @Prop() length!: number;
+  @Prop() isIndex!: boolean;
   @Prop() rank!: omegaup.SchoolsRank[];
-  @Prop() rowCount!: number;
 
   T = T;
   UI = UI;
-
-  get rankFiltered() {
-    return this.rank.slice(0, this.rowCount);
-  }
 }
 </script>

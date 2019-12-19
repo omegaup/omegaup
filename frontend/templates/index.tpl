@@ -40,7 +40,7 @@
 
 			{if isset($schoolRankPayload)}
 			<div class="col-md-6">
-				<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
+				<script type="text/json" id="school-rank-payload">{$schoolRankPayload|json_encode}</script>
 				{js_include entrypoint="schools_rank" async}
 				<div id="omegaup-schools-rank"></div>
 			</div>

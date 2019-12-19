@@ -162,6 +162,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array{offset: int, rowcount: int, start_time: int, finish_time: int, can_use_cache: bool}
+     * FIXME: Esto será usado luego para apiRank
      */
     private static function validateSchoolsOfTheMonthDetails(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
@@ -206,32 +207,6 @@ class School extends \OmegaUp\Controllers\Controller {
             ) && is_null(
                 $r['finish_time']
             )
-        ];
-    }
-
-    /**
-     * Returns rank of best schools in last month
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
-     */
-    public static function apiGetSchoolsOfTheMonth(\OmegaUp\Request $r) {
-        [
-            'offset' => $offset,
-            'rowcount' => $rowCount,
-            'start_time' => $startTime,
-            'finish_time' => $finishTime,
-            'can_use_cache' => $canUseCache,
-        ] = self::validateSchoolsOfTheMonthDetails($r);
-        return [
-            'status' => 'ok',
-            'rank' => self::getSchoolsOfTheMonth(
-                $offset,
-                $rowCount,
-                $startTime,
-                $finishTime,
-                $canUseCache
-            ),
         ];
     }
 
@@ -304,48 +279,42 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the best schools in last month
-     *
-     * @param int $offset
-     * @param int $rowCount
-     * @param int $startTime
-     * @param int $finishTime
-     * @param bool $canUseCache
-     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
+     * Gets the top five schools that are showed on the index page.
+     * @return array{status: string, rank: list<array{school_id: int, name: string, country_id: string, score: float}>}
      */
-    private static function getSchoolsOfTheMonth(
-        int $offset,
-        int $rowCount,
-        int $startTime,
-        int $finishTime,
-        bool $canUseCache
-    ): array {
-        $fetch = function () use (
-            $offset,
-            $rowCount,
-            $startTime,
-            $finishTime
-        ): array {
-            return \OmegaUp\DAO\Schools::getRankByProblemsScore(
-                $startTime,
-                $finishTime,
-                $offset,
-                $rowCount
-            );
-        };
+    public static function apiGetTopFiveSchoolsOfTheMonth(\OmegaUp\Request $r) {
+        $rowcount = 5;
 
-        if ($canUseCache) {
-            /**
-             * @var list<array{school_id: int, name: string, country_id: string, score: float}>
-             */
-            return \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
-                "{$startTime}-{$finishTime}",
-                $fetch,
-                60 * 60 * 24 // 1 day
-            );
-        }
-        return $fetch();
+        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
+        $firstDayOfCurrentMonth = $currentDate->modify(
+            'first day of this month'
+        );
+        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
+        $firstDayOfNextMonth = $currentDate->modify('first day of next month');
+        $endTime = $firstDayOfNextMonth->format('Y-m-d');
+
+        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
+        $rank = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TOP_FIVE_SCHOOLS_OF_THE_MONTH,
+            "{$startTime}-{$endTime}",
+            function () use (
+                $startTime,
+                $endTime,
+                $rowcount
+            ): array {
+                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonth(
+                    $startTime,
+                    $endTime,
+                    $rowcount
+                );
+            },
+            60 * 60 * 24 // 1 day
+        );
+
+        return [
+            'status' => 'ok',
+            'rank' => $rank,
+        ];
     }
 
     /**
@@ -399,44 +368,6 @@ class School extends \OmegaUp\Controllers\Controller {
                 ],
             ],
             'template' => 'rank.schools.tpl',
-        ];
-    }
-
-    /**
-     * Gets the rank of best schools in last month with smarty format
-     *
-     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
-     */
-    public static function getSchoolOfTheMonthForSmarty(int $rowCount = 100): array {
-        return [
-            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolOfTheMonthList(
-                $rowCount
-            ),
-            'template' => 'rank.schools.tpl'
-        ];
-    }
-
-    /**
-     * @return array{schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}
-     */
-    public static function getSchoolOfTheMonthList(int $rowCount) {
-        return [
-            'schoolRankPayload' => [
-                'rowCount' => $rowCount,
-                'rank' => self::getSchoolsOfTheMonth(
-                    /*$offset=*/0,
-                    $rowCount,
-                    /*$startTime=*/strtotime(
-                        'first day of this month',
-                        \OmegaUp\Time::get()
-                    ),
-                    /*$finishTime=*/strtotime(
-                        'first day of next month',
-                        \OmegaUp\Time::get()
-                    ),
-                    /*$canUseCache=*/true
-                ),
-            ],
         ];
     }
 }
