@@ -786,6 +786,7 @@ CREATE TABLE `School_Of_The_Month` (
   `rank` int(11) NOT NULL COMMENT 'El lugar que tuvo la escuela en el mes.',
   `selected_by` int(11) DEFAULT NULL COMMENT 'Identidad que seleccionó a la escuela.',
   PRIMARY KEY (`school_of_the_month_id`),
+  UNIQUE KEY `rank_time` (`rank`,`time`),
   KEY `school_of_the_month_id` (`school_of_the_month_id`),
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
