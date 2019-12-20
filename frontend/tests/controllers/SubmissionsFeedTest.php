@@ -26,7 +26,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
-            'isPrivate' => true,
+                'isPrivate' => true,
             ])
         );
 
@@ -36,7 +36,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
             ])
         );
 
@@ -78,7 +78,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Submissions::getLastThirtyDaysSubmissions(
+        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
             1,
             100
         );
@@ -109,7 +109,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
-        $results = \OmegaUp\DAO\Submissions::getLastThirtyDaysSubmissions(
+        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
             1,
             100
         );

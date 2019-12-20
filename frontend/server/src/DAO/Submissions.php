@@ -161,13 +161,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     /**
      * @return list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>
      */
-    public static function getLastThirtyDaysSubmissions(
+    public static function getLatestSubmissions(
         int $page,
-        int $rowcount
+        int $rowcount,
+        int $seconds = 3600 * 24
     ): array {
         $offset = ($page - 1) * $rowcount;
-        //TODO: Incluir ranking classname
-        //TODO: Filtrar solo submissions públicos
         $sql = '
             SELECT
                 UNIX_TIMESTAMP(s.time) as time,
@@ -179,7 +178,23 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 s.language,
                 r.verdict,
                 r.runtime,
-                r.memory
+                r.memory,
+                COALESCE (
+                    (SELECT urc.classname
+                    FROM User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                            SELECT
+                                ur.score
+                            FROM
+                                User_Rank ur
+                            WHERE
+                                ur.user_id = i.user_id
+                        )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT 1)
+                , "user-rank-unranked") AS classname
             FROM
                 Submissions s
             INNER JOIN
@@ -197,9 +212,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                (s.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW())
+                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= ?
                 AND u.is_private = 0
-                AND p.visibility = ?
+                AND p.visibility >= ?
                 AND (
                     s.problemset_id IS NULL
                     OR ps.access_mode = "public"
@@ -217,6 +232,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
+                $seconds,
                 \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
                 $offset,
                 $rowcount
