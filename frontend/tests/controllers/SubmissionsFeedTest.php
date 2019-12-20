@@ -7,18 +7,19 @@
 
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionsFeedDAO() {
-      /**
-       * Create 3 users, 3 problems and 1 contest.
-       *
-       * - User2 is going to have private information, so that user's
-       * submissions should not be returned by the query.
-       *
-       * - Problem2 is going to be private, so their submissions won't
-       * be returned by the query.
-       *
-       * - Contest is going to be unfinished so submissions made over its
-       * problem, won't be returned by the query.
-       */
+        \OmegaUp\Test\Utils::cleanupDB();
+        /**
+         * Create 3 users, 3 problems and 1 contest.
+         *
+         * - User2 is going to have private information, so that user's
+         * submissions should not be returned by the query.
+         *
+         * - Problem2 is going to be private, so their submissions won't
+         * be returned by the query.
+         *
+         * - Contest is going to be unfinished so submissions made over its
+         * problem, won't be returned by the query.
+         */
 
         $users = [];
         $identities = [];
