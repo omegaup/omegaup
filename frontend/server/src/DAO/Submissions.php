@@ -197,15 +197,15 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                s.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY)
+                (s.time BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW())
                 AND u.is_private = 0
-                AND p.visibility = "public"
+                AND p.visibility = ?
                 AND (
-                    s.problemset_id = NULL
+                    s.problemset_id IS NULL
                     OR ps.access_mode = "public"
                 )
                 AND (
-                    c.contest_id = NULL
+                    c.contest_id IS NULL
                     OR c.finish_time < s.time
                 )
             ORDER BY
@@ -216,7 +216,11 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$offset, $rowcount]
+            [
+                \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                $offset,
+                $rowcount
+            ]
         );
     }
 }
