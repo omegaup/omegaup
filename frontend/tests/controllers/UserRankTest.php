@@ -339,12 +339,14 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'username' => $identity->username
-        ]));
+        $response = \OmegaUp\Controllers\User::getUserProfile(
+            new \OmegaUp\Request([
+                'username' => $identity->username
+            ])
+        );
 
         $this->assertNotEquals(
-            $response['userinfo']['classname'],
+            $response['classname'],
             'user-rank-unranked'
         );
     }

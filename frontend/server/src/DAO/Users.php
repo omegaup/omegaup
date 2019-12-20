@@ -189,6 +189,30 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return new \OmegaUp\DAO\VO\Users($row);
     }
 
+    /**
+     * @return null|array{username: string, verified: bool}
+     */
+    public static function getStatusVerified(string $email) {
+        $sql = 'SELECT
+                    verified,
+                    username,
+                FROM
+                    Identities i
+                INNER JOIN
+                    Users u
+                ON
+                    u.user_id = i.user_id
+                INNER JOIN
+                    Emails e
+                ON
+                    u.main_email_id = e.email_id
+                WHERE
+                    email = ?;
+                LIMIT 1;';
+        /** @var null|array{username: string, verified: bool} */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
+    }
+
     final public static function getVerified($verified, $in_mailing_list) {
         $sql = 'SELECT
                     *

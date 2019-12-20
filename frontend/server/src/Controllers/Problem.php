@@ -1769,16 +1769,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Cache::USER_PROFILE,
                 $r->identity->username,
                 function () use ($r) {
-                    return \OmegaUp\Controllers\User::apiProfile($r);
+                    return \OmegaUp\Controllers\User::getUserProfile($r);
                 }
             );
             if (
                 !empty($userData) &&
-                !empty($userData['userinfo']) &&
-                !empty($userData['userinfo']['preferred_language'])
+                !empty($userData['preferred_language'])
             ) {
                 $response['preferred_language'] = strval(
-                    $userData['userinfo']['preferred_language']
+                    $userData['preferred_language']
                 );
             }
         }
