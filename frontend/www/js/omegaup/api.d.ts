@@ -124,6 +124,13 @@ declare namespace omegaup {
     alias?: string;
   }
 
+  export interface ContestProblem {
+    alias: string;
+    text: string;
+    score: string;
+    active: boolean;
+  }
+
   interface ContestResult {
     data: omegaup.Contest;
     length?: string;
@@ -443,6 +450,13 @@ declare namespace omegaup {
 
   export interface UserRole {
     role: string;
+    username: string;
+  }
+
+  export interface UserRank {
+    penalty: number
+    points: number;
+    position: number;
     username: string;
   }
 

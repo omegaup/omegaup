@@ -6,6 +6,8 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import arena_Navbar from '../components/arena/Navbar.vue';
+
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -279,12 +281,35 @@ export class Arena {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      miniRanking: $('#mini-ranking'),
-      problemList: $('#problem-list'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
+
+    const problemListPayload = JSON.parse(
+      document.getElementById('problem-list-payload').innerText,
+    );
+    self.elements.navBar = new Vue({
+      el: '#arena-navbar',
+      render: function(createElement) {
+        return createElement('omegaup-arena-navbar', {
+          props: {
+            showRanking: this.showRanking,
+            problemsList: this.problemsList,
+            isSummarySelected: this.isSummarySelected,
+            miniRanking: this.miniRanking,
+          },
+        });
+      },
+      data: {
+        showRanking: problemListPayload,
+        problemsList: [],
+        isSummarySelected: true,
+        miniRanking: [],
+      },
+      components: { 'omegaup-arena-navbar': arena_Navbar },
+    });
+
     if (self.elements.ranking.length) {
       self.elements.rankingTable = new Vue({
         el: self.elements.ranking[0],
@@ -556,19 +581,16 @@ export class Arena {
     self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
-    let problemTemplate = $('#problem-list .template');
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      let prob = problemTemplate
-        .clone()
-        .removeClass('template')
-        .addClass('problem_' + problem.alias);
-      $('.name', prob)
-        .attr('href', '#problems/' + problem.alias)
-        .html(problemName);
-      self.elements.problemList.append(prob);
+      self.elements.navBar.problemsList.push({
+        alias: problem.alias,
+        text: problemName,
+        score: '',
+        active: false,
+      });
 
       $('<option>')
         .val(problem.alias)
@@ -866,7 +888,6 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    $('tbody.inserted', self.elements.miniRanking).remove();
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -903,39 +924,30 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          $('#problems .problem_' + alias + ' .solved').html(
-            '(' +
-              problem.points.toFixed(self.digitsAfterDecimalPoint) +
-              ' / ' +
-              currentPoints.toFixed(self.digitsAfterDecimalPoint) +
-              ')',
+          let index = self.elements.navBar.problemsList.findIndex(
+            x => x.alias === alias,
           );
+          let myMaxScore = problem.points.toFixed(self.digitsAfterDecimalPoint);
+          let contestMaxScore = currentPoints.toFixed(
+            self.digitsAfterDecimalPoint,
+          );
+          self.elements.navBar.problemsList[
+            index
+          ].score = `(${myMaxScore} / ${contestMaxScore})`;
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
       // update miniranking
       if (i < 10) {
-        let r = $('tbody.user-list-template', self.elements.miniRanking)
-          .clone()
-          .removeClass('user-list-template')
-          .addClass('inserted');
-
-        $('.position', r).html(rank.place);
-        $('.user', r).html(
-          '<span title="' +
-            UI.rankingUsername(rank) +
-            '">' +
-            UI.rankingUsername(rank) +
-            UI.getFlag(rank['country']) +
-            '</span>',
-        );
-        $('.points', r).html(
-          rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-        );
-        $('.penalty', r).html(rank.total.penalty.toFixed(0));
-
-        self.elements.miniRanking.append(r);
+        const username = UI.rankingUsername(rank);
+        const flag = UI.getFlag(rank['country']);
+        self.elements.navBar.miniRanking.push({
+          position: rank.place,
+          username: `<span title="${username}">${username} ${flag}</span>`,
+          points: rank.total.points.toFixed(self.digitsAfterDecimalPoint),
+          penalty: rank.total.penalty.toFixed(0),
+        });
       }
     }
 
@@ -1418,11 +1430,16 @@ export class Arena {
     if (problem && self.problems[problem[1]]) {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
-
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.problem_' + problem.alias, self.elements.problemList).addClass(
-        'active',
+      // Find the selected problem
+      let index = self.elements.navBar.problemsList.findIndex(
+        x => x.alias === problem.alias,
       );
+      // Set as active the selected problem, and the others as inactive
+      self.elements.navBar.isSummarySelected = false;
+      for (let idx in self.elements.navBar.problemsList) {
+        self.elements.navBar.problemsList[idx].active = false;
+      }
+      self.elements.navBar.problemsList[index].active = true;
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1648,8 +1665,10 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.summary', self.elements.problemList).addClass('active');
+      for (let idx in self.elements.navBar.problemsList) {
+        self.elements.navBar.problemsList[idx].active = false;
+      }
+      self.elements.navBar.isSummarySelected = true;
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -2140,15 +2159,18 @@ export class Arena {
         },
       );
     }
-    $('.problem_' + alias + ' .solved').text(
-      '(' +
-        self.myRuns
-          .getMaxScore(alias, previousScore)
-          .toFixed(self.digitsAfterDecimalPoint) +
-        ' / ' +
-        parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
-        ')',
+    let index = self.elements.navBar.problemsList.findIndex(
+      x => x.alias === alias,
     );
+    let myMaxScore = self.myRuns
+      .getMaxScore(alias, previousScore)
+      .toFixed(self.digitsAfterDecimalPoint);
+    let contestMaxScore = parseFloat(maxScore || '0').toFixed(
+      self.digitsAfterDecimalPoint,
+    );
+    self.elements.navBar.problemsList[
+      index
+    ].score = `(${myMaxScore} / ${contestMaxScore})`;
   }
 }
 class RunView {
