@@ -344,11 +344,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            // HACK: Deleting cache from identity to avoid failures in test
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::USER_PROFILE,
-                $coder
-            );
             $profile = \OmegaUp\Controllers\User::getUserProfile(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
