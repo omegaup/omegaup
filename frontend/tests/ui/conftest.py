@@ -38,6 +38,16 @@ class JavaScriptLogCollector:
         self._log_index = 0
         self._log_stack = [[]]
 
+    def empty(self) -> bool:
+        '''Returns whether the stack is empty.'''
+        # There is one catch-all frame at the bottom of the stack when nobody
+        # has called push().
+        return len(self._log_stack) <= 1
+
+    def extend(self, errors):
+        '''Injects errors into the current log frame.'''
+        self._log_stack[-1].extend(errors)
+
     def push(self):
         '''Pushes a new error list.'''
         self._log_stack[-1].extend(self._get_last_console_logs())
@@ -59,7 +69,16 @@ class JavaScriptLogCollector:
         for entry in browser_logs[current_index:]:
             if entry['level'] != 'SEVERE':
                 continue
+
             logging.info(entry)
+            if 'WebSocket' in entry['message']:
+                # Travis does not have broadcaster yet.
+                continue
+            if 'https://www.facebook.com/' in entry['message']:
+                # Let's not block submissions when Facebook is
+                # having a bad day.
+                continue
+
             yield entry
 
 
