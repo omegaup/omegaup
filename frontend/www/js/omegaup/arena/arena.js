@@ -585,6 +585,63 @@ export class Arena {
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
+
+    // The following code is only for courses
+    if (typeof problemset.courseAssignments === 'undefined') {
+      return;
+    }
+
+    // Getting index of current assignment
+    let indexAssignment = problemset.courseAssignments.findIndex(
+      x => x.alias === problemset.alias,
+    );
+    console.log(indexAssignment);
+
+    // Getting buttons by query selector
+    let nextAssignmentLink = document.querySelector(
+      '#assignments-navigation .next',
+    );
+    let prevAssignmentLink = document.querySelector(
+      '#assignments-navigation .prev',
+    );
+
+    let pathName = [];
+    let newPathName = null;
+
+    // Next button is enabled when current assignment is not the last one
+    if (indexAssignment < problemset.courseAssignments.length - 1) {
+      // Getting next assignment change path name and text
+      let nextAssignment = problemset.courseAssignments[indexAssignment + 1];
+      pathName = window.location.pathname.split('/');
+      pathName.pop();
+      pathName.push(nextAssignment.alias);
+      newPathName = pathName.join('/');
+      nextAssignmentLink.setAttribute('href', newPathName);
+      nextAssignmentLink.title = nextAssignment.name;
+      nextAssignmentLink.classList.remove('disabled');
+    } else {
+      // Otherwise, button is disabled
+      nextAssignmentLink.classList.add('disabled');
+    }
+
+    // Prev button is enabled when current assignment is not the first one
+    if (indexAssignment !== 0) {
+      // Getting next assignment change path name and text
+      let prevAssignment = problemset.courseAssignments[indexAssignment - 1];
+      pathName = window.location.pathname.split('/');
+      pathName.pop();
+      pathName.push(prevAssignment.alias);
+      newPathName = pathName.join('/');
+      prevAssignmentLink.setAttribute('href', newPathName);
+      prevAssignmentLink.title = prevAssignment.name;
+      prevAssignmentLink.classList.remove('disabled');
+    } else {
+      // Otherwise, button is disabled
+      prevAssignmentLink.classList.add('disabled');
+    }
+
+    let navAssignmentLinks = document.getElementById('assignments-navigation');
+    navAssignmentLinks.style.display = 'block';
   }
 
   initProblems(problemset) {

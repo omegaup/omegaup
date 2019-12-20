@@ -35,6 +35,14 @@
 							<span class="solved"></span>
 						</div>
 					</div>
+					<div id="assignments-navigation" class="row" style="display: none">
+						<div class="text-left col-md-6 col-sm-6 col-xs-6">
+							<a class="btn btn-primary btn-sm prev" title="">{#wordsPrevAssignment#}</a>
+						</div>
+						<div class="text-right col-md-6 col-sm-6 col-xs-6">
+							<a class="btn btn-primary btn-sm next" title="">{#wordsNextAssignment#}</a>
+						</div>
+					</div>
 {if $showRanking}
 					<table id="mini-ranking">
 						<thead>
