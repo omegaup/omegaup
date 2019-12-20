@@ -218,7 +218,7 @@ class Cache {
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
-    const TOP_FIVE_SCHOOLS_OF_THE_MONTH = 'top-five-schools-of-the-month';
+    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
 
     /** @var \Logger */
     private $log;

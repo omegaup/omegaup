@@ -32,7 +32,9 @@ OmegaUp.on('ready', function() {
   });
 
   if (payload.isIndex) {
-    API.School.getTopFiveSchoolsOfTheMonth()
+    API.School.schoolsOfTheMonth({
+      rowcount: 5,
+    })
       .then(data => {
         schoolsRank.rank = data.rank;
       })

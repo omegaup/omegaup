@@ -577,9 +577,7 @@ export default {
 
     rank: _call('/api/school/rank/'),
 
-    getTopFiveSchoolsOfTheMonth: _call(
-      '/api/school/gettopfiveschoolsofthemonth',
-    ),
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
 
     schoolCodersOfTheMonth: _call(
       '/api/school/schoolcodersofthemonth',

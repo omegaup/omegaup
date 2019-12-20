@@ -229,29 +229,24 @@ class School extends \OmegaUp\Controllers\Controller {
      * Gets the top five schools that are showed on the index page.
      * @return array{status: string, rank: list<array{school_id: int, name: string, country_id: string, score: float}>}
      */
-    public static function apiGetTopFiveSchoolsOfTheMonth(\OmegaUp\Request $r) {
-        $rowcount = 5;
+    public static function apiSchoolsOfTheMonth(\OmegaUp\Request $r) {
+        $r->ensureInt('rowcount', null, null, false);
+        $rowcount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
-        $firstDayOfCurrentMonth = $currentDate->modify(
-            'first day of this month'
-        );
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
+        $date = $firstDayOfNextMonth->format('Y-m-d');
 
         /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         $rank = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::TOP_FIVE_SCHOOLS_OF_THE_MONTH,
-            "{$startTime}-{$endTime}",
+            \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
+            "{$date}-{$rowcount}",
             function () use (
-                $startTime,
-                $endTime,
+                $date,
                 $rowcount
             ): array {
-                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonth(
-                    $startTime,
-                    $endTime,
+                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+                    $date,
                     $rowcount
                 );
             },
