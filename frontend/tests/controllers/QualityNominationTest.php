@@ -351,7 +351,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have been public banned'
         );
@@ -377,7 +377,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have been made public'
         );
@@ -440,7 +440,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDemotionCanBeDeniedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -481,7 +481,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have remained public'
         );
@@ -531,7 +531,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have been public banned'
         );
@@ -557,7 +557,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have remained public banned'
         );
@@ -569,7 +569,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -610,7 +610,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
             $problem['visibility'],
             'Problem should have been private banned'
         );
@@ -636,7 +636,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             $problem['visibility'],
             'Problem should have been private'
         );

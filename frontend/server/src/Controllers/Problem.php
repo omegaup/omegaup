@@ -6,14 +6,6 @@
  * ProblemsController
  */
 class Problem extends \OmegaUp\Controllers\Controller {
-    // Constants for problem visibility.
-    const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
-    const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
-    const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
-    const VISIBILITY_PRIVATE = 0;
-    const VISIBILITY_PUBLIC = 1;
-    const VISIBILITY_PROMOTED = 2;
-
     // SOLUTION STATUS
     const SOLUTION_NOT_FOUND = 'not_found';
     const SOLUTION_UNLOCKED = 'unlocked';
@@ -33,17 +25,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'score',
         'creation_date'
     ];
-
-    // Do not update the published branch.
-    const UPDATE_PUBLISHED_NONE = 'none';
-    // Update only non-problemset runs.
-    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
-    // Update non-problemset runs and running problemsets that are owned by the
-    // author.
-    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
-    // Update non-problemset runs and running problemsets that the author has
-    // edit privileges.
-    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
     // ISO 639-1 langs
     const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
@@ -70,6 +51,80 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     // Number of rows shown in problems list
     const PAGE_SIZE = 1000;
+
+    /**
+     * Returns a ProblemParams instance from the Request values.
+     *
+     */
+    private static function convertRequestToProblemParams(
+        \OmegaUp\Request $r
+    ): \OmegaUp\ProblemParams {
+        // We need to check problem_alias
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+
+        $params = [
+            'problem_alias' => $r['problem_alias'],
+        ];
+        if (!is_null($r['email_clarifications'])) {
+            $params['email_clarifications'] = boolval(
+                $r['email_clarifications']
+            );
+        }
+        if (!is_null($r['extra_wall_time'])) {
+            $params['extra_wall_time'] = intval($r['extra_wall_time']);
+        }
+        if (!is_null($r['input_limit'])) {
+            $params['input_limit'] = intval($r['input_limit']);
+        }
+        if (!is_null($r['languages'])) {
+            if (is_array($r['languages'])) {
+                $params['languages'] = implode(',', $r['languages']);
+            } else {
+                $params['languages'] = strval($r['languages']);
+            }
+        }
+        if (!is_null($r['memory_limit'])) {
+            $params['memory_limit'] = intval($r['memory_limit']);
+        }
+        if (!is_null($r['output_limit'])) {
+            $params['output_limit'] = intval($r['output_limit']);
+        }
+        if (!is_null($r['overall_wall_time_limit'])) {
+            $params['overall_wall_time_limit'] = intval(
+                $r['overall_wall_time_limit']
+            );
+        }
+        if (!is_null($r['selected_tags'])) {
+            $params['selected_tags'] = strval($r['selected_tags']);
+        }
+        if (!is_null($r['source'])) {
+            $params['source'] = strval($r['source']);
+        }
+        if (!is_null($r['time_limit'])) {
+            $params['time_limit'] = intval($r['time_limit']);
+        }
+        if (!is_null($r['title'])) {
+            $params['title'] = strval($r['title']);
+        }
+        if (!is_null($r['update_published'])) {
+            $params['update_published'] = strval($r['update_published']);
+        }
+        if (!is_null($r['validator'])) {
+            $params['validator'] = strval($r['validator']);
+        }
+        if (!is_null($r['validator_time_limit'])) {
+            $params['validator_time_limit'] = intval(
+                $r['validator_time_limit']
+            );
+        }
+        if (!is_null($r['visibility'])) {
+            $params['visibility'] = intval($r['visibility']);
+        }
+        return new \OmegaUp\ProblemParams($params);
+    }
 
     /**
      * Validates a Create or Update Problem API request
@@ -124,8 +179,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             // Only reviewers can revert bans.
             if (
-                ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
-                  $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) &&
+                ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
+                  $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) &&
                     array_key_exists('visibility', $r) &&
                     $problem->visibility != $r['visibility'] &&
                     !\OmegaUp\Authorization::isQualityReviewer($r->identity)
@@ -146,7 +201,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 !is_null($r['visibility']) &&
                 $problem->visibility != $r['visibility']
             ) {
-                if ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED) {
+                if ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PROMOTED) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'qualityNominationProblemHasBeenPromoted',
                         'visibility'
@@ -156,10 +211,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         $r['visibility'],
                         'visibility',
                         [
-                            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
-                            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-                            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
-                            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+                            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
                         ]
                     );
                 }
@@ -168,10 +223,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r['update_published'],
                 'update_published',
                 [
-                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
-                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
-                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                    \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+                    \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                    \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                    \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
                 ],
                 false
             );
@@ -183,7 +238,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $r['visibility'],
                 'visibility',
-                [\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC]
+                [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC]
             );
             /** @var array{tagname: string, public: bool}[]|null */
             $selectedTags = json_decode($r['selected_tags'], /*assoc=*/true);
@@ -212,7 +267,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['validator'],
             'validator',
-            ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
+            [
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS,
+                \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC,
+                \OmegaUp\ProblemParams::VALIDATOR_LITERAL,
+                \OmegaUp\ProblemParams::VALIDATOR_CUSTOM,
+            ],
             $isRequired
         );
         $r->ensureInt('time_limit', 0, null, $isRequired);
@@ -902,7 +963,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         unset($problemSettings['slow']);
         self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
-        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -924,7 +985,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemDeployer = new \OmegaUp\ProblemDeployer(
                 $problem->alias,
                 $acceptsSubmissions,
-                $updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE
+                $updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE
             );
             $problemDeployer->commit(
                 $r['message'],
@@ -949,7 +1010,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if ($needsUpdate) {
                 \OmegaUp\DAO\Runs::createRunsForVersion($problem);
                 \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-                if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
@@ -1077,7 +1138,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r
             );
         }
-        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -1094,12 +1155,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     "{$directory}/{$r['lang']}.markdown" => $contents,
                 ]
             );
-            if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE) {
+            if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE) {
                 [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
                     $problem,
                     $problemDeployer->publishedCommit
                 );
-                if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
@@ -2125,20 +2186,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             40,
             false
         );
-        // \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE is not allowed here because
+        // \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
         \OmegaUp\Validators::validateInEnum(
             $r['update_published'],
             'update_published',
             [
-                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
-                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             ],
             false
         );
 
-        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -2197,7 +2258,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Runs::createRunsForVersion($problem);
             \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-            if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+            if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                 \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                     $problem,
                     $r->user,
@@ -2735,7 +2796,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $minVisibility = empty(
             $r['min_visibility']
-        ) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : intval(
+        ) ? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC : intval(
             $r['min_visibility']
         );
         $difficultyRange = null;
@@ -3138,7 +3199,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'TimeLimit' => '1s',
             ],
             'validator' => [
-                'name' => 'token-caseless',
+                'name' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
                 'tolerance' => 1e-9,
                 'limits' => [
                     'ExtraWallTime' => '0s',
@@ -3519,6 +3580,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 header("Location: /problem/{$r['problem_alias']}/edit/");
                 die();
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
                     $statusError = '{error}';
@@ -3554,7 +3616,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'TITLE' => '',
             'ALIAS' => '',
-            'VALIDATOR' => 'token-caseless',
+            'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
             'TIME_LIMIT' => '1000',
             'VALIDATOR_TIME_LIMIT' => '1000',
             'OVERALL_WALL_TIME_LIMIT' => '60000',
