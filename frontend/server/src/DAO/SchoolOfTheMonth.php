@@ -21,7 +21,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
    */
     public static function calculateSchoolsOfMonth(
         string $startDate,
-        string $finishDate
+        string $finishDate,
+        int $limit
     ): array {
         $sql = '
             SELECT
@@ -69,9 +70,9 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 s.school_id
             ORDER BY
                 score DESC
-            LIMIT 100;';
+            LIMIT ?;';
 
-        $args = [$startDate, $finishDate];
+        $args = [$startDate, $finishDate, $limit];
 
         /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -84,13 +85,14 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     public static function calculateSchoolsOfMonthByGivenDate(
-        string $date
+        string $date,
+        int $rowcount = 100
     ): array {
         $date = new \DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateSchoolsOfMonth($startTime, $endTime);
+        return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
 }
