@@ -55,23 +55,28 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 ) AS distinct_school_problems
             ON
                 distinct_school_problems.school_id = s.school_id
-            WHERE
-                NOT EXISTS (
+            LEFT JOIN
+                (
                     SELECT
-                        *
+                        school_id,
+                        MAX(time) latest_time
                     FROM
-                        School_Of_The_Month scm
+                        School_Of_The_Month
                     WHERE
-                        scm.school_id = s.school_id
-                        AND YEAR(scm.time) = YEAR(distinct_school_problems.first_ac_time)
-                )
+                        selected_by IS NOT NULL OR rank = 1
+                    GROUP BY
+                        school_id
+                ) AS sotm on s.school_id = sotm.school_id
+            WHERE
+                sotm.school_id IS NULL
+                OR DATE_ADD(sotm.latest_time, INTERVAL 1 YEAR) < ?
             GROUP BY
                 s.school_id
             ORDER BY
                 score DESC
             LIMIT 100;';
 
-        $args = [$startDate, $finishDate];
+        $args = [$startDate, $finishDate, $finishDate];
 
         /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
