@@ -312,9 +312,10 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the first school of the previous month or the one selected by
      * the mentor, if it has already been stored. Otherwise, calculates and
      * saves the new schools of the month, and returns the first one of them.
+     *
      * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
      */
-    public static function apiSchoolOfTheMonth(\OmegaUp\Request $r): array {
+    public static function getSchoolOfTheMonth(): array {
         $firstDay = self::getCurrentMonthFirstDay(null);
         $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
             $firstDay
