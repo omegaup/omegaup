@@ -45,7 +45,7 @@ class ProblemParams {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
         $this->languages = $params['languages'] ?? 'c,cpp,py';
-        $this->visibility = $params['visibility'] ?? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
+        $this->visibility = $params['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -138,7 +138,7 @@ class Problem {
         \OmegaUp\Test\ScopedLoginToken $login = null
     ): array {
         return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'author' => $author,
         ]), $login);
     }
@@ -153,9 +153,9 @@ class Problem {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
-        $params->visibility = $params->visibility >= \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
-            ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
-            : \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
+        $params->visibility = $params->visibility >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
+            ? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
+            : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
 
         // Get a user
         $problemData = self::getRequest($params);
@@ -188,9 +188,9 @@ class Problem {
         $visibility = intval($params->visibility);
 
         if (
-            $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
-            || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
-            || $visibility === \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
+            || $visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+            || $visibility === \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = intval($visibility);
             \OmegaUp\DAO\Problems::update($problem);

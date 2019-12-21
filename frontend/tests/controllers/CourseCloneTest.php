@@ -200,7 +200,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $authorLogin->auth_token,
                 'problem_alias' => $problems[0]['problem']->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
                 'message' => 'public -> private',
             ]));
 

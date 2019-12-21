@@ -65,7 +65,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
         // check that problem is not publicly or privately banned.
-        if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+        if (
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 

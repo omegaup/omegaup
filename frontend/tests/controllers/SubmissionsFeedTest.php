@@ -36,7 +36,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             ])
         );
 
