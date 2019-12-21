@@ -21,7 +21,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
    */
     public static function calculateSchoolsOfMonth(
         string $startDate,
-        string $finishDate
+        string $finishDate,
+        int $limit
     ): array {
         $sql = '
             SELECT
@@ -58,20 +59,25 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             WHERE
                 NOT EXISTS (
                     SELECT
-                        *
+                        sotm.school_id,
+                        MAX(time) latest_time
                     FROM
-                        School_Of_The_Month scm
+                        School_Of_The_Month as sotm
                     WHERE
-                        scm.school_id = s.school_id
-                        AND YEAR(scm.time) = YEAR(distinct_school_problems.first_ac_time)
+                        sotm.school_id = s.school_id
+                        AND (sotm.selected_by IS NOT NULL OR sotm.rank = 1)
+                    GROUP BY
+                        sotm.school_id
+                    HAVING
+                        DATE_ADD(latest_time, INTERVAL 1 YEAR) >= ?
                 )
             GROUP BY
                 s.school_id
             ORDER BY
                 score DESC
-            LIMIT 100;';
+            LIMIT ?;';
 
-        $args = [$startDate, $finishDate];
+        $args = [$startDate, $finishDate, $finishDate, $limit];
 
         /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -84,13 +90,14 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     public static function calculateSchoolsOfMonthByGivenDate(
-        string $date
+        string $date,
+        int $rowcount = 100
     ): array {
         $date = new \DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateSchoolsOfMonth($startTime, $endTime);
+        return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
 }

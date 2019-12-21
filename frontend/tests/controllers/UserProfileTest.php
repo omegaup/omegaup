@@ -22,10 +22,10 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayNotHasKey('password', $response['userinfo']);
+        $this->assertArrayNotHasKey('password', $response);
         $this->assertEquals(
             $identity->username,
-            $response['userinfo']['username']
+            $response['username']
         );
     }
 
@@ -51,11 +51,11 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayNotHasKey('password', $response['userinfo']);
-        $this->assertArrayNotHasKey('email', $response['userinfo']);
+        $this->assertArrayNotHasKey('password', $response);
+        $this->assertArrayNotHasKey('email', $response);
         $this->assertEquals(
             $identity2->username,
-            $response['userinfo']['username']
+            $response['username']
         );
     }
 
@@ -79,13 +79,13 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
-        foreach ($response['userinfo'] as $k => $v) {
+        foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;
             }
             $this->assertNull($v);
         }
-        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+        foreach ($response['rankinfo'] as $k => $v) {
             if ($k == 'status') {
                 continue;
             }
@@ -93,7 +93,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $this->assertEquals(
             $identity2->username,
-            $response['userinfo']['username']
+            $response['username']
         );
     }
 
@@ -111,7 +111,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
     }
 
     /*
@@ -130,14 +130,14 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
         $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
-        foreach ($response['userinfo'] as $k => $v) {
+        foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 $this->assertNotNull($v);
             }
         }
-        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+        foreach ($response['rankinfo'] as $k => $v) {
             $this->assertNotNull($v);
         }
     }
@@ -155,7 +155,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
     }
 
     /*
