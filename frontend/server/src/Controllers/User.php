@@ -3124,6 +3124,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity
         );
 
+        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+            $dateToSelect
+        );
+        $bestCoders = [];
+        if (!is_null($candidates)) {
+            foreach ($candidates as $candidate) {
+                unset($candidate['user_id']);
+                array_push($bestCoders, $candidate);
+            }
+        }
+
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
@@ -3131,25 +3142,15 @@ class User extends \OmegaUp\Controllers\Controller {
             'codersOfPreviousMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
             ),
+            'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
         ];
 
         if (!$isMentor) {
             return ['payload' => $response];
         }
-        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
-        );
-        $bestCoders = [];
 
-        if (!is_null($candidates)) {
-            foreach ($candidates as $candidate) {
-                unset($candidate['user_id']);
-                array_push($bestCoders, $candidate);
-            }
-        }
         $response['options'] = [
-            'bestCoders' => $bestCoders,
             'canChooseCoder' =>
                 \OmegaUp\Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>
