@@ -180,21 +180,24 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.runtime,
                 r.memory,
                 COALESCE (
-                    (SELECT urc.classname
-                    FROM User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                            SELECT
-                                ur.score
-                            FROM
-                                User_Rank ur
-                            WHERE
-                                ur.user_id = i.user_id
-                        )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT 1)
-                , "user-rank-unranked") AS classname
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS classname
             FROM
                 Submissions s
             INNER JOIN
