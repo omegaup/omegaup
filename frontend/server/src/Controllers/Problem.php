@@ -1765,20 +1765,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ['omit_rank' => true, 'auth_token' => $r['auth_token']]
         );
         if (!is_null($r->identity)) {
-            $userData = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::USER_PROFILE,
-                $r->identity->username,
-                function () use ($r) {
-                    return \OmegaUp\Controllers\User::apiProfile($r);
-                }
+            self::authenticateOrAllowUnauthenticatedRequest($request);
+
+            $identity = self::resolveTargetIdentity($request);
+            if (is_null($identity)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterNotFound',
+                    'Identity'
+                );
+            }
+            $userData = \OmegaUp\Controllers\User::getUserProfile(
+                $r->identity,
+                $identity,
+                /**$omitRank=*/true
             );
             if (
                 !empty($userData) &&
-                !empty($userData['userinfo']) &&
-                !empty($userData['userinfo']['preferred_language'])
+                !empty($userData['preferred_language'])
             ) {
                 $response['preferred_language'] = strval(
-                    $userData['userinfo']['preferred_language']
+                    $userData['preferred_language']
                 );
             }
         }
