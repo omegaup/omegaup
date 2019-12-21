@@ -3061,13 +3061,13 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: bool, length: int}, coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, schoolRankPayload: array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>, rowCount: int}}, template: string}
+     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
-        $response = [
+        return [
             'smartyProperties' => [
                 'coderOfTheMonthData' => self::getCodersOfTheMonth(
                     $firstDay
@@ -3077,14 +3077,13 @@ class User extends \OmegaUp\Controllers\Controller {
                     'isIndex' => true,
                     'availableFilters' => [],
                 ],
+                'schoolRankPayload' => [
+                    'length' => $rowCount,
+                    'showHeader' => true,
+                ],
             ],
             'template' => 'index.tpl',
         ];
-        $response['smartyProperties'] = array_merge(
-            $response['smartyProperties'],
-            \OmegaUp\Controllers\School::getSchoolOfTheMonthList($rowCount)
-        );
-        return $response;
     }
 
     /**
@@ -3109,6 +3108,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity
         );
 
+        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+            $dateToSelect
+        );
+        $bestCoders = [];
+        if (!is_null($candidates)) {
+            foreach ($candidates as $candidate) {
+                unset($candidate['user_id']);
+                array_push($bestCoders, $candidate);
+            }
+        }
+
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
@@ -3116,25 +3126,15 @@ class User extends \OmegaUp\Controllers\Controller {
             'codersOfPreviousMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
             ),
+            'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
         ];
 
         if (!$isMentor) {
             return ['payload' => $response];
         }
-        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
-        );
-        $bestCoders = [];
 
-        if (!is_null($candidates)) {
-            foreach ($candidates as $candidate) {
-                unset($candidate['user_id']);
-                array_push($bestCoders, $candidate);
-            }
-        }
         $response['options'] = [
-            'bestCoders' => $bestCoders,
             'canChooseCoder' =>
                 \OmegaUp\Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>

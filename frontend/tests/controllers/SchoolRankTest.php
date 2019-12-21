@@ -398,7 +398,6 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             'offset' => 1,
             'rowcount' => 100,
         ]));
-        $this->assertEquals('ok', $response['status']);
         $this->assertGreaterThanOrEqual(3, count($response['rank']));
         $this->assertGreaterThanOrEqual(
             $response['rank'][0]['rank'],
