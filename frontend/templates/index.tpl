@@ -40,16 +40,9 @@
 
 			{if isset($schoolRankPayload)}
 			<div class="col-md-6">
-				<div class="panel panel-default">
-					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					{js_include entrypoint="schools_rank" async}
-					<div id="omegaup-schools-rank"></div>
-					<div class="container-fluid">
-						<div class="col-xs-12 vertical-padding">
-							<a href="/rank/schools/">{#rankViewFull#}</a>
-						</div>
-					</div>
-				</div>
+				<script type="text/json" id="school-rank-payload">{$schoolRankPayload|json_encode}</script>
+				{js_include entrypoint="schools_rank" async}
+				<div id="omegaup-schools-rank"></div>
 			</div>
 			{/if}
 
