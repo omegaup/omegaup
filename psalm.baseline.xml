@@ -645,7 +645,7 @@
       <code>$problem</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="12">
+    <MixedArrayAccess occurrences="11">
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$clar['time']</code>
       <code>$casesStats['last_submission_id']</code>
@@ -671,7 +671,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="34">
+    <MixedAssignment occurrences="33">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -682,7 +682,6 @@
       <code>$lang</code>
       <code>$lang</code>
       <code>$problem</code>
-      <code>$userData</code>
       <code>$container</code>
       <code>$logEntry['tree'][$treeEntry['path']]</code>
       <code>$updatePublished</code>
@@ -751,7 +750,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="13">
+    <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -760,7 +759,6 @@
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$problem</code>
-      <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
       <code>$problem-&gt;acl_id</code>
       <code>$r-&gt;identity</code>

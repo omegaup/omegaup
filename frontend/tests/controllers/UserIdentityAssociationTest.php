@@ -87,7 +87,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity->password = $password;
         $identityLogin = self::login($identity);
 
-        $details = \OmegaUp\Controllers\User::getUserProfile(
+        $details = \OmegaUp\Controllers\User::apiProfile(
             new \OmegaUp\Request([
                 'auth_token' => $identityLogin->auth_token,
             ])

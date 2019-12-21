@@ -20,7 +20,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response);
         $this->assertEquals(
@@ -49,7 +49,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity2->username
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response);
         $this->assertArrayNotHasKey('email', $response);
@@ -76,7 +76,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity2->username
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
         foreach ($response as $k => $v) {
@@ -109,7 +109,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity->username
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response);
     }
@@ -128,7 +128,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity->username
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response);
         $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
@@ -153,7 +153,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity->username
         ]);
-        $response = \OmegaUp\Controllers\User::getUserProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response);
     }

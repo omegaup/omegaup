@@ -382,7 +382,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $profileResponse = \OmegaUp\Controllers\User::getUserProfile(
+        $profileResponse = \OmegaUp\Controllers\User::apiProfile(
             new \OmegaUp\Request([
                 'auth_token' => $loginResponse['auth_token'],
             ])

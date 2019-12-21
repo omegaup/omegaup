@@ -344,7 +344,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            $profile = \OmegaUp\Controllers\User::getUserProfile(
+            $profile = \OmegaUp\Controllers\User::apiProfile(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'username' => $coder,
@@ -363,7 +363,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $user_login = self::login($identity);
 
         foreach ($coders as $index => $coder) {
-            $profile = \OmegaUp\Controllers\User::getUserProfile(
+            $profile = \OmegaUp\Controllers\User::apiProfile(
                 new \OmegaUp\Request([
                     'auth_token' => $user_login->auth_token,
                     'username' => $coder,

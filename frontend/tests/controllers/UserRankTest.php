@@ -339,7 +339,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::getUserProfile(
+        $response = \OmegaUp\Controllers\User::apiProfile(
             new \OmegaUp\Request([
                 'username' => $identity->username
             ])
