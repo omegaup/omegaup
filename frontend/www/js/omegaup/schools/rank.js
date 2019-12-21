@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
         props: {
           page: this.page,
           length: this.length,
-          isIndex: this.isIndex,
+          showHeader: this.showHeader,
           rank: this.rank,
           totalRows: this.totalRows,
         },
@@ -22,7 +22,7 @@ OmegaUp.on('ready', function() {
     data: {
       page: payload.page,
       length: payload.length,
-      isIndex: payload.isIndex,
+      showHeader: payload.showHeader,
       rank: [],
       totalRows: 0,
     },
@@ -31,7 +31,7 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  if (payload.isIndex) {
+  if (payload.showHeader) {
     API.School.schoolsOfTheMonth({
       rowcount: 5,
     })

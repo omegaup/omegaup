@@ -3076,7 +3076,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{isIndex: true, length: int}}, template: string}
+     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
@@ -3094,7 +3094,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ],
                 'schoolRankPayload' => [
                     'length' => $rowCount,
-                    'isIndex' => true,
+                    'showHeader' => true,
                 ],
             ],
             'template' => 'index.tpl',

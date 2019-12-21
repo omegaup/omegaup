@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title" v-if="isIndex">
+      <h3 class="panel-title" v-if="showHeader">
         {{
           UI.formatString(T.schoolRankHeader, { count: rank ? rank.length : 0 })
         }}
@@ -39,7 +39,7 @@
       </thead>
       <tbody>
         <tr v-for="(school, index) in rank">
-          <td v-if="isIndex">{{ index + 1 }}</td>
+          <td v-if="showHeader">{{ index + 1 }}</td>
           <td v-else="">{{ school.rank }}</td>
           <td class="cell-school-name" colspan="2" v-bind:title="school.name">
             <omegaup-countryflag
@@ -101,7 +101,7 @@ import CountryFlag from '../CountryFlag.vue';
 export default class Rank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
-  @Prop() isIndex!: boolean;
+  @Prop() showHeader!: boolean;
   @Prop() totalRows!: number;
   @Prop() rank!: omegaup.SchoolsRank[];
 
@@ -113,7 +113,7 @@ export default class Rank extends Vue {
   }
 
   get shouldIncludeControls(): boolean {
-    return !this.isIndex && (this.shouldShowNextPage || this.page > 1);
+    return !this.showHeader && (this.shouldShowNextPage || this.page > 1);
   }
 }
 </script>
