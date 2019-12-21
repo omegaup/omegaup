@@ -315,8 +315,8 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
      */
-    public static function getSchoolOfTheMonth(): array {
-        $firstDay = self::getCurrentMonthFirstDay(null);
+    public static function getSchoolOfTheMonth(string $date = null): array {
+        $firstDay = self::getCurrentMonthFirstDay($date);
         $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
             $firstDay
         );
@@ -327,7 +327,7 @@ class School extends \OmegaUp\Controllers\Controller {
             );
             if (empty($schools)) {
                 return [
-                    'schoolinfo' => null
+                    'schoolinfo' => null,
                 ];
             }
 

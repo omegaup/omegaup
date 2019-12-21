@@ -235,9 +235,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         self::setUpSchoolsRuns($schoolsData);
 
         // API should return school1
-        $response = \OmegaUp\Controllers\School::getSchoolOfTheMonth(
-            new \OmegaUp\Request()
-        );
+        $response = \OmegaUp\Controllers\School::getSchoolOfTheMonth();
         $this->assertEquals(
             $schoolsData[1]['school']->name,
             $response['schoolinfo']['name']
