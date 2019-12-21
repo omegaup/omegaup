@@ -56,21 +56,21 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 ) AS distinct_school_problems
             ON
                 distinct_school_problems.school_id = s.school_id
-            LEFT JOIN
-                (
+            WHERE
+                NOT EXISTS (
                     SELECT
-                        school_id,
+                        sotm.school_id,
                         MAX(time) latest_time
                     FROM
-                        School_Of_The_Month
+                        School_Of_The_Month as sotm
                     WHERE
-                        selected_by IS NOT NULL OR rank = 1
+                        sotm.school_id = s.school_id
+                        AND (sotm.selected_by IS NOT NULL OR sotm.rank = 1)
                     GROUP BY
-                        school_id
-                ) AS sotm on s.school_id = sotm.school_id
-            WHERE
-                sotm.school_id IS NULL
-                OR DATE_ADD(sotm.latest_time, INTERVAL 1 YEAR) < ?
+                        sotm.school_id
+                    HAVING
+                        DATE_ADD(latest_time, INTERVAL 1 YEAR) >= ?
+                )
             GROUP BY
                 s.school_id
             ORDER BY
