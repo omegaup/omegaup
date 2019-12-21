@@ -808,6 +808,7 @@ const translations = {
 	runWaitGap: "(Y0u hav3 70 wai7 b37w33n c0n53cu7iv3 5ubmi55i0n5.)",
 	schoolNotFound: "(Sch001 n07 f0und)",
 	schoolRankHeader: "(T0p %(count) m057 ac7iv3 5ch0015 7hi5 m0n7h)",
+	schoolRankRangeHeader: "(T0p %(lowCount) 70 %(highCount) 5ch0015 wi7h 7h3 m057 p0in75)",
 	schoolToBeAdded: "(Y0ur 5ch001 ha5 n07 b33n r3gi573r3d in 0m3gaUp. I7 wi11 b3 add3d wh3n y0u 5av3 y0ur chang35.)",
 	schoolUsers: "(U53r5 wh0 b310ng 70 7hi5 5ch001)",
 	schoolsCreateCoursesThatMeetNeeds: "(C0ur535 7ha7 m337 y0ur n33d5. Y0u can cr3a73 y0ur 0wn pr0b13m5.)",

@@ -807,6 +807,7 @@
 	"runWaitGap": "Debes esperar unos segundos entre env\u00edos consecutivos.",
 	"schoolNotFound": "Escuela no encontrada",
 	"schoolRankHeader": "Top %(count) escuelas m\u00e1s activas del mes",
+	"schoolRankRangeHeader": "Top %(lowCount) a %(highCount) escuelas con m\u00e1s puntaje",
 	"schoolToBeAdded": "Tu escuela a\u00fan no existe en omegaUp. Ser\u00e1 agregada cuando guardes tus cambios.",
 	"schoolUsers": "Usuarios que pertenecen a esta escuela",
 	"schoolsCreateCoursesThatMeetNeeds": "Cursos que satisfacen sus necesidades. Puede crear sus propios problemas.",

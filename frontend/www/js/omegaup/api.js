@@ -575,7 +575,9 @@ export default {
 
     monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
 
-    rank: _call('/api/school/getschoolsofthemonth/'),
+    rank: _call('/api/school/rank/'),
+
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
 
     schoolCodersOfTheMonth: _call(
       '/api/school/schoolcodersofthemonth',

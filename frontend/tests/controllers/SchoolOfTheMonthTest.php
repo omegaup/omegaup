@@ -137,11 +137,12 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
         // again by the DAO as it has already been selected current year.
-        \OmegaUp\DAO\SchoolOfTheMonth::create(new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+        $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => date('Y-m-d', \OmegaUp\Time::get()),
             'rank' => 1
-        ]));
+        ]);
+        \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
             date_format($nextMonthDate, 'Y-m-d')
         );
@@ -154,18 +155,20 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
         );
+        \OmegaUp\DAO\SchoolOfTheMonth::delete($newSchool);
 
         // Now insert one but with date from year 2017, it should be retrieved as the school
         // has not been selected on the current year
-        \OmegaUp\DAO\SchoolOfTheMonth::create(new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+        $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => '2017-01-01',
             'rank' => 1
-        ]));
+        ]);
+        \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
             date_format($nextMonthDate, 'Y-m-d')
         );
-        $this->assertCount(2, $schools);
+        $this->assertCount(3, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
             $schools[0]['name']
@@ -173,6 +176,36 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $schoolsData[0]['request']['name'],
             $schools[1]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[2]['request']['name'],
+            $schools[2]['name']
+        );
+        \OmegaUp\DAO\SchoolOfTheMonth::delete($newSchool);
+
+        // Now insert an school already selected but neither rank 1 neither selected by a mentor.
+        // It should be retrieved.
+        $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+            'school_id' => $schoolsData[2]['school']->school_id,
+            'time' => date('Y-m-d', \OmegaUp\Time::get()),
+            'rank' => 4
+        ]);
+        \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+            date_format($nextMonthDate, 'Y-m-d')
+        );
+        $this->assertCount(3, $schools);
+        $this->assertEquals(
+            $schoolsData[1]['request']['name'],
+            $schools[0]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[0]['request']['name'],
+            $schools[1]['name']
+        );
+        $this->assertEquals(
+            $schoolsData[2]['request']['name'],
+            $schools[2]['name']
         );
     }
 }
