@@ -236,7 +236,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $sql,
             [
                 $seconds,
-                \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
                 $offset,
                 $rowcount
             ]
