@@ -316,7 +316,9 @@ class School extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSchoolOfTheMonth(\OmegaUp\Request $r): array {
         $firstDay = self::getCurrentMonthFirstDay(null);
-        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime($firstDay);
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+            $firstDay
+        );
         if (empty($schoolsOfTheMonth)) {
             // Calculate and store new schools of the month
             $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(

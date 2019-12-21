@@ -116,7 +116,12 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 time = ?;';
 
         $schools = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$time]
+            ) as $row
+        ) {
             array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
         }
         return $schools;
