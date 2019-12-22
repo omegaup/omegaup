@@ -807,6 +807,7 @@ const translations = {
 	runProblemNotPublic: "O problema n\u00e3o \u00e9 p\u00fablico.",
 	runWaitGap: "Voc\u00ea tem que esperar entre solu\u00e7\u00f5es consecutivas.",
 	schoolNotFound: "Escola n\u00e3o encontrada",
+	schoolOfTheMonthNotFound: "N\u00e3o foi encontrado a escola do m\u00eas.",
 	schoolRankHeader: "Top %(count) escolas mais ativas este m\u00eas",
 	schoolRankRangeHeader: "Top %(lowCount) a %(highCount) escolas com maior score obtido",
 	schoolToBeAdded: "Sua escola n\u00e3o foi registrada em omegaUp. Ele ser\u00e1 adicionada quando voc\u00ea salvar suas reda\u00e7\u00f5es.",
