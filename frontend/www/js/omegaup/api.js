@@ -577,6 +577,8 @@ export default {
 
     rank: _call('/api/school/rank/'),
 
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
+
     schoolCodersOfTheMonth: _call(
       '/api/school/schoolcodersofthemonth',
       function(data) {
@@ -705,14 +707,12 @@ export default {
     }),
 
     profile: _call('/api/user/profile/', function(data) {
-      if (data.userinfo.birth_date !== null) {
-        data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
-          data.userinfo.birth_date * 1000,
-        );
+      if (data.birth_date !== null) {
+        data.birth_date = omegaup.OmegaUp.remoteTime(data.birth_date * 1000);
       }
-      if (data.userinfo.graduation_date !== null) {
-        data.userinfo.graduation_date = omegaup.OmegaUp.remoteTime(
-          data.userinfo.graduation_date * 1000,
+      if (data.graduation_date !== null) {
+        data.graduation_date = omegaup.OmegaUp.remoteTime(
+          data.graduation_date * 1000,
         );
       }
       return data;

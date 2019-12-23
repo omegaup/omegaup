@@ -34,9 +34,7 @@ OmegaUp.on('ready', function() {
       codersOfCurrentMonth: payload.codersOfCurrentMonth,
       codersOfPreviousMonth: payload.codersOfPreviousMonth,
       isMentor: payload.isMentor,
-      candidatesToCoderOfTheMonth: payload.isMentor
-        ? payload.options.bestCoders
-        : [],
+      candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
       canChooseCoder: payload.isMentor && payload.options.canChooseCoder,
       coderIsSelected: payload.isMentor && payload.options.coderIsSelected,
     },

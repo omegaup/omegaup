@@ -9,6 +9,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCoderOfTheMonthCalc() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
+        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
         // Add a custom school
         $login = self::login($identity);
         $school = SchoolsFactory::createSchool()['school'];
@@ -17,12 +19,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'school_id' => $school->school_id,
         ]));
 
-        // Creating 10 AC runs for our user in the last month
+        // First user solves two problems, second user solves just one
         $runCreationDate = new DateTimeImmutable(date('Y-m-d'));
         $runCreationDate = $runCreationDate->modify('first day of last month');
         $runCreationDate = $runCreationDate->format('Y-m-d');
 
-        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request()
@@ -30,9 +34,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $identity->username,
-            $response['userinfo']['username']
+            $response['coderinfo']['username']
         );
-        $this->assertFalse(array_key_exists('email', $response['userinfo']));
+        $this->assertFalse(array_key_exists('email', $response['coderinfo']));
 
         // Calling API again to verify response is the same that in first time
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
@@ -41,13 +45,27 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $identity->username,
-            $response['userinfo']['username']
+            $response['coderinfo']['username']
         );
 
         // CoderOfTheMonth school_id should match with identity school_id
         $this->assertEquals(
             $school->school_id,
-            $response['userinfo']['school_id']
+            $response['coderinfo']['school_id']
+        );
+
+        // Now check if the other user has been saved on database too
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'date' => date('Y-m-d', \OmegaUp\Time::get())
+        ]));
+        $this->assertEquals(
+            $identity->username,
+            $response['coders'][0]['username']
+        );
+        $this->assertEquals(
+            $extraIdentity->username,
+            $response['coders'][1]['username']
         );
     }
 
@@ -61,13 +79,15 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
 
-        $this->assertCount(0, $response['coders']);
+        // Just one Coder of The Month, the one calculated on the previous test.
+        $this->assertCount(1, $response['coders']);
 
         // Adding parameter date should return the same value, it helps
-        // to test getMonthlyList function, which never was tested
+        // to test getMonthlyList function.
+        // It should return two users (the ones that got stored on the previous test)
         $r['date'] = date('Y-m-d', \OmegaUp\Time::get());
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
-        $this->assertCount(0, $response['coders']);
+        $this->assertCount(2, $response['coders']);
     }
 
     public function testCodersOfTheMonthBySchool() {
@@ -231,19 +251,19 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
         $this->assertEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '-11 month');
         $this->assertNotEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '1 month');
         $this->assertEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
     }
 
@@ -324,21 +344,18 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            // HACK: Deleting cache from identity to avoid failures in test
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::USER_PROFILE,
-                $coder
+            $profile = \OmegaUp\Controllers\User::apiProfile(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $coder,
+                ])
             );
-            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => $coder
-            ]));
 
             if ($index == 0) {
                 // Mentor can see the current coder of the month email
-                $this->assertArrayHasKey('email', $profile['userinfo']);
+                $this->assertArrayHasKey('email', $profile);
             } else {
-                $this->assertArrayNotHasKey('email', $profile['userinfo']);
+                $this->assertArrayNotHasKey('email', $profile);
             }
         }
 
@@ -346,12 +363,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $user_login = self::login($identity);
 
         foreach ($coders as $index => $coder) {
-            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-                'auth_token' => $user_login->auth_token,
-                'username' => $coder
-            ]));
+            $profile = \OmegaUp\Controllers\User::apiProfile(
+                new \OmegaUp\Request([
+                    'auth_token' => $user_login->auth_token,
+                    'username' => $coder,
+                ])
+            );
 
-            $this->assertArrayNotHasKey('email', $profile['userinfo']);
+            $this->assertArrayNotHasKey('email', $profile);
         }
     }
 
@@ -455,11 +474,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request()
         );
         $this->assertNotNull(
-            $response['userinfo'],
+            $response['coderinfo'],
             'A user has been selected by a mentor'
         );
         $this->assertEquals(
-            $response['userinfo']['username'],
+            $response['coderinfo']['username'],
             $identity3->username
         );
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(

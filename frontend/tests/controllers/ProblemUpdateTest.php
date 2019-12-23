@@ -654,14 +654,14 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'message' => 'public -> private',
         ]));
 
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'message' => 'no-op',
         ]));
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -674,14 +674,14 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'message' => 'private -> public',
         ]));
 
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'message' => 'no-op',
         ]));
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -693,7 +693,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             'message' => 'public -> banned',
         ]));
 
@@ -701,7 +701,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
                 'message' => 'public -> promoted',
             ]));
             $this->fail('Cannot ban problem from API');
@@ -709,13 +709,13 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Ban the problem.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
         \OmegaUp\DAO\Problems::update($problem);
 
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             'message' => 'no-op',
         ]));
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -728,7 +728,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
                 'message' => 'banned -> private',
             ]));
             $this->fail('Cannot un-ban problem from API');
@@ -743,7 +743,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
                 'message' => 'banned -> public',
             ]));
             $this->fail('Cannot un-ban problem from API');
@@ -755,13 +755,13 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Promote the problem.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
         \OmegaUp\DAO\Problems::update($problem);
 
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'message' => 'no-op',
         ]));
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -774,7 +774,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
                 'message' => 'promoted -> private',
             ]));
             $this->fail('Cannot un-promote problem from API');
@@ -789,7 +789,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
                 'message' => 'promoted -> public',
             ]));
             $this->fail('Cannot un-promote problem from API');
@@ -1167,7 +1167,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             // Runs are only added when the publishing mode is not none.
             $this->assertEquals(
-                $updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE ? 0 : 3,
+                $updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE ? 0 : 3,
                 $detourGrader->getGraderCallCount()
             );
             foreach ($detourGrader->getRuns() as $run) {
@@ -1200,7 +1200,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemInProblemsetVersionUpdateNone() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE
         );
         $this->assertEquals(
             'AC',
@@ -1221,7 +1221,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
             $identity,
             $identity
         );
@@ -1249,7 +1249,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemInProblemsetVersionUpdateNonProblemset() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
         );
         $this->assertEquals(
             'AC',
@@ -1270,7 +1270,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
             $identity,
             $identity
         );
@@ -1314,7 +1314,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemInProblemsetVersionUpdateOwnedProblemsets() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
         );
         $this->assertEquals(
             'AC',
@@ -1335,7 +1335,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
             $identity,
             $identity
         );
@@ -1420,7 +1420,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemInProblemsetVersionUpdateEditableProblemsets() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
         );
         $this->assertEquals(
             'AC',
@@ -1441,7 +1441,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,
             null,
             $identity
@@ -1465,7 +1465,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $identity,
             $identity
         );

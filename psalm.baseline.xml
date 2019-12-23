@@ -645,9 +645,8 @@
       <code>$problem</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="12">
+    <MixedArrayAccess occurrences="11">
       <code>$_FILES['problem_contents']['tmp_name']</code>
-      <code>$userData['userinfo']['preferred_language']</code>
       <code>$clar['time']</code>
       <code>$casesStats['last_submission_id']</code>
       <code>$group['cases']</code>
@@ -672,7 +671,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="34">
+    <MixedAssignment occurrences="32">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -683,7 +682,6 @@
       <code>$lang</code>
       <code>$lang</code>
       <code>$problem</code>
-      <code>$userData</code>
       <code>$container</code>
       <code>$logEntry['tree'][$treeEntry['path']]</code>
       <code>$updatePublished</code>
@@ -752,7 +750,7 @@
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
-    <PossiblyNullArgument occurrences="13">
+    <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
@@ -761,7 +759,6 @@
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$problem</code>
-      <code>$r-&gt;identity-&gt;username</code>
       <code>$r-&gt;identity</code>
       <code>$problem-&gt;acl_id</code>
       <code>$r-&gt;identity</code>
@@ -1127,15 +1124,13 @@
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="5">
+    <InvalidReturnStatement occurrences="3">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="5">
-      <code>response</code>
-      <code>\OmegaUp\DAO\VO\Contests</code>
+    <InvalidReturnType occurrences="3">
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
     </InvalidReturnType>
@@ -1206,40 +1201,21 @@
       <code>$r['username']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$value</code>
-      <code>$value</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="11">
-      <code>$response['verified']</code>
-      <code>$response['username']</code>
-      <code>$contest['alias']</code>
-      <code>$contest['scoreboard_url_admin']</code>
-      <code>$contest['alias']</code>
+    <MixedArrayAccess occurrences="4">
       <code>$identityData['username']</code>
       <code>$identityData['place']</code>
-      <code>$contest['alias']</code>
-      <code>$contest['alias']</code>
-      <code>$contest['alias']</code>
       <code>$r2['contest_admin']</code>
       <code>$r2['contest_alias']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="2">
-      <code>$contests[$contest['alias']]</code>
-      <code>$contests[$contest['alias']]</code>
-      <code>$contests[$contest['alias']]</code>
-      <code>$contests[$contest['alias']]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="21">
+    <MixedAssignment occurrences="18">
       <code>$usersMissing</code>
       <code>$user</code>
       <code>$resetRequest['auth_token']</code>
       <code>$resetRequest['permission_key']</code>
       <code>$addUserRequest['auth_token']</code>
       <code>$addUserRequest['contest_alias']</code>
-      <code>$response</code>
-      <code>$contestsParticipated</code>
-      <code>$contest</code>
       <code>$identityData</code>
       <code>$contests[$contest['alias']]['place']</code>
       <code>$problems</code>
@@ -1250,7 +1226,6 @@
       <code>$language</code>
       <code>$r-&gt;identity-&gt;language_id</code>
       <code>$r-&gt;identity-&gt;gender</code>
-      <code>$response</code>
       <code>$r2['auth_token']</code>
       <code>$r2</code>
     </MixedAssignment>
@@ -1299,12 +1274,7 @@
       <code>$identity-&gt;username</code>
       <code>$user-&gt;main_identity_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="1">
-      <code>response</code>
-    </UndefinedDocblockClass>
-    <UndefinedMethod occurrences="2">
-      <code>\OmegaUp\DAO\Identities::getStatusVerified($r['email'])</code>
-    </UndefinedMethod>
+    <UndefinedMethod occurrences="1"/>
   </file>
   <file src="frontend/server/src/DAO/Assignments.php">
     <InvalidReturnStatement occurrences="1">
@@ -1384,7 +1354,7 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Contests.php">
-    <MissingParamType occurrences="13">
+    <MissingParamType occurrences="12">
       <code>$title</code>
       <code>$alias</code>
       <code>$problemset_id</code>
@@ -1407,13 +1377,12 @@
     <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="12">
+    <MissingReturnType occurrences="11">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
       <code>hasStarted</code>
       <code>hasFinished</code>
-      <code>getContestsParticipated</code>
       <code>getAllContestsAdminedByIdentity</code>
       <code>getRecentPublicContests</code>
       <code>getAllPublicContests</code>

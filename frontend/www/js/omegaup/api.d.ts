@@ -413,6 +413,7 @@ declare namespace omegaup {
     country_id: string;
     score: number;
     name: string;
+    rank?: number;
   }
 
   interface Signature {

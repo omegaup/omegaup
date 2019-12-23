@@ -226,6 +226,7 @@ class Utils {
             'QualityNominations',
             'Runs',
             'Schools',
+            'School_Of_The_Month',
             'Submissions',
             'Submission_Log',
             'Tags',

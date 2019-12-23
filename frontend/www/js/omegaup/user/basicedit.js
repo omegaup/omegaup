@@ -34,7 +34,7 @@ OmegaUp.on('ready', function() {
 
   API.User.profile({})
     .then(function(data) {
-      basicEdit.username = data.userinfo.username;
+      basicEdit.username = data.username;
     })
     .fail(omegaup.UI.apiError);
 });

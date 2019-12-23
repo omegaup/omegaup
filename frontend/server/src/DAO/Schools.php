@@ -156,6 +156,56 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
+     * Gets the schools ordered by rank and score
+     *
+     * @return array{rank: list<array{school_id: int, country_id: int, rank: int, score: float, name: string}>, totalRows: int}
+     */
+    public static function getRank(
+        int $page,
+        int $rowsPerPage
+    ): array {
+        $offset = ($page - 1) * $rowsPerPage;
+
+        $sqlFrom = '
+            FROM
+                Schools s
+            ORDER BY
+                s.rank ASC
+        ';
+
+        $sqlCount = '
+            SELECT
+                COUNT(*)';
+
+        $sql = '
+            SELECT
+                s.school_id,
+                s.name,
+                s.rank,
+                s.score,
+                s.country_id';
+
+        $sqlLimit = ' LIMIT ?, ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount . $sqlFrom,
+            []
+        ) ?? 0;
+
+        /** @var list<array{school_id: int, country_id: int, rank: int, score: float, name: string}> */
+        $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sqlFrom . $sqlLimit,
+            [$offset, $rowsPerPage]
+        );
+
+        return [
+            'totalRows' => $totalRows,
+            'rank' => $rank,
+        ];
+    }
+
+    /**
      * Gets the users from school, and their number of problems created, solved and
      * organized contests.
      *
@@ -237,7 +287,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         /** @var array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $schoolId]
+            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $schoolId]
         );
     }
 

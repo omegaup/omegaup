@@ -123,7 +123,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return \OmegaUp\Time::get() >= $contest->finish_time;
     }
 
-    public static function getContestsParticipated($identity_id) {
+    /**
+     * @return list<array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int, scoreboard_url_admin: string}>
+     */
+    public static function getContestsParticipated(int $identityId) {
         $sql = '
             SELECT
                 c.contest_id,
@@ -154,9 +157,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ORDER BY
                 contest_id DESC;';
 
+        /** @var list<array{contest_id: int, alias: string, title: string, start_time: int, finish_time: int, last_updated: int, scoreboard_url_admin: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identity_id]
+            [$identityId]
         );
         foreach ($result as &$row) {
             // We need to get contest_id just to be able to ORDER BY it, but we
