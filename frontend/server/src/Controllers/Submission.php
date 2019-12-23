@@ -22,9 +22,23 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
+        $identityId = null;
+        if (!is_null($r['user'])) {
+            \OmegaUp\Validators::validateValidUsername(
+                $r['user'],
+                'user'
+            );
+            $userIdentity = \OmegaUp\DAO\Identities::FindByUsername($r['user']);
+            if (is_null($userIdentity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+            $identityId = $userIdentity->identity_id;
+        }
+
         return \OmegaUp\DAO\Submissions::getLatestSubmissions(
             $offset,
-            $rowCount
+            $rowCount,
+            $identityId
         );
     }
 }
