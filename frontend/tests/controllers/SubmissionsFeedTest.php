@@ -6,7 +6,7 @@
  */
 
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testSubmissionsFeedDAO() {
+    public function testSubmissionsFeed() {
         \OmegaUp\Test\Utils::cleanupDB();
         /**
          * Create 3 users, 3 problems and 1 contest.
@@ -78,15 +78,18 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            1,
-            100
+        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
+            new \OmegaUp\Request()
         );
-        $this->assertCount(1, $results);
-        $this->assertEquals($identities[0]->username, $results[0]['username']);
+        $this->assertCount(1, $results['submissions']);
+        $this->assertEquals(1, $results['totalRows']);
+        $this->assertEquals(
+            $identities[0]->username,
+            $results['submissions'][0]['username']
+        );
         $this->assertEquals(
             $problems[0]['problem']->alias,
-            $results[0]['alias']
+            $results['submissions'][0]['alias']
         );
 
         // Now add a new submission from User0 to Problem0, but out of the 30-day interval
@@ -109,15 +112,18 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
-        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            1,
-            100
+        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
+            new \OmegaUp\Request()
         );
-        $this->assertCount(1, $results);
-        $this->assertEquals($identities[0]->username, $results[0]['username']);
+        $this->assertCount(1, $results['submissions']);
+        $this->assertEquals(1, $results['totalRows']);
+        $this->assertEquals(
+            $identities[0]->username,
+            $results['submissions'][0]['username']
+        );
         $this->assertEquals(
             $problems[0]['problem']->alias,
-            $results[0]['alias']
+            $results['submissions'][0]['alias']
         );
     }
 }

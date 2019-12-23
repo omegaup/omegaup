@@ -159,7 +159,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>
+     * @return array{submissions: list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
      */
     public static function getLatestSubmissions(
         int $page,
@@ -167,6 +167,45 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         int $seconds = 3600 * 24
     ): array {
         $offset = ($page - 1) * $rowcount;
+
+        $sqlFrom = '
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Users u ON u.main_identity_id = i.identity_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = s.school_id
+            LEFT JOIN
+                Problemsets ps ON ps.problemset_id = s.problemset_id
+            LEFT JOIN
+                Contests c ON c.contest_id = ps.contest_id
+            WHERE
+                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= ?
+                AND u.is_private = 0
+                AND p.visibility >= ?
+                AND (
+                    s.problemset_id IS NULL
+                    OR ps.access_mode = "public"
+                )
+                AND (
+                    c.contest_id IS NULL
+                    OR c.finish_time < s.time
+                )
+            ORDER BY
+                s.time DESC
+        ';
+
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+        ';
+
         $sql = '
             SELECT
                 UNIX_TIMESTAMP(s.time) as time,
@@ -198,42 +237,22 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     ),
                     "user-rank-unranked"
                 ) AS classname
-            FROM
-                Submissions s
-            INNER JOIN
-                Identities i ON i.identity_id = s.identity_id
-            INNER JOIN
-                Problems p ON p.problem_id = s.problem_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id
-            INNER JOIN
-                Users u ON u.main_identity_id = i.identity_id
-            LEFT JOIN
-                Schools sc ON sc.school_id = s.school_id
-            LEFT JOIN
-                Problemsets ps ON ps.problemset_id = s.problemset_id
-            LEFT JOIN
-                Contests c ON c.contest_id = ps.contest_id
-            WHERE
-                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= ?
-                AND u.is_private = 0
-                AND p.visibility >= ?
-                AND (
-                    s.problemset_id IS NULL
-                    OR ps.access_mode = "public"
-                )
-                AND (
-                    c.contest_id IS NULL
-                    OR c.finish_time < s.time
-                )
-            ORDER BY
-                s.time DESC
-            LIMIT
-                ?, ?;';
+        ';
+
+        $sqlLimit = 'LIMIT ?, ?;';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount . $sqlFrom,
+            [
+                $seconds,
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            ]
+        ) ?? 0;
 
         /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
+        $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sqlFrom . $sqlLimit,
             [
                 $seconds,
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
@@ -241,5 +260,10 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 $rowcount
             ]
         );
+
+        return [
+            'totalRows' => $totalRows,
+            'submissions' => $submissions,
+        ];
     }
 }
