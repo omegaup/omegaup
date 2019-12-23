@@ -126,4 +126,37 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             $results['submissions'][0]['alias']
         );
     }
+
+    public function testSubmissionsFeedForUser() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
+            new \OmegaUp\Request([
+                'user' => $identity->username
+            ])
+        );
+        $this->assertEquals(2, $results['totalRows']);
+        $this->assertCount(2, $results['submissions']);
+        $this->assertEquals(
+            $identity->username,
+            $results['submissions'][0]['username']
+        );
+        $this->assertEquals(
+            $identity->username,
+            $results['submissions'][1]['username']
+        );
+    }
 }
