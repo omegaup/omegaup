@@ -28,20 +28,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 $r['username'],
                 'username'
             );
-            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if (is_null($user) || is_null($user->main_identity_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
 
-            if ($user->is_private) {
+            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+            if (!is_null($user) && $user->is_private) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'userInformationIsPrivate'
                 );
             }
 
-            $identity = \OmegaUp\DAO\Identities::getByPK(
-                $user->main_identity_id
-            );
+            $identity = \OmegaUp\DAO\Identities::FindByUsername($r['username']);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
