@@ -23,16 +23,29 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
         $identityId = null;
-        if (!is_null($r['user'])) {
+        if (!is_null($r['username'])) {
             \OmegaUp\Validators::validateValidUsername(
-                $r['user'],
-                'user'
+                $r['username'],
+                'username'
             );
-            $userIdentity = \OmegaUp\DAO\Identities::FindByUsername($r['user']);
-            if (is_null($userIdentity)) {
+            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+            if (is_null($user) || is_null($user->main_identity_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            $identityId = $userIdentity->identity_id;
+
+            if ($user->is_private) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userInformationIsPrivate'
+                );
+            }
+
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $user->main_identity_id
+            );
+            if (is_null($identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+            $identityId = $identity->identity_id;
         }
 
         return \OmegaUp\DAO\Submissions::getLatestSubmissions(

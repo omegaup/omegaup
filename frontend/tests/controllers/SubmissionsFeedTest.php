@@ -145,7 +145,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
 
         $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
             new \OmegaUp\Request([
-                'user' => $identity->username
+                'username' => $identity->username
             ])
         );
         $this->assertEquals(2, $results['totalRows']);
@@ -158,5 +158,36 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->username,
             $results['submissions'][1]['username']
         );
+    }
+
+    public function testSubmissionsFeedForPrivateUser() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'isPrivate' => true,
+            ])
+        );
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problem,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        try {
+            $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
+                new \OmegaUp\Request([
+                    'username' => $identity->username
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userInformationIsPrivate', $e->getMessage());
+        }
     }
 }

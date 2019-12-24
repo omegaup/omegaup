@@ -900,6 +900,7 @@
 	"userEmails": "E-mails",
 	"userEndTimeUpdatedSuccessfully": "O hor\u00e1rio de t\u00e9rmino do concurso para o usu\u00e1rio foi atualizado corretamente.",
 	"userGroups": "Grupos",
+	"userInformationIsPrivate": "A informa\u00e7\u00e3o deste usu\u00e1rio \u00e9 privada",
 	"userLastLogin": "Data do \u00faltimo login: %(lastLogin)",
 	"userNeverLoggedIn": "Nunca logado.",
 	"userNotAllowed": "O usu\u00e1rio n\u00e3o tem permiss\u00e3o para executar a a\u00e7\u00e3o",
