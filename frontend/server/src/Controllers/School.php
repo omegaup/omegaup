@@ -381,4 +381,84 @@ class School extends \OmegaUp\Controllers\Controller {
             ],
         ];
     }
+
+    /**
+     * Selects a certain school as school of the month
+     *
+     * @return array{status: string}
+     */
+    public static function apiSelectSchoolOfTheMonth(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $currentTimestamp = \OmegaUp\Time::get();
+
+        if (!\OmegaUp\Authorization::isMentor($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        if (
+            !\OmegaUp\Authorization::canChooseCoderOrSchool(
+                $currentTimestamp
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'schoolOfTheMonthIsNotInPeriodToBeChosen'
+            );
+        }
+
+        $r->ensureInt('school_id');
+        $selectedSchool = \OmegaUp\DAO\Schools::getByPK(
+            intval(
+                $r['school_id']
+            )
+        );
+
+        if (is_null($selectedSchool)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+            $dateToSelect
+        );
+        if (!empty($schoolsOfTheMonth)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'schoolOfTheMonthAlreadySelected'
+            );
+        }
+
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+            $dateToSelect
+        );
+
+        if (empty($schools)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('noSchools');
+        }
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            foreach ($schools as $index => $school) {
+                $newSchoolOfTheMonth = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                    'school_id' => $school['school_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                ]);
+
+                if ($school['school_id'] === $selectedSchool->school_id) {
+                    $newSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                }
+                \OmegaUp\DAO\SchoolOfTheMonth::create($newSchoolOfTheMonth);
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return ['status' => 'ok'];
+    }
 }
