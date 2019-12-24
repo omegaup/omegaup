@@ -901,6 +901,7 @@
 	"userEmails": "Correos electr\u00f3nicos",
 	"userEndTimeUpdatedSuccessfully": "El tiempo de finalizaci\u00f3n del concurso para el usuario se ha actualizado correctamente.",
 	"userGroups": "Grupos",
+	"userInformationIsPrivate": "La informaci\u00f3n de este usuario es privada",
 	"userLastLogin": "\u00daltimo inicio de sesi\u00f3n: %(lastLogin)",
 	"userNeverLoggedIn": "Nunca ha iniciado sesi\u00f3n.",
 	"userNotAllowed": "No tienes los permisos para realizar esa acci\u00f3n",

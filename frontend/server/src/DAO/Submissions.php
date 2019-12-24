@@ -164,6 +164,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     public static function getLatestSubmissions(
         int $page,
         int $rowcount,
+        int $identityId = null,
         int $seconds = 3600 * 24
     ): array {
         $offset = ($page - 1) * $rowcount;
@@ -197,6 +198,13 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     c.contest_id IS NULL
                     OR c.finish_time < s.time
                 )
+        ';
+
+        $filterByUser = '
+                AND i.identity_id = ?
+        ';
+
+        $sqlOrderBy = '
             ORDER BY
                 s.time DESC
         ';
@@ -241,24 +249,35 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
 
         $sqlLimit = 'LIMIT ?, ?;';
 
+        $query = $sql . $sqlFrom;
+        $countQuery = $sqlCount . $sqlFrom;
+
+        $params = [
+            $seconds,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+        ];
+
+        if (!is_null($identityId)) {
+            $countQuery .= $filterByUser;
+            $query .= $filterByUser;
+            $params[] = $identityId;
+        }
+
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sqlCount . $sqlFrom,
-            [
-                $seconds,
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-            ]
+            $countQuery,
+            $params
         ) ?? 0;
+
+        $params[] = $offset;
+        $params[] = $rowcount;
+
+        $query .=  $sqlOrderBy . $sqlLimit;
 
         /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
         $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlFrom . $sqlLimit,
-            [
-                $seconds,
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                $offset,
-                $rowcount
-            ]
+            $query,
+            $params
         );
 
         return [
