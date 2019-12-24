@@ -280,7 +280,7 @@ class School extends \OmegaUp\Controllers\Controller {
             ): array {
                 return \OmegaUp\DAO\Schools::getRank($offset, $rowCount);
             },
-            60 * 60 * 24 // 1 day
+            3600 // 1 hour
         );
     }
 
