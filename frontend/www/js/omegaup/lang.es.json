@@ -806,6 +806,7 @@
 	"runProblemNotPublic": "El problema no es p\u00fablico.",
 	"runWaitGap": "Debes esperar unos segundos entre env\u00edos consecutivos.",
 	"schoolNotFound": "Escuela no encontrada",
+	"schoolOfTheMonthNotFound": "No se encontr\u00f3 escuela del mes.",
 	"schoolRankHeader": "Top %(count) escuelas m\u00e1s activas del mes",
 	"schoolRankRangeHeader": "Top %(lowCount) a %(highCount) escuelas con m\u00e1s puntaje",
 	"schoolToBeAdded": "Tu escuela a\u00fan no existe en omegaUp. Ser\u00e1 agregada cuando guardes tus cambios.",

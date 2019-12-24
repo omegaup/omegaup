@@ -307,4 +307,78 @@ class School extends \OmegaUp\Controllers\Controller {
             'template' => 'rank.schools.tpl',
         ];
     }
+
+    /**
+     * Returns the first school of the previous month or the one selected by
+     * the mentor, if it has already been stored. Otherwise, calculates and
+     * saves the new schools of the month, and returns the first one of them.
+     *
+     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
+     */
+    public static function getSchoolOfTheMonth(string $date = null): array {
+        $firstDay = self::getCurrentMonthFirstDay($date);
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+            $firstDay
+        );
+        if (empty($schoolsOfTheMonth)) {
+            // Calculate and store new schools of the month
+            $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+                $firstDay
+            );
+            if (empty($schools)) {
+                return [
+                    'schoolinfo' => null,
+                ];
+            }
+
+            try {
+                \OmegaUp\DAO\DAO::transBegin();
+                $schoolOfTheMonthId = $schools[0]['school_id'];
+                foreach ($schools as $index => $school) {
+                    \OmegaUp\DAO\SchoolOfTheMonth::create(
+                        new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                            'school_id' => $school['school_id'],
+                            'time' => $firstDay,
+                            'rank' => $index + 1,
+                        ])
+                    );
+                }
+                \OmegaUp\DAO\DAO::transEnd();
+            } catch (\Exception $e) {
+                \OmegaUp\DAO\DAO::transRollback();
+                throw $e;
+            }
+        } else {
+            $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
+            foreach ($schoolsOfTheMonth as $school) {
+                if (isset($school->selected_by)) {
+                    $schoolOfTheMonthId = $school->school_id;
+                    break;
+                }
+            }
+        }
+
+        if (is_null($schoolOfTheMonthId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'schoolOfTheMonthNotFound'
+            );
+        }
+
+        // Now get the school data
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolOfTheMonthId);
+
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'schoolOfTheMonthNotFound'
+            );
+        }
+
+        return [
+            'schoolinfo' => [
+                'school_id' => intval($school->school_id),
+                'name' => strval($school->name),
+                'country_id' => $school->country_id,
+            ],
+        ];
+    }
 }

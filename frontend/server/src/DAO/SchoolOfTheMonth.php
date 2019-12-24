@@ -100,4 +100,30 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
         return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
+
+    /**
+     * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
+     */
+    public static function getByTime(
+        string $time
+    ): array {
+        $sql = '
+            SELECT
+                *
+            FROM
+                School_Of_The_Month
+            WHERE
+                time = ?;';
+
+        $schools = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$time]
+            ) as $row
+        ) {
+            array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
+        }
+        return $schools;
+    }
 }
