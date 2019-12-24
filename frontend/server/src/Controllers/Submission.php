@@ -38,7 +38,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
             if (
                 !is_null(
                     $user
-                ) && $user->main_identity_id == $identity->identity_id && $user->is_private
+                ) &&
+                ($user->main_identity_id == $identity->identity_id) &&
+                $user->is_private
             ) {
                 // Only the user's main identity is private.
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
