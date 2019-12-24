@@ -7,15 +7,17 @@
  * @author carlosabcs
  */
 class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
-    private static function setUpSchoolsRuns($schoolsData) {
-        $previousMonth = date_create(date('Y-m-d'));
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
-        $previousMonth = date_format($previousMonth, 'Y-m-d');
+    private static function setUpSchoolsRuns($schoolsData, $runDate = null) {
+        if (is_null($runDate)) {
+            $previousMonth = date_create(date('Y-m-d'));
+            date_add(
+                $previousMonth,
+                date_interval_create_from_date_string(
+                    '-1 month'
+                )
+            );
+            $runDate = date_format($previousMonth, 'Y-m-d');
+        }
 
         $users = [];
         $identities = [];
@@ -45,7 +47,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -61,7 +63,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -71,7 +73,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -81,7 +83,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -91,7 +93,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         // Setting p.accepted value
@@ -107,7 +109,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -117,7 +119,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($previousMonth)
+            strtotime($runDate)
         );
 
         // Setting p.accepted value
@@ -240,5 +242,47 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[1]['school']->name,
             $response['schoolinfo']['name']
         );
+    }
+
+    public function testApiSelectSchoolOfTheMonth() {
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+
+        $runDate = date_create(date('Y-m-15'));
+        $runDate = date_format($runDate, 'Y-m-d');
+
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+        ];
+
+        self::setUpSchoolsRuns($schoolsData, $runDate);
+
+        // Mentor's login
+        $login = self::login($mentorIdentity);
+
+        try {
+            \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'school_id' => $schoolsData[0]['school']->school_id
+            ]));
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'schoolOfTheMonthIsNotInPeriodToBeChosen',
+                $e->getMessage()
+            );
+        }
+
+        // Today must be the end of the month
+        $date = date_create(date('Y-m-d'));
+        $date->modify('last day of this month');
+        \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
+
+        $result = \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $schoolsData[0]['school']->school_id
+        ]));
+        $this->assertEquals('ok', $result['status']);
+        \OmegaUp\Time::setTimeForTesting(null);
     }
 }
