@@ -40,7 +40,7 @@
       <tbody>
         <tr v-for="(school, index) in rank">
           <td v-if="showHeader">{{ index + 1 }}</td>
-          <td v-else="">{{ school.rank ? school.rank : 0 }}</td>
+          <td v-else="">{{ school.rank ? school.rank : '' }}</td>
           <td class="cell-school-name" colspan="2" v-bind:title="school.name">
             <omegaup-countryflag
               v-bind:country="school.country_id"
