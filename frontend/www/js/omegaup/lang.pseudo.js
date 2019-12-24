@@ -904,6 +904,7 @@ const translations = {
 	userEmails: "(E-mai15)",
 	userEndTimeUpdatedSuccessfully: "(C0n7357 3nd 7im3 f0r u53r ha5 b33n upda73d 5ucc355fu11y.)",
 	userGroups: "(Gr0up5)",
+	userInformationIsPrivate: "(Th3 u53r'5 inf0rma7i0n i5 priva73)",
 	userLastLogin: "(La57 10gin: %(lastLogin))",
 	userNeverLoggedIn: "(Ha5 n3v3r 10gg3d in.)",
 	userNotAllowed: "(U53r i5 n07 a110w3d 70 p3rf0rm ac7i0n.)",

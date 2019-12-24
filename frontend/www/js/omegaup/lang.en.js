@@ -904,6 +904,7 @@ const translations = {
 	userEmails: "E-mails",
 	userEndTimeUpdatedSuccessfully: "Contest end time for user has been updated successfully.",
 	userGroups: "Groups",
+	userInformationIsPrivate: "The user's information is private",
 	userLastLogin: "Last login: %(lastLogin)",
 	userNeverLoggedIn: "Has never logged in.",
 	userNotAllowed: "User is not allowed to perform action.",
