@@ -144,7 +144,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="63">
+    <MixedArgument occurrences="62">
       <code>$r['active']</code>
       <code>$r['recommended']</code>
       <code>$r['participating']</code>
@@ -205,7 +205,6 @@
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
-      <code>$verdict</code>
       <code>$problemStats[$key]['cases_stats']</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="9">
@@ -219,7 +218,7 @@
       <code>$clar['time']</code>
       <code>$results['total']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="35">
+    <MixedAssignment occurrences="34">
       <code>$contests</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -249,7 +248,6 @@
       <code>$response['clarifications']</code>
       <code>$request-&gt;extra_note</code>
       <code>$contest-&gt;admission_mode</code>
-      <code>$verdict</code>
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
@@ -597,7 +595,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="48">
+    <MixedArgument occurrences="47">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -636,7 +634,6 @@
       <code>$r['rowcount']</code>
       <code>$r['problem']</code>
       <code>$r['problem']</code>
-      <code>$verdict</code>
       <code>$r['problem']-&gt;alias</code>
       <code>$run</code>
       <code>$case['name']</code>
@@ -671,7 +668,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="32">
+    <MixedAssignment occurrences="31">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -691,7 +688,6 @@
       <code>$clarifications</code>
       <code>$clar</code>
       <code>$response['clarifications']</code>
-      <code>$verdict</code>
       <code>$casesStats</code>
       <code>$run</code>
       <code>$group</code>
