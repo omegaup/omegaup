@@ -225,6 +225,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
+        \OmegaUp\DAO\SchoolOfTheMonth::delete($newSchool);
     }
 
     public function testGetSchoolOfTheMonth() {
@@ -248,6 +249,12 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         $runDate = date_create(date('Y-m-15'));
+        date_add(
+            $runDate,
+            date_interval_create_from_date_string(
+                '-6 month'
+            )
+        );
         $runDate = date_format($runDate, 'Y-m-d');
 
         $schoolsData = [
@@ -275,6 +282,12 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Today must be the end of the month
         $date = date_create(date('Y-m-d'));
+        date_add(
+            $date,
+            date_interval_create_from_date_string(
+                '-6 month'
+            )
+        );
         $date->modify('last day of this month');
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
 
