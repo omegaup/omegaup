@@ -2608,7 +2608,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // List of verdicts
         $verdict_counts = [];
 
-        foreach (self::$verdicts as $verdict) {
+        foreach (\OmegaUp\Controllers\Run::VERDICTS as $verdict) {
             $verdict_counts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
                 intval($r['problem']->problem_id),
                 $verdict
@@ -3386,7 +3386,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if ($run['verdict'] === 'AC') {
                 $nominationStatus['solved'] = true;
                 break;
-            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'CE') {
+            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
                 $nominationStatus['tried'] = true;
             }
         }

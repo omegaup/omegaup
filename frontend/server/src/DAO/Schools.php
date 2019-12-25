@@ -170,7 +170,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             ORDER BY
-                s.rank ASC
+                s.rank IS NULL, s.rank ASC
         ';
 
         $sqlCount = '
