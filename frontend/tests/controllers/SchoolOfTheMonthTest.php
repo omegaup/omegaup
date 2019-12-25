@@ -7,7 +7,13 @@
  * @author carlosabcs
  */
 class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
-    private static function setUpSchoolsRuns($schoolsData, $runDate = null) {
+    /**
+     * @param $schoolsData list<array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools}>
+     */
+    private static function setUpSchoolsRuns(
+        array $schoolsData,
+        string $runDate = null
+    ): void {
         if (is_null($runDate)) {
             $previousMonth = date_create(date('Y-m-d'));
             date_add(
