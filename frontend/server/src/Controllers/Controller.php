@@ -12,13 +12,6 @@ class Controller {
     public static $log;
 
     /**
-     * List of verdicts
-     *
-     * @var array
-     */
-    public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
-
-    /**
      * Calls authenticateRequest and throws only if authentication fails AND
      * there's no target username in Request.
      * This is to allow unauthenticated access to APIs that work for both

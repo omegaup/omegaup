@@ -763,7 +763,7 @@ CREATE TABLE `Runs` (
   `submission_id` int(11) NOT NULL COMMENT 'El envío',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
-  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `runtime` int(11) NOT NULL DEFAULT '0',
   `penalty` int(11) NOT NULL DEFAULT '0',
   `memory` int(11) NOT NULL DEFAULT '0',

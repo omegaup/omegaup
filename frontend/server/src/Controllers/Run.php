@@ -34,6 +34,21 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
 
+    public const VERDICTS = [
+        'AC',
+        'PA',
+        'WA',
+        'TLE',
+        'OLE',
+        'MLE',
+        'RTE',
+        'RFE',
+        'CE',
+        'JE',
+        'VE',
+        'NO-AC',
+    ];
+
     /**
      *
      * Validates Create Run request
@@ -1035,7 +1050,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 
