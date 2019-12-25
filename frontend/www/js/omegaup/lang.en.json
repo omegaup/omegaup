@@ -806,6 +806,8 @@
 	"runProblemNotPublic": "The problem is not public.",
 	"runWaitGap": "You have to wait between consecutive submissions.",
 	"schoolNotFound": "School not found",
+	"schoolOfTheMonthAlreadySelected": "School of the month has been previously selected",
+	"schoolOfTheMonthIsNotInPeriodToBeChosen": "School of the month is not in the period to be chosen",
 	"schoolOfTheMonthNotFound": "School of the month not found.",
 	"schoolRankHeader": "Top %(count) most active schools this month",
 	"schoolRankRangeHeader": "Top %(lowCount) to %(highCount) schools with the most points",

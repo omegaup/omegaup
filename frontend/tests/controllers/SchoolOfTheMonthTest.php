@@ -274,4 +274,58 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $response['schoolinfo']['name']
         );
     }
+
+    public function testApiSelectSchoolOfTheMonth() {
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+
+        $runDate = date_create(date('Y-m-15'));
+        date_add(
+            $runDate,
+            date_interval_create_from_date_string(
+                '-6 month'
+            )
+        );
+        $runDate = date_format($runDate, 'Y-m-d');
+
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool(),
+        ];
+
+        self::setUpSchoolsRuns($schoolsData, $runDate);
+
+        // Mentor's login
+        $login = self::login($mentorIdentity);
+
+        try {
+            \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'school_id' => $schoolsData[0]['school']->school_id
+            ]));
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'schoolOfTheMonthIsNotInPeriodToBeChosen',
+                $e->getMessage()
+            );
+        }
+
+        // Today must be the end of the month
+        $date = date_create(date('Y-m-d'));
+        date_add(
+            $date,
+            date_interval_create_from_date_string(
+                '-6 month'
+            )
+        );
+        $date->modify('last day of this month');
+        \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
+
+        $result = \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $schoolsData[0]['school']->school_id
+        ]));
+        $this->assertEquals('ok', $result['status']);
+        \OmegaUp\Time::setTimeForTesting(null);
+    }
 }

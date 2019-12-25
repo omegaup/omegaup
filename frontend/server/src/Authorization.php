@@ -351,9 +351,9 @@ class Authorization {
 
     /**
      * Only last two days of the month mentor is available to choose
-     * the coder of the month
+     * the coder and school of the month
      */
-    public static function canChooseCoder(int $currentTimestamp): bool {
+    public static function canChooseCoderOrSchool(int $currentTimestamp): bool {
         $today = date('Y-m-d', $currentTimestamp);
         $lastDayOfMonth = intval(date('t', $currentTimestamp));
         $availableDateToChooseCoder = [];

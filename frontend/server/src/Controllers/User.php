@@ -1430,11 +1430,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Selects coder of the month for next month.
      *
-     * @param \OmegaUp\Request $r
-     * @return Array
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
-     * @throws \OmegaUp\Exceptions\NotFoundException
+     * @return array{status: string}
      */
     public static function apiSelectCoderOfTheMonth(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -1445,7 +1441,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        if (!\OmegaUp\Authorization::canChooseCoder($currentTimestamp)) {
+        if (
+            !\OmegaUp\Authorization::canChooseCoderOrSchool(
+                $currentTimestamp
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'coderOfTheMonthIsNotInPeriodToBeChosen'
             );
@@ -3144,7 +3144,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response['options'] = [
             'canChooseCoder' =>
-                \OmegaUp\Authorization::canChooseCoder($currentTimeStamp),
+                \OmegaUp\Authorization::canChooseCoderOrSchool(
+                    $currentTimeStamp
+                ),
             'coderIsSelected' =>
                 !empty(\OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect)),
         ];

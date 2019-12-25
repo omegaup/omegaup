@@ -807,6 +807,8 @@ const translations = {
 	runProblemNotPublic: "El problema no es p\u00fablico.",
 	runWaitGap: "Debes esperar unos segundos entre env\u00edos consecutivos.",
 	schoolNotFound: "Escuela no encontrada",
+	schoolOfTheMonthAlreadySelected: "La escuela del mes ya ha sido seleccionada con anterioridad",
+	schoolOfTheMonthIsNotInPeriodToBeChosen: "La escuela del mes no est\u00e1 en periodo de ser elegida",
 	schoolOfTheMonthNotFound: "No se encontr\u00f3 escuela del mes.",
 	schoolRankHeader: "Top %(count) escuelas m\u00e1s activas del mes",
 	schoolRankRangeHeader: "Top %(lowCount) a %(highCount) escuelas con m\u00e1s puntaje",

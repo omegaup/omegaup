@@ -527,7 +527,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
         $timestampTest = strtotime($dateTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
@@ -539,7 +539,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertTrue($canChooseCoder);
@@ -550,7 +550,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
@@ -561,7 +561,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
