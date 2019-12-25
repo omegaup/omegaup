@@ -26,13 +26,13 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $problems = [];
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 6; $i++) {
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
 
         // Prepare setup:
         // school0: user0=>problem0, user1=>problem1
-        // school1: user2=>problem0, user2=>problem1, user2=>problem2
+        // school1: user2=>problem0, user2=>problem1, user2=>problem2, user2=>problem3, user2=>problem4
         // school2: user3=>problem0
         // The rank should be: school1, school0, school2
         SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
@@ -55,6 +55,10 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $identities[1]
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runDate)
+        );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problems[0],
@@ -78,6 +82,26 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problems[2],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[3],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::updateRunTime(
+            $runData['response']['guid'],
+            strtotime($runDate)
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problems[4],
             $identities[2]
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
