@@ -12,7 +12,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      */
     private static function setUpSchoolsRuns(
         array $schoolsData,
-        string $runDate = null
+        ?string $runDate = null
     ): void {
         if (is_null($runDate)) {
             $previousMonth = date_create(date('Y-m-d'));
