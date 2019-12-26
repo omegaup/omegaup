@@ -107,7 +107,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      *
      * @return list<array{school_id: int, rank: int, name: string, country_id: string}>
      */
-    public static function getSchoolsOfCertainMonth(
+    public static function getMonthlyList(
         string $firstDay
     ): array {
         $date = date('Y-m-01', strtotime($firstDay));

@@ -276,7 +276,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $response['schoolinfo']['name']
         );
 
-        $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfCertainMonth(
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
             date('Y-m-d', \OmegaUp\Time::get())
         );
         $this->assertCount(count($schoolsData), $results);
