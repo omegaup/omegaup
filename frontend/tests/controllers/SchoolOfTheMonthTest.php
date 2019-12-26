@@ -259,6 +259,8 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetSchoolOfTheMonth() {
+        \OmegaUp\Test\Utils::cleanUpDB();
+
         $schoolsData = [
             SchoolsFactory::createSchool(),
             SchoolsFactory::createSchool(),
@@ -272,6 +274,15 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $schoolsData[1]['school']->name,
             $response['schoolinfo']['name']
+        );
+
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfCertainMonth(
+            date('Y-m-d', \OmegaUp\Time::get())
+        );
+        $this->assertCount(count($schoolsData), $results);
+        $this->assertEquals(
+            $schoolsData[1]['school']->name,
+            $results[0]['name']
         );
     }
 
