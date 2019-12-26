@@ -59,7 +59,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets the details for historical rank of schools with pagination
+     * Gets the details for the latest submissions with pagination
      *
      * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
      */
