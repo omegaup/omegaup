@@ -496,6 +496,7 @@ const translations = {
 	omegaupTitleGroupsNew: "Nuevo grupo",
 	omegaupTitleGroupsScoreboardEdit: "Editar scoreboard",
 	omegaupTitleIndex: "Bienvenido",
+	omegaupTitleLatestSubmissions: "\u00daltimos env\u00edos",
 	omegaupTitleLogin: "Inicio de sesi\u00f3n",
 	omegaupTitleMyProblemsList: "Mis problemas",
 	omegaupTitleOmegaUpForSchools: "Bienvenido a omegaUp para Escuelas",
