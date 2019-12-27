@@ -447,6 +447,15 @@ declare namespace omegaup {
     username: string;
   }
 
+  export interface UserRank {
+    penalty: number
+    points: number;
+    position: number;
+    username: string;
+    classname: string;
+    country: string;
+  }
+
   export interface User {
     name?: string;
     username: string;
