@@ -16,7 +16,7 @@
           }}
         </h3>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" v-if="shouldIncludeControls">
         <template v-if="page > 1">
           <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
@@ -29,31 +29,110 @@
           v-bind:href="`/submissions?page=${page + 1}`"
           >{{ T.wordsNextPage }}
         </a>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>{{ T.wordsTime }}</th>
-              <th>{{ T.wordsUser }}</th>
-              <th>{{ T.wordsProblem }}</th>
-              <th>{{ T.wordsLanguage }}</th>
-              <th>{{ T.wordsVerdict }}</th>
-              <th>{{ T.wordsRuntime }}</th>
-              <th>{{ T.wordsMemory }}</th>
-            </tr>
-          </thead>
-        </table>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="text-center">{{ T.wordsTime }}</th>
+            <th class="text-center">{{ T.wordsUser }}</th>
+            <th class="text-center">{{ T.wordsProblem }}</th>
+            <th class="text-center">{{ T.wordsLanguage }}</th>
+            <th class="text-center">{{ T.wordsVerdict }}</th>
+            <th class="numericColumn">{{ T.wordsRuntime }}</th>
+            <th class="numericColumn">{{ T.wordsMemory }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="submission in submissions">
+            <td class="text-center">
+              {{ UI.formatDateTime(submission.time) }}
+            </td>
+            <td class="text-center">
+              <omegaup-username
+                v-bind:username="submission.username"
+                v-bind:classname="submission.classname"
+                v-bind:linkify="true"
+              >
+              </omegaup-username>
+            </td>
+            <td class="text-center">
+              <a v-bind:href="`/arena/problem/${submission.alias}/`">{{
+                submission.title
+              }}</a>
+            </td>
+            <td class="text-center">{{ submission.language }}</td>
+            <td
+              class="text-center verdict"
+              v-bind:class="`verdict-${submission.verdict}`"
+            >
+              {{ T[`verdict${submission.verdict}`] }}
+            </td>
+            <td class="numericColumn">
+              {{
+                submission.runtime === 0
+                  ? '—'
+                  : `${(parseFloat(submission.runtime || '0') / 1000).toFixed(
+                      2,
+                    )} s`
+              }}
+            </td>
+            <td class="numericColumn">
+              {{
+                submission.memory === 0
+                  ? '—'
+                  : `${(parseFloat(submission.memory) / (1024 * 1024)).toFixed(
+                      2,
+                    )} MB`
+              }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel-footer" v-if="shouldIncludeControls">
+        <template v-if="page > 1">
+          <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
+            {{ T.wordsPrevPage }}</a
+          >
+          <span class="delimiter" v-show="shouldShowNextPage">|</span>
+        </template>
+        <a
+          class="next"
+          v-show="shouldShowNextPage"
+          v-bind:href="`/submissions?page=${page + 1}`"
+          >{{ T.wordsNextPage }}
+        </a>
       </div>
     </div>
   </div>
 </template>
+
+<style>
+.verdict-AC {
+  background: #cf6;
+}
+
+.verdict-CE {
+  background: #f90;
+}
+
+.verdictJE,
+.verdictVE {
+  background: #f00;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import UI from '../../ui.js';
+import UserName from '../user/Username.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-username': UserName,
+  },
+})
 export default class SubmissionsList extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
@@ -66,6 +145,10 @@ export default class SubmissionsList extends Vue {
 
   get shouldShowNextPage(): boolean {
     return this.length * this.page < this.totalRows;
+  }
+
+  get shouldIncludeControls(): boolean {
+    return this.shouldShowNextPage || this.page > 1;
   }
 }
 </script>
