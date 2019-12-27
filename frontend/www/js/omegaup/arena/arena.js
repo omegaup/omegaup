@@ -894,7 +894,9 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    self.elements.miniRanking.users = [];
+    if (typeof self.elements.miniRanking !== 'undefined') {
+      self.elements.miniRanking.users = [];
+    }
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -944,15 +946,17 @@ export class Arena {
 
       // update miniranking
       if (i < 10) {
-        const username = UI.rankingUsername(rank);
-        self.elements.miniRanking.users.push({
-          position: rank.place,
-          username: username,
-          country: rank['country'],
-          classname: rank['classname'],
-          points: rank.total.points,
-          penalty: rank.total.penalty,
-        });
+        if (typeof self.elements.miniRanking !== 'undefined') {
+          const username = UI.rankingUsername(rank);
+          self.elements.miniRanking.users.push({
+            position: rank.place,
+            username: username,
+            country: rank['country'],
+            classname: rank['classname'],
+            points: rank.total.points,
+            penalty: rank.total.penalty,
+          });
+        }
       }
     }
 

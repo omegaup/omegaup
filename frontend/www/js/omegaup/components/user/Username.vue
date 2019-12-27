@@ -1,18 +1,23 @@
 <template>
-  <div>
-    <omegaup-countryflag v-bind:country="country"></omegaup-countryflag>
-    <span v-if="linkify"
-      ><a
-        v-bind:class="classname"
-        v-bind:title="username"
-        v-bind:href="`/profile/${username}/`"
-        >{{ username }}</a
-      ></span
-    >
-    <span v-bind:class="classname" v-bind:title="username" v-else="">{{
-      username
-    }}</span>
-  </div>
+  <span v-if="linkify">
+    <omegaup-countryflag
+      v-bind:country="country"
+      v-if="country != null"
+    ></omegaup-countryflag>
+    <a
+      v-bind:class="classname"
+      v-bind:title="username"
+      v-bind:href="`/profile/${username}/`"
+      >{{ username }}</a
+    ></span
+  >
+  <span v-bind:class="classname" v-bind:title="username" v-else="">
+    <omegaup-countryflag
+      v-bind:country="country"
+      v-if="country != null"
+    ></omegaup-countryflag
+    >{{ username }}</span
+  >
 </template>
 
 <style>

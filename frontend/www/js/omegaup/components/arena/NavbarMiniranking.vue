@@ -20,7 +20,7 @@
           </omegaup-user-username>
         </td>
         <td class="points">
-          {{ user.points.toFixed(digitsAfterDecimalPoint) }}
+          {{ user.points.toFixed(2) }}
         </td>
         <td class="penalty">{{ user.penalty.toFixed(0) }}</td>
       </tr>
@@ -74,7 +74,6 @@ import user_Username from '../user/Username.vue';
 export default class ArenaNavbarMiniranking extends Vue {
   @Prop() showRanking!: boolean;
   @Prop() users!: omegaup.UserRank[];
-  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   T = T;
 }
 </script>
