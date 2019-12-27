@@ -57,4 +57,28 @@ class Submission extends \OmegaUp\Controllers\Controller {
             $identityId
         );
     }
+
+    /**
+     * Gets the details for the latest submissions with pagination
+     *
+     * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
+     */
+    public static function getLatestSubmissionsForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'submissionsPayload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'includeUser' => false,
+                ],
+            ],
+            'template' => 'submissions.list.tpl',
+        ];
+    }
 }
