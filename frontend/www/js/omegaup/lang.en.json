@@ -851,6 +851,8 @@
 	"statementLanguagePt": "Portuguese",
 	"statementNotFound": "Problem statement not found.",
 	"status": "Update your email here.",
+	"submissionsListTitle": "Submissions on the last 24 hours",
+	"submissionsRangeHeader": "Latest submissions from %(lowCount) to %(highCount)",
 	"submittingUnOpenedProblem": "User is submitting a run and they have not even opened the problem.",
 	"successfulAddUser": "User successfully added!",
 	"successfulOperation": "Success",
