@@ -6,7 +6,8 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import arena_Navbar from '../components/arena/Navbar.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -286,29 +287,56 @@ export class Arena {
       submitForm: $('#submit'),
     };
 
-    const problemListPayload = JSON.parse(
-      document.getElementById('problem-list-payload').innerText,
-    );
-    self.elements.navBar = new Vue({
-      el: '#arena-navbar',
-      render: function(createElement) {
-        return createElement('omegaup-arena-navbar', {
-          props: {
-            showRanking: this.showRanking,
-            problemsList: this.problemsList,
-            isSummarySelected: this.isSummarySelected,
-            miniRanking: this.miniRanking,
-          },
-        });
-      },
-      data: {
-        showRanking: problemListPayload,
-        problemsList: [],
-        isSummarySelected: true,
-        miniRanking: [],
-      },
-      components: { 'omegaup-arena-navbar': arena_Navbar },
-    });
+    const navbar = document.getElementById('arena-navbar-payload');
+    let navbarPayload = false;
+    if (navbar !== null) {
+      navbarPayload = JSON.parse(navbar.innerText);
+    }
+
+    if (document.getElementById('arena-navbar-problems') !== null) {
+      self.elements.navBar = new Vue({
+        el: '#arena-navbar-problems',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-problems', {
+            props: {
+              problems: this.problems,
+              activeProblem: this.activeProblem,
+            },
+            on: {
+              'navigate-to-probem': function(problemAlias) {
+                window.location = `${window.location.pathname}#problems/${problemAlias}`;
+              },
+            },
+          });
+        },
+        data: {
+          problems: [],
+          activeProblem: null,
+        },
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+      });
+    }
+
+    if (document.getElementById('arena-navbar-miniranking') !== null) {
+      self.elements.miniRanking = new Vue({
+        el: '#arena-navbar-miniranking',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-miniranking', {
+            props: {
+              showRanking: this.showRanking,
+              users: this.users,
+            },
+          });
+        },
+        data: {
+          showRanking: navbarPayload,
+          users: [],
+        },
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+      });
+    }
 
     if (self.elements.ranking.length) {
       self.elements.rankingTable = new Vue({
@@ -585,11 +613,11 @@ export class Arena {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      self.elements.navBar.problemsList.push({
+      self.elements.navBar.problems.push({
         alias: problem.alias,
         text: problemName,
-        score: '',
-        active: false,
+        my_max_score: '',
+        max_score: '',
       });
 
       $('<option>')
@@ -924,16 +952,11 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          let index = self.elements.navBar.problemsList.findIndex(
+          let index = self.elements.navBar.problems.findIndex(
             x => x.alias === alias,
           );
-          let myMaxScore = problem.points.toFixed(self.digitsAfterDecimalPoint);
-          let contestMaxScore = currentPoints.toFixed(
-            self.digitsAfterDecimalPoint,
-          );
-          self.elements.navBar.problemsList[
-            index
-          ].score = `(${myMaxScore} / ${contestMaxScore})`;
+          self.elements.navBar.problems[index].my_max_score = problem.points;
+          self.elements.navBar.problems[index].max_score = currentPoints;
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
@@ -941,12 +964,13 @@ export class Arena {
       // update miniranking
       if (i < 10) {
         const username = UI.rankingUsername(rank);
-        const flag = UI.getFlag(rank['country']);
-        self.elements.navBar.miniRanking.push({
+        self.elements.miniRanking.users.push({
           position: rank.place,
-          username: `<span title="${username}">${username} ${flag}</span>`,
-          points: rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-          penalty: rank.total.penalty.toFixed(0),
+          username: username,
+          country: rank['country'],
+          classname: rank['classname'],
+          points: rank.total.points,
+          penalty: rank.total.penalty,
         });
       }
     }
@@ -1431,15 +1455,12 @@ export class Arena {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
       // Find the selected problem
-      let index = self.elements.navBar.problemsList.findIndex(
+      let index = self.elements.navBar.problems.findIndex(
         x => x.alias === problem.alias,
       );
       // Set as active the selected problem, and the others as inactive
-      self.elements.navBar.isSummarySelected = false;
-      for (let idx in self.elements.navBar.problemsList) {
-        self.elements.navBar.problemsList[idx].active = false;
-      }
-      self.elements.navBar.problemsList[index].active = true;
+      self.elements.navBar.activeProblem =
+        self.elements.navBar.problems[index].alias;
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1665,10 +1686,7 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      for (let idx in self.elements.navBar.problemsList) {
-        self.elements.navBar.problemsList[idx].active = false;
-      }
-      self.elements.navBar.isSummarySelected = true;
+      self.elements.navBar.activeProblem = null;
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -2159,18 +2177,12 @@ export class Arena {
         },
       );
     }
-    let index = self.elements.navBar.problemsList.findIndex(
-      x => x.alias === alias,
+    let index = self.elements.navBar.problems.findIndex(x => x.alias === alias);
+    self.elements.navBar.problems[index].my_max_score = self.myRuns.getMaxScore(
+      alias,
+      previousScore,
     );
-    let myMaxScore = self.myRuns
-      .getMaxScore(alias, previousScore)
-      .toFixed(self.digitsAfterDecimalPoint);
-    let contestMaxScore = parseFloat(maxScore || '0').toFixed(
-      self.digitsAfterDecimalPoint,
-    );
-    self.elements.navBar.problemsList[
-      index
-    ].score = `(${myMaxScore} / ${contestMaxScore})`;
+    self.elements.navBar.problems[index].max_score = maxScore || '0';
   }
 }
 class RunView {

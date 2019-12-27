@@ -25,9 +25,11 @@
 			</ul>
 {/if}
 			<div id="problems" class="tab navleft">
-
-				<div id="arena-navbar"></div>
-				<script type="text/json" id="problem-list-payload">{$showRanking|json_encode}</script>
+				<div class="navbar">
+					<div id="arena-navbar-problems"></div>
+					<div id="arena-navbar-miniranking"></div>
+					<script type="text/json" id="arena-navbar-payload">{$showRanking|json_encode}</script>
+				</div>
 
 				<div id="summary" class="main">
 					<h1 data-bind="text: title"></h1>

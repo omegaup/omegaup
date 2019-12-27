@@ -64,7 +64,7 @@ omegaup.OmegaUp.on('ready', function() {
             problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
           arenaInstance.problems[problem.alias] = problem;
-          arenaInstance.elements.navBar.problemsList.push({
+          arenaInstance.elements.navBar.problems.push({
             alias: problem.alias,
             text: problemName,
             score: '',
