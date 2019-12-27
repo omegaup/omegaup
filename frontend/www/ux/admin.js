@@ -67,7 +67,8 @@ omegaup.OmegaUp.on('ready', function() {
           arenaInstance.elements.navBar.problems.push({
             alias: problem.alias,
             text: problemName,
-            score: '',
+            bestScore: 0,
+            maxScore: 0,
             active: false,
           });
 

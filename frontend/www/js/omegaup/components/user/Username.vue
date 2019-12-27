@@ -1,18 +1,10 @@
 <template>
-  <div>
-    <omegaup-countryflag v-bind:country="country"></omegaup-countryflag>
-    <span v-if="linkify"
-      ><a
-        v-bind:class="classname"
-        v-bind:title="username"
-        v-bind:href="`/profile/${username}/`"
-        >{{ username }}</a
-      ></span
-    >
-    <span v-bind:class="classname" v-bind:title="username" v-else="">{{
+  <span v-if="linkify"
+    ><a v-bind:class="classname" v-bind:href="`/profile/${username}/`">{{
       username
-    }}</span>
-  </div>
+    }}</a></span
+  >
+  <span v-bind:class="classname" v-else="">{{ username }}</span>
 </template>
 
 <style>
@@ -48,17 +40,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import CountryFlag from '../CountryFlag.vue';
 
-@Component({
-  components: {
-    'omegaup-countryflag': CountryFlag,
-  },
-})
+@Component
 export default class UserName extends Vue {
   @Prop() username!: string;
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
-  @Prop() country!: string;
 }
 </script>

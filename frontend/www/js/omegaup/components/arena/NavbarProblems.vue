@@ -7,16 +7,16 @@
       v-bind:class="{ active: problem.alias === activeProblem }"
       v-for="problem in problems"
     >
-      <a class="name" v-on:click="$emit('navigate-to-probem', problem.alias)">{{
-        problem.text
-      }}</a>
+      <a
+        class="name"
+        v-on:click="$emit('navigate-to-problem', problem.alias)"
+        >{{ problem.text }}</a
+      >
       <span class="solved"
-        >({{
-          parseFloat(problem.my_max_score).toFixed(digitsAfterDecimalPoint)
-        }}
+        >({{ parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint) }}
         /
         {{
-          parseFloat(problem.max_score).toFixed(digitsAfterDecimalPoint)
+          parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
         }})</span
       >
     </div>

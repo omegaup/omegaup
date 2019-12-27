@@ -316,7 +316,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Get all relevant identities for a problemset.
      *
-     * @return array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool, classname: string}[]
+     * @return array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool}[]
      */
     final public static function getAllRelevantIdentities(
         int $problemsetId,
@@ -331,23 +331,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             if (is_null($groupId)) {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, pi.is_invited,
-                        COALESCE (
-                            (SELECT urc.classname
-                            FROM User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT 1)
-                        , "user-rank-unranked") AS classname
+                        i.identity_id, i.username, i.name, i.country_id, pi.is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -369,23 +353,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             } else {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, 0 as is_invited,
-                        COALESCE (
-                            (SELECT urc.classname
-                            FROM User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT 1)
-                        , "user-rank-unranked") AS classname
+                        i.identity_id, i.username, i.name, i.country_id, 0 as is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -406,23 +374,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         } else {
             $sql = '
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id, 0 as is_invited,
-                    COALESCE (
-                        (SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1)
-                    , "user-rank-unranked") AS classname
+                    i.identity_id, i.username, i.name, i.country_id, 0 as is_invited
                 FROM
                     Identities i
                 INNER JOIN
@@ -448,9 +400,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool, classname: string}[] */
+        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool}[] */
         $result = [];
-        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: int, classname: string} $row */
+        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

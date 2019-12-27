@@ -127,8 +127,8 @@ declare namespace omegaup {
   export interface ContestProblem {
     alias: string;
     text: string;
-    my_max_score: number;
-    max_score: number;
+    bestScore: number;
+    maxScore: number;
     active: boolean;
   }
 
@@ -452,15 +452,6 @@ declare namespace omegaup {
   export interface UserRole {
     role: string;
     username: string;
-  }
-
-  export interface UserRank {
-    penalty: number
-    points: number;
-    position: number;
-    username: string;
-    classname: string;
-    country: string;
   }
 
   export interface User {
