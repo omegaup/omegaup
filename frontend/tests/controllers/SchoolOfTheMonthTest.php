@@ -343,5 +343,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Should contain exactly two schools of the month, the one from previous test and
         // the one selected on the current one.
         $this->assertCount(2, $results);
+        $this->assertEquals($schoolsData[0]['school']->name, $results[1]['name']);
+        $this->assertGreaterThan($results[1]['time'], $results[0]['time']);
     }
 }

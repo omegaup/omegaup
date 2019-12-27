@@ -136,8 +136,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
-     * Gets all the best schools based on the month
-     * of a certain date.
+     * Gets the best school of each month
      *
      * @return list<array{school_id: int, name: string, country_id: string, time: string}>
      */
