@@ -356,7 +356,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     ),
                     'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
                         /* rowcount */ 100,
-                        /* useCache */ false
+                        /* useCache */ true
                     ),
                 ],
             ],
