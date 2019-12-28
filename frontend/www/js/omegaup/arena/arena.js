@@ -7,6 +7,7 @@ import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -280,7 +281,6 @@ export class Arena {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      miniRanking: $('#mini-ranking'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
@@ -307,6 +307,33 @@ export class Arena {
           activeProblem: null,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+      });
+    }
+
+    const navbar = document.getElementById('arena-navbar-payload');
+    let navbarPayload = false;
+    if (navbar !== null) {
+      navbarPayload = JSON.parse(navbar.innerText);
+    }
+
+    if (document.getElementById('arena-navbar-miniranking') !== null) {
+      self.elements.miniRanking = new Vue({
+        el: '#arena-navbar-miniranking',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-miniranking', {
+            props: {
+              showRanking: this.showRanking,
+              users: this.users,
+            },
+          });
+        },
+        data: {
+          showRanking: navbarPayload,
+          users: [],
+        },
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
       });
     }
 
@@ -888,7 +915,9 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    $('tbody.inserted', self.elements.miniRanking).remove();
+    if (typeof self.elements.miniRanking !== 'undefined') {
+      self.elements.miniRanking.users = [];
+    }
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -936,26 +965,17 @@ export class Arena {
 
       // update miniranking
       if (i < 10) {
-        let r = $('tbody.user-list-template', self.elements.miniRanking)
-          .clone()
-          .removeClass('user-list-template')
-          .addClass('inserted');
-
-        $('.position', r).html(rank.place);
-        $('.user', r).html(
-          '<span title="' +
-            UI.rankingUsername(rank) +
-            '">' +
-            UI.rankingUsername(rank) +
-            UI.getFlag(rank['country']) +
-            '</span>',
-        );
-        $('.points', r).html(
-          rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-        );
-        $('.penalty', r).html(rank.total.penalty.toFixed(0));
-
-        self.elements.miniRanking.append(r);
+        if (typeof self.elements.miniRanking !== 'undefined') {
+          const username = UI.rankingUsername(rank);
+          self.elements.miniRanking.users.push({
+            position: rank.place,
+            username: username,
+            country: rank['country'],
+            classname: rank['classname'],
+            points: rank.total.points,
+            penalty: rank.total.penalty,
+          });
+        }
       }
     }
 
@@ -2403,6 +2423,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2422,6 +2443,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2442,6 +2464,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return self.penalty();
@@ -2489,7 +2512,7 @@ class ObservableRun {
       return '#CF6';
     } else if (self.verdict() == 'CE') {
       return '#F90';
-    } else if (self.verdict() == 'JE') {
+    } else if (self.verdict() == 'JE' || self.verdict() == 'VE') {
       return '#F00';
     } else {
       return '';
@@ -2502,6 +2525,7 @@ class ObservableRun {
       self.contest_score() != null &&
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return parseFloat(self.contest_score() || '0').toFixed(2);
@@ -2515,6 +2539,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';

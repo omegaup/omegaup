@@ -421,6 +421,7 @@ declare namespace omegaup {
     country_id: string;
     score: number;
     name: string;
+    rank?: number;
   }
 
   interface Signature {
@@ -452,6 +453,15 @@ declare namespace omegaup {
   export interface UserRole {
     role: string;
     username: string;
+  }
+
+  export interface UserRank {
+    penalty: number
+    points: number;
+    position: number;
+    username: string;
+    classname: string;
+    country: string;
   }
 
   export interface User {

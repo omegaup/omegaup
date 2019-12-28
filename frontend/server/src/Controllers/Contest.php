@@ -1798,8 +1798,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+            $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+            || $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'problemIsBanned'
@@ -2978,7 +2978,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 
@@ -3110,7 +3110,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // List of verdicts
         $verdictCounts = [];
 
-        foreach (self::$verdicts as $verdict) {
+        foreach (\OmegaUp\Controllers\Run::VERDICTS as $verdict) {
             $verdictCounts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemsetByVerdict(
                 intval($contest->problemset_id),
                 $verdict

@@ -27,25 +27,8 @@
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
 					<div id="arena-navbar-problems"></div>
-{if $showRanking}
-					<table id="mini-ranking">
-						<thead>
-							<tr>
-								<th></th>
-								<th>{#wordsUser#}</th>
-								<th class="total" colspan="2">{#wordsTotal#}</th>
-							</tr>
-						</thead>
-						<tbody class="user-list-template">
-							<tr>
-								<td class="position"></td>
-								<td class="user"></td>
-								<td class="points"></td>
-								<td class="penalty"></td>
-							</tr>
-						</tbody>
-					</table>
-{/if}
+					<div id="arena-navbar-miniranking"></div>
+					<script type="text/json" id="arena-navbar-payload">{$showRanking|json_encode}</script>
 				</div>
 				<div id="summary" class="main">
 					<h1 data-bind="text: title"></h1>
