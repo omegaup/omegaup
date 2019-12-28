@@ -71,18 +71,23 @@
               {{
                 submission.runtime === 0
                   ? '—'
-                  : `${(parseFloat(submission.runtime || '0') / 1000).toFixed(
-                      2,
-                    )} ${T.wordsSecondsAbbreviation}`
+                  : UI.formatString(T.submissionRunTimeInSeconds, {
+                      value: (
+                        parseFloat(submission.runtime || '0') / 1000
+                      ).toFixed(2),
+                    })
               }}
             </td>
             <td class="numericColumn">
               {{
                 submission.memory === 0
                   ? '—'
-                  : `${(parseFloat(submission.memory) / (1024 * 1024)).toFixed(
-                      2,
-                    )} ${T.wordsMegabyteAbbreviation}`
+                  : UI.formatString(T.submissionMemoryInMegabytes, {
+                      value: (
+                        parseFloat(submission.memory) /
+                        (1024 * 1024)
+                      ).toFixed(2),
+                    })
               }}
             </td>
           </tr>
