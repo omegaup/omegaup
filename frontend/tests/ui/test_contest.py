@@ -236,7 +236,8 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                 (By.CSS_SELECTOR, '#problems')))
 
         driver.browser.find_element_by_xpath(
-            '//a[contains(@href, "problems/%s")]' % problem).click()
+            '//a[contains(text(), "%s")]/parent::div' %
+            problem.title()).click()
 
         # Now, user checks the score again, ranking should be +100
         check_ranking(driver, problem, driver.user_username,
@@ -327,8 +328,8 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' %
-              problem)))).click()
+             ('//a[contains(text(), "%s")]/parent::div' %
+              problem.title())))).click()
 
     util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)
