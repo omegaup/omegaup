@@ -509,6 +509,7 @@ const translations = {
 	omegaupTitleRank: "Rank",
 	omegaupTitleRedaccion: "Redacci\u00f3n",
 	omegaupTitleSchoolProfile: "Perfil de Escuela",
+	omegaupTitleSchoolsOfTheMonth: "Escuelas del mes",
 	omegaupTitleScoreboardmerge: "Scoreboard Merge",
 	omegaupTitleSupportDashboard: "Tablero de soporte",
 	omegaupTitleUpdatePrivileges: "Actualizar privilegios",
