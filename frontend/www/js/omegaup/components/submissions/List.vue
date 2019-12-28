@@ -16,7 +16,7 @@
           }}
         </h3>
       </div>
-      <div class="panel-body" v-if="shouldIncludeControls">
+      <div class="panel-body" v-if="shouldShowControls">
         <template v-if="page > 1">
           <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
@@ -73,7 +73,7 @@
                   ? '—'
                   : `${(parseFloat(submission.runtime || '0') / 1000).toFixed(
                       2,
-                    )} s`
+                    )} ${T.wordsSecondsAbbreviation}`
               }}
             </td>
             <td class="numericColumn">
@@ -82,13 +82,13 @@
                   ? '—'
                   : `${(parseFloat(submission.memory) / (1024 * 1024)).toFixed(
                       2,
-                    )} MB`
+                    )} ${T.wordsMegabyteAbbreviation}`
               }}
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="panel-footer" v-if="shouldIncludeControls">
+      <div class="panel-footer" v-if="shouldShowControls">
         <template v-if="page > 1">
           <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
@@ -115,8 +115,8 @@
   background: #f90;
 }
 
-.verdictJE,
-.verdictVE {
+.verdict-JE,
+.verdict-VE {
   background: #f00;
 }
 </style>
@@ -147,7 +147,7 @@ export default class SubmissionsList extends Vue {
     return this.length * this.page < this.totalRows;
   }
 
-  get shouldIncludeControls(): boolean {
+  get shouldShowControls(): boolean {
     return this.shouldShowNextPage || this.page > 1;
   }
 }

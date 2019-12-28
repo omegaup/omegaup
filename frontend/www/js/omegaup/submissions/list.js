@@ -36,7 +36,6 @@ OmegaUp.on('ready', function() {
     rowcount: submissionsList.length,
   })
     .then(data => {
-      console.log(data);
       submissionsList.totalRows = data.totalRows;
       submissionsList.submissions = data.submissions;
     })
