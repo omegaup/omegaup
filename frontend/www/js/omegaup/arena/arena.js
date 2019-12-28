@@ -2403,6 +2403,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2422,6 +2423,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2442,6 +2444,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return self.penalty();
@@ -2489,7 +2492,7 @@ class ObservableRun {
       return '#CF6';
     } else if (self.verdict() == 'CE') {
       return '#F90';
-    } else if (self.verdict() == 'JE') {
+    } else if (self.verdict() == 'JE' || self.verdict() == 'VE') {
       return '#F00';
     } else {
       return '';
@@ -2502,6 +2505,7 @@ class ObservableRun {
       self.contest_score() != null &&
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return parseFloat(self.contest_score() || '0').toFixed(2);
@@ -2515,6 +2519,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';

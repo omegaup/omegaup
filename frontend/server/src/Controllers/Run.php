@@ -34,6 +34,21 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
 
+    public const VERDICTS = [
+        'AC',
+        'PA',
+        'WA',
+        'TLE',
+        'OLE',
+        'MLE',
+        'RTE',
+        'RFE',
+        'CE',
+        'JE',
+        'VE',
+        'NO-AC',
+    ];
+
     /**
      *
      * Validates Create Run request
@@ -65,7 +80,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
         // check that problem is not publicly or privately banned.
-        if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+        if (
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 
@@ -1032,7 +1050,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 

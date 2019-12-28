@@ -91,7 +91,18 @@ export default {
           total[amount.verdict] += parseInt(amount.runs);
           return total;
         },
-        { WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0 },
+        {
+          WA: 0,
+          PA: 0,
+          AC: 0,
+          TLE: 0,
+          MLE: 0,
+          OLE: 0,
+          RTE: 0,
+          CE: 0,
+          JE: 0,
+          VE: 0,
+        },
       );
       let verdicts = Object.keys(runs);
       let response = [];
