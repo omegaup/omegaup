@@ -75,7 +75,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'submissionsPayload' => [
                     'page' => $page,
                     'length' => $length,
-                    'includeUser' => false,
+                    'includeUser' => true,
                 ],
             ],
             'template' => 'submissions.list.tpl',
