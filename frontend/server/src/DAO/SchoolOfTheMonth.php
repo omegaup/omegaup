@@ -136,6 +136,42 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
+     * Gets the best school of each month
+     *
+     * @return list<array{school_id: int, name: string, country_id: string, time: string}>
+     */
+    public static function getSchoolsOfTheMonth(): array {
+        $sql = '
+            SELECT
+                sotm.school_id,
+                sotm.time,
+                s.name,
+                s.country_id
+            FROM
+                School_Of_The_Month sotm
+            INNER JOIN
+                Schools s ON s.school_id = sotm.school_id
+            WHERE
+                sotm.selected_by IS NOT NULL
+                OR (
+                    sotm.rank = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            School_Of_The_Month
+                        WHERE
+                            time = sotm.time AND selected_by IS NOT NULL
+                    )
+                )
+            ORDER BY
+                sotm.time DESC;';
+
+        /** @var list<array{school_id: int, name: string, country_id: string, time: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, []);
+    }
+
+    /**
      * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
      */
     public static function getByTime(
