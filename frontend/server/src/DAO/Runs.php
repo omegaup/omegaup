@@ -387,7 +387,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     ON
                         r.run_id = s.current_run_id
                     WHERE
-                        r.verdict NOT IN (\'CE\', \'JE\') AND
+                        r.verdict NOT IN (\'CE\', \'JE\', \'VE\') AND
                         s.problemset_id = ? AND
                         r.status = \'ready\' AND
                         s.type = \'normal\'
@@ -434,7 +434,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ON
                     s.current_run_id = r.run_id
                 WHERE
-                    r.verdict NOT IN (\'CE\', \'JE\')
+                    r.verdict NOT IN (\'CE\', \'JE\', \'VE\')
                     AND s.problem_id = ?
                     AND s.identity_id = ?
                 ) AS tried,
@@ -495,7 +495,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.type = \'normal\' AND ' .
                 ($onlyAC ?
                     "r.verdict IN ('AC') " :
-                    "r.verdict NOT IN ('CE', 'JE') "
+                    "r.verdict NOT IN ('CE', 'JE', 'VE') "
                 ) .
             ' ORDER BY s.submission_id;';
 

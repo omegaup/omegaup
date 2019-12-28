@@ -45,7 +45,11 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
-            intval($Schools->rank),
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
             floatval($Schools->score),
             intval($Schools->school_id),
         ];
@@ -229,7 +233,11 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
-            intval($Schools->rank),
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
             floatval($Schools->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

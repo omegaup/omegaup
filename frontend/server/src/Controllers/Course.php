@@ -2524,7 +2524,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 

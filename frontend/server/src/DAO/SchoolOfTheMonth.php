@@ -100,4 +100,100 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
         return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
+
+    /**
+     * Gets all the best schools based on the month
+     * of a certain date.
+     *
+     * @return list<array{school_id: int, rank: int, name: string, country_id: string}>
+     */
+    public static function getMonthlyList(
+        string $firstDay
+    ): array {
+        $date = date('Y-m-01', strtotime($firstDay));
+        $sql = '
+            SELECT
+                sotm.school_id,
+                sotm.rank,
+                s.name,
+                s.country_id
+            FROM
+                School_Of_The_Month sotm
+            INNER JOIN
+                Schools s ON s.school_id = sotm.school_id
+            WHERE
+                sotm.time = ?
+            ORDER BY
+                sotm.selected_by IS NULL,
+                sotm.rank ASC
+            LIMIT 100;';
+
+        /** @var list<array{school_id: int, rank: int, name: string, country_id: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->getAll(
+            $sql,
+            [ $date ]
+        );
+    }
+
+    /**
+     * Gets the best school of each month
+     *
+     * @return list<array{school_id: int, name: string, country_id: string, time: string}>
+     */
+    public static function getSchoolsOfTheMonth(): array {
+        $sql = '
+            SELECT
+                sotm.school_id,
+                sotm.time,
+                s.name,
+                s.country_id
+            FROM
+                School_Of_The_Month sotm
+            INNER JOIN
+                Schools s ON s.school_id = sotm.school_id
+            WHERE
+                sotm.selected_by IS NOT NULL
+                OR (
+                    sotm.rank = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            School_Of_The_Month
+                        WHERE
+                            time = sotm.time AND selected_by IS NOT NULL
+                    )
+                )
+            ORDER BY
+                sotm.time DESC;';
+
+        /** @var list<array{school_id: int, name: string, country_id: string, time: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, []);
+    }
+
+    /**
+     * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
+     */
+    public static function getByTime(
+        string $time
+    ): array {
+        $sql = '
+            SELECT
+                *
+            FROM
+                School_Of_The_Month
+            WHERE
+                time = ?;';
+
+        $schools = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$time]
+            ) as $row
+        ) {
+            array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
+        }
+        return $schools;
+    }
 }
