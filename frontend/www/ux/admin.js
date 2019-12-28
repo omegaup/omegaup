@@ -64,15 +64,13 @@ omegaup.OmegaUp.on('ready', function() {
             problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
           arenaInstance.problems[problem.alias] = problem;
-
-          var prob = $('#problem-list .template')
-            .clone()
-            .removeClass('template')
-            .addClass('problem_' + problem.alias);
-          $('.name', prob)
-            .attr('href', '#problems/' + problem.alias)
-            .html(problemName);
-          $('#problem-list').append(prob);
+          arenaInstance.elements.navBar.problems.push({
+            alias: problem.alias,
+            text: problemName,
+            bestScore: 0,
+            maxScore: 0,
+            active: false,
+          });
 
           $('#clarification select[name=problem]').append(
             '<option value="' +

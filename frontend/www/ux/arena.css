@@ -29,8 +29,6 @@ legend {
 	margin: 0 0.2em 0 0.2em;
 }
 
-.template { display: none; }
-
 #root,
 #problem,
 #ranking,
@@ -132,37 +130,6 @@ body#only-problem #problems .main {
 
 .tab {
 	padding: 1em;
-}
-
-#problem-list > div {
-	width: 19em;
-	margin-bottom: 0.5em;
-	background: #ddd;
-	border: solid 1px #ccc;
-	border-width: 1px 0 1px 1px;
-	position: relative;
-}
-
-#problem-list > div a {
-	color: #5588DD;
-	display: block;
-	padding: 0.5em;
-	width: 100%;
-	max-width: 212px;
-}
-
-#problem-list > div.active {
-	background: white;
-}
-
-#problem-list > div.summary {
-	margin-bottom: 1em;
-}
-
-#problem-list > div .solved {
-	position: absolute;
-	top: 0.5em;
-	right: 1em;
 }
 
 #problem, #summary {

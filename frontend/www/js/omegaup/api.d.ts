@@ -124,6 +124,14 @@ declare namespace omegaup {
     alias?: string;
   }
 
+  export interface ContestProblem {
+    alias: string;
+    text: string;
+    bestScore: number;
+    maxScore: number;
+    active: boolean;
+  }
+
   interface ContestResult {
     data: omegaup.Contest;
     length?: string;

@@ -26,16 +26,7 @@
 {/if}
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
-					<div id="problem-list">
-						<div class="summary">
-							<a class="name" href="#problems">{#wordsSummary#}</a>
-						</div>
-						<div class="template">
-							<a class="name"></a>
-							<span class="solved"></span>
-						</div>
-					</div>
-
+					<div id="arena-navbar-problems"></div>
 					<div id="arena-navbar-miniranking"></div>
 					<script type="text/json" id="arena-navbar-payload">{$showRanking|json_encode}</script>
 				</div>

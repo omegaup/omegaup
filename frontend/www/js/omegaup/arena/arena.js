@@ -6,6 +6,7 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -280,11 +281,34 @@ export class Arena {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      problemList: $('#problem-list'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
+
+    if (document.getElementById('arena-navbar-problems') !== null) {
+      self.elements.navBar = new Vue({
+        el: '#arena-navbar-problems',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-problems', {
+            props: {
+              problems: this.problems,
+              activeProblem: this.activeProblem,
+            },
+            on: {
+              'navigate-to-problem': function(problemAlias) {
+                window.location.hash = `#problems/${problemAlias}`;
+              },
+            },
+          });
+        },
+        data: {
+          problems: [],
+          activeProblem: null,
+        },
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+      });
+    }
 
     const navbar = document.getElementById('arena-navbar-payload');
     let navbarPayload = false;
@@ -584,19 +608,16 @@ export class Arena {
     self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
-    let problemTemplate = $('#problem-list .template');
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      let prob = problemTemplate
-        .clone()
-        .removeClass('template')
-        .addClass('problem_' + problem.alias);
-      $('.name', prob)
-        .attr('href', '#problems/' + problem.alias)
-        .html(problemName);
-      self.elements.problemList.append(prob);
+      self.elements.navBar.problems.push({
+        alias: problem.alias,
+        text: problemName,
+        bestScore: 0,
+        maxScore: 0,
+      });
 
       $('<option>')
         .val(problem.alias)
@@ -933,13 +954,11 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          $('#problems .problem_' + alias + ' .solved').html(
-            '(' +
-              problem.points.toFixed(self.digitsAfterDecimalPoint) +
-              ' / ' +
-              currentPoints.toFixed(self.digitsAfterDecimalPoint) +
-              ')',
+          const currentProblem = self.elements.navBar.problems.find(
+            problem => problem.alias === alias,
           );
+          currentProblem.bestScore = problem.points;
+          currentProblem.maxScore = currentPoints;
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
@@ -1439,11 +1458,8 @@ export class Arena {
     if (problem && self.problems[problem[1]]) {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
-
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.problem_' + problem.alias, self.elements.problemList).addClass(
-        'active',
-      );
+      // Set as active the selected problem
+      self.elements.navBar.activeProblem = self.currentProblem.alias;
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1669,8 +1685,7 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.summary', self.elements.problemList).addClass('active');
+      self.elements.navBar.activeProblem = null;
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -2161,15 +2176,11 @@ export class Arena {
         },
       );
     }
-    $('.problem_' + alias + ' .solved').text(
-      '(' +
-        self.myRuns
-          .getMaxScore(alias, previousScore)
-          .toFixed(self.digitsAfterDecimalPoint) +
-        ' / ' +
-        parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
-        ')',
+    const currentProblem = self.elements.navBar.problems.find(
+      problem => problem.alias === alias,
     );
+    currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
+    currentProblem.maxScore = maxScore || '0';
   }
 }
 class RunView {
