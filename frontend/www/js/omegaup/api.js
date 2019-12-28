@@ -619,7 +619,7 @@ export default {
   },
 
   Submission: {
-    latestSubmissions: _call('/api/submission/latestsubmissions', function(
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
       data,
     ) {
       data.submissions.forEach(submission => {
