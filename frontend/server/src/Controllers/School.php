@@ -231,13 +231,13 @@ class School extends \OmegaUp\Controllers\Controller {
      */
     private static function getTopSchoolsOfTheMonth(
         int $rowcount,
-        bool $canUseCache
+        bool $useCache
     ): array {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
 
-        if ($canUseCache) {
+        if ($useCache) {
             /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
             return \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
@@ -276,7 +276,7 @@ class School extends \OmegaUp\Controllers\Controller {
         return [
             'rank' => self::getTopSchoolsOfTheMonth(
                 $rowcount,
-                true /** canUseCache */
+                /* useCache */ true
             ),
         ];
     }
@@ -355,8 +355,8 @@ class School extends \OmegaUp\Controllers\Controller {
                         $currentDate
                     ),
                     'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
-                        100 /** rowcount */,
-                        false /** canUseCache */
+                        /* rowcount */ 100,
+                        /* useCache */ false
                     ),
                 ],
             ],
