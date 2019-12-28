@@ -6,6 +6,7 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -279,12 +280,39 @@ export class Arena {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      miniRanking: $('#mini-ranking'),
       problemList: $('#problem-list'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
+
+    const navbar = document.getElementById('arena-navbar-payload');
+    let navbarPayload = false;
+    if (navbar !== null) {
+      navbarPayload = JSON.parse(navbar.innerText);
+    }
+
+    if (document.getElementById('arena-navbar-miniranking') !== null) {
+      self.elements.miniRanking = new Vue({
+        el: '#arena-navbar-miniranking',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-miniranking', {
+            props: {
+              showRanking: this.showRanking,
+              users: this.users,
+            },
+          });
+        },
+        data: {
+          showRanking: navbarPayload,
+          users: [],
+        },
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+      });
+    }
+
     if (self.elements.ranking.length) {
       self.elements.rankingTable = new Vue({
         el: self.elements.ranking[0],
@@ -866,7 +894,9 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    $('tbody.inserted', self.elements.miniRanking).remove();
+    if (typeof self.elements.miniRanking !== 'undefined') {
+      self.elements.miniRanking.users = [];
+    }
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -916,26 +946,17 @@ export class Arena {
 
       // update miniranking
       if (i < 10) {
-        let r = $('tbody.user-list-template', self.elements.miniRanking)
-          .clone()
-          .removeClass('user-list-template')
-          .addClass('inserted');
-
-        $('.position', r).html(rank.place);
-        $('.user', r).html(
-          '<span title="' +
-            UI.rankingUsername(rank) +
-            '">' +
-            UI.rankingUsername(rank) +
-            UI.getFlag(rank['country']) +
-            '</span>',
-        );
-        $('.points', r).html(
-          rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-        );
-        $('.penalty', r).html(rank.total.penalty.toFixed(0));
-
-        self.elements.miniRanking.append(r);
+        if (typeof self.elements.miniRanking !== 'undefined') {
+          const username = UI.rankingUsername(rank);
+          self.elements.miniRanking.users.push({
+            position: rank.place,
+            username: username,
+            country: rank['country'],
+            classname: rank['classname'],
+            points: rank.total.points,
+            penalty: rank.total.penalty,
+          });
+        }
       }
     }
 
