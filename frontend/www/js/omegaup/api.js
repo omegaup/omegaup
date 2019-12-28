@@ -618,6 +618,17 @@ export default {
     googleLogin: _call('/api/session/googlelogin/'),
   },
 
+  Submission: {
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
+      data,
+    ) {
+      data.submissions.forEach(submission => {
+        submission.time = new Date(submission.time * 1000);
+      });
+      return data;
+    }),
+  },
+
   Time: {
     /**
      * Gets the current time according to the server.
