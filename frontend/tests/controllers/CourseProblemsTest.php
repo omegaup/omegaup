@@ -127,7 +127,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[0]['problem']->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
@@ -143,7 +143,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[1]['problem']->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(

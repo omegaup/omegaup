@@ -1036,7 +1036,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             intval($response['contest']->problemset_id)
         );
         $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
-        $result['status'] = 'ok';
         $result['admin'] = true;
         return $result;
     }

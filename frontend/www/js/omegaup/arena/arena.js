@@ -1282,6 +1282,7 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     const allowedLanguages = [
+      { language: '', name: '' },
       { language: 'kp', name: 'Karel (Pascal)' },
       { language: 'kj', name: 'Karel (Java)' },
       { language: 'c', name: 'C11 (gcc 7.4)' },
@@ -1321,6 +1322,7 @@ export class Arena {
 
     const languageArray =
       typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+    languageArray.push('');
 
     allowedLanguages
       .filter(item => {

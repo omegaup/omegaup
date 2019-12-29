@@ -3800,7 +3800,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'EMAIL_CLARIFICATIONS' => '0',
             'SOURCE' => '',
             'VISIBILITY' => '0',
-            'LANGUAGES' => 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cs,hs,java,lua,pas,py2,py3,rb',
+            'LANGUAGES' => join(
+                ',',
+                \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+            ),
             'SELECTED_TAGS' => '',
             'IS_UPDATE' => false,
         ];

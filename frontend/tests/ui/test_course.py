@@ -40,7 +40,7 @@ def test_user_ranking_course(driver):
                  ('//a[contains(text(), "%s")]/parent::div' %
                   problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         # When user has tried or solved a problem, feedback popup will be shown
@@ -134,7 +134,7 @@ def test_create_identities_for_course(driver):
                  ('//a[contains(text(), "%s")]/parent::div' %
                   problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(
