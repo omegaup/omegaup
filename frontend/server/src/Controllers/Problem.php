@@ -1977,7 +1977,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get the extra problem details with all the validations
-     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: string[], email_clarifications: bool, runs?: array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int, alias: string, username: string}[], admin?: bool, solvers?: array{username: string, language: string, runtime: float, memory: float, time: int}[], points: float, score: float}
+     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: string[], email_clarifications: bool, runs?: array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}[], admin?: bool, solvers?: array{username: string, language: string, runtime: float, memory: float, time: int}[], points: float, score: float}
      */
     private static function getProblemDetails(
         \OmegaUp\Request $r,
@@ -2099,13 +2099,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
 
             // Add each filtered run to an array
-            /** @var array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int, alias: string, username: string}[] */
-            $response['runs'] = [];
+            $results = [];
             foreach ($runsArray as $run) {
                 $run['alias'] = $problem->alias;
-                $run['username'] = $r->identity->username;
-                array_push($response['runs'], $run);
+                $run['username'] = strval($r->identity->username);
+                array_push($results, $run);
             }
+            $response['runs'] = $results;
         }
 
         if (!is_null($problemset) && !is_null($r->identity)) {
@@ -2674,7 +2674,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            $runs = \OmegaUp\DAO\Runs::getAllRuns(
+            $response['runs'] = \OmegaUp\DAO\Runs::getAllRuns(
                 null,
                 $r['status'],
                 $r['verdict'],
@@ -2684,24 +2684,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r['offset'],
                 $r['rowcount']
             );
-
-            $result = [];
-
-            foreach ($runs as $run) {
-                $run['time'] = intval($run['time']);
-                $run['score'] = round(floatval($run['score']), 4);
-                if (!is_null($run['contest_score'])) {
-                    $run['contest_score'] = round(
-                        floatval(
-                            $run['contest_score']
-                        ),
-                        2
-                    );
-                }
-                array_push($result, $run);
-            }
-
-            $response['runs'] = $result;
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
@@ -2711,16 +2693,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
 
             // Add each filtered run to an array
-            $response['runs'] = [];
-            if (!empty($runsArray)) {
-                foreach ($runsArray as $run) {
-                    $run['time'] = intval($run['time']);
-                    $run['contest_score'] = floatval($run['contest_score']);
-                    $run['username'] = $r->identity->username;
-                    $run['alias'] = $r['problem']->alias;
-                    array_push($response['runs'], $run);
-                }
+            $result = [];
+            foreach ($runsArray as $run) {
+                $run['alias'] = $r['problem']->alias;
+                $run['username'] = $r->identity->username;
+                array_push($result, $run);
             }
+            $response['runs'] = $result;
         }
 
         $response['status'] = 'ok';
