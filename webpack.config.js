@@ -57,10 +57,6 @@ let config = [
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_stats: './frontend/www/js/omegaup/problem/stats.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.js',
-      school_profile: './frontend/www/js/omegaup/schools/profile.js',
-      schools_intro: './frontend/www/js/omegaup/schools/intro.js',
-      schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:
@@ -69,6 +65,11 @@ let config = [
         './frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
       qualitynomination_details:
         './frontend/www/js/omegaup/qualitynomination/details.js',
+      rank_table: './frontend/www/js/omegaup/ranktable.js',
+      schools_intro: './frontend/www/js/omegaup/schools/intro.js',
+      school_of_the_month: './frontend/www/js/omegaup/schools/schoolofthemonth.js',
+      school_profile: './frontend/www/js/omegaup/schools/profile.js',
+      schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
       user_charts: './frontend/www/js/omegaup/user/charts.js',

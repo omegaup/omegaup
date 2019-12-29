@@ -416,10 +416,14 @@ declare namespace omegaup {
     username: string;
   }
 
+  export interface SchoolOfTheMonth extends SchoolsRank {
+    time?: string;
+  }
+
   export interface SchoolsRank {
     school_id: number;
     country_id: string;
-    score: number;
+    score?: number;
     name: string;
     rank?: number;
   }
