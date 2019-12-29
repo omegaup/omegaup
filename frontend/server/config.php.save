@@ -1,0 +1,11 @@
+<?php
+define('OMEGAUP_CACERT_URL', '/etc/omegaup/frontend/certificate.pem');
+define('OMEGAUP_DB_HOST', 'localhost');
+define('OMEGAUP_DB_NAME', 'omegaup');
+define('OMEGAUP_DB_PASS', 'omegaup');
+define('OMEGAUP_DB_USER', 'omegaup');
+define('OMEGAUP_ENVIRONMENT', 'development');
+define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'gitserversharedtoken');
+define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
+define('OMEGAUP_SSLCERT_URL', '/etc/omegaup/frontend/certificate.pem');
+define('OMEGAUP_URL', 'http://70.37.160.175');
