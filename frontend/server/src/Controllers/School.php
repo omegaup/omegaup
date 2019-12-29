@@ -230,34 +230,26 @@ class School extends \OmegaUp\Controllers\Controller {
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
     private static function getTopSchoolsOfTheMonth(
-        int $rowcount,
-        bool $useCache
+        int $rowcount
     ): array {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
 
-        if ($useCache) {
-            /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
-            return \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
-                "{$date}-{$rowcount}",
-                function () use (
+        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
+            "{$date}-{$rowcount}",
+            function () use (
+                $date,
+                $rowcount
+            ): array {
+                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
                     $date,
                     $rowcount
-                ): array {
-                    return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-                        $date,
-                        $rowcount
-                    );
-                },
-                60 * 60 * 12 // 12 hours
-            );
-        }
-
-        return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $date,
-            $rowcount
+                );
+            },
+            60 * 60 * 12 // 12 hours
         );
     }
 
@@ -275,8 +267,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return [
             'rank' => self::getTopSchoolsOfTheMonth(
-                $rowcount,
-                /* useCache */ true
+                $rowcount
             ),
         ];
     }
@@ -355,8 +346,7 @@ class School extends \OmegaUp\Controllers\Controller {
                         $currentDate
                     ),
                     'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
-                        /* rowcount */ 100,
-                        /* useCache */ true
+                        /* rowcount */ 100
                     ),
                 ],
             ],
