@@ -589,7 +589,7 @@ export default {
       },
     ),
 
-    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth'),
+    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth/'),
 
     users: _call('/api/school/users/', function(data) {
       data.users = data.users.map(
