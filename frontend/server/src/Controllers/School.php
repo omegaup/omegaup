@@ -325,7 +325,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{school_id: int, name: string, country_id: string, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>}, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{school_id: int, name: string, country_id: string, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -334,6 +334,12 @@ class School extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             $identity = null;
         }
+
+        $isMentor = !is_null(
+            $identity
+        ) && \OmegaUp\Authorization::isMentor(
+            $identity
+        );
 
         $currentTimestamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimestamp);
@@ -348,16 +354,11 @@ class School extends \OmegaUp\Controllers\Controller {
                     'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
                         /* rowcount */ 100
                     ),
+                    'isMentor' => $isMentor,
                 ],
             ],
             'template' => 'schoolofthemonth.tpl',
         ];
-
-        $isMentor = !is_null(
-            $identity
-        ) && \OmegaUp\Authorization::isMentor(
-            $identity
-        );
 
         if (!$isMentor) {
             return $response;
