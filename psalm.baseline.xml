@@ -655,20 +655,10 @@
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
     </MixedArrayAccess>
-    <MixedArrayAssignment occurrences="8">
-      <code>$problemSettings['limits']['ExtraWallTime']</code>
-      <code>$problemSettings['limits']['MemoryLimit']</code>
-      <code>$problemSettings['limits']['OutputLimit']</code>
-      <code>$problemSettings['limits']['OverallWallTimeLimit']</code>
-      <code>$problemSettings['limits']['TimeLimit']</code>
-      <code>$problemSettings['validator']['name']</code>
-      <code>$problemSettings['validator']['limits']</code>
-      <code>$problemSettings['validator']['limits']</code>
-    </MixedArrayAssignment>
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="31">
+    <MixedAssignment occurrences="30">
       <code>$response['tags']</code>
       <code>$run</code>
       <code>$problem</code>
@@ -703,8 +693,6 @@
       <code>$problemArray</code>
       <code>$addedProblems[]</code>
       <code>$deletedLanguages</code>
-      <code>$problemSettings['validator']['name']</code>
-      <code>$result['sample_input']</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
@@ -713,8 +701,7 @@
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="2">
-      <code>$_SERVER['HTTP_REFERER']</code>
+    <MixedOperand occurrences="1">
       <code>$casesStats['counts'][$case['name']]</code>
     </MixedOperand>
     <MixedPropertyAssignment occurrences="5">
@@ -756,7 +743,6 @@
       <code>$r-&gt;identity</code>
       <code>$problem</code>
       <code>$r-&gt;identity</code>
-      <code>$problem-&gt;acl_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
