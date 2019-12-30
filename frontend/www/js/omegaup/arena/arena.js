@@ -73,6 +73,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     if (payload != null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
+      options.preferredLanguage = payload.preferred_language || null;
     }
   }
   return options;
@@ -274,7 +275,7 @@ export class Arena {
     self.submissionGap = 0;
 
     // Setup preferred language
-    self.preferredLanguage = null;
+    self.preferredLanguage = options.preferredLanguage || null;
 
     // UI elements
     self.elements = {
