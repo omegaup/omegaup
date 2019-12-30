@@ -144,10 +144,8 @@ abstract class UsersBadges {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\UsersBadges[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\UsersBadges> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\UsersBadges}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\UsersBadges>
      */
     final public static function getAll(
         ?int $pagina = null,
