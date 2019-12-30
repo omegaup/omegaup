@@ -778,8 +778,12 @@ let UI = {
                 columns += 2;
               } else {
                 result += `<td><pre>${escapeCharacters(
-                  matches[i + 1].replace(/\s+$/, ''),
-                  ' \t*_{}[]()>#+-=.!|`',
+                  matches[i + 1]
+                    .replace(/\s+$/, '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;'),
+                  ' \t*_{}[]()<>#+=.!|`-',
                   /*afterBackslash=*/ false,
                   /*doNotEscapeTildeAnDollar=*/ true,
                 )}</pre></td>`;
@@ -821,7 +825,7 @@ let UI = {
           }
           contents = escapeCharacters(
             lines.join('\n'),
-            ' \t*_{}[]()>#+-=.!|`',
+            ' \t*_{}[]()<>#+=.!|`-',
             /*afterBackslash=*/ false,
             /*doNotEscapeTildeAnDollar=*/ true,
           );
