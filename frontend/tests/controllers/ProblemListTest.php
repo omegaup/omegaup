@@ -151,11 +151,11 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp,c'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
-                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
+                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp11-gcc,c11-gcc',
             ]));
             for ($j = 0; $j <= $i; $j++) {
                 \OmegaUp\Test\Factories\Problem::addTag(

@@ -119,11 +119,11 @@
           v-model="validatorLanguage"
         >
           <!-- id-lint on -->
-          <option value="cpp">
-            C++
+          <option value="cpp17-gcc">
+            C++17
           </option>
-          <option value="py">
-            Python
+          <option value="py3">
+            Python 3.6
           </option>
         </select>
       </div>
@@ -165,10 +165,10 @@
           v-model="interactiveLanguage"
         >
           <!-- id-lint on -->
-          <option value="cpp11">
-            C++
+          <option value="cpp17-gcc">
+            C++17
           </option>
-          <option value="py">
+          <option value="py3">
             Python
           </option>
         </select>

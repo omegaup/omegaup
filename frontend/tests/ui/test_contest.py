@@ -36,11 +36,11 @@ def test_create_contest(driver):
                          driver.user_username, access_mode='Private')
 
     with driver.login(identity.username, identity.password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
@@ -96,20 +96,20 @@ def test_user_ranking_contest(driver):
                          driver.user_username)
 
     with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     with driver.login(user3, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(uninvited_identity.username,
                       uninvited_identity.password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     update_scoreboard_for_contest(driver, contest_alias)
@@ -195,17 +195,17 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                          driver.user_username, scoreboard_time_percent=0)
 
     with driver.login(user1, password):
-        create_run_user(driver, alias, problem, 'Main.cpp11',
+        create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user2, password):
-        create_run_user(driver, alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, alias)
 
     with driver.login(driver.user_username, 'user'):
-        create_run_user(driver, alias, problem, 'Main.cpp11',
+        create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(driver.user_username, 'user'):

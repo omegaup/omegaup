@@ -264,7 +264,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'title' => 'valid-languages'
         ]));
 
-        $languages = 'hs,java,pl';
+        $languages = 'hs,java';
 
         // Call API
         $login = self::login($problemData['author']);

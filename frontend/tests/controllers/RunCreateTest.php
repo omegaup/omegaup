@@ -71,7 +71,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -128,7 +128,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'problemset_id' => $this->assignment->problemset_id,
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -445,7 +445,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias',
             'contest_alias',
             'language',
-            'source'
+            'source',
         ];
 
         foreach ($needed_keys as $key) {
@@ -456,15 +456,11 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             unset($r[$key]);
 
             try {
-                // Call API
-                $response = \OmegaUp\Controllers\Run::apiCreate($r);
+                \OmegaUp\Controllers\Run::apiCreate($r);
+                $this->fail('apiCreate did not return expected exception');
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                // The API should throw this exception, in this case
-                // we continue
-                continue;
+                $this->assertEquals('parameterEmpty', $e->getMessage());
             }
-
-            $this->fail('apiCreate did not return expected exception');
         }
     }
 
@@ -617,7 +613,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => '', // Not inside a contest
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -631,14 +627,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Languages must be validated against the problem's allowed languages.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunInvalidProblemLanguage() {
         // Create public problem without C as an option.
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
-            'languages' => 'cpp'
+            'languages' => 'cpp11-gcc'
         ]));
 
         // Create our contestant
@@ -646,21 +640,22 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create an empty request
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-        ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'language' => 'c11-gcc',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]));
+            $this->fail('apiCreate did not return expected exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
     }
 
     /**
      * Languages must be validated against the problem's allowed languages.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunInvalidContestLanguage() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -668,7 +663,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['languages' => ['cpp']]
+                ['languages' => ['cpp11-gcc']]
             )
         );
 
@@ -692,16 +687,20 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-        ]);
 
         // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'language' => 'c11-gcc',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]));
+            $this->fail('apiCreate did not return expected exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
     }
 
     /**
@@ -734,7 +733,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => '', // Not inside a contest
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -765,7 +764,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => '', // Not inside a contest
                 'problem_alias' => $problemData['request']['problem_alias'],
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]);
 
@@ -901,7 +900,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'language' => 'c',
+             'language' => 'c11-gcc',
              'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
         ]));
     }
@@ -927,7 +926,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'language' => 'c',
+             'language' => 'c11-gcc',
              'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
         ]));
     }
