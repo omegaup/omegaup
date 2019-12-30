@@ -613,12 +613,14 @@ export class Arena {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      self.elements.navBar.problems.push({
-        alias: problem.alias,
-        text: problemName,
-        bestScore: 0,
-        maxScore: 0,
-      });
+      if (self.elements.navBar) {
+        self.elements.navBar.problems.push({
+          alias: problem.alias,
+          text: problemName,
+          bestScore: 0,
+          maxScore: 0,
+        });
+      }
 
       $('<option>')
         .val(problem.alias)
@@ -955,11 +957,13 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          const currentProblem = self.elements.navBar.problems.find(
-            problem => problem.alias === alias,
-          );
-          currentProblem.bestScore = problem.points;
-          currentProblem.maxScore = currentPoints;
+          if (self.elements.navBar) {
+            const currentProblem = self.elements.navBar.problems.find(
+              problem => problem.alias === alias,
+            );
+            currentProblem.bestScore = problem.points;
+            currentProblem.maxScore = currentPoints;
+          }
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
@@ -1462,7 +1466,9 @@ export class Arena {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
       // Set as active the selected problem
-      self.elements.navBar.activeProblem = self.currentProblem.alias;
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = self.currentProblem.alias;
+      }
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1688,7 +1694,9 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      self.elements.navBar.activeProblem = null;
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = null;
+      }
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -2179,11 +2187,13 @@ export class Arena {
         },
       );
     }
-    const currentProblem = self.elements.navBar.problems.find(
-      problem => problem.alias === alias,
-    );
-    currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
-    currentProblem.maxScore = maxScore || '0';
+    if (self.elements.navBar) {
+      const currentProblem = self.elements.navBar.problems.find(
+        problem => problem.alias === alias,
+      );
+      currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
+      currentProblem.maxScore = maxScore || '0';
+    }
   }
 }
 class RunView {
