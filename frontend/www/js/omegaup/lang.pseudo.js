@@ -1169,7 +1169,7 @@ const translations = {
 	wordsReadAgain: "(R3ad again)",
 	wordsRegistration: "(R3gi57ra7i0n/0p3n)",
 	wordsRejudge: "(R3judg3)",
-	wordsReportProblem: "(R3p0r7 inappr0pria73 c0n73n7 in 7hi5 pr0b13m.)",
+	wordsReportProblem: "(R3p0r7 pr0b13m.)",
 	wordsRequired: "(R3quir3d)",
 	wordsReset: "(0m3gaUp: R3537 pa55w0rd.)",
 	wordsResetMessage: "(C1ick 7h3 f0110wing 1ink 70 r3537 y0ur pa55w0rd: <a hr3f=\"[1ink]\">[1ink]</a><br><br>If y0u didn'7 r3qu357 7hi5 0p3ra7i0n p13a53 d0 n07 c1ick 7h3 1ink and mak3 5ur3 y0ur acc0un7 i5 5af3.)",
