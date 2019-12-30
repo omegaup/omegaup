@@ -287,7 +287,10 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testApiSelectSchoolOfTheMonth() {
-        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        [
+            'user' => $mentor,
+            'identity' => $mentorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         $runDate = date_create(date('Y-m-15'));
         date_add(
@@ -296,7 +299,6 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 '-6 month'
             )
         );
-        $runDate = date_format($runDate, 'Y-m-d');
 
         $schoolsData = [
             SchoolsFactory::createSchool(),
@@ -304,7 +306,8 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             SchoolsFactory::createSchool(),
         ];
 
-        self::setUpSchoolsRuns($schoolsData, $runDate);
+        \OmegaUp\Time::setTimeForTesting($runDate->getTimestamp());
+        self::setUpSchoolsRuns($schoolsData, date_format($runDate, 'Y-m-d'));
 
         // Mentor's login
         $login = self::login($mentorIdentity);
@@ -312,7 +315,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'school_id' => $schoolsData[0]['school']->school_id
+                'school_id' => $schoolsData[0]['school']->school_id,
             ]));
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals(
@@ -322,22 +325,15 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Today must be the end of the month
-        $date = date_create(date('Y-m-d'));
-        date_add(
-            $date,
-            date_interval_create_from_date_string(
-                '-6 month'
-            )
-        );
-        $date->modify('last day of this month');
-        \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
+        $lastDayOfMonth = $runDate;
+        $lastDayOfMonth->modify('last day of this month');
+        \OmegaUp\Time::setTimeForTesting($lastDayOfMonth->getTimestamp());
 
         $result = \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolsData[0]['school']->school_id
         ]));
         $this->assertEquals('ok', $result['status']);
-        \OmegaUp\Time::setTimeForTesting(null);
 
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         // Should contain exactly two schools of the month, the one from previous test and
