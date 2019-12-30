@@ -107,10 +107,10 @@
 							<option value=""></option>
 							{foreach from=$PROGRAMMING_LANGUAGES key=extension item=name}
 							<option value="{$extension}">
-								{if $extension != 'cat'}
-									{$name}
-								{else}
+								{if $extension == 'cat'}
 									{#outputOnly#}
+								{else}
+									{$name}
 								{/if}
 							</option>
 							{/foreach}

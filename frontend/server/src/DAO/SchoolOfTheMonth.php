@@ -136,6 +136,25 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
+     * Returns true if the school of the month for a certain date
+     * has been previously selected
+     */
+    public static function isSchoolOfTheMonthAlreadySelected(string $time): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                School_Of_The_Month
+            WHERE
+                `time` = ?;';
+
+        return \OmegaUp\MySQLConnection::getInstance()->getOne(
+            $sql,
+            [$time]
+        ) > 0;
+    }
+
+    /**
      * Gets the best school of each month
      *
      * @return list<array{school_id: int, name: string, country_id: string, time: string}>

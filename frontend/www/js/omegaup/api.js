@@ -589,6 +589,8 @@ export default {
       },
     ),
 
+    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth/'),
+
     users: _call('/api/school/users/', function(data) {
       data.users = data.users.map(
         user =>
@@ -616,6 +618,17 @@ export default {
      * @param {string} storeToken - The auth code.
      */
     googleLogin: _call('/api/session/googlelogin/'),
+  },
+
+  Submission: {
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
+      data,
+    ) {
+      data.submissions.forEach(submission => {
+        submission.time = new Date(submission.time * 1000);
+      });
+      return data;
+    }),
   },
 
   Time: {

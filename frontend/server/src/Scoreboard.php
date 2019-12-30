@@ -460,8 +460,8 @@ class Scoreboard {
     }
 
     /**
-     * @param array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
-     * @param array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool}[] $rawContestIdentities
+     * @param array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
+     * @param array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool, classname: string}[] $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
      * @param string $contestPenaltyCalcPolicy
@@ -528,6 +528,7 @@ class Scoreboard {
                     $contestant['name'] :
                     $contestant['username'],
                 'country' => $contestant['country_id'],
+                'classname' => $contestant['classname'],
                 'is_invited' => boolval($contestant['is_invited']),
                 self::TOTAL_COLUMN => [
                     'points' => 0.0,
@@ -569,7 +570,7 @@ class Scoreboard {
             }
 
             $totalPenalty = $run['penalty'] + $problem['runs'] * $contestPenalty;
-            $roundedScore = round($contestScore, 2);
+            $roundedScore = round(floatval($contestScore), 2);
             if (
                 $problem['points'] < $roundedScore ||
                 $problem['points'] == $roundedScore &&
@@ -716,7 +717,7 @@ class Scoreboard {
 
     /**
      * @param \OmegaUp\ScoreboardParams $params
-     * @param array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
+     * @param array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
      * @param array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool}[] $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @return array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[]
@@ -788,12 +789,7 @@ class Scoreboard {
 
             $problemData['points'] = max(
                 $problemData['points'],
-                round(
-                    floatval(
-                        $contestScore
-                    ),
-                    2
-                )
+                round(floatval($contestScore), 2)
             );
             $problemData['penalty'] = 0.0;
 
@@ -809,10 +805,11 @@ class Scoreboard {
                 'delta' => max(0.0, ($runDelay - $contestStart) / 60.0),
                 'problem' => [
                     'alias' => $problemMapping[$problemId]['alias'],
-                    'points' => round($contestScore, 2),
+                    'points' => round(floatval($contestScore), 2),
                     'penalty' => 0.0,
                 ],
                 'country' => $identity['country_id'],
+                'classname' => $identity['classname'],
                 'is_invited' => boolval($identity['is_invited']),
                 self::TOTAL_COLUMN => [
                     'points' => 0.0,

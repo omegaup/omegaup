@@ -16,10 +16,27 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
 
+    /**
+     * @readonly
+     * @var \OmegaUp\FileUploader
+     */
+    private $originalFileUploader;
+
     public function setUp() {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
         \OmegaUp\Test\Utils::CleanupDb();
+        $this->originalFileUploader = \OmegaUp\FileHandler::getfileUploader();
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
+    }
+
+    public function tearDown() {
+        parent::tearDown();
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->originalFileUploader
+        );
     }
 
     public static function getSortedResults(string $query) {
