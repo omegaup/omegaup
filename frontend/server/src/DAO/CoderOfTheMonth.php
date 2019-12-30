@@ -106,21 +106,34 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     final public static function getCodersOfTheMonth(): array {
         $sql = '
-          SELECT
-            cm.time, i.username, COALESCE(i.country_id, "xx") AS country_id, e.email
-          FROM
-            Coder_Of_The_Month cm
-          INNER JOIN
-            Users u ON u.user_id = cm.user_id
-          INNER JOIN
-            Identities i ON i.identity_id = u.main_identity_id
-          LEFT JOIN
-            Emails e ON e.user_id = u.user_id
-          WHERE
-            cm.rank = 1 OR cm.selected_by IS NOT NULL
-          ORDER BY
-            cm.time DESC
-        ';
+            SELECT
+                cm.time,
+                i.username,
+                COALESCE(i.country_id, "xx") AS country_id,
+                e.email
+            FROM
+                Coder_Of_The_Month cm
+            INNER JOIN
+                Users u ON u.user_id = cm.user_id
+            INNER JOIN
+                Identities i ON i.identity_id = u.main_identity_id
+            LEFT JOIN
+                Emails e ON e.user_id = u.user_id
+            WHERE
+                cm.selected_by IS NOT NULL
+                OR (
+                    cm.rank = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            Coder_Of_The_Month
+                        WHERE
+                            time = cm.time AND selected_by IS NOT NULL
+                    )
+                )
+            ORDER BY
+                cm.time DESC';
 
         /** @var array{time: string, username: string, country_id: string, email: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
