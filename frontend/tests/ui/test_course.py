@@ -44,11 +44,21 @@ def test_user_ranking_course(driver):
         driver.update_score_in_course(problem, assignment_alias)
 
         # When user has tried or solved a problem, feedback popup will be shown
+        with util.dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close'))).click()
+            driver.wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close')))
+
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '.popup button.close'))).click()
-
+                (By.XPATH,
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
