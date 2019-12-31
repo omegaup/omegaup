@@ -290,6 +290,29 @@ class MySQLConnection {
         return $typeName;
     }
 
+    private function DumpMySQLQueryResultTypes(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        $fieldTypes = [];
+        /** @var object $field */
+        foreach ($result->fetch_fields() as $field) {
+            $fieldTypes[] = "{$field->name}: " . self::PsalmType($field);
+        }
+        sort($fieldTypes);
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} array{" .
+            join(', ', $fieldTypes) .
+            '}'
+        );
+    }
+
+    private function DumpMySQLQueryResultTypeSingleField(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} " .
+            self::PsalmType($result->fetch_field_direct(0))
+        );
+    }
+
     /**
      * Executes a MySQL query.
      */
@@ -336,6 +359,9 @@ class MySQLConnection {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
             $fieldTypes = self::MapFieldTypes($result);
             /** @var array<string, mixed> */
             return self::MapRow($result->fetch_assoc(), $fieldTypes);
@@ -355,6 +381,9 @@ class MySQLConnection {
             return [];
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
             $fieldTypes = self::MapFieldTypes($result);
             $resultArray = [];
             /** @var array<string, mixed> $row */
@@ -379,6 +408,9 @@ class MySQLConnection {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypeSingleField($result);
+            }
             $row = $result->fetch_row();
             if (empty($row)) {
                 return null;

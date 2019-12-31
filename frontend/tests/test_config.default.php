@@ -25,7 +25,12 @@ try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 # LOG CONFIG
 # ####################################
 try_define('OMEGAUP_LOG_FILE', OMEGAUP_TEST_ROOT . 'omegaup.log');
+try_define(
+    'OMEGAUP_MYSQL_TYPES_LOG_FILE',
+    OMEGAUP_TEST_ROOT . 'mysql_types.log'
+);
 try_define('OMEGAUP_LOG_LEVEL', 'debug');
+try_define('DUMP_MYSQL_QUERY_RESULT_TYPES', true);
 
 # ####################################
 # GRADER CONFIG

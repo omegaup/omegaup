@@ -168,6 +168,7 @@ class Utils {
     public static function cleanupFilesAndDB(): void {
         // Clean previous log
         file_put_contents(OMEGAUP_LOG_FILE, '');
+        file_put_contents(OMEGAUP_MYSQL_TYPES_LOG_FILE, '');
         file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
 
         // Clean problems and runs path
