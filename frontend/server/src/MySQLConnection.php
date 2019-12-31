@@ -201,9 +201,7 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns the first row as an associative array.
      *
-     * @return mixed[]|null
-     *
-     * @psalm-return array<string, mixed>|null
+     * @return array<string, mixed>|null
      */
     public function GetRow(string $sql, array $params = []): ?array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
@@ -221,9 +219,7 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns all rows as associative arrays.
      *
-     * @return array{string: mixed}[]
-     *
-     * @psalm-return array<int, array<string, mixed>>
+     * @return list<array<string, mixed>>
      */
     public function GetAll(string $sql, array $params = []): array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
@@ -231,7 +227,7 @@ class MySQLConnection {
             return [];
         }
         try {
-            /** @var array<int, array<string, mixed>> */
+            /** @var list<array<string, mixed>> */
             $resultArray = [];
             /** @var array<string, mixed> $row */
             while (!is_null($row = $result->fetch_assoc())) {
