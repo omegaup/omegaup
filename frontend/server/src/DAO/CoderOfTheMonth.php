@@ -28,7 +28,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           SELECT DISTINCT
             i.user_id,
             i.username,
-            COALESCE(i.country_id, 'xx') AS country_id,
+            IFNULL(i.country_id, 'xx') AS country_id,
             isc.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
@@ -109,7 +109,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             SELECT
                 cm.time,
                 i.username,
-                COALESCE(i.country_id, "xx") AS country_id,
+                IFNULL(i.country_id, "xx") AS country_id,
                 e.email
             FROM
                 Coder_Of_The_Month cm
@@ -151,22 +151,25 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         SELECT
           cm.time,
           i.username,
-          COALESCE (
-            (SELECT urc.classname
-            FROM User_Rank_Cutoffs urc
-            WHERE
-                urc.score <= (
-                    SELECT
-                        ur.score
-                    FROM
-                        User_Rank ur
-                    WHERE
-                        ur.user_id = i.user_id
-                )
-            ORDER BY
-                urc.percentile ASC
-            LIMIT 1)
-        , "user-rank-unranked") AS classname
+          IFNULL(
+            (
+              SELECT urc.classname
+              FROM User_Rank_Cutoffs urc
+              WHERE
+                  urc.score <= (
+                      SELECT
+                          ur.score
+                      FROM
+                          User_Rank ur
+                      WHERE
+                          ur.user_id = i.user_id
+                  )
+              ORDER BY
+                  urc.percentile ASC
+              LIMIT 1
+            ),
+            "user-rank-unranked"
+          ) AS classname
         FROM
           Coder_Of_The_Month cm
         INNER JOIN
@@ -200,7 +203,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.time,
             cm.rank,
             i.username,
-            COALESCE(i.country_id, "xx") AS country_id,
+            IFNULL(i.country_id, "xx") AS country_id,
             e.email,
             u.user_id
           FROM

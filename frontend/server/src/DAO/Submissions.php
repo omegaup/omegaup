@@ -226,7 +226,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.verdict,
                 r.runtime,
                 r.memory,
-                COALESCE (
+                IFNULL(
                     (
                         SELECT urc.classname
                         FROM User_Rank_Cutoffs urc

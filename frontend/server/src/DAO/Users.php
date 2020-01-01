@@ -80,7 +80,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     */
     final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
-                    COALESCE(c.`name`, "xx") AS country,
+                    IFNULL(c.`name`, "xx") AS country,
                     c.`country_id` AS country_id,
                     s.`name` AS state,
                     s.`state_id` AS state_id,

@@ -171,7 +171,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
                     accepted / GREATEST(1, submissions)     AS ratio,
-                    ROUND(100 * COALESCE(ps.score, 0))      AS score,
+                    ROUND(100 * IFNULL(ps.score, 0))      AS score,
                     p.*
             ';
             $sql = '
@@ -206,7 +206,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
-                    ROUND(100 * COALESCE(ps.score, 0), 2)   AS score,
+                    ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
                     p.*
             ';
             $sql = '
@@ -454,7 +454,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     final public static function getPracticeDeadline($id) {
-        $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
+        $sql = 'SELECT IFNULL(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$id]);
     }
 
