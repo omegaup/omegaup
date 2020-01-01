@@ -3309,12 +3309,12 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param array{time: string, username: string, rank?: int, country_id: string, email: string}[] $coders
+     * @param array{time: string, username: string, rank?: int, country_id: string, email: ?string}[] $coders
      * @return array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}[]
      */
     private static function processCodersList(array $coders): array {
         $response = [];
-        /** @var array{time: string, username: string, country_id: string, email: string} $coder */
+        /** @var array{time: string, username: string, country_id: string, email: ?string} $coder */
         foreach ($coders as $coder) {
             $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
             if (is_null($userInfo)) {
@@ -3323,7 +3323,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $classname = \OmegaUp\DAO\Users::getRankingClassName(
                 $userInfo->user_id
             );
-            $hashEmail = md5($coder['email']);
+            $hashEmail = md5($coder['email'] ?? '');
             $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
             $response[] = [
                 'username' => $coder['username'],

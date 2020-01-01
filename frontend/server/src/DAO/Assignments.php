@@ -176,7 +176,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 
-        /** @var list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int, order: int, scoreboard_url: string, scoreboard_url_admin: string}> */
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: int, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]

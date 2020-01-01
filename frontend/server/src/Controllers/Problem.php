@@ -2522,7 +2522,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Return a report of which runs would change due to a version change.
      *
-     * @return array{status: 'ok', diff: list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}>}
+     * @return array{diff: list<array{username: string, guid: string, problemset_id: ?int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?float}>}
      */
     public static function apiRunsDiff(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -2542,7 +2542,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
             'diff' => \OmegaUp\DAO\Runs::getRunsDiffsForVersion(
                 $problem,
                 null,

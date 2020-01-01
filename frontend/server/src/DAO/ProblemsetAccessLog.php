@@ -47,7 +47,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
     }
 
     /**
-     * @return list<array{alias?: string, classname: string, ip: int, time: int, username: string}>
+     * @return list<array{ip: int, time: int, username: string}>
      */
     final public static function getAccessForCourse(int $courseId) {
         $sql = 'SELECT
@@ -68,7 +68,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        /** @var list<array{alias?: string, classname: string, ip: int, time: int, username: string}> */
+        /** @var list<array{ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]

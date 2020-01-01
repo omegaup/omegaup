@@ -13,7 +13,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the latest submissions
      *
-     * @return array{submissions: list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
+     * @return array{submissions: list<array{time: int, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
      */
     public static function apiLatestSubmissions(\OmegaUp\Request $r) {
         $r->ensureInt('offset', null, null, false);

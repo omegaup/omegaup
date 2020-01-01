@@ -63,7 +63,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
-        /** @var array{username: string, language: string, runtime: float, memory: float, time: int}[] */
+        /** @var list<array{language: string, memory: int, runtime: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -171,7 +171,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = intval($rowcount);
         }
 
-        /** @var array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}[] */
+        /** @var list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: int, type: null|string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -316,7 +316,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Get all relevant identities for a problemset.
      *
-     * @return array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool, classname: string}[]
+     * @return array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[]
      */
     final public static function getAllRelevantIdentities(
         int $problemsetId,
@@ -327,38 +327,45 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?bool $excludeAdmin = true
     ): array {
         $classNameQuery = '
-                        IFNULL(
-                            (
-                                SELECT urc.classname
-                                FROM User_Rank_Cutoffs urc
-                                WHERE
-                                    urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                                ORDER BY
-                                    urc.percentile ASC
-                                LIMIT 1
-                            ),
-                            "user-rank-unranked"
-                        ) AS classname';
+            IFNULL(
+                (
+                    SELECT urc.classname
+                    FROM User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                            SELECT
+                                ur.score
+                            FROM
+                                User_Rank ur
+                            WHERE
+                                ur.user_id = i.user_id
+                        )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT 1
+                ),
+                "user-rank-unranked"
+            ) AS classname';
         // Build SQL statement
         if ($showAllRuns) {
             if (is_null($groupId)) {
                 $sql = "
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, pi.is_invited, $classNameQuery
+                        i.identity_id,
+                        i.username,
+                        i.name,
+                        IFNULL(i.country_id, 'xx') AS country_id,
+                        CAST(pi.is_invited AS UNSIGNED) AS is_invited,
+                        $classNameQuery
                     FROM
                         Identities i
                     INNER JOIN
                         Problemset_Identities pi ON i.identity_id = pi.identity_id
                     WHERE
                         pi.problemset_id = ? AND
-                        (i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)";
+                        (i.user_id NOT IN (
+                            SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?
+                        )";
                 $val = [
                     $problemsetId,
                     $aclId,
@@ -373,7 +380,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             } else {
                 $sql = "
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, 0 as is_invited, $classNameQuery
+                        i.identity_id,
+                        i.username,
+                        i.name,
+                        IFNULL(i.country_id, 'xx') AS country_id,
+                        FALSE AS is_invited,
+                        $classNameQuery
                     FROM
                         Identities i
                     INNER JOIN
@@ -394,7 +406,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         } else {
             $sql = "
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id, 0 as is_invited, $classNameQuery
+                    i.identity_id,
+                    i.username,
+                    i.name,
+                    IFNULL(i.country_id, 'xx') AS country_id,
+                    FALSE AS is_invited,
+                    $classNameQuery
                 FROM
                     Identities i
                 INNER JOIN
@@ -420,9 +437,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool, classname: string}[] */
+        /** @var array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[] */
         $result = [];
-        /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: int, classname: string} $row */
+        /** @var array{classname: string, country_id: string, identity_id: int, is_invited: int, name: null|string, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -487,7 +504,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[]
+     * @return array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}[]
      */
     final public static function getProblemsetRuns(
         \OmegaUp\DAO\VO\Problemsets $problemset,
@@ -495,9 +512,15 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.score, r.penalty, r.contest_score, s.problem_id,
-                s.identity_id, s.type, UNIX_TIMESTAMP(s.time) AS time,
-                s.submit_delay, s.guid
+                r.score,
+                r.penalty,
+                r.contest_score,
+                s.problem_id,
+                s.identity_id,
+                s.type,
+                UNIX_TIMESTAMP(s.time) AS time,
+                s.submit_delay,
+                s.guid
             FROM
                 Problemset_Problems pp
             INNER JOIN
@@ -519,7 +542,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ) .
             ' ORDER BY s.submission_id;';
 
-        /** @var array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] */
+        /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: int, type: null|string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemset->problemset_id]
@@ -667,7 +690,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}[] */
+        /** @var list<array{contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -954,7 +977,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * @param string   $oldVersion   the old version.
      * @param string   $newVersion   the new version.
      *
-     * @return list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}>
+     * @return list<array{guid: string, new_score: float|null, new_status: string|null, new_verdict: string|null, old_score: float|null, old_status: string|null, old_verdict: string|null, problemset_id: int|null, username: string}>
      */
     final public static function getRunsDiffsForVersion(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -1009,7 +1032,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LIMIT 0, 1000;
         ';
 
-        /** @var list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}> */
+        /** @var list<array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 }

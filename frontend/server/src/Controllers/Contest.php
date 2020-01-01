@@ -228,8 +228,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Callback to get contests list, depending on a given method
      * @param \OmegaUp\Request $r
-     * @param Closure(int, int, int, null|string):array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: int, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[] $callbackUserFunction
-     * @return array{contests: array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: int, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[], status: string}
+     * @param Closure(int, int, int, null|string):array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[] $callbackUserFunction
+     * @return array{contests: array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: int, languages?: null|string, last_updated: int, original_finish_time?: string, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: int, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}[], status: string}
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
@@ -511,7 +511,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{status: string, contests: array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]}, privateContestsAlert: bool}
+     * @return array{payload: array{status: string, contests: array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}[]}, privateContestsAlert: bool}
      */
     public static function getContestListMineForSmarty(
         \OmegaUp\Request $r
@@ -2409,7 +2409,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param string[] $contestAliases
      * @param string[] $usernamesFilter
      * @param array<string, array{only_ac: bool, weight: float}> $contestParams
-     * @return array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}[]
+     * @return array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}[]
      */
     public static function getMergedScoreboard(
         array $contestAliases,
@@ -2453,7 +2453,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $scoreboards[strval($contest->alias)] = $s->generate();
         }
 
-        /** @var array<string, array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
+        /** @var array<string, array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
         $mergedScoreboard = [];
 
         // Merge
@@ -2515,8 +2515,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         usort(
             $mergedScoreboard,
             /**
-             * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $a
-             * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $b
+             * @param array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $a
+             * @param array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $b
              */
             function ($a, $b): int {
                 if ($a['total']['points'] == $b['total']['points']) {
@@ -3158,7 +3158,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest
      *
      * @param \OmegaUp\Request $r
-     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     public static function apiReport(\OmegaUp\Request $r): array {
         $contestReport = self::getContestReportDetails($r);
@@ -3171,7 +3171,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
+     * @return array{finish_time: int, problems: array{alias: string, order: int}[], ranking: array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[], start_time: int, status: string, time: int, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3208,7 +3208,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Gets all details to show the report
      *
      * @param \OmegaUp\Request $r
-     * @return array{contestReport: array{country: null|string, is_invited: bool, name: string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[]}
+     * @return array{contestReport: array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}[], details: array{groups: array{cases: array{meta: array{memory: float, time: float, wall_time: float}}[]}[]}}, runs: int}[], total: array{penalty: float, points: float}, username: string}[]}
      */
     public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];

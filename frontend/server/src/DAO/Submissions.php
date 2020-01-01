@@ -159,7 +159,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return array{submissions: list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
+     * @return array{submissions: list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: int, title: string, username: string, verdict: string}>, totalRows: int}
      */
     public static function getLatestSubmissions(
         int $page,
@@ -274,7 +274,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
 
         $query .=  $sqlOrderBy . $sqlLimit;
 
-        /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
+        /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: int, title: string, username: string, verdict: string}> */
         $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
