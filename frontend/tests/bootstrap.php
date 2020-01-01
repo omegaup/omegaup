@@ -32,6 +32,7 @@ namespace {
     require_once(
         OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php'
     );
+    \OmegaUp\Test\Utils::cleanupLogs();
     \OmegaUp\Test\Utils::cleanupFilesAndDB();
     // Clean APC cache
     \OmegaUp\Cache::clearCacheForTesting();

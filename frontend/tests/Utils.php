@@ -165,12 +165,13 @@ class Utils {
         \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
-    public static function cleanupFilesAndDB(): void {
-        // Clean previous log
+    public static function cleanupLogs(): void {
         file_put_contents(OMEGAUP_LOG_FILE, '');
         file_put_contents(OMEGAUP_MYSQL_TYPES_LOG_FILE, '');
         file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
+    }
 
+    public static function cleanupFilesAndDB(): void {
         // Clean problems and runs path
         $runsPath = OMEGAUP_TEST_ROOT . 'submissions';
         // We need to have this directory be NOT within the /opt/omegaup directory
