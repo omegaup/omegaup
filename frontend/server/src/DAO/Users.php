@@ -244,11 +244,12 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return $users;
     }
 
-    public static function getUsersCount() {
+    public static function getUsersCount(): int {
         $sql = 'SELECT
-                    COUNT(*) AS total
+                    COUNT(*)
                 FROM
                     Users;';
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql)['total'];
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
     }
 }

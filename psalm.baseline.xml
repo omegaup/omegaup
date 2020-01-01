@@ -38,14 +38,8 @@
     <MixedArgument occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
     </MixedArgument>
-    <MixedAssignment occurrences="3">
-      <code>$totalUsers</code>
-      <code>$ownersCount</code>
-      <code>$firstAssignation</code>
-    </MixedAssignment>
-    <MixedOperand occurrences="2">
+    <MixedOperand occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
-      <code>$ownersCount</code>
     </MixedOperand>
   </file>
   <file src="frontend/server/src/Controllers/Clarification.php">
@@ -1850,26 +1844,10 @@
       <code>$verified</code>
       <code>$in_mailing_list</code>
     </MissingParamType>
-    <MissingReturnType occurrences="3">
+    <MissingReturnType occurrences="2">
       <code>getHideTags</code>
       <code>getVerified</code>
-      <code>getUsersCount</code>
     </MissingReturnType>
-    <PossiblyNullArrayAccess occurrences="1">
-      <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetRow($sql)['total']</code>
-    </PossiblyNullArrayAccess>
-  </file>
-  <file src="frontend/server/src/DAO/UsersBadges.php">
-    <MissingReturnType occurrences="2">
-      <code>getBadgeOwnersCount</code>
-      <code>getBadgeFirstAssignationTime</code>
-    </MissingReturnType>
-    <MixedInferredReturnType occurrences="1">
-      <code>?int</code>
-    </MixedInferredReturnType>
-    <MixedReturnStatement occurrences="1">
-      <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
-    </MixedReturnStatement>
   </file>
   <file src="frontend/tests/factories/ClarificationsFactory.php">
     <InvalidParamDefault occurrences="2">
