@@ -218,22 +218,25 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $sql = '
         SELECT
             i.username,
-            COALESCE (
-                (SELECT urc.classname
-                FROM User_Rank_Cutoffs urc
-                WHERE
-                    urc.score <= (
-                        SELECT
-                            ur.score
-                        FROM
-                            User_Rank ur
-                        WHERE
-                            ur.user_id = i.user_id
-                    )
-                ORDER BY
-                    urc.percentile ASC
-                LIMIT 1)
-            , "user-rank-unranked") AS classname,
+            IFNULL(
+                (
+                    SELECT urc.classname
+                    FROM User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                            SELECT
+                                ur.score
+                            FROM
+                                User_Rank ur
+                            WHERE
+                                ur.user_id = i.user_id
+                        )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT 1
+                ),
+                "user-rank-unranked"
+            ) AS classname,
             (
                 SELECT
                     COUNT(DISTINCT Problems.problem_id)

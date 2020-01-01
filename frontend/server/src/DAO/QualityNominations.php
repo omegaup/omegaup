@@ -119,7 +119,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         SELECT
             i.username,
             i.name,
-            COALESCE(qnc.vote, 0) AS vote,
+            IFNULL(qnc.vote, 0) AS vote,
             UNIX_TIMESTAMP(qnc.time) AS time
         FROM
             QualityNomination_Reviewers qnr

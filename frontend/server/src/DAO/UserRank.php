@@ -33,16 +33,20 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`name`,
                 `ur`.`country_id`,
-                (SELECT
-                    `urc`.`classname`
-                 FROM
-                    `User_Rank_Cutoffs` `urc`
-                 WHERE
-                    `urc`.`score` <= `ur`.`score`
-                 ORDER BY
-                    `urc`.`percentile` ASC
-                 LIMIT
-                    1) as `classname`';
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`';
         $sql_count = '
               SELECT
                 COUNT(1)';

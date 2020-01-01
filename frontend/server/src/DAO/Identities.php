@@ -196,7 +196,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             return null;
         }
         $sql = 'SELECT
-                    COALESCE(c.`name`, "xx") AS country,
+                    IFNULL(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
                     e.`email`,
@@ -339,7 +339,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
             UNION
             SELECT
-                COALESCE(i.gender, "unknown") AS gender,
+                IFNULL(i.gender, "unknown") AS gender,
                 COUNT(DISTINCT ill.identity_id) AS users
             FROM
                 Identity_Login_Log ill
