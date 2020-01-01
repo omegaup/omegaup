@@ -18,7 +18,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfTheMonth(
         string $startTime,
@@ -26,27 +26,32 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     ): ?array {
         $sql = "
           SELECT DISTINCT
-            i.user_id,
+            IFNULL(i.user_id, 0) AS user_id,
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             isc.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
-            SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
-            (SELECT urc.classname FROM
-                User_Rank_Cutoffs urc
-            WHERE
-                urc.score <= (
-                        SELECT
-                            ur.score
-                        FROM
-                            User_Rank ur
-                        WHERE
-                            ur.user_id = i.user_id
-                    )
-            ORDER BY
-                urc.percentile ASC
-            LIMIT
-                1) classname
+            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
+            IFNULL(
+                (
+                    SELECT urc.classname FROM
+                        User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT
+                        1
+                ),
+                'user-rank-unranked'
+            ) AS classname
           FROM
             (
               SELECT DISTINCT
@@ -80,8 +85,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                 selected_by
             ) AS cm on i.user_id = cm.user_id
           WHERE
-            (cm.user_id IS NULL
-            OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
+            (cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?) AND
+            i.user_id IS NOT NULL
           GROUP BY
             up.identity_id
           ORDER BY
@@ -92,7 +97,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $val = [$startTime, $endTime, $endTime];
 
-        /** @var array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}> */
+        /** @var list<array{ProblemsSolved: int, classname: string, country_id: string, school_id: int|null, score: float, user_id: int, username: string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
@@ -102,7 +107,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     * @return array{time: string, username: string, country_id: string, email: string}[]
+     * @return array{time: string, username: string, country_id: string, email: string|null}[]
      */
     final public static function getCodersOfTheMonth(): array {
         $sql = '
@@ -135,7 +140,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             ORDER BY
                 cm.time DESC';
 
-        /** @var array{time: string, username: string, country_id: string, email: string}[] */
+        /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
@@ -185,7 +190,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           cm.time DESC
       ';
 
-      /** @var array{time: string, username: string, classname: string}[] */
+      /** @var list<array{classname: string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$schoolId]
@@ -194,7 +199,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all coder of the months based on month
-     * @return array{time: string, username: string, rank: int, country_id: string, email: string}[]
+     * @return array{time: string, username: string, rank: int, country_id: string, email: string|null}[]
      */
     final public static function getMonthlyList(string $firstDay): array {
         $date = date('Y-m-01', strtotime($firstDay));
@@ -221,7 +226,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.rank ASC
           LIMIT 100
         ';
-        /** @var array{time: string, username: string, rank: int, country_id: string, email: string}[] */
+        /** @var list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
@@ -299,7 +304,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     }
 
     /**
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfMonthByGivenDate(
         string $date

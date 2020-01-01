@@ -112,8 +112,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
         SELECT
-            YEAR(su.time) AS year,
-            MONTH(su.time) AS month,
+            IFNULL(YEAR(su.time), 0) AS year,
+            IFNULL(MONTH(su.time), 0) AS month,
             COUNT(DISTINCT su.problem_id) AS `count`
         FROM
             Submissions su
@@ -140,15 +140,15 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     AND sub.time < su.time
             )
         GROUP BY
-            YEAR(su.time),
-            MONTH(su.time)
+            IFNULL(YEAR(su.time), 0),
+            IFNULL(MONTH(su.time), 0)
         ORDER BY
-            YEAR(su.time) ASC,
-            MONTH(su.time) ASC;';
+            year ASC,
+            month ASC;';
 
         $params = [$schoolId, $monthsNumber];
 
-        /** @var array{year: int, month: int, count: int}[] */
+        /** @var list<array{count: int, month: int, year: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -158,7 +158,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
      * Gets the schools ordered by rank and score
      *
-     * @return array{rank: list<array{school_id: int, country_id: int, rank: int, score: float, name: string}>, totalRows: int}
+     * @return array{rank: list<array{country_id: string|null, name: string, rank: int|null, school_id: int, score: float}>, totalRows: int}
      */
     public static function getRank(
         int $page,
@@ -193,7 +193,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             []
         ) ?? 0;
 
-        /** @var list<array{school_id: int, country_id: int, rank: int, score: float, name: string}> */
+        /** @var list<array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlFrom . $sqlLimit,
             [$offset, $rowsPerPage]
@@ -210,7 +210,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * organized contests.
      *
      * @param int $schoolId
-     * @return array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]
+     * @return list<array{classname: string, created_problems: int, organized_contests: int, solved_problems: int, username: string}>
      */
     public static function getUsersFromSchool(
         int $schoolId
@@ -237,46 +237,55 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 ),
                 "user-rank-unranked"
             ) AS classname,
-            (
-                SELECT
-                    COUNT(DISTINCT Problems.problem_id)
-                FROM
-                    Users
-                INNER JOIN
-                    ACLs ON ACLs.owner_id = Users.user_id
-                INNER JOIN
-                    Problems ON Problems.acl_id = ACLs.acl_id
-                WHERE
-                    Problems.visibility = ? AND
-                    Users.main_identity_id = i.identity_id
+            IFNULL(
+                (
+                    SELECT
+                        COUNT(DISTINCT Problems.problem_id)
+                    FROM
+                        Users
+                    INNER JOIN
+                        ACLs ON ACLs.owner_id = Users.user_id
+                    INNER JOIN
+                        Problems ON Problems.acl_id = ACLs.acl_id
+                    WHERE
+                        Problems.visibility = ? AND
+                        Users.main_identity_id = i.identity_id
+                ),
+                0
             ) AS created_problems,
-            (
-                SELECT
-                    COUNT(DISTINCT Problems.problem_id)
-                FROM
-                    Problems
-                INNER JOIN
-                    Submissions ON Submissions.problem_id = Problems.problem_id
-                INNER JOIN
-                    Runs ON Runs.run_id = Submissions.current_run_id
-                WHERE
-                    Runs.verdict = "AC"
-                    AND Submissions.identity_id = i.identity_id
-                    AND Submissions.type = "normal"
+            IFNULL(
+                (
+                    SELECT
+                        COUNT(DISTINCT Problems.problem_id)
+                    FROM
+                        Problems
+                    INNER JOIN
+                        Submissions ON Submissions.problem_id = Problems.problem_id
+                    INNER JOIN
+                        Runs ON Runs.run_id = Submissions.current_run_id
+                    WHERE
+                        Runs.verdict = "AC"
+                        AND Submissions.identity_id = i.identity_id
+                        AND Submissions.type = "normal"
+                ),
+                0
             ) AS solved_problems,
-            (
-                SELECT
-                    COUNT(DISTINCT Contests.contest_id)
-                FROM
-                    Contests
-                INNER JOIN
-                    ACLs ON ACLs.acl_id = Contests.acl_id
-                INNER JOIN
-                    Users ON Users.user_id = ACLs.owner_id
-                INNER JOIN
-                    Problemsets ON Problemsets.problemset_id = Contests.problemset_id
-                WHERE
-                    Users.main_identity_id = i.identity_id
+            IFNULL(
+                (
+                    SELECT
+                        COUNT(DISTINCT Contests.contest_id)
+                    FROM
+                        Contests
+                    INNER JOIN
+                        ACLs ON ACLs.acl_id = Contests.acl_id
+                    INNER JOIN
+                        Users ON Users.user_id = ACLs.owner_id
+                    INNER JOIN
+                        Problemsets ON Problemsets.problemset_id = Contests.problemset_id
+                    WHERE
+                        Users.main_identity_id = i.identity_id
+                ),
+                0
             ) AS organized_contests
         FROM
             Schools sc
@@ -287,7 +296,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         WHERE
             sc.school_id = ?;';
 
-        /** @var array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[] */
+        /** @var list<array{classname: string, created_problems: int, organized_contests: int, solved_problems: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $schoolId]

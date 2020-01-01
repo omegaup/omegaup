@@ -28,8 +28,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             SELECT
                 s.school_id,
                 s.name,
-                s.country_id,
-                SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0)) AS score
+                IFNULL(s.country_id, "xx") AS country_id,
+                IFNULL(SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0)), 0.0) AS score
             FROM
                 Schools s
             INNER JOIN
@@ -79,7 +79,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
 
         $args = [$startDate, $finishDate, $finishDate, $limit];
 
-        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
+        /** @var list<array{country_id: string, name: string, school_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $args
@@ -105,7 +105,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * Gets all the best schools based on the month
      * of a certain date.
      *
-     * @return list<array{school_id: int, rank: int, name: string, country_id: string}>
+     * @return list<array{country_id: string, name: string, rank: int, school_id: int}>
      */
     public static function getMonthlyList(
         string $firstDay
@@ -116,7 +116,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.school_id,
                 sotm.rank,
                 s.name,
-                s.country_id
+                IFNULL(s.country_id, "xx") AS country_id
             FROM
                 School_Of_The_Month sotm
             INNER JOIN
@@ -128,7 +128,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.rank ASC
             LIMIT 100;';
 
-        /** @var list<array{school_id: int, rank: int, name: string, country_id: string}> */
+        /** @var list<array{country_id: string, name: string, rank: int, school_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [ $date ]
@@ -165,7 +165,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.school_id,
                 sotm.time,
                 s.name,
-                s.country_id
+                IFNULL(s.country_id, "xx") AS country_id
             FROM
                 School_Of_The_Month sotm
             INNER JOIN
@@ -186,7 +186,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             ORDER BY
                 sotm.time DESC;';
 
-        /** @var list<array{school_id: int, name: string, country_id: string, time: string}> */
+        /** @var list<array{country_id: string, name: string, school_id: int, time: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, []);
     }
 

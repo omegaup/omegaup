@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}>
+     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -46,7 +46,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problem_alias: string, problem_id: int}[] $problemsAssignments */
+        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: int, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: int}> $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $val
@@ -126,7 +126,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     pp.order, pp.problem_id ASC;';
 
         $result = [];
-        /** @var array{title: string, problem_id: string, alias: string, visibility: string, visits: string, submissions: string, accepted: string, difficulty: string, order: string, languages: string, points: string, commit: string, version: string} $row */
+        /** @var array{accepted: int, alias: string, commit: string, difficulty: float|null, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
