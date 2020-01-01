@@ -178,10 +178,10 @@ class MySQLConnection {
             case MYSQLI_TYPE_NEWDECIMAL:
                 return FieldType::TYPE_FLOAT;
 
+            case MYSQLI_TYPE_BIT:
             case MYSQLI_TYPE_TINY:
                 return FieldType::TYPE_BOOL;
 
-            case MYSQLI_TYPE_BIT:
             case MYSQLI_TYPE_INT24:
             case MYSQLI_TYPE_LONG:
             case MYSQLI_TYPE_LONGLONG:
@@ -285,7 +285,9 @@ class MySQLConnection {
                 break;
         }
         if ((intval($field->flags) & MYSQLI_NOT_NULL_FLAG) == 0) {
-            $typeName .= '|null';
+            $typeAtoms = ['null', $typeName];
+            sort($typeAtoms);
+            return join('|', $typeAtoms);
         }
         return $typeName;
     }
@@ -415,9 +417,12 @@ class MySQLConnection {
             if (empty($row)) {
                 return null;
             }
+            /** @var object */
+            $field = $result->fetch_field_direct(0);
+            /** @var int $field->type */
             return self::MapValue(
                 $row[0],
-                self::MapFieldType(intval($result->fetch_field_direct(0)->type))
+                self::MapFieldType($field->type)
             );
         } finally {
             $result->free();
