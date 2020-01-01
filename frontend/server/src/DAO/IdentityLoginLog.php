@@ -20,6 +20,7 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
                 WHERE
                     identity_id = ?;';
 
+        /** @var list<array{identity_id: int, ip: int, time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]

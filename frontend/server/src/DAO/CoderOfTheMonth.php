@@ -138,7 +138,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     )
                 )
             ORDER BY
-                cm.time DESC';
+                cm.time DESC;
+        ';
 
         /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
@@ -153,44 +154,44 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         int $schoolId
     ): array {
         $sql = '
-        SELECT
-          cm.time,
-          i.username,
-          IFNULL(
-            (
-              SELECT urc.classname
-              FROM User_Rank_Cutoffs urc
-              WHERE
-                  urc.score <= (
-                      SELECT
-                          ur.score
-                      FROM
-                          User_Rank ur
-                      WHERE
-                          ur.user_id = i.user_id
-                  )
-              ORDER BY
-                  urc.percentile ASC
-              LIMIT 1
-            ),
-            "user-rank-unranked"
-          ) AS classname
-        FROM
-          Coder_Of_The_Month cm
-        INNER JOIN
-          Users u ON u.user_id = cm.user_id
-        INNER JOIN
-          Identities i ON i.identity_id = u.main_identity_id
-        LEFT JOIN
-          Emails e ON e.user_id = u.user_id
-        WHERE
-          (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
-          cm.school_id = ?
-        ORDER BY
-          cm.time DESC
-      ';
+            SELECT
+              cm.time,
+              i.username,
+              IFNULL(
+                (
+                  SELECT urc.classname
+                  FROM User_Rank_Cutoffs urc
+                  WHERE
+                      urc.score <= (
+                          SELECT
+                              ur.score
+                          FROM
+                              User_Rank ur
+                          WHERE
+                              ur.user_id = i.user_id
+                      )
+                  ORDER BY
+                      urc.percentile ASC
+                  LIMIT 1
+                ),
+                "user-rank-unranked"
+              ) AS classname
+            FROM
+              Coder_Of_The_Month cm
+            INNER JOIN
+              Users u ON u.user_id = cm.user_id
+            INNER JOIN
+              Identities i ON i.identity_id = u.main_identity_id
+            LEFT JOIN
+              Emails e ON e.user_id = u.user_id
+            WHERE
+              (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
+              cm.school_id = ?
+            ORDER BY
+              cm.time DESC;
+        ';
 
-      /** @var list<array{classname: string, time: string, username: string}> */
+        /** @var list<array{classname: string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$schoolId]
@@ -253,6 +254,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LIMIT 1
         ';
 
+        /** @var array{username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, []);
         if (empty($rs)) {
             return false;
@@ -273,6 +275,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     `time` = ?
                 AND
                     `selected_by` ' . $clause . ';';
+        /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
@@ -294,6 +297,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                 WHERE
                     `time` = ?;';
 
+        /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];

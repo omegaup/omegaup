@@ -372,7 +372,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         WHERE
             qn.qualitynomination_id = ?;';
 
-        /** @var null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: null|string, alias: string, title: string, author_username: string, author_name: null|string} $result */
+        /** @var array{alias: string, author_name: null|string, author_username: string, contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string}|null $result */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$qualitynomination_id]
@@ -384,9 +384,16 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * This function gets the contents of QualityNomination table
      */
     public static function getAllNominations() {
-        $sql = 'SELECT `QualityNominations`.`contents` '
-            . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
+        $sql = '
+            SELECT
+                contents
+            FROM
+                QualityNominations
+            WHERE
+                `nomination` = "suggestion";
+        ';
 
+        /** @var list<array{contents: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
@@ -417,11 +424,21 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * This function gets contents of QualityNomination table
      */
-    public static function getAllSuggestionsPerProblem($problemId) {
-        $sql = 'SELECT `QualityNominations`.`contents` '
-            . 'FROM `QualityNominations` '
-            . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    public static function getAllSuggestionsPerProblem(int $problemId) {
+        $sql = '
+            SELECT
+                contents
+            FROM
+                QualityNominations
+            WHERE
+                nomination = "suggestion" AND
+                problem_id = ?;
+        ';
+        /** @var list<array{contents: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId]
+        );
     }
 
     /**
@@ -496,21 +513,20 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $contents,
         $status
     ) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    QualityNominations
-                WHERE
-                    user_id = ?
-                AND
-                    problem_id = ?
-                AND
-                    nomination = ?
-                AND
-                    contents = ?
-                AND
-                    status = ?;';
+        $sql = '
+            SELECT
+                *
+            FROM
+                QualityNominations
+            WHERE
+                user_id = ? AND
+                problem_id = ? AND
+                nomination = ? AND
+                contents = ? AND
+                status = ?;
+        ';
 
+        /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$userId, $problemId, $nomination, $contents, $status]

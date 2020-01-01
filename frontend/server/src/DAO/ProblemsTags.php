@@ -37,6 +37,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         }
         $sql .= ';';
 
+        /** @var list<array{name: string, public: bool}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

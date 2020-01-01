@@ -17,6 +17,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$name]
@@ -345,11 +346,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
+        /** @var array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;
         }
-
         return new \OmegaUp\DAO\VO\Courses($row);
     }
 
@@ -420,7 +421,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identityId,
             $group->group_id,
         ];
-        /** @var null|array{share_user_information: null|int, accept_teacher: null|int} */
+        /** @var array{accept_teacher: bool|null, share_user_information: bool|null}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return ['share_user_information' => false, 'accept_teacher' => false];
@@ -430,7 +431,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             'share_user_information' => boolval(
                 $row['share_user_information']
             ),
-            'accept_teacher' => boolval($row['accept_teacher']),
+            'accept_teacher' => boolval(
+                $row['accept_teacher']
+            ),
         ];
     }
 

@@ -16,6 +16,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
+        /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, submission_id: int, submit_delay: int, time: string, type: null|string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -52,6 +53,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -75,6 +77,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemId, $problemsetId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -94,6 +97,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemsetId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -133,6 +137,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $val = [$identityId, $problemId, $problemsetId];
         }
 
+        /** @var int|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 

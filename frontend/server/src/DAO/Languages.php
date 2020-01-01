@@ -24,11 +24,11 @@ class Languages extends \OmegaUp\DAO\Base\Languages {
                 LIMIT
                     0, 1;';
 
+        /** @var array{country_id: null|string, language_id: int, name: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
-
         return new \OmegaUp\DAO\VO\Languages($row);
     }
 }

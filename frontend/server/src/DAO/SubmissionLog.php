@@ -53,6 +53,7 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     `time`;';
         $val = [$problemset_id];
 
+        /** @var list<array{alias: string, classname: null|string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 

@@ -85,6 +85,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 WHERE
                     p.problemset_id = ?;';
 
+        /** @var list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemset_id]
@@ -115,6 +116,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             WHERE
                 pi.problemset_id = ?;';
 
+        /** @var list<array{access_time: null|string, country_id: null|string, email: null|string, end_time: null|string, identity_id: int, is_invited: bool, user_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemset_id]

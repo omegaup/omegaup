@@ -88,6 +88,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemsetId];
 
         $result = [];
+        /** @var array{guid: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -195,6 +196,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemId];
 
         $result = [];
+        /** @var array{guid: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -227,6 +229,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val = [$problemsetId, $verdict];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -251,6 +254,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val = [$problemId, $verdict];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -280,6 +284,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val = [$identityId];
 
+        /** @var list<array{date: null|string, runs: int, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -306,6 +311,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val = [$problemsetId];
 
+        /** @var array{guid: string, time: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $val);
         if (empty($row)) {
             return null;
@@ -491,7 +497,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ) AS solved;
         ';
 
-        /** @var array{tried: int, solved: int} */
+        /** @var array{solved: int|null, tried: int|null} */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemId, $identityId, $problemId, $identityId]
@@ -574,6 +580,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LIMIT 1;
         ';
         $val = [$identityId, $problemsetId, $problemId];
+        /** @var float|null|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -601,6 +608,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LIMIT 1;
         ';
         $val = [$identityId, $problemId];
+        /** @var float|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -633,6 +641,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.`time` DESC;
         ';
 
+        /** @var list<array{alias: string, contest_score: float|null, guid: string, language: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -761,6 +770,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         $result = [];
+        /** @var array{contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: string, verdict: string, version: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -957,6 +967,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $params = [$problem->current_version, $problem->problem_id];
 
         $result = [];
+        /** @var array{run_id: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

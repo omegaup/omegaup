@@ -83,11 +83,16 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      * Get number of problems in problemset.
      */
     final public static function countProblemsetProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
-        // Build SQL statement
-        $sql = 'SELECT COUNT(pp.problem_id) ' .
-               'FROM Problemset_Problems pp ' .
-               'WHERE pp.problemset_id = ?';
+        $sql = '
+            SELECT
+                COUNT(pp.problem_id)
+            FROM
+                Problemset_Problems pp
+            WHERE
+                pp.problemset_id = ?;
+        ';
         $val = [$problemset->problemset_id];
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -160,6 +165,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     `order`, `problem_id` ASC;';
 
+        /** @var list<array{commit: string, order: int, points: float, problem_id: int, problemset_id: int, version: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemset_id]
@@ -197,6 +203,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         $result = [];
+        /** @var array{alias: string, current_version: string, problem_id: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -257,13 +264,16 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
      */
     final public static function getMaxPointsByProblemset($problemset_id) {
         // Build SQL statement
-        $sql = 'SELECT
-                    SUM(points) as max_points
-                FROM
-                    Problemset_Problems
-                WHERE
-                    problemset_id = ?;';
+        $sql = '
+            SELECT
+                IFNULL(SUM(points), 0.0) as max_points
+            FROM
+                Problemset_Problems
+            WHERE
+                problemset_id = ?;
+        ';
 
+        /** @var float */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$problemset_id]
@@ -365,6 +375,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     UNIX_TIMESTAMP(c.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
+            /** @var list<array{acl_id: int, problemset_id: int}> */
             $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
@@ -390,6 +401,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     UNIX_TIMESTAMP(a.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
+            /** @var list<array{acl_id: int, problemset_id: int}> */
             $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
