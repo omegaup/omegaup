@@ -517,27 +517,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ' ORDER BY s.submission_id;';
 
         /** @var array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] */
-        $result = [];
-        /** @var array{score: float, penalty: string, contest_score: string|null, problem_id: int, identity_id: int, type: string, time: string, submit_delay: string, guid: string} $run */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                [$problemset->problemset_id]
-            ) as $run
-        ) {
-            $run['penalty'] = intval($run['penalty']);
-            $run['time'] = intval($run['time']);
-            $run['submit_delay'] = intval($run['submit_delay']);
-            $run['score'] = round(floatval($run['score']), 4);
-            if (!is_null($run['contest_score'])) {
-                $run['contest_score'] = round(
-                    floatval($run['contest_score']),
-                    2
-                );
-            }
-            array_push($result, $run);
-        }
-        return $result;
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemset->problemset_id]
+        );
     }
 
     /**
@@ -682,29 +665,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $params[] = $problemsetId;
         }
         /** @var array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}[] */
-        $runs = [];
-        /** @var array{guid: string, language: string, status: string, verdict: string, runtime: string, penalty: string, memory: string, score: string, contest_score: string|null, time: string, submit_delay: string} $run */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                $params
-            ) as $run
-        ) {
-            $run['memory'] = intval($run['memory']);
-            $run['runtime'] = intval($run['runtime']);
-            $run['penalty'] = intval($run['penalty']);
-            $run['time'] = intval($run['time']);
-            $run['submit_delay'] = intval($run['submit_delay']);
-            $run['score'] = round(floatval($run['score']), 4);
-            if (!is_null($run['contest_score'])) {
-                $run['contest_score'] = round(
-                    floatval($run['contest_score']),
-                    2
-                );
-            }
-            array_push($runs, $run);
-        }
-        return $runs;
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function isRunInsideSubmissionGap(
@@ -1046,14 +1007,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         /** @var list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}> */
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            $params
-        );
-        foreach ($result as &$row) {
-            $row['old_score'] = floatval($row['old_score']);
-            $row['new_score'] = floatval($row['new_score']);
-        }
-        return $result;
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 }
