@@ -24,6 +24,7 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
                 ORDER BY
                     n.timestamp ASC;';
         $args = [$user->user_id];
+        /** @var list<array{contents: string, notification_id: int, timestamp: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 }

@@ -23,21 +23,26 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 s.state_id,
                 sc.name as school,
                 sc.school_id as school_id,
-                (SELECT `urc`.classname FROM
-                    `User_Rank_Cutoffs` urc
-                WHERE
-                    `urc`.score <= (
-                            SELECT
-                                `ur`.`score`
-                            FROM
-                                `User_Rank` `ur`
-                            WHERE
-                                `ur`.user_id = `i`.`user_id`
-                        )
-                ORDER BY
-                    `urc`.percentile ASC
-                LIMIT
-                    1) `classname`
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -55,13 +60,13 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
 
+        /** @var list<array{classname: string, country: null|string, country_id: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$group->group_id]
         );
         $identities = [];
         foreach ($rs as $row) {
-            $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
             if (strpos($row['username'], ':') === false) {
                 array_push($identities, [
                     'username' => $row['username'],
@@ -106,6 +111,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 group_id = ?;';
 
         $groupsIdentities = [];
+        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -136,6 +142,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 gi.group_id = ?;';
 
         $identities = [];
+        /** @var array{username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

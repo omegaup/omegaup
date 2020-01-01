@@ -32,6 +32,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$name];
 
         $result = [];
+        /** @var array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float, state_id: null|string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

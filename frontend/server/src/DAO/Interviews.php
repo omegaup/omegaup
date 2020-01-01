@@ -16,6 +16,7 @@ class Interviews extends \OmegaUp\DAO\Base\Interviews {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];
 
+        /** @var array{acl_id: int, alias: string, description: string, interview_id: int, problemset_id: int, title: string, window_length: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -42,15 +43,8 @@ class Interviews extends \OmegaUp\DAO\Base\Interviews {
 
         $params = [$user_id, $user_id, \OmegaUp\Authorization::ADMIN_ROLE];
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
-
-        $result = [];
-
-        foreach ($rs as $r) {
-            $result[] = $r;
-        }
-
-        return $result;
+        /** @var list<array{acl_id: int, alias: string, description: string, interview_id: int, problemset_id: int, title: string, window_length: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     public static function getInterviewForProblemset($problemset_id) {

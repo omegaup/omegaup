@@ -22,6 +22,7 @@ class States extends \OmegaUp\DAO\Base\States {
                 WHERE
                     country_id = ?;';
 
+        /** @var list<array{country_id: string, name: string, state_id: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$countryId]

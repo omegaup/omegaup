@@ -24,10 +24,12 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConse
                   pscl.identity_id = ?
                   AND pscl.privacystatement_id = ?
                ';
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$identity_id, $privacystatement_id]
-        ) > 0;
+        );
+        return $count > 0;
     }
 
     /**

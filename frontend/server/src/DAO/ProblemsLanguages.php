@@ -30,6 +30,7 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
                 WHERE
                     problem_id = ?;';
 
+        /** @var list<array{language_id: int, problem_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemId]

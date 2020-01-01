@@ -30,6 +30,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             $acl_id,
         ];
 
+        /** @var list<array{acl: int, username: string}> */
         $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -47,6 +48,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];
+        /** @var string|null */
         $owner = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
 
         $found = false;
@@ -63,7 +65,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         }
 
         if (!$found) {
-            array_push($admins, ['username' => $owner, 'role' => 'owner']);
+            array_push($admins, [
+                'username' => $owner,
+                'role' => 'owner',
+            ]);
         }
 
         return $admins;
@@ -87,6 +92,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             $params
@@ -151,6 +157,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         ];
 
         $groups = [];
+        /** @var array{name: string} $group */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

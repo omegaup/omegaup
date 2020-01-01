@@ -55,6 +55,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 

@@ -20,6 +20,7 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
                 WHERE
                     difficulty = ?;';
 
+        /** @var list<array{difficulty: string, problem_id: int, problem_of_the_week_id: int, time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$difficulty]

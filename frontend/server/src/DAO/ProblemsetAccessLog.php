@@ -43,6 +43,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 ORDER BY `time`;';
         $val = [$problemset_id];
 
+        /** @var list<array{classname: null|string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -88,6 +89,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 AND
                     identity_id = ?;';
 
+        /** @var list<array{identity_id: int, ip: int, problemset_id: int, time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId, $identityId]

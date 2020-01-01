@@ -29,6 +29,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   e.email = ?
                 LIMIT
                   0, 1';
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
@@ -46,6 +47,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 LIMIT
                   0, 1';
         $params = [ $username ];
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -93,6 +95,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   i.user_id = ?
                 LIMIT
                   0, 1';
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$userId]);
         if (empty($rs)) {
             return null;
@@ -150,7 +153,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        /** @var null|array{reset_sent_at: int, verified: int, username: string, last_login: null|int} */
+        /** @var array{last_login: int|null, reset_sent_at: int|null, username: string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
@@ -189,7 +192,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{country: string, state: string, school: string, email: string, locale: string}|null
+     * @return array{country: string, state: null|string, school: null|string, email: null|string, locale: null|string}|null
      */
     final public static function getExtendedProfileDataByPk($identity_id) {
         if (is_null($identity_id)) {
@@ -221,7 +224,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{country: string, state: string, school: string, email: string, locale: string}|null */
+        /** @var array{country: string, email: null|string, locale: null|string, school: null|string, state: null|string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identity_id]
@@ -252,8 +255,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT 1;';
         $args = [$userId, $identityId];
 
+        /** @var array{associated: int} */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
-
         return $rs['associated'] == '1';
     }
 
@@ -271,6 +274,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT 1;';
         $args = [$username];
 
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
         if (empty($rs)) {
             return null;
@@ -294,6 +298,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 i.user_id = ?
                 ';
 
+        /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {

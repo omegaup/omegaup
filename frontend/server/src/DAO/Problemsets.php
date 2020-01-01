@@ -94,6 +94,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     1;';
         $params = [$problemset_id];
 
+        /** @var array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null */
         $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             $params

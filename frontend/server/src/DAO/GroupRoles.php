@@ -28,18 +28,19 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             $acl_id,
         ];
 
+        /** @var list<array{acl: int, alias: string, name: string}> */
         $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
         );
 
-        for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
-                $admins[$i]['role'] = 'site-admin';
+        foreach ($admins as &$admin) {
+            if ($admin['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
+                $admin['role'] = 'site-admin';
             } else {
-                $admins[$i]['role'] = 'admin';
+                $admin['role'] = 'admin';
             }
-            unset($admins[$i]['acl']);
+            unset($admin['acl']);
         }
 
         return $admins;
@@ -61,7 +62,10 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return boolval(
+            /** @var int|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
     public static function isContestant($identity_id, $acl_id) {
@@ -79,7 +83,10 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $acl_id,
         ];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return boolval(
+            /** @var int|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
     public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
