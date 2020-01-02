@@ -91,6 +91,80 @@ Case #2: 15
 </table>`);
     });
 
+    it('Should handle sample I/O tables with markdown', function() {
+      expect(
+        converter.makeHtml(`# Ejemplo
+
+||input
+5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+> hi <
+> hello <
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags <b>hello</b>
+||output
+0
+||end`),
+      ).toEqual(`<h1>Ejemplo</h1>
+
+<table class="sample_io">
+<thead><tr><th>Entrada</th><th>Salida</th></tr></thead><tbody><tr><td><pre>5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+&gt; hi &lt;
+&gt; hello &lt;
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags &lt;b&gt;hello&lt;/b&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
+</table>`);
+    });
+
     it('Should handle GitHub-flavored Markdown tables', function() {
       expect(
         converter.makeHtml(`| foo | bar |

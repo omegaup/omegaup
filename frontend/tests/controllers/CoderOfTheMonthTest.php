@@ -34,9 +34,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $identity->username,
-            $response['userinfo']['username']
+            $response['coderinfo']['username']
         );
-        $this->assertFalse(array_key_exists('email', $response['userinfo']));
+        $this->assertFalse(array_key_exists('email', $response['coderinfo']));
 
         // Calling API again to verify response is the same that in first time
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
@@ -45,13 +45,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $identity->username,
-            $response['userinfo']['username']
+            $response['coderinfo']['username']
         );
 
         // CoderOfTheMonth school_id should match with identity school_id
         $this->assertEquals(
             $school->school_id,
-            $response['userinfo']['school_id']
+            $response['coderinfo']['school_id']
         );
 
         // Now check if the other user has been saved on database too
@@ -251,19 +251,19 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
         $this->assertEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '-11 month');
         $this->assertNotEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '1 month');
         $this->assertEquals(
             $identity->username,
-            $responseCoder['userinfo']['username']
+            $responseCoder['coderinfo']['username']
         );
     }
 
@@ -344,21 +344,18 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            // HACK: Deleting cache from identity to avoid failures in test
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::USER_PROFILE,
-                $coder
+            $profile = \OmegaUp\Controllers\User::apiProfile(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $coder,
+                ])
             );
-            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => $coder
-            ]));
 
             if ($index == 0) {
                 // Mentor can see the current coder of the month email
-                $this->assertArrayHasKey('email', $profile['userinfo']);
+                $this->assertArrayHasKey('email', $profile);
             } else {
-                $this->assertArrayNotHasKey('email', $profile['userinfo']);
+                $this->assertArrayNotHasKey('email', $profile);
             }
         }
 
@@ -366,12 +363,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $user_login = self::login($identity);
 
         foreach ($coders as $index => $coder) {
-            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-                'auth_token' => $user_login->auth_token,
-                'username' => $coder
-            ]));
+            $profile = \OmegaUp\Controllers\User::apiProfile(
+                new \OmegaUp\Request([
+                    'auth_token' => $user_login->auth_token,
+                    'username' => $coder,
+                ])
+            );
 
-            $this->assertArrayNotHasKey('email', $profile['userinfo']);
+            $this->assertArrayNotHasKey('email', $profile);
         }
     }
 
@@ -475,11 +474,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request()
         );
         $this->assertNotNull(
-            $response['userinfo'],
+            $response['coderinfo'],
             'A user has been selected by a mentor'
         );
         $this->assertEquals(
-            $response['userinfo']['username'],
+            $response['coderinfo']['username'],
             $identity3->username
         );
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
@@ -528,7 +527,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
         $timestampTest = strtotime($dateTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
@@ -540,7 +539,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertTrue($canChooseCoder);
@@ -551,7 +550,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
@@ -562,7 +561,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder(
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoderOrSchool(
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);

@@ -6,6 +6,9 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
+import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -71,6 +74,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     if (payload != null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
+      options.preferredLanguage = payload.preferred_language || null;
     }
   }
   return options;
@@ -272,19 +276,101 @@ export class Arena {
     self.submissionGap = 0;
 
     // Setup preferred language
-    self.preferredLanguage = null;
+    self.preferredLanguage = options.preferredLanguage || null;
 
     // UI elements
     self.elements = {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      miniRanking: $('#mini-ranking'),
-      problemList: $('#problem-list'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
+
+    if (document.getElementById('arena-navbar-problems') !== null) {
+      self.elements.navBar = new Vue({
+        el: '#arena-navbar-problems',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-problems', {
+            props: {
+              problems: this.problems,
+              activeProblem: this.activeProblem,
+            },
+            on: {
+              'navigate-to-problem': function(problemAlias) {
+                window.location.hash = `#problems/${problemAlias}`;
+              },
+            },
+          });
+        },
+        data: {
+          problems: [],
+          activeProblem: null,
+        },
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+      });
+    }
+
+    if (
+      document.getElementById('arena-navbar-assignments') !== null &&
+      typeof self.options.courseAlias !== 'undefined'
+    ) {
+      self.elements.assignmentsNav = new Vue({
+        el: '#arena-navbar-assignments',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-assignments', {
+            props: {
+              assignments: this.assignments,
+              next: this.next,
+              previous: this.previous,
+            },
+            on: {
+              'navigate-to-assignment': function(assignment) {
+                window.location.hash = '#problems';
+                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignment.alias}`;
+              },
+            },
+          });
+        },
+        data: {
+          assignments: [],
+          next: null,
+          previous: null,
+        },
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
+      });
+    }
+
+    const navbar = document.getElementById('arena-navbar-payload');
+    let navbarPayload = false;
+    if (navbar !== null) {
+      navbarPayload = JSON.parse(navbar.innerText);
+    }
+
+    if (document.getElementById('arena-navbar-miniranking') !== null) {
+      self.elements.miniRanking = new Vue({
+        el: '#arena-navbar-miniranking',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-miniranking', {
+            props: {
+              showRanking: this.showRanking,
+              users: this.users,
+            },
+          });
+        },
+        data: {
+          showRanking: navbarPayload,
+          users: [],
+        },
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+      });
+    }
+
     if (self.elements.ranking.length) {
       self.elements.rankingTable = new Vue({
         el: self.elements.ranking[0],
@@ -556,19 +642,18 @@ export class Arena {
     self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
-    let problemTemplate = $('#problem-list .template');
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      let prob = problemTemplate
-        .clone()
-        .removeClass('template')
-        .addClass('problem_' + problem.alias);
-      $('.name', prob)
-        .attr('href', '#problems/' + problem.alias)
-        .html(problemName);
-      self.elements.problemList.append(prob);
+      if (self.elements.navBar) {
+        self.elements.navBar.problems.push({
+          alias: problem.alias,
+          text: problemName,
+          bestScore: 0,
+          maxScore: 0,
+        });
+      }
 
       $('<option>')
         .val(problem.alias)
@@ -591,57 +676,22 @@ export class Arena {
       return;
     }
 
+    self.elements.assignmentsNav.assignments = problemset.courseAssignments;
+
     // Getting index of current assignment
-    let indexAssignment = problemset.courseAssignments.findIndex(
-      x => x.alias === problemset.alias,
-    );
-    console.log(indexAssignment);
-
-    // Getting buttons by query selector
-    let nextAssignmentLink = document.querySelector(
-      '#assignments-navigation .next',
-    );
-    let prevAssignmentLink = document.querySelector(
-      '#assignments-navigation .prev',
+    const currentAssignmentIndex = problemset.courseAssignments.findIndex(
+      assignment => assignment.alias === problemset.alias,
     );
 
-    let pathName = [];
-    let newPathName = null;
-
-    // Next button is enabled when current assignment is not the last one
-    if (indexAssignment < problemset.courseAssignments.length - 1) {
-      // Getting next assignment change path name and text
-      let nextAssignment = problemset.courseAssignments[indexAssignment + 1];
-      pathName = window.location.pathname.split('/');
-      pathName.pop();
-      pathName.push(nextAssignment.alias);
-      newPathName = pathName.join('/');
-      nextAssignmentLink.setAttribute('href', newPathName);
-      nextAssignmentLink.title = nextAssignment.name;
-      nextAssignmentLink.classList.remove('disabled');
-    } else {
-      // Otherwise, button is disabled
-      nextAssignmentLink.classList.add('disabled');
+    if (currentAssignmentIndex < problemset.courseAssignments.length - 1) {
+      self.elements.assignmentsNav.next =
+        problemset.courseAssignments[currentAssignmentIndex + 1];
     }
 
-    // Prev button is enabled when current assignment is not the first one
-    if (indexAssignment !== 0) {
-      // Getting next assignment change path name and text
-      let prevAssignment = problemset.courseAssignments[indexAssignment - 1];
-      pathName = window.location.pathname.split('/');
-      pathName.pop();
-      pathName.push(prevAssignment.alias);
-      newPathName = pathName.join('/');
-      prevAssignmentLink.setAttribute('href', newPathName);
-      prevAssignmentLink.title = prevAssignment.name;
-      prevAssignmentLink.classList.remove('disabled');
-    } else {
-      // Otherwise, button is disabled
-      prevAssignmentLink.classList.add('disabled');
+    if (currentAssignmentIndex !== 0) {
+      self.elements.assignmentsNav.previous =
+        problemset.courseAssignments[currentAssignmentIndex - 1];
     }
-
-    let navAssignmentLinks = document.getElementById('assignments-navigation');
-    navAssignmentLinks.style.display = 'block';
   }
 
   initProblems(problemset) {
@@ -923,7 +973,9 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    $('tbody.inserted', self.elements.miniRanking).remove();
+    if (typeof self.elements.miniRanking !== 'undefined') {
+      self.elements.miniRanking.users = [];
+    }
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -960,39 +1012,30 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          $('#problems .problem_' + alias + ' .solved').html(
-            '(' +
-              problem.points.toFixed(self.digitsAfterDecimalPoint) +
-              ' / ' +
-              currentPoints.toFixed(self.digitsAfterDecimalPoint) +
-              ')',
-          );
+          if (self.elements.navBar) {
+            const currentProblem = self.elements.navBar.problems.find(
+              problem => problem.alias === alias,
+            );
+            currentProblem.bestScore = problem.points;
+            currentProblem.maxScore = currentPoints;
+          }
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
       // update miniranking
       if (i < 10) {
-        let r = $('tbody.user-list-template', self.elements.miniRanking)
-          .clone()
-          .removeClass('user-list-template')
-          .addClass('inserted');
-
-        $('.position', r).html(rank.place);
-        $('.user', r).html(
-          '<span title="' +
-            UI.rankingUsername(rank) +
-            '">' +
-            UI.rankingUsername(rank) +
-            UI.getFlag(rank['country']) +
-            '</span>',
-        );
-        $('.points', r).html(
-          rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-        );
-        $('.penalty', r).html(rank.total.penalty.toFixed(0));
-
-        self.elements.miniRanking.append(r);
+        if (typeof self.elements.miniRanking !== 'undefined') {
+          const username = UI.rankingUsername(rank);
+          self.elements.miniRanking.users.push({
+            position: rank.place,
+            username: username,
+            country: rank['country'],
+            classname: rank['classname'],
+            points: rank.total.points,
+            penalty: rank.total.penalty,
+          });
+        }
       }
     }
 
@@ -1299,6 +1342,7 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     const allowedLanguages = [
+      { language: '', name: '' },
       { language: 'kp', name: 'Karel (Pascal)' },
       { language: 'kj', name: 'Karel (Java)' },
       { language: 'c', name: 'C11 (gcc 7.4)' },
@@ -1338,6 +1382,7 @@ export class Arena {
 
     const languageArray =
       typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+    languageArray.push('');
 
     allowedLanguages
       .filter(item => {
@@ -1475,11 +1520,10 @@ export class Arena {
     if (problem && self.problems[problem[1]]) {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
-
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.problem_' + problem.alias, self.elements.problemList).addClass(
-        'active',
-      );
+      // Set as active the selected problem
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = self.currentProblem.alias;
+      }
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1705,8 +1749,9 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.summary', self.elements.problemList).addClass('active');
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = null;
+      }
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -2197,15 +2242,13 @@ export class Arena {
         },
       );
     }
-    $('.problem_' + alias + ' .solved').text(
-      '(' +
-        self.myRuns
-          .getMaxScore(alias, previousScore)
-          .toFixed(self.digitsAfterDecimalPoint) +
-        ' / ' +
-        parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
-        ')',
-    );
+    if (self.elements.navBar) {
+      const currentProblem = self.elements.navBar.problems.find(
+        problem => problem.alias === alias,
+      );
+      currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
+      currentProblem.maxScore = maxScore || '0';
+    }
   }
 }
 class RunView {
@@ -2448,6 +2491,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2467,6 +2511,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2487,6 +2532,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return self.penalty();
@@ -2534,7 +2580,7 @@ class ObservableRun {
       return '#CF6';
     } else if (self.verdict() == 'CE') {
       return '#F90';
-    } else if (self.verdict() == 'JE') {
+    } else if (self.verdict() == 'JE' || self.verdict() == 'VE') {
       return '#F00';
     } else {
       return '';
@@ -2547,6 +2593,7 @@ class ObservableRun {
       self.contest_score() != null &&
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return parseFloat(self.contest_score() || '0').toFixed(2);
@@ -2560,6 +2607,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';

@@ -17,10 +17,12 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $identity
-        ]));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'author' => $identity,
+            ])
+        );
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -61,15 +63,19 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
-        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $identity
-        ]));
+        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'author' => $identity,
+            ])
+        );
 
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $identity
-        ]));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'author' => $identity
+            ])
+        );
 
         $login = self::login($problemData['author']);
 
@@ -113,14 +119,18 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get problems
-        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $identity
-        ]));
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
-            'author' => $identity
-        ]));
+        $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'author' => $identity
+            ])
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'author' => $identity
+            ])
+        );
 
         $login = self::login($problemData['author']);
 
@@ -188,13 +198,13 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
             null,
             null,
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $userLogin
         );
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             null,
             null,
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $userLogin
         );
 

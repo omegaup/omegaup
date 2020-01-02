@@ -764,7 +764,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet)) {
+        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
@@ -777,7 +777,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                 $problem['alias']
             );
-            if (is_null($currentProblem)) {
+            if (
+                is_null($currentProblem) ||
+                is_null($currentProblem->problem_id)
+            ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
@@ -833,7 +836,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course->course_id
             );
 
-            if (empty($currentAssignment)) {
+            if (
+                empty($currentAssignment) ||
+                is_null($currentAssignment->assignment_id)
+            ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'assignmentNotFound'
                 );
@@ -1821,7 +1827,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: string, progress: array<string, float>, username: string}[], student?: string}}
+     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2020,7 +2026,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Courses $course
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @param bool $onlyIntroDetails
-     * @return array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
+     * @return array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
@@ -2271,7 +2277,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias,
             intval($course->course_id)
         );
-        if (is_null($assignment)) {
+        if (is_null($assignment) || is_null($assignment->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'assignmentNotFound'
             );
@@ -2288,7 +2294,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (
             $assignment->start_time > \OmegaUp\Time::get() ||
             !\OmegaUp\DAO\GroupRoles::isContestant(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $assignment->acl_id
             )
         ) {
@@ -2535,7 +2541,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 
