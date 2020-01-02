@@ -15,7 +15,7 @@
         }}
       </h3>
     </div>
-    <div class="panel-body" v-if="shouldIncludeControls">
+    <div class="panel-body" v-if="includeControls">
       <template v-if="page > 1">
         <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
@@ -56,9 +56,9 @@
       </tbody>
     </table>
     <div class="panel-footer" v-if="showHeader">
-      <a href="/schoolofthemonth">{{ T.rankViewFull }}</a>
+      <a href="/schoolofthemonth/">{{ T.rankViewFull }}</a>
     </div>
-    <div class="panel-footer" v-else-if="shouldIncludeControls">
+    <div class="panel-footer" v-else-if="includeControls">
       <template v-if="page > 1">
         <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
@@ -115,7 +115,7 @@ export default class Rank extends Vue {
     return this.length * this.page < this.totalRows;
   }
 
-  get shouldIncludeControls(): boolean {
+  get includeControls(): boolean {
     return !this.showHeader && (this.shouldShowNextPage || this.page > 1);
   }
 }

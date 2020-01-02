@@ -6,25 +6,34 @@
           v-bind:class="{
             active: selectedTab === 'schoolsOfPreviousMonths',
           }"
-          v-on:click="selectedTab = 'schoolsOfPreviousMonths'"
         >
-          <a data-toggle="tab">{{ T.schoolsOfTheMonthPrevious }}</a>
+          <a
+            data-toggle="tab"
+            v-on:click="selectedTab = 'schoolsOfPreviousMonths'"
+            >{{ T.schoolsOfTheMonthPrevious }}</a
+          >
         </li>
         <li
           v-bind:class="{
             active: selectedTab === 'schoolsOfCurrentMonth',
           }"
-          v-on:click="selectedTab = 'schoolsOfCurrentMonth'"
         >
-          <a data-toggle="tab">{{ T.schoolsOfTheMonthList }}</a>
+          <a
+            data-toggle="tab"
+            v-on:click="selectedTab = 'schoolsOfCurrentMonth'"
+            >{{ T.schoolsOfTheMonthList }}</a
+          >
         </li>
         <li
           v-bind:class="{
             active: selectedTab === 'candidatesToSchoolOfTheMonth',
           }"
-          v-on:click="selectedTab = 'candidatesToSchoolOfTheMonth'"
         >
-          <a data-toggle="tab">{{ T.schoolsOfTheMonthCandidates }}</a>
+          <a
+            data-toggle="tab"
+            v-on:click="selectedTab = 'candidatesToSchoolOfTheMonth'"
+            >{{ T.schoolsOfTheMonthCandidates }}</a
+          >
         </li>
       </ul>
     </div>
