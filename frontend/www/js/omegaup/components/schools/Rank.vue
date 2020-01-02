@@ -55,7 +55,10 @@
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer" v-if="shouldIncludeControls">
+    <div class="panel-footer" v-if="showHeader">
+      <a href="/schoolofthemonth">{{ T.rankViewFull }}</a>
+    </div>
+    <div class="panel-footer" v-else-if="shouldIncludeControls">
       <template v-if="page > 1">
         <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
