@@ -168,7 +168,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         ];
     }
 
-    public static function isVerified($identity_id) {
+    public static function isVerified(int $identityId): bool {
         $sql = 'SELECT
                   u.verified
                 FROM
@@ -183,19 +183,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        $params = [ $identity_id ];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (empty($rs)) {
-            return null;
-        }
-        return $rs['verified'];
+        $params = [$identityId];
+        return boolval(
+            /** @var bool|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
     /**
      * @return array{country: string, state: null|string, school: null|string, email: null|string, locale: null|string}|null
      */
-    final public static function getExtendedProfileDataByPk($identity_id) {
-        if (is_null($identity_id)) {
+    final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
+        if (is_null($identityId)) {
             return null;
         }
         $sql = 'SELECT
@@ -227,17 +226,17 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         /** @var array{country: string, email: null|string, locale: null|string, school: null|string, state: null|string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$identity_id]
+            [$identityId]
         );
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(
         int $userId,
         int $identityId
-    ) {
+    ): bool {
         $sql = '
             SELECT
-                COUNT(*) = 1 AS associated
+                COUNT(*)
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -255,9 +254,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT 1;';
         $args = [$userId, $identityId];
 
-        /** @var array{associated: int} */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
-        return $rs['associated'] == '1';
+        return (
+            /** @var array{associated: int} */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args)
+        ) > 0;
     }
 
     public static function getUnassociatedIdentity(
@@ -282,7 +282,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function getAssociatedIdentities($userId) {
+    /**
+     * @return list<array{username: string, default: bool}>
+     */
+    public static function getAssociatedIdentities(int $userId): array {
         $sql = '
             SELECT
                 i.username,
@@ -302,15 +305,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
-            array_push($result, [
+            $result[] = [
                 'username' => $identity['username'],
                 'default' => $identity['identity_id'] == $identity['main_identity_id'],
-            ]);
+            ];
         }
         return $result;
     }
 
-    public static function associateIdentityWithUser($userId, $identity_id) {
+    public static function associateIdentityWithUser(
+        int $userId,
+        int $identityId
+    ): int {
         $sql = '
             UPDATE
                 Identities
@@ -321,7 +327,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         ';
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             $sql,
-            [$userId, $identity_id]
+            [$userId, $identityId]
         );
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

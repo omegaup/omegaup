@@ -28,7 +28,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         $currentTime = \OmegaUp\Time::get();
         $problemsetIdentity  = self::getByPK(
             $identity->identity_id,
-            $container->problemset_id
+            intval($container->problemset_id)
         );
         if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
@@ -37,7 +37,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             }
             $problemsetIdentity = new \OmegaUp\DAO\VO\ProblemsetIdentities([
                 'identity_id' => $identity->identity_id,
-                'problemset_id' => $container->problemset_id,
+                'problemset_id' => intval($container->problemset_id),
                 'score' => 0,
                 'time' => 0,
                 'is_invited' => false,
@@ -47,10 +47,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = $currentTime;
-            $finishTime = $container->finish_time;
+            $finishTime = intval($container->finish_time);
             if (!empty($container->window_length)) {
                 $finishTime = min(
-                    $currentTime + $container->window_length * 60,
+                    $currentTime + intval($container->window_length) * 60,
                     $finishTime
                 );
             }
@@ -61,7 +61,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return $problemsetIdentity;
     }
 
-    public static function getWithExtraInformation($problemset_id) {
+    /**
+     * @return list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}>
+     */
+    public static function getWithExtraInformation(int $problemsetId): array {
         $sql = 'SELECT
                     UNIX_TIMESTAMP(pi.access_time) as access_time,
                     UNIX_TIMESTAMP(pi.end_time) as end_time,
@@ -88,11 +91,14 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         /** @var list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$problemset_id]
+            [$problemsetId]
         );
     }
 
-    final public static function getIdentitiesByProblemset($problemset_id) {
+    /**
+     * @return list<array{access_time: null|string, country_id: null|string, email: null|string, end_time: null|string, identity_id: int, is_invited: bool, user_id: int|null, username: string}>
+     */
+    final public static function getIdentitiesByProblemset(int $problemsetId): array {
         $sql = '
             SELECT
                 i.user_id,
@@ -119,7 +125,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         /** @var list<array{access_time: null|string, country_id: null|string, email: null|string, end_time: null|string, identity_id: int, is_invited: bool, user_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$problemset_id]
+            [$problemsetId]
         );
     }
 
@@ -169,7 +175,9 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    public static function updatePrivacyStatementConsent(\OmegaUp\DAO\VO\ProblemsetIdentities $problemset_identity) {
+    public static function updatePrivacyStatementConsent(
+        \OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
+    ): int {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
@@ -178,9 +186,9 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                     `identity_id` = ?
                     AND `problemset_id` = ?;';
         $params = [
-            $problemset_identity->privacystatement_consent_id,
-            $problemset_identity->identity_id,
-            $problemset_identity->problemset_id,
+            $problemsetIdentity->privacystatement_consent_id,
+            $problemsetIdentity->identity_id,
+            $problemsetIdentity->problemset_id,
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -14,7 +14,10 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
-    private static function getAdmins($acl_id) {
+    /**
+     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     */
+    private static function getAdmins(int $aclId): array {
         $sql = '
             SELECT
                 i.username, ur.acl_id AS acl
@@ -27,11 +30,11 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         $params = [
             \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\Authorization::SYSTEM_ACL,
-            $acl_id,
+            $aclId,
         ];
 
         /** @var list<array{acl: int, username: string}> */
-        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        $rawAdmins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
         );
@@ -47,34 +50,47 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
                 Identities i ON u.main_identity_id = i.identity_id
             WHERE
                 a.acl_id = ?;';
-        $params = [$acl_id];
-        /** @var string|null */
+        $params = [$aclId];
+        /** @var string */
         $owner = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
 
         $found = false;
-        for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
-                $admins[$i]['role'] = 'site-admin';
-            } elseif ($admins[$i]['username'] == $owner) {
-                $admins[$i]['role'] = 'owner';
+        $admins = [];
+        foreach ($rawAdmins as &$admin) {
+            if ($admin['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
+                $admins[] = [
+                    'username' => $admin['username'],
+                    'role' => 'site-admin',
+                ];
+            } elseif ($admin['username'] == $owner) {
                 $found = true;
+                $admins[] = [
+                    'username' => $admin['username'],
+                    'role' => 'owner',
+                ];
             } else {
-                $admins[$i]['role'] = 'admin';
+                $admins[] = [
+                    'username' => $admin['username'],
+                    'role' => 'admin',
+                ];
             }
-            unset($admins[$i]['acl']);
         }
 
         if (!$found) {
-            array_push($admins, [
+            $admins[] = [
                 'username' => $owner,
                 'role' => 'owner',
-            ]);
+            ];
         }
 
         return $admins;
     }
 
-    public static function hasRole($identity_id, $acl_id, $role_id) {
+    public static function hasRole(
+        int $identityId,
+        int $aclId,
+        int $roleId
+    ): bool {
         $sql = '
             SELECT
                 COUNT(*)
@@ -87,32 +103,43 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 i.identity_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
-            $identity_id,
-            $role_id,
+            $identityId,
+            $roleId,
             \OmegaUp\Authorization::SYSTEM_ACL,
-            $acl_id,
+            $aclId,
         ];
-        /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql,
-            $params
+        return (
+            /** @var int */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                $params
+            )
         ) > 0;
     }
 
-    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
-        return self::getAdmins($contest->acl_id);
-    }
-
-    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course) {
-        return self::getAdmins($course->acl_id);
-    }
-
-    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem) {
-        return self::getAdmins($problem->acl_id);
+    /**
+     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     */
+    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest): array {
+        return self::getAdmins(intval($contest->acl_id));
     }
 
     /**
-     * @return string[]
+     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     */
+    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course): array {
+        return self::getAdmins(intval($course->acl_id));
+    }
+
+    /**
+     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     */
+    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem): array {
+        return self::getAdmins(intval($problem->acl_id));
+    }
+
+    /**
+     * @return list<string>
      */
     public static function getSystemRoles(int $userId): array {
         $sql = '
@@ -142,7 +169,10 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         return $roles;
     }
 
-    public static function getSystemGroups($identity_id) {
+    /**
+     * @return list<string>
+     */
+    public static function getSystemGroups(int $identityId): array {
         $sql = "
             SELECT
                 g.name
@@ -153,7 +183,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 gi.identity_id = ? AND g.name LIKE '%omegaup:%';";
         $params = [
-            $identity_id
+            $identityId
         ];
 
         $groups = [];

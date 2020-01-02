@@ -14,7 +14,9 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Languages extends \OmegaUp\DAO\Base\Languages {
-    final public static function getByName($name) {
+    final public static function getByName(
+        string $name
+    ): ?\OmegaUp\DAO\VO\Languages {
         $sql = 'SELECT
                     *
                 FROM

@@ -59,17 +59,17 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return $counts;
     }
 
-    public static function getAssignmentForProblemset($problemset_id) {
-        if (is_null($problemset_id)) {
+    public static function getAssignmentForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
+        if (is_null($problemsetId)) {
             return null;
         }
 
-        return self::getByProblemset($problemset_id);
+        return self::getByProblemset($problemsetId);
     }
 
-    final public static function getByProblemset($problemset_id) {
+    final public static function getByProblemset(int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
-        $params = [$problemset_id];
+        $params = [$problemsetId];
 
         /** @var array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -130,17 +130,15 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
 
     /**
       * Update assignments order.
-      *
-      * @return Affected Rows
       */
     final public static function updateAssignmentsOrder(
-        $assignment_id,
-        $order
-    ) {
+        int $assignmentId,
+        int $order
+    ): int {
         $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';
         $params = [
             $order,
-            $assignment_id,
+            $assignmentId,
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

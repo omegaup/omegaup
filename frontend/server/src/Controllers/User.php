@@ -1394,6 +1394,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Get the profile of the coder of the month
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
+        if (is_null($user) || is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -1635,32 +1638,25 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity)) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $problems = \OmegaUp\DAO\Problems::getProblemsSolved(
             $identity->identity_id
         );
 
-        $response = [
-            'status' => 'ok',
-            'problems' => [],
-        ];
-        if (!is_null($problems)) {
-            $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
-            foreach ($problems as $problem) {
-                if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                    array_push(
-                        $response['problems'],
-                        $problem->asFilteredArray(
-                            $relevant_columns
-                        )
-                    );
-                }
+        $responseProblems = [];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted'];
+        foreach ($problems as $problem) {
+            if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
+                continue;
             }
+            $responseProblems[] = $problem->asFilteredArray($relevantColumns);
         }
 
-        return $response;
+        return [
+            'problems' => $responseProblems,
+        ];
     }
 
     /**
@@ -1673,7 +1669,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity)) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -1801,9 +1797,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         return [
             'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                intval(
-                    $identity->identity_id
-                )
+                intval($identity->identity_id)
             ),
             'status' => 'ok'
         ];
@@ -2099,7 +2093,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 } else {
                     // Create a new record
                     $newIdentitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
-                        'identity_id' => $r->identity->identity_id,
+                        'identity_id' => intval($r->identity->identity_id),
                         'school_id' => $newSchoolId,
                         'graduation_date' => $graduationDate,
                     ]);
@@ -2624,7 +2618,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         self::validateAddRemoveGroup($r);
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-            'identity_id' => $r->identity->identity_id,
+            'identity_id' => intval($r->identity->identity_id),
             'group_id' => $r['group']->group_id,
         ]));
 
@@ -2647,7 +2641,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::validateAddRemoveGroup($r);
 
         \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
-            'identity_id' => $r->identity->identity_id,
+            'identity_id' => intval($r->identity->identity_id),
             'group_id' => $r['group']->group_id
         ]));
 
@@ -2763,7 +2757,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
             ),
             'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $latestStatement['privacystatement_id']
             ),
             'git_object_id' => $latestStatement['git_object_id'],
@@ -2831,7 +2825,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'hasAccepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $latestStatement['privacystatement_id']
             ),
         ];
@@ -2903,7 +2897,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::getUnassociatedIdentity(
             $r['username']
         );
-        if (is_null($identity)) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'username'

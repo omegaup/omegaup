@@ -13,9 +13,9 @@ namespace OmegaUp\DAO;
  */
 class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConsentLog {
     public static function hasAcceptedPrivacyStatement(
-        $identity_id,
-        $privacystatement_id
-    ) {
+        int $identityId,
+        int $privacyStatementId
+    ): bool {
         $sql = 'SELECT
                   COUNT(1)
                 FROM
@@ -24,12 +24,13 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\Base\PrivacyStatementConse
                   pscl.identity_id = ?
                   AND pscl.privacystatement_id = ?
                ';
-        /** @var int */
-        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql,
-            [$identity_id, $privacystatement_id]
-        );
-        return $count > 0;
+        return (
+            /** @var int */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$identityId, $privacyStatementId]
+            )
+        ) > 0;
     }
 
     /**

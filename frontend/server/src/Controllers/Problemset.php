@@ -82,8 +82,8 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             );
         }
         \OmegaUp\DAO\Runs::recalculateScore(
-            $updatedProblemsetProblem->problemset_id,
-            $updatedProblemsetProblem->problem_id,
+            intval($updatedProblemsetProblem->problemset_id),
+            intval($updatedProblemsetProblem->problem_id),
             $updatedProblemsetProblem->points,
             $oldProblemsetProblem->points
         );

@@ -12,26 +12,34 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
-    public static function GetAccessForProblemset($problemset_id) {
+    /**
+     * @return list<array{classname: string, ip: int, time: int, username: string}>
+     */
+    public static function GetAccessForProblemset(int $problemsetId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
                     UNIX_TIMESTAMP(pal.time) AS `time`,
-                    (SELECT `urc`.classname FROM
-                        `User_Rank_Cutoffs` urc
-                    WHERE
-                        `urc`.score <= (
-                                SELECT
-                                    `ur`.`score`
-                                FROM
-                                    `User_Rank` `ur`
-                                WHERE
-                                    `ur`.user_id = `i`.`user_id`
-                            )
-                    ORDER BY
-                        `urc`.percentile ASC
-                    LIMIT
-                        1) `classname`
+                    IFNULL(
+                        (
+                            SELECT `urc`.classname FROM
+                                `User_Rank_Cutoffs` urc
+                            WHERE
+                                `urc`.score <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.user_id = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
@@ -41,9 +49,9 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 WHERE
                     pal.problemset_id = ?
                 ORDER BY `time`;';
-        $val = [$problemset_id];
+        $val = [$problemsetId];
 
-        /** @var list<array{classname: null|string, ip: int, time: int, username: string}> */
+        /** @var list<array{classname: string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -76,10 +84,13 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
         );
     }
 
+    /**
+     * @return list<\OmegaUp\DAO\VO\ProblemsetAccessLog>
+     */
     final public static function getByProblemsetIdentityId(
-        $problemsetId,
-        $identityId
-    ) {
+        int $problemsetId,
+        int $identityId
+    ): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -97,11 +108,8 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {
-            array_push(
-                $problemsetAccessLog,
-                new \OmegaUp\DAO\VO\ProblemsetAccessLog(
-                    $row
-                )
+            $problemsetAccessLog[] = new \OmegaUp\DAO\VO\ProblemsetAccessLog(
+                $row
             );
         }
         return $problemsetAccessLog;

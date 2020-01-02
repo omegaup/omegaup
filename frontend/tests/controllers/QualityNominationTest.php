@@ -1547,7 +1547,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDificulty(
+        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDifficulty(
             'easy'
         );
         $this->assertEquals(count($problemOfTheWeek), 1);

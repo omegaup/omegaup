@@ -764,7 +764,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet)) {
+        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
@@ -777,7 +777,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                 $problem['alias']
             );
-            if (is_null($currentProblem)) {
+            if (
+                is_null($currentProblem) ||
+                is_null($currentProblem->problem_id)
+            ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
@@ -833,7 +836,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course->course_id
             );
 
-            if (empty($currentAssignment)) {
+            if (
+                empty($currentAssignment) ||
+                is_null($currentAssignment->assignment_id)
+            ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'assignmentNotFound'
                 );
@@ -2262,7 +2268,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias,
             intval($course->course_id)
         );
-        if (is_null($assignment)) {
+        if (is_null($assignment) || is_null($assignment->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'assignmentNotFound'
             );
@@ -2279,7 +2285,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (
             $assignment->start_time > \OmegaUp\Time::get() ||
             !\OmegaUp\DAO\GroupRoles::isContestant(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $assignment->acl_id
             )
         ) {
