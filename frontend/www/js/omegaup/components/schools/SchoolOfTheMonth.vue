@@ -4,6 +4,22 @@
       <ul class="nav nav-tabs">
         <li
           v-bind:class="{
+            active: selectedTab === 'schoolsOfPreviousMonths',
+          }"
+          v-on:click="selectedTab = 'schoolsOfPreviousMonths'"
+        >
+          <a data-toggle="tab">{{ T.schoolsOfTheMonthPrevious }}</a>
+        </li>
+        <li
+          v-bind:class="{
+            active: selectedTab === 'schoolsOfCurrentMonth',
+          }"
+          v-on:click="selectedTab = 'schoolsOfCurrentMonth'"
+        >
+          <a data-toggle="tab">{{ T.schoolsOfTheMonthList }}</a>
+        </li>
+        <li
+          v-bind:class="{
             active: selectedTab === 'candidatesToSchoolOfTheMonth',
           }"
           v-on:click="selectedTab = 'candidatesToSchoolOfTheMonth'"
@@ -14,11 +30,63 @@
     </div>
     <table
       class="table table-striped school-of-the-month-table"
+      v-show="selectedTab === 'schoolsOfPreviousMonths'"
+    >
+      <thead>
+        <tr>
+          <th class="text-center">{{ T.wordsCountryRegion }}</th>
+          <th>{{ T.wordsSchool }}</th>
+          <th class="text-center">{{ T.wordsDate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="school in schoolsOfPreviousMonths">
+          <td class="text-center">
+            <omegaup-country-flag
+              v-bind:country="school.country_id"
+            ></omegaup-country-flag>
+          </td>
+          <td>
+            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+              school.name
+            }}</a>
+          </td>
+          <td class="text-center">{{ school.time }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <table
+      class="table table-striped school-of-the-month-table"
+      v-show="selectedTab === 'schoolsOfCurrentMonth'"
+    >
+      <thead>
+        <tr>
+          <th class="text-center">{{ T.wordsCountryRegion }}</th>
+          <th>{{ T.wordsSchool }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="school in schoolsOfCurrentMonth">
+          <td class="text-center">
+            <omegaup-country-flag
+              v-bind:country="school.country_id"
+            ></omegaup-country-flag>
+          </td>
+          <td>
+            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+              school.name
+            }}</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table
+      class="table table-striped school-of-the-month-table"
       v-show="selectedTab === 'candidatesToSchoolOfTheMonth'"
     >
       <thead>
         <tr>
-          <th class="text-center">{{ T.wordsMonthCountry }}</th>
+          <th class="text-center">{{ T.wordsCountryRegion }}</th>
           <th>{{ T.wordsSchool }}</th>
           <th class="numericColumn">
             {{ T.rankScore }}
