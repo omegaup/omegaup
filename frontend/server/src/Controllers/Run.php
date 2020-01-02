@@ -55,6 +55,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         'py3',
         'rb',
     ];
+
+    /** @var int */
     public static $defaultSubmissionGap = 60; /*seconds*/
 
     public const VERDICTS = [

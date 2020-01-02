@@ -147,8 +147,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Gets all coders of the month from a certain school
-     * @param int $schoolId
-     * @return array{time: string, username: string, classname: string}[]
+     *
+     * @return list<array{time: string, username: string, classname: string}>
      */
     final public static function getCodersOfTheMonthFromSchool(
         int $schoolId
@@ -200,7 +200,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all coder of the months based on month
-     * @return array{time: string, username: string, rank: int, country_id: string, email: string|null}[]
+     * @return list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}>
      */
     final public static function getMonthlyList(string $firstDay): array {
         $date = date('Y-m-01', strtotime($firstDay));
@@ -233,11 +233,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get true whether user is the last Coder of the month
-     *
-     * @static
-     * @return Array
      */
-    final public static function isLastCoderOfTheMonth($username) {
+    final public static function isLastCoderOfTheMonth(string $username): bool {
         $sql = '
           SELECT
             i.username
@@ -262,10 +259,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         return $username == $rs['username'];
     }
 
+    /**
+     * @return list<\OmegaUp\DAO\VO\CoderOfTheMonth>
+     */
     final public static function getByTimeAndSelected(
-        $time,
-        $autoselected = false
-    ) {
+        string $time,
+        bool $autoselected = false
+    ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
@@ -280,7 +280,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
+            $coders[] = new \OmegaUp\DAO\VO\CoderOfTheMonth($row);
         }
         return $coders;
     }

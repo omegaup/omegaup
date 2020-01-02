@@ -14,7 +14,12 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Notifications extends \OmegaUp\DAO\Base\Notifications {
-    public static function getUnreadNotifications(\OmegaUp\DAO\VO\Users $user) {
+    /**
+     * @return list<array{contents: string, notification_id: int, timestamp: int}>
+     */
+    public static function getUnreadNotifications(
+        \OmegaUp\DAO\VO\Users $user
+    ): array {
         $sql = 'SELECT
                     n.notification_id, n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp
                 FROM

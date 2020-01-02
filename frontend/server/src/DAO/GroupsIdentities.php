@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
+    /**
+     * @return list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>
+     */
     public static function GetMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
         $sql = '
             SELECT
@@ -68,13 +71,13 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         $identities = [];
         foreach ($rs as $row) {
             if (strpos($row['username'], ':') === false) {
-                array_push($identities, [
+                $identities[] = [
                     'username' => $row['username'],
                     'classname' => $row['classname'],
-                ]);
-                continue;
+                ];
+            } else {
+                $identities[] = $row;
             }
-            array_push($identities, $row);
         }
         return $identities;
     }
@@ -99,7 +102,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\GroupsIdentities[]
+     * @return list<\OmegaUp\DAO\VO\GroupsIdentities>
      */
     final public static function getByGroupId(int $groupId): array {
         $sql = '
@@ -118,17 +121,17 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 [$groupId]
             ) as $row
         ) {
-            array_push(
-                $groupsIdentities,
-                new \OmegaUp\DAO\VO\GroupsIdentities(
-                    $row
-                )
+            $groupsIdentities[] = new \OmegaUp\DAO\VO\GroupsIdentities(
+                $row
             );
         }
         return $groupsIdentities;
     }
 
-    final public static function getUsernamesByGroupId($group_id) {
+    /**
+     * @return list<string>
+     */
+    final public static function getUsernamesByGroupId(int $groupId): array {
         $sql = '
             SELECT
                 i.username
@@ -146,10 +149,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [$group_id]
+                [$groupId]
             ) as $row
         ) {
-            array_push($identities, $row['username']);
+            $identities[] = $row['username'];
         }
         return $identities;
     }

@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
-    public static function getUserByToken($auth_token) {
+    public static function getUserByToken(string $authToken): ?\OmegaUp\DAO\VO\Users {
         $sql = 'SELECT
                     u.*
                 FROM
@@ -28,7 +28,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$auth_token]
+            [$authToken]
         );
         if (empty($rs)) {
             return null;
@@ -36,7 +36,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function getIdentityByToken($auth_token): ?\OmegaUp\DAO\VO\Identities {
+    public static function getIdentityByToken(string $authToken): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                     i.*
                 FROM
@@ -50,7 +50,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$auth_token]
+            [$authToken]
         );
 
         if (empty($rs)) {
@@ -59,7 +59,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function expireAuthTokens($identity_id) {
+    public static function expireAuthTokens(int $identity_id): int {
         $sql = 'DELETE FROM
                     `Auth_Tokens`
                 WHERE
@@ -69,7 +69,10 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getByIdentityId($identityId) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\AuthTokens>
+     */
+    final public static function getByIdentityId(int $identityId): array {
         $sql = 'SELECT
                     at.*
                 FROM
@@ -84,7 +87,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
 
         $authTokens = [];
         foreach ($rs as $row) {
-            array_push($authTokens, new \OmegaUp\DAO\VO\AuthTokens($row));
+            $authTokens[] = new \OmegaUp\DAO\VO\AuthTokens($row);
         }
         return $authTokens;
     }

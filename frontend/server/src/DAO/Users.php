@@ -117,8 +117,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
     }
 
-    public static function getHideTags($identity_id) {
-        if (is_null($identity_id)) {
+    public static function getHideTags(?int $identityId): bool {
+        if (is_null($identityId)) {
             return false;
         }
         $sql = '
@@ -135,7 +135,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             LIMIT
                 1;
         ';
-        $params = [$identity_id];
+        $params = [$identityId];
 
         return boolval(
             /** @var bool|null */
@@ -221,7 +221,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
 
-    final public static function getVerified($verified, $in_mailing_list) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\Users>
+     */
+    final public static function getVerified(
+        bool $verified,
+        bool $inMailingList
+    ): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -234,12 +240,12 @@ class Users extends \OmegaUp\DAO\Base\Users {
         /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$verified, $in_mailing_list]
+            [$verified, $inMailingList]
         );
 
         $users = [];
         foreach ($rs as $row) {
-            array_push($users, new \OmegaUp\DAO\VO\Users($row));
+            $users[] = new \OmegaUp\DAO\VO\Users($row);
         }
         return $users;
     }

@@ -617,7 +617,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-        $types = (isset($r['types']) ? $r['types'] : ['promotion', 'demotion']);
+        $types = ['promotion', 'demotion'];
+        if (!empty($r['types'])) {
+            if (is_string($r['types'])) {
+                $types = explode(',', $r['types']);
+            } elseif (is_array($r['types'])) {
+                /** @var list<string> */
+                $types = $r['types'];
+            }
+        }
 
         return [
             'status' => 'ok',

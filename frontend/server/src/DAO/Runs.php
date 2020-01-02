@@ -260,10 +260,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
     /**
      * Gets the count of total runs sent to a given contest by verdict and by period of time
+     *
+     * @return list<array{date: null|string, runs: int, verdict: string}>
      */
     final public static function countRunsOfIdentityPerDatePerVerdict(
         int $identityId
-    ) {
+    ): array {
         $sql = '
             SELECT
                 DATE(s.time) AS date,
@@ -786,11 +788,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * Recalculate the contest_score of all problemset and problem Runs
      */
     public static function recalculateScore(
-        $problemset_id,
-        $problem_id,
-        $current_points,
-        $original_points
-    ) {
+        int $problemsetId,
+        int $problemId,
+        float $currentPoints,
+        float $originalPoints
+    ): int {
         $sql = '
             UPDATE
               Runs r
@@ -805,9 +807,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         $params = [
-            $current_points,
-            $problemset_id,
-            $problem_id
+            $currentPoints,
+            $problemsetId,
+            $problemId
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -824,7 +826,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * + If penalty_type is anything else then:
      *   - penalty = submit_delay
      */
-    public static function recalculatePenaltyForContest(\OmegaUp\DAO\VO\Contests $contest) {
+    public static function recalculatePenaltyForContest(\OmegaUp\DAO\VO\Contests $contest): int {
         $penalty_type = $contest->penalty_type;
         if ($penalty_type == 'none') {
             $sql = '

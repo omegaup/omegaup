@@ -2255,6 +2255,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiClarifications(\OmegaUp\Request $r) {
         $r->ensureIdentity();
+        $r->ensureInt('offset', null, null, false /* optional */);
+        $r->ensureInt('rowcount', null, null, false /* optional */);
         $contest = self::validateClarifications($r);
 
         $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
@@ -2266,8 +2268,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest->problemset_id,
             $isContestDirector,
             $r->identity->identity_id,
-            $r['offset'],
-            $r['rowcount']
+            empty($r['offset']) ? null : intval($r['offset']),
+            empty($r['rowcount']) ? 1000 : intval($r['rowcount'])
         );
 
         foreach ($clarifications as &$clar) {
@@ -2720,8 +2722,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function validateContestCanBePublic(\OmegaUp\DAO\VO\Contests $contest) {
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $contest->problemset_id
+            intval($contest->problemset_id)
         );
+        if (is_null($problemset)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
         // Check that contest has some problems at least 1 problem
         $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
             $problemset
@@ -2796,7 +2803,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 
-        $originalContest = \OmegaUp\DAO\Contests::getByPK($contest->contest_id);
+        $originalContest = \OmegaUp\DAO\Contests::getByPK(
+            intval($contest->contest_id)
+        );
+        if (is_null($originalContest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
+            );
+        }
 
         // Push changes
         try {
@@ -2809,8 +2823,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if ($updateProblemset) {
                 // Save the problemset object with data sent by user to the database
                 $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-                    $contest->problemset_id
+                    intval($contest->problemset_id)
                 );
+                if (is_null($problemset)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemsetNotFound'
+                    );
+                }
                 $problemset->needs_basic_information = $r['basic_information'] ?? false;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
@@ -2886,7 +2905,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $identity->identity_id,
             $contest->problemset_id
         );
-
+        if (is_null($problemsetIdentity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetIdentityNotFound'
+            );
+        }
         $problemsetIdentity->end_time = $r['end_time'];
         \OmegaUp\DAO\ProblemsetIdentities::update($problemsetIdentity);
 
@@ -3118,7 +3141,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Get max points posible for contest
         $totalPoints = \OmegaUp\DAO\ProblemsetProblems::getMaxPointsByProblemset(
-            $contest->problemset_id
+            intval($contest->problemset_id)
         );
 
         // Get scoreboard to calculate distribution
