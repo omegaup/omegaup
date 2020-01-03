@@ -33,16 +33,20 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`name`,
                 `ur`.`country_id`,
-                (SELECT
-                    `urc`.`classname`
-                 FROM
-                    `User_Rank_Cutoffs` `urc`
-                 WHERE
-                    `urc`.`score` <= `ur`.`score`
-                 ORDER BY
-                    `urc`.`percentile` ASC
-                 LIMIT
-                    1) as `classname`';
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`';
         $sql_count = '
               SELECT
                 COUNT(1)';
@@ -81,7 +85,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        /** @var array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[] */
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sql_from . $sqlLimit,
             $params

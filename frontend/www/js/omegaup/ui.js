@@ -637,7 +637,12 @@ let UI = {
 
     // These two functions are adapted from Markdown.Converter.js. They are
     // needed to support images with some special characters in their name.
-    function escapeCharacters(text, charsToEscape, afterBackslash) {
+    function escapeCharacters(
+      text,
+      charsToEscape,
+      afterBackslash,
+      doNotEscapeTildeAndDollar,
+    ) {
       // First we have to escape the escape characters so that
       // we can build a character class out of them
       const regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
@@ -647,10 +652,10 @@ let UI = {
       }
 
       const regex = new RegExp(regexString, 'g');
-      return text
-        .replace(/~/g, '~T')
-        .replace(/\$/g, '~D')
-        .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`);
+      if (!doNotEscapeTildeAndDollar) {
+        text = text.replace(/~/g, '~T').replace(/\$/g, '~D');
+      }
+      return text.replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`);
     }
     function unescapeCharacters(text) {
       //
@@ -707,46 +712,6 @@ let UI = {
         },
       );
       return text;
-    });
-    converter.hooks.chain('preBlockGamut', function(
-      text,
-      blockGamut,
-      spanGamut,
-    ) {
-      // GitHub-flavored fenced code blocks
-      function fencedCodeBlock(
-        whole,
-        indentation,
-        fence,
-        infoString,
-        contents,
-      ) {
-        contents = contents.replace(/&/g, '&amp;');
-        contents = contents.replace(/</g, '&lt;');
-        contents = contents.replace(/>/g, '&gt;');
-        if (indentation != '') {
-          let lines = [];
-          let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-          for (let line of contents.split('\n')) {
-            lines.push(line.replace(stripPrefix, ''));
-          }
-          contents = lines.join('\n');
-        }
-        let className = '';
-        infoString = infoString.trim();
-        if (infoString != '') {
-          className = ` class="language-${infoString.split(/\s+/)[0]}"`;
-        }
-        return `<pre><code${className}>${contents}</code></pre>`;
-      }
-      text = text.replace(
-        /^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gms,
-        fencedCodeBlock,
-      );
-      return text.replace(
-        /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gms,
-        fencedCodeBlock,
-      );
     });
     converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
@@ -812,9 +777,15 @@ let UI = {
                 )}</pre></td>`;
                 columns += 2;
               } else {
-                result += `<td><pre>${matches[i + 1].replace(
-                  /\s+$/,
-                  '',
+                result += `<td><pre>${escapeCharacters(
+                  matches[i + 1]
+                    .replace(/\s+$/, '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;'),
+                  ' \t*_{}[]()<>#+=.!|`-',
+                  /*afterBackslash=*/ false,
+                  /*doNotEscapeTildeAnDollar=*/ true,
                 )}</pre></td>`;
                 columns++;
               }
@@ -828,6 +799,51 @@ let UI = {
 
           return '<table class="sample_io">\n' + result + '\n</table>\n';
         },
+      );
+    });
+    converter.hooks.chain('preBlockGamut', function(
+      text,
+      blockGamut,
+      spanGamut,
+    ) {
+      // GitHub-flavored fenced code blocks
+      function fencedCodeBlock(
+        whole,
+        indentation,
+        fence,
+        infoString,
+        contents,
+      ) {
+        contents = contents.replace(/&/g, '&amp;');
+        contents = contents.replace(/</g, '&lt;');
+        contents = contents.replace(/>/g, '&gt;');
+        if (indentation != '') {
+          let lines = [];
+          let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+          for (let line of contents.split('\n')) {
+            lines.push(line.replace(stripPrefix, ''));
+          }
+          contents = escapeCharacters(
+            lines.join('\n'),
+            ' \t*_{}[]()<>#+=.!|`-',
+            /*afterBackslash=*/ false,
+            /*doNotEscapeTildeAnDollar=*/ true,
+          );
+        }
+        let className = '';
+        infoString = infoString.trim();
+        if (infoString != '') {
+          className = ` class="language-${infoString.split(/\s+/)[0]}"`;
+        }
+        return `<pre><code${className}>${contents}</code></pre>`;
+      }
+      text = text.replace(
+        /^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gms,
+        fencedCodeBlock,
+      );
+      return text.replace(
+        /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gms,
+        fencedCodeBlock,
       );
     });
     converter.hooks.chain('preBlockGamut', function(

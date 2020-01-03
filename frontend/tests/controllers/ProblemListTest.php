@@ -13,13 +13,13 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
         }
 
         // Get 1 problem private, should not appear
         $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -84,7 +84,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
             for ($j = 0; $j <= $i; $j++) {
                 \OmegaUp\Test\Factories\Problem::addTag(
@@ -97,7 +97,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
 
         // Get 1 problem private, should not appear
         $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
         for ($j = 0; $j < $n; $j++) {
             \OmegaUp\Test\Factories\Problem::addTag(
@@ -151,11 +151,11 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp,c'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
-                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp11-gcc,c11-gcc',
             ]));
             for ($j = 0; $j <= $i; $j++) {
                 \OmegaUp\Test\Factories\Problem::addTag(
@@ -324,27 +324,27 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityAdmin
         ]));
         $private_problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityAdmin
         ]));
         $problem_a = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityA
         ]));
         $private_problem_a = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityA
         ]));
         $problem_b = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityB
         ]));
         $private_problem_b = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityB
         ]));
 
@@ -419,7 +419,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
         }
 
@@ -446,15 +446,15 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $anotherAuthor, 'identity' => $anotherIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identity
         ]));
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
         $anotherProblemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $anotherIdentity
         ]));
 
@@ -478,11 +478,11 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identity
         ]));
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
 
@@ -507,7 +507,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
 
@@ -551,7 +551,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
         $alias = $problemDataPrivate['request']['problem_alias'];
@@ -624,7 +624,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $author, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $authorIdentity
         ]));
         $alias = $problemDataPrivate['request']['problem_alias'];
@@ -680,7 +680,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $helper, 'identity' => $helperIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $authorIdentity
         ]));
 
@@ -716,7 +716,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
                 'author' => $identity
             ]));
         }
@@ -802,10 +802,10 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testListWithAliasQuery() {
         $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
         ]));
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -867,7 +867,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 6; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
             $runs = $i / 2;
             for ($r = 0; $r < $runs; $r++) {

@@ -87,13 +87,15 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
         $identity->password = $password;
         $identityLogin = self::login($identity);
 
-        $details = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'auth_token' => $identityLogin->auth_token,
-        ]));
+        $details = \OmegaUp\Controllers\User::apiProfile(
+            new \OmegaUp\Request([
+                'auth_token' => $identityLogin->auth_token,
+            ])
+        );
 
         // apiProfile must show associated user's info
         $this->assertEquals(
-            $details['userinfo']['username'],
+            $details['username'],
             $identity->username
         );
     }

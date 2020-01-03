@@ -18,7 +18,7 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
 				"files": {
@@ -40,7 +40,7 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
 				"files": {
@@ -287,8 +287,8 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			},
 			{
@@ -303,8 +303,8 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			}
 		]
@@ -318,8 +318,8 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print 3"
+					"language": "py3",
+					"source": "print(3)"
 				}
 			},
 			{
@@ -334,8 +334,8 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print 3"
+					"language": "py3",
+					"source": "print(3)"
 				}
 			}
 		]
@@ -349,8 +349,8 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			},
 			{
@@ -365,8 +365,8 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			}
 		]
@@ -380,7 +380,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			},
@@ -396,7 +396,7 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			}
@@ -411,8 +411,8 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			},
 			{
@@ -420,7 +420,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "triangulos",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			}
@@ -435,7 +435,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			},
@@ -452,8 +452,8 @@
 				"params": {
 					"problem_alias": "sumas",
 					"problemset_id": 2,
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			}
 		]

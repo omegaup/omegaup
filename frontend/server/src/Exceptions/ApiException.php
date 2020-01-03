@@ -41,9 +41,7 @@ abstract class ApiException extends \Exception {
     }
 
     /**
-     * @return array
-     *
-     * @psalm-return array<string, mixed>
+     * @return array<string, mixed>
      */
     final public function asArray(): array {
         $previous = $this->getPrevious();

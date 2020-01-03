@@ -215,77 +215,34 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
-        \OmegaUp\UITools::assignSmartyNavbarHeader(
-            $smarty,
-            /*$inContest=*/false
-        );
+        $r = new Request($_REQUEST);
+        $inContest = false;
         try {
-            [
-                'smartyProperties' => $smartyProperties,
-                'template' => $template,
-            ] = $callback(new Request($_REQUEST));
+            $response = $callback($r);
+            $smartyProperties = $response['smartyProperties'];
+            $template = $response['template'];
+            if (isset($response['inContest'])) {
+                $r->ensureBool('is_practice', false);
+                $inContest = $response['inContest'] && (
+                    !isset($r['is_practice']) || $r['is_practice'] !== true
+                );
+            }
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
-        /** @var mixed $value */
-        foreach ($smartyProperties as $key => $value) {
-                $smarty->assign($key, $value);
-        }
-        self::displayTemplate($template, $smarty);
-    }
-
-    /**
-     * @param null|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
-     */
-    public static function renderContest(
-        ?callable $callback,
-        string $template = null
-    ): void {
-        $smarty = self::getSmartyInstance();
-        $r = new Request($_REQUEST);
-        $r->ensureBool('is_practice', false);
-        $inContest = !isset($r['is_practice']) || $r['is_practice'] !== true;
 
         \OmegaUp\UITools::assignSmartyNavbarHeader($smarty, $inContest);
 
-        if (is_null($callback)) {
-            self::displayTemplate(strval($template), $smarty);
-            return;
-        }
-        try {
-            [
-                'smartyProperties' => $smartyProperties,
-                'template' => $template,
-            ] = $callback($r);
-        } catch (\Exception $e) {
-            \OmegaUp\ApiCaller::handleException($e);
-        }
         /** @var mixed $value */
         foreach ($smartyProperties as $key => $value) {
-                $smarty->assign($key, $value);
+            $smarty->assign($key, $value);
         }
-        self::displayTemplate(strval($template), $smarty);
-    }
 
-    public static function displayTemplate(
-        string $template,
-        \Smarty $smarty
-    ): void {
         $smarty->display(
-            sprintf(
-                '%s/templates/%s',
-                strval(OMEGAUP_ROOT),
-                $template
-            )
-        );
-    }
-
-    public static function renderWithEmptyResponse(string $template): void {
-        \OmegaUp\UITools::getSmartyInstance()->display(
             sprintf(
                 '%s/templates/%s',
                 strval(OMEGAUP_ROOT),
