@@ -312,38 +312,6 @@ export class Arena {
       });
     }
 
-    if (
-      document.getElementById('arena-navbar-assignments') !== null &&
-      typeof self.options.courseAlias !== 'undefined'
-    ) {
-      self.elements.assignmentsNav = new Vue({
-        el: '#arena-navbar-assignments',
-        render: function(createElement) {
-          return createElement('omegaup-arena-navbar-assignments', {
-            props: {
-              assignments: this.assignments,
-              next: this.next,
-              previous: this.previous,
-            },
-            on: {
-              'navigate-to-assignment': function(assignment) {
-                window.location.hash = '#problems';
-                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignment.alias}`;
-              },
-            },
-          });
-        },
-        data: {
-          assignments: [],
-          next: null,
-          previous: null,
-        },
-        components: {
-          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
-        },
-      });
-    }
-
     const navbar = document.getElementById('arena-navbar-payload');
     let navbarPayload = false;
     if (navbar !== null) {
@@ -676,21 +644,30 @@ export class Arena {
       return;
     }
 
-    self.elements.assignmentsNav.assignments = problemset.courseAssignments;
-
-    // Getting index of current assignment
-    const currentAssignmentIndex = problemset.courseAssignments.findIndex(
-      assignment => assignment.alias === problemset.alias,
-    );
-
-    if (currentAssignmentIndex < problemset.courseAssignments.length - 1) {
-      self.elements.assignmentsNav.next =
-        problemset.courseAssignments[currentAssignmentIndex + 1];
-    }
-
-    if (currentAssignmentIndex !== 0) {
-      self.elements.assignmentsNav.previous =
-        problemset.courseAssignments[currentAssignmentIndex - 1];
+    if (document.getElementById('arena-navbar-assignments') !== null) {
+      self.elements.assignmentsNav = new Vue({
+        el: '#arena-navbar-assignments',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-assignments', {
+            props: {
+              assignments: this.assignments,
+              currentAssignmentAlias: this.currentAssignmentAlias,
+            },
+            on: {
+              'navigate-to-assignment': function(assignmentAlias) {
+                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+              },
+            },
+          });
+        },
+        data: {
+          assignments: problemset.courseAssignments,
+          currentAssignmentAlias: problemset.alias,
+        },
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
+      });
     }
   }
 
