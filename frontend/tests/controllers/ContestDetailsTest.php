@@ -144,14 +144,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['languages' => ['c','cpp','java']]
+                ['languages' => ['c11-gcc','cpp17-gcc','java']]
             )
         );
 
         // Get some problems into the contest
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
-            'languages' => 'cpp,java,py'
+            'languages' => 'cpp17-gcc,java,py3'
         ]));
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -177,7 +177,10 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($response['problems']));
         // Verify that the allowed languages for the problem are the intersection of
         // the allowed languages.
-        $this->assertEquals('cpp,java', $response['problems'][0]['languages']);
+        $this->assertEquals(
+            'cpp17-gcc,java',
+            $response['problems'][0]['languages']
+        );
     }
 
     /**

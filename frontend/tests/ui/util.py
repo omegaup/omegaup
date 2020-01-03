@@ -6,6 +6,7 @@
 
 import contextlib
 import inspect
+import json
 import logging
 import os
 import functools
@@ -172,21 +173,19 @@ def assert_js_errors(driver,
                      expected_paths: Sequence[str] = (),
                      expected_messages: Sequence[str] = ()) -> Iterator[None]:
     '''Shows in a list unexpected errors in javascript console'''
+    assert expected_paths or expected_messages, (
+        'Both `expected_paths` and `expected_messages` cannot be empty')
+    assert not driver.log_collector.empty(), (
+        'assert_js_errors() cannot be called without an assert_no_js_errors()')
     driver.log_collector.push()
     try:
         yield
     finally:
-        unexpected_errors = []
+        matched_errors = []
+        unmatched_errors = []
         seen_paths: List[bool] = [False] * len(expected_paths)
         seen_messages: List[bool] = [False] * len(expected_messages)
         for entry in driver.log_collector.pop():
-            if 'WebSocket' in entry['message']:
-                # Travis does not have broadcaster yet.
-                continue
-            if 'https://www.facebook.com/' in entry['message']:
-                # Let's not block submissions when Facebook is
-                # having a bad day.
-                continue
             matched = False
             for i, path in enumerate(expected_paths):
                 if not path_matches(entry['message'], (path, )):
@@ -199,8 +198,10 @@ def assert_js_errors(driver,
                 matched = True
                 seen_messages[i] = True
             if matched:
-                continue
-            unexpected_errors.append(entry['message'])
+                matched_errors.append(entry)
+            else:
+                unmatched_errors.append(entry)
+        driver.log_collector.extend(unmatched_errors)
 
         missed_paths = [
             path for path, seen in zip(expected_paths, seen_paths) if not seen
@@ -209,46 +210,59 @@ def assert_js_errors(driver,
             message for message, seen in zip(expected_messages, seen_messages)
             if not seen
         ]
-        assert not missed_paths, 'Paths are missing:\n\t' + '\n\t'.join(
-            missed_paths)
-        assert not missed_messages, 'Messages are missing:\n\t' + '\n\t'.join(
-            missed_messages)
-        assert not unexpected_errors, 'Unexpected errors:\n\t' + '\n\t'.join(
-            unexpected_errors) + '\n\nExpected errors:\n\t' + '\n\t'.join(
-                expected_paths) + '\n\t'.join(expected_messages)
+        if missed_paths or missed_messages:
+            raise Exception(
+                ('Some messages were not matched\n'
+                 '\tMatched errors:\n\t\t{matched_errors}\n'
+                 '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+                 '\tMissed paths:\n\t\t{missed_paths}\n'
+                 '\tMissed messages:\n\t\t{missed_messages}').format(
+                     matched_errors='\n'.join(
+                         json.dumps(entry) for entry in matched_errors),
+                     unmatched_errors='\n'.join(
+                         json.dumps(entry) for entry in unmatched_errors),
+                     missed_paths='\n'.join(missed_paths),
+                     missed_messages='\n'.join(missed_messages)))
 
 
 @contextlib.contextmanager
-def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
+def assert_no_js_errors(
+        driver,
+        *,
+        path_whitelist: Sequence[str] = (),
+        message_whitelist: Sequence[str] = ()) -> Iterator[None]:
     '''Shows in a list unexpected errors in javascript console'''
     driver.log_collector.push()
     try:
         yield
     finally:
+        original_errors = []
         unexpected_errors = []
         for entry in driver.log_collector.pop():
-            if 'WebSocket' in entry['message']:
-                # Travis does not have broadcaster yet.
-                continue
-            if 'https://www.facebook.com/' in entry['message']:
-                # Let's not block submissions when Facebook is
-                # having a bad day.
-                continue
+            original_errors.append(entry)
             if path_matches(entry['message'], path_whitelist + PATH_WHITELIST):
                 continue
             if message_matches(entry['message'],
                                message_whitelist + MESSAGE_WHITELIST):
                 continue
             unexpected_errors.append(entry['message'])
-        assert not unexpected_errors, '\n'.join(unexpected_errors)
+        if unexpected_errors:
+            raise Exception(
+                ('There were unexpected messages\n'
+                 '\tOriginal errors:\n\t\t{original_errors}\n'
+                 '\tUnexpected errors:\n\t\t{unexpected_errors}').format(
+                     original_errors='\n'.join(
+                         json.dumps(message) for message in original_errors),
+                     unexpected_errors='\n'.join(unexpected_errors)))
 
 
-def path_matches(message, path_list):
+def path_matches(message: str, path_list: Sequence[str]) -> bool:
     '''Checks whether URL in message matches the expected list.'''
 
     match = re.search(r'(https?://[^\s\'"]+)', message)
+    if not match:
+        return False
     url = urlparse(match.group(1))
-
     if not url:
         return False
 
@@ -259,7 +273,7 @@ def path_matches(message, path_list):
     return False
 
 
-def message_matches(message, message_list):
+def message_matches(message: str, message_list: Sequence[str]) -> bool:
     '''Checks whether string in message is whitelisted.
 
     It compares strings between double or single quotes, or the trailing part

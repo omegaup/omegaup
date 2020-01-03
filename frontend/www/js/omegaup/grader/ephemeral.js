@@ -14,33 +14,33 @@ import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
-const defaultValidatorSource = `#!/usr/bin/python
+const defaultValidatorSource = `#!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
 
 import logging
 import sys
 
-def _main():
+def _main() -> None:
   # lee "data.in" para obtener la entrada original.
   with open('data.in', 'r') as f:
     a, b = [int(x) for x in f.read().strip().split()]
-  suma = a + b
+  # lee "data.out" para obtener la salida esperada.
+  with open('data.out', 'r') as f:
+    suma = int(f.read().strip())
 
   score = 0
   try:
     # Lee la salida del concursante
-    suma_concursante = int(raw_input().strip())
+    suma_concursante = int(input().strip())
 
     # Determina si la salida es correcta
-    if suma_concursante == suma:
-      score = 1
-    else:
+    if suma_concursante != suma:
       # Cualquier cosa que imprimas a sys.stderr se ignora, pero es útil
       # para depurar con debug-rejudge.
-      print('Salida incorrecta', file=sys.stderr)
-  except Exception as e:
+      logging.error('Salida incorrecta')
+      return
+    score = 1
+  except:
     log.exception('Error leyendo la salida del concursante')
   finally:
     print(score)
@@ -52,16 +52,17 @@ const defaultInteractiveIdlSource = `interface Main {
 };
 
 interface sumas {
-    int sumas(int a, int b);
+    long sumas(long a, long b);
 };`;
 
-const defaultInteractiveMainSource = `#include <stdio.h>
+const defaultInteractiveMainSource = `#include <iostream>
+
 #include "sumas.h"
 
 int main(int argc, char* argv[]) {
-    int a, b;
-    scanf("%d %d\\n", &a, &b);
-    printf("%d\\n", sumas(a, b));
+    long long a, b;
+    std::cin >> a >> b;
+    std::cout << sumas(a, b) << '\\n';
 }`;
 
 const sourceTemplates = {
@@ -76,6 +77,8 @@ int main() {
   cpp: `#include <iostream>
 
 int main() {
+  std::cin.tie(nullptr);
+  std::ios_base::sync_with_stdio(false);
   int64_t a, b;
   std::cin >> a >> b;
   std::cout << a + b << '\\n';
@@ -114,13 +117,11 @@ public class Main {
   lua: `a = io.read("*n");
 b = io.read("*n");
 io.write(a + b);`,
-  py: `#!/usr/bin/python
+  py: `#!/usr/bin/python3
 
-from __future__ import print_function
-
-def _main():
-  a, b = (int(num) for num in raw_input().strip().split())
-  print('%d', a + b)
+def _main() -> None:
+  a, b = (int(num) for num in input().strip().split())
+  print(a + b)
 
 if __name__ == '__main__':
   _main()`,
@@ -131,19 +132,19 @@ print a + b`,
 const interactiveTemplates = {
   c: `#include "sumas.h"
 
-int sumas(int a, int b) {
+long long sumas(long long a, long long b) {
   // FIXME
   return 0;
 }`,
   cpp: `#include "sumas.h"
 
-int sumas(int a, int b) {
+long long sumas(long long a, long long b) {
   // FIXME
   return 0;
 }`,
   cs: '// not supported',
   java: `public class sumas {
-  public static int sumas(int a, int b) {
+  public static long sumas(long a, long b) {
     // FIXME
     return 0;
   }
@@ -168,11 +169,11 @@ begin
 end;
 
 end.`,
-  py: `#!/usr/bin/python
+  py: `#!/usr/bin/python3
 
 import Main
 
-def sumas(a, b):
+def sumas(a: int, b: int) -> int:
     """ sumas """
     # FIXME
     return 0`,
@@ -390,7 +391,7 @@ let store = new Vuex.Store({
         if (!state.request.input.validator.hasOwnProperty('custom_validator')) {
           Vue.set(state.request.input.validator, 'custom_validator', {
             source: defaultValidatorSource,
-            language: 'py',
+            language: 'py3',
           });
         }
       } else {
@@ -413,7 +414,7 @@ let store = new Vuex.Store({
         Vue.set(state.request.input, 'interactive', {
           idl: defaultInteractiveIdlSource,
           module_name: 'sumas',
-          language: 'cpp11',
+          language: 'cpp17-gcc',
           main_source: defaultInteractiveMainSource,
         });
       } else {
@@ -423,7 +424,7 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     InteractiveLanguage(state, value) {
-      if (value == 'cpp') value = 'cpp11';
+      if (value == 'cpp') value = 'cpp17-gcc';
       state.request.input.interactive.language = value;
       state.dirty = true;
     },
@@ -457,7 +458,7 @@ let store = new Vuex.Store({
     reset(state) {
       Vue.set(state, 'request', {
         source: sourceTemplates.cpp,
-        language: 'cpp11',
+        language: 'cpp17-gcc',
         input: {
           limits: {
             TimeLimit: 1.0, // 1s

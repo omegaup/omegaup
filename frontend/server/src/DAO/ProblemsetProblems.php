@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}>
+     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -46,7 +46,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problem_alias: string, problem_id: int}[] $problemsAssignments */
+        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: int, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: int}> $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $val
@@ -82,12 +82,19 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /*
      * Get number of problems in problemset.
      */
-    final public static function countProblemsetProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
-        // Build SQL statement
-        $sql = 'SELECT COUNT(pp.problem_id) ' .
-               'FROM Problemset_Problems pp ' .
-               'WHERE pp.problemset_id = ?';
+    final public static function countProblemsetProblems(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): int {
+        $sql = '
+            SELECT
+                COUNT(pp.problem_id)
+            FROM
+                Problemset_Problems pp
+            WHERE
+                pp.problemset_id = ?;
+        ';
         $val = [$problemset->problemset_id];
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -126,7 +133,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     pp.order, pp.problem_id ASC;';
 
         $result = [];
-        /** @var array{title: string, problem_id: string, alias: string, visibility: string, visits: string, submissions: string, accepted: string, difficulty: string, order: string, languages: string, points: string, commit: string, version: string} $row */
+        /** @var array{accepted: int, alias: string, commit: string, difficulty: float|null, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -148,8 +155,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /*
      * Get problemset problems including problemset alias, points, and order
+     *
+     * @return list<\OmegaUp\DAO\VO\ProblemsetProblems>
      */
-    final public static function getByProblemset($problemset_id) {
+    final public static function getByProblemset(int $problemsetId): array {
         // Build SQL statement
         $sql = 'SELECT
                     *
@@ -160,18 +169,16 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     `order`, `problem_id` ASC;';
 
+        /** @var list<array{commit: string, order: int, points: float, problem_id: int, problemset_id: int, version: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$problemset_id]
+            [$problemsetId]
         );
 
         $problemsetProblems = [];
         foreach ($rs as $row) {
-            array_push(
-                $problemsetProblems,
-                new \OmegaUp\DAO\VO\ProblemsetProblems(
-                    $row
-                )
+            $problemsetProblems[] = new \OmegaUp\DAO\VO\ProblemsetProblems(
+                $row
             );
         }
         return $problemsetProblems;
@@ -197,6 +204,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         $result = [];
+        /** @var array{alias: string, current_version: string, problem_id: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -210,10 +218,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /**
      * Copy problemset problems from one problem set to the new problemset
-     * @param Number, Number
-     * @return void
      */
-    public static function copyProblemset($newProblemsetId, $oldProblemsetId) {
+    public static function copyProblemset(
+        int $newProblemsetId,
+        int $oldProblemsetId
+    ): int {
         $sql = '
             INSERT INTO
                 Problemset_Problems (problemset_id, problem_id, commit, version, points, `order`)
@@ -231,18 +240,20 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
     /**
       * Update problemset order.
-      *
-      * @param $problemsetId
-      * @param $problemId
-      * @param $order
-      * @return Affected Rows
       */
     final public static function updateProblemsOrder(
-        $problemsetId,
-        $problemId,
-        $order
-    ) {
-        $sql = 'UPDATE `Problemset_Problems` SET `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
+        int $problemsetId,
+        int $problemId,
+        int $order
+    ): int {
+        $sql = '
+            UPDATE
+                `Problemset_Problems`
+            SET
+                `order` = ?
+            WHERE
+                `problemset_id` = ? AND `problem_id` = ?;
+        ';
         $params = [
             $order,
             $problemsetId,
@@ -255,18 +266,21 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /*
      * Get max points posible for contest
      */
-    final public static function getMaxPointsByProblemset($problemset_id) {
+    final public static function getMaxPointsByProblemset(int $problemsetId): float {
         // Build SQL statement
-        $sql = 'SELECT
-                    SUM(points) as max_points
-                FROM
-                    Problemset_Problems
-                WHERE
-                    problemset_id = ?;';
+        $sql = '
+            SELECT
+                IFNULL(SUM(points), 0.0) as max_points
+            FROM
+                Problemset_Problems
+            WHERE
+                problemset_id = ?;
+        ';
 
+        /** @var float */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$problemset_id]
+            [$problemsetId]
         );
     }
 
@@ -285,7 +299,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     ): void {
         $now = \OmegaUp\Time::get();
 
-        if ($updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
+        if ($updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '
                 UPDATE
                     Problemset_Problems pp
@@ -345,7 +359,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 $problem->problem_id,
                 $user->user_id,
             ]);
-        } elseif ($updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS) {
+        } elseif ($updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS) {
             $problemsets = [];
 
             $sql = '
@@ -365,6 +379,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     UNIX_TIMESTAMP(c.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
+            /** @var list<array{acl_id: int, problemset_id: int}> */
             $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
@@ -390,6 +405,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     UNIX_TIMESTAMP(a.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
+            /** @var list<array{acl_id: int, problemset_id: int}> */
             $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
@@ -399,8 +415,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             }
 
             $identity = \OmegaUp\DAO\Identities::getByPK(
-                $user->main_identity_id
+                intval($user->main_identity_id)
             );
+            if (is_null($identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             $problemsets = array_filter(
                 $problemsets,
                 function (\OmegaUp\DAO\VO\Problemsets $problemset) use ($identity) {

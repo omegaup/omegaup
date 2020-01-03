@@ -45,7 +45,11 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
-            intval($Schools->rank),
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
             floatval($Schools->score),
             intval($Schools->school_id),
         ];
@@ -144,10 +148,8 @@ abstract class Schools {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Schools[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Schools> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Schools}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Schools>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -229,7 +231,11 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
-            intval($Schools->rank),
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
             floatval($Schools->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

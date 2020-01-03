@@ -251,7 +251,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $interview = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
+        $interview = \OmegaUp\DAO\Interviews::getByAlias(
+            strval($r['interview_alias'])
+        );
         if (is_null($interview)) {
             return [
                 'exists' => false,
@@ -270,7 +272,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
-            $interview->problemset_id
+            intval($interview->problemset_id)
         );
 
         $users = [];
