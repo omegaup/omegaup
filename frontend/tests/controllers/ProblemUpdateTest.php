@@ -608,7 +608,6 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['status'], 'ok');
         $this->assertArrayContainsWithPredicate($response['results'], function ($problem) use (&$problemData) {
             return $problem['alias'] == $problemData['request']['problem_alias'];
         });
@@ -616,7 +615,6 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals($response['status'], 'ok');
 
         // Update statement
         $statement = 'This is the new statement \$x\$';
@@ -626,7 +624,6 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'message' => 'Statement is now more fun',
             'statement' => $statement
         ]));
-        $this->assertEquals($response['status'], 'ok');
 
         // Add a tag
         $response = \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
@@ -634,7 +631,6 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test',
         ]));
-        $this->assertEquals($response['status'], 'ok');
     }
 
     /**
