@@ -1183,6 +1183,7 @@ const translations = {
 	wordsScore: "(Sc0r3)",
 	wordsScoreboard: "(Sc0r3b0ard)",
 	wordsSearch: "(S3arch)",
+	wordsSeeLatestSubmissions: "(S33 1a7357 5ubmi55i0n5 53n7 by 7hi5 u53r)",
 	wordsSeeSolution: "(S33 S01u7i0n)",
 	wordsSelectFilter: "(S313c7 a fi173r)",
 	wordsSend: "(S3nd)",

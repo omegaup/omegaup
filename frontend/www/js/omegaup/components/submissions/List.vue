@@ -30,14 +30,19 @@
           >{{ T.wordsNextPage }}
         </a>
       </div>
-      <table class="table">
+      <table class="table submissions-table">
         <thead>
           <tr>
             <th class="text-center">{{ T.wordsTime }}</th>
-            <th class="text-center">{{ T.wordsUser }}</th>
+            <th class="text-center" v-if="includeUser">{{ T.wordsUser }}</th>
             <th class="text-center">{{ T.wordsProblem }}</th>
-            <th class="text-center">{{ T.wordsLanguage }}</th>
-            <th class="text-center">{{ T.wordsVerdict }}</th>
+            <th
+              v-bind:class="{ 'fixed-width-column': includeUser }"
+              class="text-center"
+            >
+              {{ T.wordsLanguage }}
+            </th>
+            <th class="text-center fixed-with-column">{{ T.wordsVerdict }}</th>
             <th class="numericColumn">{{ T.wordsRuntime }}</th>
             <th class="numericColumn">{{ T.wordsMemory }}</th>
           </tr>
@@ -47,13 +52,19 @@
             <td class="text-center">
               {{ UI.formatDateTime(submission.time) }}
             </td>
-            <td class="text-center">
+            <td class="text-center" v-if="includeUser">
               <omegaup-username
                 v-bind:username="submission.username"
                 v-bind:classname="submission.classname"
                 v-bind:linkify="true"
               >
               </omegaup-username>
+              <br />
+              <a
+                class="school-text"
+                v-bind:href="`/schools/profile/${submission.school_id}/`"
+                >{{ submission.school_name }}</a
+              >
             </td>
             <td class="text-center">
               <a v-bind:href="`/arena/problem/${submission.alias}/`">{{
@@ -112,6 +123,9 @@
 </template>
 
 <style>
+table.submissions-table > tbody > tr > td {
+  vertical-align: middle;
+}
 .verdict-AC {
   background: #cf6;
 }
@@ -123,6 +137,14 @@
 .verdict-JE,
 .verdict-VE {
   background: #f00;
+}
+
+.school-text {
+  font-size: 0.9em;
+}
+
+.fixed-width-column {
+  width: 180px;
 }
 </style>
 
