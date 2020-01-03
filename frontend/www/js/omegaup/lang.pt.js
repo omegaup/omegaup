@@ -1186,6 +1186,7 @@ const translations = {
 	wordsScore: "Pontua\u00e7\u00e3o",
 	wordsScoreboard: "Scoreboard",
 	wordsSearch: "Pesquisar",
+	wordsSeeLatestSubmissions: "Ver as \u00faltimas submiss\u00f5es realizadas pelo usu\u00e1rio",
 	wordsSeeSolution: "Ver Solu\u00e7\u00e3o",
 	wordsSelectFilter: "Selecione um filtro",
 	wordsSend: "Enviar",

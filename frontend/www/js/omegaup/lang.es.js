@@ -1186,6 +1186,7 @@ const translations = {
 	wordsScore: "Puntaje",
 	wordsScoreboard: "Lista de estudiantes",
 	wordsSearch: "Buscar",
+	wordsSeeLatestSubmissions: "Ver los \u00faltimos env\u00edos realizados por este usuario",
 	wordsSeeSolution: "Ver Soluci\u00f3n",
 	wordsSelectFilter: "Selecciona un filtro",
 	wordsSend: "Enviar",

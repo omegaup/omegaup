@@ -1186,6 +1186,7 @@ const translations = {
 	wordsScore: "Score",
 	wordsScoreboard: "Scoreboard",
 	wordsSearch: "Search",
+	wordsSeeLatestSubmissions: "See latest submissions sent by this user",
 	wordsSeeSolution: "See Solution",
 	wordsSelectFilter: "Select a filter",
 	wordsSend: "Send",
