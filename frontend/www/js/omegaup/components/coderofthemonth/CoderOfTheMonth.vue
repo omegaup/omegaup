@@ -6,7 +6,7 @@
           <a data-toggle="tab">{{ T.codersOfTheMonth }}</a>
         </li>
         <li v-on:click="selectedTab = 'codersOfPreviousMonth'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthList }}</a>
+          <a data-toggle="tab">{{ T.codersOfTheMonthRank }}</a>
         </li>
         <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'">
           <a data-toggle="tab">{{ T.codersOfTheMonthListCandidate }}</a>

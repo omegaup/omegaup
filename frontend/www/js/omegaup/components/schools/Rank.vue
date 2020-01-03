@@ -15,16 +15,16 @@
         }}
       </h3>
     </div>
-    <div class="panel-body" v-if="includeControls">
+    <div class="panel-body" v-if="showControls">
       <template v-if="page > 1">
         <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
-        <span class="delimiter" v-show="shouldShowNextPage">|</span>
+        <span class="delimiter" v-show="showNextPage">|</span>
       </template>
       <a
         class="next"
-        v-show="shouldShowNextPage"
+        v-show="showNextPage"
         v-bind:href="`/rank/schools?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
@@ -58,16 +58,16 @@
     <div class="panel-footer" v-if="showHeader">
       <a href="/schoolofthemonth/">{{ T.rankViewFull }}</a>
     </div>
-    <div class="panel-footer" v-else-if="includeControls">
+    <div class="panel-footer" v-else-if="showControls">
       <template v-if="page > 1">
         <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
-        <span class="delimiter" v-show="shouldShowNextPage">|</span>
+        <span class="delimiter" v-show="showNextPage">|</span>
       </template>
       <a
         class="next"
-        v-show="shouldShowNextPage"
+        v-show="showNextPage"
         v-bind:href="`/rank/schools?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
@@ -111,12 +111,12 @@ export default class Rank extends Vue {
   T = T;
   UI = UI;
 
-  get shouldShowNextPage(): boolean {
+  get showNextPage(): boolean {
     return this.length * this.page < this.totalRows;
   }
 
-  get includeControls(): boolean {
-    return !this.showHeader && (this.shouldShowNextPage || this.page > 1);
+  get showControls(): boolean {
+    return !this.showHeader && (this.showNextPage || this.page > 1);
   }
 }
 </script>

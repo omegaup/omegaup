@@ -21,7 +21,7 @@
           <a
             data-toggle="tab"
             v-on:click="selectedTab = 'schoolsOfCurrentMonth'"
-            >{{ T.schoolsOfTheMonthList }}</a
+            >{{ T.schoolsOfTheMonthRank }}</a
           >
         </li>
         <li
