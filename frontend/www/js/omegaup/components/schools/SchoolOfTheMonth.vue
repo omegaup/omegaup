@@ -10,7 +10,7 @@
           <a
             data-toggle="tab"
             v-on:click="selectedTab = 'schoolsOfPreviousMonths'"
-            >{{ T.schoolsOfTheMonthPrevious }}</a
+            >{{ T.schoolsOfTheMonth }}</a
           >
         </li>
         <li
