@@ -38,8 +38,9 @@ Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
 class StatusBarIsDismissed:
     """A class that can wait for the status bar to be dismissed."""
 
-    def __init__(self, status_element):
+    def __init__(self, status_element, message_class):
         self.status_element = status_element
+        self.message_class = message_class
         self.counter = int(
             self.status_element.get_attribute('data-counter') or '0')
         self.clicked = False
@@ -52,6 +53,8 @@ class StatusBarIsDismissed:
         if counter == self.counter + 2:
             # Status has finished animating. Time to click the close button.
             if not self.clicked:
+                message_class = self.status_element.get_attribute('class')
+                assert self.message_class in message_class, message_class
                 self.status_element.find_element_by_css_selector(
                     'button.close').click()
                 self.clicked = True
@@ -87,15 +90,15 @@ def add_students(driver, users, *, tab_xpath,
 
 
 @contextlib.contextmanager
-def dismiss_status(driver):
+def dismiss_status(driver, *, message_class=''):
     '''Closes the status bar and waits for it to disappear.'''
     status_element = driver.wait.until(
         EC.presence_of_element_located((By.ID, 'status')))
-    status_bar_is_dismissed = StatusBarIsDismissed(status_element)
+    status_bar_dismissed = StatusBarIsDismissed(status_element, message_class)
     try:
         yield
     finally:
-        driver.wait.until(status_bar_is_dismissed)
+        driver.wait.until(status_bar_dismissed)
 
 
 def create_run(driver, problem_alias, filename):
@@ -443,12 +446,13 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100,
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
-    if has_privileges:
-        with driver.page_transition():
+    if not has_privileges:
+        with dismiss_status(driver, message_class='danger'):
             driver.browser.find_element_by_tag_name('form').submit()
-    else:
+        return
+
+    with driver.page_transition():
         driver.browser.find_element_by_tag_name('form').submit()
-        assert_alert_is_shown(driver)
 
 
 def create_course(driver, course_alias, school_name, has_privileges=True):
@@ -482,8 +486,8 @@ def create_course(driver, course_alias, school_name, has_privileges=True):
         'course description')
 
     if not has_privileges:
-        driver.browser.find_element_by_tag_name('form').submit()
-        assert_alert_is_shown(driver)
+        with dismiss_status(driver, message_class='danger'):
+            driver.browser.find_element_by_tag_name('form').submit()
         return
 
     with driver.page_transition():
@@ -529,21 +533,12 @@ def create_problem(driver, problem_alias, has_privileges=True):
     contents_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
 
-    if has_privileges:
-        with driver.page_transition(wait_for_ajax=False):
+    if not has_privileges:
+        with dismiss_status(driver, message_class='danger'):
             contents_element.submit()
-        assert (('/problem/%s/edit/' % problem_alias) in
-                driver.browser.current_url), driver.browser.current_url
-    else:
+        return
+
+    with driver.page_transition(wait_for_ajax=False):
         contents_element.submit()
-        assert_alert_is_shown(driver)
-
-
-def assert_alert_is_shown(driver):
-    '''An alert is shown when an action is attempted without permission.'''
-
-    message = driver.wait.until(
-        EC.visibility_of_element_located((By.ID, 'status')))
-    message_class = message.get_attribute('class')
-
-    assert 'danger' in message_class, message_class
+    assert (('/problem/%s/edit/' % problem_alias) in
+            driver.browser.current_url), driver.browser.current_url

@@ -27,7 +27,7 @@ def test_create_group_with_identities_and_restrictions(driver):
 
     with driver.login(identity.username, identity.password):
         # Trying to create a problem
-        with util.assert_js_errors(driver):
+        with util.assert_no_js_errors(driver):
             util.create_problem(driver, 'some_alias', has_privileges=False)
 
         # Trying to create a contest
