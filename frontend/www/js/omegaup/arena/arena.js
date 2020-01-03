@@ -419,6 +419,8 @@ export class Arena {
     self.digitsAfterDecimalPoint = 2;
 
     self.qualityNominationForm = null;
+
+    self.elements.assignmentsNav = null;
   }
 
   installLibinteractiveHooks() {
@@ -644,7 +646,10 @@ export class Arena {
       return;
     }
 
-    if (document.getElementById('arena-navbar-assignments') !== null) {
+    if (
+      document.getElementById('arena-navbar-assignments') !== null &&
+      self.elements.assignmentsNav === null
+    ) {
       self.elements.assignmentsNav = new Vue({
         el: '#arena-navbar-assignments',
         render: function(createElement) {
