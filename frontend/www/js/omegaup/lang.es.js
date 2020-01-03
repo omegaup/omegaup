@@ -1125,7 +1125,7 @@ const translations = {
 	wordsNewSubmissions: "Nuevo env\u00edo",
 	wordsNewTest: "Nuevo examen",
 	wordsNext: "Siguiente",
-	wordsNextPage: "Siguiente p\u00e1gina",
+	wordsNextPage: "P\u00e1gina siguiente",
 	wordsNo: "No",
 	wordsNoComment: "Sin comentarios",
 	wordsNoSubmissions: "Sin env\u00edos",

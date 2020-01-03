@@ -1,9 +1,17 @@
 <template>
   <div class="row">
-    <div class="page-header">
-      <h1 class="text-center">
+    <div class="page-header text-center">
+      <h1>
         {{ T.submissionsListTitle }}
       </h1>
+      <h4 v-if="!includeUser && submissions.length > 0">
+        {{ T.wordsBy }}
+        <omegaup-username
+          v-bind:username="submissions[0].username"
+          v-bind:classname="submissions[0].classname"
+          v-bind:linkify="true"
+        ></omegaup-username>
+      </h4>
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -16,19 +24,37 @@
           }}
         </h3>
       </div>
-      <div class="panel-body" v-if="shouldShowControls">
-        <template v-if="page > 1">
-          <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
+      <div class="panel-body" v-if="includeUser || showControls">
+        <template v-if="includeUser">
+          <label
+            ><omegaup-autocomplete
+              class="form-control"
+              v-bind:init="el =&gt; UI.userTypeahead(el)"
+              v-model="searchedUsername"
+            ></omegaup-autocomplete
+          ></label>
+          <button
+            class="btn btn-primary"
+            type="button"
+            v-on:click="onSelectUser"
           >
-          <span class="delimiter" v-show="shouldShowNextPage">|</span>
+            {{ T.searchUser }}
+          </button>
         </template>
-        <a
-          class="next"
-          v-show="shouldShowNextPage"
-          v-bind:href="`/submissions?page=${page + 1}`"
-          >{{ T.wordsNextPage }}
-        </a>
+        <template v-if="showControls">
+          <template v-if="page > 1">
+            <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
+              {{ T.wordsPrevPage }}</a
+            >
+            <span class="delimiter" v-show="showNextPage">|</span>
+          </template>
+          <a
+            class="next"
+            v-show="showNextPage"
+            v-bind:href="`/submissions?page=${page + 1}`"
+            >{{ T.wordsNextPage }}
+          </a>
+        </template>
       </div>
       <table class="table submissions-table">
         <thead>
@@ -104,16 +130,16 @@
           </tr>
         </tbody>
       </table>
-      <div class="panel-footer" v-if="shouldShowControls">
+      <div class="panel-footer" v-if="showControls">
         <template v-if="page > 1">
           <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
           >
-          <span class="delimiter" v-show="shouldShowNextPage">|</span>
+          <span class="delimiter" v-show="showNextPage">|</span>
         </template>
         <a
           class="next"
-          v-show="shouldShowNextPage"
+          v-show="showNextPage"
           v-bind:href="`/submissions?page=${page + 1}`"
           >{{ T.wordsNextPage }}
         </a>
@@ -154,10 +180,12 @@ import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import UI from '../../ui.js';
 import UserName from '../user/Username.vue';
+import Autocomplete from '../Autocomplete.vue';
 
 @Component({
   components: {
     'omegaup-username': UserName,
+    'omegaup-autocomplete': Autocomplete,
   },
 })
 export default class SubmissionsList extends Vue {
@@ -169,13 +197,20 @@ export default class SubmissionsList extends Vue {
 
   T = T;
   UI = UI;
+  searchedUsername = '';
 
-  get shouldShowNextPage(): boolean {
+  onSelectUser(): void {
+    window.location.href = `/submissions/${encodeURIComponent(
+      this.searchedUsername,
+    )}/`;
+  }
+
+  get showNextPage(): boolean {
     return this.length * this.page < this.totalRows;
   }
 
-  get shouldShowControls(): boolean {
-    return this.shouldShowNextPage || this.page > 1;
+  get showControls(): boolean {
+    return this.showNextPage || this.page > 1;
   }
 }
 </script>
