@@ -16,5 +16,5 @@ GROUP BY
     `u`.`user_id`
 HAVING
     COUNT(DISTINCT `p`.`problem_id`) > 10;
-    
+
     /* 'cpp', 'cpp11', 'cpp11-gcc', 'cpp11-clang', 'cpp17-gcc', 'cpp17-clang'*/    
