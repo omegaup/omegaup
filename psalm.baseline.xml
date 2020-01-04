@@ -226,25 +226,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/src/Controllers/Group.php">
-    <MissingReturnType occurrences="5">
-      <code>apiAddUser</code>
-      <code>apiRemoveUser</code>
-      <code>apiList</code>
-      <code>apiDetails</code>
-      <code>apiMembers</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="8">
-      <code>$r['group_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['group_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['query']</code>
-      <code>$r['group_alias']</code>
-      <code>$r['group_alias']</code>
-      <code>$r['group_alias']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Controllers/GroupScoreboard.php">
     <MissingReturnType occurrences="4">
       <code>apiAddContest</code>
@@ -1052,19 +1033,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
-    <MixedArgument occurrences="2">
-      <code>$unassociatedIdentity['username']</code>
-      <code>$associatedIdentity['username']</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="3">
-      <code>$response['identities']</code>
-      <code>$unassociatedIdentity['username']</code>
-      <code>$associatedIdentity['username']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
-      <code>$response</code>
-      <code>[$unassociatedIdentity, $associatedIdentity]</code>
-    </MixedAssignment>
     <PossiblyNullPropertyAssignment occurrences="2">
       <code>$unassociatedIdentity</code>
       <code>$associatedIdentity</code>
