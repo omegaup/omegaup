@@ -251,6 +251,28 @@
                             }
                         },
                         {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": 1,
+                                "title": "Sumas_12",
+                                "problem_alias": "sumas_12",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
                             "api": "\\OmegaUp\\Controllers\\User::apiCreate",
                             "params": {
                                 "username": "test_user_0",
@@ -388,6 +410,17 @@
                                 "problem_alias": "sumas_11",
                                 "language": "cpp11-gcc",
                                 "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_12",
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
