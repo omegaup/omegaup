@@ -564,39 +564,6 @@
     </MixedInferredReturnType>
     <MixedReturnStatement occurrences="1"/>
   </file>
-  <file src="frontend/server/src/Controllers/QualityNomination.php">
-    <AssignmentToVoid occurrences="1">
-      <code>$response</code>
-    </AssignmentToVoid>
-    <MissingParamType occurrences="1">
-      <code>$contents</code>
-    </MissingParamType>
-    <MixedArgument occurrences="4">
-      <code>$r['qualitynomination_id']</code>
-      <code>$r['problem_alias']</code>
-      <code>$contents</code>
-      <code>$contents</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="3">
-      <code>$newProblemVisibility</code>
-      <code>$r['visibility']</code>
-      <code>$qualitynomination-&gt;status</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="5">
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$r['problem']-&gt;visibility</code>
-      <code>$r['problem']-&gt;visibility</code>
-    </MixedPropertyFetch>
-    <PossiblyNullArgument occurrences="2">
-      <code>$qualitynominationlog-&gt;rationale</code>
-      <code>$r-&gt;identity</code>
-    </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="1">
-      <code>$r-&gt;user-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
-  </file>
   <file src="frontend/server/src/Controllers/Run.php">
     <InvalidReturnStatement occurrences="1">
       <code>$response</code>
