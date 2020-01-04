@@ -760,20 +760,6 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/src/Controllers/Tag.php">
-    <MissingReturnType occurrences="1">
-      <code>apiList</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$r[$param]</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$tag</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$tag-&gt;name</code>
-    </MixedPropertyFetch>
-  </file>
   <file src="frontend/server/src/Controllers/User.php">
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
