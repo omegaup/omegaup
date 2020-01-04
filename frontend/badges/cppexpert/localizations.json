@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Usuario Experto en C++",
+      "description": "El usuario resolvió más de 10 problemas en C++."
+    },
+    "en": {
+      "name": "C++ Expert User",
+      "description": "The user solved more than 10 problems in C++."
+    },
+    "pt": {
+      "name": "Usuário Especialista em C++",
+      "description": "O usuário resolveu mais de 10 problemas em C++."
+    }
+  }
+  
