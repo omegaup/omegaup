@@ -218,29 +218,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/src/Controllers/GroupScoreboard.php">
-    <MissingReturnType occurrences="4">
-      <code>apiAddContest</code>
-      <code>apiRemoveContest</code>
-      <code>apiDetails</code>
-      <code>apiList</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="9">
-      <code>$r['group_alias']</code>
-      <code>$r['scoreboard_alias']</code>
-      <code>$r['contest_alias']</code>
-      <code>$r['group_alias']</code>
-      <code>$r['scoreboard_alias']</code>
-      <code>$r['contest_alias']</code>
-      <code>$r['group_alias']</code>
-      <code>$r['scoreboard_alias']</code>
-      <code>$r['group_alias']</code>
-    </MixedArgument>
-    <MixedOperand occurrences="2">
-      <code>$r['contest_alias']</code>
-      <code>$r['group_alias']</code>
-    </MixedOperand>
-  </file>
   <file src="frontend/server/src/Controllers/Identity.php">
     <MissingParamType occurrences="15">
       <code>$username</code>
