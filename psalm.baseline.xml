@@ -1,39 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
-  <file src="frontend/server/src/Controllers/ACL.php">
-    <MissingParamType occurrences="12">
-      <code>$acl_id</code>
-      <code>$user_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$user_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$group_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$group_id</code>
-      <code>$role_id</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>addUser</code>
-      <code>removeUser</code>
-      <code>addGroup</code>
-      <code>removeGroup</code>
-    </MissingReturnType>
-  </file>
-  <file src="frontend/server/src/Controllers/Authorization.php">
-    <MissingReturnType occurrences="1">
-      <code>apiProblem</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="2">
-      <code>$r['username']</code>
-      <code>$r['problem_alias']</code>
-    </MixedArgument>
-    <PossiblyNullArgument occurrences="1">
-      <code>$resolvedIdentity-&gt;identity_id</code>
-    </PossiblyNullArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Badge.php">
     <MixedArgument occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
@@ -41,62 +7,6 @@
     <MixedOperand occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
     </MixedOperand>
-  </file>
-  <file src="frontend/server/src/Controllers/Clarification.php">
-    <ArgumentTypeCoercion occurrences="2">
-      <code>$clarification</code>
-      <code>$clarification</code>
-    </ArgumentTypeCoercion>
-    <MissingReturnType occurrences="3">
-      <code>validateCreate</code>
-      <code>validateDetails</code>
-      <code>validateUpdate</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="12">
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification_id']</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification_id']</code>
-      <code>$r['clarification']</code>
-      <code>$clarification</code>
-      <code>$r['problem']</code>
-      <code>$r['user']</code>
-      <code>$r['contest']</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="3">
-      <code>$receiverId</code>
-      <code>$response</code>
-      <code>$clarification</code>
-    </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
-    <MixedMethodCall occurrences="1">
-      <code>asFilteredArray</code>
-    </MixedMethodCall>
-    <MixedPropertyFetch occurrences="7">
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['identity']-&gt;identity_id</code>
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['clarification']-&gt;clarification_id</code>
-      <code>$r['clarification']-&gt;public</code>
-    </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1">
-      <code>$response</code>
-    </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="3">
-      <code>$r-&gt;identity</code>
-      <code>$clarification-&gt;problem_id</code>
-      <code>$clarification-&gt;author_id</code>
-    </PossiblyNullArgument>
-    <PossiblyNullReference occurrences="1">
-      <code>broadcastClarification</code>
-    </PossiblyNullReference>
   </file>
   <file src="frontend/server/src/Controllers/Contest.php">
     <DocblockTypeContradiction occurrences="1">
@@ -607,9 +517,6 @@
       <code>$problem</code>
       <code>$problem</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
     <MixedPropertyAssignment occurrences="5">
       <code>$run</code>
       <code>$run</code>
@@ -638,22 +545,17 @@
       <code>$r['problem']-&gt;problem_id</code>
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1"/>
     <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$problem</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="2"/>
     <PossiblyNullPropertyAssignmentValue occurrences="1">
