@@ -341,17 +341,6 @@
       <code>\OmegaUp\Translations::getInstance()-&gt;get('loginPassword')</code>
     </PossiblyNullOperand>
   </file>
-  <file src="frontend/server/src/Controllers/Notification.php">
-    <InvalidPropertyAssignmentValue occurrences="1">
-      <code>1</code>
-    </InvalidPropertyAssignmentValue>
-    <MixedArgument occurrences="1">
-      <code>$id</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$id</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/server/src/Controllers/Problem.php">
     <InvalidArgument occurrences="1">
       <code>$r</code>
