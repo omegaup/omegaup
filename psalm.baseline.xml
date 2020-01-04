@@ -760,17 +760,6 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/src/Controllers/School.php">
-    <DocblockTypeContradiction occurrences="1">
-      <code>is_null($schools)</code>
-    </DocblockTypeContradiction>
-    <MissingReturnType occurrences="1">
-      <code>apiList</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$r[$param]</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
       <code>$r['alias']</code>
