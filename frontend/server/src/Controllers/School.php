@@ -11,16 +11,16 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
-     * @param \OmegaUp\Request $r
+     * @return list<array{id: int, label: string, value: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         $param = '';
-        if (!is_null($r['term'])) {
-            $param = 'term';
-        } elseif (!is_null($r['query'])) {
-            $param = 'query';
+        if (is_string($r['term'])) {
+            $param = $r['term'];
+        } elseif (is_string($r['query'])) {
+            $param = $r['query'];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -28,15 +28,13 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $schools = \OmegaUp\DAO\Schools::findByName($r[$param]);
-        if (is_null($schools)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
-        }
-
         $response = [];
-        foreach ($schools as $school) {
-            $entry = ['label' => $school->name, 'value' => $school->name, 'id' => $school->school_id];
-            array_push($response, $entry);
+        foreach (\OmegaUp\DAO\Schools::findByName($param) as $school) {
+            $response[] = [
+                'label' => strval($school->name),
+                'value' => strval($school->name),
+                'id' => intval($school->school_id),
+            ];
         }
 
         return $response;
