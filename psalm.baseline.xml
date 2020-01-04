@@ -8,62 +8,6 @@
       <code>static::OMEGAUP_BADGES_ROOT</code>
     </MixedOperand>
   </file>
-  <file src="frontend/server/src/Controllers/Clarification.php">
-    <ArgumentTypeCoercion occurrences="2">
-      <code>$clarification</code>
-      <code>$clarification</code>
-    </ArgumentTypeCoercion>
-    <MissingReturnType occurrences="3">
-      <code>validateCreate</code>
-      <code>validateDetails</code>
-      <code>validateUpdate</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="12">
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification_id']</code>
-      <code>$r['clarification']</code>
-      <code>$r['clarification_id']</code>
-      <code>$r['clarification']</code>
-      <code>$clarification</code>
-      <code>$r['problem']</code>
-      <code>$r['user']</code>
-      <code>$r['contest']</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="3">
-      <code>$receiverId</code>
-      <code>$response</code>
-      <code>$clarification</code>
-    </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
-    <MixedMethodCall occurrences="1">
-      <code>asFilteredArray</code>
-    </MixedMethodCall>
-    <MixedPropertyFetch occurrences="7">
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['identity']-&gt;identity_id</code>
-      <code>$r['contest']-&gt;problemset_id</code>
-      <code>$r['problem']-&gt;problem_id</code>
-      <code>$r['clarification']-&gt;clarification_id</code>
-      <code>$r['clarification']-&gt;public</code>
-    </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1">
-      <code>$response</code>
-    </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="3">
-      <code>$r-&gt;identity</code>
-      <code>$clarification-&gt;problem_id</code>
-      <code>$clarification-&gt;author_id</code>
-    </PossiblyNullArgument>
-    <PossiblyNullReference occurrences="1">
-      <code>broadcastClarification</code>
-    </PossiblyNullReference>
-  </file>
   <file src="frontend/server/src/Controllers/Contest.php">
     <DocblockTypeContradiction occurrences="1">
       <code>$req-&gt;accepted === '0'</code>
