@@ -16,7 +16,7 @@ namespace OmegaUp\DAO;
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
-     * @return array{username: string, language: string, runtime: float, memory: float, time: int}[]
+     * @return list<array{username: string, language: string, runtime: float, memory: float, time: int}>
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId

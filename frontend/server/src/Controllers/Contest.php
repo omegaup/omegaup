@@ -2180,7 +2180,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        \OmegaUp\Controllers\ACL::addGroup($contest->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::addGroup(
+            intval($contest->acl_id),
+            intval($group->group_id)
+        );
 
         return ['status' => 'ok'];
     }
@@ -2215,8 +2218,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         \OmegaUp\Controllers\ACL::removeGroup(
-            $contest->acl_id,
-            $group->group_id
+            intval($contest->acl_id),
+            intval($group->group_id)
         );
 
         return ['status' => 'ok'];
@@ -2265,7 +2268,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         $clarifications = \OmegaUp\DAO\Clarifications::GetProblemsetClarifications(
-            $contest->problemset_id,
+            intval($contest->problemset_id),
             $isContestDirector,
             $r->identity->identity_id,
             empty($r['offset']) ? null : intval($r['offset']),
@@ -2297,6 +2300,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $params = \OmegaUp\ScoreboardParams::fromContest($response['contest']);
         $params->admin = (
+            !is_null($r->identity) &&
             \OmegaUp\Authorization::isContestAdmin(
                 $r->identity,
                 $response['contest']
@@ -2552,11 +2556,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $resultAdmins =
             \OmegaUp\DAO\ProblemsetIdentityRequest::getFirstAdminForProblemsetRequest(
-                $contest->problemset_id
+                intval($contest->problemset_id)
             );
         $resultRequests =
             \OmegaUp\DAO\ProblemsetIdentityRequest::getRequestsForProblemset(
-                $contest->problemset_id
+                intval($contest->problemset_id)
             );
 
         $admins = [];
@@ -2681,7 +2685,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
-                $contest->problemset_id
+                intval($contest->problemset_id)
             ),
         ];
     }

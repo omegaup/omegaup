@@ -1647,8 +1647,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\Controllers\ACL::addUser(
-            $course->acl_id,
-            $resolvedUser->user_id
+            intval($course->acl_id),
+            intval($resolvedUser->user_id)
         );
 
         return ['status' => 'ok'];
@@ -1708,8 +1708,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\Controllers\ACL::removeUser(
-            $course->acl_id,
-            $resolvedUser->user_id
+            intval($course->acl_id),
+            intval($resolvedUser->user_id)
         );
 
         return ['status' => 'ok'];
@@ -1754,7 +1754,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Controllers\ACL::addGroup($course->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::addGroup(
+            intval($course->acl_id),
+            intval($group->group_id)
+        );
 
         return ['status' => 'ok'];
     }
@@ -1795,8 +1798,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\Controllers\ACL::removeGroup(
-            $course->acl_id,
-            $group->group_id
+            intval($course->acl_id),
+            intval($group->group_id)
         );
 
         return ['status' => 'ok'];
