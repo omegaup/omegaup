@@ -33,17 +33,19 @@
               v-model="searchedUsername"
             ></omegaup-autocomplete
           ></label>
-          <button
+          <a
             class="btn btn-primary"
             type="button"
-            v-on:click="onSelectUser"
+            v-bind:href="
+              `/submissions/${encodeURIComponent(this.searchedUsername)}/`
+            "
           >
             {{ T.searchUser }}
-          </button>
+          </a>
         </template>
         <template v-if="showControls">
           <template v-if="page > 1">
-            <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
+            <a class="prev" v-bind:href="`/submissions/?page=${page - 1}`">
               {{ T.wordsPrevPage }}</a
             >
             <span class="delimiter" v-show="showNextPage">|</span>
@@ -51,7 +53,7 @@
           <a
             class="next"
             v-show="showNextPage"
-            v-bind:href="`/submissions?page=${page + 1}`"
+            v-bind:href="`/submissions/?page=${page + 1}`"
             >{{ T.wordsNextPage }}
           </a>
         </template>
@@ -132,7 +134,7 @@
       </table>
       <div class="panel-footer" v-if="showControls">
         <template v-if="page > 1">
-          <a class="prev" v-bind:href="`/submissions?page=${page - 1}`">
+          <a class="prev" v-bind:href="`/submissions/?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
           >
           <span class="delimiter" v-show="showNextPage">|</span>
@@ -140,7 +142,7 @@
         <a
           class="next"
           v-show="showNextPage"
-          v-bind:href="`/submissions?page=${page + 1}`"
+          v-bind:href="`/submissions/?page=${page + 1}`"
           >{{ T.wordsNextPage }}
         </a>
       </div>
@@ -198,12 +200,6 @@ export default class SubmissionsList extends Vue {
   T = T;
   UI = UI;
   searchedUsername = '';
-
-  onSelectUser(): void {
-    window.location.href = `/submissions/${encodeURIComponent(
-      this.searchedUsername,
-    )}/`;
-  }
 
   get showNextPage(): boolean {
     return this.length * this.page < this.totalRows;
