@@ -496,11 +496,6 @@
       <code>$response</code>
     </PossiblyUndefinedVariable>
   </file>
-  <file src="frontend/server/src/Controllers/ProblemForfeited.php">
-    <MixedOperand occurrences="1">
-      <code>static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION</code>
-    </MixedOperand>
-  </file>
   <file src="frontend/server/src/Controllers/Problemset.php">
     <MissingParamType occurrences="1">
       <code>$problemset_id</code>
