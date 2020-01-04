@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
-  <file src="frontend/server/src/Controllers/ACL.php">
-    <MissingParamType occurrences="12">
-      <code>$acl_id</code>
-      <code>$user_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$user_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$group_id</code>
-      <code>$role_id</code>
-      <code>$acl_id</code>
-      <code>$group_id</code>
-      <code>$role_id</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>addUser</code>
-      <code>removeUser</code>
-      <code>addGroup</code>
-      <code>removeGroup</code>
-    </MissingReturnType>
-  </file>
   <file src="frontend/server/src/Controllers/Authorization.php">
     <MissingReturnType occurrences="1">
       <code>apiProblem</code>
@@ -607,9 +585,6 @@
       <code>$problem</code>
       <code>$problem</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
     <MixedPropertyAssignment occurrences="5">
       <code>$run</code>
       <code>$run</code>
@@ -638,22 +613,17 @@
       <code>$r['problem']-&gt;problem_id</code>
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1"/>
     <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$problem</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="2"/>
     <PossiblyNullPropertyAssignmentValue occurrences="1">

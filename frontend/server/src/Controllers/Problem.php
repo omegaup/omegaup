@@ -1249,7 +1249,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
                 \OmegaUp\Cache::deleteFromCache(
                     \OmegaUp\Cache::PROBLEM_STATS,
-                    $problem->alias
+                    strval($problem->alias)
                 );
             } catch (\Exception $e) {
                 self::$log->error(
@@ -1289,7 +1289,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            strval($problem->alias)
+        );
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
@@ -1313,6 +1315,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function updateLooseFile(
         \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Problems $problem,
         string $directory,
         string $contents
@@ -1342,7 +1346,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             $problemDeployer->commitLooseFiles(
                 "{$r['lang']}.markdown: {$r['message']}",
-                $r->identity,
+                $identity,
                 [
                     "{$directory}/{$r['lang']}.markdown" => $contents,
                 ]
@@ -1355,7 +1359,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
-                        $r->user,
+                        $user,
                         $updatePublished
                     );
                 }
@@ -1399,6 +1403,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $updatedFileLanguages = self::updateLooseFile(
             $r,
+            $r->identity,
+            $r->user,
             $problem,
             'statements',
             $r['statement']
@@ -1414,7 +1420,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate($r, true);
@@ -1426,6 +1432,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['solution'], 'solution');
         $updatedFileLanguages = self::updateLooseFile(
             $r,
+            $r->identity,
+            $r->user,
             $problem,
             'solutions',
             $r['solution']
@@ -1556,6 +1564,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         if (!is_null($problemset) && isset($problemset['problemset'])) {
             if (
+                !is_null($r->identity) &&
                 !\OmegaUp\Authorization::isAdmin(
                     $r->identity,
                     $problemset['problemset']
@@ -1730,7 +1739,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string   $language The language of the solution. Will default to
      *                           Spanish if not found.
      *
-     * @return array The contents of the file.
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemSolution(
@@ -1738,10 +1747,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $commit,
         string $language
     ): array {
+        /** @var array{language: string, markdown: string, images: array<string, string>} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            function () use ($problem, $commit, $language) {
+            /** @return array{language: string, markdown: string, images: array<string, string>} */
+            function () use ($problem, $commit, $language): array {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'solutions',
                     'alias' => strval($problem->alias),
@@ -1833,6 +1844,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDownload(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
             'problem_alias'
@@ -1929,7 +1942,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem' => $problem,
             'problemset' => $problemset,
         ] = $result;
-        if (!$problemExisits) {
+        if (!$problemExisits || is_null($problem)) {
             return $result;
         }
         $details = self::getProblemDetails(
@@ -1977,7 +1990,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get the extra problem details with all the validations
-     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: string[], email_clarifications: bool, runs?: array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}[], admin?: bool, solvers?: array{username: string, language: string, runtime: float, memory: float, time: int}[], points: float, score: float}
+     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: list<string>, email_clarifications: bool, runs?: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}>, admin?: bool, solvers?: list<array{username: string, language: string, runtime: float, memory: float, time: int}>, points: float, score: float}
      */
     private static function getProblemDetails(
         \OmegaUp\Request $r,
@@ -2004,7 +2017,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
-            $problem->alias,
+            strval($problem->alias),
             $commit,
             $statementLanguage
         );
@@ -2102,9 +2115,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Add each filtered run to an array
             $results = [];
             foreach ($runsArray as $run) {
-                $run['alias'] = $problem->alias;
+                $run['alias'] = strval($problem->alias);
                 $run['username'] = strval($r->identity->username);
-                array_push($results, $run);
+                $results[] = $run;
             }
             $response['runs'] = $results;
         }
@@ -2164,6 +2177,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // send the supported languages as a JSON array instead of csv
         // array_filter is needed to handle when $response['languages'] is empty
+        /** @var list<string> */
         $response['languages'] = array_filter(
             explode(',', $problem->languages)
         );
