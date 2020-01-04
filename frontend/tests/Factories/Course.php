@@ -294,7 +294,7 @@ class Course {
                             'auth_token' => $studentLogin->auth_token,
                             'problemset_id' => $assignment->problemset_id,
                             'problem_alias' => $problemData['request']['problem_alias'],
-                            'language' => 'c',
+                            'language' => 'c11-gcc',
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
                         \OmegaUp\Test\Factories\Run::gradeRun(
@@ -312,7 +312,7 @@ class Course {
                                 'auth_token' => $studentLogin->auth_token,
                                 'problemset_id' => $assignment->problemset_id,
                                 'problem_alias' => $problemData['request']['problem_alias'],
-                                'language' => 'c',
+                                'language' => 'c11-gcc',
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));
                             \OmegaUp\Test\Factories\Run::gradeRun(

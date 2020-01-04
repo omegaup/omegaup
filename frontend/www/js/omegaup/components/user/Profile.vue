@@ -46,13 +46,15 @@
         v-bind:items-per-page="15"
         v-bind:title="T.profileContests"
       >
-        <thead>
-          <tr>
-            <th>{{ T.profileContestsTableContest }}</th>
-            <th>{{ T.profileContestsTablePlace }}</th>
-          </tr>
-        </thead></omegaup-grid-paginator
-      >
+        <template slot="table-header">
+          <thead>
+            <tr>
+              <th>{{ T.profileContestsTableContest }}</th>
+              <th class="numericColumn">{{ T.profileContestsTablePlace }}</th>
+            </tr>
+          </thead>
+        </template>
+      </omegaup-grid-paginator>
       <omegaup-grid-paginator
         v-bind:columns="3"
         v-bind:items="createdProblems"

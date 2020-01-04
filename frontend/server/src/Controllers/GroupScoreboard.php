@@ -168,7 +168,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         $contestParams = [];
         foreach ($gscs as $gsc) {
             $contest = \OmegaUp\DAO\Contests::getByProblemset(
-                $gsc->problemset_id
+                intval($gsc->problemset_id)
             );
             if (empty($contest)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -203,7 +203,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             }
 
             $usernames = \OmegaUp\DAO\GroupsIdentities::getUsernamesByGroupId(
-                $scoreboard->group_id
+                intval($scoreboard->group_id)
             );
 
             $response['ranking'] = \OmegaUp\Controllers\Contest::getMergedScoreboard(

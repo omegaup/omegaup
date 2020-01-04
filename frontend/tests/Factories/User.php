@@ -67,26 +67,18 @@ class User {
             $params = new UserParams();
         }
 
-        // Populate a new Request to pass to the API
-        \OmegaUp\Controllers\User::$permissionKey = uniqid();
-        $r = new \OmegaUp\Request([
-            'username' => $params->username,
-            'name' => $params->name,
-            'password' => $params->password,
-            'email' => $params->email,
-            'is_private' => $params->isPrivate,
-            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
-        ]);
-
         // Call the API
-        $response = \OmegaUp\Controllers\User::apiCreate($r);
-
-        // If status is not OK
-        if (strcasecmp($response['status'], 'ok') !== 0) {
-            throw new \Exception(
-                '\OmegaUp\Test\Factories\User::createUser failed'
-            );
-        }
+        \OmegaUp\Controllers\User::createUser(
+            new \OmegaUp\CreateUserParams([
+                'username' => $params->username,
+                'name' => $params->name,
+                'password' => $params->password,
+                'email' => $params->email,
+                'is_private' => strval($params->isPrivate),
+            ]),
+            /*ignorePassword=*/false,
+            /*forceVerification=*/true
+        );
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params->username);

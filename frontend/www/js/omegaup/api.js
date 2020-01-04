@@ -577,6 +577,8 @@ export default {
 
     rank: _call('/api/school/rank/'),
 
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
+
     schoolCodersOfTheMonth: _call(
       '/api/school/schoolcodersofthemonth',
       function(data) {
@@ -587,7 +589,21 @@ export default {
       },
     ),
 
-    users: _call('/api/school/users/'),
+    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth/'),
+
+    users: _call('/api/school/users/', function(data) {
+      data.users = data.users.map(
+        user =>
+          new types.SchoolUser(
+            user.classname,
+            user.username,
+            user.created_problems,
+            user.solved_problems,
+            user.organized_contests,
+          ),
+      );
+      return data;
+    }),
   },
 
   Session: {
@@ -602,6 +618,17 @@ export default {
      * @param {string} storeToken - The auth code.
      */
     googleLogin: _call('/api/session/googlelogin/'),
+  },
+
+  Submission: {
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
+      data,
+    ) {
+      data.submissions.forEach(submission => {
+        submission.time = new Date(submission.time * 1000);
+      });
+      return data;
+    }),
   },
 
   Time: {
@@ -693,14 +720,12 @@ export default {
     }),
 
     profile: _call('/api/user/profile/', function(data) {
-      if (data.userinfo.birth_date !== null) {
-        data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
-          data.userinfo.birth_date * 1000,
-        );
+      if (data.birth_date !== null) {
+        data.birth_date = omegaup.OmegaUp.remoteTime(data.birth_date * 1000);
       }
-      if (data.userinfo.graduation_date !== null) {
-        data.userinfo.graduation_date = omegaup.OmegaUp.remoteTime(
-          data.userinfo.graduation_date * 1000,
+      if (data.graduation_date !== null) {
+        data.graduation_date = omegaup.OmegaUp.remoteTime(
+          data.graduation_date * 1000,
         );
       }
       return data;

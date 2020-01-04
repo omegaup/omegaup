@@ -8,23 +8,71 @@
  * @author joemmanuel
  */
 class Run extends \OmegaUp\Controllers\Controller {
+    // All languages that runs can have.
     public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',
-        'c' => 'C',
-        'cpp' => 'C++',
-        'cpp11' => 'C++ 11',
-        'java' => 'Java',
-        'py' => 'Python',
-        'rb' => 'Ruby',
-        'pl' => 'Perl',
-        'cs' => 'C#',
-        'pas' => 'Pascal',
+        'c11-gcc' => 'C11 (gcc 7.4)',
+        'c11-clang' => 'C11 (clang 6.0)',
+        'cpp11' => 'C++11 (gcc 7.4)',
+        'cpp11-gcc' => 'C++11 (g++ 7.4)',
+        'cpp11-clang' => 'C++11 (clang++ 6.0)',
+        'cpp17-gcc' => 'C++17 (g++ 7.4)',
+        'cpp17-clang' => 'C++17 (clang++ 6.0)',
+        'java' => 'Java (openjdk 11.0)',
+        'py2' => 'Python 2.7',
+        'py3' => 'Python 3.6',
+        'rb' => 'Ruby (2.5)',
+        'cs' => 'C# (dotnet 2.2)',
+        'pas' => 'Pascal (fpc 3.0)',
         'cat' => 'Output Only',
-        'hs' => 'Haskell',
-        'lua' => 'Lua',
+        'hs' => 'Haskell (ghc 8.0)',
+        'lua' => 'Lua (5.2)',
     ];
+
+    // These languages are aliases. They can be shown to the user, but should
+    // not appear as selectable mostly anywhere.
+    public const LANGUAGE_ALIASES = [
+        'c' => 'C11 (gcc 7.4)',
+        'cpp' => 'C++03 (gcc 7.4)',
+        'cpp11' => 'C++11 (gcc 7.4)',
+        'py' => 'Python 2.7',
+    ];
+
+    public const DEFAULT_LANGUAGES = [
+        'c11-gcc',
+        'c11-clang',
+        'cpp11-gcc',
+        'cpp11-clang',
+        'cpp17-gcc',
+        'cpp17-clang',
+        'cs',
+        'hs',
+        'java',
+        'lua',
+        'pas',
+        'py2',
+        'py3',
+        'rb',
+    ];
+
+    /** @var int */
     public static $defaultSubmissionGap = 60; /*seconds*/
+
+    public const VERDICTS = [
+        'AC',
+        'PA',
+        'WA',
+        'TLE',
+        'OLE',
+        'MLE',
+        'RTE',
+        'RFE',
+        'CE',
+        'JE',
+        'VE',
+        'NO-AC',
+    ];
 
     /**
      *
@@ -57,7 +105,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
         // check that problem is not publicly or privately banned.
-        if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+        if (
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
+            $r['problem']->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 
@@ -290,7 +341,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                         // time the user opened the problem
                         $opened = \OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
                             $problemsetId,
-                            $r['problem']->problem_id,
+                            intval($r['problem']->problem_id),
                             $r->identity->identity_id
                         );
 
@@ -1025,7 +1076,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['verdict'],
             'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            \OmegaUp\Controllers\Run::VERDICTS,
             false
         );
 

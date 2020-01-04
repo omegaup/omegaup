@@ -187,7 +187,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups by owner
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, groups: array{alias: string, create_time: int, description: string, name: string}[]}
+     * @return array{groups: list<array{alias: string, create_time: int, description: null|string, name: string}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -198,7 +198,6 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'status' => 'ok',
             'groups' => $groups,
         ];
     }
@@ -354,7 +353,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{groups: array{alias: string, create_time: int, description: string, name: string}[]}}
+     * @return array{payload: array{groups: array{alias: string, create_time: int, description: null|string, name: string}[]}}
      */
     public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
         // Authenticate user

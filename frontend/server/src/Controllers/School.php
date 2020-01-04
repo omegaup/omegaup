@@ -45,7 +45,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the basic details for school
      * @param \OmegaUp\Request $r
-     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, country: array{id: string, name: string}|null, state_name: string|null}}}
+     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, rank: int, country: array{id: string, name: string}|null, state_name: string|null}}}
      */
     public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -58,6 +58,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $details = [
             'school_id' => intval($school->school_id),
             'school_name' => strval($school->name),
+            'rank' => intval($school->rank),
             'country' => null,
             'state_name' => null,
         ];
@@ -157,84 +158,6 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Ensures that all the numeric parameters have valid values.
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
-     */
-    private static function validateRankDetails(\OmegaUp\Request $r): array {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', 5, 100, false);
-        $r->ensureInt('start_time', null, null, false);
-        $r->ensureInt('finish_time', null, null, false);
-
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            if (!is_null($r['start_time'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'paramterInvalid',
-                    'start_time'
-                );
-            }
-            if (!is_null($r['finish_time'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'paramterInvalid',
-                    'finish_time'
-                );
-            }
-            // Both endpoints were not specified, so the API can be used
-            // unauthenticated since it'll be cached.
-        }
-
-        return [
-            'offset' => $r['offset'] ?: 0,
-            'rowcount' => $r['rowcount'] ?: 100,
-            'start_time' => $r['start_time'] ?:
-                            strtotime(
-                                'first day of this month',
-                                \OmegaUp\Time::get()
-                            ),
-            'finish_time' => $r['finish_time'] ?:
-                            strtotime(
-                                'first day of next month',
-                                \OmegaUp\Time::get()
-                            ),
-            'can_use_cache' => is_null(
-                $r['start_time']
-            ) && is_null(
-                $r['finish_time']
-            )
-        ];
-    }
-
-    /**
-     * Returns rank of best schools in last month
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
-     */
-    public static function apiRank(\OmegaUp\Request $r) {
-        [
-            'offset' => $offset,
-            'rowcount' => $rowCount,
-            'start_time' => $startTime,
-            'finish_time' => $finishTime,
-            'can_use_cache' => $canUseCache,
-        ] = self::validateRankDetails($r);
-        return [
-            'status' => 'ok',
-            'rank' => self::getSchoolsRank(
-                $offset,
-                $rowCount,
-                $startTime,
-                $finishTime,
-                $canUseCache
-            ),
-        ];
-    }
-
-    /**
      * Returns rank of best schools in last month
      *
      * @param \OmegaUp\Request $r
@@ -303,77 +226,312 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns rank of best schools in last month
-     *
-     * @param int $offset
-     * @param int $rowCount
-     * @param int $startTime
-     * @param int $finishTime
-     * @param bool $canUseCache
-     * @return list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>
+     * Gets the top X schools of the month
+     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
-    private static function getSchoolsRank(
-        int $offset,
-        int $rowCount,
-        int $startTime,
-        int $finishTime,
-        bool $canUseCache
+    private static function getTopSchoolsOfTheMonth(
+        int $rowcount
     ): array {
-        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
-            return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
-                $startTime,
-                $finishTime,
+        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
+        $firstDayOfNextMonth = $currentDate->modify('first day of next month');
+        $date = $firstDayOfNextMonth->format('Y-m-d');
+
+        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
+            "{$date}-{$rowcount}",
+            function () use (
+                $date,
+                $rowcount
+            ): array {
+                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+                    $date,
+                    $rowcount
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
+    }
+
+    /**
+     * Gets the top schools that are showed on the index page.
+     * @return array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>}
+     */
+    public static function apiSchoolsOfTheMonth(\OmegaUp\Request $r) {
+        $r->ensureInt('rowcount', null, null, false);
+        $rowcount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
+        $firstDayOfNextMonth = $currentDate->modify('first day of next month');
+        $date = $firstDayOfNextMonth->format('Y-m-d');
+
+        return [
+            'rank' => self::getTopSchoolsOfTheMonth(
+                $rowcount
+            ),
+        ];
+    }
+
+    /**
+     * Returns the historical rank of schools
+     *
+     * @return array{rank: list<array{school_id: int, rank: int, score: float, name: string, country_id: int}>, totalRows: int}
+     */
+    public static function apiRank(\OmegaUp\Request $r) {
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        /** @var array{rank: list<array{school_id: int, country_id: int, rank: int, score: float, name: string}>, totalRows: int} */
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_RANK,
+            "{$offset}-{$rowCount}",
+            function () use (
                 $offset,
                 $rowCount
-            );
-        };
+            ): array {
+                return \OmegaUp\DAO\Schools::getRank($offset, $rowCount);
+            },
+            3600 // 1 hour
+        );
+    }
 
-        if ($canUseCache) {
-            return \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SCHOOL_RANK,
-                "{$offset}-{$rowCount}",
-                $fetch,
-                60 * 60 * 24 // 1 day
+    /**
+     * Gets the details for historical rank of schools with pagination
+     *
+     * @return array{smartyProperties: array{schoolRankPayload: array{page: int, length: int, showHeader: bool}}, template: string}
+     */
+    public static function getRankForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'schoolRankPayload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'showHeader' => false,
+                ],
+            ],
+            'template' => 'rank.schools.tpl',
+        ];
+    }
+
+    /**
+     * Gets all the information to be sent to smarty for the tabs
+     * of School of the Month
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{school_id: int, name: string, country_id: string, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     */
+    public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
+        try {
+            $r->ensureIdentity();
+            $identity = $r->identity;
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $identity = null;
+        }
+
+        $isMentor = !is_null(
+            $identity
+        ) && \OmegaUp\Authorization::isMentor(
+            $identity
+        );
+
+        $currentTimestamp = \OmegaUp\Time::get();
+        $currentDate = date('Y-m-d', $currentTimestamp);
+
+        $response = [
+            'smartyProperties' => [
+                'schoolOfTheMonthPayload' => [
+                    'schoolsOfPreviousMonths' => \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth(),
+                    'schoolsOfCurrentMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
+                        $currentDate
+                    ),
+                    'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
+                        /* rowcount */ 100
+                    ),
+                    'isMentor' => $isMentor,
+                ],
+            ],
+            'template' => 'schoolofthemonth.tpl',
+        ];
+
+        if (!$isMentor) {
+            return $response;
+        }
+
+        $firstDayOfNextMonth = new \DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $response['smartyProperties']['schoolOfTheMonthPayload']['options'] = [
+            'canChooseSchool' =>
+                \OmegaUp\Authorization::canChooseCoderOrSchool(
+                    $currentTimestamp
+                ),
+            'schoolIsSelected' =>
+                \OmegaUp\DAO\SchoolOfTheMonth::isSchoolOfTheMonthAlreadySelected(
+                    $dateToSelect
+                ),
+        ];
+        return $response;
+    }
+
+    /**
+     * Returns the first school of the previous month or the one selected by
+     * the mentor, if it has already been stored. Otherwise, calculates and
+     * saves the new schools of the month, and returns the first one of them.
+     *
+     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
+     */
+    public static function getSchoolOfTheMonth(string $date = null): array {
+        $firstDay = self::getCurrentMonthFirstDay($date);
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+            $firstDay
+        );
+        if (empty($schoolsOfTheMonth)) {
+            // Calculate and store new schools of the month
+            $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+                $firstDay
+            );
+            if (empty($schools)) {
+                return [
+                    'schoolinfo' => null,
+                ];
+            }
+
+            try {
+                \OmegaUp\DAO\DAO::transBegin();
+                $schoolOfTheMonthId = $schools[0]['school_id'];
+                foreach ($schools as $index => $school) {
+                    \OmegaUp\DAO\SchoolOfTheMonth::create(
+                        new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                            'school_id' => $school['school_id'],
+                            'time' => $firstDay,
+                            'rank' => $index + 1,
+                        ])
+                    );
+                }
+                \OmegaUp\DAO\DAO::transEnd();
+            } catch (\Exception $e) {
+                \OmegaUp\DAO\DAO::transRollback();
+                throw $e;
+            }
+        } else {
+            $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
+            foreach ($schoolsOfTheMonth as $school) {
+                if (isset($school->selected_by)) {
+                    $schoolOfTheMonthId = $school->school_id;
+                    break;
+                }
+            }
+        }
+
+        if (is_null($schoolOfTheMonthId)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'schoolOfTheMonthNotFound'
             );
         }
-        return $fetch();
-    }
 
-    /**
-     * Gets the rank of best schools in last month with smarty format
-     *
-     * @return array{smartyProperties: array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}, template: string}
-     */
-    public static function getSchoolsRankForSmarty(int $rowCount = 100): array {
-        return [
-            'smartyProperties' => \OmegaUp\Controllers\School::getSchoolsRankList(
-                $rowCount
-            ),
-            'template' => 'rank.schools.tpl'
-        ];
-    }
+        // Now get the school data
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolOfTheMonthId);
 
-    /**
-     * @return array{schoolRankPayload: array{rank: list<array{country_id: string, distinct_problems: int, distinct_users: int, name: string}>, rowCount: int}}
-     */
-    public static function getSchoolsRankList(int $rowCount) {
+        if (is_null($school)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'schoolOfTheMonthNotFound'
+            );
+        }
+
         return [
-            'schoolRankPayload' => [
-                'rowCount' => $rowCount,
-                'rank' => self::getSchoolsRank(
-                    /*$offset=*/0,
-                    $rowCount,
-                    /*$startTime=*/strtotime(
-                        'first day of this month',
-                        \OmegaUp\Time::get()
-                    ),
-                    /*$finishTime=*/strtotime(
-                        'first day of next month',
-                        \OmegaUp\Time::get()
-                    ),
-                    /*$canUseCache=*/true
-                ),
+            'schoolinfo' => [
+                'school_id' => intval($school->school_id),
+                'name' => strval($school->name),
+                'country_id' => $school->country_id,
             ],
         ];
+    }
+
+    /**
+     * Selects a certain school as school of the month
+     *
+     * @return array{status: string}
+     */
+    public static function apiSelectSchoolOfTheMonth(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $currentTimestamp = \OmegaUp\Time::get();
+
+        if (!\OmegaUp\Authorization::isMentor($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        if (
+            !\OmegaUp\Authorization::canChooseCoderOrSchool(
+                $currentTimestamp
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'schoolOfTheMonthIsNotInPeriodToBeChosen'
+            );
+        }
+
+        $r->ensureInt('school_id');
+        $selectedSchool = \OmegaUp\DAO\Schools::getByPK(
+            intval(
+                $r['school_id']
+            )
+        );
+
+        if (is_null($selectedSchool)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
+        }
+
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+            $dateToSelect
+        );
+        if (!empty($schoolsOfTheMonth)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'schoolOfTheMonthAlreadySelected'
+            );
+        }
+
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+            $dateToSelect
+        );
+
+        if (empty($schools)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('noSchools');
+        }
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            foreach ($schools as $index => $school) {
+                $newSchoolOfTheMonth = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
+                    'school_id' => $school['school_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                ]);
+
+                if ($school['school_id'] === $selectedSchool->school_id) {
+                    $newSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                }
+                \OmegaUp\DAO\SchoolOfTheMonth::create($newSchoolOfTheMonth);
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+        return ['status' => 'ok'];
     }
 }

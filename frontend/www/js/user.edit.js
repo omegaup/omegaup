@@ -51,44 +51,41 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.User.profile()
     .then(function(data) {
-      $('#username').text(data.userinfo.username);
-      $('#username').val(data.userinfo.username);
-      $('#name').val(data.userinfo.name);
+      $('#username').text(data.username);
+      $('#username').val(data.username);
+      $('#name').val(data.name);
       $('#birth_date')
-        .data('date', data.userinfo.birth_date)
+        .data('date', data.birth_date)
         .val(
-          data.userinfo.birth_date
-            ? omegaup.UI.formatDate(data.userinfo.birth_date)
-            : data.userinfo.birth_date,
+          data.birth_date
+            ? omegaup.UI.formatDate(data.birth_date)
+            : data.birth_date,
         );
-      $('#gender').val(data.userinfo.gender);
+      $('#gender').val(data.gender);
       $('#graduation_date')
-        .data('date', data.userinfo.graduation_date)
+        .data('date', data.graduation_date)
         .val(
-          data.userinfo.graduation_date
-            ? omegaup.UI.formatDate(data.userinfo.graduation_date)
-            : data.userinfo.graduation_date,
+          data.graduation_date
+            ? omegaup.UI.formatDate(data.graduation_date)
+            : data.graduation_date,
         );
-      $('#country_id').val(data.userinfo.country_id);
-      $('#locale').val(data.userinfo.locale);
+      $('#country_id').val(data.country_id);
+      $('#locale').val(data.locale);
 
       // Update state dropdown status
       $('#country_id').trigger('change');
 
-      $('#state_id').val(data.userinfo.state_id);
-      $('#scholar_degree').val(data.userinfo.scholar_degree);
-      $('#school_id').val(data.userinfo.school_id);
-      $('#school').val(data.userinfo.school);
-      $('#programming_language').val(data.userinfo.preferred_language);
-      $('#is_private').prop('checked', data.userinfo.is_private == 1);
-      $('#hide_problem_tags').prop(
-        'checked',
-        data.userinfo.hide_problem_tags == 1,
-      );
+      $('#state_id').val(data.state_id);
+      $('#scholar_degree').val(data.scholar_degree);
+      $('#school_id').val(data.school_id);
+      $('#school').val(data.school);
+      $('#programming_language').val(data.preferred_language);
+      $('#is_private').prop('checked', data.is_private == 1);
+      $('#hide_problem_tags').prop('checked', data.hide_problem_tags == 1);
 
-      original_locale = data.userinfo.locale;
-      original_school = data.userinfo.school;
-      original_school_id = data.userinfo.school_id;
+      original_locale = data.locale;
+      original_school = data.school;
+      original_school_id = data.school_id;
     })
     .fail(omegaup.UI.apiError);
 

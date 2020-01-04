@@ -165,16 +165,18 @@ class Interview extends \OmegaUp\Controllers\Controller {
                 'Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']
             );
 
-            $newUserRequest = new \OmegaUp\Request($r);
-            $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = \OmegaUp\Controllers\User::makeUsernameFromEmail(
+            $username = \OmegaUp\Controllers\User::makeUsernameFromEmail(
                 $r['usernameOrEmail']
             );
+            $newUserRequest = new \OmegaUp\Request($r);
+            $newUserRequest['email'] = $r['usernameOrEmail'];
+            $newUserRequest['username'] = $username;
             $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(
                 8
             );
 
             \OmegaUp\Controllers\User::apiCreate($newUserRequest);
+            $r['user'] = \OmegaUp\DAO\Users::findByUsername($username);
 
             // Email to new OmegaUp users
             $body = \OmegaUp\Translations::getInstance()->get(
@@ -249,7 +251,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $interview = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
+        $interview = \OmegaUp\DAO\Interviews::getByAlias(
+            strval($r['interview_alias'])
+        );
         if (is_null($interview)) {
             return [
                 'exists' => false,
@@ -268,7 +272,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
-            $interview->problemset_id
+            intval($interview->problemset_id)
         );
 
         $users = [];

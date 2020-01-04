@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
     /**
-     * @return mixed
+     * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews
      */
     public static function getProblemsetContainer(?int $problemsetId) {
         if (is_null($problemsetId)) {
@@ -66,7 +66,10 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                 \OmegaUp\Time::get() >= $container->start_time;
     }
 
-    public static function getWithTypeByPK($problemset_id) {
+    /**
+     * @return array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null
+     */
+    public static function getWithTypeByPK(int $problemsetId): ?array {
         $sql = 'SELECT
                     type,
                     c.alias AS contest_alias,
@@ -95,17 +98,13 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     p.problemset_id = ?
                 LIMIT
                     1;';
-        $params = [$problemset_id];
+        $params = [$problemsetId];
 
-        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             $params
         );
-        if (empty($problemset)) {
-            return null;
-        }
-
-        return $problemset;
     }
 
     /**

@@ -34,16 +34,24 @@
                 <li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
                 <li><a href="/problem/mine/">{#navMyProblems#}</a></li>
                 <li><a href="/problem/">{#wordsProblems#}</a></li>
+                <li><a href="/submissions/">{#wordsLatestSubmissions#}</a></li>
                 <li><a href="/nomination/mine/">{#navMyQualityNomination#}</a></li>
                 {if $CURRENT_USER_IS_REVIEWER eq '1'}
                   <li><a href="/nomination/">{#navQualityNominationQueue#}</a></li>
                 {/if}
               </ul>
             </li>
+            <li class="dropdown {if isset($navbarSection) && $navbarSection === "rank"} active{/if}" id="nav-rank">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#navRanking#}</span><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/rank/">{#navUserRanking#}</a></li>
+                <li><a href="/rank/schools/">{#navSchoolRanking#}</a></li>
+              </ul>
+            </li>
           {else}
             <li id="nav-problems"{if isset($navbarSection) && $navbarSection === "problems"} class="active"{/if}><a href="/problem/">{#wordsProblems#}</a></li>
+            <li id="nav-rank"{if isset($navbarSection) && $navbarSection === "rank"} class="active"{/if}><a href="/rank/">{#navRanking#}</a></li>
           {/if} {* LOGGED_IN *}
-          <li id="nav-rank"{if isset($navbarSection) && $navbarSection === "rank"} class="active"{/if}><a href="/rank/">{#navRanking#}</a></li>
           <li id="nav-schools"{if isset($navbarSection) && $navbarSection === "schools"} class="active"{/if}><a href="/schools/">{#navSchools#}</a></li>
           <li><a href="http://blog.omegaup.com/">{#navBlog#}</a></li>
           <li><a href="https://omegaup.com/preguntas/">{#navQuestions#}</a></li>
