@@ -1254,30 +1254,6 @@
       <code>$show_intro</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/libinteractive/index.php">
-    <MissingParamType occurrences="1">
-      <code>$http_accept_language</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>preferred_language</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$location</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="1">
-      <code>$location[strlen($location) - 1]</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
-      <code>$preferred</code>
-      <code>$location</code>
-    </MixedAssignment>
-    <MixedOperand occurrences="1">
-      <code>$location</code>
-    </MixedOperand>
-    <UndefinedVariable occurrences="1">
-      <code>$langs</code>
-    </UndefinedVariable>
-  </file>
   <file src="frontend/www/login.php">
     <MissingParamType occurrences="1">
       <code>$url</code>
