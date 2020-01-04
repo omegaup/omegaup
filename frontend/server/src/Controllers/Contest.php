@@ -2387,7 +2387,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernames_filter'],
             'usernames_filter'
         );
-        /** @var string[] */
+        /** @var list<string> */
         $usernamesFilter = [];
         if (isset($r['usernames_filter'])) {
             $usernamesFilter = explode(',', $r['usernames_filter']);
@@ -2412,10 +2412,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param string[] $contestAliases
-     * @param string[] $usernamesFilter
+     * @param list<string> $contestAliases
+     * @param list<string> $usernamesFilter
      * @param array<string, array{only_ac: bool, weight: float}> $contestParams
-     * @return array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}[]
+     *
+     * @return list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>
      */
     public static function getMergedScoreboard(
         array $contestAliases,
@@ -2432,7 +2433,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            array_push($contests, $contest);
+            $contests[] = $contest;
         }
 
         // Get all scoreboards
@@ -2537,6 +2538,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         );
 
+        /** @var list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
         return $mergedScoreboard;
     }
 
