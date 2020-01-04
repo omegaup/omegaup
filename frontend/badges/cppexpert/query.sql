@@ -11,10 +11,8 @@ INNER JOIN
 INNER JOIN
     `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id`
 WHERE
-    `r`.`verdict` = "AC" AND `s`.`type` = "normal" AND (`s`.`language`="cpp" OR `s`.`language`="cpp11" OR `s`.`language`="cpp11-gcc" OR `s`.`language`="cpp11-clang" OR `s`.`language`="cpp17-gcc" OR `s`.`language`="cpp17-clang")
+    `r`.`verdict` = "AC" AND `s`.`type` = "normal" AND  FIND_IN_SET(`s`.`language`,'cpp,cpp11,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang')
 GROUP BY
     `u`.`user_id`
 HAVING
-    COUNT(DISTINCT `p`.`problem_id`) > 10;
-
-    /* 'cpp', 'cpp11', 'cpp11-gcc', 'cpp11-clang', 'cpp17-gcc', 'cpp17-clang'*/    
+    COUNT(DISTINCT `p`.`problem_id`) > 10;  
