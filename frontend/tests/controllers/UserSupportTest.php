@@ -118,8 +118,6 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             'password' => $password,
             'password_confirmation' => $password
         ]));
-
-        $this->assertContains('ok', $response['status']);
     }
 
     /**
