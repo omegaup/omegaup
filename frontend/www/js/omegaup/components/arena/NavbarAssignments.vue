@@ -1,44 +1,53 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">{{ T.wordsAssignments }}</div>
-    <div class="panel-body">
-      <div class="text-left col-md-6 col-sm-6 col-xs-6">
-        <a
-          class="btn btn-primary btn-sm prev"
-          title=""
-          v-on:click="$emit('navigate-to-assignment', previousAssignment.alias)"
-          v-bind:class="{ disabled: previousAssignment === null }"
-          v-bind:title="
-            previousAssignment !== null ? previousAssignment.name : ''
-          "
-          role="button"
-        >
-          <span
-            class="glyphicon glyphicon-chevron-left"
-            aria-hidden="true"
-          ></span
-          >{{ T.wordsPrevAssignment }}</a
-        >
-      </div>
-      <div class="text-right col-md-6 col-sm-6 col-xs-6">
-        <a
-          class="btn btn-primary btn-sm next"
-          title=""
-          v-on:click="$emit('navigate-to-assignment', nextAssignment.alias)"
-          v-bind:class="{ disabled: nextAssignment === null }"
-          v-bind:title="nextAssignment !== null ? nextAssignment.name : ''"
-          role="button"
-        >
-          {{ T.wordsNextAssignment
-          }}<span
-            class="glyphicon glyphicon-chevron-right"
-            aria-hidden="true"
-          ></span
-        ></a>
-      </div>
+  <div class="navbar-assignments">
+    <div class="text-left col-md-12 col-sm-12 col-xs-12">
+      <a
+        class="btn btn-primary btn-sm prev"
+        title=""
+        v-on:click="$emit('navigate-to-assignment', previousAssignment.alias)"
+        v-bind:class="{ disabled: previousAssignment === null }"
+        v-bind:title="
+          previousAssignment !== null ? previousAssignment.name : ''
+        "
+        role="button"
+      >
+        <span
+          class="glyphicon glyphicon-chevron-left"
+          aria-hidden="true"
+          v-if="previousAssignment !== null"
+        ></span
+        >{{ previousAssignment !== null ? previousAssignment.name : '-' }}</a
+      >
+    </div>
+    <div class="text-right col-md-12 col-sm-12 col-xs-12">
+      <a
+        class="btn btn-primary btn-sm next"
+        title=""
+        v-on:click="$emit('navigate-to-assignment', nextAssignment.alias)"
+        v-bind:class="{ disabled: nextAssignment === null }"
+        v-bind:title="nextAssignment !== null ? nextAssignment.name : ''"
+        role="button"
+      >
+        {{ nextAssignment !== null ? nextAssignment.name : '-'
+        }}<span
+          class="glyphicon glyphicon-chevron-right"
+          aria-hidden="true"
+          v-if="nextAssignment !== null"
+        ></span
+      ></a>
     </div>
   </div>
 </template>
+
+<style>
+.navbar-assignments > div > a.btn-primary {
+  width: 100%;
+  margin-bottom: 0.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
