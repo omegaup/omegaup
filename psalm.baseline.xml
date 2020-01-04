@@ -760,12 +760,6 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/src/Controllers/Scoreboard.php">
-    <MixedArgument occurrences="3">
-      <code>$r['alias']</code>
-      <code>$r['course_alias']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Tag.php">
     <MissingReturnType occurrences="1">
       <code>apiList</code>
