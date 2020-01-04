@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
-  <file src="frontend/server/src/Controllers/Authorization.php">
-    <MissingReturnType occurrences="1">
-      <code>apiProblem</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="2">
-      <code>$r['username']</code>
-      <code>$r['problem_alias']</code>
-    </MixedArgument>
-    <PossiblyNullArgument occurrences="1">
-      <code>$resolvedIdentity-&gt;identity_id</code>
-    </PossiblyNullArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Badge.php">
     <MixedArgument occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
