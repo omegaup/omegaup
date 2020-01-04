@@ -1265,9 +1265,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{problems: list<array{accepted: int, alias: string, commit: string, difficulty: float|null, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, status: string}
+     * @return array{problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}>}>}
      */
-    public static function apiStudentProgress(\OmegaUp\Request $r) {
+    public static function apiStudentProgress(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -1276,14 +1276,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
             'course_alias'
-        );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['assignment_alias'],
-            'assignment_alias'
-        );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
         );
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id) || is_null($course->group_id)) {
@@ -1296,6 +1288,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
@@ -1310,6 +1306,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['assignment_alias'],
+            'assignment_alias'
+        );
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $r['assignment_alias'],
             $course->course_id
@@ -1320,11 +1320,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+        $rawProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $assignment->problemset_id
         );
         $letter = 0;
-        foreach ($problems as &$problem) {
+        $problems = [];
+        foreach ($rawProblems as $problem) {
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 intval($problem['problem_id']),
                 intval($assignment->problemset_id),
@@ -1332,8 +1333,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
             $problem['runs'] = [];
             foreach ($runsArray as $run) {
-                $run['time'] = intval($run['time']);
-                $run['contest_score'] = floatval($run['contest_score']);
                 try {
                     $run['source'] = \OmegaUp\Controllers\Submission::getSource(
                         $run['guid']
@@ -1344,16 +1343,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $e
                     );
                 }
-                array_push($problem['runs'], $run);
+                $problem['runs'][] = $run;
             }
             unset($problem['problem_id']);
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                 $letter++
             );
+            $problems[] = $problem;
         }
 
         return [
-            'status' => 'ok',
             'problems' => $problems,
         ];
     }
@@ -1412,15 +1411,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureIdentity();
+
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
             'course_alias'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
-        );
-
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id) || is_null($course->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1428,6 +1423,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
@@ -1458,6 +1457,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $resolvedIdentity->identity_id === $r->identity->identity_id
                  && $course->requests_user_information !== 'no'
             ) {
+                \OmegaUp\Validators::validateStringNonEmpty(
+                    $r['privacy_git_object_id'],
+                    'privacy_git_object_id'
+                );
+                \OmegaUp\Validators::validateStringNonEmpty(
+                    $r['statement_type'],
+                    'statement_type'
+                );
                 $privacyStatementId = \OmegaUp\DAO\PrivacyStatements::getId(
                     $r['privacy_git_object_id'],
                     $r['statement_type']
@@ -1490,6 +1497,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $resolvedIdentity->identity_id === $r->identity->identity_id
                  && !empty($r['accept_teacher'])
             ) {
+                \OmegaUp\Validators::validateStringNonEmpty(
+                    $r['accept_teacher_git_object_id'],
+                    'accept_teacher_git_object_id'
+                );
                 $privacyStatementId = \OmegaUp\DAO\PrivacyStatements::getId(
                     $r['accept_teacher_git_object_id'],
                     'accept_teacher'

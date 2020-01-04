@@ -226,15 +226,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/src/Controllers/Course.php">
-    <InvalidReturnStatement occurrences="1"/>
-    <InvalidReturnType occurrences="1"/>
-    <MixedArgument occurrences="3">
-      <code>$r['privacy_git_object_id']</code>
-      <code>$r['statement_type']</code>
-      <code>$r['accept_teacher_git_object_id']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
       <code>validateRequest</code>
