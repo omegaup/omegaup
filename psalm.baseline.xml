@@ -597,40 +597,6 @@
       <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/server/src/Controllers/Reset.php">
-    <MissingParamType occurrences="2">
-      <code>$r</code>
-      <code>$r</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>validateCreateRequest</code>
-      <code>validateUpdateRequest</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="6">
-      <code>$email</code>
-      <code>$r['email']</code>
-      <code>$r['password']</code>
-      <code>$r-&gt;identity</code>
-      <code>$reset_token</code>
-      <code>$password</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="5">
-      <code>$r['email']</code>
-      <code>$r['email']</code>
-      <code>$r['reset_token']</code>
-      <code>$r['password']</code>
-      <code>$r['password_confirmation']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="4">
-      <code>$email</code>
-      <code>$reset_token</code>
-      <code>$password</code>
-      <code>$password_confirmation</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$r-&gt;identity</code>
-    </MixedPropertyFetch>
-  </file>
   <file src="frontend/server/src/Controllers/Run.php">
     <InvalidReturnStatement occurrences="1">
       <code>$response</code>
