@@ -1713,7 +1713,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $commit,
         string $language
     ): array {
-        /** @var array{language: string, images: array<string, string>, markdown: string} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$alias}-{$commit}-{$language}-markdown",
@@ -1739,15 +1738,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string   $language The language of the solution. Will default to
      *                           Spanish if not found.
      *
-     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
+     *
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      */
     public static function getProblemSolution(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $language
     ): array {
-        /** @var array{language: string, markdown: string, images: array<string, string>} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
@@ -1768,14 +1767,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Gets the distributable problem settings for the problem, using the cache
      * if needed.
      *
-     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}
      */
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
     ): array {
-        /** @var array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
@@ -3862,11 +3859,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSolutionExistence(
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
-        /** @var bool */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
-            function () use ($problem) {
+            function () use ($problem): bool {
                 return \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
                     $problem
                 );
