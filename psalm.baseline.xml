@@ -694,7 +694,6 @@
       <code>$r-&gt;identity-&gt;gender</code>
       <code>$r2['auth_token']</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1"/>
     <MixedPropertyFetch occurrences="8">
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
@@ -705,7 +704,6 @@
       <code>$r['group']-&gt;group_id</code>
       <code>$r['group']-&gt;group_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1"/>
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>

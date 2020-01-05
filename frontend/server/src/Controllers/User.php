@@ -112,7 +112,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $userData = [
             'verified' => 0,
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
-            'is_private' => $createUserParams->isPrivate,
+            'is_private' => boolval($createUserParams->isPrivate),
         ];
         if (!is_null($createUserParams->name)) {
             $identityData['name'] = $createUserParams->name;
@@ -1127,7 +1127,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @return array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}
+     * @return array{birth_date: int|null, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1185,10 +1185,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get general user info
      *
-     * @param \OmegaUp\Request $r
-     * @return array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}
+     * @return array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
      */
-    public static function apiProfile(\OmegaUp\Request $r) {
+    public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
@@ -1207,7 +1206,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}
+     * @return array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
      */
     public static function getUserProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2128,10 +2127,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * If no username provided: Gets the top N users who have solved more problems
      * If username provided: Gets rank for username provided
      *
-     * @param \OmegaUp\Request $r
-     * @return array{name: string, problems_solved: int, rank: int, status: string}
+     * @return array{rank: int|list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total?: int, name?: string, problems_solved?: int}
      */
-    public static function apiRankByProblemsSolved(\OmegaUp\Request $r) {
+    public static function apiRankByProblemsSolved(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
@@ -2156,27 +2154,23 @@ class User extends \OmegaUp\Controllers\Controller {
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            $response = self::getFullRankByProblemsSolved(
+            return self::getFullRankByProblemsSolved(
                 $identity,
                 $filter,
                 $offset,
                 $rowCount
             );
-            $response['status'] = 'ok';
-            return $response;
         }
+
         [
             'identity' => $identity,
         ] = \OmegaUp\Controllers\Session::getCurrentSession($r);
-
-        $response = self::getRankByProblemsSolved(
+        return self::getRankByProblemsSolved(
             $identity,
             $filter,
             $offset,
             $rowCount
         );
-        $response['status'] = 'ok';
-        return $response;
     }
 
     /**
@@ -2217,7 +2211,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Get rank by problems solved logic. It has its own func so it can be
      * accesed internally without authentication.
      *
-     * @return array{name: string, problems_solved: int, rank: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getRankByProblemsSolved(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2234,7 +2228,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
             $rankCacheName,
             /**
-             * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+             * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
              */
             function () use (
                 $loggedIdentity,
@@ -2242,10 +2236,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 $offset,
                 $rowCount
             ): array {
-                $response = [
-                    'rank' => [],
-                    'total' => 0,
-                ];
                 $selectedFilter = self::getSelectedFilter(
                     $loggedIdentity,
                     $filteredBy
@@ -3152,7 +3142,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3180,7 +3170,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: array<int, \OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3218,7 +3208,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{payload: array{email: null|string}, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
@@ -3254,7 +3244,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{admin: true, practice: false, profile: array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR?: string, admin?: true, practice?: false, profile?: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3287,7 +3277,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{birth_date?: null|string, classname: string, country: null|string, country_id: int|null, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92: null|string, hide_problem_tags?: bool|null, is_private?: bool|null, locale: null|string, name: null|string, preferred_language?: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified?: bool|null}
+     * @return array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
      */
     private static function getProfileDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
