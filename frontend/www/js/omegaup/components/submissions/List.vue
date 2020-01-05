@@ -4,6 +4,14 @@
       <h1 class="text-center">
         {{ T.submissionsListTitle }}
       </h1>
+      <h4 v-if="!includeUser && submissions.length > 0">
+        {{ T.wordsBy }}
+        <omegaup-username
+          v-bind:username="submissions[0].username"
+          v-bind:classname="submissions[0].classname"
+          v-bind:linkify="true"
+        ></omegaup-username>
+      </h4>
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">
