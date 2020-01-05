@@ -65,7 +65,6 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertEquals(1, $response['verified']);
-        $this->assertEquals('ok', $response['status']);
     }
 
     /**
