@@ -324,7 +324,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Get all relevant identities for a problemset.
      *
-     * @return array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[]
+     * @return list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}>
      */
     final public static function getAllRelevantIdentities(
         int $problemsetId,
@@ -445,7 +445,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[] */
+        /** @var list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}> */
         $result = [];
         /** @var array{classname: string, country_id: string, identity_id: int, is_invited: int, name: null|string, username: string} $row */
         foreach (
@@ -455,7 +455,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ) as $row
         ) {
             $row['is_invited'] = boolval($row['is_invited']);
-            array_push($result, $row);
+            $result[] = $row;
         }
         return $result;
     }
@@ -512,7 +512,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}[]
+     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}>
      */
     final public static function getProblemsetRuns(
         \OmegaUp\DAO\VO\Problemsets $problemset,
