@@ -219,7 +219,7 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MissingParamType occurrences="15">
+    <MissingParamType occurrences="14">
       <code>$username</code>
       <code>$name</code>
       <code>$gender</code>
@@ -234,15 +234,8 @@
       <code>$password</code>
       <code>$gender</code>
       <code>$aliasGroup</code>
-      <code>$lang</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>validateGroupOwnership</code>
-      <code>saveIdentityGroup</code>
-      <code>validateUpdateRequest</code>
-      <code>validateIdentity</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="17">
+    <MixedArgument occurrences="14">
       <code>$r['group_alias']</code>
       <code>$r['original_username']</code>
       <code>$r['username']</code>
@@ -253,24 +246,14 @@
       <code>$name</code>
       <code>$gender</code>
       <code>$password</code>
-      <code>$_SERVER['HTTP_ACCEPT_LANGUAGE']</code>
-      <code>$lang_parse[1]</code>
-      <code>$lang_parse[1]</code>
-      <code>$lang_parse[4]</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$langCode</code>
     </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="4">
-      <code>$group</code>
-      <code>$group</code>
+    <MixedAssignment occurrences="2">
       <code>$val</code>
       <code>$langWeight</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="2">
-      <code>$group-&gt;group_id</code>
-      <code>$group-&gt;group_id</code>
-    </MixedPropertyFetch>
     <PossiblyNullArgument occurrences="1">
       <code>$identity-&gt;username</code>
     </PossiblyNullArgument>

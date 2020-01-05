@@ -369,6 +369,7 @@ const translations = {
 	groupNewFormOnlyAC: "Contar s\u00f3lo ACs",
 	groupNewFormUpdateGroup: "Guardar cambios",
 	groupNewFormWeight: "Peso del puntaje",
+	groupNotFound: "Grupo no encontrado",
 	groupsCreateNew: "Crear grupo",
 	groupsIdentitiesSuccessfullyCreated: "Las identidades han sido creadas y ligadas al grupo.",
 	groupsIdentityWarning: "Guarda las contrase\u00f1as en un lugar seguro, porque una vez que crees las identidades, no habr\u00e1 forma de recuperar las contrase\u00f1as.",
