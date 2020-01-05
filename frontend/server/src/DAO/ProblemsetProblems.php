@@ -101,7 +101,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{title: string, problem_id: int, alias: string, visibility: bool, visits: int, submissions: int, accepted: int, difficulty: float, order: int, languages: string, points: float, commit: string, version: string}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -115,7 +115,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     p.visits,
                     p.submissions,
                     p.accepted,
-                    p.difficulty,
+                    IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
                     pp.points,
@@ -132,25 +132,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        $result = [];
-        /** @var array{accepted: int, alias: string, commit: string, difficulty: float|null, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int} $row */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                [$problemsetId]
-            ) as $row
-        ) {
-            $row['problem_id'] = intval($row['problem_id']);
-            $row['visibility'] = boolval($row['visibility']);
-            $row['visits'] = intval($row['visits']);
-            $row['submissions'] = intval($row['submissions']);
-            $row['accepted'] = intval($row['accepted']);
-            $row['difficulty'] = floatval($row['difficulty']);
-            $row['order'] = intval($row['order']);
-            $row['points'] = floatval($row['points']);
-            $result[] = $row;
-        }
-        return $result;
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId]
+        );
     }
 
     /*
