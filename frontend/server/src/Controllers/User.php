@@ -1739,8 +1739,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiList(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
-
         $param = '';
         if (!is_null($r['term'])) {
             $param = 'term';
