@@ -62,10 +62,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $hashedPassword = null;
         if (!$ignorePassword) {
             \OmegaUp\SecurityTools::testStrongPassword(
-                $createUserParams->password
+                strval($createUserParams->password)
             );
             $hashedPassword = \OmegaUp\SecurityTools::hashString(
-                $createUserParams->password
+                strval($createUserParams->password)
             );
         }
 
@@ -84,7 +84,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 !is_null($identity) &&
                 $identity->user_id === $identityByEmail->user_id &&
                 \OmegaUp\SecurityTools::compareHashedStrings(
-                    $createUserParams->password,
+                    strval($createUserParams->password),
                     strval($identity->password)
                 )
             ) {
@@ -1152,7 +1152,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
 
         $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
-            $user->user_id
+            intval($user->user_id)
         );
         if (is_null($userDb)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -1176,7 +1176,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $response['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5(
-            $response['email']
+            strval($response['email'])
         ) . '?s=92';
 
         return $response;
@@ -1615,7 +1615,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
             // Grab the place of the current identity in the given contest
             foreach ($scoreboardResponse['ranking'] as $identityData) {
-                if ($identityData['username'] == $identity->username) {
+                if (
+                    $identityData['username'] == $identity->username &&
+                    isset($identityData['place'])
+                ) {
                     $contests[$contest['alias']]['place'] = $identityData['place'];
                     break;
                 }
@@ -2455,12 +2458,14 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    $r2 = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
+                    [
+                        'request' => $r2,
+                    ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
                         'problemset_id' => $tokens[2],
                         'auth_token' => $r['auth_token'],
                         'tokens' => $tokens
                     ]));
-                    if ($r2['contest_admin']) {
+                    if (!empty($r2['contest_admin']) && $r2['contest_admin']) {
                         $response['contest_admin'][] = strval(
                             $r2['contest_alias']
                         );
