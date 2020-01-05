@@ -25,10 +25,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{clarification_id: int}
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
@@ -100,15 +99,14 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'clarification_id' => $clarification->clarification_id,
+            'clarification_id' => intval($clarification->clarification_id),
         ];
     }
 
     /**
      * API for getting a clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
@@ -139,7 +137,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Add the clarificatoin the response
+        /** @var array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null} */
         return $clarification->asFilteredArray([
             'message',
             'answer',
@@ -152,10 +150,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Update a clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      */
-    public static function apiUpdate(\OmegaUp\Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
