@@ -226,11 +226,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/src/Controllers/Grader.php">
-    <MissingReturnType occurrences="1">
-      <code>validateRequest</code>
-    </MissingReturnType>
-  </file>
   <file src="frontend/server/src/Controllers/Group.php">
     <MissingReturnType occurrences="5">
       <code>apiAddUser</code>
