@@ -629,47 +629,7 @@
       <code>$value</code>
       <code>$value</code>
     </MissingClosureParamType>
-    <MissingClosureReturnType occurrences="1">
-      <code>function ($value) {</code>
-      <code>function ($value) {</code>
-    </MissingClosureReturnType>
-    <MissingParamType occurrences="2">
-      <code>$problemset_id</code>
-      <code>$user_id</code>
-    </MissingParamType>
-    <MissingPropertyType occurrences="2">
-      <code>$sendEmailOnVerify</code>
-      <code>$permissionKey</code>
-    </MissingPropertyType>
-    <MissingReturnType occurrences="26">
-      <code>apiLogin</code>
-      <code>apiMailingListBackfill</code>
-      <code>omiPrepareUser</code>
-      <code>apiCoderOfTheMonthList</code>
-      <code>userOpenedProblemset</code>
-      <code>apiInterviewStats</code>
-      <code>apiList</code>
-      <code>apiStats</code>
-      <code>deleteProblemsSolvedRankCacheList</code>
-      <code>apiUpdateMainEmail</code>
-      <code>apiValidateFilter</code>
-      <code>validateUser</code>
-      <code>validateAddRemoveRole</code>
-      <code>apiAddRole</code>
-      <code>apiRemoveRole</code>
-      <code>apiAddGroup</code>
-      <code>apiRemoveGroup</code>
-      <code>validateAddRemoveExperiment</code>
-      <code>apiAddExperiment</code>
-      <code>apiRemoveExperiment</code>
-      <code>getPrivacyPolicy</code>
-      <code>apiLastPrivacyPolicyAccepted</code>
-      <code>apiAcceptPrivacyPolicy</code>
-      <code>apiAssociateIdentity</code>
-      <code>apiListAssociatedIdentities</code>
-      <code>apiGenerateGitToken</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="12">
+    <MixedArgument occurrences="9">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -677,9 +637,6 @@
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$user_id</code>
-      <code>$problemset_id</code>
-      <code>$r[$param]</code>
       <code>$r['username']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -718,9 +675,6 @@
       <code>$identity</code>
       <code>$user-&gt;main_identity_id</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayOffset occurrences="1">
-      <code>$usersAdded</code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullPropertyAssignment occurrences="2">
       <code>$identity</code>
       <code>$r-&gt;user</code>
@@ -804,14 +758,6 @@
       <code>$_REQUEST['badge_alias']</code>
     </MixedArgument>
   </file>
-  <file src="frontend/www/coderofthemonth.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
-    <MixedAssignment occurrences="1">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/interviews/arena.php">
     <MixedAssignment occurrences="1">
       <code>$show_intro</code>
@@ -827,9 +773,6 @@
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$response</code>
-    </MixedAssignment>
     <MixedOperand occurrences="4">
       <code>$redirect_parsed_url['scheme']</code>
       <code>$redirect_parsed_url['host']</code>
