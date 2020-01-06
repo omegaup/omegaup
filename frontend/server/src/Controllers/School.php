@@ -11,16 +11,16 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
-     * @param \OmegaUp\Request $r
+     * @return list<array{id: int, label: string, value: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         $param = '';
-        if (!is_null($r['term'])) {
-            $param = 'term';
-        } elseif (!is_null($r['query'])) {
-            $param = 'query';
+        if (is_string($r['term'])) {
+            $param = $r['term'];
+        } elseif (is_string($r['query'])) {
+            $param = $r['query'];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -28,15 +28,13 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $schools = \OmegaUp\DAO\Schools::findByName($r[$param]);
-        if (is_null($schools)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
-        }
-
         $response = [];
-        foreach ($schools as $school) {
-            $entry = ['label' => $school->name, 'value' => $school->name, 'id' => $school->school_id];
-            array_push($response, $entry);
+        foreach (\OmegaUp\DAO\Schools::findByName($param) as $school) {
+            $response[] = [
+                'label' => strval($school->name),
+                'value' => strval($school->name),
+                'id' => intval($school->school_id),
+            ];
         }
 
         return $response;
@@ -236,10 +234,10 @@ class School extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
 
-        /** @var list<array{school_id: int, name: string, country_id: string, score: float}> */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
+            /** @return list<array{school_id: int, name: string, country_id: string, score: float}> */
             function () use (
                 $date,
                 $rowcount
@@ -275,7 +273,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the historical rank of schools
      *
-     * @return array{rank: list<array{school_id: int, rank: int, score: float, name: string, country_id: int}>, totalRows: int}
+     * @return array{rank: list<array{country_id: string|null, name: string, rank: int|null, school_id: int, score: float}>, totalRows: int}
      */
     public static function apiRank(\OmegaUp\Request $r) {
         $r->ensureInt('offset', null, null, false);
@@ -284,10 +282,10 @@ class School extends \OmegaUp\Controllers\Controller {
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
-        /** @var array{rank: list<array{school_id: int, country_id: int, rank: int, score: float, name: string}>, totalRows: int} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
             "{$offset}-{$rowCount}",
+            /** @return array{rank: list<array{country_id: string|null, name: string, rank: int|null, school_id: int, score: float}>, totalRows: int} */
             function () use (
                 $offset,
                 $rowCount

@@ -16,13 +16,11 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
             $courseData['admin']
         );
-        $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
-            ]));
-
-        $this->assertEquals('ok', $response['status']);
+        ]));
 
         // Validate student was added
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
@@ -131,19 +129,17 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
             $courseData['admin']
         );
-        $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $this->assertEquals('ok', $response['status']);
 
-        $response = \OmegaUp\Controllers\Course::apiRemoveStudent(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiRemoveStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias']
         ]));
-        $this->assertEquals('ok', $response['status']);
 
         // Validate student was removed.
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
@@ -205,13 +201,11 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
-        $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
-            ]));
-
-        $this->assertEquals('ok', $response['status']);
+        ]));
 
         // Validate student was added
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
@@ -267,11 +261,10 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Before adding student to public course, intro should show
         $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
-        $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPublic['course_alias']
-            ]));
-        $this->assertEquals('ok', $details['status']);
+        ]));
 
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
             $courseDataPublic['admin']

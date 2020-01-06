@@ -14,7 +14,10 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class States extends \OmegaUp\DAO\Base\States {
-    final public static function getByCountry($countryId) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\States>
+     */
+    final public static function getByCountry(string $countryId): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -22,6 +25,7 @@ class States extends \OmegaUp\DAO\Base\States {
                 WHERE
                     country_id = ?;';
 
+        /** @var list<array{country_id: string, name: string, state_id: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$countryId]
@@ -29,7 +33,7 @@ class States extends \OmegaUp\DAO\Base\States {
 
         $states = [];
         foreach ($rs as $row) {
-            array_push($states, new \OmegaUp\DAO\VO\States($row));
+            $states[] = new \OmegaUp\DAO\VO\States($row);
         }
         return $states;
     }

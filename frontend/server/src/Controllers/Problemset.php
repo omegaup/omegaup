@@ -6,7 +6,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
-    ) {
+    ): void {
         if (
             $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
             $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
@@ -26,7 +26,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     public static function addProblem(
-        $problemset_id,
+        int $problemsetId,
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $currentVersion,
@@ -34,7 +34,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         float $points,
         int $order_in_contest = 1,
         bool $validateVisibility = true
-    ) {
+    ): void {
         if ($validateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
@@ -43,7 +43,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         }
 
         self::updateProblemsetProblem(new \OmegaUp\DAO\VO\ProblemsetProblems([
-            'problemset_id' => $problemset_id,
+            'problemset_id' => $problemsetId,
             'problem_id' => $problem->problem_id,
             'commit' => $commit,
             'version' => $currentVersion,
@@ -58,7 +58,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      */
     private static function updateProblemsetProblem(
         \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem
-    ) {
+    ): void {
         $oldProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
@@ -82,40 +82,39 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             );
         }
         \OmegaUp\DAO\Runs::recalculateScore(
-            $updatedProblemsetProblem->problemset_id,
-            $updatedProblemsetProblem->problem_id,
+            intval($updatedProblemsetProblem->problemset_id),
+            intval($updatedProblemsetProblem->problem_id),
             $updatedProblemsetProblem->points,
             $oldProblemsetProblem->points
         );
     }
 
-    /**
-     * @param $r
-     * @return Array
-     */
     public static function apiDetails(\OmegaUp\Request $r) {
-        $r = self::wrapRequest($r);
+        [
+            'problemset' => $problemset,
+            'request' => $r,
+        ] = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] == 'Contest') {
+        if ($problemset['type'] == 'Contest') {
             return \OmegaUp\Controllers\Contest::apiDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'contest_alias' => $r['problemset']['contest_alias']
+                    'contest_alias' => $problemset['contest_alias']
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Assignment') {
+        } elseif ($problemset['type'] == 'Assignment') {
             return \OmegaUp\Controllers\Course::apiAssignmentDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'course' => $r['problemset']['course'],
-                    'assignment' => $r['problemset']['assignment'],
+                    'course' => $problemset['course'],
+                    'assignment' => $problemset['assignment'],
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Interview') {
+        } elseif ($problemset['type'] == 'Interview') {
             return \OmegaUp\Controllers\Interview::apiDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'interview_alias' => $r['problemset']['interview_alias'],
+                    'interview_alias' => $problemset['interview_alias'],
                 ])
             );
         }
@@ -123,27 +122,29 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param $r
-     * @return Array
+     * @return array{finish_time?: int, problems?: array<int, array{alias: string, order: int}>, ranking?: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time?: int, time?: int, title?: string}
      */
-    public static function apiScoreboard(\OmegaUp\Request $r) {
-        $r = self::wrapRequest($r);
+    public static function apiScoreboard(\OmegaUp\Request $r): array {
+        [
+            'problemset' => $problemset,
+            'request' => $r,
+        ] = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] == 'Contest') {
+        if ($problemset['type'] == 'Contest') {
             return \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
-                    'contest_alias' => $r['problemset']['contest_alias']
+                    'contest_alias' => $problemset['contest_alias']
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Assignment') {
+        } elseif ($problemset['type'] == 'Assignment') {
             return \OmegaUp\Controllers\Course::apiAssignmentScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
-                    'course' => $r['problemset']['course'],
-                    'assignment' => $r['problemset']['assignment'],
+                    'course' => $problemset['course'],
+                    'assignment' => $problemset['assignment'],
                 ])
             );
         }
@@ -154,26 +155,29 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the Scoreboard events
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}>}
      */
-    public static function apiScoreboardEvents(\OmegaUp\Request $r) {
-        $r = self::wrapRequest($r);
+    public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
+        [
+            'problemset' => $problemset,
+            'request' => $r,
+        ] = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] == 'Contest') {
+        if ($problemset['type'] == 'Contest') {
             return \OmegaUp\Controllers\Contest::apiScoreboardEvents(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'contest_alias' => $r['problemset']['contest_alias'],
+                    'contest_alias' => $problemset['contest_alias'],
                 ])
             );
-        } elseif ($r['problemset']['type'] == 'Assignment') {
+        } elseif ($problemset['type'] == 'Assignment') {
             return \OmegaUp\Controllers\Course::apiAssignmentScoreboardEvents(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'course' => $r['problemset']['course'],
-                    'assignment' => $r['problemset']['assignment'],
+                    'course' => $problemset['course'],
+                    'assignment' => $problemset['assignment'],
                     'token' => $r['token'],
                 ])
             );
@@ -188,24 +192,27 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
      * $r['tokens'][2] = Id of entity ($tokens[2])
      * $r['tokens'][3] = Token given by the filter
+     *
      * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
      */
-    public static function wrapRequest(\OmegaUp\Request $r) {
+    public static function wrapRequest(\OmegaUp\Request $r): array {
         $r->ensureInt('problemset_id');
 
-        $r['problemset'] = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
+        $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
             $r['problemset_id']
         );
-        if (is_null($r['problemset'])) {
+        if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
-        if ($r['problemset']['type'] == 'Contest') {
+        if ($problemset['type'] == 'Contest') {
             $request = new \OmegaUp\Request([
                 'token' => $r['token'],
                 'problemset_id' => $r['problemset_id'],
-                'contest_alias' => $r['problemset']['contest_alias'],
+                'contest_alias' => $problemset['contest_alias'],
             ]);
             if (isset($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
@@ -214,12 +221,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 $request['token'] = $r['tokens'][3];
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails($request);
-            $request['problemset'] = $r['problemset'];
             $request['contest_alias'] = $response['contest_alias'];
             $request['contest_admin'] = $response['contest_admin'];
-            return $request;
+            return [
+                'problemset' => $problemset,
+                'request' => $request,
+            ];
         }
-        return $r;
+        return [
+            'problemset' => $problemset,
+            'request' => $r,
+        ];
     }
 
     /**

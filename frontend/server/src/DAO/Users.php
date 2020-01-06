@@ -15,6 +15,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -36,6 +37,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     i.username = ?
                 LIMIT 1;';
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$username]
@@ -46,7 +48,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function IsUserInterviewer($user_id) {
+    public static function IsUserInterviewer(int $userId): bool {
         $sql = '
             SELECT
                 COUNT(*)
@@ -54,11 +56,12 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 User_Roles ur
             WHERE
                 ur.user_id = ? AND ur.role_id = 4;';
-        $params = [$user_id];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            $params
-        ) > 0;
+            [$userId]
+        );
+        return $count > 0;
     }
 
     /**
@@ -76,11 +79,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
     /**
      * @param int $user_id
-     * @return null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string}
+     * @return array{country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
     */
     final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
-                    COALESCE(c.`name`, "xx") AS country,
+                    IFNULL(c.`name`, "xx") AS country,
                     c.`country_id` AS country_id,
                     s.`name` AS state,
                     s.`state_id` AS state_id,
@@ -110,30 +113,34 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LIMIT
                     1;';
         $params = [$user_id];
-        /** @var null|array{country: ?string, country_id: ?int, state: ?string, state_id: ?int, school: ?string, school_id: ?int, graduation_date: ?string, email: string, locale: ?string} */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        return $rs;
+        /** @var array{country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
     }
 
-    public static function getHideTags($identity_id) {
-        if (is_null($identity_id)) {
+    public static function getHideTags(?int $identityId): bool {
+        if (is_null($identityId)) {
             return false;
         }
-        $sql = 'SELECT
-                    `Users`.`hide_problem_tags`
-                FROM
-                    Users
-                INNER JOIN
-                    Identities
-                ON
-                    Users.user_id = Identities.user_id
-                WHERE
-                    identity_id = ?
-                LIMIT
-                    1;';
-        $params = [$identity_id];
+        $sql = '
+            SELECT
+                `Users`.`hide_problem_tags`
+            FROM
+                Users
+            INNER JOIN
+                Identities
+            ON
+                Users.user_id = Identities.user_id
+            WHERE
+                identity_id = ?
+            LIMIT
+                1;
+        ';
+        $params = [$identityId];
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return boolval(
+            /** @var bool|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
     public static function getRankingClassName(?int $userId): string {
@@ -178,6 +185,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             LIMIT 1;
         ';
 
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationId]
@@ -213,7 +221,13 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
     }
 
-    final public static function getVerified($verified, $in_mailing_list) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\Users>
+     */
+    final public static function getVerified(
+        bool $verified,
+        bool $inMailingList
+    ): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -223,23 +237,25 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 AND
                     in_mailing_list = ?';
 
+        /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: null|string, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$verified, $in_mailing_list]
+            [$verified, $inMailingList]
         );
 
         $users = [];
         foreach ($rs as $row) {
-            array_push($users, new \OmegaUp\DAO\VO\Users($row));
+            $users[] = new \OmegaUp\DAO\VO\Users($row);
         }
         return $users;
     }
 
-    public static function getUsersCount() {
+    public static function getUsersCount(): int {
         $sql = 'SELECT
-                    COUNT(*) AS total
+                    COUNT(*)
                 FROM
                     Users;';
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql)['total'];
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
     }
 }

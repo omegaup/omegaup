@@ -34,6 +34,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -70,6 +71,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
+        /** @var array{accepted: bool|null, country: null|string, country_id: null|string, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string, user_id: int|null, username: string, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

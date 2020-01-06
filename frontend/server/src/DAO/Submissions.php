@@ -16,6 +16,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
+        /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, submission_id: int, submit_delay: int, time: string, type: null|string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -52,6 +53,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -75,6 +77,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemId, $problemsetId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -94,6 +97,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ';
         $val = [$problemsetId];
 
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -133,6 +137,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $val = [$identityId, $problemId, $problemsetId];
         }
 
+        /** @var int|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
@@ -159,7 +164,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return array{submissions: list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
+     * @return array{submissions: list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: int, title: string, username: string, verdict: string}>, totalRows: int}
      */
     public static function getLatestSubmissions(
         int $page,
@@ -226,7 +231,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.verdict,
                 r.runtime,
                 r.memory,
-                COALESCE (
+                IFNULL(
                     (
                         SELECT urc.classname
                         FROM User_Rank_Cutoffs urc
@@ -274,7 +279,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
 
         $query .=  $sqlOrderBy . $sqlLimit;
 
-        /** @var list<array{time: int, username: string, school_id: int, school_name: string, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}> */
+        /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: int, title: string, username: string, verdict: string}> */
         $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params

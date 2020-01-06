@@ -54,7 +54,6 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
             'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['status'], 'ok');
         $this->assertEquals($response['user'], $identity->username);
         $this->assertEquals($response['admin'], false);
         $this->assertEmpty($response['problem_admin']);

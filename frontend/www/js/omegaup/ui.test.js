@@ -118,12 +118,14 @@ ____
 github flavored markdown
 \`\`\`
 
-> hi
-> hello
+> hi <
+> hello <
 
     other kind of blockquote
 
 Other escapes: $~~T~D~E32E
+
+Tags <b>hello</b>
 ||output
 0
 ||end`),
@@ -152,12 +154,14 @@ ____
 github flavored markdown
 \`\`\`
 
-> hi
-> hello
+&gt; hi &lt;
+&gt; hello &lt;
 
     other kind of blockquote
 
-Other escapes: $~~T~D~E32E</pre></td><td><pre>0</pre></td></tr></tbody>
+Other escapes: $~~T~D~E32E
+
+Tags &lt;b&gt;hello&lt;/b&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
 </table>`);
     });
 

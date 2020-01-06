@@ -34,6 +34,7 @@
                 <li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
                 <li><a href="/problem/mine/">{#navMyProblems#}</a></li>
                 <li><a href="/problem/">{#wordsProblems#}</a></li>
+                <li><a href="/submissions/">{#wordsLatestSubmissions#}</a></li>
                 <li><a href="/nomination/mine/">{#navMyQualityNomination#}</a></li>
                 {if $CURRENT_USER_IS_REVIEWER eq '1'}
                   <li><a href="/nomination/">{#navQualityNominationQueue#}</a></li>
