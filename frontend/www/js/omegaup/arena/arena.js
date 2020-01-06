@@ -641,12 +641,8 @@ export class Arena {
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
 
-    // The following code is only for courses
-    if (typeof problemset.courseAssignments === 'undefined') {
-      return;
-    }
-
     if (
+      typeof problemset.courseAssignments !== 'undefined' &&
       document.getElementById('arena-navbar-assignments') !== null &&
       self.elements.assignmentsNav === null
     ) {

@@ -53,27 +53,24 @@ export default class ArenaNavbarAssignments extends Vue {
   T = T;
 
   get previousAssignment(): omegaup.Assignment | null {
-    // Getting index of current assignment
-    const currentAssignmentIndex = this.assignments.findIndex(
-      assignment => assignment.alias === this.currentAssignmentAlias,
-    );
-
-    if (currentAssignmentIndex === 0) {
+    if (this.currentAssignmentIndex === 0) {
       return null;
     }
-    return this.assignments[currentAssignmentIndex - 1];
+    return this.assignments[this.currentAssignmentIndex - 1];
   }
 
   get nextAssignment(): omegaup.Assignment | null {
-    // Getting index of current assignment
-    const currentAssignmentIndex = this.assignments.findIndex(
-      assignment => assignment.alias === this.currentAssignmentAlias,
-    );
-
-    if (currentAssignmentIndex === this.assignments.length - 1) {
+    if (this.currentAssignmentIndex === this.assignments.length - 1) {
       return null;
     }
-    return this.assignments[currentAssignmentIndex + 1];
+    return this.assignments[this.currentAssignmentIndex + 1];
+  }
+
+  private get currentAssignmentIndex(): number {
+    // Getting index of current assignment
+    return this.assignments.findIndex(
+      assignment => assignment.alias === this.currentAssignmentAlias,
+    );
   }
 }
 </script>
