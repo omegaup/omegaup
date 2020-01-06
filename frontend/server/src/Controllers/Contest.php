@@ -436,7 +436,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
-     * @return array{needsBasicInformation?: bool, requestsUserInformation?: false, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}
+     * @return array{inContest?: bool, smartyProperties: array{needsBasicInformation?: bool, requestsUserInformation?: false, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
      */
     public static function getContestDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3124,7 +3124,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get user
         $r->ensureIdentity();
 
-        $contest = self::validateStats($r['contest_alias'], $r->identity);
+        $contest = self::validateStats(
+            strval(
+                $r['contest_alias']
+            ),
+            $r->identity
+        );
 
         $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset(
             intval(

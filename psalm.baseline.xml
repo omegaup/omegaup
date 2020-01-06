@@ -618,11 +618,6 @@
       <code>$qualityReviewerGroup-&gt;group_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/www/arena/contest.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['contest_alias'] ?? ''</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/www/arena/problem.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$key</code>
