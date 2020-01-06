@@ -80,7 +80,8 @@ class Run {
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
      * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
      * @param \OmegaUp\DAO\VO\Identities $participant
-     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
+     *
+     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
     public static function createCourseAssignmentRun(
         $problemData,
@@ -128,7 +129,7 @@ class Run {
      * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
      * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $contestant
-     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
     public static function createRun(
         array $problemData,
@@ -162,7 +163,7 @@ class Run {
      *
      * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
      * @param \OmegaUp\DAO\VO\Identities $contestant
-     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
+     * @return array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}
      */
     public static function createRunToProblem(
         array $problemData,
@@ -205,7 +206,7 @@ class Run {
     /**
      * Given a run, set a score to a given run
      *
-     * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}  $runData     The run.
+     * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}}  $runData     The run.
      * @param float   $points      The score of the run
      * @param string  $verdict     The verdict of the run.
      * @param ?int    $submitDelay The number of minutes worth of penalty.

@@ -3,7 +3,10 @@
 /** @psalm-suppress MissingDependency we need to add PHPUnit */
 class AdminTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPlatformReportStatsRequiresAdmin() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         try {
@@ -17,11 +20,15 @@ class AdminTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testPlatformReportStats() {
-        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        [
+            'user' => $admin,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
-        \OmegaUp\Controllers\Admin::apiPlatformReportStats(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Admin::apiPlatformReportStats(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
+        $this->assertNotEmpty($response['report']);
     }
 }

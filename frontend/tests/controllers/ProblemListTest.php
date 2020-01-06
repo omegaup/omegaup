@@ -116,7 +116,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => "tag-$j",
             ]));
-            $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tag $j.
             $this->assertCount($n - $j, $response['results']);
@@ -132,7 +131,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => $plainTags,
             ]));
-            $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tags 0 through $j.
             $this->assertCount($n - $j, $response['results']);
@@ -287,7 +285,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => 'test-tag-2,test-tag-3',
+            'tag' => ['test-tag-2', 'test-tag-3'],
             'require_all_tags' => false,
             'difficulty_range' => '1,4',
             'order_by' => 'quality',
@@ -393,21 +391,18 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => 'a',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_a_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'tag' => 'a,b',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ab_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'tag' => 'a,c',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ac_results[$i], $response['results']);
         }
     }
@@ -533,8 +528,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             'usernameOrEmail' => $addedIdentityAdmin->username,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
-
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
         $this->assertArrayContainsInKey(
@@ -599,8 +592,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             'group' => $group['group']->alias,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
-
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -651,8 +642,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             'group' => $group['group']->alias,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
-
         // It should be visible just once.
         $r = new \OmegaUp\Request([
             'auth_token' => $authorLogin->auth_token,
@@ -693,8 +682,6 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
-
-        $this->assertEquals('ok', $response['status']);
 
         // This should be visible exactly once.
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([

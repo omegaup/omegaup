@@ -8,7 +8,10 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
         return [
             'smartyProperties' => [],
             'template' => 'arena.contest.admin.tpl',
-            'inContest' => true,
+            'inContest' => (
+                !isset($_REQUEST['is_practice']) ||
+                boolval($_REQUEST['is_practice']) !== true
+            ),
         ];
     }
 );

@@ -178,7 +178,7 @@ class UITools {
 
     private static function assignSmartyNavbarHeader(
         \Smarty $smarty,
-        bool $inContest
+        bool $inContest = false
     ): void {
         [
             'email' => $email,
@@ -219,18 +219,11 @@ class UITools {
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
-        $r = new Request($_REQUEST);
-        $inContest = false;
         try {
-            $response = $callback($r);
+            $response = $callback(new Request($_REQUEST));
             $smartyProperties = $response['smartyProperties'];
             $template = $response['template'];
-            if (isset($response['inContest'])) {
-                $r->ensureBool('is_practice', false);
-                $inContest = $response['inContest'] && (
-                    !isset($r['is_practice']) || $r['is_practice'] !== true
-                );
-            }
+            $inContest = $response['inContest'] ?? false;
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
