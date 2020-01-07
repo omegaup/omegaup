@@ -195,72 +195,6 @@
       <code>$identity-&gt;username</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/src/Controllers/Interview.php">
-    <InvalidArgument occurrences="1">
-      <code>$r</code>
-    </InvalidArgument>
-    <MissingParamType occurrences="2">
-      <code>$is_update</code>
-      <code>$r</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="7">
-      <code>validateCreateOrUpdate</code>
-      <code>apiCreate</code>
-      <code>apiAddUsers</code>
-      <code>addUserInternal</code>
-      <code>apiDetails</code>
-      <code>apiList</code>
-      <code>showIntro</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="5">
-      <code>$r</code>
-      <code>$r-&gt;identity</code>
-      <code>$r['interview']</code>
-      <code>$r['user']-&gt;main_email_id</code>
-      <code>$r['contest_alias'] ?? ''</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="14">
-      <code>$r['interview_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['interview']</code>
-      <code>$r['user']</code>
-      <code>$r['interview']</code>
-      <code>$r['interview']</code>
-      <code>$r['interview']</code>
-      <code>$r['interview']</code>
-      <code>$r['user']</code>
-      <code>$r['interview']</code>
-      <code>$r['interview']</code>
-      <code>$r['user']</code>
-      <code>$r['user']</code>
-      <code>$r['username']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$r['user']</code>
-    </MixedAssignment>
-    <MixedOperand occurrences="4">
-      <code>$r['alias']</code>
-      <code>$newUserRequest['username']</code>
-      <code>$newUserRequest['password']</code>
-      <code>$r['username']</code>
-    </MixedOperand>
-    <MixedPropertyFetch occurrences="10">
-      <code>$newUserRequest['user']-&gt;verification_id</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$newUserRequest['user']-&gt;verification_id</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$r-&gt;identity</code>
-      <code>$r['interview']-&gt;problemset_id</code>
-      <code>$r['user']-&gt;main_identity_id</code>
-      <code>$r['user']-&gt;main_email_id</code>
-    </MixedPropertyFetch>
-    <PossiblyNullOperand occurrences="5">
-      <code>\OmegaUp\Translations::getInstance()-&gt;get('profileUsername')</code>
-      <code>\OmegaUp\Translations::getInstance()-&gt;get('loginPassword')</code>
-    </PossiblyNullOperand>
-  </file>
   <file src="frontend/server/src/Controllers/Problem.php">
     <InvalidArgument occurrences="1">
       <code>$r</code>
@@ -648,11 +582,6 @@
     <MixedArgument occurrences="1">
       <code>$_REQUEST['badge_alias']</code>
     </MixedArgument>
-  </file>
-  <file src="frontend/www/interviews/arena.php">
-    <MixedAssignment occurrences="1">
-      <code>$show_intro</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/www/login.php">
     <MissingParamType occurrences="1">
