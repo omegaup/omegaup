@@ -176,8 +176,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    /*
+    /**
      * Gets an array of the guids of the pending runs
+     *
+     * @return list<string>
      */
     final public static function getPendingRunsOfProblem(
         int $problemId
@@ -950,6 +952,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * Gets the runs that were inserted due to a version change.
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
+     * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function getNewRunsForVersion(\OmegaUp\DAO\VO\Problems $problem): array {
         $sql = '

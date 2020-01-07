@@ -74,7 +74,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var string
+     * @var string|null
      */
     public $source;
 

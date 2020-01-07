@@ -443,7 +443,7 @@ class Validators {
 
     /**
      *
-     * @param mixed $parameter
+     * @param string|list<string>|null $parameter
      * @param string $parameterName
      * @param array $enum
      * @param bool $required
@@ -457,12 +457,6 @@ class Validators {
     ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
-        }
-        if (!is_string($parameter) && !is_array($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                $parameterName
-            );
         }
 
         $badElements = [];

@@ -734,7 +734,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @return array{admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{contest_score: int, judged_by: string, score: int, verdict: string}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -816,7 +816,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{compile_error?: string, details?: array{compile_meta: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, source: string}
+     * @return array{compile_error?: string, details?: array{contest_score: int, judged_by: string, score: int, verdict: string}, source: string}
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -850,7 +850,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{compile_error?: string, details?: array{compile_meta: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, source: string}
+     * @return array{compile_error?: string, details?: array{contest_score: int, judged_by: string, score: int, verdict: string}, source: string}
      */
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
@@ -914,6 +914,9 @@ class Run extends \OmegaUp\Controllers\Controller {
         exit;
     }
 
+    /**
+     * @return bool|null|string
+     */
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,

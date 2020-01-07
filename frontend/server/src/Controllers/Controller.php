@@ -153,6 +153,7 @@ class Controller {
                     $important = $info['important'];
                 }
             }
+            $value = null;
             if (!is_null($params)) {
                 if (is_null($params->$fieldName)) {
                     continue;
@@ -160,13 +161,16 @@ class Controller {
                 // Get or calculate new value.
                 /** @var null|mixed */
                 $value = $params->$fieldName;
-            } else {
+            } elseif (!is_null($request)) {
                 if (is_null($request[$fieldName])) {
                     continue;
                 }
                 // Get or calculate new value.
                 /** @var null|mixed */
                 $value = $request[$fieldName];
+            }
+            if (is_null($value)) {
+                continue;
             }
             if (!is_null($transform)) {
                 /** @var mixed */
