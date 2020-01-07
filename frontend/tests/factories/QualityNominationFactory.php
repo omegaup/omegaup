@@ -6,23 +6,29 @@
  * @author heduenas
  */
 class QualityNominationFactory {
+    /** @var list<\OmegaUp\DAO\VO\Identities> */
     public static $reviewers = [];
 
-    public static function initQualityReviewers() {
+    public static function initQualityReviewers(): void {
         $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
             \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
         );
+        if (is_null($qualityReviewerGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
         for ($i = 0; $i < 5; $i++) {
-            ['user' => $reviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            [
+                'identity' => $identity,
+            ] = \OmegaUp\Test\Factories\User::createUser();
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => $qualityReviewerGroup->group_id,
+                'group_id' => intval($qualityReviewerGroup->group_id),
                 'identity_id' => $identity->identity_id,
             ]));
             self::$reviewers[] = $identity;
         }
     }
 
-    public static function initTags() {
+    public static function initTags(): void {
         \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'dp']));
         \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'math']));
         \OmegaUp\DAO\Tags::create(
@@ -88,12 +94,12 @@ class QualityNominationFactory {
     }
 
     /**
-     * @param \OmegaUp\Test\ScopedLoginToken $login
      * @param string $problemAlias
      * @param null|int $difficulty
      * @param null|int $quality
      * @param null|string[] $tags
      * @param bool $beforeAC
+     *
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createSuggestion(

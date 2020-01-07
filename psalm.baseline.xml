@@ -457,44 +457,11 @@
     </PossiblyNullPropertyFetch>
     <UndefinedMethod occurrences="1"/>
   </file>
-  <file src="frontend/tests/factories/ClarificationsFactory.php">
-    <InvalidParamDefault occurrences="2">
-      <code>type</code>
-      <code>type</code>
-    </InvalidParamDefault>
-    <MissingReturnType occurrences="2">
-      <code>createClarification</code>
-      <code>answer</code>
-    </MissingReturnType>
-    <UndefinedDocblockClass occurrences="9">
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-    </UndefinedDocblockClass>
-  </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
     <PossiblyNullPropertyAssignment occurrences="2">
       <code>$unassociatedIdentity</code>
       <code>$associatedIdentity</code>
     </PossiblyNullPropertyAssignment>
-  </file>
-  <file src="frontend/tests/factories/QualityNominationFactory.php">
-    <MissingPropertyType occurrences="1">
-      <code>$reviewers</code>
-    </MissingPropertyType>
-    <MissingReturnType occurrences="2">
-      <code>initQualityReviewers</code>
-      <code>initTags</code>
-    </MissingReturnType>
-    <PossiblyNullPropertyFetch occurrences="1">
-      <code>$qualityReviewerGroup-&gt;group_id</code>
-    </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/www/arena/contest.php">
     <MixedArgument occurrences="1">
@@ -507,21 +474,9 @@
     </MixedArgument>
   </file>
   <file src="frontend/www/login.php">
-    <MissingParamType occurrences="1">
-      <code>$url</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>shouldRedirect</code>
-    </MissingReturnType>
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>
     </MixedArgument>
-    <MixedOperand occurrences="4">
-      <code>$redirect_parsed_url['scheme']</code>
-      <code>$redirect_parsed_url['host']</code>
-      <code>$redirect_parsed_url['port']</code>
-      <code>$_GET['redirect']</code>
-    </MixedOperand>
   </file>
   <file src="frontend/www/logout.php">
     <MixedOperand occurrences="1">
