@@ -286,9 +286,6 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEqualSets($languages, $problem->languages);
     }
 
-    /**
-     * Test problem update with invalid languages
-     */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();

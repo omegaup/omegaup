@@ -458,7 +458,7 @@ class Validators {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
-        if (!is_string($parameter)) {
+        if (!is_string($parameter) && !is_array($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 $parameterName
@@ -466,7 +466,14 @@ class Validators {
         }
 
         $badElements = [];
-        $elements = array_filter(explode(',', $parameter));
+        $elements = is_string(
+            $parameter
+        ) ? array_filter(
+            explode(
+                ',',
+                $parameter
+            )
+        ) : $parameter;
         foreach ($elements as $element) {
             if (!in_array($element, $enum)) {
                 $badElements[] = $element;

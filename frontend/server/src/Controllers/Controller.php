@@ -123,14 +123,16 @@ class Controller {
      *     function($value) { return gmdate('Y-m-d H:i:s', $value); }
      *
      * @param \OmegaUp\Request $request
+     * @param \OmegaUp\ProblemParams $params
      * @param object $object
      * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
     protected static function updateValueProperties(
-        \OmegaUp\Request $request,
+        ?\OmegaUp\Request $request,
         object $object,
-        array $properties
+        array $properties,
+        ?\OmegaUp\ProblemParams $params = null
     ): bool {
         $importantChange = false;
         foreach ($properties as $source => $info) {
@@ -151,12 +153,21 @@ class Controller {
                     $important = $info['important'];
                 }
             }
-            if (is_null($request[$fieldName])) {
-                continue;
+            if (!is_null($params)) {
+                if (is_null($params->$fieldName)) {
+                    continue;
+                }
+                // Get or calculate new value.
+                /** @var null|mixed */
+                $value = $params->$fieldName;
+            } else {
+                if (is_null($request[$fieldName])) {
+                    continue;
+                }
+                // Get or calculate new value.
+                /** @var null|mixed */
+                $value = $request[$fieldName];
             }
-            // Get or calculate new value.
-            /** @var null|mixed */
-            $value = $request[$fieldName];
             if (!is_null($transform)) {
                 /** @var mixed */
                 $value = $transform($value);

@@ -28,7 +28,6 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         foreach ($students as $s) {
             $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {
                 return $value['username'] == $s->username;
@@ -130,7 +129,6 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Verify response maps to expected scores
-        $this->assertEquals('ok', $response['status']);
         foreach ($expectedScores as $username => $scores) {
             $student = $this->findByPredicate($response['students'], function ($value) use ($username) {
                 return $value['username'] == $username;

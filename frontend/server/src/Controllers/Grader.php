@@ -9,31 +9,18 @@
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
-     * Validate requests for grader apis
+     * Calls to /status grader
      *
-     * @param \OmegaUp\Request $r
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @return array{grader: array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}}
      */
-    private static function validateRequest(\OmegaUp\Request $r) {
+    public static function apiStatus(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-    }
 
-    /**
-     * Calls to /status grader
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
-     */
-    public static function apiStatus(\OmegaUp\Request $r) {
-        self::validateRequest($r);
-
-        self::$log->debug('Getting grader /status');
         return [
-            'status' => 'ok',
             'grader' => \OmegaUp\Grader::getInstance()->status(),
         ];
     }

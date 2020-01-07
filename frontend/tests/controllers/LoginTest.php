@@ -33,7 +33,6 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         // Call the API
         $response = \OmegaUp\Controllers\User::apiLogin($r);
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
@@ -49,7 +48,6 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test identity login with valid credentials, email and password
-     *
      */
     public function testNativeLoginByEmailPositive() {
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
@@ -58,14 +56,11 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Inflate request with identity data
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
             'usernameOrEmail' => $email,
             'password' => $identity->password
-        ]);
+        ]));
 
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
-
-        $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
     }
 
@@ -78,14 +73,10 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Inflate request with user data
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => 'badpasswordD:'
-        ]);
-
-        // Call the API
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
+        ]));
     }
 
     /**
@@ -153,7 +144,6 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Validate output
-        $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
     }
 
@@ -173,12 +163,10 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call the API
         $response1 = \OmegaUp\Controllers\User::apiLogin($r);
-        $this->assertEquals('ok', $response1['status']);
         $this->assertLogin($identity, $response1['auth_token']);
 
         // Call the API for 2nd time
         $response2 = \OmegaUp\Controllers\User::apiLogin($r);
-        $this->assertEquals('ok', $response2['status']);
         $this->assertLogin($identity, $response2['auth_token']);
 
         $this->assertNotEquals(
