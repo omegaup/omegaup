@@ -16,12 +16,11 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(
-            null,
-            null
-        );
-        self::assertArrayHasKey('author', $nominations[0]);
-        self::assertArrayHasKey('nominator', $nominations[0]);
+        $response = \OmegaUp\Controllers\QualityNomination::apiGetNominations(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token
+        ]));
+        self::assertArrayHasKey('author', $response['nominations'][0]);
+        self::assertArrayHasKey('nominator', $response['nominations'][0]);
     }
 
     public function testGetByIdHasAuthorAndNominatorSet() {
