@@ -331,7 +331,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns all contests where a user is participating in.
      *
-     * @return array{contest_id: int, problemset_id: int, title: string, description: string, original_finish_time: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}[]
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string, window_length: int|null}>
      */
     final public static function getContestsParticipating(
         int $identityId,
@@ -457,8 +457,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * UNION
      * Todos los concursos públicos.
      *
-     *
-     * @return array
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
      */
     final public static function getAllContestsForIdentity(
         int $identityId,
@@ -467,7 +466,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $activos = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         int $recomendados = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
         ?string $query = null
-    ) {
+    ): array {
         $offset = ($pagina - 1) * $renglones_por_pagina;
 
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
@@ -791,7 +790,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return array{name: null|string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}[]
+     * @return list<array{name: null|string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}>
      */
     public static function getContestantsInfo(
         int $contestId

@@ -101,6 +101,12 @@
         </li>
       </ul>
     </div>
+    <a
+      v-if="!profile.is_private"
+      v-bind:href="`/submissions/${profile.username}/`"
+    >
+      {{ T.wordsSeeLatestSubmissions }}
+    </a>
   </div>
 </template>
 

@@ -369,7 +369,6 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'password' => $identityPassword
         ]));
 
-        $this->assertEquals('ok', $loginResponse['status']);
         $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.

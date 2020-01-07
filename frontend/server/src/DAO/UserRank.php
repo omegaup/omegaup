@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
     /**
      * @param null|string|int $value
-     * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getFilteredRank(
         int $page,

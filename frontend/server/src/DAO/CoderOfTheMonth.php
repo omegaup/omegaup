@@ -107,7 +107,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     * @return array{time: string, username: string, country_id: string, email: string|null}[]
+     * @return list<array{time: string, username: string, country_id: string, email: string|null}>
      */
     final public static function getCodersOfTheMonth(): array {
         $sql = '

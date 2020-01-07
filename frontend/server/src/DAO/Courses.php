@@ -37,7 +37,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[]
+     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     public static function getAllAssignments(
         string $alias,
@@ -81,9 +81,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['finish_time'] = intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $row['finish_time']
             ));
-            array_push($ar, $row);
+            $ar[] = $row;
         }
-
         return $ar;
     }
 
@@ -115,7 +114,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
     /**
      * Returns a list of students within a course
-     * @return array{name: string|null, progress: array<string, float>, username: string}[]
+     * @return list<array{name: string|null, progress: array<string, float>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -197,6 +196,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 );
             }
         );
+        /** @var list<array{name: string|null, progress: array<string, float>, username: string}> */
         return $progress;
     }
 
