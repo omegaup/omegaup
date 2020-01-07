@@ -914,6 +914,9 @@ class Run extends \OmegaUp\Controllers\Controller {
         exit;
     }
 
+    /**
+     * @return bool|null|string
+     */
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
