@@ -880,8 +880,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Rejudge problem
      *
-     * @param \OmegaUp\Request $r
-     *
      * @throws \OmegaUp\Exceptions\ApiException
      *
      * @return array{status: string}
@@ -1307,7 +1305,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
-            JSON_OBJECT_AS_ARRAY
+            /*assoc=*/true
         );
         if (!empty($distribSettings['interactive'])) {
             \OmegaUp\Controllers\Problem::addTag(
@@ -1322,8 +1320,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates loose file
      *
-     * @param \OmegaUp\Request $r
-     * @return array The updated file languages
      * @throws \OmegaUp\Exceptions\ApiException
      */
     private static function updateLooseFile(
@@ -1333,7 +1329,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         string $directory,
         string $contents
-    ): array {
+    ) {
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         // Check that lang is in the ISO 639-1 code list, default is "es".
         \OmegaUp\Validators::validateInEnum(
@@ -1513,11 +1509,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validate problem Details API
      *
-     * @param \OmegaUp\Request $r
-     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      */
     private static function validateDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
@@ -1645,8 +1641,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Gets the problem resource (statement/solution) from the gitserver.
      *
      * @param array{directory: string, alias: string|null, commit: string, language: string} $params
-     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the resource, plus some metadata.
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
+     *
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the resource, plus some metadata.
      */
     public static function getProblemResourceImpl(array $params): array {
         if (is_null($params['alias'])) {
@@ -1717,8 +1715,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string $language The language of the problem. Will default to
      *                           Spanish if not found.
      *
-     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
+     *
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      */
     public static function getProblemStatement(
         string $alias,
@@ -1803,6 +1802,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Gets the distributable problem settings for the problem.
      *
      * @param array{alias: string, commit: string} $params
+     *
      * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}
      */
     public static function getProblemSettingsDistribImpl(array $params): array {
@@ -1814,7 +1814,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ))->get(
                 'settings.distrib.json'
             ),
-            JSON_OBJECT_AS_ARRAY
+            /*assoc=*/true
         );
     }
 
@@ -1947,10 +1947,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem Details API
      *
-     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
-    public static function apiDetails(\OmegaUp\Request $r): array {
+    public static function apiDetails(\OmegaUp\Request $r) {
         $r->ensureBool('show_solvers', /*required=*/false);
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         $result = self::getValidProblemAndProblemset($r);
@@ -1982,10 +1981,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Get user. Allow unauthenticated requests if we are not opening a problem
      * inside a contest
      *
-     * @param \OmegaUp\Request $r
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
      *
      * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
-     * @throws \OmegaUp\Exceptions\UnauthorizedException
      */
     private static function getValidProblemAndProblemset(\OmegaUp\Request $r): array {
         try {
@@ -2223,8 +2221,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the solution for a problem if conditions are satisfied.
      *
-     * @param \OmegaUp\Request $r
-     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{exists: bool, solution?: array{language: string, markdown: string, images: array<string, string>}}
@@ -2304,8 +2300,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Entry point for Problem Versions API
-     *
-     * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
@@ -2396,8 +2390,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Change the version of the problem.
      *
-     * @param \OmegaUp\Request $r
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
@@ -2465,7 +2457,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Update problem fields.
         $problemSettings = json_decode(
             $problemArtifacts->get('settings.json'),
-            JSON_OBJECT_AS_ARRAY
+            /*assoc=*/true
         );
 
         $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
@@ -2596,11 +2588,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @param ?string  $commit  the optional explicit commit hash.
      *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
      * @return array{string, string} the SHA1 of a commit in the problem's
      *                               master branch, plus the SHA1 of the
      *                               private branch tree associated with that
      *                               commit.
-     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function resolveCommit(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -3278,12 +3271,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns the best score for a problem
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array
      */
-    public static function apiBestScore(\OmegaUp\Request $r): array {
+    public static function apiBestScore(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         // Uses same params as apiDetails, except for lang, which is optional
@@ -3499,7 +3488,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
-    ): array {
+    ) {
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         [
             'problem' => $problem,
