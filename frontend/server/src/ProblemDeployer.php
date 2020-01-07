@@ -280,13 +280,12 @@ class ProblemDeployer {
      * Returns the list of languages of updated statement or solution files.
      *
      * @param string The filetype
-     * @return array The list of updated languages
      */
     public function getUpdatedLanguages() {
         return $this->updatedLanguages;
     }
 
-    private function executeRaw(array $args, string $cwd): array {
+    private function executeRaw(array $args, string $cwd) {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],

@@ -16,23 +16,16 @@
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
-    <MissingReturnType occurrences="1">
-      <code>apiPublicDetails</code>
-    </MissingReturnType>
-    <MixedArgument occurrences="47">
+    <MixedArgument occurrences="45">
       <code>$r['active']</code>
       <code>$r['recommended']</code>
       <code>$r['participating']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest']-&gt;problemset_id</code>
-      <code>$result['start_time']</code>
-      <code>$result['finish_time']</code>
       <code>$r['contest_alias']</code>
       <code>$r['share_user_information'] ?: false</code>
       <code>$r['privacy_git_object_id']</code>
       <code>$r['statement_type']</code>
-      <code>$result['start_time']</code>
-      <code>$result['finish_time']</code>
       <code>$r['contest_alias']</code>
       <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['contest_alias']</code>
@@ -71,13 +64,7 @@
       <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="3">
-      <code>$result['admission_mode']</code>
-      <code>$result['start_time']</code>
-      <code>$result['finish_time']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="14">
-      <code>$result</code>
+    <MixedAssignment occurrences="13">
       <code>$auth_token</code>
       <code>$r['start_time']</code>
       <code>$start_time</code>
@@ -202,11 +189,6 @@
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <InvalidScalarArgument occurrences="3">
-      <code>JSON_OBJECT_AS_ARRAY</code>
-      <code>JSON_OBJECT_AS_ARRAY</code>
-      <code>JSON_OBJECT_AS_ARRAY</code>
-    </InvalidScalarArgument>
     <MixedArgument occurrences="45">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
@@ -323,9 +305,6 @@
     </PossiblyUndefinedVariable>
   </file>
   <file src="frontend/server/src/Controllers/Problemset.php">
-    <MissingReturnType occurrences="1">
-      <code>apiDetails</code>
-    </MissingReturnType>
     <MixedArgument occurrences="3">
       <code>$r['tokens']</code>
       <code>$run['guid']</code>
@@ -352,9 +331,6 @@
       <code>rand()</code>
       <code>$run-&gt;run_id</code>
     </InvalidScalarArgument>
-    <MissingReturnType occurrences="1">
-      <code>downloadSubmission</code>
-    </MissingReturnType>
     <MixedArgument occurrences="29">
       <code>$r['problem']-&gt;languages</code>
       <code>$r['contest']-&gt;languages</code>
@@ -558,9 +534,6 @@
     </MixedArgument>
   </file>
   <file src="frontend/www/arena/problem.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$key</code>
-    </MixedArgumentTypeCoercion>
     <MixedAssignment occurrences="1">
       <code>$value</code>
     </MixedAssignment>
@@ -569,11 +542,7 @@
     <MixedArgument occurrences="1">
       <code>$result['alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="3">
-      <code>$result['settings']['limits']</code>
-      <code>$result['settings']['limits']</code>
-      <code>$result['settings']['limits']</code>
-    </MixedArrayAccess>
+    <MixedArrayAccess occurrences="3"/>
     <MixedOperand occurrences="1">
       <code>$result['settings']['limits']['MemoryLimit']</code>
     </MixedOperand>
