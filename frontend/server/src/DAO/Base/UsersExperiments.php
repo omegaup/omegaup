@@ -34,10 +34,8 @@ abstract class UsersExperiments {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\UsersExperiments[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\UsersExperiments> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\UsersExperiments}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\UsersExperiments>
      */
     final public static function getAll(
         ?int $pagina = null,

@@ -43,6 +43,7 @@ try_define('OMEGAUP_LOG_LEVEL', 'info');
 try_define('OMEGAUP_LOG_FILE', '/var/log/omegaup/omegaup.log');
 try_define('OMEGAUP_CSP_LOG_FILE', '/var/log/omegaup/csp.log');
 try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
+try_define('OMEGAUP_MYSQL_TYPES_LOG_FILE', '/var/log/omegaup/omegaup.log');
 
 # ####################################
 # GRADER CONFIG

@@ -30,7 +30,9 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 $params[$k] = $v;
             }
             if (array_key_exists('files', $req)) {
-                $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
+                $_FILES['problem_contents']['tmp_name'] = (
+                    OMEGAUP_ROOT . "/../{$req['files']['problem_contents']}"
+                );
             }
             if ($req['api'] === '\\OmegaUp\\Controllers\\QualityNomination::apiCreate') {
                 $params['contents'] = json_encode($params['contents']);
@@ -115,9 +117,6 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     }
 
     public function runBadgeTest($testPath, $queryPath, $badge): void {
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
         $content = json_decode(file_get_contents($testPath), true);
         \OmegaUp\Test\Utils::cleanupFilesAndDB();
         switch ($content['testType']) {

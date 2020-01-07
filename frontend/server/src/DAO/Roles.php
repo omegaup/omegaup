@@ -22,6 +22,7 @@ class Roles extends \OmegaUp\DAO\Base\Roles {
                 WHERE
                     name = ?';
 
+        /** @var array{description: string, name: string, role_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(

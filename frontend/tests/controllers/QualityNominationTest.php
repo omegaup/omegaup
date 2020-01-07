@@ -351,7 +351,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have been public banned'
         );
@@ -377,7 +377,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have been made public'
         );
@@ -440,7 +440,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDemotionCanBeDeniedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -481,7 +481,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have remained public'
         );
@@ -531,7 +531,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have been public banned'
         );
@@ -557,7 +557,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             $problem['visibility'],
             'Problem should have remained public banned'
         );
@@ -569,7 +569,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -610,7 +610,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
             $problem['visibility'],
             'Problem should have been private banned'
         );
@@ -636,7 +636,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             $problem['visibility'],
             'Problem should have been private'
         );
@@ -679,7 +679,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
@@ -689,10 +689,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'before_ac' => true,
             ]),
         ]));
-        $this->assertEquals($result['status'], 'ok');
 
         // Dismissals could be sent before AC also
-        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
@@ -700,7 +699,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'before_ac' => true
             ]),
         ]));
-        $this->assertEquals($result['status'], 'ok');
 
         // Now solve the problem, it must not be allowed to send a before AC
         // nomination, as the problem is already solved
@@ -1050,11 +1048,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
-        $this->assertEquals(
-            'ok',
-            $list['status'],
-            'Status of apiList call is not ok'
-        );
         $this->assertGreaterThanOrEqual(
             2,
             count(
@@ -1547,7 +1540,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDificulty(
+        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDifficulty(
             'easy'
         );
         $this->assertEquals(count($problemOfTheWeek), 1);

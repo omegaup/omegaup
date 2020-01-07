@@ -127,10 +127,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
         ) {
-            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
+                /** @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
                 function () use ($r) {
                     return self::getCurrentSessionImpl($r);
                 },
@@ -251,7 +251,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
-            'identity_id' => $identity->identity_id,
+            'identity_id' => intval($identity->identity_id),
             'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
         ]));
 
@@ -259,7 +259,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         //erase expired tokens
         try {
-            \OmegaUp\DAO\AuthTokens::expireAuthTokens($identity->identity_id);
+            \OmegaUp\DAO\AuthTokens::expireAuthTokens(
+                intval($identity->identity_id)
+            );
         } catch (\Exception $e) {
             // Best effort
             self::$log->error(

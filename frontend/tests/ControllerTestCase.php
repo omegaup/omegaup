@@ -95,32 +95,25 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
     /**
      * Given an Identity, checks that login let state as supposed
-     *
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @param type $auth_token
      */
     public function assertLogin(
         \OmegaUp\DAO\VO\Identities $identity,
-        $auth_token = null
+        ?string $authToken = null
     ) {
-        // Check auth token
-        $auth_tokens_bd = \OmegaUp\DAO\AuthTokens::getByIdentityId(
+        $authTokens = \OmegaUp\DAO\AuthTokens::getByIdentityId(
             $identity->identity_id
         );
 
-        // Validar que el token se guardó en la BDD
-        if (!is_null($auth_token)) {
+        if (!is_null($authToken)) {
             $exists = false;
-            foreach ($auth_tokens_bd as $token_db) {
-                if (strcmp($token_db->token, $auth_token) === 0) {
+            foreach ($authTokens as $token) {
+                if (strcmp($token->token, $authToken) === 0) {
                     $exists = true;
                     break;
                 }
             }
 
-            if ($exists === false) {
-                $this->fail("Token $auth_token not in DB.");
-            }
+            $this->assertTrue($exists, "Token {$authToken} not in DB.");
         }
 
         // @todo check last access time
@@ -139,17 +132,11 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
             false
         );
 
-        // Inflate request with identity data
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password,
-        ]);
-
-        // Call the API
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
-
-        // Sanity check
-        self::assertEquals('ok', $response['status']);
+        ]));
+        self::assertNotEmpty($response['auth_token']);
 
         // Clean up leftovers of Login API
         unset($_REQUEST);

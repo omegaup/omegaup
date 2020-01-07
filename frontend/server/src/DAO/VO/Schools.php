@@ -99,9 +99,9 @@ class Schools extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var int|null
      */
-    public $rank = 0;
+    public $rank = null;
 
     /**
      * [Campo no documentado]
