@@ -914,11 +914,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         exit;
     }
 
+    /**
+     * @return bool|null|string
+     */
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $passthru
-    ): ?string {
+    ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
             is_null($submission) ||
