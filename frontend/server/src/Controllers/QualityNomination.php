@@ -869,13 +869,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        // Authenticate request
-        try {
-            $r->ensureMainUserIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing, we allow unauthenticated users to use this API
-        }
-
+        $r->ensureMainUserIdentity();
         $r->ensureInt('qualitynomination_id', null, null, false);
         /** @var int|null */
         $qualityNominationId = $r['qualitynomination_id'];

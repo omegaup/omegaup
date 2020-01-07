@@ -2201,12 +2201,17 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $assignmentAlias,
                 $r->identity
             );
+            $isAdmin = \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            );
 
             return [
                 'hasToken' => false,
-                'courseAdmin' => \OmegaUp\Authorization::isCourseAdmin(
-                    $r->identity,
-                    $course
+                'courseAdmin' => $isAdmin,
+                'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                    strval($course->alias),
+                    $isAdmin
                 ),
                 'assignment' => $assignment,
                 'course' => $course,
@@ -2246,6 +2251,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         // hasToken is true, it means we do not autenticate request user
         return [
             'courseAdmin' => $courseAdmin,
+            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                strval($course->alias),
+                $courseAdmin
+            ),
             'hasToken' => true,
             'assignment' => $assignment,
             'course' => $course,
@@ -2420,11 +2429,13 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'name' => $tokenAuthenticationResult['assignment']->name,
+            'alias' => $tokenAuthenticationResult['assignment']->alias,
             'description' => $tokenAuthenticationResult['assignment']->description,
             'assignment_type' => $tokenAuthenticationResult['assignment']->assignment_type,
             'start_time' => $tokenAuthenticationResult['assignment']->start_time,
             'finish_time' => $tokenAuthenticationResult['assignment']->finish_time,
             'problems' => $problems,
+            'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
             'director' => $director,
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],

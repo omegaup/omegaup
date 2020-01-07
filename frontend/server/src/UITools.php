@@ -156,10 +156,7 @@ class UITools {
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
 
         // TODO: It should be removed when all templates call render function
-        \OmegaUp\UITools::assignSmartyNavbarHeader(
-            $smarty,
-            /*$inContest=*/false
-        );
+        \OmegaUp\UITools::assignSmartyNavbarHeader($smarty);
 
         $smarty->assign(
             'ENABLED_EXPERIMENTS',
@@ -178,15 +175,14 @@ class UITools {
 
     private static function assignSmartyNavbarHeader(
         \Smarty $smarty,
-        bool $inContest = false
+        bool $inContest = false,
+        string $navbarSection = ''
     ): void {
         [
             'email' => $email,
             'identity' => $identity,
             'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        $path = explode('/', getcwd());
-        $directory = end($path);
         $smarty->assign(
             'headerPayload',
             [
@@ -209,13 +205,13 @@ class UITools {
                     '',
                 'isAdmin' => $isAdmin,
                 'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
-                'navbarSection' => $directory,
+                'navbarSection' => $navbarSection,
             ]
         );
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -224,11 +220,16 @@ class UITools {
             $smartyProperties = $response['smartyProperties'];
             $template = $response['template'];
             $inContest = $response['inContest'] ?? false;
+            $navbarSection = $response['navbarSection'] ?? '';
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
 
-        \OmegaUp\UITools::assignSmartyNavbarHeader($smarty, $inContest);
+        \OmegaUp\UITools::assignSmartyNavbarHeader(
+            $smarty,
+            $inContest,
+            $navbarSection
+        );
 
         /** @var mixed $value */
         foreach ($smartyProperties as $key => $value) {
