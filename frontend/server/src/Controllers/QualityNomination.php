@@ -668,6 +668,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     */
+    public static function apiGetMyNominations(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types');
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
+        }
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            $r->user->user_id,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
+    }
+
+    /**
      * Validates that the user making the request is member of the
      * `omegaup:quality-reviewer` group.
      *
@@ -693,27 +720,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     private static function hasDuplicates(array $contents): bool {
         return count($contents) !== count(array_unique($contents));
-    }
-
-    /**
-     * Displays all the nominations.
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>} The response.
-     */
-    public static function apiList(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        // Validate request
-        $r->ensureIdentity();
-        self::validateMemberOfReviewerGroup($r);
-
-        return self::getListImpl($r, null /* nominator */, null /* assignee */);
     }
 
     /**
@@ -925,6 +931,58 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     )['nominations'],
                     'myView' => false,
                     'currentUser' => $r->identity->username,
+                ],
+            ],
+            'template' => 'quality.nomination.list.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getListForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'myView' => false,
+                ],
+            ],
+            'template' => 'quality.nomination.list.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination for a certain user
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'myView' => true,
                 ],
             ],
             'template' => 'quality.nomination.list.tpl',

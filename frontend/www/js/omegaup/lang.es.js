@@ -474,6 +474,7 @@ const translations = {
 	navUserRanking: "Ranking de usuarios",
 	navViewProfile: "Mi perfil",
 	noCoders: "No hay coders",
+	nominationsRangeHeader: "(del %(lowCount) al %(highCount))",
 	notRegisteredInContest: "No est\u00e1s registrado en este concurso.",
 	notificationNewBadge: "Has recibido una nueva insignia: %(badgeName)",
 	notificationsMarkAllAsRead: "Marcar todo como le\u00eddo",

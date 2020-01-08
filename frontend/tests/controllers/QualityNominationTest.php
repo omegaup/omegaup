@@ -155,7 +155,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Controllers\QualityNomination::apiCreate($r);
 
-        $response = \OmegaUp\Controllers\QualityNomination::apiMyList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\QualityNomination::apiGetMyNominations(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(1, count($response['nominations']));
@@ -822,7 +822,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Login as an arbitrary reviewer.
         $login = self::login(QualityNominationFactory::$reviewers[0]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\QualityNomination::apiGetNominations(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $nomination = $this->findByPredicate(
@@ -1044,7 +1044,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
+        $list = \OmegaUp\Controllers\QualityNomination::apiGetNominations(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
         $this->assertGreaterThanOrEqual(
