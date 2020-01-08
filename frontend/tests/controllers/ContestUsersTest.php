@@ -107,10 +107,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['contest']
         );
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r,
-            $contestData['contest'],
-            $shoulShowIntro
-        );
+            $r
+        )['smartyProperties'];
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -221,10 +219,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Contest needs basic information for the user
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r,
-            $contestData['contest'],
-            $shouldShowIntro
-        );
+            $r
+        )['smartyProperties'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }

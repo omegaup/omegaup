@@ -2796,10 +2796,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // List of verdicts
-        $verdict_counts = [];
+        $verdictCounts = [];
 
         foreach (\OmegaUp\Controllers\Run::VERDICTS as $verdict) {
-            $verdict_counts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
+            $verdictCounts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
                 intval($problem->problem_id),
                 $verdict
             );
@@ -2898,7 +2898,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
-            'verdict_counts' => $verdict_counts,
+            'verdict_counts' => $verdictCounts,
             'cases_stats' => $casesStats['counts'],
         ];
     }

@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#courseDetails#}" inline}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#courseDetails#}" inline}
 
 <script src="{version_hash src="/js/course.js"}"></script>
 

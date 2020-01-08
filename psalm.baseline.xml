@@ -463,11 +463,6 @@
       <code>$associatedIdentity</code>
     </PossiblyNullPropertyAssignment>
   </file>
-  <file src="frontend/www/arena/contest.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['contest_alias'] ?? ''</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/www/badge.php">
     <MixedArgument occurrences="1">
       <code>$_REQUEST['badge_alias']</code>

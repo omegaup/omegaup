@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#enterCourse#}" inline}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#enterCourse#}" inline}
 
 <div class="container-fluid">
 	<div id="course-submissions-list"></div>
