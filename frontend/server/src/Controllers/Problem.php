@@ -2963,11 +2963,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             false
         );
-        $tags = [];
-        if (isset($r['tag'])) {
-            /** @var string|list<string> $r['tag'] */
-            $tags = self::getTagList($r['tag']);
-        }
+
+        $tags = $r->getStringList('tag');
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
@@ -3897,25 +3894,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return self::SOLUTION_UNLOCKED;
         }
         return self::SOLUTION_LOCKED;
-    }
-
-    /**
-     * @param string|list<string> $tags
-     * @return list<string>
-     */
-    private static function getTagList($tags): array {
-        if (is_array($tags)) {
-            return $tags;
-        }
-
-        // Still allow strings to be sent to avoid breaking permalinks.
-        if (empty($tags)) {
-            return [];
-        }
-        $tags = explode(',', strval($tags));
-
-        /** @var list<string> */
-        return array_unique($tags);
     }
 
     /**

@@ -648,29 +648,19 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        $r->ensureBool('my_list', false);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
-        $types = ['promotion', 'demotion'];
-        if (!empty($r['types'])) {
-            if (is_string($r['types'])) {
-                $types = explode(',', $r['types']);
-            } elseif (is_array($r['types'])) {
-                /** @var list<string> */
-                $types = $r['types'];
-            }
-        }
+        $types = $r->getStringList('types');
 
-        $nominator = null;
-        if (!is_null($r['my_list']) && $r['my_list']) {
-            $nominator = $r->user->user_id;
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
         }
 
         return \OmegaUp\DAO\QualityNominations::getNominations(
-            $nominator,
-            null, /** assignee */
+            /* nominator */ null,
+            /* assignee */ null,
             $offset,
             $rowCount,
             $types

@@ -280,6 +280,30 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Returns an array of strings from a request parameter
+     * containing a single string with comma-separated values.
+     *
+     * @return list<string>
+     */
+    public function getStringList(
+        string $param
+    ): array {
+        if (is_array($this[$param])) {
+            /** @var list<string> */
+            return $this[$param];
+        }
+
+        if (empty($this[$param])) {
+            return [];
+        }
+
+        $strings = explode(',', strval($this[$param]));
+
+        /** @var list<string> */
+        return array_unique($strings);
+    }
+
+    /**
      * Returns a real array from the Request values. This is useful to build
      * Params objects.
      *
