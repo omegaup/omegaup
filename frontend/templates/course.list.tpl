@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='schools' htmlTitle="My courses" inline}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="My courses" inline}
 
 <script type="text/javascript" src="{version_hash src="/js/course.list.js"}"></script>
 

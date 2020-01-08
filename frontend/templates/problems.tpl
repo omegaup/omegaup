@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='problems' htmlTitle="{#omegaupTitleProblems#}" inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblems#}" inline}
 
 <div id="parent_problems_list">
 	{include file='problem_search_bar.tpl' inline}
