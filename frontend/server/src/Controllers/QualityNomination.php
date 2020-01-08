@@ -616,8 +616,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
+
         $types = ['promotion', 'demotion'];
         if (!empty($r['types'])) {
             if (is_string($r['types'])) {
@@ -635,8 +636,35 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 $types
-            ),
+            )['nominations'],
         ];
+    }
+
+    /**
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     */
+    public static function apiGetNominations(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types');
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
+        }
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            /* nominator */ null,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
