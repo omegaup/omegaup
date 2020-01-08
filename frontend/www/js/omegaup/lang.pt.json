@@ -63,6 +63,8 @@
 	"badge_legacyUser_name": "Usu\u00e1rio Hist\u00f3rico",
 	"badge_problemSetter_description": "O usu\u00e1rio tem criado pelo menos um problema.",
 	"badge_problemSetter_name": "Criador de Problemas",
+	"badge_pythonexpert_description": "O usu\u00e1rio resolveu mais de 10 problemas em Python.",
+	"badge_pythonexpert_name": "Usu\u00e1rio Especialista em Python",
 	"badge_virtualContestManager_description": "O usu\u00e1rio tem administrado pelo menos um concurso virtual.",
 	"badge_virtualContestManager_name": "Administrador de Concurso Virtual",
 	"banProblemFormComments": "Coment\u00e1rios adicionais para o criador do problema",
