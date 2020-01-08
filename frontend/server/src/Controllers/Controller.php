@@ -12,13 +12,6 @@ class Controller {
     public static $log;
 
     /**
-     * List of verdicts
-     *
-     * @var array
-     */
-    public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
-
-    /**
      * Calls authenticateRequest and throws only if authentication fails AND
      * there's no target username in Request.
      * This is to allow unauthenticated access to APIs that work for both
@@ -95,6 +88,24 @@ class Controller {
         }
 
         return $identity;
+    }
+
+    /**
+     * Gets the current month's first day date.
+     */
+    protected static function getCurrentMonthFirstDay(?string $date): string {
+        if (empty($date)) {
+            // Get first day of the current month
+            return date('Y-m-01', \OmegaUp\Time::get());
+        }
+        $date = strtotime($date);
+        if ($date === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'date'
+            );
+        }
+        return date('Y-m-01', $date);
     }
 
     /**

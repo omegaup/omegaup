@@ -369,7 +369,6 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'password' => $identityPassword
         ]));
 
-        $this->assertEquals('ok', $loginResponse['status']);
         $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.
@@ -382,17 +381,19 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $profileResponse = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'auth_token' => $loginResponse['auth_token'],
-        ]));
+        $profileResponse = \OmegaUp\Controllers\User::apiProfile(
+            new \OmegaUp\Request([
+                'auth_token' => $loginResponse['auth_token'],
+            ])
+        );
 
         $this->assertEquals(
             "{$group['group']->alias}:{$identityName}",
-            $profileResponse['userinfo']['username']
+            $profileResponse['username']
         );
         $this->assertEquals(
             $identityName,
-            $profileResponse['userinfo']['name']
+            $profileResponse['name']
         );
     }
 }

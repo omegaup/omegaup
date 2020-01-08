@@ -37,18 +37,28 @@ def test_user_ranking_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         # When user has tried or solved a problem, feedback popup will be shown
+        with util.dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close'))).click()
+            driver.wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close')))
+
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '.popup button.close'))).click()
-
+                (By.XPATH,
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
@@ -121,10 +131,10 @@ def test_create_identities_for_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(

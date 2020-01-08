@@ -64,15 +64,13 @@ omegaup.OmegaUp.on('ready', function() {
             problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
           arenaInstance.problems[problem.alias] = problem;
-
-          var prob = $('#problem-list .template')
-            .clone()
-            .removeClass('template')
-            .addClass('problem_' + problem.alias);
-          $('.name', prob)
-            .attr('href', '#problems/' + problem.alias)
-            .html(problemName);
-          $('#problem-list').append(prob);
+          arenaInstance.elements.navBar.problems.push({
+            alias: problem.alias,
+            text: problemName,
+            bestScore: 0,
+            maxScore: 0,
+            active: false,
+          });
 
           $('#clarification select[name=problem]').append(
             '<option value="' +
@@ -136,8 +134,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#submit select[name="language"]').on('change', function(e) {
     var lang = $('#submit select[name="language"]').val();
-    if (lang == 'cpp11') {
+    if (lang.startsWith('cpp')) {
       $('#submit-filename-extension').text('.cpp');
+    } else if (lang.startsWith('c-')) {
+      $('#submit-filename-extension').text('.c');
+    } else if (lang.startsWith('py')) {
+      $('#submit-filename-extension').text('.py');
     } else if (lang && lang != 'cat') {
       $('#submit-filename-extension').text('.' + lang);
     } else {

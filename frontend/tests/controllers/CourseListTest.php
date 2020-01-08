@@ -35,7 +35,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
 
@@ -55,7 +54,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $otherUserLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
 

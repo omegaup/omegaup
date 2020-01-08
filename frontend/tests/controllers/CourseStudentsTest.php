@@ -42,7 +42,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $courseData['assignment']->problemset_id,
                 'problem_alias' => $problem->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(

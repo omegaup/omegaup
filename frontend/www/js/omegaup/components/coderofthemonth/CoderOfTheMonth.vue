@@ -6,12 +6,9 @@
           <a data-toggle="tab">{{ T.codersOfTheMonth }}</a>
         </li>
         <li v-on:click="selectedTab = 'codersOfPreviousMonth'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthList }}</a>
+          <a data-toggle="tab">{{ T.codersOfTheMonthRank }}</a>
         </li>
-        <li
-          v-if="isMentor"
-          v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'"
-        >
+        <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'">
           <a data-toggle="tab">{{ T.codersOfTheMonthListCandidate }}</a>
         </li>
       </ul>
@@ -26,13 +23,22 @@
           <th v-if="selectedTab == 'codersOfTheMonth'">
             {{ T.codersOfTheMonthDate }}
           </th>
-          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <th
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+          >
             {{ T.profileStatisticsNumberOfSolvedProblems }}
           </th>
-          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <th
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+          >
             {{ T.rankScore }}
           </th>
-          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <th
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+          >
             {{ T.wordsActions }}
           </th>
         </tr>
@@ -53,13 +59,22 @@
             ></omegaup-user-username>
           </td>
           <td v-if="selectedTab == 'codersOfTheMonth'">{{ coder.date }}</td>
-          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <td
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+          >
             {{ coder.ProblemsSolved }}
           </td>
-          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <td
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+          >
             {{ coder.score }}
           </td>
-          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          <td
+            class="numericColumn"
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+          >
             <button
               class="btn btn-primary"
               v-if="canChooseCoder &amp;&amp; !coderIsSelected"

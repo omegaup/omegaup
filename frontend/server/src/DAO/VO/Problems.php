@@ -220,7 +220,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      *
      * @var string
      */
-    public $languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
+    public $languages = 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua';
 
     /**
      * [Campo no documentado]

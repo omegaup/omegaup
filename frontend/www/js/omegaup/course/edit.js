@@ -181,6 +181,15 @@ OmegaUp.on('ready', function() {
             assignmentDetails.$el.scrollIntoView();
             updateNewAssignmentButtonVisibility(true);
           },
+          'add-problems': function(assignment) {
+            window.location.hash = 'problems';
+            assignmentDetails.show = false;
+            problemList.selectedAssignment = assignment;
+            updateNewAssignmentButtonVisibility(true);
+            $('#sections')
+              .find('a[href="#problems"]')
+              .tab('show');
+          },
           delete: function(assignment) {
             if (
               !window.confirm(
@@ -378,6 +387,7 @@ OmegaUp.on('ready', function() {
           assignments: this.assignments,
           assignmentProblems: this.assignmentProblems,
           taggedProblems: this.taggedProblems,
+          selectedAssignment: this.selectedAssignment,
         },
         on: {
           'add-problem': function(assignment, problemAlias) {
@@ -445,6 +455,7 @@ OmegaUp.on('ready', function() {
       assignments: [],
       assignmentProblems: [],
       taggedProblems: [],
+      selectedAssignment: null,
     },
     components: {
       'omegaup-course-problemlist': course_ProblemList,

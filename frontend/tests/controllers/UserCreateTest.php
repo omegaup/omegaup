@@ -24,7 +24,7 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
@@ -49,11 +49,9 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call API twice.
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
         $r['password'] = 'a wrong password';
@@ -351,7 +349,6 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             true,
             $response['users'][$unregisteredIdentity->username]
@@ -387,7 +384,6 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Check user was not added into the mailing list
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayNotHasKey(
             $identityNotVerified->username,
             $response['users']

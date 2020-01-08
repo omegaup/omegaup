@@ -28,7 +28,6 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time'],
@@ -89,7 +88,6 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
             $response['start_time'],
@@ -157,7 +155,6 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['request']['name'], $response['name']);
         $this->assertArrayNotHasKey('assignments', $response);
     }
@@ -172,7 +169,6 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['is_admin']);
     }
 
@@ -214,12 +210,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Call the details API for the assignment that's already started.
-        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_alias'],
         ]));
-        $this->assertEquals('ok', $response['status']);
 
         // Call the detail API for the assignment that has not started.
         try {

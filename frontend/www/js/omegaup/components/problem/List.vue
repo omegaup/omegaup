@@ -71,7 +71,7 @@
                     Score: problem.quality.toFixed(1),
                   })}`
                 "
-                >{{ QUALITY_TAGS[parseInt(problem.quality)] }}</span
+                >{{ QUALITY_TAGS[Math.round(problem.quality)] }}</span
               >
             </td>
             <td class="numericColumn" v-if="problem.difficulty === null">—</td>
@@ -83,7 +83,7 @@
                     Score: problem.difficulty.toFixed(1),
                   })}`
                 "
-                >{{ DIFFICULTY_TAGS[parseInt(problem.difficulty)] }}</span
+                >{{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}</span
               >
             </td>
             <td class="numericColumn">
