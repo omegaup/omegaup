@@ -64,7 +64,7 @@ rewrite ^/logout/?$ /logout.php last;
 rewrite ^/metrics/?$ /metrics.php last;
 rewrite ^/nomination/?$ /qualitynomination/list.php last;
 rewrite ^/nomination/([0-9]+)/?$ /qualitynomination/details.php?qualitynomination_id=$1 last;
-rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php;
+rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php last;
 rewrite ^/permissions/?$ /permissions.php last;
 rewrite ^/problem/?$ /problems/list.php last;
 rewrite ^/problem/list/?$ /problems/list.php last;
