@@ -11,9 +11,9 @@ describe('arena', function() {
       expect(omegaup.UI.formatDelta(0)).toEqual('00:00:00');
     });
 
-    it('Should handle large deltas', function() {
+    it('Should handle large deltas as human readable text', function() {
       expect(omegaup.UI.formatDelta(31 * 24 * 3600 * 1000)).toEqual(
-        '31:00:00:00',
+        'en un mes',
       );
     });
   });

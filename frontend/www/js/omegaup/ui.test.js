@@ -71,12 +71,12 @@ describe('omegaup.ui', function() {
     });
 
     it('Should handle valid human readable dates', function() {
-      expect(omegaup.UI.formatDelta(3000000000)).toEqual('in a month');
-      expect(omegaup.UI.formatDelta(5000000000)).toEqual('in 2 months');
-      expect(omegaup.UI.formatDelta(7500000000)).toEqual('in 3 months');
-      expect(omegaup.UI.formatDelta(10000000000)).toEqual('in 4 months');
-      expect(omegaup.UI.formatDelta(50000000000)).toEqual('in 2 years');
-      expect(omegaup.UI.formatDelta(100000000000)).toEqual('in 3 years');
+      expect(omegaup.UI.formatDelta(3000000000)).toEqual('en un mes');
+      expect(omegaup.UI.formatDelta(5000000000)).toEqual('en 2 meses');
+      expect(omegaup.UI.formatDelta(7500000000)).toEqual('en 3 meses');
+      expect(omegaup.UI.formatDelta(10000000000)).toEqual('en 4 meses');
+      expect(omegaup.UI.formatDelta(50000000000)).toEqual('en 2 años');
+      expect(omegaup.UI.formatDelta(100000000000)).toEqual('en 3 años');
     });
   });
 
