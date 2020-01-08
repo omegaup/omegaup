@@ -64,7 +64,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.alias = ? $timeCondition
             ORDER BY
-                start_time;";
+                `order`, start_time;";
 
         /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);

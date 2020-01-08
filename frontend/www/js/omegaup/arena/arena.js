@@ -11,6 +11,9 @@ import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue'
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
+import * as moment from 'moment';
+
+moment.locale(T.locale);
 
 export { ArenaAdmin };
 
@@ -735,10 +738,15 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      if ($('#title .human-readable').is(':checked')) {
-        clock = UI.formatDeltaHumanReadable(countdownTime.getTime() - now);
-      } else {
+      // Months to finish course
+      let monthsToFinish =
+        (countdownTime.getTime() - now) / (30.4 * 24 * 60 * 60 * 1000);
+      if (monthsToFinish < 1.0) {
         clock = UI.formatDelta(countdownTime.getTime() - now);
+      } else {
+        clock = moment(countdownTime.getTime())
+          .endOf()
+          .fromNow();
       }
     }
     self.elements.clock.text(clock);

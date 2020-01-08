@@ -52,63 +52,6 @@ let UI = {
     return clock;
   },
 
-  formatDeltaHumanReadable: function(delta) {
-    let days = Math.floor(delta / (24 * 60 * 60 * 1000));
-    delta -= days * (24 * 60 * 60 * 1000);
-    let hours = Math.floor(delta / (60 * 60 * 1000));
-    delta -= hours * (60 * 60 * 1000);
-    let minutes = Math.floor(delta / (60 * 1000));
-    delta -= minutes * (60 * 1000);
-    let seconds = Math.floor(delta / 1000);
-
-    // splitting days into months and years, keeping hours, minutes and seconds
-    let years = Math.floor(days / 365.24);
-    days -= Math.floor(years * 365.24);
-    let months = Math.floor(days / 30.44);
-    days -= Math.floor(months * 30.44);
-
-    let clock = '';
-
-    if (years > 0) {
-      if (years === 1) {
-        clock += UI.formatString(T.clockYear, { year: years });
-      } else {
-        clock += UI.formatString(T.clockYears, { years: years });
-      }
-    }
-    if (months > 0) {
-      if (months === 1) {
-        clock += UI.formatString(T.clockMonth, { month: months });
-      } else {
-        clock += UI.formatString(T.clockMonths, { months: months });
-      }
-    }
-    if (days > 0) {
-      if (days === 1) {
-        clock += UI.formatString(T.clockDay, { day: days });
-      } else {
-        clock += UI.formatString(T.clockDays, { days: days });
-      }
-    }
-    if (hours === 1) {
-      clock += UI.formatString(T.clockHour, { hour: hours });
-    } else {
-      clock += UI.formatString(T.clockHours, { hours: hours });
-    }
-    if (minutes === 1) {
-      clock += UI.formatString(T.clockMinute, { minute: minutes });
-    } else {
-      clock += UI.formatString(T.clockMinutes, { minutes: minutes });
-    }
-    if (seconds === 1) {
-      clock += UI.formatString(T.clockSecond, { second: seconds });
-    } else {
-      clock += UI.formatString(T.clockSeconds, { seconds: seconds });
-    }
-
-    return clock;
-  },
-
   isVirtual: function(contest) {
     return contest.rerun_id > 0;
   },

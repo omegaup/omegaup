@@ -8,7 +8,6 @@
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>
-				<label><input type="checkbox" class="human-readable" name="human-readable">{#wordsHumanReadable#}</label>
 			</div>
 
 {if $showNavigation}
