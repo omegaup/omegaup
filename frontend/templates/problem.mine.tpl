@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='problems' htmlTitle="{#omegaupTitleMyProblemsList#}" inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleMyProblemsList#}" inline}
 
 {if $privateProblemsAlert eq true}
 	<div class="alert alert-info">

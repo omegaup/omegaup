@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='arena' jsfile={version_hash src='/ux/arena.js' inArena=true} inline}
+{include file='head.tpl' navbarSection='arena' headerPayload=$headerPayload jsfile={version_hash src='/ux/arena.js' inArena=true} inline}
 {include file='arena.contest_list.tpl' inline}
 				<div id="content">
 					<div class="panel">

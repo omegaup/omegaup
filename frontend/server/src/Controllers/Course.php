@@ -1925,6 +1925,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             true  /*onlyIntroDetails*/
         );
         $requestUserInformation = $courseDetails['requests_user_information'];
+        $inContest = false;
         if (
             $shouldShowIntro
             || !$hasAcceptedTeacher
@@ -2019,6 +2020,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ];
             $template = 'arena.contest.course.tpl';
+            $inContest = true;
         } else {
             $smartyProperties = [
                 'showRanking' => \OmegaUp\Authorization::isCourseAdmin(
@@ -2032,6 +2034,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => $smartyProperties,
             'template' => $template,
+            'inContest' => $inContest,
         ];
     }
 
