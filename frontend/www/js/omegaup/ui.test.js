@@ -58,6 +58,28 @@ describe('omegaup.ui', function() {
     });
   });
 
+  describe('formatDelta', function() {
+    it('Should handle valid dates with countdown time format', function() {
+      expect(omegaup.UI.formatDelta(1000)).toEqual('00:00:01');
+      expect(omegaup.UI.formatDelta(10000)).toEqual('00:00:10');
+      expect(omegaup.UI.formatDelta(100000)).toEqual('00:01:40');
+      expect(omegaup.UI.formatDelta(1000000)).toEqual('00:16:40');
+      expect(omegaup.UI.formatDelta(10000000)).toEqual('02:46:40');
+      expect(omegaup.UI.formatDelta(100000000)).toEqual('1:03:46:40');
+      expect(omegaup.UI.formatDelta(1000000000)).toEqual('11:13:46:40');
+      expect(omegaup.UI.formatDelta(2500000000)).toEqual('28:22:26:40');
+    });
+
+    it('Should handle valid human readable dates', function() {
+      expect(omegaup.UI.formatDelta(3000000000)).toEqual('in a month');
+      expect(omegaup.UI.formatDelta(5000000000)).toEqual('in 2 months');
+      expect(omegaup.UI.formatDelta(7500000000)).toEqual('in 3 months');
+      expect(omegaup.UI.formatDelta(10000000000)).toEqual('in 4 months');
+      expect(omegaup.UI.formatDelta(50000000000)).toEqual('in 2 years');
+      expect(omegaup.UI.formatDelta(100000000000)).toEqual('in 3 years');
+    });
+  });
+
   describe('markdownConverter', function() {
     let converter = omegaup.UI.markdownConverter();
 

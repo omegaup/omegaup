@@ -738,16 +738,7 @@ export class Arena {
         $('#new-run').hide();
       }
     } else {
-      // Months to finish course
-      let monthsToFinish =
-        (countdownTime.getTime() - now) / (30.4 * 24 * 60 * 60 * 1000);
-      if (monthsToFinish < 1.0) {
-        clock = UI.formatDelta(countdownTime.getTime() - now);
-      } else {
-        clock = moment(countdownTime.getTime())
-          .endOf()
-          .fromNow();
-      }
+      clock = UI.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }

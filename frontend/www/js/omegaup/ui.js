@@ -1,7 +1,10 @@
 import API from './api.js';
 import { T } from './omegaup.js';
+import * as moment from 'moment';
 
 let UI = {
+  momentInitialized: false,
+
   navigateTo: function(url) {
     window.location = url;
   },
@@ -29,6 +32,19 @@ let UI = {
   },
 
   formatDelta: function(delta) {
+    if (!UI.momentInitialized) {
+      moment.locale(T.locale);
+      UI.momentInitialized = true;
+    }
+
+    // Months to finish course
+    let monthsToFinish = delta / (30 * 24 * 60 * 60 * 1000);
+    if (monthsToFinish >= 1.0) {
+      return moment(delta + Date.now())
+        .endOf()
+        .fromNow();
+    }
+
     let days = Math.floor(delta / (24 * 60 * 60 * 1000));
     delta -= days * (24 * 60 * 60 * 1000);
     let hours = Math.floor(delta / (60 * 60 * 1000));
