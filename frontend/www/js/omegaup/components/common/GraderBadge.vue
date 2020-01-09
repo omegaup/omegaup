@@ -25,7 +25,7 @@ export default class GraderCountBadge extends Vue {
   }
 
   get graderBadgeClass(): string {
-    if (this.queueLength === -1) {
+    if (this.queueLength === -1 && this.error === false) {
       return '';
     } else if (this.error === true) {
       return 'grader-error';

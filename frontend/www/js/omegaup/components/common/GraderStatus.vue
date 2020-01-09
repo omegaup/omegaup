@@ -12,7 +12,8 @@
       {{ graderInfo !== null ? graderInfo.broadcaster_sockets : '' }}
     </li>
     <li class="grader grader-broadcaster-sockets" v-else-if="error !== null">
-      API api/grader/status call failed: {{ UI.escape(error) }}
+      API api/grader/status call failed:
+      <pre style="width: 40em;">{{ UI.escape(error) }}</pre>
     </li>
     <li class="grader grader-embedded-runner" v-if="status === 'ok'">
       Embedded runner:
