@@ -67,7 +67,7 @@
                 <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <span class="grader-count badge">…</span>
+                  <div id="common-grader-count-badge"></div>
                 {/if}
                 <span class="caret"></span>
               </a>
@@ -75,12 +75,8 @@
                 <li><a href="/profile/"><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <hr class="dropdown-separator">
-                  <li class="grader-submissions"><a class="grader-submissions-link" href="/arena/admin/">{#wordsLatestSubmissions#}</a></li>
-                  <li class="grader grader-status"></li>
-                  <li class="grader grader-broadcaster-sockets"></li>
-                  <li class="grader grader-embedded-runner"></li>
-                  <li class="grader grader-queues"></li>
+                  <div id="common-grader-status"></div>
+                  {js_include entrypoint="common_navbar"}
                 {/if}
               </ul>
             </li>
@@ -107,9 +103,6 @@
         {/if} {* OMEGAUP_LOCKDOWN *}
       </ul>
     </div>
-  {if $CURRENT_USER_IS_ADMIN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
-  {/if}
   {if $LOGGED_IN eq '1'}
     {js_include entrypoint="notification_list"}
   {/if}
