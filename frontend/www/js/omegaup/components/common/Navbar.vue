@@ -27,12 +27,12 @@
           class="nav navbar-nav"
           v-if="!data.omegaUpLockDown &amp;&amp; !data.inContest"
         >
-          <li v-bind:class="activeMenu('arena')">
+          <li v-bind:class="{ active: data.navbarSection === 'arena' }">
             <a href="/arena/">{{ T.navArena }}</a>
           </li>
           <li
             class="dropdown nav-contests"
-            v-bind:class="activeMenu('contests')"
+            v-bind:class="{ active: data.navbarSection === 'contests' }"
             v-show="data.isLoggedIn"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
@@ -55,7 +55,7 @@
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="activeMenu('problems')"
+            v-bind:class="{ active: data.navbarSection === 'problems' }"
             v-if="data.isLoggedIn"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
@@ -81,15 +81,21 @@
           </li>
           <li
             class="nav-problems"
-            v-bind:class="activeMenu('problems')"
+            v-bind:class="{ active: data.navbarSection === 'problems' }"
             v-else=""
           >
             <a href="/problem/">{{ T.wordsProblems }}</a>
           </li>
-          <li class="nav-rank" v-bind:class="activeMenu('rank')">
+          <li
+            class="nav-rank"
+            v-bind:class="{ active: data.navbarSection === 'rank' }"
+          >
             <a href="/rank/">{{ T.navRanking }}</a>
           </li>
-          <li class="nav-schools" v-bind:class="activeMenu('schools')">
+          <li
+            class="nav-schools"
+            v-bind:class="{ active: data.navbarSection === 'schools' }"
+          >
             <a href="/schools/">{{ T.navSchools }}</a>
           </li>
           <li>
@@ -110,7 +116,10 @@
           <omegaup-notification-list
             v-bind:notifications="notifications"
           ></omegaup-notification-list>
-          <li class="dropdown nav-user" v-bind:class="activeMenu('users')">
+          <li
+            class="dropdown nav-user"
+            v-bind:class="{ active: data.navbarSection === 'users' }"
+          >
             <a
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
@@ -173,25 +182,13 @@ import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import notifications_List from '../notification/List.vue';
 
-interface NavbarComponent {
-  omegaUpLockDown: boolean;
-  inContest: boolean;
-  isLoggedIn: boolean;
-  isReviewer: boolean;
-  gravatarURL51: string;
-  currentUsername: string;
-  isAdmin: boolean;
-  lockDownImage: string;
-  navbarSection: string;
-}
-
 @Component({
   components: {
     'omegaup-notification-list': notifications_List,
   },
 })
 export default class Navbar extends Vue {
-  @Prop() data!: NavbarComponent;
+  @Prop() data!: omegaup.Navbar;
 
   notifications: omegaup.Notification[] = [];
   T = T;
@@ -204,10 +201,6 @@ export default class Navbar extends Vue {
     return (
       this.data.isAdmin && !this.data.omegaUpLockDown && !this.data.inContest
     );
-  }
-
-  activeMenu(menu: string): string {
-    return this.data.navbarSection === menu ? 'active' : '';
   }
 }
 </script>

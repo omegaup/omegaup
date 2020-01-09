@@ -1,11 +1,9 @@
 (function() {
-  var graderCount = $('.grader-count');
-
   function updateGraderStatus() {
-    graderCount.removeClass(
+    $('.grader-count').removeClass(
       'grader-error grader-ok grader-warning grader-unknown',
     );
-    graderCount.text('…');
+    $('.grader-count').text('…');
     omegaup.API.Grader.status()
       .then(function(stats) {
         var graderInfo = stats.grader;
@@ -17,9 +15,9 @@
               graderInfo.queue.running.length;
           }
           if (queueLength < 5) {
-            graderCount.addClass('grader-ok');
+            $('.grader-count').addClass('grader-ok');
           } else {
-            graderCount.addClass('grader-warning');
+            $('.grader-count').addClass('grader-warning');
           }
           $('.grader-status').text('Grader OK');
           $('.grader-broadcaster-sockets').text(
@@ -34,19 +32,19 @@
               '</pre>',
           );
         } else {
-          graderCount.addClass('grader-error');
+          $('.grader-count').addClass('grader-error');
           $('.grader-status').text('Grader DOWN');
         }
-        graderCount.text(queueLength);
+        $('.grader-count').text(queueLength);
       })
       .fail(function(stats) {
-        graderCount.addClass('grader-error');
+        $('.grader-count').addClass('grader-error');
         $('.grader-status').text('Grader DOWN');
         $('.grader-broadcaster-sockets').text(
           'API api/grader/status call failed: ' +
             omegaup.UI.escape(stats.error),
         );
-        graderCount.text('?');
+        $('.grader-count').text('?');
       });
   }
 

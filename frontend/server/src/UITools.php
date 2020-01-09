@@ -3,18 +3,6 @@
 namespace OmegaUp;
 
 class UITools {
-    /** @var bool */
-    public static $isLoggedIn = false;
-    /** @var bool */
-    public static $isAdmin = false;
-    /** @var string[] */
-    public static $contestPages = [
-        'arena/admin.php',
-        'arena/contest.php',
-        'course/assignment.php',
-        'arena/contest.php',
-        'arena/courseadmin.php',
-    ];
     /** @var ?\Smarty */
     private static $smarty = null;
 
@@ -107,7 +95,7 @@ class UITools {
                 'CURRENT_USER_IS_EMAIL_VERIFIED',
                 empty($user) || $user->verified
             );
-            $smarty->assign('CURRENT_USER_IS_ADMIN', self::$isAdmin);
+            $smarty->assign('CURRENT_USER_IS_ADMIN', $isAdmin);
             $smarty->assign(
                 'CURRENT_USER_IS_REVIEWER',
                 \OmegaUp\Authorization::isQualityReviewer($identity)
