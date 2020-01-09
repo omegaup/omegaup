@@ -37,9 +37,8 @@ let UI = {
       UI.momentInitialized = true;
     }
 
-    // Months to finish course
-    let monthsToFinish = delta / (30 * 24 * 60 * 60 * 1000);
-    if (monthsToFinish >= 1.0) {
+    let months = delta / (30 * 24 * 60 * 60 * 1000);
+    if (months >= 1.0) {
       return moment(delta + Date.now())
         .endOf()
         .fromNow();

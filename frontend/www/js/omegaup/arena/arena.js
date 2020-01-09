@@ -11,9 +11,6 @@ import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue'
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
-import * as moment from 'moment';
-
-moment.locale(T.locale);
 
 export { ArenaAdmin };
 
