@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -24,35 +24,51 @@ class Messages extends \OmegaUp\DAO\VO\VO {
         'date' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['message_id'])) {
-            $this->message_id = (int)$data['message_id'];
+            $this->message_id = intval(
+                $data['message_id']
+            );
         }
         if (isset($data['read'])) {
-            $this->read = boolval($data['read']);
+            $this->read = boolval(
+                $data['read']
+            );
         }
         if (isset($data['sender_id'])) {
-            $this->sender_id = (int)$data['sender_id'];
+            $this->sender_id = intval(
+                $data['sender_id']
+            );
         }
         if (isset($data['recipient_id'])) {
-            $this->recipient_id = (int)$data['recipient_id'];
+            $this->recipient_id = intval(
+                $data['recipient_id']
+            );
         }
         if (isset($data['message'])) {
-            $this->message = strval($data['message']);
+            $this->message = strval(
+                $data['message']
+            );
         }
         if (isset($data['date'])) {
             /**
              * @var string|int|float $data['date']
              * @var int $this->date
              */
-            $this->date = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['date']);
+            $this->date = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['date']
+                )
+            );
         } else {
             $this->date = \OmegaUp\Time::get();
         }

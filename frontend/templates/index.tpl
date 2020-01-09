@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
+{include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}" inline}
 
 {if isset($coderOfTheMonthData)}
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
@@ -10,7 +10,7 @@
 {else}
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
-<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}" async></script>
+{js_include entrypoint="coder_of_the_month_notice" async}
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -35,21 +35,14 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload}
+				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload inline}
 			</div>
 
 			{if isset($schoolRankPayload)}
 			<div class="col-md-6">
-				<div class="panel panel-default">
-					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}" async></script>
-					<div id="omegaup-schools-rank"></div>
-					<div class="container-fluid">
-						<div class="col-xs-12 vertical-padding">
-							<a href="/schoolsrank/">{#rankViewFull#}</a>
-						</div>
-					</div>
-				</div>
+				<script type="text/json" id="school-rank-payload">{$schoolRankPayload|json_encode}</script>
+				{js_include entrypoint="schools_rank" async}
+				<div id="omegaup-schools-rank"></div>
 			</div>
 			{/if}
 
@@ -57,16 +50,17 @@
 	</div>
 
 	<div class="col-md-4">
+		{if $ENABLE_SOCIAL_MEDIA_RESOURCES}
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<!-- Facebook like button -->
-                <div id="fb-root"></div>
-                <div class="fb-like" data-href="https://www.facebook.com/omegaup" data-layout="button_count" data-action="like" data-height="20" data-show-faces="false" data-share="true"></div>
+				<iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup&width=137&layout=button_count&action=like&size=small&show_faces=false&share=true&height=46&appId" width="137" height="46" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allow="encrypted-media"></iframe>
 				<br/>
 				<!-- Twitter follow -->
 				<a href="https://twitter.com/omegaup?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-width="300px" data-height="20" data-show-screen-name="false" data-dnt="true" data-show-count="true">Follow @omegaup</a>
-                </div>
+				</div>
 		</div>
+		{/if}
 
 		{if isset($coderOfTheMonthData)}
 		<div class="panel panel-default">
@@ -118,4 +112,4 @@
 
 <script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

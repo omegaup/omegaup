@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -24,26 +24,36 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
         'extra_note' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval(
+                $data['identity_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['request_time'])) {
             /**
              * @var string|int|float $data['request_time']
              * @var int $this->request_time
              */
-            $this->request_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['request_time']);
+            $this->request_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['request_time']
+                )
+            );
         } else {
             $this->request_time = \OmegaUp\Time::get();
         }
@@ -52,13 +62,21 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
              * @var string|int|float $data['last_update']
              * @var int $this->last_update
              */
-            $this->last_update = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['last_update']);
+            $this->last_update = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['last_update']
+                )
+            );
         }
         if (isset($data['accepted'])) {
-            $this->accepted = boolval($data['accepted']);
+            $this->accepted = boolval(
+                $data['accepted']
+            );
         }
         if (isset($data['extra_note'])) {
-            $this->extra_note = strval($data['extra_note']);
+            $this->extra_note = strval(
+                $data['extra_note']
+            );
         }
     }
 

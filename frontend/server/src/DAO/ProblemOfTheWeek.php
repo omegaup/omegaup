@@ -12,7 +12,10 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
-    final public static function getByDificulty($difficulty) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\ProblemOfTheWeek>
+     */
+    final public static function getByDifficulty(string $difficulty): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -20,11 +23,17 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
                 WHERE
                     difficulty = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$difficulty]);
+        /** @var list<array{difficulty: string, problem_id: int, problem_of_the_week_id: int, time: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$difficulty]
+        );
 
         $problemsOfTheWeek = [];
         foreach ($rs as $row) {
-            array_push($problemsOfTheWeek, new \OmegaUp\DAO\VO\ProblemOfTheWeek($row));
+            $problemsOfTheWeek[] = new \OmegaUp\DAO\VO\ProblemOfTheWeek(
+                $row
+            );
         }
         return $problemsOfTheWeek;
     }

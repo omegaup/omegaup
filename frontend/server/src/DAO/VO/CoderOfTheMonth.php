@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -23,36 +23,58 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'interview_url' => true,
         'rank' => true,
         'selected_by' => true,
+        'school_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['coder_of_the_month_id'])) {
-            $this->coder_of_the_month_id = (int)$data['coder_of_the_month_id'];
+            $this->coder_of_the_month_id = intval(
+                $data['coder_of_the_month_id']
+            );
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval(
+                $data['user_id']
+            );
         }
         if (isset($data['description'])) {
-            $this->description = strval($data['description']);
+            $this->description = strval(
+                $data['description']
+            );
         }
         if (isset($data['time'])) {
-            $this->time = strval($data['time']);
+            $this->time = strval(
+                $data['time']
+            );
         }
         if (isset($data['interview_url'])) {
-            $this->interview_url = strval($data['interview_url']);
+            $this->interview_url = strval(
+                $data['interview_url']
+            );
         }
         if (isset($data['rank'])) {
-            $this->rank = (int)$data['rank'];
+            $this->rank = intval(
+                $data['rank']
+            );
         }
         if (isset($data['selected_by'])) {
-            $this->selected_by = (int)$data['selected_by'];
+            $this->selected_by = intval(
+                $data['selected_by']
+            );
+        }
+        if (isset($data['school_id'])) {
+            $this->school_id = intval(
+                $data['school_id']
+            );
         }
     }
 
@@ -106,4 +128,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $selected_by = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $school_id = null;
 }

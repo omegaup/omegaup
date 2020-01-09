@@ -13,7 +13,7 @@ class StatusBase {
      * @param int|string $status Numeric or named constant.
      * @return null|int value on success, null otherwise.
      */
-    public static function getIntValue($status) : ?int {
+    public static function getIntValue($status): ?int {
         $cache = self::getConstCache(get_called_class());
         if (is_numeric($status)) {
             // $status may be a string, force it to an int.
@@ -33,7 +33,7 @@ class StatusBase {
      * @param int $status
      * @return string SQL snippet.
      */
-    public static function sql(int $status) : string {
+    public static function sql(int $status): string {
         $class = get_called_class();
         $cache = self::getConstCache($class);
         // This should've been validated before, but lets be paranoid anyway.
@@ -49,7 +49,7 @@ class StatusBase {
      * @param class-string $className The derived class name.
      * @return array{constants: array<string, int>, min: int, max: int}
      */
-    private static function getConstCache(string $className) : array {
+    private static function getConstCache(string $className): array {
         if (!isset(self::$_constCache[$className])) {
             $reflection = new \ReflectionClass($className);
             /** @var array<string, int> */

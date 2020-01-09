@@ -18,19 +18,44 @@ class ApiCaller {
      * @param \OmegaUp\Request $request
      * @return array<int, mixed>|array<string, mixed>
      */
-    public static function call(\OmegaUp\Request $request) : array {
+    public static function call(\OmegaUp\Request $request): array {
         try {
+            if (self::isCSRFAttempt()) {
+                throw new \OmegaUp\Exceptions\CSRFException();
+            }
             $response = $request->execute();
+            if (
+                self::isAssociativeArray($response) &&
+                !isset($response['status'])
+            ) {
+                $response['status'] = 'ok';
+            }
+            \OmegaUp\Metrics::getInstance()->apiStatus(
+                strval($request->methodName),
+                200
+            );
+            return $response;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error($e);
-            $response = $e->asResponseArray();
+            $apiException = $e;
         } catch (\Exception $e) {
-            self::$log->error($e);
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
-            $response = $apiException->asResponseArray();
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                $e
+            );
         }
 
-        return $response;
+        self::$log->error($apiException);
+        \OmegaUp\Metrics::getInstance()->apiStatus(
+            strval($request->methodName),
+            intval($apiException->getCode())
+        );
+        if (
+            extension_loaded('newrelic') &&
+            $apiException->getCode() == 500
+        ) {
+            newrelic_notice_error(strval($apiException));
+        }
+        /** @var array<string, mixed> */
+        return $apiException->asResponseArray();
     }
 
     /**
@@ -38,57 +63,35 @@ class ApiCaller {
      *
      * @return bool whether this was a CSRF attempt.
      */
-    private static function isCSRFAttempt() : bool {
+    private static function isCSRFAttempt(): bool {
         if (empty($_SERVER['HTTP_REFERER'])) {
             // This API request was explicitly created.
             return false;
         }
-        $referrer_host = parse_url(
+        $referrerHost = parse_url(
             strval($_SERVER['HTTP_REFERER']),
             PHP_URL_HOST
         );
-        if (is_null($referrer_host)) {
+        if (is_null($referrerHost)) {
             // Malformed referrer. Fail closed and prefer to not allow this.
             return true;
         }
         // Instead of attempting to exactly match the whole URL, just ensure
         // the host is the same. Otherwise this would break tests and local
         // development environments.
-        $allowed_hosts = [
+        $allowedHosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
         ];
-        return !in_array($referrer_host, $allowed_hosts, true);
+        return !in_array($referrerHost, $allowedHosts, true);
     }
 
     /**
      * Handles main API workflow. All HTTP API calls start here.
      */
-    public static function httpEntryPoint() : string {
-        $r = null;
-        /** @var null|\OmegaUp\Exceptions\ApiException */
-        $apiException = null;
-        try {
-            if (self::isCSRFAttempt()) {
-                throw new \OmegaUp\Exceptions\CSRFException();
-            }
-            $r = self::createRequest();
-            $response = $r->execute();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $apiException = $e;
-        } catch (\Exception $e) {
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
-        }
-
-        if (!is_null($apiException)) {
-            $response = $apiException->asResponseArray();
-            self::$log->error($apiException);
-            if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
-                newrelic_notice_error(strval($apiException));
-            }
-        }
-
-        return self::render($response, $r);
+    public static function httpEntryPoint(): string {
+        $r = self::createRequest();
+        return self::render(self::call($r), $r);
     }
 
     /**
@@ -98,11 +101,11 @@ class ApiCaller {
      *
      * @return bool whether the array is associative.
      */
-    static function isAssociativeArray(array $array) : bool {
+    private static function isAssociativeArray(array $array): bool {
         $i = 0;
         /** @var mixed $_ */
         foreach ($array as $key => $_) {
-            if ($key != $i++) {
+            if ($key !== $i++) {
                 return true;
             }
         }
@@ -115,7 +118,10 @@ class ApiCaller {
      * @param array<string, mixed>|array<int, mixed> $response
      * @param \OmegaUp\Request $r
      */
-    private static function render(array $response, ?\OmegaUp\Request $r = null) : string {
+    private static function render(
+        array $response,
+        ?\OmegaUp\Request $r = null
+    ): string {
         // Only add the request ID if the response is an associative array. This
         // allows the APIs that return a flat array to return the right type.
         if (self::isAssociativeArray($response)) {
@@ -131,7 +137,12 @@ class ApiCaller {
         $jsonResult = json_encode($response, $jsonEncodeFlags);
 
         if ($jsonResult === false) {
-            self::$log->warn('json_encode failed for: '. print_r($response, true));
+            self::$log->warn(
+                'json_encode failed for: ' . print_r(
+                    $response,
+                    true
+                )
+            );
             if (json_last_error() == JSON_ERROR_UTF8) {
                 // Attempt to recover gracefully, removing any unencodeable
                 // elements from the response. This should at least prevent
@@ -139,7 +150,7 @@ class ApiCaller {
                 // trying to fix a problem with illegal UTF-8 codepoints.
                 $jsonResult = json_encode(
                     $response,
-                    $jsonEncodeFlags|JSON_PARTIAL_OUTPUT_ON_ERROR
+                    $jsonEncodeFlags | JSON_PARTIAL_OUTPUT_ON_ERROR
                 );
             }
             if ($jsonResult === false) {
@@ -172,7 +183,11 @@ class ApiCaller {
         $args = preg_split('/[\/?]/', $apiAsUrl);
 
         if ($args === false || count($args) < 2) {
-            self::$log->error('Api called with URI with less args than expected: '.count($args));
+            self::$log->error(
+                'Api called with URI with less args than expected: ' . count(
+                    $args
+                )
+            );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
@@ -182,10 +197,12 @@ class ApiCaller {
         $controllerName = str_replace(chr(0), '', $controllerName);
         $methodName = str_replace(chr(0), '', $args[3]);
 
-        $controllerName = "\\OmegaUp\\Controllers\\{$controllerName}";
+        $controllerFqdn = "\\OmegaUp\\Controllers\\{$controllerName}";
 
-        if (!class_exists($controllerName)) {
-            self::$log->error("Controller name was not found: {$controllerName}");
+        if (!class_exists($controllerFqdn)) {
+            self::$log->error(
+                "Controller name was not found: {$controllerFqdn}"
+            );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
@@ -193,27 +210,30 @@ class ApiCaller {
         $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
-        $methodName = "api{$methodName}";
+        $apiMethodName = "api{$methodName}";
 
         // Check the method
-        if (!method_exists($controllerName, $methodName)) {
-            self::$log->error('Method name was not found: '. $controllerName.'::'.$methodName);
+        if (!method_exists($controllerFqdn, $apiMethodName)) {
+            self::$log->error(
+                "Method name was not found: {$controllerFqdn}::{$apiMethodName}"
+            );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         // Get the auth_token and user data from cookies
-        $cs = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
+        $session = \OmegaUp\Controllers\Session::getCurrentSession();
 
         // If we got an auth_token from cookies, replace it
-        if (!empty($cs['auth_token'])) {
-            $request['auth_token'] = $cs['auth_token'];
+        if (!empty($session['auth_token'])) {
+            $request['auth_token'] = $session['auth_token'];
         }
 
-        for ($i = 4; ($i+1) < sizeof($args); $i += 2) {
-            $request[$args[$i]] = urldecode($args[$i+1]);
+        for ($i = 4; ($i + 1) < sizeof($args); $i += 2) {
+            $request[$args[$i]] = urldecode($args[$i + 1]);
         }
 
-        $request->method = "{$controllerName}::{$methodName}";
+        $request->methodName = strtolower("{$controllerName}.{$methodName}");
+        $request->method = "{$controllerFqdn}::{$apiMethodName}";
 
         return $request;
     }
@@ -223,10 +243,15 @@ class ApiCaller {
      *
      * @param array<string, mixed>|array<int, mixed> $response
      */
-    private static function setHttpHeaders(array $response) : void {
+    private static function setHttpHeaders(array $response): void {
         // Scumbag IE y su cache agresivo.
         header('Expires: Tue, 03 Jul 2001 06:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', \OmegaUp\Time::get()) . ' GMT');
+        header(
+            'Last-Modified: ' . gmdate(
+                'D, d M Y H:i:s',
+                \OmegaUp\Time::get()
+            ) . ' GMT'
+        );
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
@@ -248,17 +273,25 @@ class ApiCaller {
      *
      * @param \Exception $e the thrown exception.
      */
-    public static function handleException(\Exception $e) : void {
+    public static function handleException(\Exception $e): void {
         $apiException = null;
         if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
         } else {
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                $e
+            );
         }
 
         if ($apiException->getCode() == 401) {
             self::$log->info("{$apiException}");
-            header('Location: /login/?redirect=' . urlencode(strval($_SERVER['REQUEST_URI'])));
+            header(
+                'Location: /login/?redirect=' . urlencode(
+                    strval(
+                        $_SERVER['REQUEST_URI']
+                    )
+                )
+            );
             die();
         }
         if ($apiException->getCode() == 403) {

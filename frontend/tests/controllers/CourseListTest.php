@@ -5,22 +5,27 @@
  * @author pablo
  */
 
-class CourseListTest extends OmegaupTestCase {
+class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp() {
         parent::setUp();
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
         );
         $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
-        $this->other_user = UserFactory::createUser();
+        ['user' => $this->other_user, 'identity' => $this->other_identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $this->other_user);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $this->other_identity
+        );
     }
 
     protected $admin_user;
     protected $course_user;
     protected $other_user;
+    protected $identity_user;
+    protected $other_identity;
     protected $course_alias;
 
     public function testGetCourseForAdminUser() {
@@ -30,7 +35,6 @@ class CourseListTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
 
@@ -45,12 +49,11 @@ class CourseListTest extends OmegaupTestCase {
     }
 
     public function testGetCourseListForNormalUser() {
-        $otherUserLogin = self::login($this->other_user);
+        $otherUserLogin = self::login($this->other_identity);
         $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $otherUserLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
 

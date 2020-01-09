@@ -1,4 +1,6 @@
 import UI from './ui.js';
+import * as types from './types.ts';
+import { OmegaUp } from './omegaup.js';
 
 function _call(url, transform, defaultParams) {
   return function(params) {
@@ -7,36 +9,36 @@ function _call(url, transform, defaultParams) {
       params = $.extend({}, defaultParams, params);
     }
     $.ajax({
-       url: url,
-       method: params ? 'POST' : 'GET',
-       data: params,
-       dataType: 'json'
-     })
-        .done(function(data) {
-          if (transform) {
-            data = transform(data);
+      url: url,
+      method: params ? 'POST' : 'GET',
+      data: params,
+      dataType: 'json',
+    })
+      .done(function(data) {
+        if (transform) {
+          data = transform(data);
+        }
+        dfd.resolve(data);
+      })
+      .fail(function(jqXHR) {
+        if (jqXHR.status == 499 || jqXHR.readyState != 4) {
+          // If we cancel the connection, let's just swallow the error since
+          // the user is not going to see it.
+          return;
+        }
+        var errorData;
+        try {
+          if (jqXHR.responseText) {
+            errorData = JSON.parse(jqXHR.responseText);
+          } else {
+            errorData = { status: 'error', error: null };
           }
-          dfd.resolve(data);
-        })
-        .fail(function(jqXHR) {
-          if (jqXHR.status == 499 || jqXHR.readyState != 4) {
-            // If we cancel the connection, let's just swallow the error since
-            // the user is not going to see it.
-            return;
-          }
-          var errorData;
-          try {
-            if (jqXHR.responseText) {
-              errorData = JSON.parse(jqXHR.responseText);
-            } else {
-              errorData = {status: 'error', error: null};
-            }
-          } catch (err) {
-            errorData = {status: 'error', error: err};
-          }
-          omegaup.OmegaUp.addError(errorData);
-          dfd.reject(errorData);
-        });
+        } catch (err) {
+          errorData = { status: 'error', error: err };
+        }
+        omegaup.OmegaUp.addError(errorData);
+        dfd.reject(errorData);
+      });
     return dfd.promise();
   };
 }
@@ -60,51 +62,44 @@ function _convertTimes(item) {
 function _normalizeContestFields(contest) {
   omegaup.OmegaUp.convertTimes(contest);
   contest.submissions_gap = parseInt(contest.submissions_gap);
-  contest.show_penalty =
-      (contest.penalty != 0 || contest.penalty_type != 'none');
+  contest.show_penalty = contest.penalty != 0 || contest.penalty_type != 'none';
   return contest;
 }
 
 export default {
   Badge: {
-    badgeDetails: _call('/api/badge/badgeDetails/',
-                        function(result) {
-                          result.first_assignation =
-                              result.first_assignation ?
-                                  new Date(result.first_assignation * 1000) :
-                                  null;
-                          return result;
-                        }),
+    badgeDetails: _call('/api/badge/badgeDetails/', function(result) {
+      result.first_assignation = result.first_assignation
+        ? new Date(result.first_assignation * 1000)
+        : null;
+      return result;
+    }),
 
     list: _call('/api/badge/list/'),
 
-    myBadgeAssignationTime: _call('/api/badge/myBadgeAssignationTime/',
-                                  function(result) {
-                                    result.assignation_time =
-                                        result.assignation_time ?
-                                            new Date(result.assignation_time *
-                                                     1000) :
-                                            null;
-                                    return result;
-                                  }),
+    myBadgeAssignationTime: _call(
+      '/api/badge/myBadgeAssignationTime/',
+      function(result) {
+        result.assignation_time = result.assignation_time
+          ? new Date(result.assignation_time * 1000)
+          : null;
+        return result;
+      },
+    ),
 
-    myList: _call('/api/badge/myList/',
-                  function(result) {
-                    result.badges.forEach((badge) => {
-                      badge.assignation_time =
-                          new Date(badge.assignation_time * 1000);
-                    });
-                    return result;
-                  }),
+    myList: _call('/api/badge/myList/', function(result) {
+      result.badges.forEach(badge => {
+        badge.assignation_time = new Date(badge.assignation_time * 1000);
+      });
+      return result;
+    }),
 
-    userList: _call('/api/badge/userList/',
-                    function(result) {
-                      result.badges.forEach((badge) => {
-                        badge.assignation_time =
-                            new Date(badge.assignation_time * 1000);
-                      });
-                      return result;
-                    }),
+    userList: _call('/api/badge/userList/', function(result) {
+      result.badges.forEach(badge => {
+        badge.assignation_time = new Date(badge.assignation_time * 1000);
+      });
+      return result;
+    }),
   },
 
   Clarification: {
@@ -114,14 +109,12 @@ export default {
   },
 
   Contest: {
-    activityReport: _call('/api/contest/activityReport/',
-                          function(result) {
-                            for (let ev of result.events) {
-                              ev.time =
-                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
-                            }
-                            return result;
-                          }),
+    activityReport: _call('/api/contest/activityReport/', function(result) {
+      for (let ev of result.events) {
+        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+      }
+      return result;
+    }),
 
     addAdmin: _call('/api/contest/addAdmin/'),
 
@@ -131,42 +124,40 @@ export default {
 
     addUser: _call('/api/contest/addUser/'),
 
-    adminDetails: _call(
-        '/api/contest/admindetails/',
-        function(contest) {
-          // We cannot use |_normalizeContestFields| because admins need to be
-          // able to get the unmodified times.
-          contest.start_time = new Date(contest.start_time * 1000);
-          contest.finish_time = new Date(contest.finish_time * 1000);
-          contest.submission_deadline =
-              omegaup.OmegaUp.remoteTime(contest.submission_deadline * 1000);
-          contest.show_penalty =
-              (contest.penalty != 0 || contest.penalty_type != 'none');
-          return contest;
-        }),
+    adminDetails: _call('/api/contest/admindetails/', function(contest) {
+      // We cannot use |_normalizeContestFields| because admins need to be
+      // able to get the unmodified times.
+      contest.start_time = new Date(contest.start_time * 1000);
+      contest.finish_time = new Date(contest.finish_time * 1000);
+      contest.submission_deadline = omegaup.OmegaUp.remoteTime(
+        contest.submission_deadline * 1000,
+      );
+      contest.show_penalty =
+        contest.penalty != 0 || contest.penalty_type != 'none';
+      return contest;
+    }),
 
-    adminList: _call('/api/contest/adminlist/',
-                     function(result) {
-                       for (var idx in result.contests) {
-                         var contest = result.contests[idx];
-                         omegaup.OmegaUp.convertTimes(contest);
-                       }
-                       return result;
-                     }),
+    adminList: _call('/api/contest/adminlist/', function(result) {
+      for (var idx in result.contests) {
+        var contest = result.contests[idx];
+        omegaup.OmegaUp.convertTimes(contest);
+      }
+      return result;
+    }),
 
     admins: _call('/api/contest/admins/'),
 
     arbitrateRequest: _call('/api/contest/arbitraterequest/'),
 
-    clarifications: _call('/api/contest/clarifications/',
-                          function(data) {
-                            for (var idx in data.clarifications) {
-                              var clarification = data.clarifications[idx];
-                              clarification.time = omegaup.OmegaUp.remoteTime(
-                                  clarification.time * 1000);
-                            }
-                            return data;
-                          }),
+    clarifications: _call('/api/contest/clarifications/', function(data) {
+      for (var idx in data.clarifications) {
+        var clarification = data.clarifications[idx];
+        clarification.time = omegaup.OmegaUp.remoteTime(
+          clarification.time * 1000,
+        );
+      }
+      return data;
+    }),
 
     contestants: _call('/api/contest/contestants/'),
 
@@ -178,30 +169,30 @@ export default {
 
     details: _call('/api/contest/details/', _normalizeContestFields),
 
-    list: _call('/api/contest/list/',
-                function(result) {
-                  for (var idx in result.results) {
-                    var contest = result.results[idx];
-                    omegaup.OmegaUp.convertTimes(contest);
-                  }
-                  return result;
-                }),
+    list: _call('/api/contest/list/', function(result) {
+      for (var idx in result.results) {
+        var contest = result.results[idx];
+        omegaup.OmegaUp.convertTimes(contest);
+      }
+      return result;
+    }),
 
-    myList: _call('/api/contest/mylist/',
-                  function(result) {
-                    for (var idx in result.contests) {
-                      var contest = result.contests[idx];
-                      omegaup.OmegaUp.convertTimes(contest);
-                    }
-                    return result;
-                  }),
+    myList: _call('/api/contest/mylist/', function(result) {
+      for (var idx in result.contests) {
+        var contest = result.contests[idx];
+        omegaup.OmegaUp.convertTimes(contest);
+      }
+      return result;
+    }),
 
     open: _call('/api/contest/open/'),
 
     problems: _call('/api/contest/problems/'),
 
-    publicDetails:
-        _call('/api/contest/publicdetails/', _normalizeContestFields),
+    publicDetails: _call(
+      '/api/contest/publicdetails/',
+      _normalizeContestFields,
+    ),
 
     registerForContest: _call('/api/contest/registerforcontest/'),
 
@@ -229,31 +220,28 @@ export default {
 
     updateEndTimeForIdentity: _call('/api/contest/updateEndTimeForIdentity/'),
 
-    users: _call('/api/contest/users/',
-                 function(result) {
-                   for (const user of result.users) {
-                     if (user.access_time !== null) {
-                       user.access_time =
-                           omegaup.OmegaUp.remoteTime(user.access_time * 1000);
-                     }
-                     if (user.end_time !== null) {
-                       user.end_time =
-                           omegaup.OmegaUp.remoteTime(user.end_time * 1000);
-                     }
-                   }
-                   return result;
-                 }),
+    users: _call('/api/contest/users/', function(result) {
+      for (const user of result.users) {
+        if (user.access_time !== null) {
+          user.access_time = omegaup.OmegaUp.remoteTime(
+            user.access_time * 1000,
+          );
+        }
+        if (user.end_time !== null) {
+          user.end_time = omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+        }
+      }
+      return result;
+    }),
   },
 
   Course: {
-    activityReport: _call('/api/course/activityReport/',
-                          function(result) {
-                            for (let ev of result.events) {
-                              ev.time =
-                                  omegaup.OmegaUp.remoteTime(ev.time * 1000);
-                            }
-                            return result;
-                          }),
+    activityReport: _call('/api/course/activityReport/', function(result) {
+      for (let ev of result.events) {
+        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+      }
+      return result;
+    }),
 
     addAdmin: _call('/api/course/addAdmin/'),
 
@@ -263,17 +251,15 @@ export default {
 
     addStudent: _call('/api/course/addStudent/'),
 
-    adminDetails: _call(
-        '/api/course/adminDetails/',
-        function(result) {
-          result.start_time = new Date(result.start_time * 1000);
-          result.finish_time = new Date(result.finish_time * 1000);
-          result.assignments.forEach(assignment => {
-            assignment.start_time = new Date(assignment.start_time * 1000);
-            assignment.finish_time = new Date(assignment.finish_time * 1000);
-          });
-          return result;
-        }),
+    adminDetails: _call('/api/course/adminDetails/', function(result) {
+      result.start_time = new Date(result.start_time * 1000);
+      result.finish_time = new Date(result.finish_time * 1000);
+      result.assignments.forEach(assignment => {
+        assignment.start_time = new Date(assignment.start_time * 1000);
+        assignment.finish_time = new Date(assignment.finish_time * 1000);
+      });
+      return result;
+    }),
 
     admins: _call('/api/course/admins/'),
 
@@ -301,29 +287,26 @@ export default {
      */
     apiGetProblemUsers: _call('/api/course/getProblemUsers'),
 
-    listAssignments: _call(
-        '/api/course/listAssignments/',
-        function(result) {
-          // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
-          // be able to get the unmodified times.
-          for (var i = 0; i < result.assignments.length; ++i) {
-            var assignment = result.assignments[i];
-            assignment.start_time = new Date(assignment.start_time * 1000);
-            assignment.finish_time = new Date(assignment.finish_time * 1000);
-          }
-          return result;
-        }),
+    listAssignments: _call('/api/course/listAssignments/', function(result) {
+      // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
+      // be able to get the unmodified times.
+      for (var i = 0; i < result.assignments.length; ++i) {
+        var assignment = result.assignments[i];
+        assignment.start_time = new Date(assignment.start_time * 1000);
+        assignment.finish_time = new Date(assignment.finish_time * 1000);
+      }
+      return result;
+    }),
 
-    listCourses: _call('/api/course/listCourses/',
-                       function(result) {
-                         for (var i = 0; i < result.admin.length; ++i) {
-                           omegaup.OmegaUp.convertTimes(result.admin[i]);
-                         }
-                         for (var i = 0; i < result.student.length; ++i) {
-                           omegaup.OmegaUp.convertTimes(result.student[i]);
-                         }
-                         return result;
-                       }),
+    listCourses: _call('/api/course/listCourses/', function(result) {
+      for (var i = 0; i < result.admin.length; ++i) {
+        omegaup.OmegaUp.convertTimes(result.admin[i]);
+      }
+      for (var i = 0; i < result.student.length; ++i) {
+        omegaup.OmegaUp.convertTimes(result.student[i]);
+      }
+      return result;
+    }),
 
     listStudents: _call('/api/course/listStudents/'),
 
@@ -343,16 +326,14 @@ export default {
 
     runs: _call('/api/course/runs/', _convertRuntimes),
 
-    studentProgress: _call('/api/course/studentProgress/',
-                           function(result) {
-                             for (var problem of result.problems) {
-                               for (var run of problem.runs) {
-                                 run.time = omegaup.OmegaUp.remoteTime(
-                                     run.time * 1000);
-                               }
-                             }
-                             return result;
-                           }),
+    studentProgress: _call('/api/course/studentProgress/', function(result) {
+      for (var problem of result.problems) {
+        for (var run of problem.runs) {
+          run.time = omegaup.OmegaUp.remoteTime(run.time * 1000);
+        }
+      }
+      return result;
+    }),
 
     update: _call('/api/course/update/'),
 
@@ -455,15 +436,13 @@ export default {
   },
 
   Notification: {
-    myList: _call('/api/notification/myList/',
-                  function(result) {
-                    result.notifications.forEach(notification => {
-                      notification.timestamp =
-                          new Date(notification.timestamp * 1000);
-                      notification.contents = JSON.parse(notification.contents);
-                    });
-                    return result;
-                  }),
+    myList: _call('/api/notification/myList/', function(result) {
+      result.notifications.forEach(notification => {
+        notification.timestamp = new Date(notification.timestamp * 1000);
+        notification.contents = JSON.parse(notification.contents);
+      });
+      return result;
+    }),
 
     readNotifications: _call('/api/notification/readNotifications/'),
   },
@@ -479,20 +458,21 @@ export default {
 
     admins: _call('/api/problem/admins/'),
 
-    clarifications: _call('/api/problem/clarifications/',
-                          function(data) {
-                            for (var idx in data.clarifications) {
-                              var clarification = data.clarifications[idx];
-                              clarification.time = omegaup.OmegaUp.remoteTime(
-                                  clarification.time * 1000);
-                            }
-                            return data;
-                          }),
+    clarifications: _call('/api/problem/clarifications/', function(data) {
+      for (var idx in data.clarifications) {
+        var clarification = data.clarifications[idx];
+        clarification.time = omegaup.OmegaUp.remoteTime(
+          clarification.time * 1000,
+        );
+      }
+      return data;
+    }),
 
     delete: _call('/api/problem/delete/'),
 
-    details: _call('/api/problem/details/', _convertRuntimes,
-                   {statement_type: 'markdown'}),
+    details: _call('/api/problem/details/', _convertRuntimes, {
+      statement_type: 'markdown',
+    }),
 
     list: _call('/api/problem/list/'),
 
@@ -542,23 +522,21 @@ export default {
 
     details: _call('/api/qualityNomination/details/'),
 
-    list: _call('/api/qualityNomination/list/',
-                function(result) {
-                  for (var idx in result.nominations) {
-                    var nomination = result.nominations[idx];
-                    omegaup.OmegaUp.convertTimes(nomination);
-                  }
-                  return result;
-                }),
+    list: _call('/api/qualityNomination/list/', function(result) {
+      for (var idx in result.nominations) {
+        var nomination = result.nominations[idx];
+        omegaup.OmegaUp.convertTimes(nomination);
+      }
+      return result;
+    }),
 
-    myList: _call('/api/qualityNomination/mylist/',
-                  function(result) {
-                    for (var idx in result.nominations) {
-                      var nomination = result.nominations[idx];
-                      omegaup.OmegaUp.convertTimes(nomination);
-                    }
-                    return result;
-                  }),
+    myList: _call('/api/qualityNomination/mylist/', function(result) {
+      for (var idx in result.nominations) {
+        var nomination = result.nominations[idx];
+        omegaup.OmegaUp.convertTimes(nomination);
+      }
+      return result;
+    }),
 
     resolve: _call('/api/qualityNomination/resolve/'),
   },
@@ -584,11 +562,10 @@ export default {
 
     disqualify: _call('/api/run/disqualify'),
 
-    status: _call('/api/run/status/',
-                  function(data) {
-                    data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
-                    return data;
-                  }),
+    status: _call('/api/run/status/', function(data) {
+      data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
+      return data;
+    }),
   },
 
   School: {
@@ -596,7 +573,37 @@ export default {
 
     list: _call('/api/school/list/'),
 
+    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
+
     rank: _call('/api/school/rank/'),
+
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
+
+    schoolCodersOfTheMonth: _call(
+      '/api/school/schoolcodersofthemonth',
+      function(data) {
+        data.coders = data.coders.map(
+          coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
+        );
+        return data;
+      },
+    ),
+
+    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth/'),
+
+    users: _call('/api/school/users/', function(data) {
+      data.users = data.users.map(
+        user =>
+          new types.SchoolUser(
+            user.classname,
+            user.username,
+            user.created_problems,
+            user.solved_problems,
+            user.organized_contests,
+          ),
+      );
+      return data;
+    }),
   },
 
   Session: {
@@ -611,6 +618,17 @@ export default {
      * @param {string} storeToken - The auth code.
      */
     googleLogin: _call('/api/session/googlelogin/'),
+  },
+
+  Submission: {
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
+      data,
+    ) {
+      data.submissions.forEach(submission => {
+        submission.time = new Date(submission.time * 1000);
+      });
+      return data;
+    }),
   },
 
   Time: {
@@ -638,7 +656,19 @@ export default {
 
     changePassword: _call('/api/user/changepassword/'),
 
-    contestStats: _call('/api/user/conteststats/'),
+    contestStats: _call('/api/user/conteststats/', function(data) {
+      let contests = [];
+      for (let contestAlias in data.contests) {
+        const now = new Date();
+        const currentTimestamp =
+          data.contests[contestAlias].data.finish_time * 1000;
+        const end = OmegaUp.remoteTime(currentTimestamp);
+        if (data.contests[contestAlias].place !== null && now > end) {
+          contests.push(new types.ContestResult(data.contests[contestAlias]));
+        }
+      }
+      return contests;
+    }),
 
     coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
@@ -660,18 +690,46 @@ export default {
 
     listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
-    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/', function(
+      data,
+    ) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
 
-    problemsSolved: _call('/api/user/problemssolved/'),
+    problemsSolved: _call('/api/user/problemssolved/', function(data) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
 
-    profile: _call('/api/user/profile/',
-                   function(data) {
-                     data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
-                         data.userinfo.birth_date * 1000);
-                     data.userinfo.graduation_date = omegaup.OmegaUp.remoteTime(
-                         data.userinfo.graduation_date * 1000);
-                     return data;
-                   }),
+    problemsCreated: _call('/api/user/problemscreated', function(data) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
+
+    profile: _call('/api/user/profile/', function(data) {
+      if (data.birth_date !== null) {
+        data.birth_date = omegaup.OmegaUp.remoteTime(data.birth_date * 1000);
+      }
+      if (data.graduation_date !== null) {
+        data.graduation_date = omegaup.OmegaUp.remoteTime(
+          data.graduation_date * 1000,
+        );
+      }
+      return data;
+    }),
 
     rankByProblemsSolved: _call('/api/user/rankByProblemsSolved/'),
 
@@ -705,4 +763,4 @@ export default {
 
     verifyEmail: _call('/api/user/verifyemail/'),
   },
-}
+};

@@ -6,28 +6,35 @@
  * @author joemmanuel
  */
 
-class ContestRunsTest extends OmegaupTestCase {
+class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them
      */
     public function testGetRunsForContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($contestData['director']);
@@ -41,8 +48,14 @@ class ContestRunsTest extends OmegaupTestCase {
 
         // Assert
         $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals($runData['response']['guid'], $response['runs'][0]['guid']);
-        $this->assertEquals($contestant->username, $response['runs'][0]['username']);
+        $this->assertEquals(
+            $runData['response']['guid'],
+            $response['runs'][0]['guid']
+        );
+        $this->assertEquals(
+            $identity->username,
+            $response['runs'][0]['username']
+        );
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Contest admin should be able to view run, even if not problem admin.
@@ -68,22 +81,29 @@ class ContestRunsTest extends OmegaupTestCase {
      */
     public function testEditProblemsetPointsDuringAContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Build request
         $directorLogin = self::login($contestData['director']);

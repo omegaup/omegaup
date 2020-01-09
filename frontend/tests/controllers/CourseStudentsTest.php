@@ -3,17 +3,17 @@
 /**
  * Tests that students' progress can be tracked.
  */
-class CourseStudentsTest extends OmegaupTestCase {
+class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentProgress test.
      */
     public function testAddStudentToCourse() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $studentsInCourse = 5;
 
         // Prepare assignment. Create problems
         $adminLogin = self::login($courseData['admin']);
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -27,21 +27,31 @@ class CourseStudentsTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse($courseData);
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
         }
 
         // Add one run to one of the problems.
         $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
         {
-            $studentLogin = OmegaupTestCase::login($students[0]);
+            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
             $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $courseData['assignment']->problemset_id,
                 'problem_alias' => $problem->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => $submissionSource,
             ]));
-            RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $runResponsePA['guid']);
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null /*runData*/,
+                0.5,
+                'PA',
+                null,
+                $runResponsePA['guid']
+            );
         }
 
         // Call API
@@ -54,7 +64,10 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
         $this->assertCount(1, $response['problems']);
         $this->assertCount(1, $response['problems'][0]['runs']);
-        $this->assertEquals($response['problems'][0]['runs'][0]['source'], $submissionSource);
+        $this->assertEquals(
+            $response['problems'][0]['runs'][0]['source'],
+            $submissionSource
+        );
         $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
     }
 
@@ -63,17 +76,17 @@ class CourseStudentsTest extends OmegaupTestCase {
      */
     public function testAddIdentityStudentToCourse() {
         // Add a new user with identity groups creator privileges, and login
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
 
         // Create a course where course admin is a identity creator group member
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $creator,
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $creatorIdentity,
             $creatorLogin
         );
 
         // Prepare assignment. Create problems
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -83,10 +96,12 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
 
         // Get Group object
-        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias($courseData['course_alias']);
+        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias(
+            $courseData['course_alias']
+        );
 
         // Create identities for a group
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         [$_, $associatedIdentity] = IdentityFactory::createIdentitiesFromAGroup(
             $associatedGroup,
             $creatorLogin,
@@ -95,7 +110,7 @@ class CourseStudentsTest extends OmegaupTestCase {
 
         // Create an unassociated group, it does not have access to the course
         $unassociatedGroup = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -109,7 +124,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         );
 
         // Create a valid run for assignment
-        $runData = RunsFactory::createCourseAssignmentRun(
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemData,
             $courseData,
             $associatedIdentity
@@ -118,7 +133,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         try {
             // Create an invalid run for assignment, because identity is not a
             // member of the course group
-            $runData = RunsFactory::createCourseAssignmentRun(
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
                 $problemData,
                 $courseData,
                 $unassociatedIdentity

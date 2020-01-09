@@ -1,7 +1,5 @@
-{include file='head.tpl' navbarSection='rank' htmlTitle="{#omegaupTitleRank#}"}
-<div class=" panel panel-default">
-		<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-		<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
-		<div id="omegaup-schools-rank"></div>
-</div>
-{include file='footer.tpl'}
+{include file='head.tpl' navbarSection='rank' headerPayload=$headerPayload htmlTitle="{#omegaupTitleRank#}" inline}
+<script type="text/json" id="school-rank-payload">{$schoolRankPayload|json_encode}</script>
+{js_include entrypoint="schools_rank"}
+<div id="omegaup-schools-rank"></div>
+{include file='footer.tpl' inline}

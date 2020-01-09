@@ -3,12 +3,15 @@
 /**
  * @author alanboy
  */
-class AssignmentUpdateTest extends OmegaupTestCase {
+class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentUpdate() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $login
+        );
         $assignmentAlias = $courseData['assignment_alias'];
         $courseAlias = $courseData['course_alias'];
 
@@ -36,7 +39,10 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $this->assertEquals($updatedFinishTime, $response['finish_time']);
 
         $this->assertEquals('some new name', $response['name']);
-        $this->assertEquals('some meaningful description', $response['description']);
+        $this->assertEquals(
+            'some meaningful description',
+            $response['description']
+        );
     }
 
     /**
@@ -44,19 +50,36 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * alias and course alias
      */
     public function testMissingDataOnAssignmentUpdate() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $login
+        );
 
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
+                'name' => 'some new name'
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to missing parameter'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'course' => $courseData['course_alias'],
                 'name' => 'some new name'
             ]));
-            $this->fail('Updating assignment should have failed due to missing parameter');
+            $this->fail(
+                'Updating assignment should have failed due to missing parameter'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterEmpty', $e->getMessage());
         }
@@ -66,10 +89,13 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Can't update the start time to be after the finish time.
      */
     public function testAssignmentUpdateWithInvertedTimes() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $login
+        );
 
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
@@ -80,7 +106,9 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'finish_time' => $courseData['request']['start_time'] + 9,
             ]));
 
-            $this->fail('Assignment should not have been updated because finish time is earlier than start time');
+            $this->fail(
+                'Assignment should not have been updated because finish time is earlier than start time'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('courseInvalidStartTime', $e->getMessage());
         }
@@ -90,21 +118,21 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Students should not be able to update the assignment.
      */
     public function testAssignmentUpdateByStudent() {
-        $admin = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($admin);
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $admin,
+        ['user' => $admin, 'identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($adminIdentity);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $adminIdentity,
             $adminLogin
         );
 
-        $student = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $student->username,
+            'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
         ]));
 
-        $login = OmegaupTestCase::login($student);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -122,7 +150,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
 
     public function testAssignmentsOutOfDate() {
         // Create 1 course with 1 assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
@@ -142,9 +170,21 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'finish_time' => $response['assignments'][0]['finish_time'] + 240,
                 'assignment_type' => $response['assignments'][0]['assignment_type'],
             ]));
-            $this->fail('Assignment should not have been updated because the date falls outside of valid range');
+            $this->fail(
+                'Assignment should not have been updated because the date falls outside of valid range'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
+            $this->assertEquals('parameterDateTooLarge', $e->getMessage());
+
+            $responseArray =  $e->asResponseArray();
+            $this->assertEquals(
+                'parameterDateTooLarge',
+                $responseArray['errorname']
+            );
+            $this->assertEquals(
+                $courseData['course']->finish_time,
+                $responseArray['payload']['upper_bound']
+            );
         }
     }
 }

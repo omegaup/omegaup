@@ -15,7 +15,7 @@ abstract class VO {
      *
      * @return array<string, mixed>
      */
-    function asArray() : array {
+    public function asArray(): array {
         return get_object_vars($this);
     }
 
@@ -28,7 +28,7 @@ abstract class VO {
      *
      * @return string
      */
-    public function __toString() : string {
+    public function __toString(): string {
         return json_encode($this->asArray()) ?: '{}';
     }
 
@@ -39,7 +39,7 @@ abstract class VO {
      * @param string[] $filters
      * @return array<string, mixed>
      */
-    public function asFilteredArray(iterable $filters) : array {
+    public function asFilteredArray(iterable $filters): array {
         // Get the complete representation of the array
         $completeArray = $this->asArray();
         // Declare an empty array to return

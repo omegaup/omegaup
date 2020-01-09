@@ -15,16 +15,20 @@ if (window.NodeList && !window.NodeList.prototype.forEach) {
 
 if (window.Node && !window.Node.prototype.innerText && Object.defineProperty) {
   Object.defineProperty(window.Node.prototype, 'innerText', {
-    get: function() { return this.textContent; },
-    set: function(value) { this.textContent = value; },
+    get: function() {
+      return this.textContent;
+    },
+    set: function(value) {
+      this.textContent = value;
+    },
   });
 }
 
 // From https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
 if (window.Element && !window.Element.prototype.matches)
   window.Element.prototype.matches =
-      window.Element.prototype.msMatchesSelector ||
-      window.Element.prototype.webkitMatchesSelector;
+    window.Element.prototype.msMatchesSelector ||
+    window.Element.prototype.webkitMatchesSelector;
 
 if (window.Element && !window.Element.prototype.closest) {
   window.Element.prototype.closest = function(s) {

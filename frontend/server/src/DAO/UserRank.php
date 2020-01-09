@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
     /**
      * @param null|string|int $value
-     * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getFilteredRank(
         int $page,
@@ -23,7 +23,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         string $orderType = 'ASC',
         ?string $filteredBy = null,
         $value = null
-    ) : array {
+    ): array {
         $sql = '
               SELECT
                 `ur`.`user_id`,
@@ -33,16 +33,20 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`name`,
                 `ur`.`country_id`,
-                (SELECT
-                    `urc`.`classname`
-                 FROM
-                    `User_Rank_Cutoffs` `urc`
-                 WHERE
-                    `urc`.`score` <= `ur`.`score`
-                 ORDER BY
-                    `urc`.`percentile` ASC
-                 LIMIT
-                    1) as `classname`';
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`';
         $sql_count = '
               SELECT
                 COUNT(1)';
@@ -57,10 +61,14 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             $sql_from .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($filteredBy) . '_id` = ?';
+            $sql_from .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+                $filteredBy
+            ) . '_id` = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+                $order
+            ) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $paramsLimit = [
             (($page - 1) * intval($colsPerPage)), // Offset
@@ -69,13 +77,19 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $sqlLimit = ' LIMIT ?, ?';
         // Get total rows
         /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params) ?? 0;
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql_count . $sql_from,
+            $params
+        ) ?? 0;
 
         $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        /** @var array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[] */
-        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sqlLimit, $params);
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}> */
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sql_from . $sqlLimit,
+            $params
+        );
         return [
             'rank' => $allData,
             'total' => $totalRows

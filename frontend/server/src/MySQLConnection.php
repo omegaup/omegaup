@@ -2,6 +2,13 @@
 
 namespace OmegaUp;
 
+class FieldType {
+    const TYPE_STRING = 0;
+    const TYPE_INT = 1;
+    const TYPE_FLOAT = 2;
+    const TYPE_BOOL = 3;
+}
+
 /**
  * A minimalistic database access layer that has an interface mostly compatible
  * with ADOdb.
@@ -43,7 +50,7 @@ class MySQLConnection {
      * shutdown function to flush any outstanding queries upon script
      * termination.
      */
-    public static function getInstance() : MySQLConnection {
+    public static function getInstance(): MySQLConnection {
         if (is_null(self::$_instance)) {
             self::$_instance = new MySQLConnection();
 
@@ -59,20 +66,22 @@ class MySQLConnection {
     }
 
     private function __construct() {
-        $this->_connect();
+        $this->connect();
     }
 
-    private function _connect() : void {
+    private function connect(): void {
         $this->_connection = mysqli_init();
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
-        if (!$this->_connection->real_connect(
-            'p:' . OMEGAUP_DB_HOST,
-            OMEGAUP_DB_USER,
-            OMEGAUP_DB_PASS,
-            OMEGAUP_DB_NAME
-        )) {
+        if (
+            !$this->_connection->real_connect(
+                'p:' . OMEGAUP_DB_HOST,
+                OMEGAUP_DB_USER,
+                OMEGAUP_DB_PASS,
+                OMEGAUP_DB_NAME
+            )
+        ) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
                 . mysqli_connect_error(),
@@ -91,7 +100,7 @@ class MySQLConnection {
      *
      * @return string[] The list of variables that will be serialized.
      */
-    public function __sleep() : array {
+    public function __sleep(): array {
         $this->Flush();
         return [];
     }
@@ -99,14 +108,14 @@ class MySQLConnection {
     /**
      * Deserializes the database connection. Just connects to the database again.
      */
-    public function __wakeup() : void {
-        $this->_connect();
+    public function __wakeup(): void {
+        $this->connect();
     }
 
     /**
      * Commits any outstanding transactions.
      */
-    private function Flush() : void {
+    private function Flush(): void {
         if ($this->_transactionCount > 0) {
             $this->_transactionCount = 1;
             $this->CompleteTrans();
@@ -126,7 +135,7 @@ class MySQLConnection {
      * Binds the query parameters and returns a query that can be passed into
      * mysqli_query.
      */
-    private function BindQueryParams(string $sql, array $params) : string {
+    private function BindQueryParams(string $sql, array $params): string {
         if (empty($params)) {
             return $sql;
         }
@@ -149,7 +158,11 @@ class MySQLConnection {
             } elseif (is_bool($params[$i])) {
                 $chunks[] = $params[$i] ? '1' : '0';
             } else {
-                $chunks[] = "'" . $this->_connection->real_escape_string((string) $params[$i]) . "'";
+                $chunks[] = "'" . $this->_connection->real_escape_string(
+                    strval(
+                        $params[$i]
+                    )
+                ) . "'";
             }
             $chunks[] = $inputChunks[$i + 1];
         }
@@ -157,12 +170,166 @@ class MySQLConnection {
         return implode('', $chunks);
     }
 
+    private function MapFieldType(int $fieldType): int {
+        switch ($fieldType) {
+            case MYSQLI_TYPE_DECIMAL:
+            case MYSQLI_TYPE_DOUBLE:
+            case MYSQLI_TYPE_FLOAT:
+            case MYSQLI_TYPE_NEWDECIMAL:
+                return FieldType::TYPE_FLOAT;
+
+            case MYSQLI_TYPE_BIT:
+            case MYSQLI_TYPE_TINY:
+                return FieldType::TYPE_BOOL;
+
+            case MYSQLI_TYPE_INT24:
+            case MYSQLI_TYPE_LONG:
+            case MYSQLI_TYPE_LONGLONG:
+            case MYSQLI_TYPE_SHORT:
+            case MYSQLI_TYPE_YEAR:
+                return FieldType::TYPE_INT;
+
+            case MYSQLI_TYPE_TIMESTAMP:
+            case MYSQLI_TYPE_DATE:
+            case MYSQLI_TYPE_TIME:
+            case MYSQLI_TYPE_DATETIME:
+            case MYSQLI_TYPE_NEWDATE:
+                return FieldType::TYPE_STRING;
+
+            case MYSQLI_TYPE_ENUM:
+            case MYSQLI_TYPE_SET:
+            case MYSQLI_TYPE_STRING:
+            case MYSQLI_TYPE_VAR_STRING:
+                return FieldType::TYPE_STRING;
+
+            case MYSQLI_TYPE_TINY_BLOB:
+            case MYSQLI_TYPE_MEDIUM_BLOB:
+            case MYSQLI_TYPE_LONG_BLOB:
+            case MYSQLI_TYPE_BLOB:
+                return FieldType::TYPE_STRING;
+
+            default:
+                throw new \Exception("Unknown field type: {$fieldType}");
+        }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function MapFieldTypes(\mysqli_result &$result): array {
+        $fieldTypes = [];
+        /** @var object $field */
+        foreach ($result->fetch_fields() as $field) {
+            /**
+             * @var string $field->name
+             * @var int $field->type
+             */
+            $fieldTypes[$field->name] = self::MapFieldType($field->type);
+        }
+        return $fieldTypes;
+    }
+
+    /**
+     * @param mixed $value
+     * @return null|int|bool|float|string
+     */
+    private function MapValue($value, int $fieldType) {
+        if (is_null($value)) {
+            return null;
+        }
+        switch ($fieldType) {
+            case FieldType::TYPE_BOOL:
+                return boolval($value);
+
+            case FieldType::TYPE_INT:
+                return intval($value);
+
+            case FieldType::TYPE_FLOAT:
+                return floatval($value);
+
+            case FieldType::TYPE_STRING:
+            default:
+                return strval($value);
+        }
+    }
+
+    /**
+     * @param null|array<string, mixed> $row
+     * @param array<string, int> $fieldTypes
+     * @return null|array<string, mixed>
+     */
+    private function MapRow(?array $row, array $fieldTypes): ?array {
+        if (is_null($row)) {
+            return null;
+        }
+        /** @var mixed $value */
+        foreach ($row as $key => $value) {
+            $row[$key] = self::MapValue($value, $fieldTypes[$key]);
+        }
+        return $row;
+    }
+
+    private function PsalmType(object $field): string {
+        $typeName = 'string';
+        switch (self::MapFieldType(intval($field->type))) {
+            case FieldType::TYPE_BOOL:
+                $typeName = 'bool';
+                break;
+
+            case FieldType::TYPE_INT:
+                $typeName = 'int';
+                break;
+
+            case FieldType::TYPE_FLOAT:
+                $typeName = 'float';
+                break;
+        }
+        if ((intval($field->flags) & MYSQLI_NOT_NULL_FLAG) == 0) {
+            $typeAtoms = ['null', $typeName];
+            sort($typeAtoms);
+            return join('|', $typeAtoms);
+        }
+        return $typeName;
+    }
+
+    private function DumpMySQLQueryResultTypes(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        $fieldTypes = [];
+        /** @var object $field */
+        foreach ($result->fetch_fields() as $field) {
+            $fieldTypes[] = "{$field->name}: " . self::PsalmType($field);
+        }
+        sort($fieldTypes);
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} array{" .
+            join(', ', $fieldTypes) .
+            '}'
+        );
+    }
+
+    private function DumpMySQLQueryResultTypeSingleField(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} " .
+            self::PsalmType($result->fetch_field_direct(0))
+        );
+    }
+
     /**
      * Executes a MySQL query.
      */
-    private function Query(string $sql, array $params, int $resultmode) : ?\mysqli_result {
-        /** @var \mysqli_result|bool */
-        $result = $this->_connection->query($this->BindQueryParams($sql, $params), $resultmode);
+    private function Query(
+        string $sql,
+        array $params,
+        int $resultmode
+    ): ?\mysqli_result {
+        $result = $this->_connection->query(
+            $this->BindQueryParams(
+                $sql,
+                $params
+            ),
+            $resultmode
+        );
         if ($result === false) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}",
@@ -178,7 +345,7 @@ class MySQLConnection {
     /**
      * Executes a MySQL query.
      */
-    public function Execute(string $sql, array $params = []) : void {
+    public function Execute(string $sql, array $params = []): void {
         $this->Query($sql, $params, MYSQLI_STORE_RESULT);
         $this->_needsFlushing = true;
     }
@@ -186,18 +353,20 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns the first row as an associative array.
      *
-     * @return mixed[]|null
-     *
-     * @psalm-return array<string, mixed>|null
+     * @return array<string, mixed>|null
      */
-    public function GetRow(string $sql, array $params = []) : ?array {
+    public function GetRow(string $sql, array $params = []): ?array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
         if (is_null($result)) {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
+            $fieldTypes = self::MapFieldTypes($result);
             /** @var array<string, mixed> */
-            return $result->fetch_assoc();
+            return self::MapRow($result->fetch_assoc(), $fieldTypes);
         } finally {
             $result->free();
         }
@@ -206,21 +375,23 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns all rows as associative arrays.
      *
-     * @return array{string: mixed}[]
-     *
-     * @psalm-return array<int, array<string, mixed>>
+     * @return list<array<string, mixed>>
      */
-    public function GetAll(string $sql, array $params = []) : array {
+    public function GetAll(string $sql, array $params = []): array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
         if (is_null($result)) {
             return [];
         }
         try {
-            /** @var array<int, array<string, mixed>> */
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
+            $fieldTypes = self::MapFieldTypes($result);
             $resultArray = [];
             /** @var array<string, mixed> $row */
             while (!is_null($row = $result->fetch_assoc())) {
-                $resultArray[] = $row;
+                /** @var array<string, mixed> This cannot be null. */
+                $resultArray[] = self::MapRow($row, $fieldTypes);
             }
             return $resultArray;
         } finally {
@@ -239,11 +410,20 @@ class MySQLConnection {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypeSingleField($result);
+            }
             $row = $result->fetch_row();
             if (empty($row)) {
                 return null;
             }
-            return $row[0];
+            /** @var object */
+            $field = $result->fetch_field_direct(0);
+            /** @var int $field->type */
+            return self::MapValue(
+                $row[0],
+                self::MapFieldType($field->type)
+            );
         } finally {
             $result->free();
         }
@@ -252,7 +432,7 @@ class MySQLConnection {
     /**
      * Returns the number of rows affected by the previous query.
      */
-    public function Affected_Rows() : int {
+    public function Affected_Rows(): int {
         /** @var int */
         return $this->_connection->affected_rows;
     }
@@ -260,7 +440,7 @@ class MySQLConnection {
     /**
      * Returns the last AUTO_INCREMENT ID that was inserted.
      */
-    public function Insert_ID() : int {
+    public function Insert_ID(): int {
         /** @var int */
         return $this->_connection->insert_id;
     }
@@ -269,14 +449,14 @@ class MySQLConnection {
      * Returns the provided string escaped in a way that can be used in a query
      * without having SQL injections.
      */
-    public function Escape(string $s) : string {
+    public function Escape(string $s): string {
         return $this->_connection->real_escape_string($s);
     }
 
     /**
      * Starts a transaction.
      */
-    public function StartTrans() : void {
+    public function StartTrans(): void {
         if (++$this->_transactionCount > 1) {
             return;
         }
@@ -288,9 +468,12 @@ class MySQLConnection {
      * Marks the transaction as complete and commits it to the database. Will
      * roll it back if FailTrans() was called.
      */
-    public function CompleteTrans() : void {
+    public function CompleteTrans(): void {
         if ($this->_transactionCount <= 0) {
-            throw new \OmegaUp\Exceptions\DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                'Called FailTrans() outside of a transaction',
+                0
+            );
         }
         if (--$this->_transactionCount > 0) {
             return;
@@ -307,9 +490,12 @@ class MySQLConnection {
      * Marks the transaction as failed. When CompleteTrans() is called, it will
      * be rolled back.
      */
-    public function FailTrans() : void {
+    public function FailTrans(): void {
         if ($this->_transactionCount <= 0) {
-            throw new \OmegaUp\Exceptions\DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
+                'Called FailTrans() outside of a transaction',
+                0
+            );
         }
         $this->_transactionOk = false;
     }

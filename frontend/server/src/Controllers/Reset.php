@@ -7,60 +7,74 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * Creates a reset operation, the first of two steps needed to reset a
      * password. The first step consist of sending an email to the user with
      * instructions to reset he's password, if and only if the email is valid.
-     * @param \OmegaUp\Request $r
-     * @return array
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return array{message?: string, token?: string}
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r): array {
         self::validateCreateRequest($r);
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['email'],
+            'email'
+        );
         $email = strval($r['email']);
         $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = \OmegaUp\Time::get();
         \OmegaUp\DAO\Users::update($user);
 
         if (IS_TEST) {
-            return ['status' => 'ok', 'token' => $token];
+            return ['token' => $token];
         }
 
         $subject = \OmegaUp\Translations::getInstance()->get('wordsReset')
             ?: 'wordsReset';
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage')
+        $message = \OmegaUp\Translations::getInstance()->get(
+            'wordsResetMessage'
+        )
             ?: 'wordsResetMessage';
         $body = str_replace('[link]', $link, $message);
 
         try {
             \OmegaUp\Email::sendEmail([$email], $subject, $body);
         } catch (\Exception $e) {
-            self::$log->error('Failed to send reset password email ' . $e->getMessage());
+            self::$log->error(
+                'Failed to send reset password email ' . $e->getMessage()
+            );
             $user->reset_digest = null;
             $user->reset_sent_at = null;
             \OmegaUp\DAO\Users::update($user);
         }
 
         return [
-            'status' => 'ok',
-            'message' => \OmegaUp\Translations::getInstance()->get('passwordResetRequestSuccess')
+            'message' => \OmegaUp\Translations::getInstance()->get(
+                'passwordResetRequestSuccess'
+            ) ?? 'passwordResetRequestSuccess'
         ];
     }
 
     /**
      * Creates a reset operation, support team members can generate a valid
      * token and then they can send it to end user
-     * @param \OmegaUp\Request $r
-     * @return array
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{link: string, token: string}
      */
-    public static function apiGenerateToken(\OmegaUp\Request $r) {
+    public static function apiGenerateToken(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
@@ -68,16 +82,25 @@ class Reset extends \OmegaUp\Controllers\Controller {
         }
 
         self::validateCreateRequest($r);
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['email'],
+            'email'
+        );
         $email = $r['email'];
 
         $lastRequest = \OmegaUp\DAO\Identities::getExtraInformation($email);
 
         if (is_null($lastRequest)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
 
         if (!$lastRequest['within_last_day']) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'userDoesNotHaveAnyPasswordChangeRequest'
+            );
         }
 
         $token = \OmegaUp\ApiUtils::getRandomString();
@@ -85,73 +108,139 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = \OmegaUp\Time::get();
         \OmegaUp\DAO\Users::update($user);
 
         $link = OMEGAUP_URL . '/login/password/reset/?';
-        $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
+        $link .= 'email=' . rawurlencode(
+            $email
+        ) . '&reset_token=' . rawurlencode(
+            $token
+        );
 
-        return ['status' => 'ok', 'token' => $token, 'link' => $link];
+        return [
+            'token' => $token,
+            'link' => $link,
+        ];
     }
 
     /**
      * Updates the password of a given user, this is the second and last step
      * in order to reset the password. This operation is done if and only if
      * the correct parameters are suplied.
-     * @param \OmegaUp\Request $r
-     * @return array
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return array{message: string}
      */
-    public static function apiUpdate(\OmegaUp\Request $r) {
-        self::validateUpdateRequest($r);
+    public static function apiUpdate(\OmegaUp\Request $r): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['email'],
+            'email'
+        );
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
         }
-        $user->password = \OmegaUp\SecurityTools::hashString($r['password']);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['reset_token'],
+            'reset_token'
+        );
+        $resetToken = $r['reset_token'];
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password'],
+            'password'
+        );
+        $password = $r['password'];
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password_confirmation'],
+            'password_confirmation'
+        );
+        $passwordConfirmation = $r['password_confirmation'];
+
+        if ($user->reset_digest !== hash('sha1', $resetToken)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidResetToken'
+            );
+        }
+
+        if ($password !== $passwordConfirmation) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMismatch'
+            );
+        }
+
+        \OmegaUp\SecurityTools::testStrongPassword($password);
+
+        if (is_null($user->reset_sent_at)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetResetExpired'
+            );
+        }
+        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
+        if ($seconds > PASSWORD_RESET_TIMEOUT) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetResetExpired'
+            );
+        }
+
         $user->reset_digest = null;
         $user->reset_sent_at = null;
         if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
-        $identity->password = $user->password;
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-            \OmegaUp\DAO\Users::update($user);
-            \OmegaUp\DAO\Identities::update($identity);
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to reset password', $e);
-            throw $e;
-        }
+        $identity->password = \OmegaUp\SecurityTools::hashString(
+            $r['password']
+        );
+
+        \OmegaUp\DAO\Identities::update($identity);
 
         return [
-            'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : \OmegaUp\Translations::getInstance()->get('passwordResetResetSuccess')
+            'message' => IS_TEST ?
+                'message' :
+                    \OmegaUp\Translations::getInstance()->get(
+                        'passwordResetResetSuccess'
+                    ) ?? 'passwordResetResetSuccess'
         ];
     }
 
-    private static function validateCreateRequest($r) {
+    private static function validateCreateRequest(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
         }
 
         if (!$user->verified) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('unverifiedUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'unverifiedUser'
+            );
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && \OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+        if (
+            !is_null($r->identity) &&
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $r->identity
+            )
+        ) {
             return;
         }
 
@@ -160,39 +249,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
         }
         $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetMinWait');
-        }
-    }
-
-    private static function validateUpdateRequest($r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
-        $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
-        $reset_token = $r['reset_token'];
-        $password = $r['password'];
-        $password_confirmation = $r['password_confirmation'];
-        if (is_null($user)
-            || is_null($reset_token)
-            || is_null($password)
-            || is_null($password_confirmation)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
-        }
-
-        if ($user->reset_digest !== hash('sha1', $reset_token)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidResetToken');
-        }
-
-        if ($password !== $password_confirmation) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordMismatch');
-        }
-
-        \OmegaUp\SecurityTools::testStrongPassword($password);
-
-        if (is_null($user->reset_sent_at)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetResetExpired');
-        }
-        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
-        if ($seconds > PASSWORD_RESET_TIMEOUT) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('passwordResetResetExpired');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordResetMinWait'
+            );
         }
     }
 }

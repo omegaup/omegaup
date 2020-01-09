@@ -1,10 +1,16 @@
 <template>
   <div class="omegaup-scoreboard">
     <!-- id-lint off -->
-    <div id="ranking-chart"></div><!-- id-lint on -->
-    <label><input class="toggle-contestants"
-           type="checkbox"
-           v-model="onlyShowExplicitlyInvited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
+    <div id="ranking-chart"></div>
+    <!-- id-lint on -->
+    <label
+      ><input
+        class="toggle-contestants"
+        type="checkbox"
+        v-model="onlyShowExplicitlyInvited"
+      />
+      {{ T.scoreboardShowOnlyInvitedIdentities }}</label
+    >
     <table>
       <thead>
         <tr>
@@ -12,33 +18,50 @@
           <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
-            <a v-bind:href="'#problems/' + problem.alias"
-                v-bind:title="problem.alias">{{ UI.columnName(index) }}</a>
+            <a
+              v-bind:href="'#problems/' + problem.alias"
+              v-bind:title="problem.alias"
+              >{{ UI.columnName(index) }}</a
+            >
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:class="user.username"
-            v-for="(user, userIndex) in ranking"
-            v-if="showUser(user.is_invited)">
-          <td class="legend"
-              v-bind:style="{ backgroundColor: legendColor(userIndex) }"></td>
+        <tr
+          v-bind:class="user.username"
+          v-for="(user, userIndex) in ranking"
+          v-if="showUser(user.is_invited)"
+        >
+          <td
+            class="legend"
+            v-bind:style="{ backgroundColor: legendColor(userIndex) }"
+          ></td>
           <td class="position">{{ user.place || '—' }}</td>
-          <td class="user">{{ UI.rankingUsername(user) }} <img alt=""
-               height="11"
-               v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
-               v-bind:title="user.country"
-               v-if="user.country"
-               width="16"></td>
-          <td v-bind:class="problemClass(problem, problems[problemIndex].alias)"
-              v-for="(problem, problemIndex) in user.problems">
+          <td class="user">
+            {{ UI.rankingUsername(user) }}
+            <img
+              alt=""
+              height="11"
+              v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
+              v-bind:title="user.country"
+              v-if="user.country"
+              width="16"
+            />
+          </td>
+
+          <td
+            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
+            v-for="(problem, problemIndex) in user.problems"
+          >
             <template v-if="problem.runs &gt; 0">
               <div class="points">
                 {{ renderPoints(problem) }}
               </div>
               <div class="penalty">
-                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{ problem.runs }})
+                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
+                  problem.runs
+                }})
               </div>
             </template>
             <template v-else="">
@@ -68,7 +91,7 @@
   margin: 0 auto;
 }
 .omegaup-scoreboard a {
-  color: #5588DD;
+  color: #5588dd;
 }
 .omegaup-scoreboard .footer {
   padding: 1em;
@@ -117,7 +140,7 @@
   width: 3.5em;
 }
 .omegaup-scoreboard td.legend {
-  width: .5em;
+  width: 0.5em;
 }
 .omegaup-scoreboard td[class$='points'] {
   width: 3.5em;
@@ -186,5 +209,4 @@ export default class ArenaScoreboard extends Vue {
     return userIsInvited || !this.onlyShowExplicitlyInvited;
   }
 }
-
 </script>

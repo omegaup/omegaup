@@ -1,10 +1,10 @@
 import contest_List from '../components/contest/ContestList.vue';
-import {OmegaUp, T} from '../omegaup.js';
+import { OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   let payloadElement = document.getElementById('my-next-contests-payload');
-  let payload = {'contests': []};
+  let payload = { contests: [] };
   if (payloadElement) {
     payload = JSON.parse(payloadElement.innerText);
     for (let contest of payload.contests) {
@@ -18,11 +18,11 @@ OmegaUp.on('ready', function() {
         props: {
           contests: this.contests,
           isAdmin: false,
-          title: T.contestMyActiveContests
+          title: T.contestMyActiveContests,
         },
       });
     },
-    data: {contests: payload.contests},
+    data: { contests: payload.contests },
     components: {
       'my-next-contests': contest_List,
     },

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import {OmegaUp, T, API} from '../omegaup.js';
+import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -20,11 +20,14 @@ OmegaUp.on('ready', function() {
             username: payload.author.username,
             name: payload.author.name,
           },
-          problem: {alias: payload.problem.alias, title: payload.problem.title},
+          problem: {
+            alias: payload.problem.alias,
+            title: payload.problem.title,
+          },
           qualitynomination_id: parseInt(payload.qualitynomination_id),
           reviewer: payload.reviewer,
           votes: payload.votes,
-          initialRationale: payload.contents.rationale
+          initialRationale: payload.contents.rationale,
         },
         on: {
           'mark-resolution': function(viewDetails, banProblem) {
@@ -34,18 +37,17 @@ OmegaUp.on('ready', function() {
             }
             let newStatus = banProblem ? 'approved' : 'denied';
             API.QualityNomination.resolve({
-                                   problem_alias: viewDetails.problem.alias,
-                                   status: newStatus,
-                                   qualitynomination_id:
-                                       viewDetails.qualitynomination_id,
-                                   rationale: viewDetails.rationale
-                                 })
-                .then(function(data) {
-                  omegaup.UI.success(T.qualityNominationResolutionSuccess);
-                })
-                .fail(UI.apiError);
-          }
-        }
+              problem_alias: viewDetails.problem.alias,
+              status: newStatus,
+              qualitynomination_id: viewDetails.qualitynomination_id,
+              rationale: viewDetails.rationale,
+            })
+              .then(function(data) {
+                omegaup.UI.success(T.qualityNominationResolutionSuccess);
+              })
+              .fail(UI.apiError);
+          },
+        },
       });
     },
     components: {

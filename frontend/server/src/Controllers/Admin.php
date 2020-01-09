@@ -7,7 +7,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
      * Get stats for an overall platform report.
      * @return array{status: 'ok', report: array<string, mixed>}
      */
-    public static function apiPlatformReportStats(\OmegaUp\Request $r) : array {
+    public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -17,7 +17,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateOptionalNumber($r['start_time'], 'start_time');
+        \OmegaUp\Validators::validateOptionalNumber(
+            $r['start_time'],
+            'start_time'
+        );
         \OmegaUp\Validators::validateOptionalNumber($r['end_time'], 'end_time');
 
         $startTime = empty($r['start_time']) ?
@@ -35,7 +38,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
                      * @param array{gender: string, users: int} $row
                      * @return array<string, int>
                      */
-                    function (array $row) : array {
+                    function (array $row): array {
                         return [$row['gender'] => $row['users']];
                     },
                     \OmegaUp\DAO\Identities::countActiveUsersByGender(

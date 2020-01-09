@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
-    ) : ?array {
+    ): ?array {
         $sql = '
             SELECT
                 r.*,
@@ -34,10 +34,14 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId]
+        );
     }
 
-    public static function getRequestsForProblemset(int $problemsetId) : array {
+    public static function getRequestsForProblemset(int $problemsetId): array {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
@@ -67,7 +71,13 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]) as $row) {
+        /** @var array{accepted: bool|null, country: null|string, country_id: null|string, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string, user_id: int|null, username: string, username: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$problemsetId]
+            ) as $row
+        ) {
             $row['accepted'] = $row['accepted'] == '1';
             $result[] = $row;
         }

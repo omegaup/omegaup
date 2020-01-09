@@ -1,6 +1,6 @@
 <?php
 
-spl_autoload_register(function (string $classname) : bool {
+spl_autoload_register(function (string $classname): bool {
     $components = explode('\\', $classname);
     if (empty($components[0])) {
         array_shift($components);

@@ -14,9 +14,10 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
-    public static function findByAlias(string $alias) : ?\OmegaUp\DAO\VO\Groups {
+    public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
+        /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -24,7 +25,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
-    public static function SearchByName($name) {
+    /**
+     * @return \OmegaUp\DAO\VO\Groups[]
+     */
+    public static function SearchByName(string $name) {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
@@ -36,9 +40,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return $ar;
     }
 
-    public static function getByName(string $name) : ?\OmegaUp\DAO\VO\Groups {
+    public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
+        /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
@@ -50,18 +55,18 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * Returns all groups that a user can manage.
      * @param int $userId
      * @param int $identityId
-     * @return array{alias: string, create_time: int, description: string, name: string}[]
+     * @return list<array{alias: string, create_time: int, description: null|string, name: string}>
      */
     final public static function getAllGroupsAdminedByUser(
         int $userId,
         int $identityId
-    ) : array {
+    ): array {
         // group_id is only necessary to make ORDER BY work, because
         // ONLY_FULL_GROUP_BY mode is enabled.
         $sql = '
             SELECT
                 DISTINCT g.alias,
-                g.create_time,
+                UNIX_TIMESTAMP(g.create_time) AS create_time,
                 g.description,
                 g.name,
                 g.group_id
@@ -82,26 +87,29 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             ORDER BY
                 g.group_id DESC;';
 
+        /** @var list<array{alias: string, create_time: int, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
-                $userId,
-                \OmegaUp\Authorization::ADMIN_ROLE,
-                $userId,
-                \OmegaUp\Authorization::ADMIN_ROLE,
-                $identityId,
-            ]);
-
+            $userId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $userId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $identityId,
+        ]);
         foreach ($rs as &$row) {
             unset($row['group_id']);
         }
-
-        /** @var array{alias: string, create_time: int, description: string, name: string}[] $rs */
         return $rs;
     }
 
     /**
      * Gets a random sample (of up to size $n) of group members.
+     *
+     * @return \OmegaUp\DAO\VO\Identities[] $identities
      */
-    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, $n) {
+    final public static function sampleMembers(
+        \OmegaUp\DAO\VO\Groups $group,
+        int $n
+    ): array {
         $sql = '
             SELECT
                 i.*
@@ -116,8 +124,15 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             LIMIT
                 0, ?;';
 
+        /** @var \OmegaUp\DAO\VO\Identities[] */
         $identities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$group->group_id, $n]
+            ) as $row
+        ) {
             $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;

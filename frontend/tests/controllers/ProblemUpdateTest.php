@@ -6,10 +6,10 @@
  * @author joemmanuel
  */
 
-class UpdateProblemTest extends OmegaupTestCase {
+class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'title' => 'Problem Language'
         ]));
@@ -40,36 +40,48 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemTitleAndContents() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData[0] = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runData[1] = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData[1] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
 
         // Grade the run
-        RunsFactory::gradeRun($runData[0]);
-        RunsFactory::gradeRun($runData[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[1]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set file upload context
         $login = self::login($problemData['author']);
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'triangulos.zip';
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip';
         $newTitle = 'new title';
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -78,6 +90,8 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed some properties',
         ]));
+        $this->assertTrue($response['rejudged']);
+        unset($_FILES['problem_contents']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
@@ -85,16 +99,18 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
 
-        // Validate rsponse
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(true, $response['rejudged']);
-
         {
-            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                $problemData['request']['problem_alias']
+            );
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));
-            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $this->assertTrue(
+                $problemArtifacts->exists(
+                    'statements/es.markdown'
+                )
+            );
             $this->assertFalse($problemArtifacts->exists('examples/sample.in'));
 
             // Check update in statements
@@ -120,20 +136,26 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Call API again to add an example, should not trigger rejudge.
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'triangulos-examples.zip';
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos-examples.zip';
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Add example',
         ]));
-        $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(false, $response['rejudged']);
+        $this->assertFalse($response['rejudged']);
+        unset($_FILES['problem_contents']);
         {
-            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                $problemData['request']['problem_alias']
+            );
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));
-            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
+            $this->assertTrue(
+                $problemArtifacts->exists(
+                    'statements/es.markdown'
+                )
+            );
             $this->assertTrue($problemArtifacts->exists('examples/sample.in'));
 
             // Check update in statements
@@ -161,17 +183,28 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemSettings() {
         // Get a problem with a run.
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
-        $contestant = UserFactory::createUser();
-        $runData[0] = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData[0]);
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData[0] = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
 
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $this->assertTrue($problemArtifacts->exists('cases'));
-            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
-            $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+            $this->assertTrue(
+                $problemArtifacts->exists(
+                    'statements/es.markdown'
+                )
+            );
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
             $this->assertEquals(
                 3,
                 count($problemSettings->Cases)
@@ -183,7 +216,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API to update time limit.
         $newTimeLimit = 12345;
@@ -195,20 +228,23 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemAlias,
             'message' => 'Increased time limit',
         ]));
-
-        // Validate response
-        $this->assertEquals('ok', $response['status']);
-        $this->assertTrue(
-            $response['rejudged'],
-            'Problem should have been rejudged'
-        );
+        $this->assertTrue($response['rejudged']);
+        unset($_FILES['problem_contents']);
 
         // Verify problem settings were set.
         {
             $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $this->assertTrue($problemArtifacts->exists('cases'));
-            $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
-            $problemSettings = json_decode($problemArtifacts->get('settings.json'));
+            $this->assertTrue(
+                $problemArtifacts->exists(
+                    'statements/es.markdown'
+                )
+            );
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
             $this->assertEquals(
                 3,
                 count($problemSettings->Cases)
@@ -224,11 +260,11 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     public function testUpdateProblemWithValidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'title' => 'valid-languages'
         ]));
 
-        $languages = 'hs,java,pl';
+        $languages = 'hs,java';
 
         // Call API
         $login = self::login($problemData['author']);
@@ -238,35 +274,38 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed alias and languages',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         // Verify data in DB
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
 
         // Check that we only retrieved 1 element
         $this->assertNotNull($problem);
         $this->assertEqualSets($languages, $problem->languages);
-
-        // Validate response
-        $this->assertEquals('ok', $response['status']);
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-     */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($problemData['author']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'languages' => 'cows,hs,java,pl',
-            'problem_alias' => $problemData['request']['alias'],
-            'message' => 'Changed invalid languages',
-        ]);
 
-        //Call API
-        $response = \OmegaUp\Controllers\Problem::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'languages' => 'cows,hs,java,pl',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed invalid languages',
+            ]));
+            $this->fail('Expected update to fail');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'parameterNotInExpectedSet',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -274,7 +313,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdate() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -291,9 +330,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemData['request']['problem_alias']
+        );
 
-        $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
+        $statementMarkdownContents = $problemArtifacts->get(
+            'statements/es.markdown'
+        );
 
         $this->assertContains($statement, $statementMarkdownContents);
     }
@@ -302,7 +345,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Test apiUpdateSolution
      */
     public function testProblemSolutionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Update solution
         $solution = 'La nueva solución \$x\$';
@@ -330,7 +373,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
         // Get a problem (with 'es' statements)
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
@@ -350,8 +393,12 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
-        $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemData['request']['problem_alias']
+        );
+        $statementMarkdownContents = $problemArtifacts->get(
+            'statements/es.markdown'
+        );
 
         $this->assertEquals($statement, $statementMarkdownContents);
     }
@@ -361,19 +408,19 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemFailed() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
-        $detourGrader = new ScopedGraderDetour();
-
-        // Set file upload context. This problem should fail
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'nostmt.zip';
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API. Should fail
         try {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'nostmt.zip';
             $login = self::login($problemData['author']);
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -384,11 +431,18 @@ class UpdateProblemTest extends OmegaupTestCase {
             ]));
             $this->fail('Expected update to fail');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
-            $this->assertEquals('problemDeployerNoStatements', $e->getMessage());
+            $this->assertEquals(
+                'problemDeployerNoStatements',
+                $e->getMessage()
+            );
+        } finally {
+            unset($_FILES['problem_contents']);
         }
 
         // Verify contents were not erased
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemData['request']['problem_alias']
+        );
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
@@ -405,16 +459,16 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemWithProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $problemAdmin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
         $response = \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $problemAdmin->username,
+            'usernameOrEmail' => $identity->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
@@ -422,13 +476,14 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         //Call API
         $newTitle = 'new title coadmin';
-        $login = self::login($problemAdmin);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'title' => $newTitle,
             'message' => 'Admin powers',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
@@ -443,10 +498,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testUpdateProblemWithRemovedProblemAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -475,6 +530,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             'title' => $newTitle,
             'message' => 'Non-admin powers',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
@@ -485,10 +541,10 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemAdmins() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add admin to the problem
         $login = self::login($problemData['author']);
@@ -526,14 +582,14 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
             'visibility' => 0
         ]));
 
         // Normal user shouldn't even be able to see the problem.
-        $reviewer = UserFactory::createUser();
-        $login = self::login($reviewer);
+        ['user' => $reviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -545,11 +601,13 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Promote to reviewer, can see the problem now.
-        UserFactory::addSystemRole($reviewer, \OmegaUp\Authorization::REVIEWER_ROLE);
+        \OmegaUp\Test\Factories\User::addSystemRole(
+            $reviewer,
+            \OmegaUp\Authorization::REVIEWER_ROLE
+        );
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['status'], 'ok');
         $this->assertArrayContainsWithPredicate($response['results'], function ($problem) use (&$problemData) {
             return $problem['alias'] == $problemData['request']['problem_alias'];
         });
@@ -557,7 +615,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
-        $this->assertEquals($response['status'], 'ok');
 
         // Update statement
         $statement = 'This is the new statement \$x\$';
@@ -567,7 +624,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'message' => 'Statement is now more fun',
             'statement' => $statement
         ]));
-        $this->assertEquals($response['status'], 'ok');
 
         // Add a tag
         $response = \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
@@ -575,7 +631,6 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test',
         ]));
-        $this->assertEquals($response['status'], 'ok');
     }
 
     /**
@@ -583,146 +638,173 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemUpdateVisibility() {
         // Create a public problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $problem = $problemData['problem'];
 
         // Make it private.
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'message' => 'public -> private',
         ]));
+        $this->assertFalse($response['rejudged']);
 
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'message' => 'no-op',
         ]));
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $this->assertFalse($response['rejudged']);
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         // Make it public
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'message' => 'private -> public',
         ]));
+        $this->assertFalse($response['rejudged']);
 
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'message' => 'no-op',
         ]));
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $this->assertFalse($response['rejudged']);
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
         ]));
+        $this->assertFalse($response['rejudged']);
 
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             'message' => 'public -> banned',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
                 'message' => 'public -> promoted',
             ]));
             $this->fail('Cannot ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasBeenBanned'
+            );
         }
 
         // Ban the problem.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
         \OmegaUp\DAO\Problems::update($problem);
 
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             'message' => 'no-op',
         ]));
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $this->assertFalse($response['rejudged']);
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
                 'message' => 'banned -> private',
             ]));
             $this->fail('Cannot un-ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasBeenBanned'
+            );
         }
 
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
                 'message' => 'banned -> public',
             ]));
             $this->fail('Cannot un-ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasBeenBanned'
+            );
         }
 
         // Promote the problem.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
         \OmegaUp\DAO\Problems::update($problem);
 
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'message' => 'no-op',
         ]));
-        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+        $this->assertFalse($response['rejudged']);
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
         ]));
+        $this->assertFalse($response['rejudged']);
 
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
                 'message' => 'promoted -> private',
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasBeenPromoted'
+            );
         }
 
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
                 'message' => 'promoted -> public',
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasBeenPromoted'
+            );
         }
     }
 
@@ -730,7 +812,7 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Tests tag operations.
      */
     public function testTags() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         $this->assertEquals(
             [
@@ -804,11 +886,14 @@ class UpdateProblemTest extends OmegaupTestCase {
      * Tests problem version update.
      */
     public function testProblemVersionUpdate() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problem = $problemData['problem'];
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData, 1.0, 'AC');
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC');
 
         $login = self::login($problemData['author']);
         $originalVersionData = \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
@@ -822,9 +907,9 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Change the problem to something completely different.
         {
-            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
-            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'message' => 'Changed to mrkareltastic',
@@ -836,9 +921,18 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'memory_limit' => 64000,
                 'output_limit' => 20480,
             ]));
+            $this->assertTrue($response['rejudged']);
             $this->assertEquals(1, $detourGrader->getGraderCallCount());
+            unset($_FILES['problem_contents']);
         foreach ($detourGrader->getRuns() as $run) {
-            RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                null,
+                0,
+                'WA',
+                null,
+                null,
+                $run->run_id
+            );
         }
         }
 
@@ -862,9 +956,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Change it back to the original problem. Should not cause any new
         // rejudges, but current_version should go back to the original.
         {
-            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'testproblem.zip';
-            $detourGrader = new ScopedGraderDetour();
-            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip';
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'message' => 'Changed back',
@@ -876,7 +970,9 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'memory_limit' => 32000,
                 'output_limit' => 10240,
             ]));
+            $this->assertTrue($response['rejudged']);
             $this->assertEquals(0, $detourGrader->getGraderCallCount());
+            unset($_FILES['problem_contents']);
         }
 
         $restoredVersionData = \OmegaUp\Controllers\Problem::apiVersions(new \OmegaUp\Request([
@@ -919,7 +1015,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             1.0,
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $runData['response']['guid']
+                )->current_run_id
             )->score
         );
 
@@ -946,7 +1044,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             0.0,
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $runData['response']['guid']
+                )->current_run_id
             )->score
         );
 
@@ -973,66 +1073,97 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             1.0,
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $runData['response']['guid']
+                )->current_run_id
             )->score
         );
     }
 
     private function updateProblemsetProblemWithRuns(
         string $updatePublished,
-        ?\OmegaUp\DAO\VO\Users $problemAuthor = null,
-        ?\OmegaUp\DAO\VO\Users $contestDirector = null,
-        ?\OmegaUp\DAO\VO\Users $contestAdmin = null
+        ?\OmegaUp\DAO\VO\Identities $problemAuthor = null,
+        ?\OmegaUp\DAO\VO\Identities $contestDirector = null,
+        ?\OmegaUp\DAO\VO\Identities $contestAdmin = null
     ) {
         $originalTime = \OmegaUp\Time::get();
         try {
-            $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'author' => $problemAuthor,
             ]));
             $problem = $problemData['problem'];
-            $contestant = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
             \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
             // Create a standalone run.
-            $pastStandaloneRunData = RunsFactory::createRunToProblem($problemData, $contestant);
-            RunsFactory::gradeRun($pastStandaloneRunData);
+            $pastStandaloneRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($pastStandaloneRunData);
 
             // Create a contest in the past with one run.
-            $pastContestData = ContestsFactory::createContest(new ContestParams([
-                'start_time' => $originalTime - 60 * 60,
-                'finish_time' => $originalTime - 5 * 60,
+            $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime - 5 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest($problemData, $pastContestData);
-            ContestsFactory::addUser($pastContestData, $contestant);
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $pastContestData
+            );
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $pastContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser($pastContestData, $contestAdmin);
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
+                    $pastContestData,
+                    $contestAdmin
+                );
             }
-            $pastRunData = RunsFactory::createRun($problemData, $pastContestData, $contestant);
-            RunsFactory::gradeRun($pastRunData);
+            $pastRunData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $pastContestData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($pastRunData);
 
             // Now create one in the present with one more run.
-            $presentContestData = ContestsFactory::createContest(new ContestParams([
-                'start_time' => $originalTime - 60 * 60,
-                'finish_time' => $originalTime + 60 * 60,
+            $presentContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $originalTime - 60 * 60,
+                'finishTime' => $originalTime + 60 * 60,
                 'contestDirector' => $contestDirector,
             ]));
-            ContestsFactory::addProblemToContest($problemData, $presentContestData);
-            ContestsFactory::addUser($presentContestData, $contestant);
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $presentContestData
+            );
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $presentContestData,
+                $identity
+            );
             if (!is_null($contestAdmin)) {
-                ContestsFactory::addAdminUser($presentContestData, $contestAdmin);
+                \OmegaUp\Test\Factories\Contest::addAdminUser(
+                    $presentContestData,
+                    $contestAdmin
+                );
             }
-            $presentRunData = RunsFactory::createRun($problemData, $presentContestData, $contestant);
-            RunsFactory::gradeRun($presentRunData);
+            $presentRunData = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $presentContestData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($presentRunData);
 
             \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
 
             $login = self::login($problemData['author']);
             // Change the problem to something completely different.
-            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT.'mrkareltastic.zip';
-            $detourGrader = new ScopedGraderDetour();
-            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip';
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'message' => 'Changed to mrkareltastic',
@@ -1045,13 +1176,24 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'output_limit' => 20480,
                 'update_published' => $updatePublished,
             ]));
+            $this->assertEquals(
+                $response['rejudged'],
+                $updatePublished != 'none'
+            );
             // Runs are only added when the publishing mode is not none.
             $this->assertEquals(
-                $updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE ? 0 : 3,
+                $updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE ? 0 : 3,
                 $detourGrader->getGraderCallCount()
             );
             foreach ($detourGrader->getRuns() as $run) {
-                RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+                \OmegaUp\Test\Factories\Run::gradeRun(
+                    null,
+                    0,
+                    'WA',
+                    null,
+                    null,
+                    $run->run_id
+                );
             }
 
             return [
@@ -1064,6 +1206,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ];
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
+            unset($_FILES['problem_contents']);
         }
     }
 
@@ -1072,36 +1215,46 @@ class UpdateProblemTest extends OmegaupTestCase {
      * the published branch. All runs are kept as-is.
      */
     public function testProblemInProblemsetVersionUpdateNone() {
-        $result = $this->updateProblemsetProblemWithRuns(\OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE);
+        $result = $this->updateProblemsetProblemWithRuns(
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE
+        );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
-            $owner,
-            $owner
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
     }
@@ -1112,37 +1265,45 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemInProblemsetVersionUpdateNonProblemset() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
-            $owner,
-            $owner
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
@@ -1169,43 +1330,53 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemInProblemsetVersionUpdateOwnedProblemsets() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-            $owner,
-            $owner
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
         // Ensure that the version change would make a difference.
         $login = self::login($result['pastProblemData']['author']);
-        $presentProblem = \OmegaUp\DAO\Problems::getByAlias($result['pastProblemData']['problem']->alias);
+        $presentProblem = \OmegaUp\DAO\Problems::getByAlias(
+            $result['pastProblemData']['problem']->alias
+        );
         $diffResult = \OmegaUp\Controllers\Contest::apiRunsDiff(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $result['pastProblemData']['problem']->alias,
@@ -1233,7 +1404,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
@@ -1249,7 +1422,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
     }
@@ -1261,57 +1436,69 @@ class UpdateProblemTest extends OmegaupTestCase {
      */
     public function testProblemInProblemsetVersionUpdateEditableProblemsets() {
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            $owner,
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $identity,
             null,
-            $owner
+            $identity
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
-            \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            $owner,
-            $owner
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['pastRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
             \OmegaUp\DAO\Runs::getByPK(
-                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+                \OmegaUp\DAO\Submissions::getByGuid(
+                    $result['presentRunData']['response']['guid']
+                )->current_run_id
             )->verdict
         );
     }
