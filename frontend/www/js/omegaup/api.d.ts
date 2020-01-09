@@ -216,12 +216,6 @@ declare namespace omegaup {
     name: string;
   }
 
-  export enum GraderStatus {
-    Ok = 'Grader OK',
-    Down = 'Grader DOWN',
-    Pending = '',
-  }
-
   interface GraderQueue {
     running: string[];
     run_queue_length: number;
