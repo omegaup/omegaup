@@ -1,14 +1,14 @@
 {
     "es": {
       "name": "Usuario Experto en Python",
-      "description": "El usuario resolvió más de 10 problemas en Python."
+      "description": "El usuario ha resuelto más de 10 problemas en Python."
     },
     "en": {
       "name": "Python Expert User",
-      "description": "The user solved more than 10 problems in Python."
+      "description": "The user has solved more than 10 problems in Python."
     },
     "pt": {
       "name": "Usuário Especialista em Python",
-      "description": "O usuário resolveu mais de 10 problemas em Python."
+      "description": "O usuário tem resolveu mais de 10 problemas em Python."
     }
   }

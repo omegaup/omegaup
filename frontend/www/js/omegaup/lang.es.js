@@ -64,7 +64,7 @@ const translations = {
 	badge_legacyUser_name: "Usuario Hist\u00f3rico",
 	badge_problemSetter_description: "El usuario ha creado al menos un problema.",
 	badge_problemSetter_name: "Creador de Problemas",
-	badge_pythonexpert_description: "El usuario resolvi\u00f3 m\u00e1s de 10 problemas en Python.",
+	badge_pythonexpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Python.",
 	badge_pythonexpert_name: "Usuario Experto en Python",
 	badge_virtualContestManager_description: "El usuario ha administrado al menos un concurso virtual.",
 	badge_virtualContestManager_name: "Administrador de Concurso Virtual",

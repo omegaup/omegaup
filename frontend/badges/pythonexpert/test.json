@@ -427,13 +427,24 @@
                             }
                         }
                     ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas",
+                                "language": "py2",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
                 }
-            ]
-        },
-        {
-            "type": "scripts",
-            "scripts": [
-                "update_ranks.py"
             ]
         }
     ],
