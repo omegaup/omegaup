@@ -447,6 +447,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'] ?? ''
         );
 
+        if ($contest->admission_mode === 'private') {
+            $r->ensureMainUserIdentity();
+        }
+
         $isPractice = isset($r['is_practice']) && $r['is_practice'] === true;
 
         $shouldShowIntro = !$isPractice && \OmegaUp\Controllers\Contest::shouldShowIntro(
