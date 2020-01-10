@@ -259,22 +259,25 @@ export class Arena {
 
     // Currently opened notifications.
     self.notifications = new Notifications();
+    self.clarificationNotifications = null;
     OmegaUp.on('ready', function() {
       self.notifications.attach($('#notifications'));
-      self.clarificationNotifications = new Vue({
-        el: '#clarification-notifications',
-        render: function(createElement) {
-          return createElement('omegaup-notifications-clarifications', {
-            props: {
-              data: this.data,
-            },
-          });
-        },
-        data: { data: null },
-        components: {
-          'omegaup-notifications-clarifications': notification_Clarifications,
-        },
-      });
+      if (document.getElementById('clarification-notifications') !== null) {
+        self.clarificationNotifications = new Vue({
+          el: '#clarification-notifications',
+          render: function(createElement) {
+            return createElement('omegaup-notifications-clarifications', {
+              props: {
+                data: this.data,
+              },
+            });
+          },
+          data: { data: null },
+          components: {
+            'omegaup-notifications-clarifications': notification_Clarifications,
+          },
+        });
+      }
     });
 
     // Currently opened problem.
@@ -1325,23 +1328,25 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
-    if (self.problemsetAdmin) {
-      self.clarificationNotifications.data = data.clarifications
-        .filter(clarification => clarification.answer === null)
-        .reverse();
-    } else {
-      // Removing to the notifications list all unsolved clarifications
-      self.clarifications = data.clarifications
-        .filter(clarification => clarification.answer !== null)
-        .reverse();
-      // Removing to the notifications list all marked as resolved
-      // clarifications
-      self.clarificationNotifications.data = self.clarifications.filter(
-        clarification =>
-          localStorage.getItem(
-            `clarification-${clarification.clarification_id}`,
-          ) === null,
-      );
+    if (self.clarificationNotifications !== null) {
+      if (self.problemsetAdmin) {
+        self.clarificationNotifications.data = data.clarifications
+          .filter(clarification => clarification.answer === null)
+          .reverse();
+      } else {
+        // Removing to the notifications list all unsolved clarifications
+        self.clarifications = data.clarifications
+          .filter(clarification => clarification.answer !== null)
+          .reverse();
+        // Removing to the notifications list all marked as resolved
+        // clarifications
+        self.clarificationNotifications.data = self.clarifications.filter(
+          clarification =>
+            localStorage.getItem(
+              `clarification-${clarification.clarification_id}`,
+            ) === null,
+        );
+      }
     }
     if (
       self.answeredClarifications > previouslyAnswered &&

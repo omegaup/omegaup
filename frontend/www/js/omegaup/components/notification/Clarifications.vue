@@ -1,49 +1,64 @@
 <template>
   <li class="dropdown">
-    <a aria-expanded="false"
-        aria-haspopup="true"
-        class="notification-button dropdown-toggle"
-        data-toggle="dropdown"
-        href="#"
-        role="button"><span class="notification-icon glyphicon glyphicon-bell"></span>
-        <span v-bind:class="unreadClass"
-          v-if="clarifications &amp;&amp; clarifications.length &gt; 0"
-          v-model="unread">{{ clarifications.length }}</span></a>
+    <a
+      aria-expanded="false"
+      aria-haspopup="true"
+      class="notification-button dropdown-toggle"
+      data-toggle="dropdown"
+      href="#"
+      role="button"
+      ><span class="notification-icon glyphicon glyphicon-bell"></span>
+      <span
+        v-bind:class="unreadClass"
+        v-if="clarifications &amp;&amp; clarifications.length &gt; 0"
+        v-model="unread"
+        >{{ clarifications.length }}</span
+      ></a
+    >
     <ul class="dropdown-menu">
-      <li class="empty"
-          v-if="!clarifications || clarifications.length === 0">{{
-          T.notificationsNoNewNotifications }}</li>
+      <li class="empty" v-if="!clarifications || clarifications.length === 0">
+        {{ T.notificationsNoNewNotifications }}
+      </li>
       <li v-else="">
         <ul class="notification-drawer">
           <li v-for="clarification in clarifications">
-            <button aria-label="Close"
-                class="close"
-                type="button"
-                v-on:click.prevent="onCloseClicked(clarification)"><span aria-hidden=
-                "true">×</span></button> <a v-bind:href="anchor(clarification)"><span>{{
-                clarification.problem_alias }}</span> — <span>{{ clarification.author }}</span>
-            <pre>{{ clarification.message }}</pre>
-            <hr v-if="clarification.answer">
-            <pre v-if="clarification.answer">{{ clarification.answer }}</pre></a>
+            <button
+              aria-label="Close"
+              class="close"
+              type="button"
+              v-on:click.prevent="onCloseClicked(clarification)"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+            <a v-bind:href="anchor(clarification)"
+              ><span>{{ clarification.problem_alias }}</span> —
+              <span>{{ clarification.author }}</span>
+              <pre>{{ clarification.message }}</pre>
+              <hr v-if="clarification.answer" />
+              <pre v-if="clarification.answer">{{
+                clarification.answer
+              }}</pre></a
+            >
           </li>
         </ul>
       </li>
-      <li class="divider"
-          role="separator"
-          v-if="clarifications &amp;&amp; clarifications.length &gt; 1"></li>
+      <li
+        class="divider"
+        role="separator"
+        v-if="clarifications &amp;&amp; clarifications.length &gt; 1"
+      ></li>
       <li v-if="clarifications &amp;&amp; clarifications.length &gt; 1">
-        <a class="notification-clear"
-            href="#"
-            v-on:click.prevent="onMarkAllAsRead"><span class=
-            "glyphicon glyphicon-align-right"></span> {{ T.notificationsMarkAllAsRead }}</a>
+        <a
+          class="notification-clear"
+          href="#"
+          v-on:click.prevent="onMarkAllAsRead"
+          ><span class="glyphicon glyphicon-align-right"></span>
+          {{ T.notificationsMarkAllAsRead }}</a
+        >
       </li>
     </ul>
   </li>
 </template>
-
-<style>
-
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -136,5 +151,4 @@ export default class Clarifications extends Vue {
     this.$emit('onCloseClicked', clarification);
   }
 }
-
 </script>
