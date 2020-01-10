@@ -448,7 +448,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         if ($contest->admission_mode === 'private') {
-            $r->ensureMainUserIdentity();
+            $r->ensureIdentity();
         }
 
         $isPractice = isset($r['is_practice']) && $r['is_practice'] === true;
