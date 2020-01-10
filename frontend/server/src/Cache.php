@@ -316,12 +316,15 @@ class Cache {
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
      *
+     * @template T
+     *
      * @param string $prefix
      * @param string $id
-     * @param callable():mixed $setFunc
+     * @param callable():T $setFunc
      * @param int $timeout (seconds)
      * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
-     * @return mixed the value returned from the cache or $setFunc().
+     *
+     * @return T the value returned from the cache or $setFunc().
      */
     public static function getFromCacheOrSet(
         string $prefix,
@@ -331,7 +334,7 @@ class Cache {
         ?bool &$cacheUsed = null
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
-        /** @var null|mixed */
+        /** @var null|T */
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
@@ -343,7 +346,7 @@ class Cache {
         }
 
         // Get the value from the function provided
-        /** @var mixed */
+        /** @var T */
         $returnValue = call_user_func($setFunc);
         $cache->set($returnValue, $timeout);
 

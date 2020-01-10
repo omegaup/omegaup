@@ -369,6 +369,7 @@ const translations = {
 	groupNewFormOnlyAC: "Contar s\u00f3 ACs",
 	groupNewFormUpdateGroup: "Salvar altera\u00e7\u00f5es",
 	groupNewFormWeight: "Peso do pontua\u00e7\u00e3o",
+	groupNotFound: "Grupo n\u00e3o encontrado",
 	groupsCreateNew: "Novo grupo",
 	groupsIdentitiesSuccessfullyCreated: "As identidades foram criadas e ligadas ao grupo.",
 	groupsIdentityWarning: "Salve as senhas em um local seguro, porque depois de criar as identidades, n\u00e3o haver\u00e1 maneira de recuperar as senhas.",

@@ -143,7 +143,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     private function assertRun($r, $response) {
         // Validate
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('guid', $response);
 
         // Get submissionn from DB
@@ -304,7 +303,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('guid', $response);
     }
 

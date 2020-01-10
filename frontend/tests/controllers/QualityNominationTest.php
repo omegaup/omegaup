@@ -16,12 +16,11 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(
-            null,
-            null
-        );
-        self::assertArrayHasKey('author', $nominations[0]);
-        self::assertArrayHasKey('nominator', $nominations[0]);
+        $response = \OmegaUp\Controllers\QualityNomination::apiGetNominations(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token
+        ]));
+        self::assertArrayHasKey('author', $response['nominations'][0]);
+        self::assertArrayHasKey('nominator', $response['nominations'][0]);
     }
 
     public function testGetByIdHasAuthorAndNominatorSet() {
@@ -679,7 +678,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
@@ -689,10 +688,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'before_ac' => true,
             ]),
         ]));
-        $this->assertEquals($result['status'], 'ok');
 
         // Dismissals could be sent before AC also
-        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
@@ -700,7 +698,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'before_ac' => true
             ]),
         ]));
-        $this->assertEquals($result['status'], 'ok');
 
         // Now solve the problem, it must not be allowed to send a before AC
         // nomination, as the problem is already solved
@@ -1050,11 +1047,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
-        $this->assertEquals(
-            'ok',
-            $list['status'],
-            'Status of apiList call is not ok'
-        );
         $this->assertGreaterThanOrEqual(
             2,
             count(

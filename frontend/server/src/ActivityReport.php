@@ -7,14 +7,13 @@ class ActivityReport {
      * @param list<array{alias?: string, classname?: string, ip: int, time: int, username: string}> $accesses
      * @param list<array{alias?: string, classname?: string, ip: int, time: int, username: string}> $submissions
      *
-     * @return array{username: string, ip: int, time: int, classname?: string, alias?: string}[]
+     * @return list<array{username: string, ip: int, time: int, classname?: string, alias?: string}>
      */
     final public static function getActivityReport(
         array $accesses,
         array $submissions
     ): array {
         // Merge both logs.
-        /** @var array{username: string, ip: int, time: int, classname?: string, alias?: string}[] */
         $events = [];
         $lenAccesses = count($accesses);
         $lenSubmissions = count($submissions);
@@ -23,28 +22,28 @@ class ActivityReport {
 
         while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
             if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                array_push($events, self::processData(
+                $events[] = self::processData(
                     $accesses[$iAccesses++]
-                ));
+                );
             } else {
-                array_push($events, self::processData(
+                $events[] = self::processData(
                     $submissions[$iSubmissions++],
                     true
-                ));
+                );
             }
         }
 
         while ($iAccesses < $lenAccesses) {
-            array_push($events, self::processData(
+            $events[] = self::processData(
                 $accesses[$iAccesses++]
-            ));
+            );
         }
 
         while ($iSubmissions < $lenSubmissions) {
-            array_push($events, self::processData(
+            $events[] = self::processData(
                 $submissions[$iSubmissions++],
                 true
-            ));
+            );
         }
 
         // Anonymize data.

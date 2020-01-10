@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='problems' htmlTitle="{#omegaupTitleProblemEdit#}" inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemEdit#}" inline}
 
 {js_include entrypoint="problem_edit"}
 
