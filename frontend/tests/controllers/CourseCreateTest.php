@@ -48,6 +48,54 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Create course with unlimited duration
+     */
+    public function testCreateCourseWithUnlimitedDuration() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $response = \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => null,
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\Courses::findByName(
+                    $name
+                )
+            )
+        );
+    }
+
+    /**
+     * Create course with undefined finish time
+     */
+    public function testCreateCourseWithUndefinedFinishTime() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+            ]));
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+    }
+
+    /**
      * Two courses cannot have the same alias
      *
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
@@ -388,5 +436,43 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $course,
             $group
         ));
+    }
+
+    public function testUpdateCourseToUnlimitedDuration() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+
+        $response = \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
+        ]));
+
+        $course = \OmegaUp\DAO\Courses::findByName(
+            $name
+        )[0];
+
+        print_r($course);
+
+        // Setting finish_time as null
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $course->alias,
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => $course->name,
+            'description' => $course->description,
+            'finish_time' => null
+        ]));
+
+        $course = \OmegaUp\DAO\Courses::findByName(
+            $name
+        )[0];
+
+        print_r($course);
     }
 }

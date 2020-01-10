@@ -119,7 +119,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): void {
         self::validateBasicCreateOrUpdate($r);
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -145,11 +148,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $originalCourse->finish_time;
-        }
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -184,7 +187,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureInt('finish_time', null, null, !$isUpdate);
+        $r->ensureNullableInt('finish_time', null, null, !$isUpdate);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -2664,6 +2667,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
+        if (isset($r['finish_time'])) {
+            /** @var int|null */
+            $originalCourse->finish_time = $r['finish_time'];
+        }
 
         // Push changes
         \OmegaUp\DAO\Courses::update($originalCourse);

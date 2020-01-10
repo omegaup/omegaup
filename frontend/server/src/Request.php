@@ -147,6 +147,37 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that the value associated with the key is an int or null
+     */
+    public function ensureNullableInt(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required = true
+    ): void {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        if (!is_null($val)) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $val,
+                $key,
+                $lowerBound,
+                $upperBound
+            );
+            $this[$key] = intval($val);
+        }
+    }
+
+    /**
      * Ensures that the value associated with the key is a timestamp.
      */
     public function ensureTimestamp(
