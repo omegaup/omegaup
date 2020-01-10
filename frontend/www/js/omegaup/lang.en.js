@@ -60,6 +60,8 @@ const translations = {
 	badge_cppexpert_name: "C++ Expert User",
 	badge_feedbackProvider_description: "User has provided feedback for at least one problem.",
 	badge_feedbackProvider_name: "Feedback Provider",
+	badge_javaexpert_description: "The user has solved more than 10 problems in Java.",
+	badge_javaexpert_name: "Java Expert User",
 	badge_legacyUser_description: "User made a submission within the first year since omegaUp launchment.",
 	badge_legacyUser_name: "Legacy User",
 	badge_problemSetter_description: "User has created at least one problem.",
