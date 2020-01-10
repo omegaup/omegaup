@@ -507,7 +507,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        ?int $points = 100,
+        ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
@@ -522,13 +522,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $assignedPoints = is_null($points) ? 100 : $points;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
             $masterCommit,
             $currentVersion,
             $identity,
-            is_null($points) ? 100 : $points,
+            $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $validateVisibility
         );
