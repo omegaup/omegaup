@@ -174,9 +174,9 @@ class Courses extends \OmegaUp\DAO\VO\VO {
     /**
      * Hora de finalizacion de este curso
      *
-     * @var int
+     * @var int|null
      */
-    public $finish_time = 946706400; // 2000-01-01 06:00:00
+    public $finish_time = null;
 
     /**
      * True implica que cualquier usuario puede entrar al curso

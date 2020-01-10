@@ -290,6 +290,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $offset = intval($r['start_time']) - $originalCourse->start_time;
 
+        $cloneCourseFinishTime = null;
+        if (!is_null($originalCourse->finish_time)) {
+            $cloneCourseFinishTime = $originalCourse->finish_time + $offset;
+        }
+
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
@@ -300,7 +305,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
                 'start_time' => $r['start_time'],
-                'finish_time' => $originalCourse->finish_time + $offset,
+                'finish_time' => $cloneCourseFinishTime,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -2666,10 +2671,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
-        if (isset($r['finish_time'])) {
-            /** @var int|null */
-            $originalCourse->finish_time = $r['finish_time'];
-        }
 
         // Push changes
         \OmegaUp\DAO\Courses::update($originalCourse);
