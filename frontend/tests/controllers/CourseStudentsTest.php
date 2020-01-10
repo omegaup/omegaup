@@ -158,17 +158,14 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         // submissions and the last one does not.
         $adminLogin = self::login($courseData['admin']);
         $problems = [];
-        for ($i = 0; $i < 4; $i++) {
-            if ($i < 3) {
-                $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
-                continue;
-            }
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
-                new \OmegaUp\Test\Factories\ProblemParams([
-                    'languages' => '',
-                ])
-            );
+        for ($i = 0; $i < 3; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'languages' => '',
+            ])
+        );
 
         // Problems 1 and 2 will be assigned to the first assignment, both have
         // submissions. Problem 3 and 4 will be assigned to second assignment

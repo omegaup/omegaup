@@ -155,15 +155,16 @@ class Course {
         }
         $admin = $courseFactoryResult['admin'];
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
-        $assignmentAlias = [];
-        $assignmentProblemsetId = [];
+        $assignmentAliases = [];
+        $assignmentProblemsetIds = [];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
+                $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
                 $r = new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => \OmegaUp\Test\Utils::createRandomString(),
-                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $assignmentAlias,
                     'description' => \OmegaUp\Test\Utils::createRandomString(),
                     'start_time' => (\OmegaUp\Time::get()),
                     'finish_time' => (\OmegaUp\Time::get() + 120),
@@ -173,7 +174,7 @@ class Course {
 
                 \OmegaUp\Controllers\Course::apiCreateAssignment($r);
                 $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
-                    strval($r['alias']),
+                    $assignmentAlias,
                     $course->course_id
                 );
                 if (
@@ -184,16 +185,16 @@ class Course {
                         'assignmentNotFound'
                     );
                 }
-                $assignmentAlias[] = strval($r['alias']);
-                $assignmentProblemsetId[] = $assignment->problemset_id;
+                $assignmentAliases[] = $assignmentAlias;
+                $assignmentProblemsetIds[] = $assignment->problemset_id;
             }
         }
 
         return [
             'admin' => $admin,
             'course_alias' => $courseAlias,
-            'assignment_aliases' => $assignmentAlias,
-            'assignment_problemset_ids' => $assignmentProblemsetId,
+            'assignment_aliases' => $assignmentAliases,
+            'assignment_problemset_ids' => $assignmentProblemsetIds,
         ];
     }
 
