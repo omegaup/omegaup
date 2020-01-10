@@ -11,7 +11,8 @@ INNER JOIN
 INNER JOIN
     `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id`
 WHERE
-    `r`.`verdict` = "AC" AND `s`.`type` = "normal" AND
+    `r`.`verdict` = "AC" AND
+    `s`.`type` = "normal" AND
     FIND_IN_SET(`s`.`language`,'cpp,cpp11,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang')
 GROUP BY
     `u`.`user_id`
