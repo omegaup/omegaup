@@ -149,11 +149,11 @@ class Request extends \ArrayObject {
     /**
      * Ensures that the value associated with the key is an int or null
      */
-    public function ensureNullableInt(
+    public function ensureOptionalInt(
         string $key,
         ?int $lowerBound = null,
         ?int $upperBound = null,
-        bool $required = true
+        bool $required = false
     ): void {
         if (!self::offsetExists($key)) {
             if (!$required) {

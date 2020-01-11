@@ -165,14 +165,14 @@ class Courses extends \OmegaUp\DAO\VO\VO {
     public $acl_id = null;
 
     /**
-     * Hora de inicio de este curso
+     * [Campo no documentado]
      *
      * @var int
      */
-    public $start_time = 946706400; // 2000-01-01 06:00:00
+    public $start_time = 0;
 
     /**
-     * Hora de finalizacion de este curso
+     * [Campo no documentado]
      *
      * @var int|null
      */
