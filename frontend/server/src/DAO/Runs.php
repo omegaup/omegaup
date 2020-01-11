@@ -16,7 +16,7 @@ namespace OmegaUp\DAO;
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
-     * @return array{username: string, language: string, runtime: float, memory: float, time: int}[]
+     * @return list<array{username: string, language: string, runtime: float, memory: float, time: int}>
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId
@@ -101,7 +101,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}[]
+     * @return list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>
      */
     final public static function getAllRuns(
         ?int $problemset_id,
@@ -176,12 +176,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    /*
+    /**
      * Gets an array of the guids of the pending runs
+     *
+     * @return list<array{guid: string}>
      */
     final public static function getPendingRunsOfProblem(
         int $problemId
-    ): array {
+    ) {
         $sql = '
             SELECT
                 s.guid
@@ -196,7 +198,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemId];
 
         $result = [];
-        /** @var array{guid: string} $row */
+        /** @var array{guid: string}[] $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -324,7 +326,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Get all relevant identities for a problemset.
      *
-     * @return array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[]
+     * @return list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}>
      */
     final public static function getAllRelevantIdentities(
         int $problemsetId,
@@ -445,7 +447,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}[] */
+        /** @var list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}> */
         $result = [];
         /** @var array{classname: string, country_id: string, identity_id: int, is_invited: int, name: null|string, username: string} $row */
         foreach (
@@ -455,7 +457,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ) as $row
         ) {
             $row['is_invited'] = boolval($row['is_invited']);
-            array_push($result, $row);
+            $result[] = $row;
         }
         return $result;
     }
@@ -512,7 +514,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}[]
+     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}>
      */
     final public static function getProblemsetRuns(
         \OmegaUp\DAO\VO\Problemsets $problemset,
@@ -675,7 +677,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}[]
+     * @return list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}>
      */
     final public static function getForProblemDetails(
         int $problemId,

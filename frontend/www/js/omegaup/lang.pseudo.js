@@ -369,6 +369,7 @@ const translations = {
 	groupNewFormOnlyAC: "(On1y c0un7 AC5)",
 	groupNewFormUpdateGroup: "(Sav3 gr0up)",
 	groupNewFormWeight: "(Sc0r3 w3igh7)",
+	groupNotFound: "(Gr0up n07 f0und)",
 	groupsCreateNew: "(N3w gr0up)",
 	groupsIdentitiesSuccessfullyCreated: "(Th3 id3n7i7i35 hav3 b33n cr3a73d and 1ink3d 70 7h3 gr0up.)",
 	groupsIdentityWarning: "(Sav3 7h3 pa55w0rd5 in a 5af3 p1ac3, b3cau53 0nc3 y0u cr3a73 7h3 id3n7i7i35 7h3r3 wi11 b3 n0 way 0f r3c0v3ring 7h3 pa55w0rd5.)",

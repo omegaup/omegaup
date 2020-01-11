@@ -10,16 +10,19 @@ namespace OmegaUp\Controllers;
 class Badge extends \OmegaUp\Controllers\Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
+    /**
+     * @return list<string>
+     */
     public static function getAllBadges(): array {
         $aliases = array_diff(
             scandir(
-                static::OMEGAUP_BADGES_ROOT
+                strval(static::OMEGAUP_BADGES_ROOT)
             ),
             ['..', '.', 'default_icon.svg']
         );
         $results = [];
         foreach ($aliases as $alias) {
-            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
+            if (!is_dir(strval(static::OMEGAUP_BADGES_ROOT) . "/${alias}")) {
                 continue;
             }
             $results[] = $alias;
@@ -30,23 +33,20 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of existing badges
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return list<string>
      */
-    public static function apiList(\OmegaUp\Request $r) {
+    public static function apiList(\OmegaUp\Request $r): array {
         return self::getAllBadges();
     }
 
     /**
      * Returns a list of badges owned by current user
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{badges: list<array{assignation_time: string, badge_alias: string}>}
      */
-    public static function apiMyList(\OmegaUp\Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         return [
-            'status' => 'ok',
             'badges' => is_null($r->user) ?
                 [] :
                 \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($r->user),
@@ -56,10 +56,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of badges owned by a certain user
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{badges: list<array{assignation_time: string, badge_alias: string}>, status: string}
      */
-    public static function apiUserList(\OmegaUp\Request $r) {
+    public static function apiUserList(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidUsername(
             $r['target_username'],
             'target_username'
@@ -78,10 +77,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{assignation_time: int|null, status: string}
      */
-    public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r) {
+    public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         \OmegaUp\Validators::validateValidAlias(
             $r['badge_alias'],
@@ -106,10 +104,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{first_assignation: int|null, owners_percentage: float, status: string}
      */
-    public static function apiBadgeDetails(\OmegaUp\Request $r) {
+    public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
             $r['badge_alias'],
             'badge_alias'
@@ -128,7 +125,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'first_assignation' => $firstAssignation,
-            'owners_percentage' => (($ownersCount / $totalUsers) * 100)
+            'owners_percentage' => (($ownersCount * 100.0) / $totalUsers)
         ];
     }
 }
