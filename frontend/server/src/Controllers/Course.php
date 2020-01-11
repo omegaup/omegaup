@@ -380,7 +380,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         self::validateCreate($r);
 
-        $newCourse = new \OmegaUp\DAO\VO\Courses([
+        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
             'name' => $r['name'],
             'description' => $r['description'],
             'alias' => $r['alias'],
@@ -391,9 +391,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
             'requests_user_information' => $r['requests_user_information'],
-        ]);
-
-        self::createCourseAndGroup($newCourse, $r->user);
+        ]), $r->user);
 
         return [
             'status' => 'ok',
