@@ -238,7 +238,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             where a.course_id = ?;
         ';
 
-        /** @var list<array{assignment: string, score: float, max_score: float}> */
+        /** @var list<array{assignment: string, max_score: float, score: float}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $identityId, $courseId]
