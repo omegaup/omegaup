@@ -56,7 +56,7 @@ const translations = {
 	badge_coderOfTheMonth_name: "Coder del Mes",
 	badge_contestManager_description: "El usuario ha administrado al menos un concurso.",
 	badge_contestManager_name: "Administrador de Concurso",
-	badge_cppexpert_description: "El usuario resolvi\u00f3 m\u00e1s de 10 problemas en C++.",
+	badge_cppexpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en C++.",
 	badge_cppexpert_name: "Usuario Experto en C++",
 	badge_feedbackProvider_description: "El usuario ha enviado la calificaci\u00f3n de al menos un problema.",
 	badge_feedbackProvider_name: "Proveedor de Feedback",
