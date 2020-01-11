@@ -187,7 +187,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureOptionalInt('finish_time', null, null, /* is_required */false);
+        $r->ensureOptionalInt(
+            'finish_time',
+            null,
+            null, /* is_required */
+            false
+        );
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
