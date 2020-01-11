@@ -61,7 +61,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['description'],
@@ -119,7 +119,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidNamespacedAlias(
             $r['group_alias'],
             'group_alias'
         );
@@ -166,7 +166,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidNamespacedAlias(
             $r['group_alias'],
             'group_alias'
         );
@@ -261,7 +261,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidNamespacedAlias(
             $r['group_alias'],
             'group_alias'
         );
@@ -297,7 +297,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidNamespacedAlias(
             $r['group_alias'],
             'group_alias'
         );
@@ -323,7 +323,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidNamespacedAlias(
             $r['group_alias'],
             'group_alias'
         );
@@ -335,11 +335,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['alias'],
-            'alias',
-            true
-        );
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['description'],
