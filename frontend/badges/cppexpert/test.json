@@ -427,13 +427,24 @@
                             }
                         }
                     ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas",
+                                "language": "cpp11-gcc",
+                                "source": "#include <iostream> \n using namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
                 }
-            ]
-        },
-        {
-            "type": "scripts",
-            "scripts": [
-                "update_ranks.py"
             ]
         }
     ],
