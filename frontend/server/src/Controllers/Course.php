@@ -187,7 +187,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureNullableInt('finish_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt('finish_time', null, null, /* is_required */false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -380,7 +380,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         self::validateCreate($r);
 
-        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
+        $newCourse = new \OmegaUp\DAO\VO\Courses([
             'name' => $r['name'],
             'description' => $r['description'],
             'alias' => $r['alias'],
@@ -391,7 +391,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
             'requests_user_information' => $r['requests_user_information'],
-        ]), $r->user);
+        ]);
+
+        self::createCourseAndGroup($newCourse, $r->user);
 
         return [
             'status' => 'ok',

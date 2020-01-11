@@ -61,38 +61,18 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => \OmegaUp\Test\Utils::createRandomString(),
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
-            'finish_time' => null,
         ]));
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $name
+        );
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             1,
-            count(
-                \OmegaUp\DAO\Courses::findByName(
-                    $name
-                )
-            )
+            count($courses)
         );
-    }
-
-    /**
-     * Create course with undefined finish time
-     */
-    public function testCreateCourseWithUndefinedFinishTime() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        $login = self::login($identity);
-        try {
-            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'name' => \OmegaUp\Test\Utils::createRandomString(),
-                'alias' => \OmegaUp\Test\Utils::createRandomString(),
-                'description' => \OmegaUp\Test\Utils::createRandomString(),
-                'start_time' => (\OmegaUp\Time::get() + 60),
-            ]));
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterEmpty', $e->getMessage());
-        }
+        $this->assertNull($courses[0]->finish_time);
     }
 
     /**
