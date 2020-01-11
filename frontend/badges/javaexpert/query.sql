@@ -13,6 +13,7 @@ INNER JOIN
 WHERE
     `r`.`verdict` = "AC" AND
     `s`.`type` = "normal" AND
+    `p`.`visibility` >= 1 AND
     `s`.`language`='java'
 GROUP BY
     `u`.`user_id`
