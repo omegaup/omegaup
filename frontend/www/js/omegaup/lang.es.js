@@ -66,8 +66,6 @@ const translations = {
 	badge_problemSetter_name: "Creador de Problemas",
 	badge_pythonExpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Python.",
 	badge_pythonExpert_name: "Usuario Experto en Python",
-	badge_pythonexpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Python.",
-	badge_pythonexpert_name: "Usuario Experto en Python",
 	badge_virtualContestManager_description: "El usuario ha administrado al menos un concurso virtual.",
 	badge_virtualContestManager_name: "Administrador de Concurso Virtual",
 	banProblemFormComments: "Comentarios adicionales para el creador del problema",
