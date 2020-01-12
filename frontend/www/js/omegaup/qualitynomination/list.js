@@ -28,7 +28,7 @@ OmegaUp.on('ready', function() {
   });
 
   if (!payload.myView) {
-    API.QualityNomination.getNominations({
+    API.QualityNomination.list({
       offset: nominationsList.page,
       rowcount: nominationsList.length,
     })
@@ -38,7 +38,7 @@ OmegaUp.on('ready', function() {
       })
       .catch(UI.apiError);
   } else {
-    API.QualityNomination.getMyNominations({
+    API.QualityNomination.myList({
       offset: nominationsList.page,
       rowcount: nominationsList.length,
     })

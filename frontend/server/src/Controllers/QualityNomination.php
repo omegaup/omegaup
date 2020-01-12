@@ -681,6 +681,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
         $types = $r->getStringList('types');
+        //TODO: Hay que validar desde Validators::validateValidSubset()
 
         if (empty($types)) {
             $types = ['promotion', 'demotion'];
@@ -903,7 +904,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
-        self::validateMemberOfReviewerGroup($r);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
