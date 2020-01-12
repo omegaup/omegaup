@@ -20,7 +20,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string|null, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$name]
@@ -66,7 +66,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string|null, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -100,7 +100,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string|null, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
@@ -301,7 +301,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $offset,
             $pageSize,
         ];
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string|null, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
@@ -354,7 +354,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
-        /** @var array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}|null */
+        /** @var array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string|null, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;
