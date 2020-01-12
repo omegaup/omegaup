@@ -641,60 +641,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
-     */
-    public static function apiGetNominations(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        $types = $r->getStringList('types');
-
-        if (empty($types)) {
-            $types = ['promotion', 'demotion'];
-        }
-
-        return \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */ null,
-            /* assignee */ null,
-            $offset,
-            $rowCount,
-            $types
-        );
-    }
-
-    /**
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
-     */
-    public static function apiGetMyNominations(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        $types = $r->getStringList('types');
-
-        if (empty($types)) {
-            $types = ['promotion', 'demotion'];
-        }
-
-        return \OmegaUp\DAO\QualityNominations::getNominations(
-            $r->user->user_id,
-            /* assignee */ null,
-            $offset,
-            $rowCount,
-            $types
-        );
-    }
-
-    /**
      * Validates that the user making the request is member of the
      * `omegaup:quality-reviewer` group.
      *
@@ -723,6 +669,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     */
+    public static function apiList(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types');
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
+        }
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            /* nominator */ null,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
+    }
+
+    /**
      * Displays the nominations that this user has been assigned.
      *
      * @param \OmegaUp\Request $r
@@ -741,6 +714,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         return self::getListImpl($r, null /* nominator */, $r->user->user_id);
+    }
+
+    /**
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     */
+    public static function apiMyList(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types');
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
+        }
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            $r->user->user_id,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
