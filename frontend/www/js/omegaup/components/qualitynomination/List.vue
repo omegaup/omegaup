@@ -2,7 +2,6 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">
-        {{ T.qualityNomination }}
         {{
           UI.formatString(T.nominationsRangeHeader, {
             lowCount: (page - 1) * length + 1,

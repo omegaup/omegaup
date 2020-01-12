@@ -672,6 +672,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
     public static function apiList(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
         $r->ensureMainUserIdentity();
 
         $r->ensureInt('offset', null, null, false);
@@ -721,6 +725,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
         $r->ensureMainUserIdentity();
 
         $r->ensureInt('offset', null, null, false);
@@ -851,6 +859,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     public static function getDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
         $r->ensureMainUserIdentity();
         $r->ensureInt('qualitynomination_id', null, null, true);
 
@@ -874,6 +886,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
      */
     public static function getListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
         $r->ensureMainUserIdentity();
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
@@ -901,6 +917,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
      */
     public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
         $r->ensureMainUserIdentity();
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
