@@ -503,8 +503,25 @@ class Validators {
             );
         }
 
-        $badElements = [];
         $elements = array_filter(explode(',', $parameter));
+
+        self::validateValidStringList($parameterName, $elements, $enum);
+    }
+
+    /**
+     * Validates that the provided string list from parameter
+     * has the right values.
+     *
+     * @param string[] $elements
+     * @param array $enum
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidStringList(
+        string $parameterName,
+        array $elements,
+        array $enum
+    ): void {
+        $badElements = [];
         foreach ($elements as $element) {
             if (!in_array($element, $enum)) {
                 $badElements[] = $element;

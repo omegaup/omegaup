@@ -619,14 +619,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
 
-        $types = ['promotion', 'demotion'];
-        if (!empty($r['types'])) {
-            if (is_string($r['types'])) {
-                $types = explode(',', $r['types']);
-            } elseif (is_array($r['types'])) {
-                /** @var list<string> */
-                $types = $r['types'];
-            }
+        $types = $r->getStringList('types');
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
         }
 
         return [
@@ -686,7 +682,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
         $types = $r->getStringList('types');
-        //TODO: Hay que validar desde Validators::validateValidSubset()
+        \OmegaUp\Validators::validateValidStringList(
+            'types',
+            $types,
+            ['promotion', 'demotion']
+        );
 
         if (empty($types)) {
             $types = ['promotion', 'demotion'];
