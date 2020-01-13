@@ -522,20 +522,18 @@ export default {
 
     details: _call('/api/qualityNomination/details/'),
 
-    list: _call('/api/qualityNomination/list/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    list: _call('/api/qualityNomination/list/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
-    myList: _call('/api/qualityNomination/mylist/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    myList: _call('/api/qualityNomination/mylist/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
     resolve: _call('/api/qualityNomination/resolve/'),

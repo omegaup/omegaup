@@ -7,6 +7,7 @@ import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -418,6 +419,8 @@ export class Arena {
     self.digitsAfterDecimalPoint = 2;
 
     self.qualityNominationForm = null;
+
+    self.elements.assignmentsNav = null;
   }
 
   installLibinteractiveHooks() {
@@ -637,6 +640,36 @@ export class Arena {
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
+
+    if (
+      typeof problemset.courseAssignments !== 'undefined' &&
+      document.getElementById('arena-navbar-assignments') !== null &&
+      self.elements.assignmentsNav === null
+    ) {
+      self.elements.assignmentsNav = new Vue({
+        el: '#arena-navbar-assignments',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-assignments', {
+            props: {
+              assignments: this.assignments,
+              currentAssignmentAlias: this.currentAssignmentAlias,
+            },
+            on: {
+              'navigate-to-assignment': function(assignmentAlias) {
+                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+              },
+            },
+          });
+        },
+        data: {
+          assignments: problemset.courseAssignments,
+          currentAssignmentAlias: problemset.alias,
+        },
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
+      });
+    }
   }
 
   initProblems(problemset) {

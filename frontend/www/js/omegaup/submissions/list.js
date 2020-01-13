@@ -34,6 +34,7 @@ OmegaUp.on('ready', function() {
   API.Submission.latestSubmissions({
     offset: submissionsList.page,
     rowcount: submissionsList.length,
+    username: payload.user,
   })
     .then(data => {
       submissionsList.totalRows = data.totalRows;

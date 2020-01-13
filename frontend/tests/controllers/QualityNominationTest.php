@@ -3,9 +3,8 @@
 class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login(QualityNominationFactory::$reviewers[0]);
 
-        $login = self::login($identity);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -16,12 +15,11 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(
-            null,
-            null
-        );
-        self::assertArrayHasKey('author', $nominations[0]);
-        self::assertArrayHasKey('nominator', $nominations[0]);
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token
+        ]));
+        self::assertArrayHasKey('author', $response['nominations'][0]);
+        self::assertArrayHasKey('nominator', $response['nominations'][0]);
     }
 
     public function testGetByIdHasAuthorAndNominatorSet() {

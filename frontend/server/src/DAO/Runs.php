@@ -176,12 +176,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    /*
+    /**
      * Gets an array of the guids of the pending runs
+     *
+     * @return list<array{guid: string}>
      */
     final public static function getPendingRunsOfProblem(
         int $problemId
-    ): array {
+    ) {
         $sql = '
             SELECT
                 s.guid
@@ -196,7 +198,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemId];
 
         $result = [];
-        /** @var array{guid: string} $row */
+        /** @var array{guid: string}[] $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
