@@ -62,6 +62,8 @@ const translations = {
 	badge_feedbackProvider_name: "Provedor de Feedback",
 	badge_legacyUser_description: "O usu\u00e1rio realizou um envio no primeiro ano desde o lan\u00e7amento de omegaUp.",
 	badge_legacyUser_name: "Usu\u00e1rio Hist\u00f3rico",
+	badge_pascalExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em Pascal.",
+	badge_pascalExpert_name: "Usu\u00e1rio Especialista em Pascal",
 	badge_problemSetter_description: "O usu\u00e1rio tem criado pelo menos um problema.",
 	badge_problemSetter_name: "Criador de Problemas",
 	badge_pythonExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em Python.",
