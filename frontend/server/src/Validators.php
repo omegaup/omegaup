@@ -503,6 +503,7 @@ class Validators {
             );
         }
 
+        /** @var list<string> */
         $elements = array_filter(explode(',', $parameter));
 
         self::validateValidStringList($parameterName, $elements, $enum);
@@ -512,7 +513,7 @@ class Validators {
      * Validates that the provided string list from parameter
      * has the right values.
      *
-     * @param string[] $elements
+     * @param list<string> $elements
      * @param array $enum
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
