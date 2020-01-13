@@ -142,23 +142,29 @@ class Course {
 
     /**
      * @param array{homework?: int, test?: int} $assignmentsPerType
-     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string}
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string, assignment_problemset_ids: list<int>}
      */
     public static function createCourseWithNAssignmentsPerType(
         array $assignmentsPerType
     ): array {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         $admin = $courseFactoryResult['admin'];
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
-        $assignmentAlias = [];
+        $assignmentAliases = [];
+        $assignmentProblemsetIds = [];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
+                $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
                 $r = new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => \OmegaUp\Test\Utils::createRandomString(),
-                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $assignmentAlias,
                     'description' => \OmegaUp\Test\Utils::createRandomString(),
                     'start_time' => (\OmegaUp\Time::get()),
                     'finish_time' => (\OmegaUp\Time::get() + 120),
@@ -166,15 +172,29 @@ class Course {
                     'assignment_type' => $assignmentType
                 ]);
 
-                $assignmentAlias[] = strval($r['alias']);
                 \OmegaUp\Controllers\Course::apiCreateAssignment($r);
+                $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                    $assignmentAlias,
+                    $course->course_id
+                );
+                if (
+                    is_null($assignment) ||
+                    is_null($assignment->problemset_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
+                $assignmentAliases[] = $assignmentAlias;
+                $assignmentProblemsetIds[] = $assignment->problemset_id;
             }
         }
 
         return [
             'admin' => $admin,
             'course_alias' => $courseAlias,
-            'assignment_aliases' => $assignmentAlias
+            'assignment_aliases' => $assignmentAliases,
+            'assignment_problemset_ids' => $assignmentProblemsetIds,
         ];
     }
 

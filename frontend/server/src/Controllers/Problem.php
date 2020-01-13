@@ -2796,10 +2796,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // List of verdicts
-        $verdict_counts = [];
+        $verdictCounts = [];
 
         foreach (\OmegaUp\Controllers\Run::VERDICTS as $verdict) {
-            $verdict_counts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
+            $verdictCounts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
                 intval($problem->problem_id),
                 $verdict
             );
@@ -2898,7 +2898,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunsGuids,
-            'verdict_counts' => $verdict_counts,
+            'verdict_counts' => $verdictCounts,
             'cases_stats' => $casesStats['counts'],
         ];
     }
@@ -2963,11 +2963,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             false
         );
-        $tags = [];
-        if (isset($r['tag'])) {
-            /** @var string|list<string> $r['tag'] */
-            $tags = self::getTagList($r['tag']);
-        }
+
+        $tags = $r->getStringList('tag');
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
@@ -3897,25 +3894,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return self::SOLUTION_UNLOCKED;
         }
         return self::SOLUTION_LOCKED;
-    }
-
-    /**
-     * @param string|list<string> $tags
-     * @return list<string>
-     */
-    private static function getTagList($tags): array {
-        if (is_array($tags)) {
-            return $tags;
-        }
-
-        // Still allow strings to be sent to avoid breaking permalinks.
-        if (empty($tags)) {
-            return [];
-        }
-        $tags = explode(',', strval($tags));
-
-        /** @var list<string> */
-        return array_unique($tags);
     }
 
     /**

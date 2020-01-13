@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}" inline}
+{include file='head.tpl' navbarSection='users' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProfile#}" inline}
 
 {if !isset($STATUS_ERROR)}
 
