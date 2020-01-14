@@ -417,4 +417,85 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $group
         ));
     }
+
+    public function testUpdateCourseFinishTime() {
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $adminLogin,
+            false,
+            'no',
+            'true'
+        );
+
+        // Should not update the finish time
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertEquals(
+            $courseData['request']['course']->finish_time,
+            $course->finish_time
+        );
+
+        // Should update the finish time as expected
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'finish_time' => (\OmegaUp\Time::get() + 360)
+        ]));
+        $newCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNotEquals(
+            $courseData['request']['course']->finish_time,
+            $newCourse->finish_time
+        );
+
+        // Should set the finish time as null
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'finish_time' => (\OmegaUp\Time::get() - 18360),
+            'unlimited_duration' => true
+        ]));
+        $newCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNull($newCourse->finish_time);
+
+        // Now update one more time with the unlimited_duration set as false
+        $newFinishTime = (\OmegaUp\Time::get() + 540);
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'finish_time' => $newFinishTime,
+            'unlimited_duration' => false
+        ]));
+        $newCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertEquals($newFinishTime, $newCourse->finish_time);
+    }
 }
