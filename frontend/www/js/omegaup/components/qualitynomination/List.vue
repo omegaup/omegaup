@@ -1,7 +1,14 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">{{ T.qualityNomination }}</h3>
+      <h3 class="panel-title">
+        {{
+          UI.formatString(T.nominationsRangeHeader, {
+            lowCount: (page - 1) * length + 1,
+            highCount: page * length,
+          })
+        }}
+      </h3>
     </div>
     <div class="panel-body">
       <a href="/group/omegaup:quality-reviewer/edit/#members">
@@ -13,6 +20,15 @@
           {{ T.qualityNominationShowAll }}
         </label>
       </div>
+      <div v-if="showControls">
+        <template v-if="page > 1">
+          <a class="prev" v-bind:href="prevPageUrl"> {{ T.wordsPrevPage }}</a>
+          <span class="delimiter" v-show="showNextPage">|</span>
+        </template>
+        <a class="next" v-show="showNextPage" v-bind:href="nextPageUrl"
+          >{{ T.wordsNextPage }}
+        </a>
+      </div>
     </div>
     <table class="table table-striped">
       <thead>
@@ -22,7 +38,6 @@
           <th>{{ T.wordsNominator }}</th>
           <th>{{ T.wordsAuthor }}</th>
           <th>{{ T.wordsSubmissionDate }}</th>
-          <th>{{ T.qualityNominationAssignedJudge }}</th>
           <th class="text-center">{{ T.wordsStatus }}</th>
           <th><!-- view button --></th>
         </tr>
@@ -46,7 +61,6 @@
             }}</a>
           </td>
           <td>{{ nomination.time.format('long') }}</td>
-          <td><!-- TODO: Judges aren't returned from the API yet --></td>
           <td class="text-center">{{ nomination.status }}</td>
           <td>
             <a
@@ -70,12 +84,15 @@ import UI from '../../ui.js';
 
 @Component
 export default class QualityNominationList extends Vue {
-  @Prop() nominations!: omegaup.Nomination[];
-  @Prop() currentUser!: string;
+  @Prop() page!: number;
+  @Prop() length!: number;
   @Prop() myView!: boolean;
+  @Prop() nominations!: omegaup.Nomination[];
+  @Prop() totalRows!: number;
 
   showAll = true;
   T = T;
+  UI = UI;
 
   get visibleNominations(): omegaup.Nomination[] {
     if (this.showAll) {
@@ -84,6 +101,30 @@ export default class QualityNominationList extends Vue {
     return this.nominations.filter((nomination: omegaup.Nomination) => {
       return nomination.status === 'open';
     });
+  }
+
+  get showNextPage(): boolean {
+    return this.length * this.page < this.totalRows;
+  }
+
+  get showControls(): boolean {
+    return this.showNextPage || this.page > 1;
+  }
+
+  get nextPageUrl(): string {
+    if (this.myView) {
+      return `/nomination/mine/?page=${this.page + 1}`;
+    } else {
+      return `/nomination/?page=${this.page + 1}`;
+    }
+  }
+
+  get prevPageUrl(): string {
+    if (this.myView) {
+      return `/nomination/mine/?page=${this.page - 1}`;
+    } else {
+      return `/nomination/?page=${this.page - 1}`;
+    }
   }
 
   problemUrl(problemAlias: string): string {

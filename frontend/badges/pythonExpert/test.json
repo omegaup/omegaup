@@ -298,8 +298,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas",
-                                "language": "cpp11-gcc",
-                                "source": "#include <iostream> \n using namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py2",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -309,8 +309,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_2",
-                                "language": "cpp11-gcc",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -320,8 +320,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_3",
-                                "language": "cpp11-clang",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -331,8 +331,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_4",
-                                "language": "cpp11-clang",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -342,8 +342,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_5",
-                                "language": "cpp17-gcc",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -353,8 +353,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_6",
-                                "language": "cpp17-gcc",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -364,8 +364,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_7",
-                                "language": "cpp17-clang",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -375,8 +375,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_8",
-                                "language": "cpp17-clang",
-                                "source": "#include <iostream> \n using namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -386,8 +386,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_9",
-                                "language": "cpp11-gcc",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -397,8 +397,8 @@
                             "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
                             "params": {
                                 "problem_alias": "sumas_10",
-                                "language": "cpp11-gcc",
-                                "source": "#include <iostream>\nusing namespace std;int main(){int a,b;cin>>a>>b;cout<<a+b<<endl;return 0;}"
+                                "language": "py3",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
                             },
                             "gradeResult": {
                                 "verdict": "AC"
@@ -427,13 +427,24 @@
                             }
                         }
                     ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas",
+                                "language": "py2",
+                                "source": "print(sum(int(x) for x in input().strip().split()))"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
                 }
-            ]
-        },
-        {
-            "type": "scripts",
-            "scripts": [
-                "update_ranks.py"
             ]
         }
     ],

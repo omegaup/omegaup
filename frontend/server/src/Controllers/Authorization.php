@@ -14,7 +14,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        \OmegaUp\Validators::validateValidAlias(
+        \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
         );

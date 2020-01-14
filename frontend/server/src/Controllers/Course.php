@@ -119,7 +119,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): void {
         self::validateBasicCreateOrUpdate($r);
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -145,11 +148,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $originalCourse->finish_time;
-        }
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -184,7 +187,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureInt('finish_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt(
+            'finish_time',
+            null,
+            null, /* is_required */
+            false
+        );
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -287,6 +295,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $offset = intval($r['start_time']) - $originalCourse->start_time;
 
+        $cloneCourseFinishTime = null;
+        if (!is_null($originalCourse->finish_time)) {
+            $cloneCourseFinishTime = $originalCourse->finish_time + $offset;
+        }
+
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
@@ -297,7 +310,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
                 'start_time' => $r['start_time'],
-                'finish_time' => $originalCourse->finish_time + $offset,
+                'finish_time' => $cloneCourseFinishTime,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -507,7 +520,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        ?int $points = 100,
+        ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
@@ -522,13 +535,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $assignedPoints = is_null($points) ? 100 : $points;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
             $masterCommit,
             $currentVersion,
             $identity,
-            is_null($points) ? 100 : $points,
+            $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $validateVisibility
         );
