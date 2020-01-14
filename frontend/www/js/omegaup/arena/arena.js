@@ -1182,9 +1182,17 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
+    let clarifications = self.clarificationNotifications.data;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
-
+      if (self.problemsetAdmin) {
+        self.clarificationNotifications.data = clarifications.filter(
+          notification =>
+            notification.clarification_id !== clarification.clarification_id,
+        );
+      } else {
+        clarifications.push(clarification);
+      }
       self.notifications.notify({
         id: 'clarification-' + clarification.clarification_id,
         author: clarification.author,
@@ -1203,6 +1211,9 @@ export class Arena {
         .addClass('inserted');
 
       if (self.problemsetAdmin) {
+        if (clarifications !== null) {
+          clarifications.push(clarification);
+        }
         (function(id, answerNode) {
           let responseFormNode = $(
             '#create-response-form',
@@ -1329,24 +1340,23 @@ export class Arena {
     }
 
     if (self.clarificationNotifications !== null) {
-      if (self.problemsetAdmin) {
-        self.clarificationNotifications.data = data.clarifications
-          .filter(clarification => clarification.answer === null)
-          .reverse();
-      } else {
-        // Removing to the notifications list all unsolved clarifications
-        self.clarifications = data.clarifications
-          .filter(clarification => clarification.answer !== null)
-          .reverse();
-        // Removing to the notifications list all marked as resolved
-        // clarifications
-        self.clarificationNotifications.data = self.clarifications.filter(
-          clarification =>
-            localStorage.getItem(
-              `clarification-${clarification.clarification_id}`,
-            ) === null,
-        );
-      }
+      // Removing to the notifications list all unsolved clarifications
+      self.clarificationNotifications.data = data.clarifications
+        .filter(clarification =>
+          self.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null,
+        )
+        .reverse();
+
+      // Removing to the notifications list all marked as resolved
+      // clarifications
+      self.clarificationNotifications.data = self.clarificationNotifications.data.filter(
+        clarification =>
+          localStorage.getItem(
+            `clarification-${clarification.clarification_id}`,
+          ) === null,
+      );
     }
     if (
       self.answeredClarifications > previouslyAnswered &&

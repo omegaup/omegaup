@@ -7,9 +7,11 @@
       data-toggle="dropdown"
       href="#"
       role="button"
+      v-on:click="unread = false"
       ><span class="notification-icon glyphicon glyphicon-bell"></span>
       <span
-        v-bind:class="unreadClass"
+        class="notification-counter label"
+        v-bind:class="{ 'label-danger': unread }"
         v-if="clarifications &amp;&amp; clarifications.length &gt; 0"
         v-model="unread"
         >{{ clarifications.length }}</span
@@ -73,7 +75,6 @@ export default class Clarifications extends Vue {
   unread: boolean = true;
   flashInterval: number = 0;
   clarifications: omegaup.Clarification[] = this.data;
-  clarificationMapping: omegaup.Clarification[] = this.data;
 
   @Watch('data')
   onPropertyChanged(
@@ -81,6 +82,7 @@ export default class Clarifications extends Vue {
     oldValue: Array<omegaup.Clarification>,
   ): void {
     this.clarifications = newValue;
+    this.unread = true;
   }
 
   @Watch('unread')
@@ -99,12 +101,6 @@ export default class Clarifications extends Vue {
     }
   }
 
-  get unreadClass(): string {
-    return this.unread
-      ? 'notification-counter label label-danger'
-      : 'notification-counter label';
-  }
-
   anchor(clarification: omegaup.Clarification): string {
     return `#clarifications/clarification-${clarification.clarification_id}`;
   }
@@ -120,35 +116,19 @@ export default class Clarifications extends Vue {
   onCloseClicked(clarification: omegaup.Clarification): void {
     let self = this;
     const id = `clarification-${clarification.clarification_id}`;
-    const idx = self.clarifications.findIndex(function(element, index, array) {
-      return element.clarification_id === clarification.clarification_id;
+    self.clarifications = self.clarifications.filter(function(element) {
+      return element.clarification_id !== clarification.clarification_id;
     });
     localStorage.setItem(id, Date.now().toString());
-    self.$delete(self.clarifications, idx);
   }
 
   onMarkAllAsRead(): void {
     let self = this;
-    self.clarificationMapping = self.clarifications;
-    for (let key in self.clarificationMapping) {
+    for (let key in self.clarifications) {
       const id = `clarification-${self.clarifications[key].clarification_id}`;
-      const idx = self.clarifications.findIndex(function(
-        element,
-        index,
-        array,
-      ) {
-        return (
-          element.clarification_id === self.clarifications[key].clarification_id
-        );
-      });
       localStorage.setItem(id, Date.now().toString());
-      self.$delete(self.clarifications, idx);
     }
-    self.clarificationMapping = [];
-  }
-
-  resolve(clarification: omegaup.Clarification): void {
-    this.$emit('onCloseClicked', clarification);
+    self.clarifications = [];
   }
 }
 </script>
