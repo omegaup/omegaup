@@ -48,6 +48,34 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Create course with unlimited duration
+     */
+    public function testCreateCourseWithUnlimitedDuration() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $response = \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+        ]));
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $name
+        );
+
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(
+            1,
+            count($courses)
+        );
+        $this->assertNull($courses[0]->finish_time);
+    }
+
+    /**
      * Two courses cannot have the same alias
      *
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException

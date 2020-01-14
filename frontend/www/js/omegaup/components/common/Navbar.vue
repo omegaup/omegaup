@@ -72,6 +72,9 @@
                 <a href="/problem/">{{ T.wordsProblems }}</a>
               </li>
               <li>
+                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
+              </li>
+              <li>
                 <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
               </li>
               <li v-show="data.isReviewer">
@@ -80,17 +83,39 @@
             </ul>
           </li>
           <li
-            class="nav-problems"
+            class="dropdown nav-problems"
             v-bind:class="{ active: data.navbarSection === 'problems' }"
             v-else=""
           >
-            <a href="/problem/">{{ T.wordsProblems }}</a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{ T.wordsProblems }}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/problem/">{{ T.wordsProblems }}</a>
+              </li>
+              <li>
+                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
+              </li>
+            </ul>
           </li>
           <li
-            class="nav-rank"
+            class="dropdown nav-rank"
             v-bind:class="{ active: data.navbarSection === 'rank' }"
           >
-            <a href="/rank/">{{ T.navRanking }}</a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{ T.navRanking }}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/rank/">{{ T.navUserRanking }}</a>
+              </li>
+              <li>
+                <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
+              </li>
+            </ul>
           </li>
           <li
             class="nav-schools"
