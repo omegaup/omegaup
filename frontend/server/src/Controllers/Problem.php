@@ -2964,7 +2964,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             false
         );
 
-        $tags = $r->getStringList('tag');
+        $tags = $r->getStringList('tag', []);
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
