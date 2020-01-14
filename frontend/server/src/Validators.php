@@ -481,50 +481,20 @@ class Validators {
 
     /**
      *
-     * @param mixed $parameter
+     * @template T
+     * @param list<T> $parameter
      * @param string $parameterName
-     * @param array $enum
-     * @param bool $required
+     * @param list<T> $validOptions
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidSubset(
-        $parameter,
+        array $parameter,
         string $parameterName,
-        array $enum,
-        bool $required = true
-    ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
-            return;
-        }
-        if (!is_string($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                $parameterName
-            );
-        }
-
-        /** @var list<string> */
-        $elements = array_filter(explode(',', $parameter));
-
-        self::validateValidStringList($parameterName, $elements, $enum);
-    }
-
-    /**
-     * Validates that the provided string list from parameter
-     * has the right values.
-     *
-     * @param list<string> $elements
-     * @param array $enum
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     */
-    public static function validateValidStringList(
-        string $parameterName,
-        array $elements,
-        array $enum
+        array $validOptions
     ): void {
         $badElements = [];
-        foreach ($elements as $element) {
-            if (!in_array($element, $enum)) {
+        foreach ($parameter as $element) {
+            if (!in_array($element, $validOptions)) {
                 $badElements[] = $element;
             }
         }
@@ -534,7 +504,7 @@ class Validators {
                 $parameterName,
                 [
                     'bad_elements' => implode(',', $badElements),
-                    'expected_set' => implode(', ', $enum),
+                    'expected_set' => implode(', ', $validOptions),
                 ]
             );
         }

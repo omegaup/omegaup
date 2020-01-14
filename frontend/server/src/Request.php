@@ -319,9 +319,16 @@ class Request extends \ArrayObject {
      */
     public function getStringList(
         string $param,
-        array $default
+        array $default = [],
+        bool $required = false
     ): array {
         if (is_null($this[$param])) {
+            if ($required) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $param
+                );
+            }
             return $default;
         }
 

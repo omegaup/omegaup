@@ -678,9 +678,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
-        \OmegaUp\Validators::validateValidStringList(
-            'types',
+        \OmegaUp\Validators::validateValidSubset(
             $types,
+            'types',
             ['promotion', 'demotion']
         );
 
