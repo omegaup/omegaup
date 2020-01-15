@@ -197,10 +197,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             null,
             false /* required */
         );
-
-        if ($isUpdate) {
-            $r->ensureBool('unlimited_duration', false);
-        }
+        $r->ensureBool('unlimited_duration', false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
