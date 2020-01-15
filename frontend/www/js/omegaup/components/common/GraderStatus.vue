@@ -13,7 +13,7 @@
     </li>
     <li class="grader grader-broadcaster-sockets" v-else-if="error !== null">
       API api/grader/status call failed:
-      <pre style="width: 40em;">{{ UI.escape(error) }}</pre>
+      <pre style="width: 40em;">{{ error }}</pre>
     </li>
     <li class="grader grader-embedded-runner" v-if="status === 'ok'">
       Embedded runner:
@@ -29,6 +29,28 @@
     </li>
   </ul>
 </template>
+
+<style>
+.grader-submissions,
+a.grader-submissions-link {
+  background-color: #fff;
+  color: #000 !important;
+  text-decoration: none;
+}
+
+.grader-submissions:hover,
+a.grader-submissions-link:hover {
+  background-color: #fff !important;
+}
+
+.grader {
+  padding: 3px 20px;
+}
+
+hr.dropdown-separator {
+  margin: 0;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';

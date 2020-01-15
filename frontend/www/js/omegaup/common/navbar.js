@@ -47,7 +47,7 @@ OmegaUp.on('ready', function() {
 
   function updateGraderStatus() {
     API.Grader.status()
-      .then(function(stats) {
+      .then(stats => {
         commonNavbarGraderStatus.graderInfo = stats.grader;
         if (commonNavbarGraderStatus.graderInfo.status !== 'ok') {
           commonNavbarGraderStatus.status = 'down';
@@ -62,7 +62,7 @@ OmegaUp.on('ready', function() {
         commonNavbarGraderStatus.error = null;
         commonNavbarGraderBadge.error = false;
       })
-      .fail(function(stats) {
+      .fail(stats => {
         commonNavbarGraderStatus.status = 'down';
         commonNavbarGraderStatus.error = stats.error;
         commonNavbarGraderBadge.error = true;
