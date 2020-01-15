@@ -67,7 +67,6 @@ declare namespace omegaup {
     answer?: string;
     public: number;
     receiver?: string;
-
   }
 
   export interface CoderOfTheMonth extends Profile {

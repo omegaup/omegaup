@@ -1,7 +1,6 @@
 import { OmegaUp, T } from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
-import Notifications from './notifications.js';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
@@ -258,21 +257,19 @@ export class Arena {
     self.markdownConverter = UI.markdownConverter();
 
     // Currently opened notifications.
-    self.notifications = new Notifications();
     self.clarificationNotifications = null;
     OmegaUp.on('ready', function() {
-      self.notifications.attach($('#notifications'));
       if (document.getElementById('clarification-notifications') !== null) {
         self.clarificationNotifications = new Vue({
           el: '#clarification-notifications',
           render: function(createElement) {
             return createElement('omegaup-notifications-clarifications', {
               props: {
-                data: this.data,
+                initialClarifications: this.initialClarifications,
               },
             });
           },
-          data: { data: null },
+          data: { initialClarifications: [] },
           components: {
             'omegaup-notifications-clarifications': notification_Clarifications,
           },
@@ -1182,28 +1179,17 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
-    let clarifications = self.clarificationNotifications.data;
+    let clarifications = self.clarificationNotifications.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
       if (self.problemsetAdmin) {
-        self.clarificationNotifications.data = clarifications.filter(
+        self.clarificationNotifications.initialClarifications = clarifications.filter(
           notification =>
             notification.clarification_id !== clarification.clarification_id,
         );
       } else {
         clarifications.push(clarification);
       }
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
     } else {
       r = $('.clarifications tbody.clarification-list tr.template')
         .clone()
@@ -1255,11 +1241,6 @@ export class Arena {
               .then(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
-                if (self.problemsetAdmin) {
-                  self.notifications.resolve({
-                    id: `clarification-${clarification.clarification_id}`,
-                  });
-                }
               })
               .fail(function() {
                 $('pre', answerNode).html(responseText);
@@ -1282,20 +1263,6 @@ export class Arena {
     $('.answer pre', r).html(UI.escape(clarification.answer));
     if (clarification.answer) {
       self.answeredClarifications++;
-    }
-
-    if (self.problemsetAdmin != !!clarification.answer) {
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
     }
 
     if (!self.clarifications[clarification.clarification_id]) {
@@ -1341,7 +1308,7 @@ export class Arena {
 
     if (self.clarificationNotifications !== null) {
       // Removing to the notifications list all unsolved clarifications
-      self.clarificationNotifications.data = data.clarifications
+      self.clarificationNotifications.initialClarifications = data.clarifications
         .filter(clarification =>
           self.problemsetAdmin
             ? clarification.answer === null
@@ -1351,7 +1318,7 @@ export class Arena {
 
       // Removing to the notifications list all marked as resolved
       // clarifications
-      self.clarificationNotifications.data = self.clarificationNotifications.data.filter(
+      self.clarificationNotifications.initialClarifications = self.clarificationNotifications.initialClarifications.filter(
         clarification =>
           localStorage.getItem(
             `clarification-${clarification.clarification_id}`,

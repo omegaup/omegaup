@@ -93,7 +93,6 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {if $LOGGED_IN eq '1'}
-              {include file='common.navbar.notifications.tpl'}
               <li id="clarification-notifications"></li>
               <li id="notifications-list"></li>
               <li class="dropdown">

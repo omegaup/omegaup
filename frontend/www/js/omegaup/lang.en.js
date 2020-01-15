@@ -1039,6 +1039,7 @@ const translations = {
 	wordsClarifications: "Clarification",
 	wordsCloneContest: "Clone contest",
 	wordsCloneCourse: "Clone course",
+	wordsClose: "Close",
 	wordsCompilerOutput: "Compiler output",
 	wordsConfirm: "Confirm",
 	wordsConsole: "Console",

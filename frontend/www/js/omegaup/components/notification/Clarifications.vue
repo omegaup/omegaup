@@ -8,7 +8,7 @@
       href="#"
       role="button"
       v-on:click="unread = false"
-      ><span class="notification-icon glyphicon glyphicon-bell"></span>
+      ><span class="glyphicon glyphicon-bell"></span>
       <span
         class="notification-counter label"
         v-bind:class="{ 'label-danger': unread }"
@@ -25,7 +25,7 @@
         <ul class="notification-drawer">
           <li v-for="clarification in clarifications">
             <button
-              aria-label="Close"
+              v-bind:aria-label="T.wordsClose"
               class="close"
               type="button"
               v-on:click.prevent="onCloseClicked(clarification)"
@@ -50,10 +50,7 @@
         v-if="clarifications &amp;&amp; clarifications.length &gt; 1"
       ></li>
       <li v-if="clarifications &amp;&amp; clarifications.length &gt; 1">
-        <a
-          class="notification-clear"
-          href="#"
-          v-on:click.prevent="onMarkAllAsRead"
+        <a href="#" v-on:click.prevent="onMarkAllAsRead"
           ><span class="glyphicon glyphicon-align-right"></span>
           {{ T.notificationsMarkAllAsRead }}</a
         >
@@ -62,6 +59,83 @@
   </li>
 </template>
 
+<style>
+.notification-button {
+  padding-top: 6px !important;
+  padding-bottom: 20px !important;
+  padding-right: 12px !important;
+  padding-left: 12px !important;
+  font-size: 22px;
+}
+
+.notification-counter {
+  position: absolute;
+  font-size: 16px;
+  padding: 2px 4px;
+  bottom: 4px;
+  right: 0px;
+}
+
+.notification-drawer::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+.notification-drawer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #f5f5f5;
+}
+
+.notification-drawer::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #7f7f7f;
+}
+
+.notification-drawer {
+  width: 320px;
+  max-width: 320px;
+  max-height: 380px;
+  overflow-y: scroll;
+}
+
+.notification-drawer li {
+  padding: 3px 20px;
+  border-top: 1px solid #f1f1f1;
+}
+
+.notification-drawer li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.notification-drawer li a pre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.notification-drawer li:hover,
+.notification-drawer li:focus,
+.notification-drawer li:active {
+  cursor: pointer;
+  background-color: #678dd7;
+  text-decoration: none;
+}
+
+.notification-drawer li:hover > a,
+.notification-drawer li:focus > a,
+.notification-drawer li:active > a {
+  color: #fff;
+}
+
+.notification-drawer li a > h4,
+.notification-drawer li a > p {
+  word-wrap: break-word;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
@@ -69,32 +143,35 @@ import omegaup from '../../api.js';
 
 @Component
 export default class Clarifications extends Vue {
-  @Prop() data!: omegaup.Clarification[];
+  @Prop() initialClarifications!: omegaup.Clarification[];
   T = T;
 
   unread: boolean = true;
   flashInterval: number = 0;
-  clarifications: omegaup.Clarification[] = this.data;
+  clarifications: omegaup.Clarification[] = this.initialClarifications;
 
-  @Watch('data')
+  @Watch('initialClarifications')
   onPropertyChanged(
     newValue: Array<omegaup.Clarification>,
     oldValue: Array<omegaup.Clarification>,
   ): void {
     this.clarifications = newValue;
     this.unread = true;
+    let audio = <HTMLMediaElement>document.getElementById('notification-audio');
+    if (audio !== null) {
+      audio.play();
+    }
   }
 
   @Watch('unread')
   onPropertyChange(newValue: boolean, oldValue: boolean): void {
-    let self = this;
     if (newValue) {
-      if (self.flashInterval) return;
-      self.flashInterval = setInterval(self.flashTitle, 1000);
+      if (this.flashInterval) return;
+      this.flashInterval = setInterval(this.flashTitle, 1000);
     } else {
-      if (!self.flashInterval) return;
-      clearInterval(self.flashInterval);
-      self.flashInterval = 0;
+      if (!this.flashInterval) return;
+      clearInterval(this.flashInterval);
+      this.flashInterval = 0;
       if (document.title.indexOf('!') === 0) {
         document.title = document.title.substring(2);
       }
@@ -114,21 +191,19 @@ export default class Clarifications extends Vue {
   }
 
   onCloseClicked(clarification: omegaup.Clarification): void {
-    let self = this;
     const id = `clarification-${clarification.clarification_id}`;
-    self.clarifications = self.clarifications.filter(function(element) {
-      return element.clarification_id !== clarification.clarification_id;
-    });
+    this.clarifications = this.clarifications.filter(
+      element => element.clarification_id !== clarification.clarification_id,
+    );
     localStorage.setItem(id, Date.now().toString());
   }
 
   onMarkAllAsRead(): void {
-    let self = this;
-    for (let key in self.clarifications) {
-      const id = `clarification-${self.clarifications[key].clarification_id}`;
+    for (let key in this.clarifications) {
+      const id = `clarification-${this.clarifications[key].clarification_id}`;
       localStorage.setItem(id, Date.now().toString());
     }
-    self.clarifications = [];
+    this.clarifications = [];
   }
 }
 </script>
