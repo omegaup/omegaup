@@ -50,7 +50,7 @@ class ProblemParams {
     public $title;
 
     /**
-     * @var \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED
+     * @var \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED|null
      */
     public $visibility;
 
@@ -74,19 +74,19 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var string
+     * @var string|null
      */
     public $source;
 
     /**
      * @readonly
-     * @var \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL
+     * @var \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL|null
      */
     public $validator;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $timeLimit;
 
@@ -110,7 +110,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $memoryLimit;
 
@@ -133,13 +133,69 @@ class ProblemParams {
     public $emailClarifications;
 
     /**
-     * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     * @readonly
+     * @var string
      */
-    public function __construct($params) {
-        $isRequired = true;
+    public $order;
+
+    /**
+     * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     */
+    public function __construct($params, bool $isUpdate = false) {
+        $isRequired = !$isUpdate;
+        $visibilityStatements = $isUpdate ? [
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+        ] : [
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+        ];
+        if (isset($params['visibility'])) {
+            \OmegaUp\Validators::validateInEnum(
+                $params['visibility'],
+                'visibility',
+                $visibilityStatements,
+                $isRequired
+            );
+        }
+        if (isset($params['validator'])) {
+            \OmegaUp\Validators::validateInEnum(
+                $params['validator'],
+                'validator',
+                [
+                    \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
+                    \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS,
+                    \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC,
+                    \OmegaUp\ProblemParams::VALIDATOR_LITERAL,
+                    \OmegaUp\ProblemParams::VALIDATOR_CUSTOM,
+                ],
+                $isRequired
+            );
+        }
+        if (isset($params['time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['time_limit'],
+                'time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['memory_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['memory_limit'],
+                'memory_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+
         $this->problemAlias = $params['problem_alias'];
         $this->title = $params['title'] ?? null;
-        $this->visibility = $params['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+        $this->visibility = $params['visibility'] ?? null;
         $this->languages = isset(
             $params['languages']
         ) ? explode(
@@ -148,15 +204,16 @@ class ProblemParams {
         ) : null;
         $this->updatePublished = $params['update_published'] ?? \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         $this->selectedTagsAsJSON = $params['selected_tags'] ?? null;
-        $this->source = $params['source'] ?? '';
-        $this->validator = $params['validator'] ?? \OmegaUp\ProblemParams::VALIDATOR_TOKEN;
-        $this->timeLimit = $params['time_limit'] ?? 1000;
+        $this->source = $params['source'] ?? null;
+        $this->validator = $params['validator'] ?? null;
+        $this->timeLimit = $params['time_limit'] ?? null;
         $this->validatorTimeLimit = $params['validator_time_limit'] ?? 1000;
         $this->overallWallTimeLimit = $params['overall_wall_time_limit'] ?? 60000;
         $this->extraWallTime = $params['extra_wall_time'] ?? 0;
-        $this->memoryLimit = $params['memory_limit'] ?? 32768;
+        $this->memoryLimit = $params['memory_limit'] ?? null;
         $this->outputLimit = $params['output_limit'] ?? 10240;
         $this->inputLimit = $params['input_limit'] ?? 10240;
         $this->emailClarifications = $params['email_clarifications'] ?? false;
+        $this->order = $params['order'] ?? 'normal';
     }
 }
