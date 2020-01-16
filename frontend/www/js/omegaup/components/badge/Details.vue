@@ -18,7 +18,7 @@
         </div>
         <div class="badge-detail-text">
           <span class="badge-detail-text-icon">👥</span>
-          {{ this.T['badgeOwnersPercentageMessage'] }}
+          {{ this.T['badgeOwnersMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -132,7 +132,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get ownersNumber(): string {
-    return `${this.badge.owners_total}/${this.badge.owners_count}`;
+    return `${this.badge.owners_count}/${this.badge.owners_total}`;
   }
 }
 </script>
