@@ -125,7 +125,8 @@ class Badge extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'first_assignation' => $firstAssignation,
-            'owners_percentage' => (($ownersCount * 100.0) / $totalUsers)
+            'owners_total' => $totalUsers,
+	    'owners_count' => $ownersCount
         ];
     }
 }
