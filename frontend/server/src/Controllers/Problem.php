@@ -58,7 +58,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
-        bool $isUpdate = false
+        bool $isRequired = true
     ): \OmegaUp\ProblemParams {
         // We need to check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -124,7 +124,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['visibility'])) {
             $params['visibility'] = intval($r['visibility']);
         }
-        return new \OmegaUp\ProblemParams($params, $isUpdate);
+        return new \OmegaUp\ProblemParams($params, $isRequired);
     }
 
     /**
