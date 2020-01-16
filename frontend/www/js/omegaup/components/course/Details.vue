@@ -152,35 +152,35 @@
               </option>
             </select>
           </div>
-          <div class="row">
-            <div class="form-group container-fluid">
-              <label
-                >{{ T.courseNewFormDescription }}
-                <textarea
-                  class="form-control"
-                  cols="30"
-                  rows="5"
-                  v-model="description"
-                ></textarea
-              ></label>
-            </div>
+          <div class="form-group container-fluid">
+            <label
+              >{{ T.courseNewFormDescription }}
+              <textarea
+                class="form-control"
+                cols="30"
+                rows="5"
+                v-model="description"
+              ></textarea
+            ></label>
           </div>
-          <div class="form-group pull-right">
-            <button class="btn btn-primary submit" type="submit">
-              <template v-if="update">
-                {{ T.courseNewFormUpdateCourse }}
-              </template>
-              <template v-else="">
-                {{ T.courseNewFormScheduleCourse }}
-              </template>
-            </button>
-            <button
-              class="btn btn-secondary"
-              type="reset"
-              v-on:click.prevent="onCancel"
-            >
-              {{ T.wordsCancel }}
-            </button>
+          <div class="form-group col-md-4 pull-right">
+            <div class="pull-right">
+              <button class="btn btn-primary submit" type="submit">
+                <template v-if="update">
+                  {{ T.courseNewFormUpdateCourse }}
+                </template>
+                <template v-else="">
+                  {{ T.courseNewFormScheduleCourse }}
+                </template>
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="reset"
+                v-on:click.prevent="onCancel"
+              >
+                {{ T.wordsCancel }}
+              </button>
+            </div>
           </div>
         </div>
       </form>
