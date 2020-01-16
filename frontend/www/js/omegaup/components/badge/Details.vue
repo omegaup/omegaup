@@ -14,7 +14,7 @@
     <div class="badge-details-grid">
       <div class="badge-detail">
         <div class="badge-detail-data">
-          {{ownersNumber}}
+          {{ ownersNumber }}
         </div>
         <div class="badge-detail-text">
           <span class="badge-detail-text-icon">👥</span>
@@ -131,7 +131,7 @@ export default class BadgeDetails extends Vue {
       : '';
   }
 
-  get ownersNumber(): string{
+  get ownersNumber(): string {
     return `${this.badge.owners_total}/${this.badge.owners_count}`;
   }
 }

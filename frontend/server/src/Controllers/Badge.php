@@ -126,7 +126,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'first_assignation' => $firstAssignation,
             'owners_total' => $totalUsers,
-	    'owners_count' => $ownersCount
+            'owners_count' => $ownersCount,
         ];
     }
 }
