@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
             <label
               >{{ T.courseNewFormStartDate }}
               <span
@@ -44,7 +44,7 @@
               <omegaup-datepicker v-model="startTime"></omegaup-datepicker
             ></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
             <label
               >{{ T.courseNewFormEndDate }}
               <span
@@ -54,10 +54,41 @@
                 data-toggle="tooltip"
                 v-bind:title="T.courseNewFormEndDateDesc"
               ></span>
-              <omegaup-datepicker v-model="finishTime"></omegaup-datepicker
+              <omegaup-datepicker
+                v-bind:enabled="!unlimitedDuration"
+                v-model="finishTime"
+              ></omegaup-datepicker
             ></label>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
+            <span class="faux-label"
+              >{{ T.courseNewFormUnlimitedDuration }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
+              ></span
+            ></span>
+            <div class="form-control container-fluid">
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="true"
+                  v-model="unlimitedDuration"
+                />{{ T.wordsYes }}</label
+              >
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="false"
+                  v-model="unlimitedDuration"
+                />{{ T.wordsNo }}</label
+              >
+            </div>
+          </div>
+          <div class="form-group col-md-3">
             <span class="faux-label"
               >{{ T.courseNewFormShowScoreboard }}
               <span
@@ -225,6 +256,7 @@ export default class CourseDetails extends Vue {
   school_id = this.course.school_id;
   basic_information_required = !!this.course.basic_information_required;
   requests_user_information = this.course.requests_user_information || 'no';
+  unlimitedDuration = !this.course.finish_time;
 
   data(): { [name: string]: any } {
     return {
@@ -260,6 +292,7 @@ export default class CourseDetails extends Vue {
     this.basic_information_required = !!this.course.basic_information_required;
     this.requests_user_information =
       this.course.requests_user_information || 'no';
+    this.unlimitedDuration = !this.course.finish_time;
   }
 
   onSubmit(): void {

@@ -30,19 +30,23 @@ OmegaUp.on('ready', function() {
             }
             schoolIdDeferred
               .then(function(school_id) {
-                API.Course.create({
+                let params = {
                   alias: ev.alias,
                   name: ev.name,
                   description: ev.description,
                   start_time: ev.startTime.getTime() / 1000,
-                  finish_time:
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000,
                   show_scoreboard: ev.showScoreboard,
                   needs_basic_information: ev.basic_information_required,
                   requests_user_information: ev.requests_user_information,
                   school_id: school_id,
-                })
-                  .then(function(data) {
+                };
+
+                if (!ev.unlimitedDuration) {
+                  params['finish_time'] = new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
+                }
+
+                API.Course.create(params)
+                  .then(function() {
                     window.location.replace(
                       '/course/' + ev.alias + '/edit/#assignments',
                     );
@@ -51,7 +55,7 @@ OmegaUp.on('ready', function() {
               })
               .fail(UI.apiError);
           },
-          cancel: function(ev) {
+          cancel: function() {
             window.location = '/course/';
           },
         },
