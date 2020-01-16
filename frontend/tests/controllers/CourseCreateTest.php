@@ -286,6 +286,91 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
     }
 
+    public function testCreateAssignmentWithUnlimitedDuration() {
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $adminLogin,
+            false,
+            'no',
+            'true'
+        );
+
+        // Try to create an assignment with unlimited duration
+        // in a non unlimited duration course.
+        try {
+            \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'course_alias' => $courseData['course_alias'],
+                'assignment_type' => 'homework',
+                'start_time' => (\OmegaUp\Time::get() + 120),
+            ]));
+            $this->assertFail('Should have thrown exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+
+        // Now update the course in order to be of unlimited duration
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'finish_time' => (\OmegaUp\Time::get() - 18360),
+            'unlimited_duration' => true
+        ]));
+
+        $updatedCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+
+        // This assignment should have unlimited duration
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework',
+            'start_time' => (\OmegaUp\Time::get() + 120),
+        ]));
+
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $updatedCourse->course_id
+        );
+        $this->assertNull($assignment->finish_time);
+
+        // Create an assignment with duration so big (but not unlimited)
+        // in an unlimited duration course
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        $finishTime = (\OmegaUp\Time::get() + 12000000);
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'course_alias' => $courseData['course_alias'],
+            'assignment_type' => 'homework',
+            'start_time' => (\OmegaUp\Time::get() + 120),
+            'finish_time' => $finishTime,
+        ]));
+
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $updatedCourse->course_id
+        );
+        $this->assertEquals($finishTime, $assignment->finish_time);
+    }
+
     /**
      * Public course can't be created by default
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
