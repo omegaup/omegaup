@@ -179,6 +179,27 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($identitySchool->school_id, $newSchool->school_id);
         $this->assertEquals($identitySchool->graduation_date, $graduationDate);
         $this->assertNull($identitySchool->end_time);
+
+        // Update the school one more time, set the first school again
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school->school_id,
+        ]));
+
+        // Previous IdentitySchool should have end_time filled.
+        $previousIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identitySchool->identity_school_id
+        );
+        $this->assertNotNull($previousIdentitySchool->end_time);
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
+        );
+        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertNull($identitySchool->end_time);
     }
 
     /**

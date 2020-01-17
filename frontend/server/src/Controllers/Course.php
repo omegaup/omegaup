@@ -119,7 +119,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): void {
         self::validateBasicCreateOrUpdate($r);
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -145,11 +148,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $originalCourse->finish_time;
-        }
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            (
+                is_null($r['unlimited_duration']) ||
+                !$r['unlimited_duration']
+            ) &&
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -184,7 +191,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureInt('finish_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt(
+            'finish_time',
+            null,
+            null,
+            false /* required */
+        );
+        $r->ensureBool('unlimited_duration', false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -287,6 +300,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $offset = intval($r['start_time']) - $originalCourse->start_time;
 
+        $cloneCourseFinishTime = null;
+        if (!is_null($originalCourse->finish_time)) {
+            $cloneCourseFinishTime = $originalCourse->finish_time + $offset;
+        }
+
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
@@ -297,7 +315,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
                 'start_time' => $r['start_time'],
-                'finish_time' => $originalCourse->finish_time + $offset,
+                'finish_time' => $cloneCourseFinishTime,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -507,7 +525,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        ?int $points = 100,
+        ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
@@ -522,13 +540,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $assignedPoints = is_null($points) ? 100 : $points;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
             $masterCommit,
             $currentVersion,
             $identity,
-            is_null($points) ? 100 : $points,
+            $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $validateVisibility
         );
@@ -2316,7 +2335,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given assignment
      *
-     * @return array{name: null|string, description: null|string, assignment_type: null|string, start_time: int, finish_time: int, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, director: \OmegaUp\DAO\VO\Identities, problemset_id: int, admin: bool}
+     * @return array{name: null|string, description: null|string, assignment_type: null|string, start_time: int, finish_time: int, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, director: string, problemset_id: int, admin: bool}
      */
     public static function apiAssignmentDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2414,7 +2433,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        $directorUsername = $director->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
@@ -2436,7 +2454,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time' => $tokenAuthenticationResult['assignment']->finish_time,
             'problems' => $problems,
             'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
-            'director' => $director,
+            'director' => strval($director->username),
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
         ];
@@ -2636,6 +2654,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias'
         );
         $originalCourse = self::validateUpdate($r, $r['course_alias']);
+
         if (
             !\OmegaUp\Authorization::isCourseAdmin(
                 $r->identity,
@@ -2664,6 +2683,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
+
+        // Set null finish time if required
+        if (
+            !is_null($r['unlimited_duration']) &&
+            $r['unlimited_duration']
+        ) {
+            $originalCourse->finish_time = null;
+        }
 
         // Push changes
         \OmegaUp\DAO\Courses::update($originalCourse);

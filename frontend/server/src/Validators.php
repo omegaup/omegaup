@@ -179,6 +179,44 @@ class Validators {
     }
 
     /**
+     * Enforces namespaced alias (of the form "namespace:alias").
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidNamespacedAlias(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+            return;
+        }
+        if (
+            !is_string($parameter) ||
+            strlen($parameter) < 2 ||
+            strlen($parameter) > 32
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+        if (self::isRestrictedAlias($parameter)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+        }
+        if (!preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
      * Enforces username requirements
      *
      * @param mixed $parameter
