@@ -1225,6 +1225,7 @@ const translations = {
 	wordsTotal: "Total",
 	wordsTotalVotes: "votos en total",
 	wordsUnimplemented: "Esta caracter\u00edstica no ha sido implementada a\u00fan :(",
+	wordsUnlimitedDuration: "Duraci\u00f3n ilimitada",
 	wordsUnlockSolution: "Desbloquear Soluci\u00f3n",
 	wordsUpdateProblem: "Actualizar problema",
 	wordsUploadedOn: "Problema subido en: %(date)",

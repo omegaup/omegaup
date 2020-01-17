@@ -42,7 +42,8 @@ OmegaUp.on('ready', function() {
                 };
 
                 if (!ev.unlimitedDuration) {
-                  params['finish_time'] = new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
+                  params['finish_time'] =
+                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
                 }
 
                 API.Course.create(params)

@@ -1225,6 +1225,7 @@ const translations = {
 	wordsTotal: "(T07a1)",
 	wordsTotalVotes: "(707a1 v0735)",
 	wordsUnimplemented: "(Thi5 f3a7ur3 ha5 n07 b33n imp13m3n73d y37 :()",
+	wordsUnlimitedDuration: "(Un1imi73d dura7i0n)",
 	wordsUnlockSolution: "(Un10ck S01u7i0n)",
 	wordsUpdateProblem: "(Upda73 pr0b13m)",
 	wordsUploadedOn: "(Pr0b13m up10ad3d 0n: %(date))",
