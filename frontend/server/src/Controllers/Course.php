@@ -76,7 +76,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            /* required */ is_null($courseFinishTime) ? false : true
+            /* required */ !is_null($courseFinishTime)
         );
 
         if (
