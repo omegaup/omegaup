@@ -12,6 +12,8 @@ OmegaUp.on('ready', function() {
           adminCoursesPast: this.adminCoursesPast,
           studentCoursesCurrent: this.studentCoursesCurrent,
           studentCoursesPast: this.studentCoursesPast,
+          initialActiveTabStudent: this.initialActiveTabStudent,
+          initialActiveTabAdmin: this.initialActiveTabAdmin,
         },
       });
     },
@@ -20,6 +22,8 @@ OmegaUp.on('ready', function() {
       adminCoursesPast: [],
       studentCoursesCurrent: [],
       studentCoursesPast: [],
+      initialActiveTabStudent: '',
+      initialActiveTabAdmin: '',
     },
     components: {
       'omegaup-course-list': course_List,
@@ -28,6 +32,7 @@ OmegaUp.on('ready', function() {
 
   API.Course.listCourses()
     .then(function(data) {
+      let activeTabAdmin = '';
       for (let course of data.admin) {
         if (course.finish_time.getTime() > Date.now()) {
           courseList.adminCoursesCurrent.push(course);
@@ -35,7 +40,14 @@ OmegaUp.on('ready', function() {
           courseList.adminCoursesPast.push(course);
         }
       }
+      if (courseList.adminCoursesCurrent.length > 0) {
+        activeTabAdmin = 'admin-courses-current';
+      } else if (courseList.adminCoursesPast.length > 0) {
+        activeTabAdmin = 'admin-courses-past';
+      }
+      courseList.initialActiveTabAdmin = activeTabAdmin;
 
+      let activeTabStudent = '';
       for (let course of data.student) {
         if (course.finish_time.getTime() > Date.now()) {
           courseList.studentCoursesCurrent.push(course);
@@ -43,13 +55,12 @@ OmegaUp.on('ready', function() {
           courseList.studentCoursesPast.push(course);
         }
       }
-
-      // Enable the first visible tab.
-      let tabs = $('.nav-link');
-      if (tabs.length > 0) {
-        $(tabs[0]).trigger('click');
+      if (courseList.studentCoursesCurrent.length > 0) {
+        activeTabStudent = 'student-courses-current';
+      } else if (courseList.studentCoursesPast.length > 0) {
+        activeTabStudent = 'student-courses-past';
       }
-      $('.tab-container').show();
+      courseList.initialActiveTabStudent = activeTabStudent;
     })
     .fail(omegaup.UI.apiError);
 });
