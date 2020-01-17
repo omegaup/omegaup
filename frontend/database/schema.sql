@@ -333,7 +333,6 @@ CREATE TABLE `Identities_Schools` (
   `creation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `end_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`identity_school_id`),
-  UNIQUE KEY `identity_school_graduation_date` (`identity_id`,`school_id`,`graduation_date`),
   KEY `identity_id` (`identity_id`),
   KEY `school_id` (`school_id`),
   CONSTRAINT `fk_isi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

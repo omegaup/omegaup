@@ -150,6 +150,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if (
+            (
+                is_null($r['unlimited_duration']) ||
+                !$r['unlimited_duration']
+            ) &&
             !is_null($r['finish_time']) &&
             $r['start_time'] > $r['finish_time']
         ) {
@@ -190,9 +194,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt(
             'finish_time',
             null,
-            null, /* is_required */
-            false
+            null,
+            false /* required */
         );
+        $r->ensureBool('unlimited_duration', false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -2649,6 +2654,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias'
         );
         $originalCourse = self::validateUpdate($r, $r['course_alias']);
+
         if (
             !\OmegaUp\Authorization::isCourseAdmin(
                 $r->identity,
@@ -2677,6 +2683,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
+
+        // Set null finish time if required
+        if (
+            !is_null($r['unlimited_duration']) &&
+            $r['unlimited_duration']
+        ) {
+            $originalCourse->finish_time = null;
+        }
 
         // Push changes
         \OmegaUp\DAO\Courses::update($originalCourse);
