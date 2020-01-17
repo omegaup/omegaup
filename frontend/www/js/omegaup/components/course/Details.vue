@@ -6,7 +6,7 @@
     <div class="panel-body">
       <form class="form" v-on:submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-md-4">
             <label
               >{{ T.wordsName }}
               <input class="form-control name" type="text" v-model="name"
@@ -29,66 +29,7 @@
                 v-model="alias"
             /></label>
           </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-3">
-            <label
-              >{{ T.courseNewFormStartDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
-                v-bind:title="T.courseNewFormStartDateDesc"
-              ></span>
-              <omegaup-datepicker v-model="startTime"></omegaup-datepicker
-            ></label>
-          </div>
-          <div class="form-group col-md-3">
-            <label
-              >{{ T.courseNewFormEndDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
-                v-bind:title="T.courseNewFormEndDateDesc"
-              ></span>
-              <omegaup-datepicker
-                v-bind:enabled="!unlimitedDuration"
-                v-model="finishTime"
-              ></omegaup-datepicker
-            ></label>
-          </div>
-          <div class="form-group col-md-3">
-            <span class="faux-label"
-              >{{ T.courseNewFormUnlimitedDuration }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
-                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
-              ></span
-            ></span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="true"
-                  v-model="unlimitedDuration"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="false"
-                  v-model="unlimitedDuration"
-                />{{ T.wordsNo }}</label
-              >
-            </div>
-          </div>
-          <div class="form-group col-md-3">
+          <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormShowScoreboard }}
               <span
@@ -112,6 +53,65 @@
                   type="radio"
                   v-bind:value="false"
                   v-model="showScoreboard"
+                />{{ T.wordsNo }}</label
+              >
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label
+              >{{ T.courseNewFormStartDate }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseNewFormStartDateDesc"
+              ></span>
+              <omegaup-datepicker v-model="startTime"></omegaup-datepicker
+            ></label>
+          </div>
+          <div class="form-group col-md-4">
+            <label
+              >{{ T.courseNewFormEndDate }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseNewFormEndDateDesc"
+              ></span>
+              <omegaup-datepicker
+                v-bind:enabled="!unlimitedDuration"
+                v-model="finishTime"
+              ></omegaup-datepicker
+            ></label>
+          </div>
+          <div class="form-group col-md-4">
+            <span class="faux-label"
+              >{{ T.courseNewFormUnlimitedDuration }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
+              ></span
+            ></span>
+            <div class="form-control container-fluid">
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="true"
+                  v-model="unlimitedDuration"
+                />{{ T.wordsYes }}</label
+              >
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="false"
+                  v-model="unlimitedDuration"
                 />{{ T.wordsNo }}</label
               >
             </div>

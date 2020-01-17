@@ -336,7 +336,7 @@ OmegaUp.on('ready', function() {
             }
             schoolIdDeferred
               .then(function(school_id) {
-                let params = {
+                const params = {
                   course_alias: courseAlias,
                   name: ev.name,
                   description: ev.description,
@@ -348,11 +348,11 @@ OmegaUp.on('ready', function() {
                   school_id: school_id,
                 };
 
-                if (!ev.unlimitedDuration) {
-                  params['finish_time'] =
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
+                if (ev.unlimitedDuration) {
+                  params.unlimited_duration = true;
                 } else {
-                  params['unlimited_duration'] = true;
+                  params.finish_time =
+                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
                 }
 
                 API.Course.update(params)

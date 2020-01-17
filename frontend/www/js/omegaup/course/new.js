@@ -30,7 +30,7 @@ OmegaUp.on('ready', function() {
             }
             schoolIdDeferred
               .then(function(school_id) {
-                let params = {
+                const params = {
                   alias: ev.alias,
                   name: ev.name,
                   description: ev.description,
@@ -42,7 +42,7 @@ OmegaUp.on('ready', function() {
                 };
 
                 if (!ev.unlimitedDuration) {
-                  params['finish_time'] =
+                  params.finish_time =
                     new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
                 }
 
