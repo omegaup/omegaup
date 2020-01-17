@@ -19,7 +19,7 @@ OmegaUp.on('ready', function() {
         badge_alias: payload.badge,
         assignation_time: null,
         first_assignation: null,
-        owners_total: null,
+        total_users: null,
         owners_count: null,
       },
     },
@@ -31,7 +31,7 @@ OmegaUp.on('ready', function() {
   API.Badge.badgeDetails({ badge_alias: payload.badge })
     .then(function(data) {
       badgeDetails.badge['first_assignation'] = data['first_assignation'];
-      badgeDetails.badge['owners_total'] = data['owners_total'];
+      badgeDetails.badge['total_users'] = data['total_users'];
       badgeDetails.badge['owners_count'] = data['owners_count'];
     })
     .fail(UI.apiError);

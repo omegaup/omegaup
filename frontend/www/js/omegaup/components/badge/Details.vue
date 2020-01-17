@@ -132,7 +132,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get ownersNumber(): string {
-    return `${this.badge.owners_count}/${this.badge.owners_total}`;
+    return `${this.badge.owners_count}/${this.badge.total_users}`;
   }
 }
 </script>

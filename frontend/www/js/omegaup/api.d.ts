@@ -47,7 +47,7 @@ declare namespace omegaup {
     assignation_time?: Date;
     unlocked?: boolean;
     first_assignation?: Date;
-    owners_total?: number;
+    total_users?: number;
     owners_count?: number;
   }
 

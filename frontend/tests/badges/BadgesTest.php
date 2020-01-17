@@ -361,7 +361,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             )
         );
         $this->assertEquals(1, $details['owners_count']);
-        $this->assertEquals(4, $details['owners_total']);
+        $this->assertEquals(4, $details['total_users']);
         $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
