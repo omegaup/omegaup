@@ -39,7 +39,7 @@ CREATE TABLE `Assignments` (
   `publish_time_delay` int(11) DEFAULT NULL,
   `assignment_type` enum('homework','test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
-  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `finish_time` timestamp NULL DEFAULT NULL,
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
   `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
