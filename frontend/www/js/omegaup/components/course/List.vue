@@ -4,102 +4,46 @@
       <h3 class="panel-title">{{ T.courseList }}</h3>
     </div>
 
-    <div class="page-header">
-      <div class="pull-right">
-        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
-      </div>
-      <h1>
-        <span>{{ T.courseList }}</span> <small></small>
-      </h1>
-    </div>
-
-    <div class="panel-body tab-container">
-      <ul class="nav nav-tabs">
-        <li
-          class="nav-item"
-          v-bind:class="{
-            active: showTabStudent === 'student-courses-current',
-          }"
-          v-if="studentCoursesCurrent.length > 0"
-          v-on:click="showTabStudent = 'student-courses-current'"
-        >
-          <a data-toggle="tab">{{ T.courseListStudentCurrentCourses }}</a>
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTabStudent === 'student-courses-past' }"
-          v-if="studentCoursesPast.length > 0"
-          v-on:click="showTabStudent = 'student-courses-past'"
-        >
-          <a data-toggle="tab">{{ T.courseListStudentPastCourses }}</a>
-        </li>
-      </ul>
-
-      <div class="tab-content">
-        <div
-          class="tab-pane active"
-          v-if="showTabStudent === 'student-courses-current'"
-        >
-          <omegaup-course-filtered-list
-            v-bind:courses="studentCoursesCurrent"
-          ></omegaup-course-filtered-list>
+    <template v-for="typeCourses in courses">
+      <div class="page-header">
+        <div class="pull-right">
+          <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
         </div>
-        <div
-          class="tab-pane active"
-          v-if="showTabStudent === 'student-courses-past'"
-        >
-          <omegaup-course-filtered-list
-            v-bind:courses="studentCoursesPast"
-          ></omegaup-course-filtered-list>
+        <h1>
+          <span>{{ typeCourses.name }}</span>
+        </h1>
+      </div>
+
+      <div class="panel-body tab-container">
+        <ul class="nav nav-tabs">
+          <li
+            class="nav-item"
+            v-bind:class="{
+              active:
+                typeCourses.activeTab ===
+                `${typeCourses.type}-courses-${filteredCourses.type}`,
+            }"
+            v-if="filteredCourses.courses.length > 0"
+            v-on:click="selectTabToShow(typeCourses.type, filteredCourses.type)"
+            v-for="filteredCourses in typeCourses.filteredCourses"
+          >
+            <a data-toggle="tab">{{ tabName(filteredCourses.type) }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div
+            class="tab-pane active"
+            v-if="shouldShowTab(typeCourses.type, filteredCourses.type)"
+            v-for="filteredCourses in typeCourses.filteredCourses"
+          >
+            <omegaup-course-filtered-list
+              v-bind:courses="filteredCourses.courses"
+            ></omegaup-course-filtered-list>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="page-header">
-      <h1>
-        <span>{{ T.courseListAdminCourses }}</span> <small></small>
-      </h1>
-    </div>
-
-    <div class="panel-body tab-container">
-      <ul class="nav nav-tabs">
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTabAdmin === 'admin-courses-current' }"
-          v-if="adminCoursesCurrent.length > 0"
-          v-on:click="showTabAdmin = 'admin-courses-current'"
-        >
-          <a data-toggle="tab">{{ T.courseListStudentCurrentCourses }}</a>
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTabAdmin === 'admin-courses-past' }"
-          v-if="adminCoursesPast.length > 0"
-          v-on:click="showTabAdmin = 'admin-courses-past'"
-        >
-          <a data-toggle="tab">{{ T.courseListStudentPastCourses }}</a>
-        </li>
-      </ul>
-
-      <div class="tab-content">
-        <div
-          class="tab-pane active"
-          v-if="showTabAdmin === 'admin-courses-current'"
-        >
-          <omegaup-course-filtered-list
-            v-bind:courses="adminCoursesCurrent"
-          ></omegaup-course-filtered-list>
-        </div>
-        <div
-          class="tab-pane active"
-          v-if="showTabAdmin === 'admin-courses-past'"
-        >
-          <omegaup-course-filtered-list
-            v-bind:courses="adminCoursesPast"
-          ></omegaup-course-filtered-list>
-        </div>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -110,16 +54,25 @@ import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import course_FilteredList from './FilteredList.vue';
 
+interface typeCourse {
+  type: string;
+  filteredCourses: filteredCourses[];
+  name: string;
+  activeTab: string;
+}
+
+interface filteredCourses {
+  type: string;
+  courses: omegaup.Course[];
+}
+
 @Component({
   components: {
     'omegaup-course-filtered-list': course_FilteredList,
   },
 })
 export default class CourseList extends Vue {
-  @Prop() studentCoursesCurrent!: omegaup.Course[];
-  @Prop() studentCoursesPast!: omegaup.Course[];
-  @Prop() adminCoursesCurrent!: omegaup.Course[];
-  @Prop() adminCoursesPast!: omegaup.Course[];
+  @Prop() courses!: typeCourse[];
   @Prop() initialActiveTabStudent!: string;
   @Prop() initialActiveTabAdmin!: string;
 
@@ -128,13 +81,37 @@ export default class CourseList extends Vue {
   showTabStudent = '';
   showTabAdmin = '';
 
+  tabName(filteredTypeCourses: string): string {
+    if (filteredTypeCourses === 'current') {
+      return this.T.courseListStudentCurrentCourses;
+    } else if (filteredTypeCourses === 'past') {
+      return this.T.courseListStudentPastCourses;
+    }
+    return '';
+  }
+
+  selectTabToShow(typeCourses: string, filteredTypeCourses: string): void {
+    if (typeCourses === 'student') {
+      this.showTabStudent = `student-courses-${filteredTypeCourses}`;
+    } else if (typeCourses === 'admin') {
+      this.showTabAdmin = `admin-courses-${filteredTypeCourses}`;
+    }
+  }
+
+  shouldShowTab(typeCourses: string, filteredTypeCourses: string): boolean {
+    if (typeCourses === 'student') {
+      return this.showTabStudent === `student-courses-${filteredTypeCourses}`;
+    }
+    return this.showTabAdmin === `admin-courses-${filteredTypeCourses}`;
+  }
+
   @Watch('initialActiveTabStudent')
-  onPropertyChanged(activeTab: string, oldActiveTab: string) {
+  onPropertyChanged(activeTab: string, oldActiveTab: string): void {
     this.showTabStudent = activeTab;
   }
 
   @Watch('initialActiveTabAdmin')
-  onPropertyHasChanged(activeTab: string, oldActiveTab: string) {
+  onPropertyHasChanged(activeTab: string, oldActiveTab: string): void {
     this.showTabAdmin = activeTab;
   }
 }
