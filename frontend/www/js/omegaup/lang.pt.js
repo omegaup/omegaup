@@ -47,7 +47,7 @@ const translations = {
 	badgeFirstAssignationMessage: "A primeira vez que este crach\u00e1 foi atribu\u00eddo",
 	badgeNotAssignedMessage: "Voc\u00ea ainda n\u00e3o tem este crach\u00e1",
 	badgeNotExist: "O crach\u00e1 n\u00e3o existe.",
-	badgeOwnersPercentageMessage: "Porcentagem de usu\u00e1rios que receberam este crach\u00e1",
+	badgeOwnersMessage: "Usu\u00e1rios que receberam este crach\u00e1",
 	badge_100solvedProblems_description: "O usu\u00e1rio tem resolvido 100 ou mais problemas.",
 	badge_100solvedProblems_name: "100 Problemas Resolvidos",
 	badge_500score_description: "O usu\u00e1rio tem conseguido uma pontua\u00e7\u00e3o igual ou maior que 500.",
