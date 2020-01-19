@@ -47,7 +47,7 @@ const translations = {
 	badgeFirstAssignationMessage: "(Th3 fir57 7im3 7hi5 badg3 wa5 a55ign3d)",
 	badgeNotAssignedMessage: "(Y0u hav3 n07 g07 7hi5 badg3 y37)",
 	badgeNotExist: "(Th3 pr0vid3d badg3 d035n'7 3xi57.)",
-	badgeOwnersPercentageMessage: "(P3rc3n7ag3 0f u53r5 wh0 hav3 r3c3iv3d 7hi5 badg3)",
+	badgeOwnersMessage: "(U53r5 wh0 hav3 r3c3iv3d 7hi5 badg3)",
 	badge_100solvedProblems_description: "(U53r ha5 501v3d 100 0r m0r3 pr0b13m5.)",
 	badge_100solvedProblems_name: "(100 501v3d Pr0b13m5)",
 	badge_500score_description: "(U53r ha5 achi3v3d a 5c0r3 3qua1 70 0r gr3a73r 7han 500.)",
