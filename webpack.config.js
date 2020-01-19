@@ -210,6 +210,11 @@ let config = [
     devServer: { historyApiFallback: true, noInfo: true },
     performance: { hints: false },
     devtool: 'cheap-source-map',
+    watchOptions: {
+      aggregateTimeout: 300,
+      poll: 1000,
+      ignored: /node_modules/,
+    },
   },
   {
     name: 'style',
