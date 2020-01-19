@@ -295,7 +295,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'problem' => $problem,
             'selectedTags' => $selectedTags,
-            'languages' => strval($r['languages']),
+            'languages' => join(',', $languages),
         ];
     }
 
