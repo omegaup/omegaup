@@ -57,7 +57,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      */
     private static function convertRequestToProblemParams(
-        \OmegaUp\Request $r
+        \OmegaUp\Request $r,
+        bool $isRequired = true
     ): \OmegaUp\ProblemParams {
         // We need to check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -123,7 +124,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['visibility'])) {
             $params['visibility'] = intval($r['visibility']);
         }
-        return new \OmegaUp\ProblemParams($params);
+        return new \OmegaUp\ProblemParams($params, $isRequired);
     }
 
     /**
@@ -284,26 +285,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('output_limit', 0, null, $isRequired);
         $r->ensureInt('input_limit', 0, null, $isRequired);
 
-        // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
-        // on it already, so I'll just leave this here for now...
-        if (!isset($r['languages']) && isset($_REQUEST['languages'])) {
-            $languages = implode(',', $_REQUEST['languages']);
-        } elseif (isset($r['languages']) && is_array($r['languages'])) {
-            $languages = implode(',', $r['languages']);
-        } else {
-            $languages = strval($r['languages']);
-        }
+        $languages = $r->getStringList('languages', [], $isRequired);
         \OmegaUp\Validators::validateValidSubset(
-            $r['languages'],
+            $languages,
             'languages',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-            $isRequired
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
 
         return [
             'problem' => $problem,
             'selectedTags' => $selectedTags,
-            'languages' => $languages,
+            'languages' => join(',', $languages),
         ];
     }
 
@@ -322,7 +314,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r,
             $r['title'],
             $r['problem_alias'],
-            $r['validator'],
+            $r['validator'] ?? \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
             $r['time_limit'],
             $r['validator_time_limit'],
             $r['overall_wall_time_limit'],
@@ -330,9 +322,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['memory_limit'],
             $r['output_limit'],
             $r['input_limit'],
-            $r['source'],
+            $r['source'] ?? '',
             $r['email_clarifications'],
-            $r['visibility'],
+            $r['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             $r->user,
             $r->identity
         );
@@ -355,7 +347,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         int $inputLimit,
         ?string $source,
         ?string $emailClarifications,
-        bool $visibility,
+        int $visibility,
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
@@ -2964,7 +2956,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             false
         );
 
-        $tags = $r->getStringList('tag');
+        $tags = $r->getStringList('tag', []);
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
@@ -3761,7 +3753,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ) ? strval(
                         $r['email_clarifications']
                     ) : null,
-                    boolval($r['visibility']),
+                    intval($r['visibility']),
                     $r->user,
                     $r->identity
                 );

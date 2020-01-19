@@ -252,8 +252,10 @@ export default {
     addStudent: _call('/api/course/addStudent/'),
 
     adminDetails: _call('/api/course/adminDetails/', function(result) {
+      if (result.finish_time) {
+        result.finish_time = new Date(result.finish_time * 1000);
+      }
       result.start_time = new Date(result.start_time * 1000);
-      result.finish_time = new Date(result.finish_time * 1000);
       result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
         assignment.finish_time = new Date(assignment.finish_time * 1000);
@@ -269,7 +271,17 @@ export default {
 
     create: _call('/api/course/create/'),
 
-    details: _call('/api/course/details/', _convertTimes),
+    details: _call('/api/course/details/', function(data) {
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      data.start_time = new Date(data.start_time * 1000);
+      data.assignments.forEach(assignment => {
+        assignment.start_time = new Date(assignment.start_time * 1000);
+        assignment.finish_time = new Date(assignment.finish_time * 1000);
+      });
+      return data;
+    }),
 
     myProgress: _call('/api/course/myProgress/'),
 
@@ -299,12 +311,18 @@ export default {
     }),
 
     listCourses: _call('/api/course/listCourses/', function(result) {
-      for (var i = 0; i < result.admin.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.admin[i]);
-      }
-      for (var i = 0; i < result.student.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.student[i]);
-      }
+      result.admin.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.student.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
@@ -522,20 +540,18 @@ export default {
 
     details: _call('/api/qualityNomination/details/'),
 
-    list: _call('/api/qualityNomination/list/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    list: _call('/api/qualityNomination/list/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
-    myList: _call('/api/qualityNomination/mylist/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    myList: _call('/api/qualityNomination/mylist/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
     resolve: _call('/api/qualityNomination/resolve/'),

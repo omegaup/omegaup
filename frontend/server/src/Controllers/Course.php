@@ -76,10 +76,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            $isRequired
+            /* required */ !is_null($courseFinishTime)
         );
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -119,7 +122,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): void {
         self::validateBasicCreateOrUpdate($r);
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -145,11 +151,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = $originalCourse->finish_time;
-        }
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            (
+                is_null($r['unlimited_duration']) ||
+                !$r['unlimited_duration']
+            ) &&
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
@@ -184,7 +194,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
-        $r->ensureInt('finish_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt(
+            'finish_time',
+            null,
+            null,
+            false /* required */
+        );
+        $r->ensureBool('unlimited_duration', false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -287,6 +303,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $offset = intval($r['start_time']) - $originalCourse->start_time;
 
+        $cloneCourseFinishTime = null;
+        if (!is_null($originalCourse->finish_time)) {
+            $cloneCourseFinishTime = $originalCourse->finish_time + $offset;
+        }
+
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
@@ -297,7 +318,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
                 'start_time' => $r['start_time'],
-                'finish_time' => $originalCourse->finish_time + $offset,
+                'finish_time' => $cloneCourseFinishTime,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -507,7 +528,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        ?int $points = 100,
+        ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
@@ -522,13 +543,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
+        $assignedPoints = is_null($points) ? 100 : $points;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
             $masterCommit,
             $currentVersion,
             $identity,
-            is_null($points) ? 100 : $points,
+            $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $validateVisibility
         );
@@ -985,7 +1007,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * List course assignments
      *
-     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: int, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}>}
+     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: null|int, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}>}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListAssignments(\OmegaUp\Request $r) {
@@ -1091,7 +1113,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Converts a Course object into an array
      *
-     * @return array{alias: string, name: string, start_time: int, finish_time: int, counts: array<string, int>}
+     * @return array{alias: string, name: string, start_time: int, finish_time: int|null, counts: array<string, int>}
      */
     private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
@@ -1115,7 +1137,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int, name: string, start_time: int}>}
+     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListCourses(\OmegaUp\Request $r) {
@@ -1841,7 +1863,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{course: array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
+     * @return array{payload: array{course: array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2040,7 +2062,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns course details common between admin & non-admin
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
+     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
@@ -2072,9 +2094,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'start_time' => intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $course->start_time
                 )),
-                'finish_time' => intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                'finish_time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $course->finish_time
-                )),
+                ),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
                 'basic_information_required' => boolval(
@@ -2116,7 +2138,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all details of a given Course
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
      */
     public static function apiAdminDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2316,7 +2338,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given assignment
      *
-     * @return array{name: null|string, description: null|string, assignment_type: null|string, start_time: int, finish_time: int, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, director: \OmegaUp\DAO\VO\Identities, problemset_id: int, admin: bool}
+     * @return array{name: null|string, description: null|string, assignment_type: null|string, start_time: int, finish_time: null|int, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, director: string, problemset_id: int, admin: bool}
      */
     public static function apiAssignmentDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2414,7 +2436,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        $directorUsername = $director->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
@@ -2436,7 +2457,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time' => $tokenAuthenticationResult['assignment']->finish_time,
             'problems' => $problems,
             'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
-            'director' => $director,
+            'director' => strval($director->username),
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
         ];
@@ -2587,7 +2608,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given course
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2636,6 +2657,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias'
         );
         $originalCourse = self::validateUpdate($r, $r['course_alias']);
+
         if (
             !\OmegaUp\Authorization::isCourseAdmin(
                 $r->identity,
@@ -2664,6 +2686,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
+
+        // Set null finish time if required
+        if (
+            !is_null($r['unlimited_duration']) &&
+            $r['unlimited_duration']
+        ) {
+            $originalCourse->finish_time = null;
+        }
 
         // Push changes
         \OmegaUp\DAO\Courses::update($originalCourse);

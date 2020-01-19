@@ -47,7 +47,8 @@ declare namespace omegaup {
     assignation_time?: Date;
     unlocked?: boolean;
     first_assignation?: Date;
-    owners_percentage?: number;
+    total_users?: number;
+    owners_count?: number;
   }
 
   interface Case {

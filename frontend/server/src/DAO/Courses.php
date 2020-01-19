@@ -20,7 +20,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$name]
@@ -37,7 +37,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     public static function getAllAssignments(
         string $alias,
@@ -64,9 +64,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.alias = ? $timeCondition
             ORDER BY
-                start_time;";
+                `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: null|string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -78,9 +78,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['start_time'] =  intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $row['start_time']
             ));
-            $row['finish_time'] = intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $row['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $row['finish_time']
-            ));
+            );
             $ar[] = $row;
         }
         return $ar;
@@ -100,7 +100,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
@@ -238,7 +238,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             where a.course_id = ?;
         ';
 
-        /** @var list<array{assignment: string, score: float, max_score: float}> */
+        /** @var list<array{assignment: string, max_score: float, score: float}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $identityId, $courseId]
@@ -301,7 +301,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $offset,
             $pageSize,
         ];
-        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
@@ -354,7 +354,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
-        /** @var array{acl_id: int, alias: string, course_id: int, description: string, finish_time: string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}|null */
+        /** @var array{acl_id: int, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;

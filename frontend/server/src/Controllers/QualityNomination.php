@@ -619,15 +619,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
 
-        $types = ['promotion', 'demotion'];
-        if (!empty($r['types'])) {
-            if (is_string($r['types'])) {
-                $types = explode(',', $r['types']);
-            } elseif (is_array($r['types'])) {
-                /** @var list<string> */
-                $types = $r['types'];
-            }
-        }
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
 
         return [
             'nominations' => \OmegaUp\DAO\QualityNominations::getNominations(
@@ -638,33 +630,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $types
             )['nominations'],
         ];
-    }
-
-    /**
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
-     */
-    public static function apiGetNominations(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        $types = $r->getStringList('types');
-
-        if (empty($types)) {
-            $types = ['promotion', 'demotion'];
-        }
-
-        return \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */ null,
-            /* assignee */ null,
-            $offset,
-            $rowCount,
-            $types
-        );
     }
 
     /**
@@ -696,24 +661,36 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Displays all the nominations.
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>} The response.
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
-    public static function apiList(\OmegaUp\Request $r): array {
+    public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
         self::validateMemberOfReviewerGroup($r);
 
-        return self::getListImpl($r, null /* nominator */, null /* assignee */);
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
+        \OmegaUp\Validators::validateValidSubset(
+            $types,
+            'types',
+            ['promotion', 'demotion']
+        );
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            /* nominator */ null,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
@@ -738,52 +715,34 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Displays the nominations that this user has created. The user does
-     * not need to be a member of the reviewer group.
-     *
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        return self::getMyList($r);
-    }
+        $r->ensureMainUserIdentity();
 
-    /**
-     * @return array{smartyProperties: array{payload: array{currentUser: string, myView: true, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}}, template: string}
-     */
-    public static function getMyQualityNominationListForSmarty(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
         }
 
-        // Validate request
-        $r->ensureMainUserIdentity();
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'nominations' => self::getMyList($r)['nominations'],
-                    'myView' => true,
-                    'currentUser' => $r->identity->username,
-                ],
-            ],
-            'template' => 'quality.nomination.list.tpl',
-        ];
-    }
-
-    /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
-     */
-    private static function getMyList(\OmegaUp\Request $r) {
-        // Validate request
-        $r->ensureMainUserIdentity();
-
-        return self::getListImpl($r, $r->user->user_id, null /* assignee */);
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            $r->user->user_id,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
@@ -888,9 +847,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: non-empty-array<string, array{images: array<string, string>, language: string, markdown: string}>|object, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>, myView: bool, currentUser: string}, template: string}
+     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}}, template: string}
      */
-    public static function getQualityNominationDetailsForSmarty(
+    public static function getDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -898,33 +857,76 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        $r->ensureInt('qualitynomination_id', null, null, false);
-        /** @var int|null */
-        $qualityNominationId = $r['qualitynomination_id'];
+        $r->ensureInt('qualitynomination_id', null, null, true);
 
-        if (!is_null($qualityNominationId)) {
-            return [
-                'smartyProperties' => [
-                    'payload' => \OmegaUp\Controllers\QualityNomination::getDetails(
-                        $r->identity,
-                        $qualityNominationId
-                    ),
-                ],
-                'template' => 'quality.nomination.details.tpl',
-            ];
+        $qualityNominationId = intval($r['qualitynomination_id']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => \OmegaUp\Controllers\QualityNomination::getDetails(
+                    $r->identity,
+                    $qualityNominationId
+                ),
+            ],
+            'template' => 'quality.nomination.details.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
         self::validateMemberOfReviewerGroup($r);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'nominations' => self::getListImpl(
-                        $r,
-                        null /* nominator */,
-                        null /* assignee */
-                    )['nominations'],
+                    'page' => $page,
+                    'length' => $length,
                     'myView' => false,
-                    'currentUser' => $r->identity->username,
+                ],
+            ],
+            'template' => 'quality.nomination.list.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination for a certain user
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'myView' => true,
                 ],
             ],
             'template' => 'quality.nomination.list.tpl',
