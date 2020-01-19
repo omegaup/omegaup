@@ -217,6 +217,20 @@ declare namespace omegaup {
     name: string;
   }
 
+  interface GraderQueue {
+    running: string[];
+    run_queue_length: number;
+    runner_queue_length: number;
+    runners: string[];
+  }
+
+  export interface Grader {
+    status: string;
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: omegaup.GraderQueue;
+  }
+
   export interface Group {
     alias: string;
     create_time: Date;
