@@ -47,7 +47,7 @@ const translations = {
 	badgeFirstAssignationMessage: "The first time this badge was assigned",
 	badgeNotAssignedMessage: "You have not got this badge yet",
 	badgeNotExist: "The provided badge doesn't exist.",
-	badgeOwnersPercentageMessage: "Percentage of users who have received this badge",
+	badgeOwnersMessage: "Users who have received this badge",
 	badge_100solvedProblems_description: "User has solved 100 or more problems.",
 	badge_100solvedProblems_name: "100 solved Problems",
 	badge_500score_description: "User has achieved a score equal to or greater than 500.",

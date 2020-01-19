@@ -47,7 +47,7 @@ const translations = {
 	badgeFirstAssignationMessage: "La primera vez que esta insignia fue asignada",
 	badgeNotAssignedMessage: "A\u00fan no has conseguido esta insignia",
 	badgeNotExist: "La insignia no existe.",
-	badgeOwnersPercentageMessage: "Porcentaje de usuarios que han recibido esta insignia",
+	badgeOwnersMessage: "Usuarios que han recibido esta insignia",
 	badge_100solvedProblems_description: "El usuario ha resuelto 100 problemas o m\u00e1s.",
 	badge_100solvedProblems_name: "100 Problemas resueltos",
 	badge_500score_description: "El usuario ha conseguido una puntuaci\u00f3n igual o mayor que 500.",
