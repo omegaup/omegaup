@@ -1,9 +1,5 @@
 $('#alert-close').on('click', omegaup.UI.dismissNotifications);
 
-$('#email-verification-alert-close').on('click', function() {
-  $('#email-verification-alert').slideUp();
-});
-
 function isBrowserSupported() {
   // From
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent#Browser_Name
