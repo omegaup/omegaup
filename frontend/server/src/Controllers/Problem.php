@@ -285,26 +285,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('output_limit', 0, null, $isRequired);
         $r->ensureInt('input_limit', 0, null, $isRequired);
 
-        // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
-        // on it already, so I'll just leave this here for now...
-        if (!isset($r['languages']) && isset($_REQUEST['languages'])) {
-            $languages = implode(',', $_REQUEST['languages']);
-        } elseif (isset($r['languages']) && is_array($r['languages'])) {
-            $languages = implode(',', $r['languages']);
-        } else {
-            $languages = strval($r['languages']);
-        }
+        $languages = $r->getStringList('languages', [], $isRequired);
         \OmegaUp\Validators::validateValidSubset(
-            $r['languages'],
+            $languages,
             'languages',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-            $isRequired
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
 
         return [
             'problem' => $problem,
             'selectedTags' => $selectedTags,
-            'languages' => $languages,
+            'languages' => join(',', $languages),
         ];
     }
 
@@ -2965,7 +2956,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             false
         );
 
-        $tags = $r->getStringList('tag');
+        $tags = $r->getStringList('tag', []);
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
