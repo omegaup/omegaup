@@ -473,7 +473,7 @@ class Scoreboard {
      * @param bool $sortByName
      * @param bool $withRunDetails
      * @param null|string $authToken
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     private static function getScoreboardFromRuns(
         array $contestRuns,
@@ -484,7 +484,7 @@ class Scoreboard {
         ?int $scoreboardTimeLimit,
         string $contestTitle,
         int $contestStartTime,
-        int $contestFinishTime,
+        ?int $contestFinishTime,
         bool $showAllRuns,
         bool $sortByName,
         bool $withRunDetails = false,

@@ -20,7 +20,7 @@ class ScoreboardParams {
     /** @var int */
     public $start_time;
 
-    /** @var int */
+    /** @var null|int */
     public $finish_time;
 
     /** @var int */
@@ -93,11 +93,15 @@ class ScoreboardParams {
         ScoreboardParams::validateParameter(
             'finish_time',
             $params,
-            true /*is_required*/
+            false /*is_required*/
         );
-        $this->finish_time = is_int($params['finish_time'])
+        if (!is_null($params['finish_time'])) {
+            $this->finish_time = is_int($params['finish_time'])
             ? $params['finish_time']
             : strtotime(strval($params['finish_time']));
+        } else {
+            $this->finish_time = null;
+        }
 
         ScoreboardParams::validateParameter(
             'acl_id',
