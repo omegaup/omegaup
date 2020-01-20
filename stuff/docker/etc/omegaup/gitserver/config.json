@@ -1,0 +1,9 @@
+{
+	"Logging": {
+		"File": ""
+	},
+	"Gitserver": {
+		"AllowDirectPushToMaster": true,
+		"FrontendAuthorizationProblemRequestURL": "http://localhost:8000/api/authorization/problem/"
+	}
+}
