@@ -302,11 +302,12 @@ export default {
     listAssignments: _call('/api/course/listAssignments/', function(result) {
       // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
       // be able to get the unmodified times.
-      for (var i = 0; i < result.assignments.length; ++i) {
-        var assignment = result.assignments[i];
+      result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
-      }
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
       return result;
     }),
 

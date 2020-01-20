@@ -1,7 +1,7 @@
 <template>
   <input
     class="form-control"
-    readonly
+    v-bind:readonly="readonly"
     size="16"
     type="text"
     v-bind:disabled="!enabled"
@@ -21,6 +21,7 @@ export default class DateTimePicker extends Vue {
   @Prop({ default: T.dateTimePickerFormat }) format!: string;
   @Prop({ default: null }) start!: Date;
   @Prop({ default: null }) finish!: Date;
+  @Prop({ default: true }) readonly!: boolean;
 
   mounted() {
     let self = this;
