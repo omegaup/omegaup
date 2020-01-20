@@ -634,20 +634,26 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
         }
+
+        $r->ensureBool('unlimited_duration', false);
+
         $r->ensureTimestamp(
             'finish_time',
             $course->start_time,
             $course->finish_time
         );
 
-        if ($r['start_time'] > $r['finish_time']) {
+        if (
+            !is_null($r['finish_time']) &&
+            $r['start_time'] > $r['finish_time']
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
         }
 
         // Prevent date changes if a course already has runs
-        if ($r['start_time'] != $assignment->start_time) {
+        if ($r['start_time'] !== $assignment->start_time) {
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 intval($assignment->problemset_id)
             );
@@ -668,6 +674,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
 
+        if (
+            is_null($course->finish_time) &&
+            $r['unlimited_duration']
+        ) {
+            $assignment->finish_time = null;
+        }
         \OmegaUp\DAO\Assignments::update($assignment);
 
         return [
