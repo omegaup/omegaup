@@ -104,7 +104,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @return array{first_assignation: int|null, owners_percentage: float, status: string}
+     * @return array{first_assignation: int|null, total_users: int, owners_count: int, status: string}
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
@@ -125,7 +125,8 @@ class Badge extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'first_assignation' => $firstAssignation,
-            'owners_percentage' => (($ownersCount * 100.0) / $totalUsers)
+            'total_users' => $totalUsers,
+            'owners_count' => $ownersCount,
         ];
     }
 }

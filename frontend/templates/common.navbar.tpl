@@ -41,17 +41,22 @@
                 {/if}
               </ul>
             </li>
-            <li class="dropdown {if isset($navbarSection) && $navbarSection === "rank"} active{/if}" id="nav-rank">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#navRanking#}</span><span class="caret"></span></a>
+          {else}
+            <li class="dropdown {if isset($navbarSection) && $navbarSection === "problems"} active{/if}" id="nav-problems">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="/rank/">{#navUserRanking#}</a></li>
-                <li><a href="/rank/schools/">{#navSchoolRanking#}</a></li>
+                <li><a href="/problem/">{#wordsProblems#}</a></li>
+                <li><a href="/submissions/">{#wordsLatestSubmissions#}</a></li>
               </ul>
             </li>
-          {else}
-            <li id="nav-problems"{if isset($navbarSection) && $navbarSection === "problems"} class="active"{/if}><a href="/problem/">{#wordsProblems#}</a></li>
-            <li id="nav-rank"{if isset($navbarSection) && $navbarSection === "rank"} class="active"{/if}><a href="/rank/">{#navRanking#}</a></li>
           {/if} {* LOGGED_IN *}
+          <li class="dropdown {if isset($navbarSection) && $navbarSection === "rank"} active{/if}" id="nav-rank">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#navRanking#}</span><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/rank/">{#navUserRanking#}</a></li>
+              <li><a href="/rank/schools/">{#navSchoolRanking#}</a></li>
+            </ul>
+          </li>
           <li id="nav-schools"{if isset($navbarSection) && $navbarSection === "schools"} class="active"{/if}><a href="/schools/">{#navSchools#}</a></li>
           <li><a href="http://blog.omegaup.com/">{#navBlog#}</a></li>
           <li><a href="https://omegaup.com/preguntas/">{#navQuestions#}</a></li>
@@ -67,7 +72,7 @@
                 <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <span class="grader-count badge">…</span>
+                  <div id="common-grader-count-badge"></div>
                 {/if}
                 <span class="caret"></span>
               </a>
@@ -75,12 +80,8 @@
                 <li><a href="/profile/"><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <hr class="dropdown-separator">
-                  <li class="grader-submissions"><a class="grader-submissions-link" href="/arena/admin/">{#wordsLatestSubmissions#}</a></li>
-                  <li class="grader grader-status"></li>
-                  <li class="grader grader-broadcaster-sockets"></li>
-                  <li class="grader grader-embedded-runner"></li>
-                  <li class="grader grader-queues"></li>
+                  <div id="common-grader-status"></div>
+                  {js_include entrypoint="common_navbar"}
                 {/if}
               </ul>
             </li>
@@ -107,9 +108,6 @@
         {/if} {* OMEGAUP_LOCKDOWN *}
       </ul>
     </div>
-  {if $CURRENT_USER_IS_ADMIN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
-  {/if}
   {if $LOGGED_IN eq '1'}
     {js_include entrypoint="notification_list"}
   {/if}

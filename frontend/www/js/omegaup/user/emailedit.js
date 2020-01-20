@@ -1,6 +1,6 @@
 import user_EmailEdit from '../components/user/EmailEdit.vue';
 import Vue from 'vue';
-import { OmegaUp } from '../omegaup.js';
+import { OmegaUp, UI } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -15,10 +15,7 @@ OmegaUp.on('ready', function() {
           submit: function(newEmail) {
             omegaup.API.User.updateMainEmail({ email: newEmail })
               .then(function(response) {
-                $('#status')
-                  .text(omegaup.T.userEditSuccessfulEmailUpdate)
-                  .addClass('alert-success')
-                  .slideDown();
+                UI.success(omegaup.T.userEditSuccessfulEmailUpdate);
               })
               .fail(UI.apiError);
           },
