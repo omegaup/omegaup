@@ -619,15 +619,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
 
-        $types = ['promotion', 'demotion'];
-        if (!empty($r['types'])) {
-            if (is_string($r['types'])) {
-                $types = explode(',', $r['types']);
-            } elseif (is_array($r['types'])) {
-                /** @var list<string> */
-                $types = $r['types'];
-            }
-        }
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
 
         return [
             'nominations' => \OmegaUp\DAO\QualityNominations::getNominations(
@@ -685,12 +677,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
-        $types = $r->getStringList('types');
-        //TODO: Hay que validar desde Validators::validateValidSubset()
-
-        if (empty($types)) {
-            $types = ['promotion', 'demotion'];
-        }
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
+        \OmegaUp\Validators::validateValidSubset(
+            $types,
+            'types',
+            ['promotion', 'demotion']
+        );
 
         return \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */ null,
@@ -738,7 +730,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
 
-        $types = $r->getStringList('types');
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
 
         if (empty($types)) {
             $types = ['promotion', 'demotion'];

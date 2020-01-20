@@ -26,6 +26,14 @@ OmegaUp.on('ready', function() {
 
   API.Course.listCourses()
     .then(function(data) {
+      const courseTypes = {
+        CURRENT: 0,
+        PAST: 1,
+      };
+      const courseMode = {
+        STUDENT: 0,
+        ADMIN: 1,
+      };
       const allCourses = [
         {
           type: 'student',
@@ -50,11 +58,18 @@ OmegaUp.on('ready', function() {
       for (const [index, typed] of allCourses.entries()) {
         let activeTab = '';
         for (const course of data[typed.type]) {
-          if (course.finish_time.getTime() > Date.now()) {
-            allCourses[index].filteredCourses[0].courses.push(course);
+          if (
+            !course.finish_time ||
+            course.finish_time.getTime() > Date.now()
+          ) {
+            allCourses[index].filteredCourses[courseTypes.CURRENT].courses.push(
+              course,
+            );
             continue;
           }
-          allCourses[index].filteredCourses[1].courses.push(course);
+          allCourses[index].filteredCourses[courseTypes.PAST].courses.push(
+            course,
+          );
         }
         for (const filtered of typed.filteredCourses) {
           if (filtered.courses.length > 0) {
@@ -63,11 +78,9 @@ OmegaUp.on('ready', function() {
           }
         }
         allCourses[index].activeTab = activeTab;
-        if (index === 0) {
-          // Student
+        if (index === courseMode.STUDENT) {
           courseList.initialActiveTabStudent = activeTab;
-        } else {
-          // Admin
+        } else if (index === courseMode.ADMIN) {
           courseList.initialActiveTabAdmin = activeTab;
         }
       }

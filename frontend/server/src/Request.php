@@ -314,11 +314,24 @@ class Request extends \ArrayObject {
      * Returns an array of strings from a request parameter
      * containing a single string with comma-separated values.
      *
+     * @param list<string> $default
      * @return list<string>
      */
     public function getStringList(
-        string $param
+        string $param,
+        array $default = [],
+        bool $required = false
     ): array {
+        if (is_null($this[$param])) {
+            if ($required) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $param
+                );
+            }
+            return $default;
+        }
+
         if (is_array($this[$param])) {
             /** @var list<string> */
             return $this[$param];

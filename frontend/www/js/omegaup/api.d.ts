@@ -47,7 +47,8 @@ declare namespace omegaup {
     assignation_time?: Date;
     unlocked?: boolean;
     first_assignation?: Date;
-    owners_percentage?: number;
+    total_users?: number;
+    owners_count?: number;
   }
 
   interface Case {
@@ -160,6 +161,13 @@ declare namespace omegaup {
     student_count: boolean;
   }
 
+  export interface CourseType {
+    type: string;
+    filteredCourses: omegaup.FilteredCourses[];
+    name: string;
+    activeTab: string;
+  }
+
   export interface CourseAdmin {
     username: string;
     role: string;
@@ -214,6 +222,27 @@ declare namespace omegaup {
     config: boolean;
     hash: string;
     name: string;
+  }
+
+  export interface FilteredCourses {
+    type: string;
+    courses: omegaup.Course[];
+    activeTab: string;
+    name: string;
+  }
+
+  interface GraderQueue {
+    running: string[];
+    run_queue_length: number;
+    runner_queue_length: number;
+    runners: string[];
+  }
+
+  export interface Grader {
+    status: string;
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: omegaup.GraderQueue;
   }
 
   export interface Group {

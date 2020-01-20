@@ -189,9 +189,8 @@
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <MixedArgument occurrences="38">
+    <MixedArgument occurrences="37">
       <code>$r['selected_tags']</code>
-      <code>$_REQUEST['languages']</code>
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>

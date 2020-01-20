@@ -13,8 +13,7 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.2.1.min.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-migrate-3.0.1.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.4.1.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
@@ -46,9 +45,9 @@
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
 		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="/third_party/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/third_party/bootstrap-3.4.1/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
-		<script src="{version_hash src="/third_party/js/bootstrap.min.js"}"></script>
+		<script src="{version_hash src="/third_party/bootstrap-3.4.1/js/bootstrap.min.js"}"></script>
 		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
 		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
 		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}"></script>
