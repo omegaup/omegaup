@@ -124,7 +124,7 @@
 					<div class="form-group col-md-6">
 						<label for="languages">{#wordsLanguage#}s</label>
 						<br>
-						<select id="languages" name="languages" class="form-control" multiple="multiple">
+						<select id="languages" name="languages" class="form-control selectpicker" multiple="multiple">
 							{foreach item=language from=$LANGUAGES}
 							<option value="{$language}">{$language}</option>
 							{/foreach}
@@ -165,6 +165,6 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="/third_party/js/bootstrap-multiselect.js"></script>
+<script type="text/javascript" src="/third_party/js/bootstrap-select.min.js"></script>
 <script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}"></script>
-<link rel="stylesheet" href="/third_party/css/bootstrap-multiselect.css">
+<link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">
