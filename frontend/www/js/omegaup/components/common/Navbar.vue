@@ -18,22 +18,22 @@
           <img
             alt="lockdown"
             title="lockdown"
-            v-bind:src="data.lockDownImage"
-            v-show="data.omegaUpLockDown"
+            v-bind:src="header.lockDownImage"
+            v-show="header.omegaUpLockDown"
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul
           class="nav navbar-nav"
-          v-if="!data.omegaUpLockDown &amp;&amp; !data.inContest"
+          v-if="!header.omegaUpLockDown &amp;&amp; !header.inContest"
         >
-          <li v-bind:class="{ active: data.navbarSection === 'arena' }">
+          <li v-bind:class="{ active: header.navbarSection === 'arena' }">
             <a href="/arena/">{{ T.navArena }}</a>
           </li>
           <li
             class="dropdown nav-contests"
-            v-bind:class="{ active: data.navbarSection === 'contests' }"
-            v-show="data.isLoggedIn"
+            v-bind:class="{ active: header.navbarSection === 'contests' }"
+            v-show="header.isLoggedIn"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
@@ -55,8 +55,8 @@
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: data.navbarSection === 'problems' }"
-            v-if="data.isLoggedIn"
+            v-bind:class="{ active: header.navbarSection === 'problems' }"
+            v-if="header.isLoggedIn"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsProblems }}</span> <span class="caret"></span
@@ -77,14 +77,14 @@
               <li>
                 <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
               </li>
-              <li v-show="data.isReviewer">
+              <li v-show="header.isReviewer">
                 <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
               </li>
             </ul>
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: data.navbarSection === 'problems' }"
+            v-bind:class="{ active: header.navbarSection === 'problems' }"
             v-else=""
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -102,7 +102,7 @@
           </li>
           <li
             class="dropdown nav-rank"
-            v-bind:class="{ active: data.navbarSection === 'rank' }"
+            v-bind:class="{ active: header.navbarSection === 'rank' }"
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <span>{{ T.navRanking }}</span>
@@ -119,7 +119,7 @@
           </li>
           <li
             class="nav-schools"
-            v-bind:class="{ active: data.navbarSection === 'schools' }"
+            v-bind:class="{ active: header.navbarSection === 'schools' }"
           >
             <a href="/schools/">{{ T.navSchools }}</a>
           </li>
@@ -132,7 +132,7 @@
         </ul>
         <ul class="nav navbar-nav" v-else=""></ul>
         <!-- in lockdown or contest mode there is no left navbar -->
-        <ul class="nav navbar-nav navbar-right" v-if="!data.isLoggedIn">
+        <ul class="nav navbar-nav navbar-right" v-if="!header.isLoggedIn">
           <li>
             <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
@@ -143,21 +143,25 @@
           ></omegaup-notification-list>
           <li
             class="dropdown nav-user"
-            v-bind:class="{ active: data.navbarSection === 'users' }"
+            v-bind:class="{ active: header.navbarSection === 'users' }"
           >
             <a
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
               href="#"
-              ><img v-bind:src="data.gravatarURL51"/>
-              <span class="username" v-bind:title="data.currentUsername">{{
-                data.currentUsername
+              ><img v-bind:src="header.gravatarURL51"/>
+              <span class="username" v-bind:title="header.currentUsername">{{
+                header.currentUsername
               }}</span>
-              <span class="grader-count badge" v-show="data.isAdmin">…</span>
+              <omegaup-common-grader-badge
+                v-show="header.isAdmin"
+                v-bind:queueLength="graderBadge.queueLength"
+                v-bind:error="graderBadge.error"
+              ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
             <ul class="dropdown-menu" v-if="navbarHidden">
-              <li v-show="!data.omegaUpLockDown &amp;&amp; !data.inContest">
+              <li v-show="!header.omegaUpLockDown &amp;&amp; !header.inContest">
                 <a href="/profile/"
                   ><span class="glyphicon glyphicon-user"></span>
                   {{ T.navViewProfile }}</a
@@ -169,19 +173,14 @@
                   {{ T.navLogOut }}</a
                 >
               </li>
-              <hr class="dropdown-separator" />
-              <li class="grader-submissions">
-                <a class="grader-submissions-link" href="/arena/admin/">{{
-                  T.wordsLatestSubmissions
-                }}</a>
-              </li>
-              <li class="grader grader-status"></li>
-              <li class="grader grader-broadcaster-sockets"></li>
-              <li class="grader grader-embedded-runner"></li>
-              <li class="grader grader-queues"></li>
+              <omegaup-common-grader-status
+                v-bind:status="graderStatus.status"
+                v-bind:error="graderStatus.error"
+                v-bind:graderInfo="graderStatus.graderInfo"
+              ></omegaup-common-grader-status>
             </ul>
             <ul class="dropdown-menu" v-else="">
-              <li v-show="!data.omegaUpLockDown &amp;&amp; !data.inContest">
+              <li v-show="!header.omegaUpLockDown &amp;&amp; !header.inContest">
                 <a href="/profile/"
                   ><span class="glyphicon glyphicon-user"></span>
                   {{ T.navViewProfile }}</a
@@ -206,14 +205,31 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import notifications_List from '../notification/List.vue';
+import common_GraderStatus from '../common/GraderStatus.vue';
+import common_GraderBadge from '../common/GraderBadge.vue';
+
+interface GraderStatus {
+  status: string;
+  error: string;
+  graderInfo: omegaup.Grader;
+}
+
+interface GraderBadge {
+  queueLength: number;
+  error: boolean;
+}
 
 @Component({
   components: {
     'omegaup-notification-list': notifications_List,
+    'omegaup-common-grader-status': common_GraderStatus,
+    'omegaup-common-grader-badge': common_GraderBadge,
   },
 })
 export default class Navbar extends Vue {
-  @Prop() data!: omegaup.Navbar;
+  @Prop() header!: omegaup.Navbar;
+  @Prop() graderStatus!: GraderStatus;
+  @Prop() graderBadge!: GraderBadge;
 
   notifications: omegaup.Notification[] = [];
   T = T;
@@ -224,7 +240,9 @@ export default class Navbar extends Vue {
 
   get navbarHidden(): boolean {
     return (
-      this.data.isAdmin && !this.data.omegaUpLockDown && !this.data.inContest
+      this.header.isAdmin &&
+      !this.header.omegaUpLockDown &&
+      !this.header.inContest
     );
   }
 }

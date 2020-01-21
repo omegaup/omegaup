@@ -6,14 +6,16 @@ omegaup.OmegaUp.on('ready', function() {
       var course = data[section][i];
       course.courseURL = '/course/' + course.alias;
       course.startDate = omegaup.UI.formatDate(course.start_time);
-      course.endDate = omegaup.UI.formatDate(course.finish_time);
+      course.endDate = course.finish_time
+        ? omegaup.UI.formatDate(course.finish_time)
+        : omegaup.T.wordsUnlimitedDuration;
       course.numHomeworks = course.counts.homework;
       course.numTests = course.counts.test;
       course.activityURL = '/course/' + course.alias + '/activity/';
       course.submissionsListUrl = '/course/' + course.alias + '/list/';
       course.submissionsList = omegaup.T.courseListSubmissionsByGroup;
       course.activity = omegaup.T.wordsActivityReport;
-      if (course.finish_time.getTime() > Date.now()) {
+      if (!course.finish_time || course.finish_time.getTime() > Date.now()) {
         current.push(course);
       } else {
         past.push(course);
