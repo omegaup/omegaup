@@ -35,7 +35,7 @@ class Scoreboard {
     /**
      * Generate Scoreboard snapshot
      *
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     public function generate(
         bool $withRunDetails = false,
@@ -60,7 +60,7 @@ class Scoreboard {
                     strval($this->params->problemset_id)
                 );
             }
-            /** @var null|array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string} */
+            /** @var null|array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string} */
             $result = $cache->get();
             if (!is_null($result)) {
                 \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
@@ -131,6 +131,8 @@ class Scoreboard {
         if (!is_null($cache)) {
             $timeout = max(
                 0,
+                is_null($this->params->finish_time) ?
+                0 :
                 $this->params->finish_time - \OmegaUp\Time::get()
             );
             $cache->set($result, $timeout);
@@ -216,7 +218,12 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = max(0, $this->params->finish_time - \OmegaUp\Time::get());
+        $timeout = max(
+            0,
+            is_null(
+                $this->params->finish_time
+            ) ? 0 : $this->params->finish_time - \OmegaUp\Time::get()
+        );
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($canUseAdminCache) {
@@ -301,7 +308,12 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout = max(0, $params->finish_time - \OmegaUp\Time::get());
+        $timeout =  max(
+            0,
+            is_null(
+                $params->finish_time
+            ) ? 0 : $params->finish_time - \OmegaUp\Time::get()
+        );
         $contestantScoreboardCache = new \OmegaUp\Cache(
             \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX,
             strval($params->problemset_id)
@@ -427,7 +439,11 @@ class Scoreboard {
 
         $percentage = floatval($params->scoreboard_pct) / 100.0;
 
-        $limit = $start + intval(($finish - $start) * $percentage);
+        $limit = $start + intval(
+            (is_null(
+                $finish
+            ) ? $start : $finish - $start) * $percentage
+        );
 
         return $limit;
     }
