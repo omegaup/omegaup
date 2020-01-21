@@ -308,12 +308,13 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout =  max(
-            0,
-            is_null(
-                $params->finish_time
-            ) ? 0 : $params->finish_time - \OmegaUp\Time::get()
-        );
+        $timeout =  is_null($params->finish_time) ?
+            0 :
+            max(
+                0,
+                $params->finish_time - \OmegaUp\Time::get()
+            );
+
         $contestantScoreboardCache = new \OmegaUp\Cache(
             \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX,
             strval($params->problemset_id)
@@ -428,6 +429,7 @@ class Scoreboard {
             $params->admin
             || ((\OmegaUp\Time::get() >= $params->finish_time)
             && $params->show_scoreboard_after)
+            || is_null($params->finish_time)
         ) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
@@ -439,11 +441,7 @@ class Scoreboard {
 
         $percentage = floatval($params->scoreboard_pct) / 100.0;
 
-        $limit = $start + intval(
-            (is_null(
-                $finish
-            ) ? $start : $finish - $start) * $percentage
-        );
+        $limit = $start + intval(($finish - $start) * $percentage);
 
         return $limit;
     }
