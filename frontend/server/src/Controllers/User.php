@@ -1082,6 +1082,39 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys = [
                 'Virtual-ESCOM2018' => 50,
             ];
+        } elseif ($r['contest_type'] == 'OMI_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMI_CHH-2020' => 50
+            ];
+        } elseif ($r['contest_type'] == 'OMIP_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIP_CHH-2020' => 50
+            ];
+        } elseif ($r['contest_type'] == 'OMIS_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIS_CHH-2020' => 70
+            ];
         } elseif ($r['contest_type'] == 'CONTESTCAC') {
             if (
                 $r->identity->username != 'Franco1010'
