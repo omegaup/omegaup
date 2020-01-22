@@ -277,6 +277,7 @@ const translations = {
 	courseEditRegisteredAdminRole: "Role",
 	courseEditStudents: "Students",
 	courseGroupNotFound: "Course group not found",
+	courseHasNotUnlimitedDuration: "It is not possible to set an unlimited duration to an assignment of a course with a non unlimited duration.",
 	courseInvalidStartTime: "The start time must be before the end time.",
 	courseList: "Courses list",
 	courseListAdminCurrentCourses: "Current courses (I teach)",

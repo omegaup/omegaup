@@ -277,6 +277,7 @@ const translations = {
 	courseEditRegisteredAdminRole: "Rol",
 	courseEditStudents: "Estudiantes",
 	courseGroupNotFound: "No se encontr\u00f3 el grupo del curso",
+	courseHasNotUnlimitedDuration: "No se puede establecer duraci\u00f3n ilimitada a una tarea de un curso que no es de duraci\u00f3n ilimitada.",
 	courseInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
 	courseList: "Lista de cursos",
 	courseListAdminCurrentCourses: "Cursos actuales (que ense\u00f1o)",
