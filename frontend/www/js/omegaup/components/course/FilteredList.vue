@@ -89,19 +89,15 @@ import UI from '../../ui.js';
 @Component
 export default class CourseFilteredList extends Vue {
   @Prop() courses!: omegaup.FilteredCourses;
+  @Prop() name!: string;
 
   T = T;
   UI = UI;
-  showTabStudent = '';
-  showTabAdmin = '';
+  showTab = '';
 
   mounted() {
     this.$nextTick(function() {
-      if (this.courses.type === 'student') {
-        this.showTabStudent = this.courses.activeTab;
-      } else if (this.courses.type === 'admin') {
-        this.showTabAdmin = this.courses.activeTab;
-      }
+      this.showTab = this.courses.activeTab;
     });
   }
 
@@ -115,18 +111,11 @@ export default class CourseFilteredList extends Vue {
   }
 
   selectTabToShow(typeCourses: string, filteredTypeCourses: string): void {
-    if (typeCourses === 'student') {
-      this.showTabStudent = `student-courses-${filteredTypeCourses}`;
-    } else if (typeCourses === 'admin') {
-      this.showTabAdmin = `admin-courses-${filteredTypeCourses}`;
-    }
+    this.showTab = `${typeCourses}-courses-${filteredTypeCourses}`;
   }
 
   shouldShowTab(typeCourses: string, filteredTypeCourses: string): boolean {
-    if (typeCourses === 'student') {
-      return this.showTabStudent === `student-courses-${filteredTypeCourses}`;
-    }
-    return this.showTabAdmin === `admin-courses-${filteredTypeCourses}`;
+    return this.showTab === `${typeCourses}-courses-${filteredTypeCourses}`;
   }
 }
 </script>

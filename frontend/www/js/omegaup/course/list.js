@@ -9,15 +9,11 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-course-list', {
         props: {
           courses: this.courses,
-          initialActiveTabStudent: this.initialActiveTabStudent,
-          initialActiveTabAdmin: this.initialActiveTabAdmin,
         },
       });
     },
     data: {
       courses: [],
-      initialActiveTabStudent: '',
-      initialActiveTabAdmin: '',
     },
     components: {
       'omegaup-course-list': course_List,
@@ -78,11 +74,6 @@ OmegaUp.on('ready', function() {
           }
         }
         allCourses[index].activeTab = activeTab;
-        if (index === courseMode.STUDENT) {
-          courseList.initialActiveTabStudent = activeTab;
-        } else if (index === courseMode.ADMIN) {
-          courseList.initialActiveTabAdmin = activeTab;
-        }
       }
       courseList.courses = allCourses;
     })

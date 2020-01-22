@@ -15,10 +15,8 @@
       </div>
 
       <omegaup-course-filtered-list
-        v-bind:name="key"
         v-bind:courses="typeCourses"
-        v-bind:showTabStudent="showTabStudent"
-        v-bind:showTabAdmin="showTabAdmin"
+        v-bind:showTab="typeCourses.activeTab"
       ></omegaup-course-filtered-list>
     </template>
   </div>
@@ -38,12 +36,8 @@ import course_FilteredList from './FilteredList.vue';
 })
 export default class CourseList extends Vue {
   @Prop() courses!: omegaup.CourseType[];
-  @Prop() initialActiveTabStudent!: string;
-  @Prop() initialActiveTabAdmin!: string;
 
   T = T;
   UI = UI;
-  showTabStudent = '';
-  showTabAdmin = '';
 }
 </script>

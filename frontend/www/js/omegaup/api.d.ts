@@ -162,10 +162,8 @@ declare namespace omegaup {
   }
 
   export interface CourseType {
-    type: string;
     filteredCourses: omegaup.FilteredCourses[];
     name: string;
-    activeTab: string;
   }
 
   export interface CourseAdmin {
