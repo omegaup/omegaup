@@ -195,9 +195,9 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var int|null
      */
-    public $finish_time = 946706400; // 2000-01-01 06:00:00
+    public $finish_time = null;
 
     /**
      * La cantidad total de puntos que se pueden obtener.

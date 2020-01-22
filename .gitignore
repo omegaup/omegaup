@@ -17,9 +17,6 @@ tags
 # Ignore classes
 *.class
 
-# Ignore configuration files
-*.conf
-
 # IDE-related stuff
 build.xml
 nbproject/
@@ -32,7 +29,6 @@ grader/lib/
 *.jks
 *.crt
 *.key
-*.pem
 *.srl
 
 # ignore frontend config file
@@ -108,6 +104,7 @@ frontend/www/docs/pas
 
 # Ignore VS Code json
 .vscode/*
+.save
 
 # Ignore omegaup.db
 omegaup.db

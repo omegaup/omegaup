@@ -481,33 +481,24 @@ class Validators {
 
     /**
      *
-     * @param string|list<string>|null $parameter
+     * @template T
+     * @param list<T> $parameter
      * @param string $parameterName
-     * @param array $enum
-     * @param bool $required
+     * @param list<T> $validOptions
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidSubset(
-        $parameter,
+        ?array $parameter,
         string $parameterName,
-        array $enum,
+        array $validOptions,
         bool $required = true
     ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
-
         $badElements = [];
-        $elements = is_string(
-            $parameter
-        ) ? array_filter(
-            explode(
-                ',',
-                $parameter
-            )
-        ) : $parameter;
-        foreach ($elements as $element) {
-            if (!in_array($element, $enum)) {
+        foreach ($parameter as $element) {
+            if (!in_array($element, $validOptions)) {
                 $badElements[] = $element;
             }
         }
@@ -517,7 +508,7 @@ class Validators {
                 $parameterName,
                 [
                     'bad_elements' => implode(',', $badElements),
-                    'expected_set' => implode(', ', $enum),
+                    'expected_set' => implode(', ', $validOptions),
                 ]
             );
         }

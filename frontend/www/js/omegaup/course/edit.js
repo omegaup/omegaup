@@ -336,20 +336,27 @@ OmegaUp.on('ready', function() {
             }
             schoolIdDeferred
               .then(function(school_id) {
-                API.Course.update({
+                const params = {
                   course_alias: courseAlias,
                   name: ev.name,
                   description: ev.description,
                   start_time: ev.startTime.getTime() / 1000,
-                  finish_time:
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000,
                   alias: ev.alias,
                   show_scoreboard: ev.showScoreboard,
                   needs_basic_information: ev.basic_information_required,
                   requests_user_information: ev.requests_user_information,
                   school_id: school_id,
-                })
-                  .then(function(data) {
+                };
+
+                if (ev.unlimitedDuration) {
+                  params.unlimited_duration = true;
+                } else {
+                  params.finish_time =
+                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
+                }
+
+                API.Course.update(params)
+                  .then(function() {
                     UI.success(
                       UI.formatString(T.courseEditCourseEditedAndGoToCourse, {
                         alias: ev.alias,

@@ -183,7 +183,7 @@
             <label>{{ T.wordsLanguages }}</label
             ><br />
             <select
-              class="form-control"
+              class="form-control selectpicker"
               multiple="multiple"
               v-model="languages"
             >
@@ -324,6 +324,10 @@ export default class NewForm extends Vue {
 
   onSubmit() {
     this.$emit('emit-update-contest', this);
+  }
+
+  mounted() {
+    $('.selectpicker', this.$el).selectpicker();
   }
 }
 </script>

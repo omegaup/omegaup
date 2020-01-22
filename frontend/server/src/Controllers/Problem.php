@@ -130,7 +130,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validates a Create or Update Problem API request
      *
-     * @return array{languages: null|list<string>, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: array{public: bool, tagname: string}[]|null}
+     * @return array{languages: null|string, problem: \OmegaUp\DAO\VO\Problems|null, selectedTags: array{public: bool, tagname: string}[]|null}
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreateOrUpdate(
@@ -297,7 +297,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'problem' => $problem,
             'selectedTags' => $selectedTags,
-            'languages' => $params->languages,
+            'languages' => is_array(
+                $params->languages
+            ) ? join(
+                ',',
+                $params->languages
+            ) : $params->languages,
         ];
     }
 
@@ -335,7 +340,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity,
             $params
         );
-        $languages = implode(',', $languages);
 
         // Populate a new Problem object
         $problem = new \OmegaUp\DAO\VO\Problems([
@@ -1122,10 +1126,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'languages',
         ];
         self::updateValueProperties(null, $problem, $valueProperties, $params);
-        $problem->languages = $languages ? implode(
-            ',',
-            $languages
-        ) : $problem->languages;
+        $problem->languages = $languages ?: $problem->languages;
 
         $response = [
             'rejudged' => false,
@@ -2980,7 +2981,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             false
         );
 
-        $tags = $r->getStringList('tag');
+        $tags = $r->getStringList('tag', []);
 
         $keyword = substr(strval($r['query']), 0, 256);
         if (!$keyword) {
