@@ -122,8 +122,6 @@ class Controller {
      *     it into the proper form that should be stored in $object. For example:
      *     function($value) { return gmdate('Y-m-d H:i:s', $value); }
      *
-     * @param \OmegaUp\Request $request
-     * @param \OmegaUp\ProblemParams $params
      * @param object $object
      * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
      * @return bool True if there were changes to any property marked as 'important'.

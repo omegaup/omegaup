@@ -222,8 +222,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             /** @var array{tagname: string, public: bool}[]|null */
             $selectedTags = json_decode(
-                $params->selectedTagsAsJSON, /*assoc=*/
-                true
+                $params->selectedTagsAsJSON,
+                /*$assoc=*/true
             );
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
@@ -1414,13 +1414,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        $isRequired = false;
+        ;
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate(
             $r->identity,
-            self::convertRequestToProblemParams($r, $isRequired),
-            $isRequired
+            self::convertRequestToProblemParams($r, /*$isRequired=*/ false),
+            /*$isRequired=*/ false
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2022,9 +2022,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $version = strval($problemsetProblem->version);
         }
 
-        if (is_null($problem->alias)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
             strval($problem->alias),
             $commit,
