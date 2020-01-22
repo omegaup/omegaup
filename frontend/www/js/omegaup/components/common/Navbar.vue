@@ -155,12 +155,12 @@
               }}</span>
               <omegaup-common-grader-badge
                 v-show="header.isAdmin"
-                v-bind:queueLength="graderBadge.queueLength"
-                v-bind:error="graderBadge.error"
+                v-bind:queueLength="graderQueueLength"
+                v-bind:error="inError"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
-            <ul class="dropdown-menu" v-if="navbarHidden">
+            <ul class="dropdown-menu" v-if="showNavbar">
               <li v-show="!header.omegaUpLockDown &amp;&amp; !header.inContest">
                 <a href="/profile/"
                   ><span class="glyphicon glyphicon-user"></span>
@@ -174,9 +174,9 @@
                 >
               </li>
               <omegaup-common-grader-status
-                v-bind:status="graderStatus.status"
-                v-bind:error="graderStatus.error"
-                v-bind:graderInfo="graderStatus.graderInfo"
+                v-bind:status="status"
+                v-bind:error="errorMessage"
+                v-bind:graderInfo="graderInfo"
               ></omegaup-common-grader-status>
             </ul>
             <ul class="dropdown-menu" v-else="">
@@ -208,17 +208,6 @@ import notifications_List from '../notification/List.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 
-interface GraderStatus {
-  status: string;
-  error: string;
-  graderInfo: omegaup.Grader;
-}
-
-interface GraderBadge {
-  queueLength: number;
-  error: boolean;
-}
-
 @Component({
   components: {
     'omegaup-notification-list': notifications_List,
@@ -227,9 +216,12 @@ interface GraderBadge {
   },
 })
 export default class Navbar extends Vue {
-  @Prop() header!: omegaup.Navbar;
-  @Prop() graderStatus!: GraderStatus;
-  @Prop() graderBadge!: GraderBadge;
+  @Prop() header!: omegaup.NavbarPayload;
+  @Prop() status!: string;
+  @Prop() graderInfo!: omegaup.Grader;
+  @Prop() graderQueueLength!: number;
+  @Prop() inError!: boolean;
+  @Prop() errorMessage!: string;
 
   notifications: omegaup.Notification[] = [];
   T = T;
@@ -238,7 +230,7 @@ export default class Navbar extends Vue {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
 
-  get navbarHidden(): boolean {
+  get showNavbar(): boolean {
     return (
       this.header.isAdmin &&
       !this.header.omegaUpLockDown &&

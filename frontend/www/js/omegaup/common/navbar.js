@@ -13,22 +13,21 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-common-navbar', {
         props: {
           header: this.header,
-          graderStatus: this.graderStatus,
-          graderBadge: this.graderBadge,
+          status: this.status,
+          graderInfo: this.graderInfo,
+          graderQueueLength: this.graderQueueLength,
+          inError: this.inError,
+          errorMessage: this.errorMessage,
         },
       });
     },
     data: {
       header: headerPayload,
-      graderStatus: {
-        status: 'ok',
-        error: null,
-        graderInfo: null,
-      },
-      graderBadge: {
-        queueLength: -1,
-        error: false,
-      },
+      status: 'ok',
+      graderInfo: null,
+      graderQueueLength: -1,
+      inError: false,
+      errorMessage: null,
     },
     components: {
       'omegaup-common-navbar': common_Navbar,
@@ -46,24 +45,24 @@ OmegaUp.on('ready', function() {
   function updateGraderStatus() {
     API.Grader.status()
       .then(stats => {
-        commonNavbar.graderStatus.graderInfo = stats.grader;
-        if (commonNavbar.graderStatus.graderInfo.status !== 'ok') {
-          commonNavbar.graderStatus.status = 'down';
+        commonNavbar.graderInfo = stats.grader;
+        if (stats.status !== 'ok') {
+          commonNavbar.status = 'down';
           return;
         }
         if (stats.grader.queue) {
-          commonNavbar.graderBadge.queueLength =
+          commonNavbar.graderQueueLength =
             stats.grader.queue.run_queue_length +
             stats.grader.queue.running.length;
         }
-        commonNavbar.graderStatus.status = 'ok';
-        commonNavbar.graderStatus.error = null;
-        commonNavbar.graderBadge.error = false;
+        commonNavbar.status = 'ok';
+        commonNavbar.errorMessage = null;
+        commonNavbar.inError = false;
       })
       .fail(stats => {
-        commonNavbar.graderStatus.status = 'down';
-        commonNavbar.graderStatus.error = stats.error;
-        commonNavbar.graderBadge.error = true;
+        commonNavbar.status = 'down';
+        commonNavbar.errorMessage = stats.error;
+        commonNavbar.inError = true;
       });
   }
 

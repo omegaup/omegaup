@@ -277,7 +277,7 @@ declare namespace omegaup {
     memory: number;
   }
 
-  export interface Navbar {
+  export interface NavbarPayload {
     omegaUpLockDown: boolean;
     inContest: boolean;
     isLoggedIn: boolean;
