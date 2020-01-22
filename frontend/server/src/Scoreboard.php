@@ -129,12 +129,12 @@ class Scoreboard {
         );
 
         if (!is_null($cache)) {
-            $timeout = max(
-                0,
-                is_null($this->params->finish_time) ?
+            $timeout =  is_null($this->params->finish_time) ?
                 0 :
-                $this->params->finish_time - \OmegaUp\Time::get()
-            );
+                max(
+                    0,
+                    $this->params->finish_time - \OmegaUp\Time::get()
+                );
             $cache->set($result, $timeout);
         }
 
@@ -218,12 +218,12 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = max(
-            0,
-            is_null(
-                $this->params->finish_time
-            ) ? 0 : $this->params->finish_time - \OmegaUp\Time::get()
-        );
+        $timeout =  is_null($this->params->finish_time) ?
+            0 :
+            max(
+                0,
+                $this->params->finish_time - \OmegaUp\Time::get()
+            );
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($canUseAdminCache) {
