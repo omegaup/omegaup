@@ -1414,7 +1414,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        ;
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate(
