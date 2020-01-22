@@ -394,7 +394,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\ProblemDeployer::CREATE,
                 $problemSettings
             );
-            $problem->commit = $problemDeployer->publishedCommit;
+            $problem->commit = $problemDeployer->publishedCommit ?: '';
             $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
@@ -1152,6 +1152,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
             if (
                 isset($_FILES['problem_contents'])
+                && is_array($_FILES['problem_contents'])
                 && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
                     $_FILES['problem_contents']['tmp_name']
                 )
@@ -1231,7 +1232,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 foreach ($runs as $run) {
                     \OmegaUp\Cache::deleteFromCache(
                         \OmegaUp\Cache::RUN_ADMIN_DETAILS,
-                        $run->run_id
+                        strval($run->run_id)
                     );
                 }
                 \OmegaUp\Cache::deleteFromCache(
@@ -1376,9 +1377,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     private static function updateStatement(\OmegaUp\Request $r): void {
         $r->ensureMainUserIdentity();
-        [
-            'problem' => $problem,
-        ] = self::validateCreateOrUpdate($r, true);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
@@ -1549,8 +1553,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problemset' => null,
         ];
         if (!is_null($problemset) && isset($problemset['problemset'])) {
+            if (is_null($r->identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             if (
-                !is_null($r->identity) &&
                 !\OmegaUp\Authorization::isAdmin(
                     $r->identity,
                     $problemset['problemset']
@@ -2023,7 +2029,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $request = new \OmegaUp\Request(
             ['omit_rank' => true, 'auth_token' => $r['auth_token']]
         );
-        if (!is_null($r->identity)) {
+        if (!is_null($r->identity) && !is_null($r->identity->username)) {
             self::authenticateOrAllowUnauthenticatedRequest($request);
 
             $identity = self::resolveTargetIdentity($request);
@@ -2067,11 +2073,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
         if (
-            !is_null($r->identity) &&
-            (\OmegaUp\DAO\Problems::isVisible($problem) ||
-             \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem))
+            \OmegaUp\DAO\Problems::isVisible($problem) ||
+            (
+                !is_null($r->identity) &&
+                \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
+            )
         ) {
-            $acl = \OmegaUp\DAO\ACLs::getByPK(intval($problem->acl_id));
+            if (is_null($problem->acl_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+            $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
             if (is_null($acl->owner_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
@@ -2121,6 +2134,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problemset
             );
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
+                if (is_null($problemset->problemset_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemsetNotFound'
+                    );
+                }
                 // At this point, contestant_user relationship should be established.
                 $container = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                     $problemset->problemset_id
@@ -2435,6 +2453,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // Update problem fields.
+        /** @var array{Cases: list<array{Cases: list<array{Name: string, Weight: int}>, Name: string}>, Limits: array{ExtraWallTime: string, MemoryLimit: int, OutputLimit: int, OverallWallTimeLimit: string, TimeLimit: string}, Slow: null, Validator: array{Name: string, Tolerance: string, Limits: array{ExtraWallTime: string, MemoryLimit: int, OutputLimit: int, OverallWallTimeLimit: string, TimeLimit: string}}}*/
         $problemSettings = json_decode(
             $problemArtifacts->get('settings.json'),
             /*assoc=*/true
@@ -2492,7 +2511,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 foreach ($runs as $run) {
                     \OmegaUp\Cache::deleteFromCache(
                         \OmegaUp\Cache::RUN_ADMIN_DETAILS,
-                        $run->run_id
+                        strval($run->run_id)
                     );
                 }
                 \OmegaUp\Cache::deleteFromCache(
@@ -2661,10 +2680,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
+            $identity = null;
             if (!is_null($r['username'])) {
                 try {
-                    $r['identity'] = \OmegaUp\DAO\Identities::findByUsername(
-                        $r['username']
+                    $identity = \OmegaUp\DAO\Identities::findByUsername(
+                        strval($r['username'])
                     );
                 } catch (\Exception $e) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2674,13 +2694,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $response['runs'] = \OmegaUp\DAO\Runs::getAllRuns(
                 null,
-                $r['status'],
-                $r['verdict'],
+                !is_null($r['status']) ? strval($r['status']) : null,
+                !is_null($r['verdict']) ? strval($r['verdict']) : null,
                 $problem->problem_id,
-                $r['language'],
-                !is_null($r['identity']) ? $r['identity']->identity_id : null,
-                $r['offset'],
-                $r['rowcount']
+                !is_null($r['language']) ? strval($r['language']) : null,
+                !is_null($identity) ? intval($identity->identity_id) : null,
+                !is_null($r['offset']) ? intval($r['offset']) : null,
+                !is_null($r['rowcount']) ? intval($r['rowcount']) : null
             );
         } else {
             // Get all the available runs
@@ -2719,18 +2739,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias'
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $is_problem_admin = \OmegaUp\Authorization::isProblemAdmin(
+        $problemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $problem
         );
 
         $clarifications = \OmegaUp\DAO\Clarifications::GetProblemClarifications(
             $problem->problem_id,
-            $is_problem_admin,
+            $problemAdmin,
             $r->identity->identity_id,
             $r['offset'],
             $r['rowcount']
@@ -2751,7 +2771,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{total_runs: int, pending_runs: array, verdict_counts: array<string, int>, cases_stats: array<string, int>}
+     * @return array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         // Get user
@@ -2767,7 +2787,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        // We need to check that the user has priviledges on the problem
+        // We need to check that the user has privileges on the problem
         if (
             !\OmegaUp\Authorization::isProblemAdmin(
                 $r->identity,
@@ -2833,7 +2853,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 /*missingOk=*/true
             );
             if (!is_null($detailsJson)) {
-                /** @var null|mixed */
+                /** @var null|array{verdict: string, compile_meta: array{Main: array{verdict: string, time: float, sys_time: float, wall_time: float, memory: int}}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}}>}>} */
                 $details = json_decode($detailsJson, /*associative=*/true);
                 if (!is_array($details)) {
                     self::$log->error(
@@ -2841,34 +2861,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                     continue;
                 }
-                foreach ($details as $group) {
-                    if (!isset($group['cases']) || !is_array($group['cases'])) {
+                foreach ($details as $key => $item) {
+                    if ($key !== 'groups' || !is_array($item)) {
                         continue;
                     }
-                    foreach ($group['cases'] as $case) {
-                        if (
-                            !is_array($case) ||
-                            !isset($case['name']) ||
-                            !is_string($case['name'])
-                        ) {
-                            self::$log->error(
-                                "Failed to interpret run details: {$detailsJson}"
-                            );
+                    foreach ($item as $group) {
+                        if (!isset($group['cases'])) {
                             continue;
                         }
-                        $caseName = strval($case['name']);
-                        if (
-                            !array_key_exists(
-                                $caseName,
-                                $casesStats['counts']
-                            )
-                        ) {
-                            $casesStats['counts'][$caseName] = 0;
+                        foreach ($group['cases'] as $case) {
+                            $caseName = strval($case['name']);
+                            if (
+                                !array_key_exists(
+                                    $caseName,
+                                    $casesStats['counts']
+                                )
+                            ) {
+                                $casesStats['counts'][$case['name']] = 0;
+                            }
+                            if ($case['score'] === 0) {
+                                continue;
+                            }
+                            $casesStats['counts'][$case['name']]++;
                         }
-                        if ($case->score == 0) {
-                            continue;
-                        }
-                        $casesStats['counts'][$caseName]++;
                     }
                 }
             }
@@ -3673,6 +3688,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
+        $r->ensureMainUserIdentity();
+
         if (!isset($r['request'])) {
             return [
                 'IS_UPDATE' => true,
