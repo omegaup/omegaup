@@ -27,7 +27,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByEmail($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
-        }        
+        }
         $exception = new \OmegaUp\Exceptions\NotFoundException(
             'userOrMailNotFound'
         );
