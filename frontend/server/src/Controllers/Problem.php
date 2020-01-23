@@ -2743,14 +2743,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $problemAdmin = \OmegaUp\Authorization::isProblemAdmin(
+        $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $problem
         );
 
         $clarifications = \OmegaUp\DAO\Clarifications::GetProblemClarifications(
             $problem->problem_id,
-            $problemAdmin,
+            $isProblemAdmin,
             $r->identity->identity_id,
             $r['offset'],
             $r['rowcount']
