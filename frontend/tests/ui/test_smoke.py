@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium end-to-end tests.'''
 
@@ -34,6 +35,25 @@ def test_login(driver):
 
     with driver.login_admin():
         pass
+
+
+@util.no_javascript_errors()
+@util.annotate
+def test_js_errors(driver):
+    '''Tests assert{,_no}_js_errors().'''
+
+    # console.log() is not considered an error.
+    with util.assert_no_js_errors(driver):
+        driver.browser.execute_script('console.log("foo");')
+
+    with util.assert_js_errors(driver, expected_messages=('bar', )):
+        driver.browser.execute_script('console.error("bar");')
+
+    with util.assert_no_js_errors(driver):
+        # Within an asset_js_error() context manager, messages should not be
+        # bubbled up.
+        with util.assert_js_errors(driver, expected_messages=('baz', )):
+            driver.browser.execute_script('console.error("baz");')
 
 
 @util.no_javascript_errors()

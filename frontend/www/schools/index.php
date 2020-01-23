@@ -1,11 +1,12 @@
 <?php
-require_once('../../server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 try {
     $hasActivityInCourses = \OmegaUp\Controllers\Course::userHasActivityInCourses(
         new \OmegaUp\Request($_REQUEST)
     );
-} catch (Exception $e) {
+} catch (\Exception $e) {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
@@ -14,4 +15,11 @@ if ($hasActivityInCourses) {
     die(header('Location: /course/'));
 }
 
-$smarty->display('../templates/schools.intro.tpl');
+\OmegaUp\UITools::getSmartyInstance()->display(
+    sprintf(
+        '%s/templates/schools.intro.tpl',
+        strval(
+            OMEGAUP_ROOT
+        )
+    )
+);

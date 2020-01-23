@@ -80,7 +80,6 @@ class SecurityTools {
                 self::ARGON2ID_MEMORY_COST * 1024
             );
         } else {
-            /** @psalm-suppress MixedArgument blocked by https://github.com/vimeo/psalm/pull/2069 */
             $hashedString = password_hash(
                 $string,
                 PASSWORD_ARGON2ID,
@@ -118,7 +117,6 @@ class SecurityTools {
                 self::ARGON2ID_MEMORY_COST * 1024
             );
         }
-        /** @psalm-suppress MixedArgument blocked by https://github.com/vimeo/psalm/pull/2069 */
         return password_needs_rehash(
             $hashedPassword,
             PASSWORD_ARGON2ID,

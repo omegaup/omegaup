@@ -10,4 +10,5 @@ define('OMEGAUP_DB_USER', 'travis');
 define('OMEGAUP_ENVIRONMENT', 'production');
 define('OMEGAUP_GRADER_FAKE', true);
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
+define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
 define('SMARTY_CACHE_DIR', '/tmp');

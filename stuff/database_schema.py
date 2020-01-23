@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 # -*- coding: utf-8 -*-
 
 '''Tool to validate schema.sql.'''

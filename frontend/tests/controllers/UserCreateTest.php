@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateUserTest extends OmegaupTestCase {
+class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates an omegaup user happily :)
      */
@@ -14,9 +14,9 @@ class CreateUserTest extends OmegaupTestCase {
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -24,7 +24,7 @@ class CreateUserTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
@@ -41,19 +41,17 @@ class CreateUserTest extends OmegaupTestCase {
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API twice.
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
         $response = \OmegaUp\Controllers\User::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
         $r['password'] = 'a wrong password';
@@ -75,9 +73,9 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Inflate request
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -85,7 +83,7 @@ class CreateUserTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Randomize email again
-        $r['email'] = Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com';
+        $r['email'] = \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com';
 
         // Call api
         $response = \OmegaUp\Controllers\User::apiCreate($r);
@@ -101,9 +99,9 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Inflate request
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -111,7 +109,7 @@ class CreateUserTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Randomize email again
-        $r['username'] = Utils::CreateRandomString();
+        $r['username'] = \OmegaUp\Test\Utils::createRandomString();
 
         // Call api
         $response = \OmegaUp\Controllers\User::apiCreate($r);
@@ -127,8 +125,8 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Inflate request
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -146,8 +144,8 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Inflate request
         $r = new \OmegaUp\Request([
-            'username' => Utils::CreateRandomString(),
-            'password' => Utils::CreateRandomString(),
+            'username' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -165,8 +163,8 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Inflate request
         $r = new \OmegaUp\Request([
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -181,9 +179,9 @@ class CreateUserTest extends OmegaupTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Set context
-        $_REQUEST['username'] = Utils::CreateRandomString();
-        $_REQUEST['password'] = Utils::CreateRandomString();
-        $_REQUEST['email'] = Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com';
+        $_REQUEST['username'] = \OmegaUp\Test\Utils::createRandomString();
+        $_REQUEST['password'] = \OmegaUp\Test\Utils::createRandomString();
+        $_REQUEST['email'] = \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com';
         $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
 
         // Override session_start, phpunit doesn't like it, but we still validate that it is called once
@@ -191,7 +189,10 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api
         $_SERVER['REQUEST_URI'] = '/api/user/create';
-        $response = json_decode(ApiCallerMock::httpEntryPoint(), true);
+        $response = json_decode(
+            \OmegaUp\Test\ApiCallerMock::httpEntryPoint(),
+            true
+        );
 
         $this->assertEquals('ok', $response['status']);
 
@@ -211,8 +212,8 @@ class CreateUserTest extends OmegaupTestCase {
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => 'ínvalid username',
-            'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -231,8 +232,8 @@ class CreateUserTest extends OmegaupTestCase {
         try {
             $response = \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => 'invalid:username',
-                'password' => Utils::CreateRandomString(),
-                'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             ]));
 
@@ -248,20 +249,22 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['verify' => false])
+        );
 
         // Admin will verify $user
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         // Call api using admin
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]));
 
         // Get user from db again to pick up verification changes
-        $userdb = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $userdb = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
         $this->assertEquals(1, $userdb->verified);
         $this->assertEquals('ok', $response['status']);
@@ -275,13 +278,13 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminInvalidUsername() {
         // Admin will verify $user
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         // Call api using admin
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => Utils::CreateRandomString(),
+            'usernameOrEmail' => \OmegaUp\Test\Utils::createRandomString(),
         ]));
     }
 
@@ -292,16 +295,18 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['verify' => false])
+        );
 
         // Another user will try to verify $user
-        $user2 = UserFactory::createUser();
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call api using admin
-        $login = self::login($user2);
+        $login = self::login($identity2);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]));
     }
 
@@ -311,9 +316,9 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -324,7 +329,7 @@ class CreateUserTest extends OmegaupTestCase {
      * into Sendy.
      */
     public function testMailingtListBackfill() {
-        $userUnregistered = UserFactory::createUser();
+        ['user' => $unregisteredUser, 'identity' => $unregisteredIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $urlHelperMock = $this
             ->getMockBuilder('\\OmegaUp\\UrlHelper')
@@ -338,16 +343,15 @@ class CreateUserTest extends OmegaupTestCase {
             );
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        $adminLogin = self::login($admin);
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             true,
-            $response['users'][$userUnregistered->username]
+            $response['users'][$unregisteredIdentity->username]
         );
     }
 
@@ -355,8 +359,8 @@ class CreateUserTest extends OmegaupTestCase {
      * Test only verified users are backfilled into Sendy
      */
     public function testMailingListBackfillOnlyVerified() {
-        $userNotVerified = UserFactory::createUser(
-            new UserParams(
+        ['user' => $userNotVerified, 'identity' => $identityNotVerified] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['verify' => false]
             )
         );
@@ -373,16 +377,15 @@ class CreateUserTest extends OmegaupTestCase {
             );
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        $adminLogin = self::login($admin);
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
         // Check user was not added into the mailing list
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayNotHasKey(
-            $userNotVerified->username,
+            $identityNotVerified->username,
             $response['users']
         );
     }

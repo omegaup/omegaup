@@ -5,31 +5,34 @@
  *
  * @author joemmanuel
  */
-class RunsTotalsTest extends OmegaupTestCase {
+class RunsTotalsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRunTotals() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run. Submission gap must be 60 seconds
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataOld = RunsFactory::createRun(
+        $runDataOld = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid(

@@ -3,31 +3,34 @@
 /**
  * Description of DetailsRunTest
  */
-class RunStatusTest extends OmegaupTestCase {
+class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test of viewing run details
      */
     public function testShowRunDetailsValid() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-
-        // Create our contestant
-        $contestant = UserFactory::createUser();
-
-        // Create a run
-        $runData = RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
-            $contestData,
-            $contestant
+            $contestData
         );
 
-        $login = self::login($contestant);
+        // Create our contestant
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
@@ -42,16 +45,17 @@ class RunStatusTest extends OmegaupTestCase {
      * Basic test of downloading a full run.
      */
     public function testDownload() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
-            $user->username
-        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestantIdentity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
             \OmegaUp\Controllers\Run::downloadSubmission(

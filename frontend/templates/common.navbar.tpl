@@ -25,7 +25,7 @@
                 <li><a href="/contest/new/">{#contestsCreateNew#}</a></li>
                 <li><a href="/contest/mine/">{#navMyContests#}</a></li>
                 <li><a href="/group/">{#navMyGroups#}</a></li>
-                <li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
+                <li><a href="/scoreboardmerge/">{#contestsJoinScoreboards#}</a></li>
               </ul>
             </li>
             <li class="dropdown {if isset($navbarSection) && $navbarSection === "problems"} active{/if}" id="nav-problems">
@@ -34,6 +34,7 @@
                 <li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
                 <li><a href="/problem/mine/">{#navMyProblems#}</a></li>
                 <li><a href="/problem/">{#wordsProblems#}</a></li>
+                <li><a href="/submissions/">{#wordsLatestSubmissions#}</a></li>
                 <li><a href="/nomination/mine/">{#navMyQualityNomination#}</a></li>
                 {if $CURRENT_USER_IS_REVIEWER eq '1'}
                   <li><a href="/nomination/">{#navQualityNominationQueue#}</a></li>
@@ -41,9 +42,21 @@
               </ul>
             </li>
           {else}
-            <li id="nav-problems"{if isset($navbarSection) && $navbarSection === "problems"} class="active"{/if}><a href="/problem/">{#wordsProblems#}</a></li>
+            <li class="dropdown {if isset($navbarSection) && $navbarSection === "problems"} active{/if}" id="nav-problems">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/problem/">{#wordsProblems#}</a></li>
+                <li><a href="/submissions/">{#wordsLatestSubmissions#}</a></li>
+              </ul>
+            </li>
           {/if} {* LOGGED_IN *}
-          <li id="nav-rank"{if isset($navbarSection) && $navbarSection === "rank"} class="active"{/if}><a href="/rank/">{#navRanking#}</a></li>
+          <li class="dropdown {if isset($navbarSection) && $navbarSection === "rank"} active{/if}" id="nav-rank">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{#navRanking#}</span><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="/rank/">{#navUserRanking#}</a></li>
+              <li><a href="/rank/schools/">{#navSchoolRanking#}</a></li>
+            </ul>
+          </li>
           <li id="nav-schools"{if isset($navbarSection) && $navbarSection === "schools"} class="active"{/if}><a href="/schools/">{#navSchools#}</a></li>
           <li><a href="http://blog.omegaup.com/">{#navBlog#}</a></li>
           <li><a href="https://omegaup.com/preguntas/">{#navQuestions#}</a></li>
@@ -51,15 +64,15 @@
         <ul class="nav navbar-nav navbar-right">
           {if $LOGGED_IN eq '1'}
             {if isset($inContest) && $inContest}
-              {include file='common.navbar.notifications.tpl'}
+              {include file='common.navbar.notifications.tpl' inline}
             {/if}
             <li id="notifications-list"></li>
             <li id="nav-user" class="dropdown{if isset($navbarSection) && $navbarSection === "users"} active{/if}">
               <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
-                {$CURRENT_USER_GRAVATAR_URL_51}
+                <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <span class="grader-count badge">…</span>
+                  <div id="common-grader-count-badge"></div>
                 {/if}
                 <span class="caret"></span>
               </a>
@@ -67,12 +80,8 @@
                 <li><a href="/profile/"><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <hr class="dropdown-separator">
-                  <li class="grader-submissions"><a class="grader-submissions-link" href="/arena/admin/">{#wordsLatestSubmissions#}</a></li>
-                  <li class="grader grader-status"></li>
-                  <li class="grader grader-broadcaster-sockets"></li>
-                  <li class="grader grader-embedded-runner"></li>
-                  <li class="grader grader-queues"></li>
+                  <div id="common-grader-status"></div>
+                  {js_include entrypoint="common_navbar"}
                 {/if}
               </ul>
             </li>
@@ -85,7 +94,10 @@
             {if $LOGGED_IN eq '1'}
               <li id="notifications-list"></li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
+                  <img src="{$CURRENT_USER_GRAVATAR_URL_51}">
+                  <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span>
+                </a>
                 <ul class="dropdown-menu">
                   <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 </ul>
@@ -96,11 +108,8 @@
         {/if} {* OMEGAUP_LOCKDOWN *}
       </ul>
     </div>
-  {if $CURRENT_USER_IS_ADMIN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/common.navbar.grader_status.js"}"></script>
-  {/if}
   {if $LOGGED_IN eq '1'}
-    <script type="text/javascript" src="{version_hash src="/js/dist/notification_list.js"}"></script>
+    {js_include entrypoint="notification_list"}
   {/if}
   </div>
 </div>

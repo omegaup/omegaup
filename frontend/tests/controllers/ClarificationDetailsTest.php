@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class DetailsClarificationTest extends OmegaupTestCase {
+class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Validates a clarification given the clarification ID
      *
@@ -39,23 +39,26 @@ class DetailsClarificationTest extends OmegaupTestCase {
      */
     public function testShowClarificationAsContestDirector() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -79,23 +82,26 @@ class DetailsClarificationTest extends OmegaupTestCase {
      */
     public function testShowClarificationAsOriginalContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -103,7 +109,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Call API
@@ -120,26 +126,29 @@ class DetailsClarificationTest extends OmegaupTestCase {
      */
     public function testClarificationsCreatedPrivateAsDefault() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create our contestant who will try to view the clarification
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Prepare the request object
@@ -147,7 +156,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant2);
+        $login = self::login($identity2);
         $r['auth_token'] = $login->auth_token;
 
         // Call API, will fail
@@ -156,26 +165,29 @@ class DetailsClarificationTest extends OmegaupTestCase {
 
     public function testPublicClarificationsCanBeViewed() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create our contestant who will try to view the clarification
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
         $clarificationData = ClarificationsFactory::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Manually set the just created clarification to PUBLIC
@@ -190,7 +202,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
-        $login = self::login($contestant2);
+        $login = self::login($identity2);
         $r['auth_token'] = $login->auth_token;
 
         // Call API

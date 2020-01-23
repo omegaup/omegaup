@@ -12,29 +12,32 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
-    public static function getProblemsetContainer($problemset_id) {
-        if (is_null($problemset_id)) {
+    /**
+     * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews
+     */
+    public static function getProblemsetContainer(?int $problemsetId) {
+        if (is_null($problemsetId)) {
             return null;
         }
 
         // Whenever I see a problemset I say it's used by a contest
         // and 99% of the time I'm right!
         $contest = \OmegaUp\DAO\Contests::getContestForProblemset(
-            $problemset_id
+            $problemsetId
         );
         if (!is_null($contest)) {
             return $contest;
         }
 
         $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
-            $problemset_id
+            $problemsetId
         );
         if (!is_null($assignment)) {
             return $assignment;
         }
 
         $interview = \OmegaUp\DAO\Interviews::getInterviewForProblemset(
-            $problemset_id
+            $problemsetId
         );
         if (!is_null($interview)) {
             return $interview;
@@ -63,7 +66,10 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                 \OmegaUp\Time::get() >= $container->start_time;
     }
 
-    public static function getWithTypeByPK($problemset_id) {
+    /**
+     * @return array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null
+     */
+    public static function getWithTypeByPK(int $problemsetId): ?array {
         $sql = 'SELECT
                     type,
                     c.alias AS contest_alias,
@@ -92,17 +98,13 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     p.problemset_id = ?
                 LIMIT
                     1;';
-        $params = [$problemset_id];
+        $params = [$problemsetId];
 
-        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             $params
         );
-        if (empty($problemset)) {
-            return null;
-        }
-
-        return $problemset;
     }
 
     /**

@@ -26,6 +26,7 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
         'time' => true,
         'submit_delay' => true,
         'type' => true,
+        'school_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -94,6 +95,11 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
         if (isset($data['type'])) {
             $this->type = strval(
                 $data['type']
+            );
+        }
+        if (isset($data['school_id'])) {
+            $this->school_id = intval(
+                $data['school_id']
             );
         }
     }
@@ -169,4 +175,11 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
      * @var string
      */
     public $type = 'normal';
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $school_id = null;
 }

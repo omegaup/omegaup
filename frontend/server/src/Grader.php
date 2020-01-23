@@ -96,7 +96,7 @@ class Grader {
     /**
      * Returns the response of the /status entry point
      *
-     * @return array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: array{name: string, id: int}[], run_queue_length: int, runner_queue_length: 0, runners: string[]}} json array
+     * @return array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
      */
     public function status(): array {
         if (OMEGAUP_GRADER_FAKE) {
@@ -112,7 +112,7 @@ class Grader {
                 ],
             ];
         }
-        /** @var array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: array{name: string, id: int}[], run_queue_length: int, runner_queue_length: 0, runners: string[]}} */
+        /** @var array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}} */
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . '/grader/status/',
             self::REQUEST_MODE_JSON
@@ -190,6 +190,15 @@ class Grader {
         );
     }
 
+    public function setGraderResourceForTesting(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename,
+        string $contents
+    ): void {
+        // Not implemented.
+        throw new \BadMethodCallException();
+    }
+
     /**
      * Sends a request to the grader.
      *
@@ -247,7 +256,6 @@ class Grader {
             }
 
             // Execute call
-            /** @var bool|string */
             $response = curl_exec($curl);
             /** @var int */
             $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);

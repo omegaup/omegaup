@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#courseDetails#}"}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#courseDetails#}" inline}
 
 <script src="{version_hash src="/js/course.js"}"></script>
 
@@ -79,4 +79,4 @@
 </script>
 
 <div id="course-info" data-bind="template: 'course-info-template'"></div>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

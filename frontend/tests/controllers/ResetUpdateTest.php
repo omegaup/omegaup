@@ -1,5 +1,5 @@
 <?php
-class ResetUpdateTest extends OmegaupTestCase {
+class ResetUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testShouldRequireAllParameters() {
         try {
             $r = new \OmegaUp\Request();
@@ -13,7 +13,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
     public function testShouldRefuseInvalidResetToken() {
         try {
-            $user_data = UserFactory::generateUser();
+            $user_data = \OmegaUp\Test\Factories\User::generateUser();
             $user_data['password_confirmation'] = $user_data['password'];
             $user_data['reset_token'] = 'abcde';
             $r = new \OmegaUp\Request($user_data);
@@ -26,7 +26,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
     public function testShouldRefusePasswordMismatch() {
         try {
-            $user_data = UserFactory::generateUser();
+            $user_data = \OmegaUp\Test\Factories\User::generateUser();
             $r = new \OmegaUp\Request(['email' => $user_data['email']]);
             $response = \OmegaUp\Controllers\Reset::apiCreate($r);
             $user_data['reset_token'] = $response['token'];
@@ -40,7 +40,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     }
 
     public function testShouldRefuseInvalidPassword() {
-        $user_data = UserFactory::generateUser();
+        $user_data = \OmegaUp\Test\Factories\User::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
         $response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $user_data['reset_token'] = $response['token'];
@@ -73,7 +73,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     }
 
     public function testShouldRefuseExpiredReset() {
-        $user_data = UserFactory::generateUser();
+        $user_data = \OmegaUp\Test\Factories\User::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
         $response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $user_data['password_confirmation'] = $user_data['password'];
@@ -100,7 +100,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     }
 
     public function testShouldLogInWithNewPassword() {
-        $user_data = UserFactory::generateUser();
+        $user_data = \OmegaUp\Test\Factories\User::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
         $create_response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $reset_token = $create_response['token'];
@@ -111,9 +111,9 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);
 
-        $user = \OmegaUp\DAO\Users::findByEmail($user_data['email']);
         \OmegaUp\Controllers\Reset::apiUpdate($r);
-        $user->password = $new_password;
-        self::login($user);
+        $identity = \OmegaUp\DAO\Identities::findByEmail($user_data['email']);
+        $identity->password = $new_password;
+        self::login($identity);
     }
 }

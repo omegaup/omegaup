@@ -4,17 +4,17 @@
  *
  * @author juan.pablo
  */
-class UserPrivacyPolicyTest extends OmegaupTestCase {
+class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * User reviews Privacy Consent Log
      */
     public function testUserReviewsPrivacyConsentLog() {
         // Create privacy policy
-        $privacy_poilcy = UserFactory::createPrivacyStatement();
+        $privacy_poilcy = \OmegaUp\Test\Factories\User::createPrivacyStatement();
 
         // Create the user
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\User::apiLastPrivacyPolicyAccepted(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
@@ -31,11 +31,11 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
      */
     public function testUserAcceptsPrivacyPolicy() {
         // Create the user
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         // Create privacy policy
-        $privacy_poilcy = UserFactory::createPrivacyStatement();
+        $privacy_poilcy = \OmegaUp\Test\Factories\User::createPrivacyStatement();
         $latest_privacy_policy = \OmegaUp\Controllers\User::getPrivacyPolicy(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -63,11 +63,11 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
      */
     public function testUserTriesToAcceptPolicyPreviouslyAccepted() {
         // Create the user
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         // Create privacy policy
-        $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
+        $privacy_poilcy_version_1 = \OmegaUp\Test\Factories\User::createPrivacyStatement();
         $latest_privacy_policy = \OmegaUp\Controllers\User::getPrivacyPolicy(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -99,11 +99,11 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
      */
     public function testAcceptsPreviousPolicyButNotLatestOne() {
         // Create the user
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         // Create privacy policy
-        $privacy_poilcy_version_1 = UserFactory::createPrivacyStatement();
+        $privacy_poilcy_version_1 = \OmegaUp\Test\Factories\User::createPrivacyStatement();
         $latest_privacy_policy = \OmegaUp\Controllers\User::getPrivacyPolicy(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -127,7 +127,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Create other privacy policy
-        $privacy_poilcy_version_2 = UserFactory::createPrivacyStatement();
+        $privacy_poilcy_version_2 = \OmegaUp\Test\Factories\User::createPrivacyStatement();
 
         $response = \OmegaUp\Controllers\User::apiLastPrivacyPolicyAccepted(new \OmegaUp\Request([
             'auth_token' => $login->auth_token

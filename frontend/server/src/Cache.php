@@ -218,6 +218,7 @@ class Cache {
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
+    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
 
     /** @var \Logger */
     private $log;
@@ -294,13 +295,13 @@ class Cache {
      *
      * Si el cache está prendido y la clave está en el cache, regresa el valor. Si no está, regresa null
      *
-     * @return mixed
+     * @return null|mixed
      */
     public function get() {
         if (!self::isEnabled()) {
             return null;
         }
-        /** @var mixed */
+        /** @var false|mixed */
         $result = CacheAdapter::getInstance()->fetch($this->key);
         if ($result === false) {
             $this->log->info("Cache miss for key: {$this->key}");
@@ -315,12 +316,15 @@ class Cache {
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
      *
+     * @template T
+     *
      * @param string $prefix
      * @param string $id
-     * @param callable():mixed $setFunc
+     * @param callable():T $setFunc
      * @param int $timeout (seconds)
      * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
-     * @return mixed the value returned from the cache or $setFunc().
+     *
+     * @return T the value returned from the cache or $setFunc().
      */
     public static function getFromCacheOrSet(
         string $prefix,
@@ -330,7 +334,7 @@ class Cache {
         ?bool &$cacheUsed = null
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
-        /** @var mixed */
+        /** @var null|T */
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
@@ -342,7 +346,7 @@ class Cache {
         }
 
         // Get the value from the function provided
-        /** @var mixed */
+        /** @var T */
         $returnValue = call_user_func($setFunc);
         $cache->set($returnValue, $timeout);
 

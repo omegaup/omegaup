@@ -2,6 +2,13 @@
 
 namespace OmegaUp;
 
+class FieldType {
+    const TYPE_STRING = 0;
+    const TYPE_INT = 1;
+    const TYPE_FLOAT = 2;
+    const TYPE_BOOL = 3;
+}
+
 /**
  * A minimalistic database access layer that has an interface mostly compatible
  * with ADOdb.
@@ -163,6 +170,151 @@ class MySQLConnection {
         return implode('', $chunks);
     }
 
+    private function MapFieldType(int $fieldType): int {
+        switch ($fieldType) {
+            case MYSQLI_TYPE_DECIMAL:
+            case MYSQLI_TYPE_DOUBLE:
+            case MYSQLI_TYPE_FLOAT:
+            case MYSQLI_TYPE_NEWDECIMAL:
+                return FieldType::TYPE_FLOAT;
+
+            case MYSQLI_TYPE_BIT:
+            case MYSQLI_TYPE_TINY:
+                return FieldType::TYPE_BOOL;
+
+            case MYSQLI_TYPE_INT24:
+            case MYSQLI_TYPE_LONG:
+            case MYSQLI_TYPE_LONGLONG:
+            case MYSQLI_TYPE_SHORT:
+            case MYSQLI_TYPE_YEAR:
+                return FieldType::TYPE_INT;
+
+            case MYSQLI_TYPE_TIMESTAMP:
+            case MYSQLI_TYPE_DATE:
+            case MYSQLI_TYPE_TIME:
+            case MYSQLI_TYPE_DATETIME:
+            case MYSQLI_TYPE_NEWDATE:
+                return FieldType::TYPE_STRING;
+
+            case MYSQLI_TYPE_ENUM:
+            case MYSQLI_TYPE_SET:
+            case MYSQLI_TYPE_STRING:
+            case MYSQLI_TYPE_VAR_STRING:
+                return FieldType::TYPE_STRING;
+
+            case MYSQLI_TYPE_TINY_BLOB:
+            case MYSQLI_TYPE_MEDIUM_BLOB:
+            case MYSQLI_TYPE_LONG_BLOB:
+            case MYSQLI_TYPE_BLOB:
+                return FieldType::TYPE_STRING;
+
+            default:
+                throw new \Exception("Unknown field type: {$fieldType}");
+        }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function MapFieldTypes(\mysqli_result &$result): array {
+        $fieldTypes = [];
+        /** @var object $field */
+        foreach ($result->fetch_fields() as $field) {
+            /**
+             * @var string $field->name
+             * @var int $field->type
+             */
+            $fieldTypes[$field->name] = self::MapFieldType($field->type);
+        }
+        return $fieldTypes;
+    }
+
+    /**
+     * @param mixed $value
+     * @return null|int|bool|float|string
+     */
+    private function MapValue($value, int $fieldType) {
+        if (is_null($value)) {
+            return null;
+        }
+        switch ($fieldType) {
+            case FieldType::TYPE_BOOL:
+                return boolval($value);
+
+            case FieldType::TYPE_INT:
+                return intval($value);
+
+            case FieldType::TYPE_FLOAT:
+                return floatval($value);
+
+            case FieldType::TYPE_STRING:
+            default:
+                return strval($value);
+        }
+    }
+
+    /**
+     * @param null|array<string, mixed> $row
+     * @param array<string, int> $fieldTypes
+     * @return null|array<string, mixed>
+     */
+    private function MapRow(?array $row, array $fieldTypes): ?array {
+        if (is_null($row)) {
+            return null;
+        }
+        /** @var mixed $value */
+        foreach ($row as $key => $value) {
+            $row[$key] = self::MapValue($value, $fieldTypes[$key]);
+        }
+        return $row;
+    }
+
+    private function PsalmType(object $field): string {
+        $typeName = 'string';
+        switch (self::MapFieldType(intval($field->type))) {
+            case FieldType::TYPE_BOOL:
+                $typeName = 'bool';
+                break;
+
+            case FieldType::TYPE_INT:
+                $typeName = 'int';
+                break;
+
+            case FieldType::TYPE_FLOAT:
+                $typeName = 'float';
+                break;
+        }
+        if ((intval($field->flags) & MYSQLI_NOT_NULL_FLAG) == 0) {
+            $typeAtoms = ['null', $typeName];
+            sort($typeAtoms);
+            return join('|', $typeAtoms);
+        }
+        return $typeName;
+    }
+
+    private function DumpMySQLQueryResultTypes(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        $fieldTypes = [];
+        /** @var object $field */
+        foreach ($result->fetch_fields() as $field) {
+            $fieldTypes[] = "{$field->name}: " . self::PsalmType($field);
+        }
+        sort($fieldTypes);
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} array{" .
+            join(', ', $fieldTypes) .
+            '}'
+        );
+    }
+
+    private function DumpMySQLQueryResultTypeSingleField(\mysqli_result $result): void {
+        $caller = debug_backtrace()[1];
+        \Logger::getLogger('mysqltypes')->info(
+            "{$caller['file']}:{$caller['line']} " .
+            self::PsalmType($result->fetch_field_direct(0))
+        );
+    }
+
     /**
      * Executes a MySQL query.
      */
@@ -171,7 +323,6 @@ class MySQLConnection {
         array $params,
         int $resultmode
     ): ?\mysqli_result {
-        /** @var \mysqli_result|bool */
         $result = $this->_connection->query(
             $this->BindQueryParams(
                 $sql,
@@ -202,9 +353,7 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns the first row as an associative array.
      *
-     * @return mixed[]|null
-     *
-     * @psalm-return array<string, mixed>|null
+     * @return array<string, mixed>|null
      */
     public function GetRow(string $sql, array $params = []): ?array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
@@ -212,8 +361,12 @@ class MySQLConnection {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
+            $fieldTypes = self::MapFieldTypes($result);
             /** @var array<string, mixed> */
-            return $result->fetch_assoc();
+            return self::MapRow($result->fetch_assoc(), $fieldTypes);
         } finally {
             $result->free();
         }
@@ -222,9 +375,7 @@ class MySQLConnection {
     /**
      * Executes a MySQL query and returns all rows as associative arrays.
      *
-     * @return array{string: mixed}[]
-     *
-     * @psalm-return array<int, array<string, mixed>>
+     * @return list<array<string, mixed>>
      */
     public function GetAll(string $sql, array $params = []): array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
@@ -232,11 +383,15 @@ class MySQLConnection {
             return [];
         }
         try {
-            /** @var array<int, array<string, mixed>> */
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypes($result);
+            }
+            $fieldTypes = self::MapFieldTypes($result);
             $resultArray = [];
             /** @var array<string, mixed> $row */
             while (!is_null($row = $result->fetch_assoc())) {
-                $resultArray[] = $row;
+                /** @var array<string, mixed> This cannot be null. */
+                $resultArray[] = self::MapRow($row, $fieldTypes);
             }
             return $resultArray;
         } finally {
@@ -255,11 +410,20 @@ class MySQLConnection {
             return null;
         }
         try {
+            if (defined('DUMP_MYSQL_QUERY_RESULT_TYPES')) {
+                self::DumpMySQLQueryResultTypeSingleField($result);
+            }
             $row = $result->fetch_row();
             if (empty($row)) {
                 return null;
             }
-            return $row[0];
+            /** @var object */
+            $field = $result->fetch_field_direct(0);
+            /** @var int $field->type */
+            return self::MapValue(
+                $row[0],
+                self::MapFieldType($field->type)
+            );
         } finally {
             $result->free();
         }

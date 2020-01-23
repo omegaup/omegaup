@@ -5,17 +5,17 @@
  * @author joemmanuel
  */
 
-class SchoolCreateTest extends OmegaupTestCase {
+class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create school happy path
      */
     public function testCreateSchool() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
         ]);
 
         // Call api
@@ -36,12 +36,12 @@ class SchoolCreateTest extends OmegaupTestCase {
      *
      */
     public function testCreateSchoolDuplicatedName() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString()
+            'name' => \OmegaUp\Test\Utils::createRandomString()
         ]);
 
         // Call api

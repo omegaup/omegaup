@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestScoreboardTest extends OmegaupTestCase {
+class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Sets the context for a basic scoreboard test
      * @param  int     $nUsers
@@ -21,30 +21,40 @@ class ContestScoreboardTest extends OmegaupTestCase {
         bool $runForAdmin = true,
         bool $runForDirector = true
     ) {
-        $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
-        $contestData = ContestsFactory::createContest();
+        $problemData = [\OmegaUp\Test\Factories\Problem::createProblem(), \OmegaUp\Test\Factories\Problem::createProblem()];
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problems to the contest
-        ContestsFactory::addProblemToContest($problemData[0], $contestData);
-        ContestsFactory::addProblemToContest($problemData[1], $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData[0],
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData[1],
+            $contestData
+        );
 
         // Create our contestants
         $contestants = [];
+        $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
-            $contestants[] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
         $contestDirector = $contestData['director'];
-        $contestAdmin = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestAdmin);
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $contestIdentityAdmin
+        );
 
         foreach ($runMap as $runDescription) {
-            $runData = RunsFactory::createRun(
+            $runData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[$runDescription['problem_idx']],
                 $contestData,
-                $contestants[$runDescription['contestant_idx']]
+                $identities[$runDescription['contestant_idx']]
             );
 
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 $runData,
                 $runDescription['points'],
                 $runDescription['verdict'],
@@ -54,27 +64,27 @@ class ContestScoreboardTest extends OmegaupTestCase {
         }
 
         if ($runForDirector) {
-            $runDataDirector = RunsFactory::createRun(
+            $runDataDirector = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[0],
                 $contestData,
                 $contestDirector
             );
-            RunsFactory::gradeRun($runDataDirector);
+            \OmegaUp\Test\Factories\Run::gradeRun($runDataDirector);
         }
 
         if ($runForAdmin) {
-            $runDataAdmin = RunsFactory::createRun(
+            $runDataAdmin = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData[0],
                 $contestData,
-                $contestAdmin
+                $contestIdentityAdmin
             );
-            RunsFactory::gradeRun($runDataAdmin);
+            \OmegaUp\Test\Factories\Run::gradeRun($runDataAdmin);
         }
 
         return [
             'problemData' => $problemData,
             'contestData' => $contestData,
-            'contestants' => $contestants,
+            'contestants' => $identities,
             'contestAdmin' => $contestAdmin,
             'runMap' => $runMap
         ];
@@ -223,41 +233,47 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testMaxPolicyScoreboard() {
         // Get two problems
-        $problemData = ProblemsFactory::createProblem();
-        $problemData2 = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
-                ['penalty_calc_policy' => 'max']
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['penaltyCalcPolicy' => 'max']
             )
         );
 
         // Add the problems to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        ContestsFactory::addProblemToContest($problemData2, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData2,
+            $contestData
+        );
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create runs
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
-        $runData1 = RunsFactory::createRun(
+        $runData1 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData2,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the runs
-        RunsFactory::gradeRun($runData, 1, 'AC', 60);
-        RunsFactory::gradeRun($runData1, 1, 'AC', 200);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 60);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData1, 1, 'AC', 200);
 
         // Create request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
@@ -269,7 +285,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $response['ranking'][0]['username']
         );
 
@@ -283,32 +299,38 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardPercentajeForContestant() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Set 0% of scoreboard show
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
@@ -321,7 +343,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(1, count($response['ranking']));
 
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $response['ranking'][0]['username']
         );
 
@@ -346,29 +368,35 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardPercentageForContestAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Set 0% of scoreboard show
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($contestData['director']);
@@ -384,7 +412,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals(1, count($response['ranking']));
 
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $response['ranking'][0]['username']
         );
 
@@ -409,44 +437,50 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardMerge() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get contests
-        $contestData = ContestsFactory::createContest();
-        $contestData2 = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData2 = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
-        ContestsFactory::addProblemToContest($problemData, $contestData2);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData2
+        );
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
-        $runData2 = RunsFactory::createRun(
+        $runData2 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant2
+            $identity2
         );
-        $runData3 = RunsFactory::createRun(
+        $runData3 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData2,
-            $contestant2
+            $identity2
         );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runData2);
-        RunsFactory::gradeRun($runData3);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData3);
 
         // Create request
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_aliases' => $contestData['request']['alias'] . ',' . $contestData2['request']['alias'],
@@ -468,30 +502,36 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrl() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         );
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our user not added to the contest
-        $externalUser = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create our contestant, will submit 1 run
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
-        $runData = RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get the scoreboard url by using the MyList api being the
         // contest director
@@ -516,7 +556,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call scoreboard api from the user
-        $login = self::login($externalUser);
+        $login = self::login($externalIdentity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
@@ -554,13 +594,13 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlInvalidToken() {
         // Create our user not added to the contest
-        $externalUser = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Call scoreboard api from the user
-        $login = self::login($externalUser);
+        $login = self::login($externalIdentity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
@@ -576,27 +616,33 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlNoLogin() {
         // Get a private contest with 0% of scoreboard show percentage
-        $contestData = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         );
-        ContestsFactory::setScoreboardPercentage($contestData, 0);
+        \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
+            $contestData,
+            0
+        );
 
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant, will submit 1 run
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        ContestsFactory::addUser($contestData, $contestant);
-        $runData = RunsFactory::createRun(
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get the scoreboard url by using the AdminList api being the
         // contest director
@@ -811,7 +857,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $isAdmin = false,
         $testApi = 'apiScoreboard'
     ) {
-        $scoreboardTestRun = new ScopedScoreboardTestRun();
+        $scoreboardTestRun = new \OmegaUp\Test\ScopedScoreboardTestRun();
 
         $runMap = [
             [
@@ -909,8 +955,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Only system admins can remove problems from a problemset where at
         // least one run has been added.
-        UserFactory::addSystemRole(
-            $testData['contestData']['director'],
+        \OmegaUp\Test\Factories\User::addSystemRole(
+            $testData['contestData']['userDirector'],
             \OmegaUp\Authorization::ADMIN_ROLE
         );
         $login = self::login($testData['contestData']['director']);

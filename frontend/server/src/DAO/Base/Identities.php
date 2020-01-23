@@ -39,8 +39,8 @@ abstract class Identities {
                 `language_id` = ?,
                 `country_id` = ?,
                 `state_id` = ?,
-                `school_id` = ?,
-                `gender` = ?
+                `gender` = ?,
+                `current_identity_school_id` = ?
             WHERE
                 (
                     `identity_id` = ?
@@ -61,12 +61,12 @@ abstract class Identities {
             ),
             $Identities->country_id,
             $Identities->state_id,
-            (
-                is_null($Identities->school_id) ?
-                null :
-                intval($Identities->school_id)
-            ),
             $Identities->gender,
+            (
+                is_null($Identities->current_identity_school_id) ?
+                null :
+                intval($Identities->current_identity_school_id)
+            ),
             intval($Identities->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -96,8 +96,8 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
-                `Identities`.`gender`
+                `Identities`.`gender`,
+                `Identities`.`current_identity_school_id`
             FROM
                 `Identities`
             WHERE
@@ -168,10 +168,8 @@ abstract class Identities {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Identities[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Identities> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Identities}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Identities>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -189,8 +187,8 @@ abstract class Identities {
                 `Identities`.`language_id`,
                 `Identities`.`country_id`,
                 `Identities`.`state_id`,
-                `Identities`.`school_id`,
-                `Identities`.`gender`
+                `Identities`.`gender`,
+                `Identities`.`current_identity_school_id`
             FROM
                 `Identities`
         ';
@@ -248,8 +246,8 @@ abstract class Identities {
                     `language_id`,
                     `country_id`,
                     `state_id`,
-                    `school_id`,
-                    `gender`
+                    `gender`,
+                    `current_identity_school_id`
                 ) VALUES (
                     ?,
                     ?,
@@ -277,12 +275,12 @@ abstract class Identities {
             ),
             $Identities->country_id,
             $Identities->state_id,
-            (
-                is_null($Identities->school_id) ?
-                null :
-                intval($Identities->school_id)
-            ),
             $Identities->gender,
+            (
+                is_null($Identities->current_identity_school_id) ?
+                null :
+                intval($Identities->current_identity_school_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

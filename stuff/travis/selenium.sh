@@ -7,13 +7,14 @@ stage_before_install() {
 	init_frontend_submodules
 
 	# Install pre-dependencies
-	python3.5 -m pip install --user --upgrade pip
-	python3.5 -m pip install --user --upgrade urllib3
-	python3.5 -m pip install --user setuptools
-	python3.5 -m pip install --user selenium
-	python3.5 -m pip install --user pytest
-	python3.5 -m pip install --user pytest-xdist
-	python3.5 -m pip install --user flaky
+	sudo ln -sf python3.6 /usr/bin/python3
+	python3 -m pip install --user --upgrade pip
+	python3 -m pip install --user --upgrade urllib3
+	python3 -m pip install --user setuptools
+	python3 -m pip install --user selenium
+	python3 -m pip install --user pytest
+	python3 -m pip install --user pytest-xdist
+	python3 -m pip install --user flaky
 
 	install_yarn
 }
@@ -66,7 +67,7 @@ stage_before_script() {
 
 stage_script() {
 	# TODO(https://github.com/omegaup/omegaup/issues/1798): Reenable Firefox
-	python3.5 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
+	python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" \
 		--verbose --capture=no --log-cli-level=INFO --browser=chrome \
 		--force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 }

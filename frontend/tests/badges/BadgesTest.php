@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class BadgesTest extends BadgesTestCase {
+class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getSortedExpectedResults(array $expected): array {
         $results = [];
         foreach ($expected as $username) {
@@ -30,7 +30,9 @@ class BadgesTest extends BadgesTestCase {
                 $params[$k] = $v;
             }
             if (array_key_exists('files', $req)) {
-                $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
+                $_FILES['problem_contents']['tmp_name'] = (
+                    OMEGAUP_ROOT . "/../{$req['files']['problem_contents']}"
+                );
             }
             if ($req['api'] === '\\OmegaUp\\Controllers\\QualityNomination::apiCreate') {
                 $params['contents'] = json_encode($params['contents']);
@@ -39,7 +41,10 @@ class BadgesTest extends BadgesTestCase {
             $r->method = $req['api'];
             $fullResponse = \OmegaUp\ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
-                throw new Exception($fullResponse['error']);
+                throw new Exception(
+                    'request=' . json_encode($req) .
+                    "\nresponse=" . json_encode($fullResponse)
+                );
             }
             if ($r->method === '\\OmegaUp\\Controllers\\Run::apiCreate') {
                 $points = array_key_exists(
@@ -47,7 +52,12 @@ class BadgesTest extends BadgesTestCase {
                     $req['gradeResult']
                 ) ? $req['gradeResult']['points'] : 1;
                 $verdict = $req['gradeResult']['verdict'];
-                Utils::gradeRun(null, $fullResponse['guid'], $points, $verdict);
+                \OmegaUp\Test\Utils::gradeRun(
+                    null,
+                    $fullResponse['guid'],
+                    $points,
+                    $verdict
+                );
             }
         }
     }
@@ -73,11 +83,11 @@ class BadgesTest extends BadgesTestCase {
                 case 'scripts':
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
-                            case 'update_user_rank.py':
-                                Utils::RunUpdateUserRank();
+                            case 'update_ranks.py':
+                                \OmegaUp\Test\Utils::runUpdateRanks();
                                 break;
                             case 'aggregate_feedback.py':
-                                Utils::RunAggregateFeedback();
+                                \OmegaUp\Test\Utils::runAggregateFeedback();
                                 break;
                             default:
                                 throw new Exception(
@@ -107,11 +117,8 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function runBadgeTest($testPath, $queryPath, $badge): void {
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
         $content = json_decode(file_get_contents($testPath), true);
-        Utils::CleanupFilesAndDb();
+        \OmegaUp\Test\Utils::cleanupFilesAndDB();
         switch ($content['testType']) {
             case 'apicall':
                 self::apicallTest(
@@ -175,7 +182,11 @@ class BadgesTest extends BadgesTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            self::runBadgeTest($testPath, $queryPath, $alias);
+            try {
+                self::runBadgeTest($testPath, $queryPath, $alias);
+            } catch (Exception $e) {
+                $this->fail("For badge {$alias}: $e");
+            }
         }
     }
 
@@ -218,20 +229,20 @@ class BadgesTest extends BadgesTestCase {
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
-        $userOne = UserFactory::createUser();
-        $userTwo = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($userOne);
-        ProblemsFactory::createProblemWithAuthor($userTwo);
-        ContestsFactory::createContest(
-            new ContestParams(
-                ['contestDirector' => $userTwo]
+        ['user' => $userOne, 'identity' => $identityOne] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityOne);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityTwo);
+        \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['contestDirector' => $identityTwo]
             )
         );
         $expectedUserOneResults = ['problemSetter'];
         $expectedUserTwoResults = ['contestManager', 'problemSetter'];
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
         {
-            $login = self::login($userOne);
+            $login = self::login($identityOne);
             // Fetch badges through apiMyList
             $userOneBadges = \OmegaUp\Controllers\Badge::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -251,7 +262,7 @@ class BadgesTest extends BadgesTestCase {
 
             // Fetch badges through apiUserList
             $userTwoBadges = \OmegaUp\Controllers\Badge::apiUserList(new \OmegaUp\Request([
-                'target_username' => $userTwo->username,
+                'target_username' => $identityTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
             $this->assertEquals(
@@ -279,7 +290,7 @@ class BadgesTest extends BadgesTestCase {
             );
         }
         {
-            $login = self::login($userTwo);
+            $login = self::login($identityTwo);
             $userTwoNotifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
@@ -295,13 +306,13 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testGetAssignationTime() {
-        $user = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $problemSetterResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -327,13 +338,13 @@ class BadgesTest extends BadgesTestCase {
     public function testBadgeDetails() {
         // Creates one owner for ContestManager Badge and no owner for
         // ContestManager, then checks badge details results.
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($user);
+        \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
-        Utils::RunAssignBadges();
+        \OmegaUp\Test\Utils::runAssignBadges();
 
         // In total they must exist 4 users: admintest, test,
         // the user created by createProblemWithAuthor and $user
@@ -349,12 +360,12 @@ class BadgesTest extends BadgesTestCase {
                 $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
-        $this->assertEquals(25, $details['owners_percentage']);
-
+        $this->assertEquals(1, $details['owners_count']);
+        $this->assertEquals(4, $details['total_users']);
         $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
-        $this->assertEquals(0, $details['owners_percentage']);
+        $this->assertEquals(0, $details['owners_count']);
         $this->assertNull($details['first_assignation']);
     }
 

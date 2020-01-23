@@ -6,9 +6,9 @@
  * @author carlosabcs
  */
 
-class NotificationTest extends OmegaupTestCase {
+class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testListUnreadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
@@ -24,7 +24,7 @@ class NotificationTest extends OmegaupTestCase {
         ]));
 
         // Get all unread notifications through API
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -40,7 +40,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -61,7 +61,7 @@ class NotificationTest extends OmegaupTestCase {
         ]));
 
         // Get all unread notifications (3) for user
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -91,8 +91,8 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsExceptions() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -116,7 +116,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -125,8 +125,8 @@ class NotificationTest extends OmegaupTestCase {
         ]);
         \OmegaUp\DAO\Notifications::create($notification);
 
-        $maliciousUser = UserFactory::createUser();
-        $login = self::login($maliciousUser);
+        ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($maliciousIdentity);
 
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([

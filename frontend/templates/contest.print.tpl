@@ -5,10 +5,8 @@
     <title>omegaUp &mdash; {$contestName|htmlspecialchars}</title>
     <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
     <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.2.1.min.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-migrate-3.0.1.min.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/js/dist/commons.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
+    <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.4.1.min.js"}"></script>
+    {js_include entrypoint="omegaup" runtime}
     <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 

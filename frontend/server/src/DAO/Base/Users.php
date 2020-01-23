@@ -32,14 +32,11 @@ abstract class Users {
             UPDATE
                 `Users`
             SET
-                `username` = ?,
                 `facebook_user_id` = ?,
-                `password` = ?,
                 `git_token` = ?,
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
                 `scholar_degree` = ?,
-                `graduation_date` = ?,
                 `birth_date` = ?,
                 `verified` = ?,
                 `verification_id` = ?,
@@ -54,9 +51,7 @@ abstract class Users {
                     `user_id` = ?
                 );';
         $params = [
-            $Users->username,
             $Users->facebook_user_id,
-            $Users->password,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?
@@ -69,7 +64,6 @@ abstract class Users {
                 intval($Users->main_identity_id)
             ),
             $Users->scholar_degree,
-            $Users->graduation_date,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,
@@ -107,14 +101,11 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`username`,
                 `Users`.`facebook_user_id`,
-                `Users`.`password`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
                 `Users`.`scholar_degree`,
-                `Users`.`graduation_date`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
@@ -194,10 +185,8 @@ abstract class Users {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Users[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Users> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Users}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Users>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -208,14 +197,11 @@ abstract class Users {
         $sql = '
             SELECT
                 `Users`.`user_id`,
-                `Users`.`username`,
                 `Users`.`facebook_user_id`,
-                `Users`.`password`,
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
                 `Users`.`scholar_degree`,
-                `Users`.`graduation_date`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
                 `Users`.`verification_id`,
@@ -275,14 +261,11 @@ abstract class Users {
         $sql = '
             INSERT INTO
                 Users (
-                    `username`,
                     `facebook_user_id`,
-                    `password`,
                     `git_token`,
                     `main_email_id`,
                     `main_identity_id`,
                     `scholar_degree`,
-                    `graduation_date`,
                     `birth_date`,
                     `verified`,
                     `verification_id`,
@@ -306,15 +289,10 @@ abstract class Users {
                     ?,
                     ?,
                     ?,
-                    ?,
-                    ?,
-                    ?,
                     ?
                 );';
         $params = [
-            $Users->username,
             $Users->facebook_user_id,
-            $Users->password,
             $Users->git_token,
             (
                 is_null($Users->main_email_id) ?
@@ -327,7 +305,6 @@ abstract class Users {
                 intval($Users->main_identity_id)
             ),
             $Users->scholar_degree,
-            $Users->graduation_date,
             $Users->birth_date,
             intval($Users->verified),
             $Users->verification_id,

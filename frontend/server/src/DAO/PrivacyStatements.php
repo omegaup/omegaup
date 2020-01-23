@@ -12,7 +12,12 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
-    public static function getLatestPublishedStatement($statement_type = 'privacy_policy') {
+    /**
+     * @return array{privacystatement_id: int, git_object_id: string}|null
+     */
+    public static function getLatestPublishedStatement(
+        string $statementType = 'privacy_policy'
+    ): ?array {
         $sql = 'SELECT
                   privacystatement_id,
                   git_object_id
@@ -23,9 +28,11 @@ class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
+
+        /** @var array{git_object_id: string, privacystatement_id: int}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$statement_type]
+            [$statementType]
         );
     }
 

@@ -1,15 +1,15 @@
 <?php
 
-class CourseProblemsTest extends OmegaupTestCase {
+class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testOrderProblems() {
         // Create a test course
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Create a course with an assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $user,
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
             $login
         );
         $courseAlias = $courseData['course_alias'];
@@ -18,12 +18,12 @@ class CourseProblemsTest extends OmegaupTestCase {
         // Add 3 problems to the assignment.
         $numberOfProblems = 3;
         for ($i = 0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 1,
-                'author' => $user,
+                'author' => $identity,
             ]), $login);
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
@@ -89,27 +89,31 @@ class CourseProblemsTest extends OmegaupTestCase {
     }
 
     public function testCourseProblemUsers() {
-        $admin = UserFactory::createUser();
-        $student = UserFactory::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $student, 'identity' => $identityStudent] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a course with an assignment
-        $adminLogin = self::login($admin);
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $admin,
+        $adminLogin = self::login($identity);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
             $adminLogin
         );
-        CoursesFactory::addStudentToCourse($courseData, $student, $adminLogin);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identityStudent,
+            $adminLogin
+        );
         $course = $courseData['course'];
         $assignment = $courseData['assignment'];
 
         $problemData = [];
         for ($i = 0; $i < 3; $i++) {
-            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 1,
-                'author' => $admin,
+                'author' => $identity,
             ]), $adminLogin);
         }
-        CoursesFactory::addProblemsToAssignment(
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $adminLogin,
             $course->alias,
             $assignment->alias,
@@ -117,16 +121,16 @@ class CourseProblemsTest extends OmegaupTestCase {
         );
 
         // Send runs to problem 1 (PA) and 2 (AC).
-        $login = self::login($student);
+        $login = self::login($identityStudent);
         {
             $response = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[0]['problem']->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 null /*runData*/,
                 0.5,
                 'PA',
@@ -139,10 +143,10 @@ class CourseProblemsTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[1]['problem']->alias,
-                'language' => 'c',
+                'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]));
-            RunsFactory::gradeRun(
+            \OmegaUp\Test\Factories\Run::gradeRun(
                 null /*runData*/,
                 1.0,
                 'AC',
@@ -157,13 +161,19 @@ class CourseProblemsTest extends OmegaupTestCase {
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[0]['problem']->alias,
         ]));
-        $this->assertEquals([$student->username], $response['identities']);
+        $this->assertEquals(
+            [$identityStudent->username],
+            $response['identities']
+        );
         $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[1]['problem']->alias,
         ]));
-        $this->assertEquals([$student->username], $response['identities']);
+        $this->assertEquals(
+            [$identityStudent->username],
+            $response['identities']
+        );
         $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,

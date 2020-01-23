@@ -8,106 +8,73 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     const REVIEWERS_PER_NOMINATION = 2;
 
+    const ALLOWED_TAGS = [
+        'problemTopic2Sat',
+        'problemTopicArrays',
+        'problemTopicBacktracking',
+        'problemTopicBigNumbers',
+        'problemTopicBinarySearch',
+        'problemTopicBitmasks',
+        'problemTopicBreadthDepthFirstSearch',
+        'problemTopicBruteForce',
+        'problemTopicBuckets',
+        'problemTopicCombinatorics',
+        'problemTopicDataStructures',
+        'problemTopicDisjointSets',
+        'problemTopicDivideAndConquer',
+        'problemTopicDynamicProgramming',
+        'problemTopicFastFourierTransform',
+        'problemTopicGameTheory',
+        'problemTopicGeometry',
+        'problemTopicGraphTheory',
+        'problemTopicGreedy',
+        'problemTopicHashing',
+        'problemTopicIfElseSwitch',
+        'problemTopicImplementation',
+        'problemTopicInputOutput',
+        'problemTopicLoops',
+        'problemTopicMath',
+        'problemTopicMatrices',
+        'problemTopicMaxFlow',
+        'problemTopicMeetInTheMiddle',
+        'problemTopicNumberTheory',
+        'problemTopicParsing',
+        'problemTopicProbability',
+        'problemTopicShortestPath',
+        'problemTopicSimulation',
+        'problemTopicSorting',
+        'problemTopicStackQueue',
+        'problemTopicStrings',
+        'problemTopicSuffixArray',
+        'problemTopicSuffixTree',
+        'problemTopicTernarySearch',
+        'problemTopicTrees',
+        'problemTopicTwoPointers',
+    ];
+
     /**
-     * Creates a new QualityNomination
-     *
-     * There are three ways in which users can interact with this:
-     *
-     * # Suggestion
-     *
-     * A user that has already solved a problem can make suggestions about a
-     * problem. This expects the `nomination` field to be `suggestion` and the
-     * `contents` field should be a JSON blob with at least one the following fields:
-     *
-     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
-     *                 difficulty of the problem.
-     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
-     *             of the problem.
-     * * `tags`: (Optional) An array of tag names that will be added to the
-     *           problem upon promotion.
-     * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
-     *                before receiving an AC verdict for problem run.
-     *
-     * # Promotion
-     *
-     * A user that has already solved a problem can nominate it to be promoted
-     * as a Quality Problem. This expects the `nomination` field to be
-     * `promotion` and the `contents` field should be a JSON blob with the
-     * following fields:
-     *
-     * * `statements`: A dictionary of languages to objects that contain a
-     *                 `markdown` field, which is the markdown-formatted
-     *                 problem statement for that language.
-     * * `source`: A URL or string clearly documenting the source or full name
-     *             of original author of the problem.
-     * * `tags`: An array of tag names that will be added to the problem upon
-     *           promotion.
-     *
-     * # Demotion
-     *
-     * A demoted problem is banned, and cannot be un-banned or added to any new
-     * problemsets. This expects the `nomination` field to be `demotion` and
-     * the `contents` field should be a JSON blob with the following fields:
-     *
-     * * `rationale`: A small text explaining the rationale for demotion.
-     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
-     * * `original`: If the `reason` is `duplicate`, the alias of the original
-     *               problem.
-     * # Dismissal
-     * A user that has already solved a problem can dismiss suggestions. The
-     * `contents` field is empty.
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array
-     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+     * @return \OmegaUp\DAO\VO\QualityNominations
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        // Validate request
-        $r->ensureIdentity();
-
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
-        );
-        \OmegaUp\Validators::validateInEnum(
-            $r['nomination'],
-            'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal']
-        );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
-        /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
-         */
-        $contents = json_decode($r['contents'], true /*assoc*/);
-        if (!is_array($contents)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'contents'
-            );
-        }
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        if ($r['nomination'] !== 'demotion') {
+    public static function createNomination(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $nominationType,
+        array $contents
+    ): \OmegaUp\DAO\VO\QualityNominations {
+        if ($nominationType !== 'demotion') {
             if (
                 isset($contents['before_ac']) &&
                 boolval($contents['before_ac']) &&
-                ($r['nomination'] === 'dismissal' ||
-                 $r['nomination'] === 'suggestion')
+                ($nominationType === 'dismissal' ||
+                 $nominationType === 'suggestion')
             ) {
                 // Before AC suggestions or dismissals are only allowed
                 // for users who didn't solve a problem, but tried to.
                 if (
                     \OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -118,7 +85,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -132,7 +99,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($r->identity->identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -142,7 +109,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if ($r['nomination'] === 'suggestion') {
+        if ($nominationType === 'suggestion') {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
                 if (
@@ -191,13 +158,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if (isset($contents['tags'])) {
                 /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
-                    if (!is_string($tag)) {
+                    if (
+                        !is_string($tag) ||
+                        !in_array($tag, self::ALLOWED_TAGS)
+                    ) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'contents'
                         );
                     }
-                    $tag = \OmegaUp\Controllers\Tag::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -205,7 +174,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-        } elseif ($r['nomination'] === 'promotion') {
+        } elseif ($nominationType === 'promotion') {
             if (
                 (!isset($contents['statements'])
                 || !is_array($contents['statements']))
@@ -223,13 +192,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             // Tags must be strings.
             /** @var mixed $tag */
             foreach ($contents['tags'] as &$tag) {
-                if (!is_string($tag)) {
+                if (
+                    !is_string($tag) ||
+                    !in_array($tag, self::ALLOWED_TAGS)
+                ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'contents'
                     );
                 }
-                $tag = \OmegaUp\Controllers\Tag::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException(
@@ -256,12 +227,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-        } elseif ($r['nomination'] === 'demotion') {
+        } elseif ($nominationType === 'demotion') {
             if (
                 !isset($contents['reason']) ||
                 !in_array(
                     $contents['reason'],
-                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases']
+                    ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases', 'poorly-described']
                 )
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -312,7 +283,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     }
                 }
             }
-        } elseif ($r['nomination'] === 'dismissal') {
+        } elseif ($nominationType === 'dismissal') {
             if (
                 isset($contents['origin'])
                 || isset($contents['difficulty'])
@@ -328,12 +299,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Create object
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
-            'user_id' => $r->user->user_id,
+            'user_id' => $identity->user_id,
             'problem_id' => $problem->problem_id,
-            'nomination' => $r['nomination'],
-            'contents' => json_encode($contents), // re-encoding it for normalization.
+            'nomination' => $nominationType,
+            'contents' => json_encode($contents),
             'status' => 'open',
         ]);
         \OmegaUp\DAO\QualityNominations::create($nomination);
@@ -359,21 +329,113 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 ]));
             }
         }
+        return $nomination;
+    }
+
+    /**
+     * Creates a new QualityNomination
+     *
+     * There are three ways in which users can interact with this:
+     *
+     * # Suggestion
+     *
+     * A user that has already solved a problem can make suggestions about a
+     * problem. This expects the `nomination` field to be `suggestion` and the
+     * `contents` field should be a JSON blob with at least one the following fields:
+     *
+     * * `difficulty`: (Optional) A number in the range [0-4] indicating the
+     *                 difficulty of the problem.
+     * * `quality`: (Optional) A number in the range [0-4] indicating the quality
+     *             of the problem.
+     * * `tags`: (Optional) An array of tag names that will be added to the
+     *           problem upon promotion.
+     * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
+     *                before receiving an AC verdict for problem run.
+     *
+     * # Promotion
+     *
+     * A user that has already solved a problem can nominate it to be promoted
+     * as a Quality Problem. This expects the `nomination` field to be
+     * `promotion` and the `contents` field should be a JSON blob with the
+     * following fields:
+     *
+     * * `statements`: A dictionary of languages to objects that contain a
+     *                 `markdown` field, which is the markdown-formatted
+     *                 problem statement for that language.
+     * * `source`: A URL or string clearly documenting the source or full name
+     *             of original author of the problem.
+     * * `tags`: An array of tag names that will be added to the problem upon
+     *           promotion.
+     *
+     * # Demotion
+     *
+     * A demoted problem is banned, and cannot be un-banned or added to any new
+     * problemsets. This expects the `nomination` field to be `demotion` and
+     * the `contents` field should be a JSON blob with the following fields:
+     *
+     * * `rationale`: A small text explaining the rationale for demotion.
+     * * `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
+     * * `original`: If the `reason` is `duplicate`, the alias of the original
+     *               problem.
+     * # Dismissal
+     * A user that has already solved a problem can dismiss suggestions. The
+     * `contents` field is empty.
+     *
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     *
+     * @return array{qualitynomination_id: int}
+     */
+    public static function apiCreate(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        // Validate request
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['nomination'],
+            'nomination',
+            ['suggestion', 'promotion', 'demotion', 'dismissal']
+        );
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        /**
+         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+         */
+        $contents = json_decode($r['contents'], true /*assoc*/);
+        if (!is_array($contents)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contents'
+            );
+        }
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
+            $problem,
+            $r->identity,
+            strval($r['nomination']),
+            $contents
+        );
 
         return [
-            'status' => 'ok',
-            'qualitynomination_id' => $nomination->qualitynomination_id
+            'qualitynomination_id' => intval($nomination->qualitynomination_id)
         ];
     }
 
     /**
      * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
      *
-     * @param \OmegaUp\Request $r         The request.
-     *
-     * @return array The response.
+     * @return array{status: string}
      */
-    public static function apiResolve(\OmegaUp\Request $r) {
+    public static function apiResolve(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -390,9 +452,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
 
         // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
 
+        \OmegaUp\Validators::validateNumber(
+            $r['qualitynomination_id'],
+            'qualitynomination_id'
+        );
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
             $r['qualitynomination_id']
         );
@@ -410,27 +476,31 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             return ['status' => 'ok'];
         }
 
-        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($r['problem'])) {
+        \OmegaUp\Validators::validateValidAlias(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $newProblemVisibility = $r['problem']->visibility;
+        $newProblemVisibility = $problem->visibility;
         switch ($r['status']) {
             case 'approved':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE) {
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC) {
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
+                if ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
-                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
+                if ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
                     // If banning is reverted, problem will become private.
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
-                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
-                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
                 }
                 break;
             case 'open':
@@ -449,23 +519,22 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'to_status' => $r['status'],
             'rationale' => $r['rationale']
         ]);
-        $qualitynomination->status = $r['status'];
+        $qualitynomination->status = $qualitynominationlog->to_status;
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
-            $response = [];
             \OmegaUp\Controllers\Problem::apiUpdate($r);
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
             if (
-                $newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED  ||
-                $newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED  ||
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
             ) {
-                $response = self::sendDemotionEmail(
-                    $r,
+                self::sendDemotionEmail(
+                    $problem,
                     $qualitynomination,
-                    $qualitynominationlog->rationale
+                    $qualitynominationlog->rationale ?? ''
                 );
             }
         } catch (\Exception $e) {
@@ -490,12 +559,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Send a mail with demotion notification to the original creator
      */
     private static function sendDemotionEmail(
-        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\QualityNominations $qualitynomination,
         string $rationale
     ): void {
-        /** @var \OmegaUp\DAO\VO\Problems */
-        $problem = $r['problem'];
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
         if (is_null($adminUser)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
@@ -539,29 +606,29 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param int     $assignee  The user id of the person assigned to review
      *                           nominations.  May be null.
      *
-     * @return array The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>} The response.
      */
     private static function getListImpl(
         \OmegaUp\Request $r,
-        $nominator,
-        $assignee
-    ) {
+        ?int $nominator,
+        ?int $assignee
+    ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-        $types = (isset($r['types']) ? $r['types'] : ['promotion', 'demotion']);
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
+
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
 
         return [
-            'status' => 'ok',
             'nominations' => \OmegaUp\DAO\QualityNominations::getNominations(
                 $nominator,
                 $assignee,
                 $page,
                 $pageSize,
                 $types
-            ),
+            )['nominations'],
         ];
     }
 
@@ -575,6 +642,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
@@ -585,68 +653,96 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Checks if the given array has duplicate entries.
      *
-     * @param $contents array
-     * @return boolean
+     * @template T
+     * @param array<T> $contents
      */
-    private static function hasDuplicates($contents) {
+    private static function hasDuplicates(array $contents): bool {
         return count($contents) !== count(array_unique($contents));
     }
 
     /**
-     * Displays all the nominations.
-     *
-     * @param \OmegaUp\Request $r
-     * @return array
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
         self::validateMemberOfReviewerGroup($r);
 
-        return self::getListImpl($r, null /* nominator */, null /* assignee */);
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
+        \OmegaUp\Validators::validateValidSubset(
+            $types,
+            'types',
+            ['promotion', 'demotion']
+        );
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            /* nominator */ null,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
      * Displays the nominations that this user has been assigned.
      *
      * @param \OmegaUp\Request $r
-     * @return array
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     */
-    public static function apiMyAssignedList(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        // Validate request
-        $r->ensureIdentity();
-        self::validateMemberOfReviewerGroup($r);
-
-        return self::getListImpl($r, null /* nominator */, $r->user->user_id);
-    }
-
-    /**
-     * Displays the nominations that this user has created. The user does
-     * not need to be a member of the reviewer group.
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>} The response.
      */
-    public static function apiMyList(\OmegaUp\Request $r) {
+    public static function apiMyAssignedList(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
         $r->ensureMainUserIdentity();
+        self::validateMemberOfReviewerGroup($r);
 
-        return self::getListImpl($r, $r->user->user_id, null /* assignee */);
+        return self::getListImpl($r, null /* nominator */, $r->user->user_id);
+    }
+
+    /**
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
+     */
+    public static function apiMyList(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
+
+        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
+        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+
+        $types = $r->getStringList('types', ['promotion', 'demotion']);
+
+        if (empty($types)) {
+            $types = ['promotion', 'demotion'];
+        }
+
+        return \OmegaUp\DAO\QualityNominations::getNominations(
+            $r->user->user_id,
+            /* assignee */ null,
+            $offset,
+            $rowCount,
+            $types
+        );
     }
 
     /**
@@ -654,37 +750,44 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * nominator or a member of the reviewer group.
      *
      * @param \OmegaUp\Request $r
-     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[], reviewer: bool, original_contents?: array{statements: array<string, array{language: string, markdown: string, images: array<string, string>}>|object, source: string|null, tags?: array{name: string, autogenerated: bool}[]}, nomination_status: string}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
-
         // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $r->ensureInt('qualitynomination_id');
-        $response = \OmegaUp\DAO\QualityNominations::getByID(
-            intval(
-                $r['qualitynomination_id']
-            )
+        return self::getDetails(
+            $r->identity,
+            intval($r['qualitynomination_id'])
+        );
+    }
+
+    /**
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
+     */
+    private static function getDetails(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $qualityNominationId
+    ) {
+        $response = \OmegaUp\DAO\QualityNominations::getById(
+            $qualityNominationId
         );
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'qualityNominationNotFound'
             );
         }
-        if (is_null($r->user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        $currentUserIsNominator = ($r->identity->username == $response['nominator']['username']);
+        $currentUserIsNominator = ($identity->username === $response['nominator']['username']);
         $currentUserReviewer = \OmegaUp\Authorization::isQualityReviewer(
-            $r->identity
+            $identity
         );
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -696,14 +799,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $response['problem']['alias']
         );
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Adding in the response object a flag to know whether the user is a reviewer
         $response['reviewer'] = $currentUserReviewer;
 
-        if ($response['nomination'] == 'promotion') {
+        if ($response['nomination'] === 'promotion') {
             $response['original_contents'] = [
                 'statements' => [],
                 'source' => $problem->source,
@@ -717,17 +820,22 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            /**
-             * Pull original problem statements in every language the nominator is trying to override.
-             * @var string $language
-             * @var string $_
-            */
-            foreach ($response['contents']['statements'] as $language => $_) {
-                $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
-                    $problem,
-                    'published',
-                    $language
-                );
+            if (
+                isset($response['contents']) &&
+                isset($response['contents']['statements'])
+            ) {
+                /**
+                 * Pull original problem statements in every language the nominator is trying to override.
+                 * @var string $language
+                 * @var string $_
+                 */
+                foreach ($response['contents']['statements'] as $language => $_) {
+                    $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
+                        $problem->alias,
+                        'published',
+                        $language
+                    );
+                }
             }
             if (empty($response['original_contents']['statements'])) {
                 // Force 'statements' to be an object.
@@ -735,8 +843,93 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
         $response['nomination_status'] = $response['status'];
-        $response['status'] = 'ok';
-
         return $response;
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}}, template: string}
+     */
+    public static function getDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('qualitynomination_id', null, null, true);
+
+        $qualityNominationId = intval($r['qualitynomination_id']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => \OmegaUp\Controllers\QualityNomination::getDetails(
+                    $r->identity,
+                    $qualityNominationId
+                ),
+            ],
+            'template' => 'quality.nomination.details.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+        self::validateMemberOfReviewerGroup($r);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'myView' => false,
+                ],
+            ],
+            'template' => 'quality.nomination.list.tpl',
+        ];
+    }
+
+    /**
+     * Gets the details for the quality nomination's list
+     * with pagination for a certain user
+     *
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     */
+    public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+
+        $page = is_null($r['page']) ? 1 : intval($r['page']);
+        $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'myView' => true,
+                ],
+            ],
+            'template' => 'quality.nomination.list.tpl',
+        ];
     }
 }

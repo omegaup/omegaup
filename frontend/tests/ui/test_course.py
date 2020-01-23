@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium course tests.'''
 
@@ -36,12 +37,28 @@ def test_user_ranking_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
+        # When user has tried or solved a problem, feedback popup will be shown
+        with util.dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close'))).click()
+            driver.wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close')))
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
@@ -114,10 +131,10 @@ def test_create_identities_for_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(
@@ -250,8 +267,9 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector('textarea').send_keys(
         'homework description')
 
-    new_assignment_form.find_element_by_css_selector(
-        'button[type=submit]').click()
+    with util.dismiss_status(driver):
+        new_assignment_form.find_element_by_css_selector(
+            'button[type=submit]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
@@ -260,7 +278,6 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH,
              '//*[contains(@class, "omegaup-course-assignmentlist")]'
              '//a[text()="%s"]' % assignment_alias)))
-    util.dismiss_status(driver)
 
 
 @util.annotate
@@ -309,7 +326,7 @@ def update_scoreboard_for_assignment(driver, assignment_alias, course_alias):
         (urllib.parse.quote(assignment_alias, safe=''),
          urllib.parse.quote(course_alias, safe='')))
     driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
+    assert '"status":"ok"' in driver.browser.page_source
 
 
 @util.annotate

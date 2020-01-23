@@ -1,0 +1,16 @@
+{
+  "css": [
+<%=
+    Object.values(htmlWebpackPlugin.files.css)
+      .map(css => `    "${css}"`)
+      .join(',\n')
+%>
+  ],
+  "js": [
+<%=
+    Object.values(htmlWebpackPlugin.files.js)
+      .map(js => `    "${js}"`)
+      .join(',\n')
+%>
+  ]
+}

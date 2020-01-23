@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 '''A tool that helps update the DAOs.'''
 
 from __future__ import print_function

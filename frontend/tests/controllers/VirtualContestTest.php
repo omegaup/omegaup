@@ -6,24 +6,27 @@
  * @author SpaceWhite
  */
 
-class VirtualContestTest extends OmegaupTestCase {
+class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCreateVirtualContest() {
         // create a real contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add problem to contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Let assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         // Create a new contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -106,12 +109,12 @@ class VirtualContestTest extends OmegaupTestCase {
 
     public function testCreateVirtualContestBeforeTheOriginalEnded() {
         // Create a real contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a new contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -129,18 +132,18 @@ class VirtualContestTest extends OmegaupTestCase {
 
     public function testVirtualContestRestrictedApiAddProblem() {
         // Create a real contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create a new contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -164,21 +167,24 @@ class VirtualContestTest extends OmegaupTestCase {
 
     public function testVirtualContestRestrictedApiRemoveProblem() {
         // Create a real contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add problem to original contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create a new contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -201,15 +207,15 @@ class VirtualContestTest extends OmegaupTestCase {
 
     public function testVirtualContestRestrictedApiUpdate() {
         // Create a real contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a new contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token

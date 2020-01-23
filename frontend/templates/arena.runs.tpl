@@ -19,6 +19,7 @@
 									<option value="RFE">RFE</option>
 									<option value="CE">CE</option>
 									<option value="JE">JE</option>
+									<option value="VE">VE</option>
 									<option value="NO-AC">No AC</option>
 								</select>
 							</label>

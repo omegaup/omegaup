@@ -37,7 +37,8 @@ abstract class CoderOfTheMonth {
                 `time` = ?,
                 `interview_url` = ?,
                 `rank` = ?,
-                `selected_by` = ?
+                `selected_by` = ?,
+                `school_id` = ?
             WHERE
                 (
                     `coder_of_the_month_id` = ?
@@ -60,6 +61,11 @@ abstract class CoderOfTheMonth {
                 is_null($Coder_Of_The_Month->selected_by) ?
                 null :
                 intval($Coder_Of_The_Month->selected_by)
+            ),
+            (
+                is_null($Coder_Of_The_Month->school_id) ?
+                null :
+                intval($Coder_Of_The_Month->school_id)
             ),
             intval($Coder_Of_The_Month->coder_of_the_month_id),
         ];
@@ -88,7 +94,8 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
                 `Coder_Of_The_Month`.`rank`,
-                `Coder_Of_The_Month`.`selected_by`
+                `Coder_Of_The_Month`.`selected_by`,
+                `Coder_Of_The_Month`.`school_id`
             FROM
                 `Coder_Of_The_Month`
             WHERE
@@ -159,10 +166,8 @@ abstract class CoderOfTheMonth {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\CoderOfTheMonth[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\CoderOfTheMonth> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\CoderOfTheMonth}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\CoderOfTheMonth>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -178,7 +183,8 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
                 `Coder_Of_The_Month`.`rank`,
-                `Coder_Of_The_Month`.`selected_by`
+                `Coder_Of_The_Month`.`selected_by`,
+                `Coder_Of_The_Month`.`school_id`
             FROM
                 `Coder_Of_The_Month`
         ';
@@ -234,8 +240,10 @@ abstract class CoderOfTheMonth {
                     `time`,
                     `interview_url`,
                     `rank`,
-                    `selected_by`
+                    `selected_by`,
+                    `school_id`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -261,6 +269,11 @@ abstract class CoderOfTheMonth {
                 is_null($Coder_Of_The_Month->selected_by) ?
                 null :
                 intval($Coder_Of_The_Month->selected_by)
+            ),
+            (
+                is_null($Coder_Of_The_Month->school_id) ?
+                null :
+                intval($Coder_Of_The_Month->school_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

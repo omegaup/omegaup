@@ -35,7 +35,7 @@ class Scoreboard {
     /**
      * Generate Scoreboard snapshot
      *
-     * @return array{status: string, problems: array{order: int, alias: string}[], ranking: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     public function generate(
         bool $withRunDetails = false,
@@ -60,7 +60,7 @@ class Scoreboard {
                     strval($this->params->problemset_id)
                 );
             }
-            /** @var null|array{status: string, problems: array{order: int, alias: string}[], ranking: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int} */
+            /** @var null|array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string} */
             $result = $cache->get();
             if (!is_null($result)) {
                 \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
@@ -129,10 +129,12 @@ class Scoreboard {
         );
 
         if (!is_null($cache)) {
-            $timeout = max(
-                0,
-                $this->params->finish_time - \OmegaUp\Time::get()
-            );
+            $timeout =  is_null($this->params->finish_time) ?
+                0 :
+                max(
+                    0,
+                    $this->params->finish_time - \OmegaUp\Time::get()
+                );
             $cache->set($result, $timeout);
         }
 
@@ -142,7 +144,7 @@ class Scoreboard {
     /**
      * Returns Scoreboard events
      *
-     * @return array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[]
+     * @return list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>
      */
     public function events(): array {
         $result = null;
@@ -161,10 +163,10 @@ class Scoreboard {
 
         // If cache is turned on and we're not looking for admin-only runs
         if ($canUseContestantCache) {
-            /** @var array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[] */
+            /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>|null */
             $result = $contestantEventsCache->get();
         } elseif ($canUseAdminCache) {
-            /** @var array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[] */
+            /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>|null */
             $result = $adminEventsCache->get();
         }
 
@@ -216,7 +218,12 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = max(0, $this->params->finish_time - \OmegaUp\Time::get());
+        $timeout =  is_null($this->params->finish_time) ?
+            0 :
+            max(
+                0,
+                $this->params->finish_time - \OmegaUp\Time::get()
+            );
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($canUseAdminCache) {
@@ -301,7 +308,13 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout = max(0, $params->finish_time - \OmegaUp\Time::get());
+        $timeout =  is_null($params->finish_time) ?
+            0 :
+            max(
+                0,
+                $params->finish_time - \OmegaUp\Time::get()
+            );
+
         $contestantScoreboardCache = new \OmegaUp\Cache(
             \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX,
             strval($params->problemset_id)
@@ -416,6 +429,7 @@ class Scoreboard {
             $params->admin
             || ((\OmegaUp\Time::get() >= $params->finish_time)
             && $params->show_scoreboard_after)
+            || is_null($params->finish_time)
         ) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
@@ -433,7 +447,7 @@ class Scoreboard {
     }
 
     /**
-     * @param array{alias: string, points: float, penalty: float, percent: float, runs: int}[] $scores
+     * @param list<array{alias: string, points: float, penalty: float, percent: float, runs: int}> $scores
      * @param string $contestPenaltyCalcPolicy
      * @return array{points: float, penalty: float}
      */
@@ -460,8 +474,8 @@ class Scoreboard {
     }
 
     /**
-     * @param array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
-     * @param array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool}[] $rawContestIdentities
+     * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}> $contestRuns
+     * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool, classname: string}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
      * @param string $contestPenaltyCalcPolicy
@@ -473,7 +487,7 @@ class Scoreboard {
      * @param bool $sortByName
      * @param bool $withRunDetails
      * @param null|string $authToken
-     * @return array{status: string, problems: array{order: int, alias: string}[], ranking: array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     private static function getScoreboardFromRuns(
         array $contestRuns,
@@ -484,7 +498,7 @@ class Scoreboard {
         ?int $scoreboardTimeLimit,
         string $contestTitle,
         int $contestStartTime,
-        int $contestFinishTime,
+        ?int $contestFinishTime,
         bool $showAllRuns,
         bool $sortByName,
         bool $withRunDetails = false,
@@ -494,30 +508,29 @@ class Scoreboard {
         $testOnly = [];
         /** @val array<int, bool> */
         $noRuns = [];
-        /** @val array<int, array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}> */
+        /** @val array<int, array{problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, username: string, name: string|null, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}> */
         $identitiesInfo = [];
-        /** @val array{order: int, alias: string}[] */
-        $problems = [];
 
+        $problems = [];
         foreach ($problemMapping as $problem) {
-            array_push($problems, $problem);
+            $problems[] = $problem;
         }
 
         // Calculate score for each contestant x problem
         foreach ($rawContestIdentities as $contestant) {
-            /** @var array{alias: string, points: float, penalty: float, percent: float, runs: int}[] */
+            /** @var list<array{alias: string, points: float, penalty: float, percent: float, runs: int}> */
             $identityProblems = [];
 
             $testOnly[$contestant['identity_id']] = true;
             $noRuns[$contestant['identity_id']] = true;
             foreach ($problemMapping as $id => $problem) {
-                array_push($identityProblems, [
+                $identityProblems[] = [
                     'alias' => $problem['alias'],
                     'points' => 0.0,
                     'percent' => 0.0,
                     'penalty' => 0.0,
                     'runs' => 0
-                ]);
+                ];
             }
 
             // Add the problems' information
@@ -528,6 +541,7 @@ class Scoreboard {
                     $contestant['name'] :
                     $contestant['username'],
                 'country' => $contestant['country_id'],
+                'classname' => $contestant['classname'],
                 'is_invited' => boolval($contestant['is_invited']),
                 self::TOTAL_COLUMN => [
                     'points' => 0.0,
@@ -569,7 +583,7 @@ class Scoreboard {
             }
 
             $totalPenalty = $run['penalty'] + $problem['runs'] * $contestPenalty;
-            $roundedScore = round($contestScore, 2);
+            $roundedScore = round(floatval($contestScore), 2);
             if (
                 $problem['points'] < $roundedScore ||
                 $problem['points'] == $roundedScore &&
@@ -596,8 +610,8 @@ class Scoreboard {
             $problem['runs']++;
         }
 
-        /** @val array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}}[] */
-        $result = [];
+        /** @var list<array{country: null|string, is_invited: bool, name: null|string, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}> */
+        $ranking = [];
         foreach ($rawContestIdentities as $contestant) {
             $identityId = $contestant['identity_id'];
 
@@ -613,10 +627,10 @@ class Scoreboard {
                 $info['problems'],
                 $contestPenaltyCalcPolicy
             );
-            array_push($result, $info);
+            $ranking[] = $info;
         }
 
-        \OmegaUp\Scoreboard::sortScoreboard($result, $sortByName);
+        \OmegaUp\Scoreboard::sortScoreboard($ranking, $sortByName);
 
         usort(
             $problems,
@@ -629,10 +643,10 @@ class Scoreboard {
             }
         );
 
+        /** @var list<array{country: null|string, is_invited: bool, name: null|string, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}> $ranking */
         return [
-            'status' => 'ok',
             'problems' => $problems,
-            'ranking' => $result,
+            'ranking' => $ranking,
             'start_time' => $contestStartTime,
             'finish_time' => $contestFinishTime,
             'title' => $contestTitle,
@@ -641,7 +655,7 @@ class Scoreboard {
     }
 
     /**
-     * @param array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}}[] $scoreboard
+     * @param array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}[] $scoreboard
      * @param bool $sortByName
      */
     private static function sortScoreboard(
@@ -653,8 +667,8 @@ class Scoreboard {
             usort(
                 $scoreboard,
                 /**
-                 * @param array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}} $a
-                 * @param array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}} $b
+                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $a
+                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $b
                  */
                 function (array $a, array $b): int {
                     if ($a[self::TOTAL_COLUMN]['points'] != $b[self::TOTAL_COLUMN]['points']) {
@@ -671,8 +685,8 @@ class Scoreboard {
             usort(
                 $scoreboard,
                 /**
-                 * @param array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}} $a
-                 * @param array{username: string, name: string, country: null|string, is_invited: bool, place?: int, problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], total: array{points: float, penalty: float}} $b
+                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $a
+                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $b
                  */
                 function (array $a, array $b): int {
                     return strcasecmp($a['username'], $b['username']);
@@ -717,10 +731,10 @@ class Scoreboard {
 
     /**
      * @param \OmegaUp\ScoreboardParams $params
-     * @param array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] $contestRuns
-     * @param array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool}[] $rawContestIdentities
+     * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}> $contestRuns
+     * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
-     * @return array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[]
+     * @return list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>
      */
     private static function calculateEvents(
         \OmegaUp\ScoreboardParams $params,
@@ -728,14 +742,14 @@ class Scoreboard {
         array $rawContestIdentities,
         array $problemMapping
     ): array {
-        /** @var array<int, array{identity_id: int, username: string, name: string, country_id: null|string, is_invited: bool}> */
+        /** @var array<int, array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool}> */
         $contestIdentities = [];
 
         foreach ($rawContestIdentities as $identity) {
             $contestIdentities[$identity['identity_id']] = $identity;
         }
 
-        /** @var array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string, username: string, problem: array{alias: string, points: float, penalty: float}}[] */
+        /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}> */
         $result = [];
         /** @var array<int, array<int, array{points: int, penalty: int}>> */
         $identityProblemsScore = [];
@@ -789,12 +803,7 @@ class Scoreboard {
 
             $problemData['points'] = max(
                 $problemData['points'],
-                round(
-                    floatval(
-                        $contestScore
-                    ),
-                    2
-                )
+                round(floatval($contestScore), 2)
             );
             $problemData['penalty'] = 0.0;
 
@@ -810,10 +819,11 @@ class Scoreboard {
                 'delta' => max(0.0, ($runDelay - $contestStart) / 60.0),
                 'problem' => [
                     'alias' => $problemMapping[$problemId]['alias'],
-                    'points' => round($contestScore, 2),
+                    'points' => round(floatval($contestScore), 2),
                     'penalty' => 0.0,
                 ],
                 'country' => $identity['country_id'],
+                'classname' => $identity['classname'],
                 'is_invited' => boolval($identity['is_invited']),
                 self::TOTAL_COLUMN => [
                     'points' => 0.0,
@@ -834,7 +844,7 @@ class Scoreboard {
             }
 
             // Add contestant results to scoreboard data
-            array_push($result, $data);
+            $result[] = $data;
         }
 
         return $result;

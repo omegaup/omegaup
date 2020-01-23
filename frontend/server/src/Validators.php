@@ -179,6 +179,44 @@ class Validators {
     }
 
     /**
+     * Enforces namespaced alias (of the form "namespace:alias").
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidNamespacedAlias(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+            return;
+        }
+        if (
+            !is_string($parameter) ||
+            strlen($parameter) < 2 ||
+            strlen($parameter) > 32
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+        if (self::isRestrictedAlias($parameter)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+        }
+        if (!preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
      * Enforces username requirements
      *
      * @param mixed $parameter
@@ -211,7 +249,6 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @param bool $required
      * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -226,10 +263,11 @@ class Validators {
             $parameter,
             $parameterName,
             2,
-            null, /*required=*/
-            true
+            null,
+            /*required=*/true
         );
 
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
@@ -325,6 +363,54 @@ class Validators {
 
     /**
      *
+     * @param mixed     $parameter
+     * @param string    $parameterName
+     * @param int|null $lowerBound
+     * @param int|null $upperBound
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateTimestampInRange(
+        $parameter,
+        string $parameterName,
+        ?int $lowerBound,
+        ?int $upperBound
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, true)) {
+            return;
+        }
+        if (!is_numeric($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotADate',
+                $parameterName
+            );
+        }
+        $parameter = intval($parameter);
+        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooSmall',
+                $parameterName
+            );
+            $exception->addCustomMessageToArray(
+                'payload',
+                ['lower_bound' => $lowerBound]
+            );
+            throw $exception;
+        }
+        if (!is_null($upperBound) && $parameter > $upperBound) {
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterDateTooLarge',
+                $parameterName
+            );
+            $exception->addCustomMessageToArray(
+                'payload',
+                ['upper_bound' => $upperBound]
+            );
+            throw $exception;
+        }
+    }
+
+    /**
+     *
      * @param mixed  $parameter
      * @param string $parameterName
      * @psalm-assert int $parameter
@@ -395,32 +481,20 @@ class Validators {
 
     /**
      *
-     * @param mixed $parameter
+     * @template T
+     * @param list<T> $parameter
      * @param string $parameterName
-     * @param array $enum
-     * @param bool $required
+     * @param list<T> $validOptions
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidSubset(
-        $parameter,
+        array $parameter,
         string $parameterName,
-        array $enum,
-        bool $required = true
+        array $validOptions
     ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
-            return;
-        }
-        if (!is_string($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                $parameterName
-            );
-        }
-
         $badElements = [];
-        $elements = array_filter(explode(',', $parameter));
-        foreach ($elements as $element) {
-            if (!in_array($element, $enum)) {
+        foreach ($parameter as $element) {
+            if (!in_array($element, $validOptions)) {
                 $badElements[] = $element;
             }
         }
@@ -430,7 +504,7 @@ class Validators {
                 $parameterName,
                 [
                     'bad_elements' => implode(',', $badElements),
-                    'expected_set' => implode(', ', $enum),
+                    'expected_set' => implode(', ', $validOptions),
                 ]
             );
         }

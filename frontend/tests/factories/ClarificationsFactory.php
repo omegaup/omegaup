@@ -10,43 +10,46 @@ class ClarificationsFactory {
     /**
      * Creates a clarification in a problem inside a contest
      *
-     * @param type $problemData
-     * @param type $contestData
-     * @param type $contestant
-     * @param type $message
-     * @param type $receiver
+     * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param \OmegaUp\DAO\VO\Identities $contestant
+     * @param null|string $message
+     * @param null|string $receiver
+     *
+     * @return array{request: \OmegaUp\Request, response: array{clarification_id: int}}
      */
     public static function createClarification(
-        $problemData,
-        $contestData,
-        $contestant,
-        $message = null,
-        $receiver = null
-    ) {
+        array $problemData,
+        array $contestData,
+        \OmegaUp\DAO\VO\Identities $contestant,
+        ?string $message = null,
+        ?string $receiver = null
+    ): array {
         // Our contestant has to open the contest before sending a clarification
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant
         );
 
         // Create the request for our api
-        $r = new \OmegaUp\Request();
-        $r['message'] = (
-            is_null($message) ?
-            Utils::CreateRandomString() :
-            $message
-        );
-        $r['contest_alias'] = $contestData['request']['alias'];
-        $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['username'] = $receiver;
-        $r['public'] = '0';
+        $r = new \OmegaUp\Request([
+            'message' => (
+                is_null($message) ?
+                \OmegaUp\Test\Utils::createRandomString() :
+                $message
+            ),
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'username' => $receiver,
+            'public' => '0',
+        ]);
 
         // Log in our user and set the auth_token properly
-        $login = OmegaupTestCase::login($contestant);
+        $login = \OmegaUp\Test\ControllerTestCase::login($contestant);
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
@@ -64,32 +67,29 @@ class ClarificationsFactory {
     /**
      * Answer a clarification
      *
-     * @param type $clarificationData
-     * @param type $contestData
-     * @param type $message
-     * @param type $public
+     * @param array{request: \OmegaUp\Request, response: array{clarification_id: int}} $clarificationData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param string $message
+     * @param null|string $receiver
+     * @param string $public
      */
     public static function answer(
-        $clarificationData,
-        $contestData,
-        $message = 'lol',
-        $receiver = null,
-        $public = '0'
-    ) {
-        // Prepare request
-        $r = new \OmegaUp\Request();
-        $r['clarification_id'] = $clarificationData['response']['clarification_id'];
+        array $clarificationData,
+        array $contestData,
+        string $message = 'lol',
+        ?string $receiver = null,
+        string $public = '0'
+    ): void {
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
 
-        // Log in the user
-        $login = OmegaupTestCase::login($contestData['director']);
-        $r['auth_token'] = $login->auth_token;
-
-        // Update answer
-        $r['answer'] = $message;
-        $r['public'] = $public;
-        $r['username'] = $receiver;
-
-        // Call api
-        \OmegaUp\Controllers\Clarification::apiUpdate($r);
+        \OmegaUp\Controllers\Clarification::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'answer' => $message,
+            'public' => $public,
+            'username' => $receiver,
+            'clarification_id' => $clarificationData['response']['clarification_id'],
+        ]));
     }
 }

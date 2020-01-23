@@ -1,6 +1,6 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleOmegaUpForSchools#}"}
-<script type="text/javascript" src="{version_hash src="/js/dist/schools_intro.js"}"></script>
+{include file='head.tpl' htmlTitle="{#omegaupTitleOmegaUpForSchools#}" inline}
+{js_include entrypoint="schools_intro"}
 <div id="intro">
     <div></div>
 </div>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

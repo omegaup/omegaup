@@ -6,27 +6,34 @@
  * @author joemmanuel
  */
 
-class ContestUsersTest extends OmegaupTestCase {
+class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
     public function testContestUsersValid() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create 10 users
         $n = 10;
         $users = [];
+        $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            $users[$i] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
-            ContestsFactory::addUser($contestData, $users[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
 
         // Create a n+1 user who will just join to the contest without being
         // added via API. For public contests, by entering to the contest, the user should be in
         // the list of contest's users.
-        $nonRegisteredUser = UserFactory::createUser();
-        ContestsFactory::openContest($contestData, $nonRegisteredUser);
+        ['user' => $nonRegisteredUser, 'identity' => $nonRegisteredIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData,
+            $nonRegisteredIdentity
+        );
 
         // Log in with the admin of the contest
         $login = self::login($contestData['director']);
@@ -44,12 +51,12 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestActivityReport() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $user = UserFactory::createUser();
-        ContestsFactory::openContest($contestData, $user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
 
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
         \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -65,7 +72,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $response['events'][0]['username']
         );
         $this->assertEquals(0, $response['events'][0]['ip']);
@@ -74,19 +81,23 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestParticipantsReport() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams([
-            'requests_user_information' => 'optional'
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
+            'requestsUserInformation' => 'optional',
         ]));
-
+        $user = [];
+        $identity = [];
         for ($i = 0; $i < 3; $i++) {
             // Create users
-            $user[$i] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to our private contest
-            ContestsFactory::addUser($contestData, $user[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identity[$i]
+            );
         }
 
-        $userLogin = self::login($user[0]);
+        $userLogin = self::login($identity[0]);
         $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -96,10 +107,8 @@ class ContestUsersTest extends OmegaupTestCase {
             $contestData['contest']
         );
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r,
-            $contestData['contest'],
-            $shoulShowIntro
-        );
+            $r
+        )['smartyProperties'];
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -130,7 +139,7 @@ class ContestUsersTest extends OmegaupTestCase {
             $response['contestants']
         ));
 
-        $userLogin = self::login($user[1]);
+        $userLogin = self::login($identity[1]);
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -150,7 +159,7 @@ class ContestUsersTest extends OmegaupTestCase {
             $response['contestants']
         ));
 
-        $userLogin = self::login($user[2]);
+        $userLogin = self::login($identity[2]);
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -173,7 +182,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestCanBeSeenByUnloggedUsers() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         $shouldShowIntro =
             \OmegaUp\Controllers\Contest::shouldShowIntro(
@@ -188,13 +197,13 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testNeedsBasicInformation() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams([
-            'basic_information' => 'true'
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
+            'basicInformation' => 'true',
         ]));
 
         // Create and login a user to view the contest
-        $user = UserFactory::createUser();
-        $userLogin = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
 
         $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
@@ -210,10 +219,8 @@ class ContestUsersTest extends OmegaupTestCase {
 
         // Contest needs basic information for the user
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r,
-            $contestData['contest'],
-            $shouldShowIntro
-        );
+            $r
+        )['smartyProperties'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }

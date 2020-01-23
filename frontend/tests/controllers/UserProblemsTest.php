@@ -5,16 +5,22 @@
  *
  * @author joemmanuel
  */
-class UserProblemsTest extends OmegaupTestCase {
+class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testEditableProblems() {
-        $author = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemData[0] = ProblemsFactory::createProblemWithAuthor($author);
-        $problemData[1] = ProblemsFactory::createProblemWithAuthor($author);
-        $problemData[2] = ProblemsFactory::createProblemWithAuthor($author);
+        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identity
+        );
+        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identity
+        );
+        $problemData[2] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identity
+        );
 
         // Call API
-        $login = self::login($author);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
@@ -36,10 +42,10 @@ class UserProblemsTest extends OmegaupTestCase {
     }
 
     public function testNoProblems() {
-        $author = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call API
-        $login = self::login($author);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
@@ -53,32 +59,38 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testAdminList() {
         // Our author
-        $author = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemAdminData = [];
 
         // Get two problems with another author, add $author to their
         // admin list
-        $problemAdminData[0] = ProblemsFactory::createProblem();
-        ProblemsFactory::addAdminUser($problemAdminData[0], $author);
+        $problemAdminData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Problem::addAdminUser(
+            $problemAdminData[0],
+            $identity
+        );
 
         // Get two problems with another author, add $author to their
         // group admin list
-        $problemAdminData[1] = ProblemsFactory::createProblem();
+        $problemAdminData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
         $group = GroupsFactory::createGroup($problemAdminData[1]['author']);
-        GroupsFactory::addUserToGroup($group, $author);
-        ProblemsFactory::addGroupAdmin($problemAdminData[1], $group['group']);
+        GroupsFactory::addUserToGroup($group, $identity);
+        \OmegaUp\Test\Factories\Problem::addGroupAdmin(
+            $problemAdminData[1],
+            $group['group']
+        );
 
-        $problemAuthorData[0] = ProblemsFactory::createProblem(new ProblemParams([
+        $problemAuthorData[0] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
-            'author' => $author
+            'author' => $identity
         ]));
-        $problemAuthorData[1] = ProblemsFactory::createProblem(new ProblemParams([
+        $problemAuthorData[1] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0,
-            'author' => $author
+            'author' => $identity
         ]));
 
         // Call api
-        $login = self::login($author);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
@@ -118,10 +130,10 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemsCount() {
         // Create private problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
-        $user = $problemData['author'];
+        $user = $problemData['authorUser'];
 
         $this->assertEquals(1, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
@@ -131,10 +143,10 @@ class UserProblemsTest extends OmegaupTestCase {
      */
     public function testPrivateProblemsCountWithPublicProblem() {
         // Create public problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1
         ]));
-        $user = $problemData['author'];
+        $user = $problemData['authorUser'];
 
         $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
@@ -143,7 +155,7 @@ class UserProblemsTest extends OmegaupTestCase {
      * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 0 problems
      */
     public function testPrivateProblemsCountWithNoProblems() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }

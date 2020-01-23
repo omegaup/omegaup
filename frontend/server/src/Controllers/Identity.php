@@ -11,11 +11,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Given a username or a email, returns the identity object
      *
-     * @param ?string $userOrEmail
-     * @return \OmegaUp\DAO\VO\Identities
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function resolveIdentity(?string $userOrEmail): \OmegaUp\DAO\VO\Identities {
+    public static function resolveIdentity(
+        ?string $userOrEmail
+    ): \OmegaUp\DAO\VO\Identities {
         \OmegaUp\Validators::validateStringNonEmpty(
             $userOrEmail,
             'usernameOrEmail'
@@ -60,9 +60,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create an Identity API
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     *
+     * @return array{username: string}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -75,19 +75,51 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Prepare DAOs
+            $countryId = is_null(
+                $r['country_id']
+            ) ? null : strval(
+                $r['country_id']
+            );
+            $stateId = is_null($r['state_id']) ? null : strval($r['state_id']);
             $identity = self::createIdentity(
                 $r['username'],
                 $r['name'],
                 $r['password'],
-                is_null($r['country_id']) ? null : strval($r['country_id']),
-                is_null($r['state_id']) ? null : strval($r['state_id']),
+                $countryId,
+                $stateId,
                 $r['gender'],
-                $r['school_name'],
                 $r['group_alias']
             );
 
+            $state = null;
+            if (!is_null($countryId) && !is_null($stateId)) {
+                $state = \OmegaUp\DAO\States::getByPK(
+                    $countryId,
+                    $stateId
+                );
+            }
+            $schoolId = \OmegaUp\Controllers\School::createSchool(
+                trim($r['school_name']),
+                $state
+            );
+
             // Save in DB
-            self::saveIdentityGroup($identity, $group->group_id);
+            self::saveIdentityGroup(
+                $identity,
+                intval($group->group_id)
+            );
+
+            // Create IdentitySchool
+            $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                'identity_id' => $identity->identity_id,
+                'school_id' => $schoolId,
+            ]);
+
+            \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+            // Save current_identity_school_id on Identity
+            $identity->current_identity_school_id = $identitySchool->identity_school_id;
+            \OmegaUp\DAO\Identities::update($identity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -96,13 +128,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
-            'username' => $identity->username,
+            'username' => strval($identity->username),
         ];
     }
 
     /**
      * Entry point for Create bulk Identities API
+     *
+     * @return array{status: string}
      */
     public static function apiBulkCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -117,26 +150,54 @@ class Identity extends \OmegaUp\Controllers\Controller {
             /** @var array<string, string> $identity */
             foreach ($r['identities'] as $identity) {
                 // Prepare DAOs
-                $identity = self::createIdentity(
+                $countryId = empty(
+                    $identity['country_id']
+                ) ? null : strval(
+                    $identity['country_id']
+                );
+                $stateId = empty(
+                    $identity['state_id']
+                ) ? null : strval(
+                    $identity['state_id']
+                );
+                $newIdentity = self::createIdentity(
                     $identity['username'],
                     $identity['name'],
                     $identity['password'],
-                    empty(
-                        $identity['country_id']
-                    ) ? null : strval(
-                        $identity['country_id']
-                    ),
-                    empty(
-                        $identity['state_id']
-                    ) ? null : strval(
-                        $identity['state_id']
-                    ),
+                    $countryId,
+                    $stateId,
                     $identity['gender'],
-                    $identity['school_name'],
                     $r['group_alias']
                 );
 
-                self::saveIdentityGroup($identity, $group->group_id);
+                $state = null;
+                if (!is_null($countryId) && !is_null($stateId)) {
+                    $state = \OmegaUp\DAO\States::getByPK(
+                        $countryId,
+                        $stateId
+                    );
+                }
+                $schoolId = \OmegaUp\Controllers\School::createSchool(
+                    trim($identity['school_name']),
+                    $state
+                );
+
+                self::saveIdentityGroup(
+                    $newIdentity,
+                    intval($group->group_id)
+                );
+
+                // Create IdentitySchool
+                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                    'identity_id' => $newIdentity->identity_id,
+                    'school_id' => $schoolId,
+                ]);
+
+                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+                // Save current_identity_school_id on Identity
+                $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
+                \OmegaUp\DAO\Identities::update($newIdentity);
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -150,17 +211,26 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    private static function validateGroupOwnership(\OmegaUp\Request $r) {
+    private static function validateGroupOwnership(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Groups {
         $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
+        \OmegaUp\Validators::validateValidAlias(
+            $r['group_alias'],
+            'group_alias'
+        );
         $group = \OmegaUp\Controllers\Group::validateGroup(
             $r['group_alias'],
             $r->identity
         );
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
         if (
             !is_array($r['identities']) &&
             !isset($r['username']) &&
@@ -178,25 +248,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
     private static function updateIdentity(
         $username,
         $name,
-        ?string $countryId,
-        ?string $stateId,
+        ?\OmegaUp\DAO\VO\States $state,
         $gender,
-        $school,
         $aliasGroup,
-        $originalIdentity
-    ) {
+        \OmegaUp\DAO\VO\Identities $originalIdentity
+    ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
-
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
-        $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
-            $state
-        );
 
         return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
@@ -208,7 +265,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $state
             ) ? $state->state_id : $originalIdentity->state_id,
             'gender' => $gender ?? $originalIdentity->gender,
-            'school_id' => $schoolId,
+            'current_identity_school_id' => $originalIdentity->current_identity_school_id,
             'password' => $originalIdentity->password,
             'user_id' => $originalIdentity->user_id,
         ]);
@@ -217,11 +274,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Save object Identities in DB, and add user into group.
      * This function is called inside a transaction.
+     *
+     * @return void
      */
     private static function saveIdentityGroup(
         \OmegaUp\DAO\VO\Identities $identity,
         $groupId
-    ) {
+    ): void {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
@@ -247,29 +306,59 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Update an Identity API
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      */
-    public static function apiUpdate(\OmegaUp\Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
             \OmegaUp\Experiments::IDENTITIES
         );
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
+        $originalSchoolId = null;
+        if (!is_null($originalIdentity->current_identity_school_id)) {
+            $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $originalIdentity->current_identity_school_id
+            );
+            $originalSchoolId = !is_null(
+                $originalIdentitySchool
+            ) ? $originalIdentitySchool->school_id : null;
+        }
+
         // Prepare DAOs
+        $state = null;
+        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+            $state = \OmegaUp\DAO\States::getByPK(
+                strval($r['country_id']),
+                strval($r['state_id'])
+            );
+        }
         $identity = self::updateIdentity(
             $r['username'],
             $r['name'],
-            is_null($r['country_id']) ? null : strval($r['country_id']),
-            is_null($r['state_id']) ? null : strval($r['state_id']),
+            $state,
             $r['gender'],
-            $r['school_name'],
             $r['group_alias'],
             $originalIdentity
         );
 
         $identity->identity_id = $originalIdentity->identity_id;
+
+        $schoolId = \OmegaUp\Controllers\School::createSchool(
+            trim(
+                $r['school_name']
+            ),
+            $state
+        );
+
+        if ($originalSchoolId !== $schoolId) {
+            $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                $identity,
+                $schoolId, /* new school_id */
+                null /* graduation_date */
+            );
+            $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
+        }
 
         // Save in DB
         \OmegaUp\DAO\Identities::update($identity);
@@ -287,11 +376,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for change passowrd of an identity
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     *
+     * @return array{status: string}
      */
-    public static function apiChangePassword(\OmegaUp\Request $r) {
+    public static function apiChangePassword(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
             \OmegaUp\Experiments::IDENTITIES
         );
@@ -318,9 +407,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
     /**
      * @param \OmegaUp\Request $r
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return void
      */
-    private static function validateUpdateRequest(\OmegaUp\Request $r) {
+    private static function validateUpdateRequest(\OmegaUp\Request $r): void {
         $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -349,7 +441,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         &$name,
         &$gender,
         $groupAlias
-    ) {
+    ): void {
         // Check group is present
         $identityUsername = explode(':', $username);
         if (count($identityUsername) != 2) {
@@ -402,21 +494,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?string $countryId,
         ?string $stateId,
         $gender,
-        $school,
         $aliasGroup
-    ) {
+    ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
-
-        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState(
-            $countryId,
-            $stateId
-        );
-        $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $school
-            ),
-            $state
-        );
 
         // Check password
         \OmegaUp\SecurityTools::testStrongPassword($password);
@@ -429,35 +509,30 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'country_id' => $countryId,
             'state_id' => $stateId,
             'gender' => $gender,
-            'school_id' => $schoolId,
         ]);
     }
 
     /**
      * Get identity profile from cache
-     * Requires $r["identity"] to be an actual Identity
      *
-     * @param \OmegaUp\Request $r
-     * @param array $response
-     * @param \OmegaUp\Request $r
-     * @return type
+     * @return array{birth_date?: int|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool}
      */
     public static function getProfile(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
         bool $omitRank
     ): array {
-        if (is_null($identity)) {
+        if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
-                'Identity'
+                'username'
             );
         }
-
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
+            /** @return array{birth_date?: int|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool} */
             function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
@@ -470,69 +545,81 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
 
         if ($omitRank) {
-            $response['userinfo']['rankinfo'] = [];
+            $response['rankinfo'] = [];
         } else {
-            $response['userinfo']['rankinfo'] =
-                \OmegaUp\Controllers\User::getRankByProblemsSolved(
-                    $r,
+            $response['rankinfo'] =
+                \OmegaUp\Controllers\User::getFullRankByProblemsSolved(
+                    $identity,
                     '',
                     1,
-                    100,
-                    $identity
+                    100
                 );
         }
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
         if (
-            !is_null($r->identity)
-            && (\OmegaUp\Authorization::isSystemAdmin($r->identity)
-                || $identity->identity_id == $r->identity->identity_id)
+            !is_null($loggedIdentity)
+            && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                || $identity->identity_id === $loggedIdentity->identity_id)
         ) {
             return $response;
         }
 
         // Mentors can see current coder of the month email.
         if (
-            !is_null($r->identity)
-            && \OmegaUp\Authorization::canViewEmail($r->identity)
+            !is_null($loggedIdentity)
+            && \OmegaUp\Authorization::canViewEmail($loggedIdentity)
             && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth(
                 $identity->username
             )
         ) {
             return $response;
         }
-        unset($response['userinfo']['email']);
+        unset($response['email']);
         return $response;
     }
 
     /**
      * Returns the profile of the identity given
      *
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return array
+     * @return array{country: null|string, country_id: null|string, is_private: true, locale: string, name: null|string, preferred_language: null, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string}
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
             $identity->identity_id
         );
 
+        $schoolId = null;
+        if (!is_null($identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $schoolId = $identitySchool->school_id;
+            }
+        }
+
         return [
-            'userinfo' => [
-                'username' => $identity->username,
-                'name' => $identity->name,
-                'preferred_language' => null,
-                'country' => $extendedProfile['country'],
-                'country_id' => $identity->country_id,
-                'state' => $extendedProfile['state'],
-                'state_id' => $identity->state_id,
-                'school' => $extendedProfile['school'],
-                'school_id' => $identity->school_id,
-                'is_private' => true,
-                'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
-                    $extendedProfile['locale']
-                ),
-            ]
+            'username' => $identity->username,
+            'name' => $identity->name,
+            'preferred_language' => null,
+            'country' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['country'] : null,
+            'country_id' => $identity->country_id,
+            'state' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['state'] : null,
+            'state_id' => $identity->state_id,
+            'school' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['school'] : null,
+            'school_id' => $schoolId,
+            'is_private' => true,
+            'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
+                $extendedProfile['locale'] ?? ''
+            ),
         ];
     }
 
@@ -543,7 +630,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
     public static function getPreferredLanguage(\OmegaUp\Request $r): string {
         // for quick debugging
         if (isset($_GET['lang'])) {
-            return self::convertToSupportedLanguage($_GET['lang']);
+            return self::convertToSupportedLanguage(
+                strval($_GET['lang'])
+            );
         }
 
         try {
@@ -552,7 +641,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $result = \OmegaUp\DAO\Languages::getByPK(
                     $identity->language_id
                 );
-                if (is_null($result)) {
+                if (is_null($result) || is_null($result->name)) {
                     self::$log->warn('Invalid language id for identity');
                 } else {
                     return \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
@@ -566,24 +655,27 @@ class Identity extends \OmegaUp\Controllers\Controller {
             self::$log->debug($ex);
         }
 
+        /** @var array<string, float> */
         $langs = [];
 
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             // break up string into pieces (languages and q factors)
-            preg_match_all(
-                '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
-                $_SERVER['HTTP_ACCEPT_LANGUAGE'],
-                $lang_parse
-            );
-
-            if (count($lang_parse[1])) {
+            /** @var array{0: string, 1: string, 2: string} $langParse */
+            if (
+                preg_match_all(
+                    '/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
+                    strval($_SERVER['HTTP_ACCEPT_LANGUAGE']),
+                    $langParse
+                ) !== false &&
+                !empty($langParse[1])
+            ) {
                 // create a list like "en" => 0.8
-                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+                $langs = array_combine($langParse[1], $langParse[2]);
 
                 // set default to 1 for any without q factor
                 foreach ($langs as $lang => $val) {
                     if ($val === '') {
-                        $langs[$lang] = 1;
+                        $langs[$lang] = 1.0;
                     }
                 }
 
@@ -609,7 +701,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return 'es';
     }
 
-    public static function convertToSupportedLanguage($lang) {
+    public static function convertToSupportedLanguage(?string $lang): string {
         switch ($lang) {
             case 'en':
             case 'en-us':

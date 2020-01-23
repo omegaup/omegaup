@@ -6,13 +6,13 @@
  * @author joemmanuel
  */
 
-class CreateProblemTest extends OmegaupTestCase {
+class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for creating a problem
      */
     public function testCreateValidProblem() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -52,8 +52,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem settings.
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
@@ -84,7 +84,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testSlowQueue() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $r['time_limit'] = 8000;
         $problemAuthor = $problemData['author'];
@@ -126,7 +126,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testSlowQueueWithWallLimit() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $r['time_limit'] = 8000;
         $r['overall_wall_time_limit'] = 20000;
@@ -169,7 +169,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateValidProblemWithINCases() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'mrkareltastic.zip'
         ]));
         $r = $problemData['request'];
@@ -222,7 +222,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         foreach ($valid_keys as $key) {
             // Get the problem data
-            $problemData = ProblemsFactory::getRequest();
+            $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
             $r = $problemData['request'];
             $problemAuthor = $problemData['author'];
 
@@ -257,7 +257,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         foreach (['abc', 'c,cpp,cows', 'java,coffee,espresso'] as $languages) {
             // Get the problem data
-            $problemData = ProblemsFactory::getRequest();
+            $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
             $r = $problemData['request'];
             $problemAuthor = $problemData['author'];
 
@@ -282,7 +282,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testValidProblemNoTestplan() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
         $r = $problemData['request'];
@@ -323,8 +323,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -344,7 +344,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testValidProblemWithNonUTF8CharsInStmt() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'nonutf8stmt.zip'
         ]));
         $r = $problemData['request'];
@@ -391,7 +391,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $imageAbsoluteUrl = 'http://i.imgur.com/fUkvDkw.png';
 
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip'
         ]));
         $r = $problemData['request'];
@@ -440,6 +440,20 @@ class CreateProblemTest extends OmegaupTestCase {
             $response['statement']['images']['bunny.jpg']
         );
         $this->assertFileExists(IMAGES_PATH . $imagePath);
+        $expectedImageHash = sha1(file_get_contents(IMAGES_PATH . $imagePath));
+
+        // Delete the image and check that it exists after
+        // regeneration.
+        unlink(IMAGES_PATH . $imagePath);
+        $this->assertFileNotExists(IMAGES_PATH . $imagePath);
+        \OmegaUp\Controllers\Problem::regenerateImage(
+            $r['problem_alias'],
+            $imageGitObjectId,
+            $imageExtension
+        );
+        $this->assertFileExists(IMAGES_PATH . $imagePath);
+        $actualImageHash = sha1(file_get_contents(IMAGES_PATH . $imagePath));
+        $this->assertEquals($expectedImageHash, $actualImageHash);
     }
 
     /**
@@ -447,7 +461,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testConstructAliasFromTitle() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -497,7 +511,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemWithTags() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -548,7 +562,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemTagsWithWrongAttribute() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest();
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
         $r = $problemData['request'];
         $problemAuthor = $problemData['author'];
 
@@ -579,7 +593,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemWithoutStatement() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'nostmt.zip'
         ]));
         $r = $problemData['request'];
@@ -611,7 +625,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testCreateProblemMissingOutput() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'missingout.zip'
         ]));
         $r = $problemData['request'];
@@ -643,7 +657,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testValidProblemInteractive() {
         // Get the problem data
-        $problemData = ProblemsFactory::getRequest(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_interactive.zip'
         ]));
         $r = $problemData['request'];
@@ -684,8 +698,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -727,5 +741,46 @@ class CreateProblemTest extends OmegaupTestCase {
                 TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_windows_cpp.zip"
             )
         );
+    }
+
+    public function testProblemParams() {
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+
+        // Asserting all default values
+        $this->assertEquals(0, $problemParams->visibility);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(1000, $problemParams->validatorTimeLimit);
+        $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
+        $this->assertEquals(0, $problemParams->extraWallTime);
+        $this->assertEquals(10240, $problemParams->outputLimit);
+        $this->assertEquals(10240, $problemParams->inputLimit);
+        $this->assertFalse($problemParams->emailClarifications);
+
+        // New object with custom values
+        $titleAlias = \OmegaUp\Test\Utils::createRandomString();
+        $overallWallTimeLimit = 50000;
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => $titleAlias,
+            'title' => $titleAlias,
+            'update_published' => \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+            'overall_wall_time_limit' => $overallWallTimeLimit,
+            'email_clarifications' => true,
+        ]);
+
+        $this->assertEquals($titleAlias, $problemParams->title);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(
+            $overallWallTimeLimit,
+            $problemParams->overallWallTimeLimit
+        );
+        $this->assertTrue($problemParams->emailClarifications);
     }
 }

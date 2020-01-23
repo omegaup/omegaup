@@ -199,10 +199,8 @@ abstract class GroupsScoreboardsProblemsets {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets>
      */
     final public static function getAll(
         ?int $pagina = null,
