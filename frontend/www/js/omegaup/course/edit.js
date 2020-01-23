@@ -290,7 +290,9 @@ OmegaUp.on('ready', function() {
                 assignment_type: ev.assignmentType,
               };
 
-              if (!ev.unlimitedDuration) {
+              if (ev.unlimitedDuration) {
+                params.unlimited_duration = true;
+              } else {
                 params.finish_time = ev.finishTime.getTime() / 1000;
               }
 

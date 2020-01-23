@@ -21,7 +21,7 @@ export default class DateTimePicker extends Vue {
   @Prop({ default: T.dateTimePickerFormat }) format!: string;
   @Prop({ default: null }) start!: Date;
   @Prop({ default: null }) finish!: Date;
-  @Prop({ default: true }) readonly!: boolean;
+  @Prop({ default: false }) readonly!: boolean;
 
   mounted() {
     let self = this;

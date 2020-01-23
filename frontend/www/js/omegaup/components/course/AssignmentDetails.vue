@@ -64,7 +64,6 @@
               ></span>
               <omegaup-datetimepicker
                 v-bind:enabled="!assignment.has_runs"
-                v-bind:readonly="false"
                 v-model="startTime"
               ></omegaup-datetimepicker
             ></label>
