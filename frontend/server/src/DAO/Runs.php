@@ -951,7 +951,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets the runs that were inserted due to a version change.
      *
-     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function getNewRunsForVersion(\OmegaUp\DAO\VO\Problems $problem): array {

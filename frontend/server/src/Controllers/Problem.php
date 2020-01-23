@@ -1152,9 +1152,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
-            /** @psalm-suppress MixedArrayAccess Assuming problem_contents is an array */
             if (
                 isset($_FILES['problem_contents'])
+                && is_array($_FILES['problem_contents'])
                 && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
                     $_FILES['problem_contents']['tmp_name']
                 )
@@ -2749,14 +2749,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $problemAdmin = \OmegaUp\Authorization::isProblemAdmin(
+
+        $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $problem
         );
 
         $clarifications = \OmegaUp\DAO\Clarifications::GetProblemClarifications(
             $problem->problem_id,
-            $problemAdmin,
+            $isProblemAdmin,
             $r->identity->identity_id,
             $r['offset'],
             $r['rowcount']
