@@ -75,7 +75,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have thrown exception.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
-                'courseHasNotUnlimitedDuration',
+                'courseDoesNotHaveUnlimitedDuration',
                 $e->getMessage()
             );
         }
