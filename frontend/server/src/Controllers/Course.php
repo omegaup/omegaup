@@ -645,7 +645,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseHasNotUnlimitedDuration'
+                'courseDoesNotHaveUnlimitedDuration'
             );
         }
 
