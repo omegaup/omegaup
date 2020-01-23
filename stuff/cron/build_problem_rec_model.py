@@ -21,6 +21,7 @@ import MySQLdb.connections
 
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 import lib.db
 import lib.logs
@@ -60,9 +61,9 @@ def get_first_run_per_problem(runs: pd.DataFrame) -> pd.DataFrame:
     first_ac = runs.groupby(['identity_id', 'problem_id']).apply(
         lambda x: x.sort_values(['time']).head(1))
     logging.info('Found %d first AC runs', len(first_ac))
-
-    return first_ac.reset_index(drop=True).groupby(['identity_id']).apply(
-        lambda x: x.sort_values(['time']))
+    return first_ac.reset_index(drop=True).groupby(
+        ['identity_id'], as_index=False, sort=False).apply(
+            lambda x: x.sort_values(['time']))
 
 
 class TrainingConfig:
@@ -127,9 +128,9 @@ class Model:
 
         # Split dataset into test/train
         users = pd.Series(runs.identity_id.unique())
-        train_users = users.sample(frac=self.config.train_fraction,
-                                   random_state=self.config.rng_seed)
-        test_users = users.drop(train_users.index)
+        train_users, test_users = train_test_split(
+            users, train_size=self.config.train_fraction,
+            random_state=self.config.rng_seed)
         logging.info('Training users: %d', len(train_users))
         logging.info('Testing users: %d', len(test_users))
 
@@ -243,7 +244,7 @@ class Model:
 
             score += cur_score / (num_problems - 1)
 
-        return score / user_count
+        return score / user_count if user_count else 0
 
     def build(self, dbconn: MySQLdb.connections.Connection) -> None:
         '''Builds a recommendation model.'''
@@ -317,7 +318,7 @@ def main():
         model.build(dbconn)
 
         score = model.evaluate()
-        logging.info('Model MAP score: %f', eval)
+        logging.info('Model MAP score: %f', score)
         if score >= args.min_map_score:
             # Save current model
             model.save(args.output)
