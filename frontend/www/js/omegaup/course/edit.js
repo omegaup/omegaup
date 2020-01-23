@@ -499,8 +499,12 @@ OmegaUp.on('ready', function() {
                 refreshStudentList();
                 UI.success(T.courseStudentAdded);
               })
-              .fail(function() {
-                UI.error(T.bulkUserAddError);
+              .fail(function(event) {
+                UI.error(
+                  UI.formatString(T.bulkUserAddError, {
+                    userEmail: event.userEmail,
+                  }),
+                );
               });
           },
           'remove-student': function(student) {
