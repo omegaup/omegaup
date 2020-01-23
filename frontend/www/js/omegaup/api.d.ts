@@ -161,11 +161,6 @@ declare namespace omegaup {
     student_count: boolean;
   }
 
-  export interface CourseType {
-    filteredCourses: omegaup.FilteredCourses[];
-    name: string;
-  }
-
   export interface CourseAdmin {
     username: string;
     role: string;
@@ -219,13 +214,6 @@ declare namespace omegaup {
   export interface Experiment {
     config: boolean;
     hash: string;
-    name: string;
-  }
-
-  export interface FilteredCourses {
-    type: string;
-    courses: omegaup.Course[];
-    activeTab: string;
     name: string;
   }
 

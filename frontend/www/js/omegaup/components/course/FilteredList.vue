@@ -4,12 +4,10 @@
       <li
         class="nav-item"
         v-bind:class="{
-          active:
-            courses.activeTab ===
-            `${courses.type}-courses-${filteredCourses.type}`,
+          active: activeTab === `${type}-courses-${filteredCourses.type}`,
         }"
         v-if="filteredCourses.courses.length > 0"
-        v-on:click="selectTabToShow(courses.type, filteredCourses.type)"
+        v-on:click="selectTabToShow(type, filteredCourses.type)"
         v-for="filteredCourses in courses.filteredCourses"
       >
         <a data-toggle="tab">{{ tabName(filteredCourses.type) }}</a>
@@ -19,7 +17,7 @@
     <div class="tab-content">
       <div
         class="tab-pane active"
-        v-if="shouldShowTab(courses.type, filteredCourses.type)"
+        v-if="shouldShowTab(type, filteredCourses.type)"
         v-for="filteredCourses in courses.filteredCourses"
       >
         <div class="panel">
@@ -88,8 +86,9 @@ import UI from '../../ui.js';
 
 @Component
 export default class CourseFilteredList extends Vue {
-  @Prop() courses!: omegaup.FilteredCourses;
-  @Prop() name!: string;
+  @Prop() courses!: omegaup.Course[];
+  @Prop() type!: string;
+  @Prop() activeTab!: string;
 
   T = T;
   UI = UI;
@@ -97,15 +96,15 @@ export default class CourseFilteredList extends Vue {
 
   mounted() {
     this.$nextTick(function() {
-      this.showTab = this.courses.activeTab;
+      this.showTab = this.activeTab;
     });
   }
 
   tabName(filteredTypeCourses: string): string {
     if (filteredTypeCourses === 'current') {
-      return this.T.courseListStudentCurrentCourses;
+      return this.T.courseListCurrentCourses;
     } else if (filteredTypeCourses === 'past') {
-      return this.T.courseListStudentPastCourses;
+      return this.T.courseListPastCourses;
     }
     return '';
   }

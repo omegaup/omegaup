@@ -10,13 +10,14 @@
           <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
         </div>
         <h1>
-          <span>{{ typeCourses.name }}</span>
+          <span>{{ typeCourses.description }}</span>
         </h1>
       </div>
 
       <omegaup-course-filtered-list
+        v-bind:type="typeCourses.type"
         v-bind:courses="typeCourses"
-        v-bind:showTab="typeCourses.activeTab"
+        v-bind:activeTab="typeCourses.activeTab"
       ></omegaup-course-filtered-list>
     </template>
   </div>
@@ -35,7 +36,7 @@ import course_FilteredList from './FilteredList.vue';
   },
 })
 export default class CourseList extends Vue {
-  @Prop() courses!: omegaup.CourseType[];
+  @Prop() courses!: omegaup.Course[];
 
   T = T;
   UI = UI;

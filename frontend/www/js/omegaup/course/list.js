@@ -37,7 +37,7 @@ OmegaUp.on('ready', function() {
             { type: 'current', courses: [] },
             { type: 'past', courses: [] },
           ],
-          name: T.courseList,
+          description: T.courseList,
           activeTab: '',
         },
         {
@@ -46,7 +46,7 @@ OmegaUp.on('ready', function() {
             { type: 'current', courses: [] },
             { type: 'past', courses: [] },
           ],
-          name: T.courseListAdminCourses,
+          description: T.courseListAdminCourses,
           activeTab: '',
         },
       ];
