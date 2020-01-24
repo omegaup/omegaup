@@ -3,21 +3,19 @@
     <ul class="nav nav-tabs">
       <li
         class="nav-item"
-        v-bind:class="{
-          active: activeTab === `${type}-courses-${filteredCourses.type}`,
-        }"
+        v-bind:class="{ active: activeTab === filteredCourses.timeType }"
         v-if="filteredCourses.courses.length > 0"
-        v-on:click="selectTabToShow(type, filteredCourses.type)"
+        v-on:click="selectTabToShow(filteredCourses.timeType)"
         v-for="filteredCourses in courses.filteredCourses"
       >
-        <a data-toggle="tab">{{ tabName(filteredCourses.type) }}</a>
+        <a data-toggle="tab">{{ filteredCourses.tabName }}</a>
       </li>
     </ul>
 
     <div class="tab-content">
       <div
         class="tab-pane active"
-        v-if="shouldShowTab(type, filteredCourses.type)"
+        v-if="shouldShowTab(filteredCourses.timeType)"
         v-for="filteredCourses in courses.filteredCourses"
       >
         <div class="panel">
@@ -30,7 +28,7 @@
                   <th>{{ T.wordsEndTime }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
-                  <th colspan="2" v-if="courses.type === 'admin'">
+                  <th colspan="2" v-if="courses.accessMode === 'admin'">
                     {{ T.wordsActions }}
                   </th>
                 </tr>
@@ -52,7 +50,7 @@
                   </td>
                   <td>{{ course.counts.homework }}</td>
                   <td>{{ course.counts.test }}</td>
-                  <template v-if="courses.type === 'admin'">
+                  <template v-if="courses.accessMode === 'admin'">
                     <td>
                       <a
                         class="glyphicon glyphicon-list-alt"
@@ -87,34 +85,23 @@ import UI from '../../ui.js';
 @Component
 export default class CourseFilteredList extends Vue {
   @Prop() courses!: omegaup.Course[];
-  @Prop() type!: string;
   @Prop() activeTab!: string;
 
   T = T;
   UI = UI;
   showTab = '';
 
-  mounted() {
-    this.$nextTick(function() {
-      this.showTab = this.activeTab;
-    });
+  selectTabToShow(filteredTypeCourses: string): void {
+    this.showTab = filteredTypeCourses;
   }
 
-  tabName(filteredTypeCourses: string): string {
-    if (filteredTypeCourses === 'current') {
-      return this.T.courseListCurrentCourses;
-    } else if (filteredTypeCourses === 'past') {
-      return this.T.courseListPastCourses;
-    }
-    return '';
+  shouldShowTab(filteredTypeCourses: string): boolean {
+    return this.showTab === filteredTypeCourses;
   }
 
-  selectTabToShow(typeCourses: string, filteredTypeCourses: string): void {
-    this.showTab = `${typeCourses}-courses-${filteredTypeCourses}`;
-  }
-
-  shouldShowTab(typeCourses: string, filteredTypeCourses: string): boolean {
-    return this.showTab === `${typeCourses}-courses-${filteredTypeCourses}`;
+  @Watch('activeTab')
+  onPropertyChange(newValue: string) {
+    this.showTab = newValue;
   }
 }
 </script>

@@ -4,18 +4,20 @@
       <h3 class="panel-title">{{ T.courseList }}</h3>
     </div>
 
-    <template v-for="(typeCourses, key) in courses">
+    <div class="page-header">
+      <div class="pull-right">
+        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
+      </div>
+      <h1>&nbsp;</h1>
+    </div>
+    <template v-for="typeCourses in courses">
       <div class="page-header">
-        <div class="pull-right" v-if="key === 0">
-          <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
-        </div>
         <h1>
           <span>{{ typeCourses.description }}</span>
         </h1>
       </div>
 
       <omegaup-course-filtered-list
-        v-bind:type="typeCourses.type"
         v-bind:courses="typeCourses"
         v-bind:activeTab="typeCourses.activeTab"
       ></omegaup-course-filtered-list>
@@ -24,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
