@@ -5,7 +5,7 @@
         class="nav-item"
         v-bind:class="{ active: activeTab === filteredCourses.timeType }"
         v-if="filteredCourses.courses.length > 0"
-        v-on:click="selectTabToShow(filteredCourses.timeType)"
+        v-on:click="showTab = filteredCourses.timeType"
         v-for="filteredCourses in courses.filteredCourses"
       >
         <a data-toggle="tab">{{ filteredCourses.tabName }}</a>
@@ -15,7 +15,7 @@
     <div class="tab-content">
       <div
         class="tab-pane active"
-        v-if="shouldShowTab(filteredCourses.timeType)"
+        v-if="showTab === filteredCourses.timeType"
         v-for="filteredCourses in courses.filteredCourses"
       >
         <div class="panel">
@@ -89,19 +89,6 @@ export default class CourseFilteredList extends Vue {
 
   T = T;
   UI = UI;
-  showTab = '';
-
-  selectTabToShow(filteredTypeCourses: string): void {
-    this.showTab = filteredTypeCourses;
-  }
-
-  shouldShowTab(filteredTypeCourses: string): boolean {
-    return this.showTab === filteredTypeCourses;
-  }
-
-  @Watch('activeTab')
-  onPropertyChange(newValue: string) {
-    this.showTab = newValue;
-  }
+  showTab = this.activeTab;
 }
 </script>
