@@ -13,20 +13,16 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-common-navbar', {
         props: {
           header: this.header,
-          status: this.status,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
-          inError: this.inError,
           errorMessage: this.errorMessage,
         },
       });
     },
     data: {
       header: headerPayload,
-      status: 'ok',
       graderInfo: null,
       graderQueueLength: -1,
-      inError: false,
       errorMessage: null,
     },
     components: {
@@ -40,6 +36,9 @@ OmegaUp.on('ready', function() {
         commonNavbar.notifications = data.notifications;
       })
       .fail(UI.apiError);
+
+    updateGraderStatus();
+    setInterval(updateGraderStatus, 30000);
   }
 
   function updateGraderStatus() {
@@ -47,7 +46,7 @@ OmegaUp.on('ready', function() {
       .then(stats => {
         commonNavbar.graderInfo = stats.grader;
         if (stats.status !== 'ok') {
-          commonNavbar.status = 'down';
+          commonNavbar.errorMessage = T.generalError;
           return;
         }
         if (stats.grader.queue) {
@@ -55,17 +54,10 @@ OmegaUp.on('ready', function() {
             stats.grader.queue.run_queue_length +
             stats.grader.queue.running.length;
         }
-        commonNavbar.status = 'ok';
         commonNavbar.errorMessage = null;
-        commonNavbar.inError = false;
       })
       .fail(stats => {
-        commonNavbar.status = 'down';
         commonNavbar.errorMessage = stats.error;
-        commonNavbar.inError = true;
       });
   }
-
-  updateGraderStatus();
-  setInterval(updateGraderStatus, 30000);
 });

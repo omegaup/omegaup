@@ -156,7 +156,7 @@
               <omegaup-common-grader-badge
                 v-show="header.isAdmin"
                 v-bind:queueLength="graderQueueLength"
-                v-bind:error="inError"
+                v-bind:error="errorMessage !== null"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
@@ -174,7 +174,7 @@
                 >
               </li>
               <omegaup-common-grader-status
-                v-bind:status="status"
+                v-bind:status="errorMessage !== null ? 'down' : 'ok'"
                 v-bind:error="errorMessage"
                 v-bind:graderInfo="graderInfo"
               ></omegaup-common-grader-status>
@@ -217,10 +217,8 @@ import common_GraderBadge from '../common/GraderBadge.vue';
 })
 export default class Navbar extends Vue {
   @Prop() header!: omegaup.NavbarPayload;
-  @Prop() status!: string;
   @Prop() graderInfo!: omegaup.Grader;
   @Prop() graderQueueLength!: number;
-  @Prop() inError!: boolean;
   @Prop() errorMessage!: string;
 
   notifications: omegaup.Notification[] = [];
