@@ -21,9 +21,9 @@ from typing import List, Optional, Tuple
 
 import MySQLdb.connections
 
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
+import numpy as np  # type: ignore
+import pandas as pd  # type: ignore
+from sklearn.model_selection import train_test_split  # type: ignore
 
 sys.path.insert(
     0,
@@ -161,7 +161,7 @@ class Model:
                     );
                     CREATE INDEX Recs_index ON ProblemRecommendations(solved);
                     ''')
-                for solved_problem_id, recs in self.model:
+                for solved_problem_id, recs in self.model:  # type: ignore
                     for recommended_problem_id, score in recs:
                         cur.execute('''
                             INSERT INTO
@@ -177,7 +177,8 @@ class Model:
     def generate_weighted_pairs(self) -> pd.DataFrame:
         '''Assumes runs are sorted by submission time'''
         tuples: List[Tuple[int, int, float]] = []
-        for _, problems in self.train_ac.groupby('identity_id'):
+        for _, problems in self.train_ac.groupby(  # type: ignore
+                'identity_id'):
             num_problems = len(problems)
             # TODO: Figure out how to ask Pandas nicely for this.
             for i in range(num_problems):
@@ -212,7 +213,7 @@ class Model:
                        made.
         '''
         try:
-            recs = self.model.loc[latest_problem].reset_index(
+            recs = self.model.loc[latest_problem].reset_index(  # type: ignore
                 'target').sort_values(y='weight', ascending=False)['target']
             unsolved_recs = recs[~recs.isin(banned_problems)]
             return None if unsolved_recs.empty else unsolved_recs.iloc[0:k]
@@ -225,7 +226,7 @@ class Model:
             k = self.config.num_followups
         score = 0.
         user_count = 0
-        for _, runs in self.test_ac.groupby('identity_id'):
+        for _, runs in self.test_ac.groupby('identity_id'):  # type: ignore
             problems = runs['problem_id']
             num_problems = len(problems)
             if num_problems <= 1:
