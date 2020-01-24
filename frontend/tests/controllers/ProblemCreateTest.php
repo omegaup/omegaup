@@ -214,7 +214,6 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $valid_keys = [
             'title',
             'source',
-            'languages',
         ];
 
         foreach ($valid_keys as $key) {

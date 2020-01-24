@@ -284,15 +284,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             null,
             $isRequired
         );
-        \OmegaUp\Validators::validateValidSubset(
-            $params->languages,
-            'languages',
-            array_merge(
-                [''],
-                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-            ),
-            $isRequired
-        );
+        if (!is_null($params->languages)) {
+            \OmegaUp\Validators::validateValidSubset(
+                $params->languages,
+                'languages',
+                array_merge(
+                    [''],
+                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+                )
+            );
+        }
 
         return [
             'problem' => $problem,
@@ -1125,7 +1126,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages',
         ];
-        self::updateValueProperties(null, $problem, $valueProperties, $params);
+        \OmegaUp\ProblemParams::updateValueParams(
+            $params,
+            $problem,
+            $valueProperties
+        );
         $problem->languages = $languages ?: $problem->languages;
 
         $response = [
@@ -2416,6 +2421,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         // \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['update_published'],
+            'update_published'
+        );
         \OmegaUp\Validators::validateInEnum(
             $r['update_published'],
             'update_published',
@@ -2429,7 +2438,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
-            $updatePublished = strval($r['update_published']);
+            $updatePublished = $r['update_published'];
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);

@@ -488,14 +488,10 @@ class Validators {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidSubset(
-        ?array $parameter,
+        array $parameter,
         string $parameterName,
-        array $validOptions,
-        bool $required = true
+        array $validOptions
     ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
-            return;
-        }
         $badElements = [];
         foreach ($parameter as $element) {
             if (!in_array($element, $validOptions)) {
