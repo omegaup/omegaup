@@ -12,7 +12,9 @@ up to the latest one.
 
 import argparse
 import logging
+import os
 import sqlite3
+import sys
 import warnings
 
 from typing import List, Optional, Tuple
@@ -23,8 +25,12 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 
 # Default training parameters.
@@ -173,7 +179,7 @@ class Model:
 
     def generate_weighted_pairs(self) -> pd.DataFrame:
         '''Assumes runs are sorted by submission time'''
-        tuples: Tuple[int, int, float] = []
+        tuples: Tuple[int, int, float] = ()
         for _, problems in self.train_ac.groupby('identity_id'):
             num_problems = len(problems)
             # TODO: Figure out how to ask Pandas nicely for this.
@@ -220,7 +226,7 @@ class Model:
         '''Compute a score about how good the model is.'''
         if k is None:
             k = self.config.num_followups
-        score = 0
+        score = 0.
         user_count = 0
         for _, runs in self.test_ac.groupby('identity_id'):
             problems = runs['problem_id']
@@ -229,7 +235,7 @@ class Model:
                 continue
 
             user_count += 1
-            cur_score = 0
+            cur_score = 0.
             for i in range(1, num_problems):
                 recs = self.recommend(problems[i - 1], problems[:i - 1], k)
                 # TODO: Use mean_average_precision() instead of manually
@@ -304,7 +310,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
     parser = build_parser()
     args = parser.parse_args()
