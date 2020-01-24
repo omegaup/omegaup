@@ -88,9 +88,6 @@ class Model:
     def __init__(self, config: TrainingConfig):
         self.config = config
 
-        # Set of users from the training data.
-        self.users: Optional[pd.Series] = None
-
         # Train/test runs
         self.train_runs: Optional[pd.DataFrame] = None
         self.test_runs: Optional[pd.DataFrame] = None
@@ -179,7 +176,7 @@ class Model:
 
     def generate_weighted_pairs(self) -> pd.DataFrame:
         '''Assumes runs are sorted by submission time'''
-        tuples: Tuple[int, int, float] = ()
+        tuples: List[Tuple[int, int, float]] = []
         for _, problems in self.train_ac.groupby('identity_id'):
             num_problems = len(problems)
             # TODO: Figure out how to ask Pandas nicely for this.
