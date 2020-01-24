@@ -40,11 +40,11 @@ omegaup.OmegaUp.on('ready', function() {
           course.assignments[i].alias +
           '/admin/#runs';
         course.assignments[i].startTime = omegaup.UI.formatDateTime(
-          new Date(1000 * course.assignments[i].start_time),
+          course.assignments[i].start_time,
         );
-        course.assignments[i].finishTime = omegaup.UI.formatDateTime(
-          new Date(1000 * course.assignments[i].finish_time),
-        );
+        course.assignments[i].finishTime = course.assignments[i].finish_time
+          ? omegaup.UI.formatDateTime(course.assignments[i].finish_time)
+          : omegaup.T.wordsUnlimitedDuration;
 
         var iScore = score.assignments[course.assignments[i].alias];
         var percent = (iScore.score / iScore.max_score) * 100;

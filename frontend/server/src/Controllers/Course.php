@@ -66,6 +66,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
+        $r->ensureBool('unlimited_duration', false);
         $r->ensureOptionalTimestamp(
             'start_time',
             $courseStartTime,
@@ -76,7 +77,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            /* required */ !is_null($courseFinishTime)
+            /* required */ (
+                !is_null($courseFinishTime) ||
+                !$r['unlimited_duration']
+            )
         );
 
         if (
@@ -642,6 +646,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->start_time,
             $course->finish_time
         );
+
+        if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration'
+            );
+        }
 
         if (
             !is_null($r['finish_time']) &&

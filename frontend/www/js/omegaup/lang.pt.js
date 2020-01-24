@@ -260,6 +260,7 @@ const translations = {
 	courseBasicInformationNeeded: "Para participar do curso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o <a href=\"/profile/edit/\">Meu perfil</a>",
 	courseDetails: "Detalhes do curso",
 	courseDetailsScoreboard: "Painel de avalia\u00e7\u00e3o",
+	courseDoesNotHaveUnlimitedDuration: "No \u00e9 poss\u00edvel estabelecer uma dura\u00e7\u00e3o ilimitada a uma tarea de um curso que n\u00e3o \u00e9 de dura\u00e7\u00e3o ilimitada.",
 	courseEdit: "Editar curso",
 	courseEditAddAdminsTooltip: "Adicionar administratores usando seu nome de usu\u00e1rio omegaUp",
 	courseEditAddAssignment: "Adicionar designa\u00e7\u00e3o",
