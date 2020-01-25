@@ -68,29 +68,29 @@ OmegaUp.on('ready', function() {
       ];
 
       const currentDate = Date.now();
-      for (const [index, course] of allCourses.entries()) {
+      for (const courseDescription of allCourses) {
         let activeTab = '';
-        for (const course of data[course.accessMode]) {
+        for (const course of data[courseDescription.accessMode]) {
           if (
             !course.finish_time ||
             course.finish_time.getTime() > currentDate
           ) {
-            allCourses[index].filteredCourses[timeTypes.CURRENT].courses.push(
+            courseDescription.filteredCourses[timeTypes.CURRENT].courses.push(
               course,
             );
-            continue;
+          } else {
+            courseDescription.filteredCourses[timeTypes.PAST].courses.push(
+              course,
+            );
           }
-          allCourses[index].filteredCourses[timeTypes.PAST].courses.push(
-            course,
-          );
         }
-        for (const filtered of course.filteredCourses) {
+        for (const filtered of courseDescription.filteredCourses) {
           if (filtered.courses.length > 0) {
             activeTab = filtered.timeType;
             break;
           }
         }
-        allCourses[index].activeTab = activeTab;
+        courseDescription.activeTab = activeTab;
       }
       courseList.courses = allCourses;
     })
