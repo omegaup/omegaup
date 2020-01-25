@@ -48,7 +48,8 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
 
     /**
      *  Check whether a submission is before the deadline.
-     *  No one, including admins, can submit after the deadline.
+     *  If the deadline is null, the submission could be made, otherwise,
+     *  no one, including admins, can submit after the deadline.
      */
     public static function isLateSubmission(
         object $container,
@@ -58,7 +59,10 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             return isset($container->finish_time) &&
                    (\OmegaUp\Time::get() > $container->finish_time);
         }
-        return \OmegaUp\Time::get() > $problemsetIdentity->end_time;
+        return (
+            !is_null($container->finish_time) &&
+            (\OmegaUp\Time::get() > $problemsetIdentity->end_time)
+        );
     }
 
     public static function isSubmissionWindowOpen(object $container): bool {

@@ -201,7 +201,7 @@ def enter_course_assignments_page(driver, course_alias):
                 (By.XPATH, '//a[@href = "/schools/"]'))).click()
 
     with driver.page_transition():
-        course_url = '/course/%s' % course_alias
+        course_url = '/course/%s/' % course_alias
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,

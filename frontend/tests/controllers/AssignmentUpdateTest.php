@@ -61,6 +61,25 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $updatedStartTime = $courseData['request']['start_time'] + 10;
 
+        try {
+            // Try to set unlimited duration to assignment
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $assignmentAlias,
+                'course' => $courseAlias,
+                'start_time' => $updatedStartTime,
+                'unlimited_duration' => true,
+                'name' => 'some new name',
+                'description' => 'some meaningful description'
+            ]));
+            $this->fail('Should have thrown exception.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'courseDoesNotHaveUnlimitedDuration',
+                $e->getMessage()
+            );
+        }
+
         // Now update the course in order to be of unlimited duration
         \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
