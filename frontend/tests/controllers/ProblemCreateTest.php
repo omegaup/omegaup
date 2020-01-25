@@ -213,11 +213,7 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         // Array of valid keys
         $valid_keys = [
             'title',
-            'validator',
-            'time_limit',
-            'memory_limit',
             'source',
-            'languages',
         ];
 
         foreach ($valid_keys as $key) {

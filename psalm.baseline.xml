@@ -183,21 +183,16 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Problem.php">
-    <InvalidArgument occurrences="1">
-      <code>$r</code>
-    </InvalidArgument>
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <MixedArgument occurrences="28">
-      <code>$r['selected_tags']</code>
+    <MixedArgument occurrences="13">
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
       <code>$run</code>
-      <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$updatePublished</code>
       <code>$r['problem_alias']</code>
       <code>$updatePublished</code>
@@ -209,7 +204,7 @@
       <code>$run</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="8">
       <code>$run</code>
       <code>$updatePublished</code>
       <code>$run</code>
@@ -229,12 +224,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <PossiblyNullArgument occurrences="11">
-      <code>$problem-&gt;alias</code>
-      <code>$problem</code>
-      <code>$problem-&gt;alias</code>
-      <code>$problem-&gt;alias</code>
-    </PossiblyNullArgument>
+    <PossiblyNullArgument occurrences="10"/>
     <PossiblyNullArrayAccess occurrences="2"/>
     <PossiblyNullPropertyFetch occurrences="3">
       <code>$acl-&gt;owner_id</code>
