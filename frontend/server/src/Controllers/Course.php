@@ -1138,7 +1138,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Converts a Course object into an array
      *
-     * @return array{alias: string, name: string, start_time: int, finish_time: int|null, counts: array<string, int>}
+     * @return array{alias: string, name: string, start_time: int, finish_time: int|null, public: bool, counts: array<string, int>}
      */
     private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
@@ -1146,9 +1146,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'courseNotFound'
             );
         }
-        $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
-        /** @var array{alias: string, name: string, start_time: int, finish_time: int} */
-        $arr = $course->asFilteredArray($relevant_columns);
+        $relevantColumns = [
+            'alias',
+            'name',
+            'start_time',
+            'finish_time',
+            'public',
+        ];
+        /** @var array{alias: string, name: string, start_time: int, finish_time: int, public: bool} */
+        $arr = $course->asFilteredArray($relevantColumns);
 
         $arr['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
             $course->course_id
@@ -1180,16 +1186,16 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
-        $admin_courses = [];
+        $adminCourses = [];
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $admin_courses = \OmegaUp\DAO\Courses::getAll(
+            $adminCourses = \OmegaUp\DAO\Courses::getAll(
                 $page,
                 $pageSize,
                 'course_id',
                 'DESC'
             );
         } else {
-            $admin_courses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+            $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
                 $pageSize
@@ -1197,7 +1203,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Courses the user is a student in.
-        $student_courses = \OmegaUp\DAO\Courses::getCoursesForStudent(
+        $studentCourses = \OmegaUp\DAO\Courses::getCoursesForStudent(
             $r->identity->identity_id
         );
 
@@ -1205,12 +1211,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admin' => [],
             'student' => [],
         ];
-        foreach ($admin_courses as $course) {
+        foreach ($adminCourses as $course) {
             $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
         }
-        foreach ($student_courses as $course) {
+        foreach ($studentCourses as $course) {
             $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );

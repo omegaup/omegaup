@@ -283,6 +283,7 @@ const translations = {
 	courseListAdminCourses: "Courses I manage",
 	courseListCurrentCourses: "Current courses",
 	courseListPastCourses: "Past courses",
+	courseListPublicCourses: "Public courses",
 	courseListSubmissionsByGroup: "Submissions made by users of this course",
 	courseNew: "New course",
 	courseNewFormBasicInformationRequired: "Basic information is required",
