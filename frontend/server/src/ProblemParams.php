@@ -219,14 +219,13 @@ class ProblemParams {
     }
 
     /**
-     * Update properties of $object based on what is provided in $params.
+     * Update properties of $object based on what is provided in this class.
      *
      * @param object $object
      * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
-    public static function updateValueParams(
-        \OmegaUp\ProblemParams $params,
+    public function updateValueParams(
         object $object,
         array $properties
     ): bool {
@@ -250,12 +249,12 @@ class ProblemParams {
                 }
             }
             $value = null;
-            if (is_null($params->$fieldName)) {
+            if (is_null($this->$fieldName)) {
                 continue;
             }
             // Get or calculate new value.
             /** @var null|mixed */
-            $value = $params->$fieldName;
+            $value = $this->$fieldName;
             if (is_null($value)) {
                 continue;
             }

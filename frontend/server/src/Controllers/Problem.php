@@ -1126,11 +1126,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages',
         ];
-        \OmegaUp\ProblemParams::updateValueParams(
-            $params,
-            $problem,
-            $valueProperties
-        );
+        $params->updateValueParams($problem, $valueProperties);
         $problem->languages = $languages ?: $problem->languages;
 
         $response = [
