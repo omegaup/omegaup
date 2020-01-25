@@ -37,27 +37,27 @@ OmegaUp.on('ready', function() {
       })
       .fail(UI.apiError);
 
+    function updateGraderStatus() {
+      API.Grader.status()
+        .then(stats => {
+          commonNavbar.graderInfo = stats.grader;
+          if (stats.status !== 'ok') {
+            commonNavbar.errorMessage = T.generalError;
+            return;
+          }
+          if (stats.grader.queue) {
+            commonNavbar.graderQueueLength =
+              stats.grader.queue.run_queue_length +
+              stats.grader.queue.running.length;
+          }
+          commonNavbar.errorMessage = null;
+        })
+        .fail(stats => {
+          commonNavbar.errorMessage = stats.error;
+        });
+    }
+
     updateGraderStatus();
     setInterval(updateGraderStatus, 30000);
-  }
-
-  function updateGraderStatus() {
-    API.Grader.status()
-      .then(stats => {
-        commonNavbar.graderInfo = stats.grader;
-        if (stats.status !== 'ok') {
-          commonNavbar.errorMessage = T.generalError;
-          return;
-        }
-        if (stats.grader.queue) {
-          commonNavbar.graderQueueLength =
-            stats.grader.queue.run_queue_length +
-            stats.grader.queue.running.length;
-        }
-        commonNavbar.errorMessage = null;
-      })
-      .fail(stats => {
-        commonNavbar.errorMessage = stats.error;
-      });
   }
 });
