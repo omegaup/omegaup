@@ -1225,59 +1225,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns true when logged user has previous activity in any course
-     */
-    public static function userHasActivityInCourses(\OmegaUp\Request $r): bool {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        $identity = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        )['identity'];
-
-        // User doesn't have activity because is not logged.
-        if (is_null($identity)) {
-            return false;
-        }
-
-        if (is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
-
-        if (
-            !empty(
-                \OmegaUp\DAO\Courses::getCoursesForStudent(
-                    $identity->identity_id
-                )
-            )
-        ) {
-            return true;
-        }
-
-        // Default values to search courses for legged user
-        $page = 1;
-        $pageSize = 1;
-        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
-            $result = \OmegaUp\DAO\Courses::getAll(
-                $page,
-                $pageSize,
-                'course_id',
-                'DESC'
-            );
-            if (!empty($result)) {
-                return true;
-            }
-        }
-        $result = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-            $identity->identity_id,
-            $page,
-            $pageSize
-        );
-        return !empty($result);
-    }
-
-    /**
      * List students in a course
      *
      * @return array{students: list<array{name: null|string, progress: array<string, float>, username: string}>}
