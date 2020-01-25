@@ -66,6 +66,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
+        $r->ensureBool('unlimited_duration', false);
         $r->ensureOptionalTimestamp(
             'start_time',
             $courseStartTime,
@@ -76,7 +77,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            /* required */ !is_null($courseFinishTime)
+            /* required */ (
+                !is_null($courseFinishTime) ||
+                !$r['unlimited_duration']
+            )
         );
 
         if (
@@ -193,14 +197,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
+        $r->ensureBool('unlimited_duration', false);
         $r->ensureInt('start_time', null, null, !$isUpdate);
         $r->ensureOptionalInt(
             'finish_time',
             null,
             null,
-            false /* required */
+            /* required */ (
+                !$isUpdate &&
+                !$r['unlimited_duration']
+            )
         );
-        $r->ensureBool('unlimited_duration', false);
 
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -642,6 +649,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->start_time,
             $course->finish_time
         );
+
+        if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration'
+            );
+        }
 
         if (
             !is_null($r['finish_time']) &&
@@ -2721,7 +2734,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets Scoreboard for an assignment
      *
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r): array {
         $r->ensureIdentity();

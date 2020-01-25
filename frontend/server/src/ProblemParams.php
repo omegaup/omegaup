@@ -147,7 +147,8 @@ class ProblemParams {
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
         ] : [
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
