@@ -297,6 +297,29 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
+        } elseif ($nominationType === 'quality_tag') {
+            // Si la nominación es negativa, la categoría es opcional
+            // Si la nominación es positiva la categoría es obligatoria
+            if (
+                !isset($contents['quality_seal']) ||
+                (
+                    $contents['quality_seal'] &&
+                    !isset($contents['tag'])
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
+
+            /*
+            if (!in_array($contents['tag'], self::CATEGORY_TAGS)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            } */
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
@@ -352,6 +375,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
      *                before receiving an AC verdict for problem run.
      *
+     * # Quality category
+     *
+     * A reviewer could send this type of nomination to make the user marked as
+     * a quality problem or not. The reviewer could also specify which category
+     * is the one the problem belongs to. The 'contents' field should have the
+     * following subfields:
+     *
+     * * tag: The name of the tag corresponding to the category of the problem
+     * * quality_seal: A boolean that if activated, means that the problem is a
+     *   quality problem
+     *
      * # Promotion
      *
      * A user that has already solved a problem can nominate it to be promoted
@@ -400,7 +434,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['nomination'],
             'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal']
+            ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
