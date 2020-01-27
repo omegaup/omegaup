@@ -37,7 +37,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     public static function getAllAssignments(
         string $alias,
@@ -66,7 +66,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: null|string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -78,9 +78,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['start_time'] =  intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $row['start_time']
             ));
-            $row['finish_time'] = intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $row['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $row['finish_time']
-            ));
+            );
             $ar[] = $row;
         }
         return $ar;

@@ -252,11 +252,15 @@ export default {
     addStudent: _call('/api/course/addStudent/'),
 
     adminDetails: _call('/api/course/adminDetails/', function(result) {
+      if (result.finish_time) {
+        result.finish_time = new Date(result.finish_time * 1000);
+      }
       result.start_time = new Date(result.start_time * 1000);
-      result.finish_time = new Date(result.finish_time * 1000);
       result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
       });
       return result;
     }),
@@ -269,13 +273,31 @@ export default {
 
     create: _call('/api/course/create/'),
 
-    details: _call('/api/course/details/', _convertTimes),
+    details: _call('/api/course/details/', function(data) {
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      data.start_time = new Date(data.start_time * 1000);
+      data.assignments.forEach(assignment => {
+        assignment.start_time = new Date(assignment.start_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
+      return data;
+    }),
 
     myProgress: _call('/api/course/myProgress/'),
 
     createAssignment: _call('/api/course/createAssignment/'),
 
-    getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
+    getAssignment: _call('/api/course/assignmentDetails', function(data) {
+      data.start_time = new Date(data.start_time * 1000);
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      return data;
+    }),
 
     /**
      * Returns the list of users signed up for the course that have
@@ -290,21 +312,28 @@ export default {
     listAssignments: _call('/api/course/listAssignments/', function(result) {
       // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
       // be able to get the unmodified times.
-      for (var i = 0; i < result.assignments.length; ++i) {
-        var assignment = result.assignments[i];
+      result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
-      }
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
     listCourses: _call('/api/course/listCourses/', function(result) {
-      for (var i = 0; i < result.admin.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.admin[i]);
-      }
-      for (var i = 0; i < result.student.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.student[i]);
-      }
+      result.admin.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.student.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
       return result;
     }),
 

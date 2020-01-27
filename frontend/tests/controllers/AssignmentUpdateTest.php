@@ -46,6 +46,73 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test if it's possible to set finish time as null on assignment update
+     */
+    public function testAssignmentUpdateUnlimitedDuration() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $login
+        );
+        $assignmentAlias = $courseData['assignment_alias'];
+        $courseAlias = $courseData['course_alias'];
+
+        $updatedStartTime = $courseData['request']['start_time'] + 10;
+
+        try {
+            // Try to set unlimited duration to assignment
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $assignmentAlias,
+                'course' => $courseAlias,
+                'start_time' => $updatedStartTime,
+                'unlimited_duration' => true,
+                'name' => 'some new name',
+                'description' => 'some meaningful description'
+            ]));
+            $this->fail('Should have thrown exception.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'courseDoesNotHaveUnlimitedDuration',
+                $e->getMessage()
+            );
+        }
+
+        // Now update the course in order to be of unlimited duration
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'unlimited_duration' => true
+        ]));
+
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $updatedStartTime,
+            'unlimited_duration' => true,
+            'name' => 'some new name',
+            'description' => 'some meaningful description'
+        ]));
+
+        // Read the assignment again
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias
+        ]));
+
+        $this->assertEquals($updatedStartTime, $response['start_time']);
+        $this->assertNull($response['finish_time']);
+    }
+
+    /**
      * When updating an assignment you need to supply both assignment
      * alias and course alias
      */

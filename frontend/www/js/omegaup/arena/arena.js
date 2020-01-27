@@ -257,25 +257,7 @@ export class Arena {
     self.markdownConverter = UI.markdownConverter();
 
     // Currently opened notifications.
-    self.clarificationNotifications = null;
-    OmegaUp.on('ready', function() {
-      if (document.getElementById('clarification-notifications') !== null) {
-        self.clarificationNotifications = new Vue({
-          el: '#clarification-notifications',
-          render: function(createElement) {
-            return createElement('omegaup-notifications-clarifications', {
-              props: {
-                initialClarifications: this.initialClarifications,
-              },
-            });
-          },
-          data: { initialClarifications: [] },
-          components: {
-            'omegaup-notifications-clarifications': notification_Clarifications,
-          },
-        });
-      }
-    });
+    self.clarificationNotifications = [];
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -1086,7 +1068,9 @@ export class Arena {
     for (let i in dataInSeries) {
       if (dataInSeries.hasOwnProperty(i)) {
         dataInSeries[i].push([
-          Math.min(this.finishTime.getTime(), Date.now()),
+          this.finishTime
+            ? Math.min(this.finishTime.getTime(), Date.now())
+            : Date.now(),
           dataInSeries[i][dataInSeries[i].length - 1][1],
         ]);
         series.push({
@@ -1103,7 +1087,9 @@ export class Arena {
     });
 
     navigatorData.push([
-      Math.min(this.finishTime.getTime(), Date.now()),
+      this.finishTime
+        ? Math.min(this.finishTime.getTime(), Date.now())
+        : Date.now(),
       navigatorData[navigatorData.length - 1][1],
     ]);
     this.createChart(series, navigatorData);
@@ -1179,11 +1165,11 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
-    let clarifications = self.clarificationNotifications.initialClarifications;
+    let clarifications = self.clarificationNotifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
       if (self.problemsetAdmin) {
-        self.clarificationNotifications.initialClarifications = clarifications.filter(
+        self.clarificationNotifications = clarifications.filter(
           notification =>
             notification.clarification_id !== clarification.clarification_id,
         );
@@ -1308,7 +1294,7 @@ export class Arena {
 
     if (self.clarificationNotifications !== null) {
       // Removing to the notifications list all unsolved clarifications
-      self.clarificationNotifications.initialClarifications = data.clarifications
+      self.clarificationNotifications = data.clarifications
         .filter(clarification =>
           self.problemsetAdmin
             ? clarification.answer === null
@@ -1316,9 +1302,8 @@ export class Arena {
         )
         .reverse();
 
-      // Removing to the notifications list all marked as resolved
-      // clarifications
-      self.clarificationNotifications.initialClarifications = self.clarificationNotifications.initialClarifications.filter(
+      // Removing to the notifications list all marked as solved clarifications
+      self.clarificationNotifications = self.clarificationNotifications.filter(
         clarification =>
           localStorage.getItem(
             `clarification-${clarification.clarification_id}`,
@@ -2098,16 +2083,26 @@ export class Arena {
     }
     self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
-    let duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    let duration = null;
+    if (contest.finish_time) {
+      duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    }
     self.summaryView.windowLength(
-      UI.formatDelta(contest.window_length * 60000 || duration),
+      duration
+        ? UI.formatDelta(contest.window_length * 60000 || duration)
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(
       Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
     );
     self.summaryView.finishTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()),
+      contest.finish_time
+        ? Highcharts.dateFormat(
+            '%Y-%m-%d %H:%M:%S',
+            contest.finish_time.getTime(),
+          )
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.scoreboardCutoff(
       Highcharts.dateFormat(
