@@ -510,6 +510,7 @@ const translations = {
 	omegaupTitleIndex: "(Ind3x)",
 	omegaupTitleLatestSubmissions: "(La7357 5ubmi55i0n5)",
 	omegaupTitleLogin: "(L0gin)",
+	omegaupTitleLogout: "(L0g0u7)",
 	omegaupTitleMyProblemsList: "(MyPr0b13m5Li57)",
 	omegaupTitleOmegaUpForSchools: "(W31c0m3 70 0m3gaUp f0r Sch0015)",
 	omegaupTitlePrivacyPolicy: "(Privacy P01icy)",

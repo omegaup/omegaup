@@ -510,6 +510,7 @@ const translations = {
 	omegaupTitleIndex: "Index",
 	omegaupTitleLatestSubmissions: "Latest submissions",
 	omegaupTitleLogin: "Login",
+	omegaupTitleLogout: "Logout",
 	omegaupTitleMyProblemsList: "MyProblemsList",
 	omegaupTitleOmegaUpForSchools: "Welcome to omegaUp for Schools",
 	omegaupTitlePrivacyPolicy: "Privacy Policy",

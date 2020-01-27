@@ -132,7 +132,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def page_transition(self, wait_for_ajax=True):
+    def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
         prev_url = self.browser.current_url
@@ -140,6 +140,9 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         yield
         self.wait.until(lambda _: self.browser.current_url != prev_url)
         logging.debug('New URL: %s', self.browser.current_url)
+        if target_url:
+            self.wait.until(lambda _: self.browser.current_url == target_url)
+            logging.debug('Target URL: %s', self.browser.current_url)
         if wait_for_ajax:
             self._wait_for_page_loaded()
 
@@ -240,7 +243,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             self._wait_for_page_loaded()
             with self.page_transition():
                 self.browser.get(self.url(_BLANK))
-            with self.page_transition():
+            with self.page_transition(target_url=home_page_url):
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (
                 'Invalid URL redirect. Expected %s, got %s' % (
@@ -292,7 +295,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         # Home screen
         with self.page_transition():
             self.browser.get(self.url(_BLANK))
-        with self.page_transition():
+        with self.page_transition(target_url=home_page_url):
             self.browser.get(self.url('/logout/?redirect=/'))
         assert self.browser.current_url == home_page_url, (
             'Invalid URL redirect. Expected %s, got %s' % (
