@@ -3,17 +3,14 @@
 		"File": ""
 	},
 	"Broadcaster": {
-		"FrontendURL": "http://localhost:8000"
+		"FrontendURL": "http://frontend:8000"
 	},
 	"DB": {
 		"Driver": "mysql",
 		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup"
 	},
-	"Metrics": {
-		"Port": 6061
-	},
 	"Grader": {
-		"BroadcasterURL": "https://localhost:32672/broadcast/",
+		"BroadcasterURL": "https://broadcaster:32672/broadcast/",
 		"V1": {
 			"Enabled": true
 		}

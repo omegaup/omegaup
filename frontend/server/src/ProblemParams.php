@@ -147,7 +147,8 @@ class ProblemParams {
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
         ] : [
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
@@ -215,5 +216,58 @@ class ProblemParams {
         $this->inputLimit = $params['input_limit'] ?? 10240;
         $this->emailClarifications = $params['email_clarifications'] ?? false;
         $this->order = $params['order'] ?? 'normal';
+    }
+
+    /**
+     * Update properties of $object based on what is provided in this class.
+     *
+     * @param object $object
+     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
+     * @return bool True if there were changes to any property marked as 'important'.
+     */
+    public function updateValueParams(
+        object $object,
+        array $properties
+    ): bool {
+        $importantChange = false;
+        foreach ($properties as $source => $info) {
+            /** @var null|callable(mixed):mixed */
+            $transform = null;
+            $important = false;
+            if (is_int($source)) {
+                $fieldName = $info;
+            } else {
+                $fieldName = $source;
+                if (
+                    isset($info['transform']) &&
+                    is_callable($info['transform'])
+                ) {
+                    $transform = $info['transform'];
+                }
+                if (isset($info['important']) && $info['important'] === true) {
+                    $important = $info['important'];
+                }
+            }
+            $value = null;
+            if (is_null($this->$fieldName)) {
+                continue;
+            }
+            // Get or calculate new value.
+            /** @var null|mixed */
+            $value = $this->$fieldName;
+            if (is_null($value)) {
+                continue;
+            }
+            if (!is_null($transform)) {
+                /** @var mixed */
+                $value = $transform($value);
+            }
+            // Important property, so check if it changes.
+            if ($important) {
+                $importantChange |= ($value != $object->$fieldName);
+            }
+            $object->$fieldName = $value;
+        }
+        return $importantChange;
     }
 }

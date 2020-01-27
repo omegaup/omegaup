@@ -2,8 +2,12 @@
 	"Logging": {
 		"File": ""
 	},
+	"DB": {
+		"Driver": "mysql",
+		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup"
+	},
 	"Gitserver": {
 		"AllowDirectPushToMaster": true,
-		"FrontendAuthorizationProblemRequestURL": "http://localhost:8000/api/authorization/problem/"
+		"FrontendAuthorizationProblemRequestURL": "http://frontend:8000/api/authorization/problem/"
 	}
 }
