@@ -61,6 +61,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => \OmegaUp\Test\Utils::createRandomString(),
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
+            'unlimited_duration' => true,
         ]));
 
         $courses = \OmegaUp\DAO\Courses::findByName(
@@ -341,6 +342,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
             'start_time' => (\OmegaUp\Time::get() + 120),
+            'unlimited_duration' => true,
         ]));
 
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
