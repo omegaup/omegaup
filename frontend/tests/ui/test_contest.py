@@ -36,11 +36,11 @@ def test_create_contest(driver):
                          driver.user_username, access_mode='Private')
 
     with driver.login(identity.username, identity.password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, contest_alias)
@@ -48,14 +48,16 @@ def test_create_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH, '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-contests "'
+                      ')]//a[@href = "/contest/mine/"]')))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -96,20 +98,20 @@ def test_user_ranking_contest(driver):
                          driver.user_username)
 
     with driver.login(user1, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user2, password):
-        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     with driver.login(user3, password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(uninvited_identity.username,
                       uninvited_identity.password):
-        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+        create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     update_scoreboard_for_contest(driver, contest_alias)
@@ -117,13 +119,16 @@ def test_user_ranking_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH,
+                 '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-contests "'
+                      ')]//a[@href = "/contest/mine/"]')))).click()
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
@@ -131,13 +136,16 @@ def test_user_ranking_contest(driver):
 
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH,
+                 '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-contests "'
+                      ')]//a[@href = "/contest/mine/"]')))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Admin')
 
@@ -195,17 +203,17 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                          driver.user_username, scoreboard_time_percent=0)
 
     with driver.login(user1, password):
-        create_run_user(driver, alias, problem, 'Main.cpp11',
+        create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(user2, password):
-        create_run_user(driver, alias, problem, 'Main_wrong.cpp11',
+        create_run_user(driver, alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
     update_scoreboard_for_contest(driver, alias)
 
     with driver.login(driver.user_username, 'user'):
-        create_run_user(driver, alias, problem, 'Main.cpp11',
+        create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
 
     with driver.login(driver.user_username, 'user'):
@@ -236,7 +244,8 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                 (By.CSS_SELECTOR, '#problems')))
 
         driver.browser.find_element_by_xpath(
-            '//a[contains(@href, "problems/%s")]' % problem).click()
+            '//a[contains(text(), "%s")]/parent::div' %
+            problem.title()).click()
 
         # Now, user checks the score again, ranking should be +100
         check_ranking(driver, problem, driver.user_username,
@@ -327,8 +336,8 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             ('//a[contains(@href, "#problems/%s")]' %
-              problem)))).click()
+             ('//a[contains(text(), "%s")]/parent::div' %
+              problem.title())))).click()
 
     util.create_run(driver, problem, filename)
     driver.update_score_in_contest(problem, contest_alias, **kwargs)
@@ -347,13 +356,16 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH,
+             '//div[@id="root"]//li[contains(concat(" ", '
+             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/new/"]')))).click()
+                 ('//div[@id="root"]//li[contains(concat(" ", '
+                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
+                  '= "/contest/new/"]')))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(

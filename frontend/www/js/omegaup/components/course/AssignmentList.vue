@@ -42,6 +42,16 @@
             </td>
             <td class="button-column">
               <a
+                v-bind:title="T.courseAddProblemsAdd"
+                v-on:click="$emit('add-problems', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-th-list"
+                ></span
+              ></a>
+            </td>
+            <td class="button-column">
+              <a
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('delete', assignment)"
                 ><span

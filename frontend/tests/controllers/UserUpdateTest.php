@@ -105,11 +105,10 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
-        $r = new \OmegaUp\Request([
-            'username' => $identity->username
-        ]);
         $this->assertEquals($locale->name, \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $r
+            new \OmegaUp\Request([
+                'username' => $identity->username
+            ])
         ));
     }
 
@@ -180,24 +179,27 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($identitySchool->school_id, $newSchool->school_id);
         $this->assertEquals($identitySchool->graduation_date, $graduationDate);
         $this->assertNull($identitySchool->end_time);
-    }
 
-    /**
-     * Value for the recruitment optin flag should be non-negative
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-     */
-    public function testNegativeStateUpdate() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        $login = self::login($identity);
-        $r = new \OmegaUp\Request([
+        // Update the school one more time, set the first school again
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
-            // Invalid state_id
-            'state_id' => -1,
-        ]);
+            'school_id' => $school->school_id,
+        ]));
 
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        // Previous IdentitySchool should have end_time filled.
+        $previousIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identitySchool->identity_school_id
+        );
+        $this->assertNotNull($previousIdentitySchool->end_time);
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identity->username
+        );
+        $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+            $identity->current_identity_school_id
+        );
+        $this->assertEquals($identitySchool->school_id, $school->school_id);
+        $this->assertNull($identitySchool->end_time);
     }
 
     /**
@@ -207,13 +209,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $newUsername = \OmegaUp\Test\Utils::createRandomString();
-        $r = new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            //new username
             'username' => $newUsername
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-        $user = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        ]));
+        $user = \OmegaUp\DAO\AuthTokens::getUserByToken($login->auth_token);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         $this->assertEquals($identity->username, $newUsername);
@@ -221,69 +221,79 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Update profile username with existed username
-     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicateUsernameUpdate() {
         ['user' => $oldUser, 'identity' => $oldIdentity] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            //update username with existed username
-            'username' => $oldIdentity->username
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                //update username with existed username
+                'username' => $oldIdentity->username
+            ]));
+            $this->fail('Should not have been able to use duplicate username');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('usernameInUse', $e->getMessage());
+        }
     }
 
      /**
      * Request parameter name cannot be too long
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNameUpdateTooLong() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            // Invalid name
-            'name' => 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ',
-            'country_id' => 'MX',
-        ]);
 
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                // Invalid name
+                'name' => 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ',
+            ]));
+            $this->fail('Update should have failed due to name too long');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterStringTooLong', $e->getMessage());
+            $this->assertEquals('name', $e->parameter);
+        }
     }
 
     /**
      * Request parameter name cannot be empty
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testEmptyNameUpdate() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            // Invalid name
-            'name' => '',
-        ]);
 
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => '',
+            ]));
+            $this->fail('Update should have failed due to empty name');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterStringTooShort', $e->getMessage());
+            $this->assertEquals('name', $e->parameter);
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-     */
     public function testFutureBirthday() {
         // Create the user to edit
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'birth_date' => strtotime('2088-01-01'),
-        ]);
-
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'birth_date' => strtotime('2088-01-01'),
+            ]));
+            $this->fail('Update should have failed due to future birthday');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('birthdayInTheFuture', $e->getMessage());
+            $this->assertEquals('birth_date', $e->parameter);
+        }
     }
 
     /**
@@ -295,20 +305,17 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Omit state.
-        $country_id = 'MX';
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'country_id' => $country_id,
-        ]);
-
         try {
-            \OmegaUp\Controllers\User::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'country_id' => 'MX',
+            ]));
             $this->fail(
                 'All countries now have state information, so it must be provided.'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            // OK!
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertEquals('state_id', $e->parameter);
         }
     }
 
@@ -321,17 +328,15 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        //generate wrong gender option
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'gender' => \OmegaUp\Test\Utils::createRandomString(),
-        ]);
-
         try {
-            \OmegaUp\Controllers\User::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'gender' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            // OK!
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertEquals('gender', $e->parameter);
         }
     }
 
@@ -344,12 +349,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => 'female',
-        ]);
-
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        ]));
+        $this->assertEquals('ok', $response['status']);
     }
 
     /**
@@ -361,12 +365,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => null,
-        ]);
-
-        \OmegaUp\Controllers\User::apiUpdate($r);
+        ]));
+        $this->assertEquals('ok', $response['status']);
     }
 
     /**
@@ -378,17 +381,15 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        //generate wrong gender option
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'gender' => '',
-        ]);
-
         try {
-            \OmegaUp\Controllers\User::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'gender' => '',
+            ]));
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            // OK!
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+            $this->assertEquals('gender', $e->parameter);
         }
     }
 

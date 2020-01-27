@@ -213,11 +213,7 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         // Array of valid keys
         $valid_keys = [
             'title',
-            'validator',
-            'time_limit',
-            'memory_limit',
             'source',
-            'languages',
         ];
 
         foreach ($valid_keys as $key) {
@@ -741,5 +737,46 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_windows_cpp.zip"
             )
         );
+    }
+
+    public function testProblemParams() {
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+
+        // Asserting all default values
+        $this->assertEquals(0, $problemParams->visibility);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(1000, $problemParams->validatorTimeLimit);
+        $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
+        $this->assertEquals(0, $problemParams->extraWallTime);
+        $this->assertEquals(10240, $problemParams->outputLimit);
+        $this->assertEquals(10240, $problemParams->inputLimit);
+        $this->assertFalse($problemParams->emailClarifications);
+
+        // New object with custom values
+        $titleAlias = \OmegaUp\Test\Utils::createRandomString();
+        $overallWallTimeLimit = 50000;
+        $problemParams = new \OmegaUp\ProblemParams([
+            'problem_alias' => $titleAlias,
+            'title' => $titleAlias,
+            'update_published' => \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+            'overall_wall_time_limit' => $overallWallTimeLimit,
+            'email_clarifications' => true,
+        ]);
+
+        $this->assertEquals($titleAlias, $problemParams->title);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE,
+            $problemParams->updatePublished
+        );
+        $this->assertEquals(
+            $overallWallTimeLimit,
+            $problemParams->overallWallTimeLimit
+        );
+        $this->assertTrue($problemParams->emailClarifications);
     }
 }

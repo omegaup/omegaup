@@ -83,7 +83,7 @@ class UITools {
             'user' => $user,
             'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        if (!is_null($identity)) {
+        if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
 
             $smarty->assign(
@@ -102,27 +102,19 @@ class UITools {
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=92">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '128')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_16',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=16">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '16')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_32',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=32">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '32')
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_51',
-                '<img src="https://secure.gravatar.com/avatar/' . md5(
-                    $email
-                ) . '?s=51">'
+                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '51')
             );
 
             $smarty->assign(
@@ -134,11 +126,11 @@ class UITools {
         } else {
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
-                '<img src="/media/avatar_92.png">'
+                '/media/avatar_92.png'
             );
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_16',
-                '<img src="/media/avatar_16.png">'
+                '/media/avatar_16.png'
             );
         }
 
@@ -163,6 +155,9 @@ class UITools {
         $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
 
+        // TODO: It should be removed when all templates call render function
+        \OmegaUp\UITools::assignSmartyNavbarHeader($smarty);
+
         $smarty->assign(
             'ENABLED_EXPERIMENTS',
             \OmegaUp\Experiments::getInstance()->getEnabledExperiments()
@@ -171,43 +166,77 @@ class UITools {
         return $smarty;
     }
 
-    /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string} $callback
-     */
-    public static function render(
-        callable $callback,
-        bool $withStatusError = false
+    public static function getFormattedGravatarURL(
+        string $hashedEmail,
+        string $size
+    ): string {
+        return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
+
+    private static function assignSmartyNavbarHeader(
+        \Smarty $smarty,
+        bool $inContest = false,
+        string $navbarSection = ''
     ): void {
-        $smarty = self::getSmartyInstance();
-        try {
+        [
+            'email' => $email,
+            'identity' => $identity,
+            'is_admin' => $isAdmin,
+        ] = \OmegaUp\Controllers\Session::getCurrentSession();
+        $smarty->assign(
+            'headerPayload',
             [
-                'smartyProperties' => $smartyProperties,
-                'template' => $template
-            ] = $callback(new Request($_REQUEST));
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            if ($withStatusError) {
-                $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
-            } else {
-                \OmegaUp\ApiCaller::handleException($e);
-            }
-        } catch (\Exception $e) {
-            \OmegaUp\ApiCaller::handleException($e);
-        }
-        /** @var mixed $value */
-        foreach ($smartyProperties as $key => $value) {
-                $smarty->assign($key, $value);
-        }
-        \OmegaUp\UITools::getSmartyInstance()->display(
-            sprintf(
-                '%s/templates/%s',
-                strval(OMEGAUP_ROOT),
-                $template
-            )
+                'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
+                'inContest' => $inContest,
+                'isLoggedIn' => !is_null($identity),
+                'isReviewer' => !is_null(
+                    $identity
+                ) ? \OmegaUp\Authorization::isQualityReviewer(
+                    $identity
+                ) : false,
+                'gravatarURL51' => is_null($email) ? '' :
+                  self::getFormattedGravatarURL(md5($email), '51'),
+                'currentUsername' =>
+                    !is_null(
+                        $identity
+                    ) && !is_null(
+                        $identity->username
+                    ) ? $identity->username :
+                    '',
+                'isAdmin' => $isAdmin,
+                'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
+                'navbarSection' => $navbarSection,
+            ]
         );
     }
 
-    public static function renderWithEmptyResponse(string $template): void {
-        \OmegaUp\UITools::getSmartyInstance()->display(
+    /**
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, navbarSection?: string} $callback
+     */
+    public static function render(callable $callback): void {
+        $smarty = self::getSmartyInstance();
+        try {
+            $response = $callback(new Request($_REQUEST));
+            $smartyProperties = $response['smartyProperties'];
+            $template = $response['template'];
+            $inContest = $response['inContest'] ?? false;
+            $navbarSection = $response['navbarSection'] ?? '';
+        } catch (\Exception $e) {
+            \OmegaUp\ApiCaller::handleException($e);
+        }
+
+        \OmegaUp\UITools::assignSmartyNavbarHeader(
+            $smarty,
+            $inContest,
+            $navbarSection
+        );
+
+        /** @var mixed $value */
+        foreach ($smartyProperties as $key => $value) {
+            $smarty->assign($key, $value);
+        }
+
+        $smarty->display(
             sprintf(
                 '%s/templates/%s',
                 strval(OMEGAUP_ROOT),

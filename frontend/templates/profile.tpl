@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}" inline}
+{include file='head.tpl' navbarSection='users' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProfile#}" inline}
 
 {if !isset($STATUS_ERROR)}
 
@@ -89,7 +89,6 @@
 </div>
 <div id="username" style="display:none" data-username="{$profile.username|replace:"\\":""}"></div>
 
-<script src="{version_hash src="/js/profile.js"}"></script>
 <script src="{version_hash src="/third_party/js/iso-3166-2.js/iso3166.min.js"}"></script>
 
 {/if}

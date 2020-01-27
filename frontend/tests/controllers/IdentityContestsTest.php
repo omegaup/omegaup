@@ -34,7 +34,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $contestantLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -95,8 +95,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $identityPublicContest['username'],
             $password
         );
-
-        $this->assertEquals('ok', $runResponse['status']);
+        $this->assertArrayHasKey('guid', $runResponse);
 
         // Updating admission_mode for the contest
         $directorLogin = self::login($contestData['director']);
@@ -119,8 +118,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $invitedIdentityPrivateContest['username'],
             $password
         );
-
-        $this->assertEquals('ok', $runResponse['status']);
+        $this->assertArrayHasKey('guid', $runResponse);
 
         try {
             // Our contestant tries to open a private contest

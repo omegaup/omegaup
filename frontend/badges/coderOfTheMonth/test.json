@@ -27,7 +27,7 @@
                 "output_limit": 10240,
                 "input_limit": 10240,
                 "source": "omegaUp classics",
-                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
                 "email_clarifications": 1
               },
               "files": {
@@ -49,7 +49,7 @@
                 "output_limit": 10240,
                 "input_limit": 10240,
                 "source": "omegaUp classics",
-                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
                 "email_clarifications": 1
               },
               "files": {
@@ -90,8 +90,8 @@
               "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
               "params": {
                 "problem_alias": "sumas",
-                "language": "py",
-                "source": "print sum(map(int, raw_input().strip().split()))"
+                "language": "py3",
+                "source": "print(sum(int(x) for x in input().strip().split()))"
               },
               "gradeResult": {
                 "verdict": "AC"
@@ -101,8 +101,8 @@
               "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
               "params": {
                 "problem_alias": "sumas_2",
-                "language": "py",
-                "source": "print sum(map(int, raw_input().strip().split()))"
+                "language": "py3",
+                "source": "print(sum(int(x) for x in input().strip().split()))"
               },
               "gradeResult": {
                 "verdict": "AC"
@@ -115,7 +115,7 @@
     {
       "type": "scripts",
       "scripts": [
-        "update_user_rank.py"
+        "update_ranks.py"
       ]
     },
     {

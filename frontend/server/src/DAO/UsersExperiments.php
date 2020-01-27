@@ -39,6 +39,7 @@ class UsersExperiments extends \OmegaUp\DAO\Base\UsersExperiments {
 
         /** @var \OmegaUp\DAO\VO\UsersExperiments[] */
         $usersExperiments = [];
+        /** @var array{experiment: string, user_id: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

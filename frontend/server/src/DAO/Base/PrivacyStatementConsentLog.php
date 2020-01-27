@@ -148,10 +148,8 @@ abstract class PrivacyStatementConsentLog {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\PrivacyStatementConsentLog[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\PrivacyStatementConsentLog> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\PrivacyStatementConsentLog>
      */
     final public static function getAll(
         ?int $pagina = null,
