@@ -1812,6 +1812,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem Download API
      *
+     * @param \OmegaUp\Request $r
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return void
@@ -2923,6 +2925,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validate list request
      *
+     * @param \OmegaUp\Request $r
      * @return array{offset: null|int, rowcount: null|int}
      */
     private static function validateList(\OmegaUp\Request $r) {

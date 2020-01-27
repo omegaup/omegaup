@@ -291,6 +291,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($problemData['author']);
+
         try {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
