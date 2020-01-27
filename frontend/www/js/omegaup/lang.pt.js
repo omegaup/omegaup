@@ -62,6 +62,8 @@ const translations = {
 	badge_feedbackProvider_name: "Provedor de Feedback",
 	badge_javaExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em Java.",
 	badge_javaExpert_name: "Usu\u00e1rio Especialista em Java",
+	badge_karelExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em Karel.",
+	badge_karelExpert_name: "Usu\u00e1rio Especialista em Karel",
 	badge_legacyUser_description: "O usu\u00e1rio realizou um envio no primeiro ano desde o lan\u00e7amento de omegaUp.",
 	badge_legacyUser_name: "Usu\u00e1rio Hist\u00f3rico",
 	badge_pascalExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em Pascal.",
