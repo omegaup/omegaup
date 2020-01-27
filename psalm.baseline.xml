@@ -436,9 +436,4 @@
       <code>$_GET['redirect']</code>
     </MixedArgument>
   </file>
-  <file src="frontend/www/logout.php">
-    <MixedOperand occurrences="1">
-      <code>$_REQUEST['redirect']</code>
-    </MixedOperand>
-  </file>
 </files>

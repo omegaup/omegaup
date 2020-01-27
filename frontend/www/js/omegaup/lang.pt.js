@@ -510,6 +510,7 @@ const translations = {
 	omegaupTitleIndex: "Bem-vindo",
 	omegaupTitleLatestSubmissions: "\u00daltimas submiss\u00f5es",
 	omegaupTitleLogin: "Entrar",
+	omegaupTitleLogout: "Sair",
 	omegaupTitleMyProblemsList: "Meus problemas",
 	omegaupTitleOmegaUpForSchools: "Bem-vindo a omegaUp para escolas",
 	omegaupTitlePrivacyPolicy: "Pol\u00edtica de privacidade",
