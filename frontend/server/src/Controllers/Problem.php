@@ -1822,7 +1822,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        $problem = self::validateDownload($r);
+        $problem = self::validateDownload(
+            $r->identity,
+            strval($r['problem_alias'])
+        );
 
         header('Pragma: public');
         header('Expires: 0');
@@ -1843,28 +1846,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validate problem Details API
      *
-     * @param \OmegaUp\Request $r
-     *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return \OmegaUp\DAO\VO\Problems
      */
-    private static function validateDownload(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Problems {
-        $r->ensureIdentity();
-
+    private static function validateDownload(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $problemAlias
+    ): \OmegaUp\DAO\VO\Problems {
         \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
+            $problemAlias,
             'problem_alias'
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1944,7 +1946,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureBool('show_solvers', /*required=*/false);
+        $r->ensureBool('prevent_problemset_open', /*required=*/false);
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['auth_token'],
+            'auth_token'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         $result = self::getValidProblemAndProblemset($r);
         [
             'exists' => $problemExisits,
@@ -1955,11 +1966,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $result;
         }
         $details = self::getProblemDetails(
-            $r,
+            $r->identity,
             $problem,
             $problemset,
             strval($r['lang']),
-            boolval($r['show_solvers']) === true
+            boolval($r['show_solvers']) === true,
+            $r['auth_token'],
+            boolval($r['prevent_problemset_open']) === true,
+            $r['contest_alias']
         );
         if (is_null($details)) {
             return [
@@ -1999,11 +2013,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: list<string>, email_clarifications: bool, runs?: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}>, admin?: bool, solvers?: list<array{username: string, language: string, runtime: float, memory: float, time: int}>, points: float, score: float}
      */
     private static function getProblemDetails(
-        \OmegaUp\Request $r,
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
         string $statementLanguage,
-        bool $showSolvers
+        bool $showSolvers,
+        ?string $authToken,
+        bool $preventProblemsetOpen,
+        ?string $contestAlias
     ): ?array {
         $response = [];
 
@@ -2034,10 +2051,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Add preferred language of the user.
         $request = new \OmegaUp\Request(
-            ['omit_rank' => true, 'auth_token' => $r['auth_token']]
+            [
+                'omit_rank' => true,
+                'auth_token' => $authToken,
+            ]
         );
 
-        if (!is_null($r->identity) && !is_null($r->identity->username)) {
+        if (!is_null($loggedIdentity) && !is_null($loggedIdentity->username)) {
             self::authenticateOrAllowUnauthenticatedRequest($request);
 
             $identity = self::resolveTargetIdentity($request);
@@ -2048,7 +2068,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $userData = \OmegaUp\Controllers\User::getUserProfile(
-                $r->identity,
+                $loggedIdentity,
                 $identity,
                 /**$omitRank=*/true
             );
@@ -2083,8 +2103,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (
             \OmegaUp\DAO\Problems::isVisible($problem) ||
             (
-                !is_null($r->identity) &&
-                \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
+                !is_null($loggedIdentity) &&
+                \OmegaUp\Authorization::isProblemAdmin(
+                    $loggedIdentity,
+                    $problem
+                )
             )
         ) {
             if (is_null($problem->acl_id)) {
@@ -2118,30 +2141,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id
         ) : null;
 
-        if (!is_null($r->identity)) {
+        if (!is_null($loggedIdentity)) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 intval($problem->problem_id),
                 $problemsetId,
-                intval($r->identity->identity_id)
+                intval($loggedIdentity->identity_id)
             );
 
             // Add each filtered run to an array
             $results = [];
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
-                $run['username'] = strval($r->identity->username);
+                $run['username'] = strval($loggedIdentity->username);
                 $results[] = $run;
             }
             $response['runs'] = $results;
         }
 
-        if (!is_null($problemset) && !is_null($r->identity)) {
+        if (!is_null($problemset) && !is_null($loggedIdentity)) {
             $result['admin'] = \OmegaUp\Authorization::isAdmin(
-                $r->identity,
+                $loggedIdentity,
                 $problemset
             );
-            if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
+            if (!$result['admin'] || $preventProblemsetOpen !== true) {
                 if (is_null($problemset->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemsetNotFound'
@@ -2157,10 +2180,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
-                    $r->identity,
+                    $loggedIdentity,
                     $container,
                     \OmegaUp\Authorization::canSubmitToProblemset(
-                        $r->identity,
+                        $loggedIdentity,
                         $problemset
                     )
                 );
@@ -2171,14 +2194,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 !\OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
                     $problemsetId,
                     $problem->problem_id,
-                    $r->identity->identity_id
+                    $loggedIdentity->identity_id
                 )
             ) {
                 \OmegaUp\DAO\ProblemsetProblemOpened::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
                     'open_time' => \OmegaUp\Time::get(),
-                    'identity_id' => $r->identity->identity_id
+                    'identity_id' => $loggedIdentity->identity_id
                 ]));
             }
         } elseif ($showSolvers) {
@@ -2187,9 +2210,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($r->identity)) {
+        if (!is_null($loggedIdentity)) {
             \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
-                intval($r->identity->identity_id),
+                intval($loggedIdentity->identity_id),
                 intval($problem->problem_id)
             );
         }
@@ -2211,14 +2234,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             )),
             2
         );
-        if (is_null($r->identity)) {
+        if (is_null($loggedIdentity)) {
             $response['score'] = 0.0;
         } else {
             $response['score'] = self::bestScore(
                 $problem,
                 $problemsetId,
-                $r['contest_alias'],
-                intval($r->identity->identity_id)
+                $contestAlias,
+                intval($loggedIdentity->identity_id)
             );
         }
         return $response;
@@ -2925,28 +2948,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validate list request
      *
-     * @param \OmegaUp\Request $r
      * @return array{offset: null|int, rowcount: null|int}
      */
-    private static function validateList(\OmegaUp\Request $r) {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
+    private static function validateList(
+        ?int $offset,
+        ?int $rowcount,
+        ?int $page
+    ) {
         // Defaults for offset and rowcount
-        $offset = null;
-        $rowcount = null;
-        if (!isset($r['page'])) {
-            $offset = !isset($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = !isset(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
+        $newOffset = null;
+        $newRowcount = null;
+        if (!is_null($page)) {
+            $newOffset = !is_null($offset) ? 0 : is_null($offset);
+            $newRowcount = !is_null(
+                $rowcount
+            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : is_null(
+                $rowcount
             );
         }
 
         return [
-            'offset' => $offset,
-            'rowcount' => $rowcount,
+            'offset' => $newOffset,
+            'rowcount' => $newRowcount,
         ];
     }
 
@@ -3066,7 +3089,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         [
             'offset' => $offset,
             'rowcount' => $rowcount,
-        ] = self::validateList($r);
+        ] = self::validateList(
+            isset($r['offset']) ? intval($r['offset']) : null,
+            isset($r['rowcount']) ? intval($r['rowcount']) : null,
+            isset($r['page']) ? intval($r['page']) : null
+        );
         [
             'mode' => $mode,
             'page' => $page,
@@ -3239,7 +3266,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         [
             'offset' => $offset,
             'rowcount' => $pageSize,
-        ] = self::validateList($r);
+        ] = self::validateList(
+            isset($r['offset']) ? intval($r['offset']) : null,
+            isset($r['rowcount']) ? intval($r['rowcount']) : null,
+            isset($r['page']) ? intval($r['page']) : null
+        );
 
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
@@ -3477,7 +3508,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
+        $r->ensureBool('prevent_problemset_open', /*required=*/false);
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['auth_token'],
+            'auth_token'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         [
             'problem' => $problem,
             'problemset' => $problemset,
@@ -3488,11 +3528,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Get problem details from API
         $details = self::getProblemDetails(
-            $r,
+            $r->identity,
             $problem,
             $problemset,
             strval($r['lang']),
-            /*showSolvers=*/true
+            /*showSolvers=*/true,
+            $r['auth_token'],
+            boolval($r['prevent_problemset_open']) === true,
+            $r['contest_alias']
         );
         if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -3616,7 +3659,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         [
             'offset' => $offset,
             'rowcount' => $rowcount,
-        ] = self::validateList($r);
+        ] = self::validateList(
+            isset($r['offset']) ? intval($r['offset']) : null,
+            isset($r['rowcount']) ? intval($r['rowcount']) : null,
+            isset($r['page']) ? intval($r['page']) : null
+        );
         [
             'mode' => $mode,
             'page' => $page,
