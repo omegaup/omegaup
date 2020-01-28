@@ -1,0 +1,15 @@
+{
+  "es": {
+    "name": "Usuario Experto en Karel",
+    "description": "El usuario ha resuelto más de 10 problemas en Karel."
+  },
+  "en": {
+    "name": "Karel Expert User",
+    "description": "The user has solved more than 10 problems in Karel."
+  },
+  "pt": {
+    "name": "Usuário Especialista em Karel",
+    "description": "O usuário tem resolvido mais de 10 problemas em Karel."
+  }
+}
+
