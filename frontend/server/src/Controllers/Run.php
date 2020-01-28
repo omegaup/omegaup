@@ -1120,17 +1120,15 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready'],
-            false
+            ['new', 'waiting', 'compiling', 'running', 'ready']
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],
             'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS,
-            false
+            \OmegaUp\Controllers\Run::VERDICTS
         );
 
         // Check filter by problem, is optional
@@ -1150,11 +1148,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
-            array_keys(self::SUPPORTED_LANGUAGES),
-            false
+            array_keys(self::SUPPORTED_LANGUAGES)
         );
 
         // Get user if we have something in username
