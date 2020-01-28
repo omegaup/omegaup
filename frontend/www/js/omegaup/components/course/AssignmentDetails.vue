@@ -3,7 +3,7 @@
     <div class="panel-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-md-4">
             <label
               >{{ T.wordsTitle }}
               <input
@@ -29,6 +29,26 @@
                 v-bind:disabled="update"
                 v-model="alias"
             /></label>
+          </div>
+          <div class="form-group col-md-4">
+            <label
+              >{{ T.courseAssignmentNewFormType }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseAssignmentNewFormTypeDesc"
+              ></span>
+              <select class="form-control" v-model="assignmentType">
+                <option value="homework">
+                  {{ T.wordsHomework }}
+                </option>
+                <option value="test">
+                  {{ T.wordsTest }}
+                </option>
+              </select></label
+            >
           </div>
         </div>
         <div class="row">
@@ -59,29 +79,39 @@
                 v-bind:title="T.courseAssignmentNewFormEndDateDesc"
               ></span>
               <omegaup-datetimepicker
+                v-bind:enabled="!unlimitedDuration"
+                v-bind:readonly="false"
                 v-model="finishTime"
               ></omegaup-datetimepicker
             ></label>
           </div>
           <div class="form-group col-md-4">
-            <label
-              >{{ T.courseAssignmentNewFormType }}
+            <span class="faux-label"
+              >{{ T.courseNewFormUnlimitedDuration }}
               <span
                 aria-hidden="true"
                 class="glyphicon glyphicon-info-sign"
                 data-placement="top"
                 data-toggle="tooltip"
-                v-bind:title="T.courseAssignmentNewFormTypeDesc"
-              ></span>
-              <select class="form-control" v-model="assignmentType">
-                <option value="homework">
-                  {{ T.wordsHomework }}
-                </option>
-                <option value="test">
-                  {{ T.wordsTest }}
-                </option>
-              </select></label
-            >
+                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
+              ></span
+            ></span>
+            <div class="form-control container-fluid">
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="true"
+                  v-model="unlimitedDuration"
+                />{{ T.wordsYes }}</label
+              >
+              <label class="radio-inline"
+                ><input
+                  type="radio"
+                  v-bind:value="false"
+                  v-model="unlimitedDuration"
+                />{{ T.wordsNo }}</label
+              >
+            </div>
           </div>
         </div>
         <div class="row">
@@ -148,6 +178,7 @@ export default class CourseAssignmentDetails extends Vue {
   name = this.assignment.name || '';
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
+  unlimitedDuration = !this.assignment.finish_time;
 
   @Watch('assignment')
   onAssignmentChange() {
@@ -161,6 +192,7 @@ export default class CourseAssignmentDetails extends Vue {
     this.finishTime = this.assignment.finish_time || new Date();
     this.name = this.assignment.name;
     this.startTime = this.assignment.start_time || new Date();
+    this.unlimitedDuration = !this.assignment.finish_time;
   }
 
   @Emit('cancel')

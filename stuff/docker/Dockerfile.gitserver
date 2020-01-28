@@ -1,0 +1,26 @@
+FROM ubuntu:bionic
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update -y && \
+    apt install --no-install-recommends -y \
+        curl ca-certificates xz-utils openjdk-11-jre-headless && \
+    /usr/sbin/update-ca-certificates && \
+    apt autoremove -y && \
+    apt clean
+
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.6/omegaup-gitserver.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
+RUN mkdir -p /etc/omegaup/gitserver
+
+RUN useradd --create-home --shell=/bin/bash ubuntu
+
+RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
+RUN mkdir -p /var/lib/omegaup && chown -R ubuntu /var/lib/omegaup
+RUN mkdir -p /var/lib/omegaup/problems.git && chown -R ubuntu /var/lib/omegaup
+
+COPY ./etc/omegaup/gitserver/* /etc/omegaup/gitserver/
+
+USER ubuntu
+WORKDIR /var/lib
+
+CMD ["/usr/bin/omegaup-gitserver"]

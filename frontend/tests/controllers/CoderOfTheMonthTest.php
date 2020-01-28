@@ -233,7 +233,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
 
         $runCreationDate = date_create($runCreationDate);
         date_add(
@@ -243,9 +243,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
 
-        $this->createRuns($identity, $today, 2 /*numRuns*/);
+        $this->createRuns($identity, $today, 10 /*numRuns*/);
 
         // Getting Coder Of The Month
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');

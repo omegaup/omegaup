@@ -41,9 +41,10 @@ OmegaUp.on('ready', function() {
                   school_id: school_id,
                 };
 
-                if (!ev.unlimitedDuration) {
-                  params.finish_time =
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
+                if (ev.unlimitedDuration) {
+                  params.unlimited_duration = true;
+                } else {
+                  params.finish_time = ev.finishTime.getTime() / 1000;
                 }
 
                 API.Course.create(params)
