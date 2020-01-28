@@ -2958,13 +2958,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Defaults for offset and rowcount
         $newOffset = null;
         $newRowcount = null;
-        if (!is_null($page)) {
-            $newOffset = !is_null($offset) ? 0 : is_null($offset);
-            $newRowcount = !is_null(
+        if (is_null($page)) {
+            $newOffset = is_null($offset) ? 0 : $offset;
+            $newRowcount = is_null(
                 $rowcount
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : is_null(
-                $rowcount
-            );
+            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : $rowcount;
         }
 
         return [
