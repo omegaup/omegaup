@@ -205,8 +205,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-                ],
-                false
+                ]
             );
         } else {
             if (\OmegaUp\Validators::isRestrictedAlias($params->problemAlias)) {
@@ -1314,22 +1313,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $contents,
         string $message,
         ?string $lang,
-        ?string $updatePublished
+        string $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
     ): array {
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $lang,
             'lang',
-            \OmegaUp\Controllers\Problem::ISO639_1,
-            false /* is_required */
+            \OmegaUp\Controllers\Problem::ISO639_1
         );
         if (is_null($lang)) {
             $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
                 $identity
             );
-        }
-        if (is_null($updatePublished)) {
-            $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         }
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1347,7 +1342,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     "{$directory}/{$lang}.markdown" => $contents,
                 ]
             );
-            if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE) {
+            if ($updatePublished !== \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE) {
                 [
                     $problem->commit,
                     $problem->current_version
@@ -1355,7 +1350,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problem,
                     $problemDeployer->publishedCommit
                 );
-                if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                if ($updatePublished !== \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $user,
@@ -1395,20 +1390,32 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['statement'],
             'statement'
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        self::updateStatement(
-            $r->identity,
-            $r->user,
-            $problem,
-            $r['statement'],
-            $r['message'],
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['lang'],
-            !is_null(
-                $r['update_published']
-            ) ? strval(
-                $r['update_published']
-            ) : null
+            'lang',
+            \OmegaUp\Controllers\Problem::ISO639_1
         );
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
+        if (!is_null($r['update_published'])) {
+            self::updateStatement(
+                $r->identity,
+                $r->user,
+                $problem,
+                $r['statement'],
+                $r['message'],
+                $r['lang'],
+                strval($r['update_published'])
+            );
+        } else {
+            self::updateStatement(
+                $r->identity,
+                $r->user,
+                $problem,
+                $r['statement'],
+                $r['message'],
+                $r['lang']
+            );
+        }
         return [
             'status' => 'ok'
         ];
@@ -1421,7 +1428,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $statement,
         string $message,
         ?string $lang,
-        ?string $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+        string $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
     ): void {
         $updatedFileLanguages = self::updateLooseFile(
             $identity,
@@ -1459,20 +1466,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\Validators::validateStringNonEmpty($r['solution'], 'solution');
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        $updatedFileLanguages = self::updateLooseFile(
-            $r->identity,
-            $r->user,
-            $problem,
-            'solutions',
-            $r['solution'],
-            $r['message'],
-            !is_null($r['lang']) ? strval($r['lang']) : null,
-            !is_null(
-                $r['update_published']
-            ) ? strval(
-                $r['update_published']
-            ) : null
-        );
+        if (!is_null($r['update_published'])) {
+            $updatedFileLanguages = self::updateLooseFile(
+                $r->identity,
+                $r->user,
+                $problem,
+                'solutions',
+                $r['solution'],
+                $r['message'],
+                !is_null($r['lang']) ? strval($r['lang']) : null,
+                strval($r['update_published'])
+            );
+        } else {
+            $updatedFileLanguages = self::updateLooseFile(
+                $r->identity,
+                $r->user,
+                $problem,
+                'solutions',
+                $r['solution'],
+                $r['message'],
+                !is_null($r['lang']) ? strval($r['lang']) : null
+            );
+        }
         self::invalidateSolutionCache($problem, $updatedFileLanguages);
         return [
             'status' => 'ok'
@@ -1989,15 +2004,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureBool('show_solvers', /*required=*/false);
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
-        $identity = null;
         try {
             $r->ensureIdentity();
-            $identity = $r->identity;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
         }
         $result = self::getValidProblemAndProblemset(
-            $identity,
+            $r->identity,
             $r['contest_alias'],
             $r['problem_alias'],
             $r['lang'],
@@ -2501,15 +2514,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['update_published'],
             'update_published'
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['update_published'],
             'update_published',
             [
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            ],
-            false
+            ]
         );
 
         $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
@@ -2572,7 +2584,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Runs::createRunsForVersion($problem);
             \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-            if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+            if (
+                strval(
+                    $updatePublished
+                ) != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
+            ) {
                 \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                     $problem,
                     $r->user,
@@ -2844,8 +2860,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->problem_id,
             $isProblemAdmin,
             $r->identity->identity_id,
-            $r['offset'],
-            $r['rowcount']
+            !empty($r['offset']) ? intval($r['offset']) : null,
+            intval($r['rowcount'])
         );
 
         foreach ($clarifications as &$clar) {
@@ -3034,33 +3050,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, mode: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
      */
     private static function validateListParams(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['mode'],
             'mode',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
-            ),
-            false
+            )
         );
         \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['order_by'],
             'order_by',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
-            ),
-            false
+            )
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
             array_merge(
                 ['all', ''],
                 \OmegaUp\Controllers\Problem::VALID_LANGUAGES
-            ),
-            false
+            )
         );
 
         $tags = $r->getStringList('tag', []);
@@ -3564,19 +3577,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $identity = null;
         try {
             $r->ensureIdentity();
-            $identity = $r->identity;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
+            $r->identity = null;
         }
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         [
             'problem' => $problem,
             'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset(
-            $identity,
+            $r->identity,
             !is_null($r['contest_alias']) ? strval($r['contest_alias']) : null,
             !is_null($r['problem_alias']) ? strval($r['problem_alias']) : null,
             $r['lang'],
@@ -3652,18 +3664,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result['payload'] = $details;
 
         if (
-            is_null($identity)
-            || is_null($identity->user_id)
+            is_null($r->identity)
+            || is_null($r->identity->user_id)
             || is_null($problem->problem_id)
         ) {
             return $result;
         }
         $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
             $problem->problem_id,
-            $identity->user_id
+            $r->identity->user_id
         );
         $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
-            $identity,
+            $r->identity,
             $problem
         );
 
@@ -3691,13 +3703,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
             !is_null($r->user) && !\OmegaUp\Controllers\User::isMainIdentity(
                 $r->user,
-                $identity
+                $r->identity
             ) && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                 $r->user
             );
         $result['payload']['solution_status'] = self::getProblemSolutionStatus(
             $problem,
-            $identity
+            $r->identity
         );
         return $result;
     }

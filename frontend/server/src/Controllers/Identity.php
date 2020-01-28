@@ -481,8 +481,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $gender,
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                false
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
         }
     }

@@ -450,23 +450,22 @@ class Validators {
     }
 
     /**
-     *
+     * @template T
      * @param mixed $parameter
      * @param string $parameterName
-     * @param array $enum
+     * @param T[] $enum
      * @param bool $required
+     * @psalm-assert T $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateInEnum(
         $parameter,
         string $parameterName,
-        array $enum,
-        bool $required = true
+        array $enum
     ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*$required=*/true)) {
             return;
         }
-
         if (!in_array($parameter, $enum)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
@@ -480,7 +479,27 @@ class Validators {
     }
 
     /**
-     *
+     * @template T
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @param T[] $enum
+     * @param bool $required
+     * @psalm-assert null|T $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateOptionalInEnum(
+        $parameter,
+        string $parameterName,
+        array $enum,
+        bool $required = false
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateInEnum($parameter, $parameterName, $enum);
+    }
+
+    /**
      * @template T
      * @param list<T> $parameter
      * @param string $parameterName

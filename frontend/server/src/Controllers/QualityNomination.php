@@ -443,8 +443,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
             'status',
-            ['open', 'approved', 'denied'],
-            true /*is_required*/
+            ['open', 'approved', 'denied']
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['rationale'],
