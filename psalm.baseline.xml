@@ -186,7 +186,7 @@
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <MixedArgument occurrences="13">
+    <MixedArgument occurrences="12">
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
@@ -196,13 +196,11 @@
       <code>$updatePublished</code>
       <code>$r['problem_alias']</code>
       <code>$updatePublished</code>
-      <code>$r['contest_alias']</code>
       <code>$r['lang']</code>
       <code>$updatePublished</code>
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
       <code>$run</code>
-      <code>$r['contest_alias']</code>
     </MixedArgument>
     <MixedAssignment occurrences="8">
       <code>$run</code>

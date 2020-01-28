@@ -1856,11 +1856,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         string $problemAlias
     ): \OmegaUp\DAO\VO\Problems {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $problemAlias,
-            'problem_alias'
-        );
-
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
