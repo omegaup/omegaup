@@ -1168,7 +1168,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>}
+     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, public: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListCourses(\OmegaUp\Request $r) {
@@ -1210,6 +1210,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $response = [
             'admin' => [],
             'student' => [],
+            'public' => [],
         ];
         foreach ($adminCourses as $course) {
             $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
@@ -1217,11 +1218,82 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         foreach ($studentCourses as $course) {
-            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+            $courseAsArray = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
+            $response['student'][] = $courseAsArray;
+            if ($course->public) {
+                $response['public'][] = $courseAsArray;
+            }
         }
+
         return $response;
+    }
+
+    /**
+     * Returns true when logged user has previous activity in any course
+     *
+     * @return array{smartyProperties: array<empty, empty>, template: string}
+     */
+    public static function userHasActivityForSmarty(\OmegaUp\Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // User is not logged. Anyways, we need to show intro school page
+            return [
+                'smartyProperties' => [],
+                'template' => 'schools.intro.tpl',
+            ];
+        }
+
+        if (
+            !empty(
+                \OmegaUp\DAO\Courses::getCoursesForStudent(
+                    $r->identity->identity_id
+                )
+            )
+        ) {
+            die(header('Location: /course/'));
+        }
+
+        // Default values to search courses for legged user
+        $page = 1;
+        $pageSize = 1;
+        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            if (
+                !empty(
+                    \OmegaUp\DAO\Courses::getAll(
+                        $page,
+                        $pageSize,
+                        'course_id',
+                        'DESC'
+                    )
+                )
+            ) {
+                die(header('Location: /course/'));
+            }
+        }
+
+        if (
+            !empty(
+                \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                    $r->identity->identity_id,
+                    $page,
+                    $pageSize
+                )
+            )
+        ) {
+            die(header('Location: /course/'));
+        }
+        // User is logged in, but there is no information about courses
+        return [
+            'smartyProperties' => [],
+            'template' => 'schools.intro.tpl',
+        ];
     }
 
     /**

@@ -25,13 +25,30 @@ OmegaUp.on('ready', function() {
       const timeTypes = {
         CURRENT: 0,
         PAST: 1,
-        PUBLIC: 2,
       };
       const accessModes = {
-        STUDENT: 0,
-        ADMIN: 1,
+        PUBLIC: 0,
+        STUDENT: 1,
+        ADMIN: 2,
       };
       const allCourses = [
+        {
+          accessMode: 'public',
+          filteredCourses: [
+            {
+              timeType: 'current',
+              courses: [],
+              tabName: T.courseListCurrentCourses,
+            },
+            {
+              timeType: 'past',
+              courses: [],
+              tabName: T.courseListPastCourses,
+            },
+          ],
+          description: T.courseListPublicCourses,
+          activeTab: '',
+        },
         {
           accessMode: 'student',
           filteredCourses: [
@@ -45,13 +62,8 @@ OmegaUp.on('ready', function() {
               courses: [],
               tabName: T.courseListPastCourses,
             },
-            {
-              timeType: 'public',
-              courses: [],
-              tabName: T.courseListPublicCourses,
-            },
           ],
-          description: T.courseList,
+          description: T.courseListIStudy,
           activeTab: '',
         },
         {
@@ -67,11 +79,6 @@ OmegaUp.on('ready', function() {
               courses: [],
               tabName: T.courseListPastCourses,
             },
-            {
-              timeType: 'public',
-              courses: [],
-              tabName: T.courseListPublicCourses,
-            },
           ],
           description: T.courseListAdminCourses,
           activeTab: '',
@@ -82,11 +89,7 @@ OmegaUp.on('ready', function() {
       for (const courseDescription of allCourses) {
         let activeTab = '';
         for (const course of data[courseDescription.accessMode]) {
-          if (course.public) {
-            courseDescription.filteredCourses[timeTypes.PUBLIC].courses.push(
-              course,
-            );
-          } else if (
+          if (
             !course.finish_time ||
             course.finish_time.getTime() > currentDate
           ) {
