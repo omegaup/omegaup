@@ -254,4 +254,92 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    public function testAssignmentUpdateWithRuns() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            /*$admin=*/ null,
+            /*$adminLogin=*/ null,
+            /*$public=*/ false,
+            /*$requestsUserInformation=*/ 'no',
+            /*$showScoreboard=*/ 'false',
+            /*$startTimeDelay=*/ 0,
+            /*$courseDuration=*/ 180
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Login
+        $login = self::login($courseData['admin']);
+
+        // Add the problem to the assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
+        );
+
+        // Create our participant
+        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add student to course
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Trying to create a run out of the time
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 140);
+
+        try {
+            // Create a run for assignment
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problemData,
+                $courseData,
+                $participant
+            );
+            $this->fail('Should have thrown exception.');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals(
+                'runNotInsideContest',
+                $e->getMessage()
+            );
+        }
+
+        // Updating finish time to let participants create runs
+        $updatedStartTime = $courseData['request']['start_time'];
+        $updatedFinishTime = $courseData['request']['start_time'] + 160;
+
+        // Login
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $updatedStartTime,
+            'finish_time' => $updatedFinishTime,
+        ]));
+
+        // Create a successful run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+    }
 }

@@ -693,7 +693,19 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             $assignment->finish_time = null;
         }
-        \OmegaUp\DAO\Assignments::update($assignment);
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            \OmegaUp\DAO\Assignments::update($assignment);
+
+            \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeAsFinishTime(
+                $assignment
+            );
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         return [
             'status' => 'ok',

@@ -11,7 +11,8 @@ class Course {
         \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
         bool $public = false,
         string $requestsUserInformation = 'no',
-        string $showScoreboard = 'false'
+        string $showScoreboard = 'false',
+        int $courseDuration = 120
     ): array {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -44,7 +45,7 @@ class Course {
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get()),
-            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'finish_time' => (\OmegaUp\Time::get() + $courseDuration),
             'public' => $public,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -68,7 +69,8 @@ class Course {
         bool $public = false,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
-        int $startTimeDelay = 0
+        int $startTimeDelay = 0,
+        int $courseDuration = 120
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -81,7 +83,8 @@ class Course {
             $adminLogin,
             $public,
             $requestsUserInformation,
-            $showScoreboard
+            $showScoreboard,
+            $courseDuration
         );
         $courseAlias = $courseFactoryResult['course_alias'];
 
