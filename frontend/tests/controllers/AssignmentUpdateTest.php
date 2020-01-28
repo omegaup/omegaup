@@ -341,5 +341,44 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData,
             $participant
         );
+
+        // Set the unlimited duration time of the course as true
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAlias,
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'unlimited_duration' => true
+        ]));
+        $newCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNull($newCourse->finish_time);
+
+        // Set the unlimited duration time of the assignment as true
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'unlimited_duration' => true,
+        ]));
+
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNull($assignment->finish_time);
+
+        // Going forward in the time to test whether participant can create runs
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 280);
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
     }
 }
