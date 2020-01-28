@@ -1,11 +1,11 @@
 INSERT INTO
     `Tags` (`name`)
 VALUES
-    ('problemCategoryOpenAnswer'),
+    ('problemCategoryOpenResponse'),
     ('problemCategoryKarelEducation'),
     ('problemCategoryIntroductionToProgramming'),
     ('problemCategoryMathematicalProblems'),
-    ('problemCategoryElementalDataStructures'),
-    ('problemCategoryAlgorithmsAndNetworksOptimization'),
+    ('problemCategoryElementaryDataStructures'),
+    ('problemCategoryAlgorithmAndNetworkOptimization'),
     ('problemCategoryCompetitiveProgramming'),
     ('problemCategorySpecializedTopics');
