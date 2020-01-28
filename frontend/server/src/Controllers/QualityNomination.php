@@ -52,6 +52,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
+    const CATEGORY_TAGS = [
+        'problemCategoryOpenResponse',
+        'problemCategoryKarelEducation',
+        'problemCategoryIntroductionToProgramming',
+        'problemCategoryMathematicalProblems',
+        'problemCategoryElementaryDataStructures',
+        'problemCategoryAlgorithmAndNetworkOptimization',
+        'problemCategoryCompetitiveProgramming',
+        'problemCategorySpecializedTopics',
+    ];
+
     /**
      * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
@@ -62,7 +73,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         string $nominationType,
         array $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
-        if ($nominationType !== 'demotion') {
+        if ($nominationType !== 'demotion' && $nominationType !== 'quality_tag') {
             if (
                 isset($contents['before_ac']) &&
                 boolval($contents['before_ac']) &&
@@ -94,7 +105,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             } else {
                 // All nominations types, except demotions and before AC
-                // suggestions/demotions,are only allowed for users who
+                // suggestions/demotions, are only allowed for users who
                 // have already solved the problem.
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
@@ -298,8 +309,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
         } elseif ($nominationType === 'quality_tag') {
-            // Si la nominación es negativa, la categoría es opcional
-            // Si la nominación es positiva la categoría es obligatoria
+            // Only reviewers are allowed to send this type of nominations
+            if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+
             if (
                 !isset($contents['quality_seal']) ||
                 (
@@ -313,13 +329,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            /*
             if (!in_array($contents['tag'], self::CATEGORY_TAGS)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
                 );
-            } */
+            }
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
