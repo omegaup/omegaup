@@ -10,7 +10,10 @@
       </div>
       <h1>&nbsp;</h1>
     </div>
-    <template v-for="typeCourses in courses">
+    <template
+      v-for="typeCourses in courses"
+      v-if="typeCourses.activeTab !== ''"
+    >
       <div class="page-header">
         <h1>
           <span>{{ typeCourses.description }}</span>
