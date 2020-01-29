@@ -891,16 +891,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
+        $problemParams = self::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
+
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         return self::updateProblem(
             $r->identity,
             $r->user,
-            self::convertRequestToProblemParams($r, /*$isRequired=*/ false),
+            $problemParams,
             strval($r['message']),
-            $r['update_published'] ? strval(
-                $r['update_published']
-            ) : \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            $problemParams->updatePublished,
             boolval($r['redirect'])
         );
     }
@@ -1313,7 +1316,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $contents,
         string $message,
         ?string $lang,
-        string $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+        string $updatePublished
     ): array {
         // Check that lang is in the ISO 639-1 code list, default is "es".
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -1376,10 +1379,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateStatement(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $problemParams = self::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
             'problem_alias'
         );
+
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1390,32 +1398,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['statement'],
             'statement'
         );
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['lang'],
             'lang',
             \OmegaUp\Controllers\Problem::ISO639_1
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        if (!is_null($r['update_published'])) {
-            self::updateStatement(
-                $r->identity,
-                $r->user,
-                $problem,
-                $r['statement'],
-                $r['message'],
-                $r['lang'],
-                strval($r['update_published'])
-            );
-        } else {
-            self::updateStatement(
-                $r->identity,
-                $r->user,
-                $problem,
-                $r['statement'],
-                $r['message'],
-                $r['lang']
-            );
-        }
+        self::updateStatement(
+            $r->identity,
+            $r->user,
+            $problem,
+            $r['statement'],
+            $r['message'],
+            $r['lang'],
+            $problemParams->updatePublished
+        );
         return [
             'status' => 'ok'
         ];
@@ -1428,7 +1425,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $statement,
         string $message,
         ?string $lang,
-        string $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS
+        string $updatePublished
     ): void {
         $updatedFileLanguages = self::updateLooseFile(
             $identity,
@@ -1452,11 +1449,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $problemParams = self::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
         [
             'problem' => $problem,
         ] = self::validateCreateOrUpdate(
             $r->identity,
-            self::convertRequestToProblemParams($r, /*$isRequired=*/ false),
+            $problemParams,
             /*$isRequired=*/ false
         );
         if (is_null($problem)) {
@@ -1466,28 +1467,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\Validators::validateStringNonEmpty($r['solution'], 'solution');
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        if (!is_null($r['update_published'])) {
-            $updatedFileLanguages = self::updateLooseFile(
-                $r->identity,
-                $r->user,
-                $problem,
-                'solutions',
-                $r['solution'],
-                $r['message'],
-                !is_null($r['lang']) ? strval($r['lang']) : null,
-                strval($r['update_published'])
-            );
-        } else {
-            $updatedFileLanguages = self::updateLooseFile(
-                $r->identity,
-                $r->user,
-                $problem,
-                'solutions',
-                $r['solution'],
-                $r['message'],
-                !is_null($r['lang']) ? strval($r['lang']) : null
-            );
-        }
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['lang'],
+            'lang',
+            \OmegaUp\Controllers\Problem::ISO639_1
+        );
+
+        $updatedFileLanguages = self::updateLooseFile(
+            $r->identity,
+            $r->user,
+            $problem,
+            'solutions',
+            $r['solution'],
+            $r['message'],
+            $r['lang'],
+            $problemParams->updatePublished
+        );
         self::invalidateSolutionCache($problem, $updatedFileLanguages);
         return [
             'status' => 'ok'
@@ -3794,6 +3789,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
+        // HACK to prevent fails in validateCreateOrUpdate
+        $r['problem_alias'] = strval($r['problem']);
+
+        $problemParams = self::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
 
         if (!isset($r['request'])) {
             return [
@@ -3809,21 +3811,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             self::updateProblem(
                 $r->identity,
                 $r->user,
-                self::convertRequestToProblemParams($r, /*$isRequired=*/ false),
+                $problemParams,
                 strval($r['message']),
-                !is_null(
-                    $r['update_published']
-                ) ? strval(
-                    $r['update_published']
-                ) : \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                $problemParams->updatePublished,
                 boolval($r['redirect'])
             );
         } elseif ($r['request'] === 'markdown') {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['problem_alias'],
-                'problem_alias'
-            );
-            $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+            [
+                'problem' => $problem,
+            ] = self::validateCreateOrUpdate($r->identity, $problemParams);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
@@ -3833,9 +3829,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r['wmd-input-statement'],
                 'statement'
             );
-            \OmegaUp\Validators::validateStringNonEmpty(
+            \OmegaUp\Validators::validateOptionalInEnum(
                 $r['statement-language'],
-                'lang'
+                'lang',
+                \OmegaUp\Controllers\Problem::ISO639_1
             );
 
             self::updateStatement(
@@ -3844,7 +3841,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 $r['wmd-input-statement'],
                 $r['message'],
-                $r['statement-language']
+                $r['statement-language'],
+                $problemParams->updatePublished
             );
         }
 
