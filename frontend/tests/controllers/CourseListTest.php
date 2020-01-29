@@ -56,8 +56,10 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
-
-        $this->assertEquals(1, count($response['student']));
+        $studentCourses = array_filter($response['student'], function ($course) {
+            return !boolval($course['public']);
+        });
+        $this->assertEquals(1, count($studentCourses));
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
