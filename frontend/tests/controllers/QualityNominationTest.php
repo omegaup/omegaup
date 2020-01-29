@@ -232,6 +232,26 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'tag' => 'problemCategoryOpenResponse',
             ]),
         ]));
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategoryOpenResponse',
+                ]),
+            ]));
+            $this->fail(
+                'Reviewer can not send again a nomination for the same problem'
+            );
+        } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                'reviewerHasAlreadySentNominationForProblem',
+                $e->getMessage()
+            );
+        }
     }
 
     /**

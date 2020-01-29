@@ -338,6 +338,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
+
+            if (
+                \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
+                    $identity,
+                    $problem
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'reviewerHasAlreadySentNominationForProblem'
+                );
+            }
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
