@@ -219,6 +219,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCoderOfTheMonthAfterYear() {
+        // HACK: Cleaning the DB to avoid this test fails in the moment of
+        // calculate the coder of the month
+        \OmegaUp\Test\Utils::cleanupDB();
         ['user' => $userLastYear, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Using the first day of the month as "today" to avoid failures near
