@@ -16,30 +16,20 @@ RUN apt update -y && \
         php7.2-fpm php7.2-curl php7.2-mysql php7.2-sqlite3 php7.2-zip \
         php7.2-mbstring php7.2-json php7.2-opcache php7.2-xml nginx git \
         yarn nodejs supervisor python3-requests python3-mysqldb \
-        mysql-client-core-5.7 openjdk-11-jre-headless sudo && \
+        mysql-client-core-5.7 sudo && \
     apt autoremove -y && \
     apt clean
 
-RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.6/omegaup-gitserver.tar.xz | tar xJ -C /
-RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.28/omegaup-backend.tar.xz | tar xJ -C /
-RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.28/omegaup-runner.tar.xz | tar xJ -C /
-RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
 RUN curl -sL https://phar.phpunit.de/phpunit-6.5.9.phar -o /usr/bin/phpunit
 RUN chmod +x /usr/bin/phpunit
-RUN mkdir -p /etc/omegaup/gitserver /etc/omegaup/grader \
-    /etc/omegaup/broadcaster /etc/omegaup/runner /etc/omegaup/frontend
+RUN mkdir -p /etc/omegaup/frontend
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
 
-RUN mkdir -p /var/lib/omegaup/problems.git && chown -R ubuntu /var/lib/omegaup
 RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
 RUN mkdir -p /var/log/supervisor && chown -R ubuntu /var/log/supervisor
 
-COPY ./etc/omegaup/broadcaster/* /etc/omegaup/broadcaster/
 COPY ./etc/omegaup/frontend/* /etc/omegaup/frontend/
-COPY ./etc/omegaup/gitserver/* /etc/omegaup/gitserver/
-COPY ./etc/omegaup/grader/* /etc/omegaup/grader/
-COPY ./etc/omegaup/runner/* /etc/omegaup/runner/
 COPY ./etc/supervisor/* /etc/supervisor/
 COPY ./etc/php/7.2/fpm/* /etc/php/7.2/fpm/
 COPY ./etc/nginx/* /etc/nginx/
