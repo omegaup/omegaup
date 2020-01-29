@@ -56,46 +56,9 @@
 					</select>
 				</div>
 			</div>
-
-			<div class="row">
-				<div class="form-group  col-md-6">
-					<label for="validator_time_limit">{#problemEditFormValidatorTimeLimit#}</label>
-					<input id='validator_time_limit' name='validator_time_limit' value='{if $IS_UPDATE eq false}{$VALIDATOR_TIME_LIMIT}{/if}' type='text' class="form-control" />
-				</div>
-
-				<div class="form-group  col-md-6">
-					<label for="time_limit">{#problemEditFormTimeLimit#}</label>
-					<input id='time_limit' name='time_limit' value='{if $IS_UPDATE eq false}{$TIME_LIMIT}{/if}' type='text' class="form-control" />
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="form-group col-md-6">
-					<label for="overall_wall_time_limit">{#problemEditFormWallTimeLimit#}</label>
-					<input id='overall_wall_time_limit' name='overall_wall_time_limit' value='{if $IS_UPDATE eq false}{$OVERALL_WALL_TIME_LIMIT}{/if}' type='text' class="form-control" />
-				</div>
-
-				<div class="form-group col-md-6">
-					<label for="extra_wall_time">{#wordsExtraWallTimeMs#}</label>
-					<input id='extra_wall_time' name='extra_wall_time' value='{if $IS_UPDATE eq false}{$EXTRA_WALL_TIME}{/if}' type='text' class="form-control" />
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="form-group  col-md-6">
-					<label for="memory_limit">{#problemEditFormMemoryLimit#}</label>
-					<input id='memory_limit' name='memory_limit' value='{if $IS_UPDATE eq false}{$MEMORY_LIMIT}{/if}' type='text' class="form-control" />
-				</div>
-
-				<div class="form-group col-md-3 col-sm-6">
-					<label for="output_limit">{#problemEditFormOutputLimit#}</label>
-					<input id="output_limit" name="output_limit" value="{if $IS_UPDATE eq false}{$OUTPUT_LIMIT}{/if}" type='text' class="form-control" />
-				</div>
-				<div class="form-group col-md-3 col-sm-6">
-					<label for="input_limit">{#problemEditFormInputLimit#}</label>
-					<input id="input_limit" name="input_limit" value="{if $IS_UPDATE eq false}{$INPUT_LIMIT}{/if}" type='text' class="form-control" />
-				</div>
-			</div>
+			<div id="problem-new-validator"></div>
+			<script type="text/json" id="payload">{$payload|json_encode}</script>
+			{js_include entrypoint="problem_new_validator"}
 
 			<div class="row">
 				<div class="form-group  col-md-6" id="source-group">
