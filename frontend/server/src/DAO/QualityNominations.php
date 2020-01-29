@@ -102,6 +102,31 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         return $response;
     }
 
+    public static function reviewerHasQualityTagNominatedProblem(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ): bool {
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?";
+
+        return (
+            /** @var int */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$identity->identity_id, $problem->problem_id]
+            )
+        ) > 0;
+    }
+
     /**
      * Returns the votes from all the assigned reviewers for a particular
      * nomination.
