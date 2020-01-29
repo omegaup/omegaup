@@ -50,11 +50,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $r['participating']
             )
             : \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
-        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
-            'public',
-            'private',
-            'registration'
-        ], false);
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                'public',
+                'private',
+                'registration',
+            ]
+        );
 
         // admission mode status in contest is public
         $public = (
@@ -1472,11 +1476,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
-            'public',
-            'private',
-            'registration'
-        ], false);
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                'public',
+                'private',
+                'registration',
+            ]
+        );
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
             'alias',
@@ -1500,23 +1508,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['feedback'],
             'feedback',
             ['no', 'yes', 'partial'],
             $isRequired
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['penalty_type'],
             'penalty_type',
             ['contest_start', 'problem_open', 'runtime', 'none'],
             $isRequired
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['penalty_calc_policy'],
             'penalty_calc_policy',
-            ['sum', 'max'],
-            false
+            ['sum', 'max']
         );
 
         // Problems is optional
@@ -1561,11 +1568,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                \OmegaUp\Validators::validateInEnum(
+                \OmegaUp\Validators::validateOptionalInEnum(
                     $language,
                     'languages',
-                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-                    false
+                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
                 );
             }
         }
@@ -3021,17 +3027,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready'],
-            false
+            ['new', 'waiting', 'compiling', 'running', 'ready']
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],
             'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS,
-            false
+            \OmegaUp\Controllers\Run::VERDICTS
         );
 
         $problem = null;
@@ -3050,11 +3054,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-            false
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
 
         // Get user if we have something in username

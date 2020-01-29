@@ -205,8 +205,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
                     \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-                ],
-                false
+                ]
             );
         } else {
             if (\OmegaUp\Validators::isRestrictedAlias($params->problemAlias)) {
@@ -1314,11 +1313,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['lang'],
             'lang',
-            \OmegaUp\Controllers\Problem::ISO639_1,
-            false /* is_required */
+            \OmegaUp\Controllers\Problem::ISO639_1
         );
         if (is_null($r['lang'])) {
             $r['lang'] = \OmegaUp\Controllers\Identity::getPreferredLanguage(
@@ -2421,15 +2419,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['update_published'],
             'update_published'
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['update_published'],
             'update_published',
             [
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET,
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
                 \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            ],
-            false
+            ]
         );
 
         $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
@@ -2492,7 +2489,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Runs::createRunsForVersion($problem);
             \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-            if ($updatePublished != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+            if (
+                strval(
+                    $updatePublished
+                ) != \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET
+            ) {
                 \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                     $problem,
                     $r->user,
@@ -2954,33 +2955,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, mode: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
      */
     private static function validateListParams(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['mode'],
             'mode',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
-            ),
-            false
+            )
         );
         \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['order_by'],
             'order_by',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
-            ),
-            false
+            )
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
             array_merge(
                 ['all', ''],
                 \OmegaUp\Controllers\Problem::VALID_LANGUAGES
-            ),
-            false
+            )
         );
 
         $tags = $r->getStringList('tag', []);
