@@ -28,7 +28,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+        $exception = new \OmegaUp\Exceptions\NotFoundException(
+            'userOrMailNotFound'
+        );
+        $exception->addCustomMessageToArray(
+            'userEmail',
+            $userOrEmail
+        );
+        throw $exception;
     }
 
     /**
