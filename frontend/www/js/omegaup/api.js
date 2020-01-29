@@ -334,6 +334,12 @@ export default {
           res.finish_time = new Date(res.finish_time * 1000);
         }
       });
+      result.public.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
