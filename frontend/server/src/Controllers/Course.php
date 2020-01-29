@@ -92,7 +92,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['assignment_type'],
             'assignment_type',
             ['test', 'homework'],
@@ -218,11 +218,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Show scoreboard, needs basic information and request user information are always optional
         $r->ensureBool('needs_basic_information', false /*isRequired*/);
         $r->ensureBool('show_scoreboard', false /*isRequired*/);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['requests_user_information'],
             'requests_user_information',
-            ['no', 'optional', 'required'],
-            false
+            ['no', 'optional', 'required']
         );
 
         $r->ensureBool('public', false /*isRequired*/);
@@ -693,7 +692,19 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             $assignment->finish_time = null;
         }
-        \OmegaUp\DAO\Assignments::update($assignment);
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            \OmegaUp\DAO\Assignments::update($assignment);
+
+            \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeAsFinishTime(
+                $assignment
+            );
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
 
         return [
             'status' => 'ok',
@@ -2607,17 +2618,15 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready'],
-            false
+            ['new', 'waiting', 'compiling', 'running', 'ready']
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],
             'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS,
-            false
+            \OmegaUp\Controllers\Run::VERDICTS
         );
 
         // Check filter by problem, is optional
@@ -2634,11 +2643,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-            false
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
 
         // Get user if we have something in username

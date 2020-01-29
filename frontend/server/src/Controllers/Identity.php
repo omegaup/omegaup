@@ -28,7 +28,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+        $exception = new \OmegaUp\Exceptions\NotFoundException(
+            'userOrMailNotFound'
+        );
+        $exception->addCustomMessageToArray(
+            'userEmail',
+            $userOrEmail
+        );
+        throw $exception;
     }
 
     /**
@@ -481,8 +488,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $gender,
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                false
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
         }
     }
