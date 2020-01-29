@@ -64,7 +64,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, tag?: mixed, quality_seal?: bool} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -390,7 +390,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
      *                before receiving an AC verdict for problem run.
      *
-     * # Quality category
+     * # Quality tag
      *
      * A reviewer could send this type of nomination to make the user marked as
      * a quality problem or not. The reviewer could also specify which category
