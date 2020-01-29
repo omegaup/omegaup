@@ -1231,11 +1231,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns true when logged user has previous activity in any course
+     * It checks whether user has previous activity in any course in order to
+     * redirect to right location
      *
      * @return array{smartyProperties: array<empty, empty>, template: string}
      */
-    public static function userHasActivityForSmarty(\OmegaUp\Request $r) {
+    public static function schoolsIndexForSmarty(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -1260,7 +1261,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             die(header('Location: /course/'));
         }
 
-        // Default values to search courses for legged user
+        // Default values to search courses for logged user
         $page = 1;
         $pageSize = 1;
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
