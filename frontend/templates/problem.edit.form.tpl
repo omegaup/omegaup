@@ -46,7 +46,7 @@
 					</select>
 				</div>
 
-				<div class="form-group col-md-6">					
+				<div class="form-group col-md-6">
 					<label for="languages">{#problemEditFormLanguages#}</label>
 					<select name="languages" id="languages" class="form-control">
 						<option value="c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb" {if $IS_UPDATE eq false && $LANGUAGES eq "c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>

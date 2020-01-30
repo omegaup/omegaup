@@ -48,7 +48,7 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  $('#languages').on('change', function() {    
+  $('#languages').on('change', function() {
     problemsNewValidator.LANGUAGES = $(this).val();
     problemsNewValidator.VALIDATOR_TIME_LIMIT = $(
       'input[name=validator_time_limit]',
@@ -57,7 +57,9 @@ OmegaUp.on('ready', function() {
     problemsNewValidator.OVERALL_WALL_TIME_LIMIT = $(
       'input[name=overall_wall_time_limit]',
     ).val();
-    problemsNewValidator.EXTRA_WALL_TIME = $('input[name=extra_wall_time]').val();
+    problemsNewValidator.EXTRA_WALL_TIME = $(
+      'input[name=extra_wall_time]',
+    ).val();
     problemsNewValidator.MEMORY_LIMIT = $('input[name=memory_limit]').val();
     problemsNewValidator.OUTPUT_LIMIT = $('input[name=output_limit]').val();
     problemsNewValidator.INPUT_LIMIT = $('input[name=input_limit]').val();
@@ -619,37 +621,37 @@ OmegaUp.on('ready', function() {
         '/">' +
         T.problemEditGoToProblem +
         '</a>',
-    );    
-    
+    );
+
     $('#statement-preview .title').html(UI.escape(problem.title));
-    let languages=problem.languages.sort().join();
+    let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemsNewValidator.LANGUAGES=languages;
+    problemsNewValidator.LANGUAGES = languages;
     $('input[name=title]').val(problem.title);
-    problemsNewValidator.TIME_LIMIT =
-      UI.parseDuration(problem.settings.limits.TimeLimit);
-    
+    problemsNewValidator.TIME_LIMIT = UI.parseDuration(
+      problem.settings.limits.TimeLimit,
+    );
+
     if (
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      problemsNewValidator.VALIDATOR_TIME_LIMIT =
-        UI.parseDuration(
-          problem.settings.validator.custom_validator.limits.TimeLimit,
-        );
-      
-    } else {      
-      problemsNewValidator.VALIDATOR_TIME_LIMIT =0;
+      problemsNewValidator.VALIDATOR_TIME_LIMIT = UI.parseDuration(
+        problem.settings.validator.custom_validator.limits.TimeLimit,
+      );
+    } else {
+      problemsNewValidator.VALIDATOR_TIME_LIMIT = 0;
     }
-    problemsNewValidator.OVERALL_WALL_TIME_LIMIT =
-      UI.parseDuration(problem.settings.limits.OverallWallTimeLimit)
-    ;
-    problemsNewValidator.EXTRA_WALL_TIME = 
-      UI.parseDuration(problem.settings.limits.ExtraWallTime);
-      problemsNewValidator.MEMORY_LIMIT =
+    problemsNewValidator.OVERALL_WALL_TIME_LIMIT = UI.parseDuration(
+      problem.settings.limits.OverallWallTimeLimit,
+    );
+    problemsNewValidator.EXTRA_WALL_TIME = UI.parseDuration(
+      problem.settings.limits.ExtraWallTime,
+    );
+    problemsNewValidator.MEMORY_LIMIT =
       problem.settings.limits.MemoryLimit / 1024;
-      problemsNewValidator.OUTPUT_LIMIT =problem.settings.limits.OutputLimit;
-      problemsNewValidator.INPUT_LIMIT = problem.input_limit;
+    problemsNewValidator.OUTPUT_LIMIT = problem.settings.limits.OutputLimit;
+    problemsNewValidator.INPUT_LIMIT = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -667,7 +669,7 @@ OmegaUp.on('ready', function() {
       // The problem is banned or promoted, so the user isn't allowed to
       // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
-    }    
+    }
     $('input[name=alias]').val(problemAlias);
 
     if (
@@ -708,7 +710,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    problemsNewValidator.LANGUAGES =chosenLanguage;
+    problemsNewValidator.LANGUAGES = chosenLanguage;
     API.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',

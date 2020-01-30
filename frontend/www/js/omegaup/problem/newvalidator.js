@@ -8,7 +8,7 @@ OmegaUp.on('ready', function() {
     el: '#problem-new-validator',
     render: function(createElement) {
       return createElement('omegaup-problem-new-validator', {
-        props: {          
+        props: {
           TIME_LIMIT: this.TIME_LIMIT,
           EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
           MEMORY_LIMIT: this.MEMORY_LIMIT,
@@ -36,7 +36,7 @@ OmegaUp.on('ready', function() {
       'omegaup-problem-new-validator': problem_New_Validator,
     },
   });
-  $('#languages').on('change', function() {    
+  $('#languages').on('change', function() {
     problemsNewValidator.LANGUAGES = $(this).val();
     problemsNewValidator.VALIDATOR_TIME_LIMIT = $(
       'input[name=validator_time_limit]',
@@ -45,7 +45,9 @@ OmegaUp.on('ready', function() {
     problemsNewValidator.OVERALL_WALL_TIME_LIMIT = $(
       'input[name=overall_wall_time_limit]',
     ).val();
-    problemsNewValidator.EXTRA_WALL_TIME = $('input[name=extra_wall_time]').val();
+    problemsNewValidator.EXTRA_WALL_TIME = $(
+      'input[name=extra_wall_time]',
+    ).val();
     problemsNewValidator.MEMORY_LIMIT = $('input[name=memory_limit]').val();
     problemsNewValidator.OUTPUT_LIMIT = $('input[name=output_limit]').val();
     problemsNewValidator.INPUT_LIMIT = $('input[name=input_limit]').val();

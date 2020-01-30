@@ -3816,8 +3816,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
                 'LANGUAGES' => join(
-                        ',',
-                        \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                    ',',
+                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
                 ),
                 'payload' => [
                     'TITLE' => '',
