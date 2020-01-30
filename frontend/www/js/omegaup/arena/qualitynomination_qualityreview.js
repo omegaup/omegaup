@@ -7,7 +7,6 @@ OmegaUp.on('ready', function() {
     document.getElementById('qualitynomination-reportproblem-payload')
       .innerText,
   );
-  console.log(nominationPayload);
   if (nominationPayload.reviewer && !nominationPayload.already_reviewed) {
     const qualityNominationForm = new Vue({
       el: '#qualitynomination-qualityreview',
@@ -15,15 +14,20 @@ OmegaUp.on('ready', function() {
         return createElement('qualitynomination-popup', {
           props: {
             linkTitle: T.reviewerNomination,
-            reviewerSuggestion: true,
+            reviewerNomination: true,
           },
           on: {
             submit: function(ev) {
-              console.log(ev);
-            },
-            dismiss: function(ev) {
-              console.log('babai');
-              console.log(ev);
+              const contents = {};
+              if (ev.tags.length) {
+                contents.tag = ev.tags;
+              }
+              contents.quality_seal = ev.qualitySeal;
+              API.QualityNomination.create({
+                problem_alias: nominationPayload.problem_alias,
+                nomination: 'quality_tag',
+                contents: JSON.stringify(contents),
+              }).fail(UI.apiError);
             },
           },
         });

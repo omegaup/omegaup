@@ -21,12 +21,12 @@
             <div class="form-group">
               <label class="control-label">
                 {{
-                  reviewerSuggestion
+                  reviewerNomination
                     ? T.reviewerNominationQuality
                     : T.qualityFormDifficulty
                 }} </label
               ><br />
-              <template v-if="!reviewerSuggestion">
+              <template v-if="!reviewerNomination">
                 <label class="radio-inline"
                   ><input type="radio" v-model="difficulty" value="0" />
                   {{ T.qualityFormDifficultyVeryEasy }}</label
@@ -52,7 +52,7 @@
                 <label class="radio-inline"
                   ><input
                     type="radio"
-                    v-model="difficulty"
+                    v-model="qualitySeal"
                     v-bind:value="true"
                   />
                   {{ T.wordsYes }}</label
@@ -60,7 +60,7 @@
                 <label class="radio-inline"
                   ><input
                     type="radio"
-                    v-model="difficulty"
+                    v-model="qualitySeal"
                     v-bind:value="false"
                   />
                   {{ T.wordsNo }}</label
@@ -69,7 +69,11 @@
             </div>
             <div class="form-group">
               <label class="control-label"
-                >{{ T.qualityFormTags }}
+                >{{
+                  reviewerNomination
+                    ? T.reviewerNominationCategory
+                    : T.qualityFormTags
+                }}
                 <ul class="tag-select">
                   <li
                     class="tag-select"
@@ -77,7 +81,7 @@
                   >
                     <label class="tag-select"
                       ><input
-                        v-bind:type="reviewerSuggestion ? 'radio' : 'checkbox'"
+                        v-bind:type="reviewerNomination ? 'radio' : 'checkbox'"
                         v-bind:value="problemTopic.value"
                         v-model="tags"
                       />
@@ -87,7 +91,7 @@
                 </ul></label
               >
             </div>
-            <div class="formGroup">
+            <div class="formGroup" v-if="!reviewerNomination">
               <label class="control-label">{{ T.qualityFormQuality }}</label
               ><br />
               <label class="radio-inline"
@@ -116,7 +120,7 @@
               <button
                 class="col-md-4 btn btn-primary"
                 type="submit"
-                v-bind:disabled="!quality &amp;&amp; !tags.length &amp;&amp; !difficulty"
+                v-bind:disabled="disableSubmitButton"
                 v-on:click="onSubmit"
               >
                 {{ T.wordsSend }}
@@ -148,7 +152,7 @@
   right: 4%;
   z-index: 9999999 !important;
   width: 550px;
-  height: 408px;
+  height: 443px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
@@ -200,7 +204,7 @@
 }
 
 ul.tag-select {
-  height: 150px;
+  height: 185px;
   overflow: auto;
   border: 1px solid #ccc;
 }
@@ -247,7 +251,7 @@ interface ProblemTag {
 @Component
 export default class QualityNominationPopup extends Vue {
   @Prop() linkTitle!: string;
-  @Prop({ default: false }) reviewerSuggestion!: boolean;
+  @Prop({ default: false }) reviewerNomination!: boolean;
   @Prop({ default: false }) solved!: boolean;
   @Prop({ default: true }) tried!: boolean;
   @Prop({ default: false }) nominated!: boolean;
@@ -262,6 +266,7 @@ export default class QualityNominationPopup extends Vue {
   currentView = 'suggestion';
   difficulty = '';
   quality = '';
+  qualitySeal = false;
   showFormOverride = true;
   localDismissed = this.dismissed || (this.dismissedBeforeAC && !this.solved);
   localNominated = this.nominated || (this.nominatedBeforeAC && !this.solved);
@@ -336,20 +341,30 @@ export default class QualityNominationPopup extends Vue {
     return (this.tried || this.solved) && !this.localNominated;
   }
 
+  get disableSubmitButton(): boolean {
+    if (this.reviewerNomination) {
+      return this.qualitySeal && !this.tags.length;
+    }
+    return !this.quality && !this.tags.length && !this.difficulty;
+  }
+
   get sortedProblemTags(): ProblemTag[] {
-    let self = this;
-    const tags =
-    let topics: ProblemTag[] = QualityNominationPopup.PROBLEM_TOPICS.map(
-      (x: string) => {
-        return {
-          value: x,
-          text: self.T[x],
-        };
-      },
-    );
-    return topics.sort((a: ProblemTag, b: ProblemTag): number => {
-      return a.text.localeCompare(b.text, self.T.lang);
-    });
+    const self = this;
+    const tags = this.reviewerNomination
+      ? QualityNominationPopup.PROBLEM_CATEGORIES
+      : QualityNominationPopup.PROBLEM_TOPICS;
+    return tags
+      .map(
+        (x: string): ProblemTag => {
+          return {
+            value: x,
+            text: self.T[x],
+          };
+        },
+      )
+      .sort((a: ProblemTag, b: ProblemTag): number => {
+        return a.text.localeCompare(b.text, self.T.lang);
+      });
   }
 
   get suggestLink(): string {
@@ -361,7 +376,7 @@ export default class QualityNominationPopup extends Vue {
   }
 
   get formTitle(): string {
-    if (this.reviewerSuggestion) {
+    if (this.reviewerNomination) {
       return T.reviewerNominationFormTitle;
     }
     return this.solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC;
@@ -369,7 +384,7 @@ export default class QualityNominationPopup extends Vue {
 
   onHide(isDismissed: boolean): void {
     this.showFormOverride = false;
-    if (isDismissed) {
+    if (isDismissed && !this.reviewerNomination) {
       this.$emit('dismiss', this);
     }
   }

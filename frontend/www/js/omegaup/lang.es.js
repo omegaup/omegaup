@@ -828,6 +828,7 @@ const translations = {
 	requestDate: "Fecha de solicitud",
 	resendInterviewEmail: "Reenviar correo",
 	reviewerNomination: "Calificar el problema como revisor",
+	reviewerNominationCategory: "\u00bfCual es la categor\u00eda de este problema?",
 	reviewerNominationFormTitle: "\u00a1Califica este problema!",
 	reviewerNominationQuality: "\u00bfEs un problema de calidad?",
 	runNotEvenOpened: "Debes abrir el problema antes de intentar enviar una soluci\u00f3n.",
