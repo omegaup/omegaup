@@ -28,7 +28,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+        $exception = new \OmegaUp\Exceptions\NotFoundException(
+            'userOrMailNotFound'
+        );
+        $exception->addCustomMessageToArray(
+            'userEmail',
+            $userOrEmail
+        );
+        throw $exception;
     }
 
     /**
@@ -481,8 +488,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $gender,
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                false
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
         }
     }
@@ -627,7 +633,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Returns the prefered language as a string (en,es,fra) of the identity given
      * If no identity is given, language is retrived from the browser.
      */
-    public static function getPreferredLanguage(\OmegaUp\Request $r): string {
+    public static function getPreferredLanguage(
+        ?\OmegaUp\DAO\VO\Identities $identity
+    ): string {
         // for quick debugging
         if (isset($_GET['lang'])) {
             return self::convertToSupportedLanguage(
@@ -636,7 +644,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            $identity = self::resolveTargetIdentity($r);
             if (!is_null($identity) && !is_null($identity->language_id)) {
                 $result = \OmegaUp\DAO\Languages::getByPK(
                     $identity->language_id

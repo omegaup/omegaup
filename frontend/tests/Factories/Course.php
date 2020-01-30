@@ -11,7 +11,8 @@ class Course {
         \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
         bool $public = false,
         string $requestsUserInformation = 'no',
-        string $showScoreboard = 'false'
+        string $showScoreboard = 'false',
+        ?int $courseDuration = 120
     ): array {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -43,8 +44,10 @@ class Course {
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => (\OmegaUp\Time::get()),
-            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => !is_null(
+                $courseDuration
+            ) ? \OmegaUp\Time::get() + $courseDuration : null,
             'public' => $public,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -68,7 +71,9 @@ class Course {
         bool $public = false,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
-        int $startTimeDelay = 0
+        int $startTimeDelay = 0,
+        ?int $courseDuration = 120,
+        ?int $assignmentDuration = 120
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -81,7 +86,8 @@ class Course {
             $adminLogin,
             $public,
             $requestsUserInformation,
-            $showScoreboard
+            $showScoreboard,
+            $courseDuration
         );
         $courseAlias = $courseFactoryResult['course_alias'];
 
@@ -101,7 +107,9 @@ class Course {
             'alias' => $assignmentAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => \OmegaUp\Time::get() + $startTimeDelay,
-            'finish_time' => \OmegaUp\Time::get() + 120,
+            'finish_time' => !is_null(
+                $assignmentDuration
+            ) ? \OmegaUp\Time::get() + $assignmentDuration : null,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework',
             'course' => $course,

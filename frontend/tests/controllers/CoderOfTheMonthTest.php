@@ -219,6 +219,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCoderOfTheMonthAfterYear() {
+        // Cleaning Rank and Runs tables in order to avoid this test fails in
+        // the moment of calculate the coder of the month
+        \OmegaUp\Test\Utils::deleteAllRanks();
+        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         ['user' => $userLastYear, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Using the first day of the month as "today" to avoid failures near
@@ -233,7 +237,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
 
         $runCreationDate = date_create($runCreationDate);
         date_add(
@@ -243,9 +247,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($identity, $runCreationDate, 2 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
 
-        $this->createRuns($identity, $today, 2 /*numRuns*/);
+        $this->createRuns($identity, $today, 10 /*numRuns*/);
 
         // Getting Coder Of The Month
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
