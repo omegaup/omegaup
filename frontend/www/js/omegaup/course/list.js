@@ -27,10 +27,28 @@ OmegaUp.on('ready', function() {
         PAST: 1,
       };
       const accessModes = {
-        STUDENT: 0,
-        ADMIN: 1,
+        PUBLIC: 0,
+        STUDENT: 1,
+        ADMIN: 2,
       };
       const allCourses = [
+        {
+          accessMode: 'public',
+          filteredCourses: [
+            {
+              timeType: 'current',
+              courses: [],
+              tabName: T.courseListCurrentCourses,
+            },
+            {
+              timeType: 'past',
+              courses: [],
+              tabName: T.courseListPastCourses,
+            },
+          ],
+          description: T.courseListPublicCourses,
+          activeTab: '',
+        },
         {
           accessMode: 'student',
           filteredCourses: [
@@ -45,7 +63,7 @@ OmegaUp.on('ready', function() {
               tabName: T.courseListPastCourses,
             },
           ],
-          description: T.courseList,
+          description: T.courseListIStudy,
           activeTab: '',
         },
         {

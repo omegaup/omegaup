@@ -184,6 +184,77 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check if only a category tag is allowed for a nomination of
+     * type 'quality tag'.
+     */
+    public function testCategoryTagOnQualityTagNomination() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategoryOpenResponse',
+                ]),
+            ]));
+            $this->fail('The user must be a reviewer.');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategory',
+                ]),
+            ]));
+            $this->fail('The tag should be one of the category tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategoryOpenResponse',
+                ]),
+            ]));
+            $this->fail(
+                'Reviewer can not send again a nomination for the same problem'
+            );
+        } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                'reviewerHasAlreadySentNominationForProblem',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Check that before suggesting improvements to a problem, the user must
      * have solved it first.
      */
