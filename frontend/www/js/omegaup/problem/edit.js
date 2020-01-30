@@ -3,6 +3,7 @@ import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
+import problem_New_Validator from '../components/problem/NewValidator.vue';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;
@@ -13,6 +14,54 @@ OmegaUp.on('ready', function() {
       .find('a[href="' + window.location.hash + '"]')
       .tab('show');
   }
+  const payload = JSON.parse(document.getElementById('payload').innerText);
+  let problemsNewValidator = new Vue({
+    el: '#problem-new-validator',
+    render: function(createElement) {
+      return createElement('omegaup-problem-new-validator', {
+        props: {
+          TIME_LIMIT: this.TIME_LIMIT,
+          EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
+          MEMORY_LIMIT: this.MEMORY_LIMIT,
+          OUTPUT_LIMIT: this.OUTPUT_LIMIT,
+          INPUT_LIMIT: this.INPUT_LIMIT,
+          OVERALL_WALL_TIME_LIMIT: this.OVERALL_WALL_TIME_LIMIT,
+          EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
+          VALIDATOR_TIME_LIMIT: this.VALIDATOR_TIME_LIMIT,
+          LANGUAGES: this.LANGUAGES,
+        },
+      });
+    },
+    data: {
+      TIME_LIMIT: 0,
+      EXTRA_WALL_TIME: 0,
+      MEMORY_LIMIT: 0,
+      OUTPUT_LIMIT: 0,
+      INPUT_LIMIT: 0,
+      OVERALL_WALL_TIME_LIMIT: 0,
+      EXTRA_WALL_TIME: 0,
+      VALIDATOR_TIME_LIMIT: 0,
+      LANGUAGES: payload.LANGUAGES,
+    },
+    components: {
+      'omegaup-problem-new-validator': problem_New_Validator,
+    },
+  });
+
+  $('#languages').on('change', function() {    
+    problemsNewValidator.LANGUAGES = $(this).val();
+    problemsNewValidator.VALIDATOR_TIME_LIMIT = $(
+      'input[name=validator_time_limit]',
+    ).val();
+    problemsNewValidator.TIME_LIMIT = $('input[name=time_limit]').val();
+    problemsNewValidator.OVERALL_WALL_TIME_LIMIT = $(
+      'input[name=overall_wall_time_limit]',
+    ).val();
+    problemsNewValidator.EXTRA_WALL_TIME = $('input[name=extra_wall_time]').val();
+    problemsNewValidator.MEMORY_LIMIT = $('input[name=memory_limit]').val();
+    problemsNewValidator.OUTPUT_LIMIT = $('input[name=output_limit]').val();
+    problemsNewValidator.INPUT_LIMIT = $('input[name=input_limit]').val();
+  });
 
   $('#sections').on('click', 'a', function(e) {
     e.preventDefault();
@@ -570,35 +619,37 @@ OmegaUp.on('ready', function() {
         '/">' +
         T.problemEditGoToProblem +
         '</a>',
-    );
-    $('input[name=title]').val(problem.title);
+    );    
+    
     $('#statement-preview .title').html(UI.escape(problem.title));
-    $('input[name=time_limit]').val(
-      UI.parseDuration(problem.settings.limits.TimeLimit),
-    );
+    let languages=problem.languages.sort().join();
+    $('#languages').val(languages);
+    problemsNewValidator.LANGUAGES=languages;
+    $('input[name=title]').val(problem.title);
+    problemsNewValidator.TIME_LIMIT =
+      UI.parseDuration(problem.settings.limits.TimeLimit);
+    
     if (
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      $('input[name=validator_time_limit]').val(
+      problemsNewValidator.VALIDATOR_TIME_LIMIT =
         UI.parseDuration(
           problem.settings.validator.custom_validator.limits.TimeLimit,
-        ),
-      );
-    } else {
-      $('input[name=validator_time_limit]').val(0);
+        );
+      
+    } else {      
+      problemsNewValidator.VALIDATOR_TIME_LIMIT =0;
     }
-    $('input[name=overall_wall_time_limit]').val(
-      UI.parseDuration(problem.settings.limits.OverallWallTimeLimit),
-    );
-    $('input[name=extra_wall_time]').val(
-      UI.parseDuration(problem.settings.limits.ExtraWallTime),
-    );
-    $('input[name=memory_limit]').val(
-      problem.settings.limits.MemoryLimit / 1024,
-    );
-    $('input[name=output_limit]').val(problem.settings.limits.OutputLimit);
-    $('input[name=input_limit]').val(problem.input_limit);
+    problemsNewValidator.OVERALL_WALL_TIME_LIMIT =
+      UI.parseDuration(problem.settings.limits.OverallWallTimeLimit)
+    ;
+    problemsNewValidator.EXTRA_WALL_TIME = 
+      UI.parseDuration(problem.settings.limits.ExtraWallTime);
+      problemsNewValidator.MEMORY_LIMIT =
+      problem.settings.limits.MemoryLimit / 1024;
+      problemsNewValidator.OUTPUT_LIMIT =problem.settings.limits.OutputLimit;
+      problemsNewValidator.INPUT_LIMIT = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -616,8 +667,7 @@ OmegaUp.on('ready', function() {
       // The problem is banned or promoted, so the user isn't allowed to
       // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
-    }
-    $('#languages').val(problem.languages.sort().join());
+    }    
     $('input[name=alias]').val(problemAlias);
 
     if (
@@ -658,6 +708,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
+    problemsNewValidator.LANGUAGES =chosenLanguage;
     API.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',

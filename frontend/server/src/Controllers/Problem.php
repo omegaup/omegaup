@@ -3815,6 +3815,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'LOAD_MATHJAX' => true,
                 'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
+                'LANGUAGES' => join(
+                        ',',
+                        \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                ),
                 'payload' => [
                     'TITLE' => '',
                     'ALIAS' => '',
