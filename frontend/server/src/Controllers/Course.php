@@ -2708,14 +2708,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             'finish_time',
             'school_id',
             'show_scoreboard' => ['transform' => function (string $value): int {
-                return boolval($value) ? 1 : 0;
+                return boolval($value);
             }],
             'needs_basic_information' => ['transform' => function (string $value): int {
-                return $value == 'true' ? 1 : 0;
+                return boolval($value);
             }],
             'requests_user_information',
             'public' => ['transform' => function (?bool $value): bool {
-                return is_null($value) ? false : $value;
+                return is_null($value) ? false : boolval($value);
             }],
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
