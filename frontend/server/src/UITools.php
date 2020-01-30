@@ -144,14 +144,8 @@ class UITools {
             $smarty->compile_check = false;
         }
 
-        $identityRequest = new \OmegaUp\Request();
-        $identityRequest['username'] = is_null(
-            $identity
-        ) ? null : $identity->username;
         /** @var string */
-        $_lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $identityRequest
-        );
+        $_lang = \OmegaUp\Controllers\Identity::getPreferredLanguage($identity);
         $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
 
