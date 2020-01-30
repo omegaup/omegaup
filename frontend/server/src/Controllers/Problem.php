@@ -3567,7 +3567,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, mixed>, limits: array{MemoryLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: mixed}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, qualitynomination_reportproblem_payload: array{problem_alias: string}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, visibility: int}
+     * @return array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, mixed>, limits: array{MemoryLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: mixed}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, visibility: int}
      */
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3631,8 +3631,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'nominated' => false,
                 'dismissed' => false,
             ],
-            'qualitynomination_reportproblem_payload' => [
+            'nomination_payload' => [
                 'problem_alias' => $details['alias'],
+                'reviewer' => false,
+                'already_reviewed' => false,
             ],
             'karel_problem' => count(array_intersect(
                 $details['languages'],
@@ -3655,7 +3657,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'quality' => floatval($problem->quality),
             'difficulty' => floatval($problem->difficulty),
         ];
-        $details['user'] = ['logged_in' => false, 'admin' => false];
+        $details['user'] = ['logged_in' => false, 'admin' => false, 'reviewer' => false];
         $result['payload'] = $details;
 
         if (
@@ -3670,6 +3672,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->user_id
         );
         $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
+        );
+        $isQualityReviewer = \OmegaUp\Authorization::isQualityReviewer(
+            $r->identity
+        );
+
+        $result['nomination_payload']['reviewer'] = $isQualityReviewer;
+        $result['nomination_payload']['already_reviewed'] = \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
             $r->identity,
             $problem
         );
@@ -3690,7 +3701,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $nominationStatus['can_nominate_problem'] = !is_null($r->user);
         $user = [
             'logged_in' => true,
-            'admin' => $isProblemAdmin
+            'admin' => $isProblemAdmin,
+            'reviewer' => $isQualityReviewer,
         ];
         $result['quality_payload'] = $nominationStatus;
         $result['problem_admin'] = $isProblemAdmin;
