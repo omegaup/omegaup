@@ -2707,10 +2707,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'start_time',
             'finish_time',
             'school_id',
-            'show_scoreboard' => ['transform' => function (string $value): int {
+            'show_scoreboard' => ['transform' => function (string $value): bool {
                 return boolval($value);
             }],
-            'needs_basic_information' => ['transform' => function (string $value): int {
+            'needs_basic_information' => ['transform' => function (string $value): bool {
                 return boolval($value);
             }],
             'requests_user_information',
