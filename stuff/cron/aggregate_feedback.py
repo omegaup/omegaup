@@ -386,6 +386,16 @@ def aggregate_feedback(dbconn: MySQLdb.connections.Connection) -> None:
                                        global_difficulty_average)
 
 
+def aggregate_reviewers_feedback(
+        dbconn: MySQLdb.connections.Connection) -> None:
+    '''Aggregates the quality_tag nominations sent by reviewers
+
+    Updates the quality_seal field on Problems table and updates the
+    problem category tag.
+    '''
+    logging.info('Aggregating problem quality tag.')
+
+
 def get_last_friday() -> datetime.date:
     '''Returns datetime object corresponding to last Friday.
     '''
@@ -489,6 +499,13 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
+        try:
+            aggregate_reviewers_feedback(dbconn)
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to calculate problem quality seal and category.')
+            raise
+
         try:
             aggregate_feedback(dbconn)
         except:  # noqa: bare-except
