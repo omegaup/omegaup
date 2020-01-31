@@ -79,10 +79,13 @@ export function GetOptionsFromLocation(arenaLocation) {
       options.preferredLanguage = payload.preferred_language || null;
     }
   }
-  const headerPayload = JSON.parse(
-    document.getElementById('header-payload').innerText,
-  );
-  options.headerPayload = headerPayload;
+
+  options.headerPayload = null;
+  if (document.getElementById('header-payload') !== null) {
+    options.headerPayload = JSON.parse(
+      document.getElementById('header-payload').innerText,
+    );
+  }
   return options;
 }
 
@@ -263,60 +266,63 @@ export class Arena {
     self.markdownConverter = UI.markdownConverter();
 
     // Currently opened clarification notifications.
-    self.commonNavbar = new Vue({
-      el: '#common-navbar',
-      render: function(createElement) {
-        return createElement('omegaup-common-navbar', {
-          props: {
-            header: this.header,
-            graderInfo: this.graderInfo,
-            graderQueueLength: this.graderQueueLength,
-            errorMessage: this.errorMessage,
-            initialClarifications: this.initialClarifications,
-          },
-        });
-      },
-      data: {
-        header: self.options.headerPayload,
-        graderInfo: null,
-        graderQueueLength: -1,
-        errorMessage: null,
-        initialClarifications: [],
-      },
-      components: {
-        'omegaup-common-navbar': common_Navbar,
-      },
-    });
-
-    if (self.options.headerPayload.isAdmin) {
-      API.Notification.myList({})
-        .then(function(data) {
-          self.commonNavbar.notifications = data.notifications;
-        })
-        .fail(UI.apiError);
-
-      function updateGraderStatus() {
-        API.Grader.status()
-          .then(stats => {
-            self.commonNavbar.graderInfo = stats.grader;
-            if (stats.status !== 'ok') {
-              self.commonNavbar.errorMessage = T.generalError;
-              return;
-            }
-            if (stats.grader.queue) {
-              self.commonNavbar.graderQueueLength =
-                stats.grader.queue.run_queue_length +
-                stats.grader.queue.running.length;
-            }
-            self.commonNavbar.errorMessage = null;
-          })
-          .fail(stats => {
-            self.commonNavbar.errorMessage = stats.error;
+    self.commonNavbar = null;
+    if (document.getElementById('common-navbar')) {
+      self.commonNavbar = new Vue({
+        el: '#common-navbar',
+        render: function(createElement) {
+          return createElement('omegaup-common-navbar', {
+            props: {
+              header: this.header,
+              graderInfo: this.graderInfo,
+              graderQueueLength: this.graderQueueLength,
+              errorMessage: this.errorMessage,
+              initialClarifications: this.initialClarifications,
+            },
           });
-      }
+        },
+        data: {
+          header: self.options.headerPayload,
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+        },
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+      });
 
-      updateGraderStatus();
-      setInterval(updateGraderStatus, 30000);
+      if (self.options.headerPayload.isAdmin) {
+        API.Notification.myList({})
+          .then(function(data) {
+            self.commonNavbar.notifications = data.notifications;
+          })
+          .fail(UI.apiError);
+
+        function updateGraderStatus() {
+          API.Grader.status()
+            .then(stats => {
+              self.commonNavbar.graderInfo = stats.grader;
+              if (stats.status !== 'ok') {
+                self.commonNavbar.errorMessage = T.generalError;
+                return;
+              }
+              if (stats.grader.queue) {
+                self.commonNavbar.graderQueueLength =
+                  stats.grader.queue.run_queue_length +
+                  stats.grader.queue.running.length;
+              }
+              self.commonNavbar.errorMessage = null;
+            })
+            .fail(stats => {
+              self.commonNavbar.errorMessage = stats.error;
+            });
+        }
+
+        updateGraderStatus();
+        setInterval(updateGraderStatus, 30000);
+      }
     }
 
     // Currently opened problem.
@@ -1225,6 +1231,9 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
+    if (self.commonNavbar === null) {
+      return;
+    }
     let clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
