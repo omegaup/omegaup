@@ -56,10 +56,10 @@
 					</select>
 				</div>
 			</div>
-			<div id="problem-new-validator"></div>
-			<script type="text/json" id="payload">{$payload|json_encode}</script>
+			<div id="problem-validator"></div>
+			<script type="text/json" id="problem-payload">{$payload|json_encode}</script>
 			{if $IS_UPDATE eq false}
-			{js_include entrypoint="problem_new_validator"}
+			{js_include entrypoint="problem_validator"}
 			{/if}
 			<div class="row">
 				<div class="form-group  col-md-6" id="source-group">

@@ -3,7 +3,7 @@ import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
-import problem_New_Validator from '../components/problem/NewValidator.vue';
+import problem_Validator from '../components/problem/Validator.vue';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;
@@ -14,11 +14,11 @@ OmegaUp.on('ready', function() {
       .find('a[href="' + window.location.hash + '"]')
       .tab('show');
   }
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+  const payload = JSON.parse(document.getElementById('problem-payload').innerText);
   let problemsNewValidator = new Vue({
-    el: '#problem-new-validator',
+    el: '#problem-validator',
     render: function(createElement) {
-      return createElement('omegaup-problem-new-validator', {
+      return createElement('omegaup-problem-validator', {
         props: {
           TIME_LIMIT: this.TIME_LIMIT,
           EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
@@ -44,25 +44,8 @@ OmegaUp.on('ready', function() {
       LANGUAGES: payload.LANGUAGES,
     },
     components: {
-      'omegaup-problem-new-validator': problem_New_Validator,
+      'omegaup-problem-validator': problem_Validator,
     },
-  });
-
-  $('#languages').on('change', function() {
-    problemsNewValidator.LANGUAGES = $(this).val();
-    problemsNewValidator.VALIDATOR_TIME_LIMIT = $(
-      'input[name=validator_time_limit]',
-    ).val();
-    problemsNewValidator.TIME_LIMIT = $('input[name=time_limit]').val();
-    problemsNewValidator.OVERALL_WALL_TIME_LIMIT = $(
-      'input[name=overall_wall_time_limit]',
-    ).val();
-    problemsNewValidator.EXTRA_WALL_TIME = $(
-      'input[name=extra_wall_time]',
-    ).val();
-    problemsNewValidator.MEMORY_LIMIT = $('input[name=memory_limit]').val();
-    problemsNewValidator.OUTPUT_LIMIT = $('input[name=output_limit]').val();
-    problemsNewValidator.INPUT_LIMIT = $('input[name=input_limit]').val();
   });
 
   $('#sections').on('click', 'a', function(e) {

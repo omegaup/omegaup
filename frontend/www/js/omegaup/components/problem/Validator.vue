@@ -7,8 +7,7 @@
         }}</label>
         <input
           name="validator_time_limit"
-          v-bind:value="VALIDATOR_TIME_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="VALIDATOR_TIME_LIMIT"          
           type="text"
           class="form-control"
         />
@@ -18,8 +17,7 @@
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
-          v-bind:value="TIME_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="TIME_LIMIT"          
           type="text"
           class="form-control"
         />
@@ -33,8 +31,7 @@
         }}</label>
         <input
           name="overall_wall_time_limit"
-          v-bind:value="OVERALL_WALL_TIME_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="OVERALL_WALL_TIME_LIMIT"          
           type="text"
           class="form-control"
         />
@@ -44,8 +41,7 @@
         <label for="extra_wall_time">{{ T.wordsExtraWallTimeMs }}</label>
         <input
           name="extra_wall_time"
-          v-bind:value="EXTRA_WALL_TIME"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="EXTRA_WALL_TIME"        
           type="text"
           class="form-control"
         />
@@ -57,8 +53,7 @@
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"
-          v-bind:value="MEMORY_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="MEMORY_LIMIT"          
           type="text"
           class="form-control"
         />
@@ -68,8 +63,7 @@
         <label for="output_limit">{{ T.problemEditFormOutputLimit }}</label>
         <input
           name="output_limit"
-          v-bind:value="OUTPUT_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="OUTPUT_LIMIT"        
           type="text"
           class="form-control"
         />
@@ -78,8 +72,7 @@
         <label for="input_limit">{{ T.problemEditFormInputLimit }}</label>
         <input
           name="input_limit"
-          v-bind:value="INPUT_LIMIT"
-          v-bind:disabled="LANGUAGES === ''"
+          v-bind:value="INPUT_LIMIT"          
           type="text"
           class="form-control"
         />
@@ -94,7 +87,7 @@ import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
 @Component
-export default class ProblemNewValidator extends Vue {
+export default class ProblemValidator extends Vue {
   @Prop() TIME_LIMIT!: number;
   @Prop() EXTRA_WALL_TIME!: number;
   @Prop() MEMORY_LIMIT!: number;

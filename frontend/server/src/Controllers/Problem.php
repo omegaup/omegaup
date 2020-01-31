@@ -3819,26 +3819,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ',',
                     \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
                 ),
-                'payload' => [
-                    'TITLE' => '',
-                    'ALIAS' => '',
-                    'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                    'TIME_LIMIT' => '1000',
-                    'VALIDATOR_TIME_LIMIT' => '1000',
-                    'OVERALL_WALL_TIME_LIMIT' => '60000',
-                    'EXTRA_WALL_TIME' => '0',
-                    'OUTPUT_LIMIT' => '10240',
-                    'INPUT_LIMIT' => '10240',
-                    'MEMORY_LIMIT' => '32768',
-                    'EMAIL_CLARIFICATIONS' => '0',
-                    'SOURCE' => '',
-                    'VISIBILITY' => '0',
-                    'LANGUAGES' => join(
-                        ',',
-                        \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
-                    ),
-                    'SELECTED_TAGS' => '',
-                    'IS_UPDATE' => true]
+                'payload' => [                    
+                    'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    ]
             ];
         }
         // Validate commit message.
@@ -3889,26 +3872,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
-            'payload' => [
-                'TITLE' => '',
-                'ALIAS' => '',
-                'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                'TIME_LIMIT' => '1000',
-                'VALIDATOR_TIME_LIMIT' => '1000',
-                'OVERALL_WALL_TIME_LIMIT' => '60000',
-                'EXTRA_WALL_TIME' => '0',
-                'OUTPUT_LIMIT' => '10240',
-                'INPUT_LIMIT' => '10240',
-                'MEMORY_LIMIT' => '32768',
-                'EMAIL_CLARIFICATIONS' => '0',
-                'SOURCE' => '',
-                'VISIBILITY' => '0',
-                'LANGUAGES' => join(
-                    ',',
-                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
-                ),
-                'SELECTED_TAGS' => '',
-                'IS_UPDATE' => true]
+            'payload' => [                
+                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,               
+            ]
         ];
     }
 
@@ -3964,28 +3930,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'SELECTED_TAGS' => strval($r['selected_tags']),
                     'STATUS_ERROR' => $statusError,
                     'payload' => [
-                        'TITLE' => strval($r['title']),
-                        'ALIAS' => strval($r['problem_alias']),
-                        'VALIDATOR' => strval($r['validator']),
-                        'TIME_LIMIT' => strval($r['time_limit']),
-                        'VALIDATOR_TIME_LIMIT' => strval(
-                            $r['validator_time_limit']
-                        ),
-                        'OVERALL_WALL_TIME_LIMIT' => strval(
-                            $r['overall_wall_time_limit']
-                        ),
-                        'EXTRA_WALL_TIME' => strval($r['extra_wall_time']),
-                        'OUTPUT_LIMIT' => strval($r['output_limit']),
-                        'INPUT_LIMIT' => strval($r['input_limit']),
-                        'MEMORY_LIMIT' => strval($r['memory_limit']),
-                        'EMAIL_CLARIFICATIONS' => strval(
-                            $r['email_clarifications']
-                        ),
-                        'SOURCE' => strval($r['source']),
-                        'VISIBILITY' => strval($r['visibility']),
-                        'LANGUAGES' => strval($r['languages']),
-                        'SELECTED_TAGS' => strval($r['selected_tags']),
-                        'STATUS_ERROR' => $statusError
+                        'timeLimit' => 1000,
+                        'validatorTimeLimit' => 1000,
+                        'overallWallTimeLimit'=>60000,                
+                        'extraWallTime' => 0,
+                        'outputLimit' => 10240,
+                        'inputLimit' => 10240,
+                        'memoryLimit' => 32768,                
+                        'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     ]
                 ];
             }
@@ -4011,25 +3963,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'SELECTED_TAGS' => '',
             'IS_UPDATE' => false,
             'payload' => [
-                'TITLE' => '',
-                'ALIAS' => '',
-                'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                'TIME_LIMIT' => '1000',
-                'VALIDATOR_TIME_LIMIT' => '1000',
-                'OVERALL_WALL_TIME_LIMIT' => '60000',
-                'EXTRA_WALL_TIME' => '0',
-                'OUTPUT_LIMIT' => '10240',
-                'INPUT_LIMIT' => '10240',
-                'MEMORY_LIMIT' => '32768',
-                'EMAIL_CLARIFICATIONS' => '0',
-                'SOURCE' => '',
-                'VISIBILITY' => '0',
-                'LANGUAGES' => join(
-                    ',',
-                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
-                ),
-                'SELECTED_TAGS' => '',
-                'IS_UPDATE' => false]
+                'timeLimit' => 1000,
+                'validatorTimeLimit' => 1000,
+                'overallWallTimeLimit'=>60000,                
+                'extraWallTime' => 0,
+                'outputLimit' => 10240,
+                'inputLimit' => 10240,
+                'memoryLimit' => 32768,                
+                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+            ]
         ];
     }
 
