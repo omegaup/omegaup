@@ -97,6 +97,31 @@ def test_user_ranking_course(driver):
         util.check_scoreboard_events(driver, assignment_alias, url,
                                      num_elements=1, scoreboard='Admin')
 
+        enter_course_assignments_page(driver, course_alias)
+        with driver.page_transition():
+            driver.wait.until(EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/course/%s/edit/")]' %
+                 course_alias))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//input[@name = "show-scoreboard"][@value="true"]'))).click()
+
+        driver.browser.find_element_by_tag_name('form').submit()
+        assert (('/course/%s/edit/' % course_alias) in
+                driver.browser.current_url), driver.browser.current_url
+
+    with driver.login_user():
+        enter_course(driver, course_alias, assignment_alias, first_time=False)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, ('//a[contains(@href, "#ranking")]')))).click()
+        assert (('#ranking') in
+                driver.browser.current_url), driver.browser.current_url
+
 
 def test_create_identities_for_course(driver):
     '''Adding some identities into a course and associating one of them to
@@ -345,7 +370,7 @@ def add_students_course(driver, users):
 
 
 @util.annotate
-def enter_course(driver, course_alias, assignment_alias):
+def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
     '''Enter to course previously created.'''
 
     with driver.page_transition():
@@ -362,12 +387,13 @@ def enter_course(driver, course_alias, assignment_alias):
     assert (course_url in
             driver.browser.current_url), driver.browser.current_url
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//input[@name = "accept-teacher"]'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//button[@name = "start-course-submit"]'))).click()
+    if first_time:
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//input[@name = "accept-teacher"]'))).click()
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//button[@name = "start-course-submit"]'))).click()
 
     assignment_url = '/course/%s/assignment/%s' % (course_alias,
                                                    assignment_alias)
