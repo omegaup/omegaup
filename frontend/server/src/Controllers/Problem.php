@@ -3819,7 +3819,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ',',
                     \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
                 ),
-                'payload' => [                    
+                'payload' => [
                     'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     ]
             ];
@@ -3872,8 +3872,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
-            'payload' => [                
-                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,               
+            'payload' => [
+                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
             ]
         ];
     }
@@ -3932,11 +3932,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'payload' => [
                         'timeLimit' => 1000,
                         'validatorTimeLimit' => 1000,
-                        'overallWallTimeLimit'=>60000,                
+                        'overallWallTimeLimit' => 60000,
                         'extraWallTime' => 0,
                         'outputLimit' => 10240,
                         'inputLimit' => 10240,
-                        'memoryLimit' => 32768,                
+                        'memoryLimit' => 32768,
                         'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     ]
                 ];
@@ -3965,11 +3965,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'payload' => [
                 'timeLimit' => 1000,
                 'validatorTimeLimit' => 1000,
-                'overallWallTimeLimit'=>60000,                
+                'overallWallTimeLimit' => 60000,
                 'extraWallTime' => 0,
                 'outputLimit' => 10240,
                 'inputLimit' => 10240,
-                'memoryLimit' => 32768,                
+                'memoryLimit' => 32768,
                 'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
             ]
         ];

@@ -3,7 +3,9 @@ import problem_Validator from '../components/problem/Validator.vue';
 import { OmegaUp } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('problem-payload').innerText);
+  const payload = JSON.parse(
+    document.getElementById('problem-payload').innerText,
+  );
   let problemsValidator = new Vue({
     el: '#problem-validator',
     render: function(createElement) {
@@ -22,7 +24,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      TIME_LIMIT: payload.timeLimit,      
+      TIME_LIMIT: payload.timeLimit,
       MEMORY_LIMIT: payload.memoryLimit,
       OUTPUT_LIMIT: payload.outputLimit,
       INPUT_LIMIT: payload.inputLimit,
@@ -34,5 +36,5 @@ OmegaUp.on('ready', function() {
     components: {
       'omegaup-problem-validator': problem_Validator,
     },
-  });  
+  });
 });

@@ -14,7 +14,9 @@ OmegaUp.on('ready', function() {
       .find('a[href="' + window.location.hash + '"]')
       .tab('show');
   }
-  const payload = JSON.parse(document.getElementById('problem-payload').innerText);
+  const payload = JSON.parse(
+    document.getElementById('problem-payload').innerText,
+  );
   let problemsNewValidator = new Vue({
     el: '#problem-validator',
     render: function(createElement) {
