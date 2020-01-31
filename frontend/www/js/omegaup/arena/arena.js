@@ -9,6 +9,7 @@ import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
+import common_Navbar from '../components/common/Navbar.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -38,6 +39,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    headerPayload: {},
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -77,6 +79,10 @@ export function GetOptionsFromLocation(arenaLocation) {
       options.preferredLanguage = payload.preferred_language || null;
     }
   }
+  const headerPayload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
+  options.headerPayload = headerPayload;
   return options;
 }
 
@@ -256,8 +262,62 @@ export class Arena {
     // The Markdown-to-HTML converter.
     self.markdownConverter = UI.markdownConverter();
 
-    // Currently opened notifications.
-    self.clarificationNotifications = [];
+    // Currently opened clarification notifications.
+    self.commonNavbar = new Vue({
+      el: '#common-navbar',
+      render: function(createElement) {
+        return createElement('omegaup-common-navbar', {
+          props: {
+            header: this.header,
+            graderInfo: this.graderInfo,
+            graderQueueLength: this.graderQueueLength,
+            errorMessage: this.errorMessage,
+            initialClarifications: this.initialClarifications,
+          },
+        });
+      },
+      data: {
+        header: self.options.headerPayload,
+        graderInfo: null,
+        graderQueueLength: -1,
+        errorMessage: null,
+        initialClarifications: [],
+      },
+      components: {
+        'omegaup-common-navbar': common_Navbar,
+      },
+    });
+
+    if (self.options.headerPayload.isAdmin) {
+      API.Notification.myList({})
+        .then(function(data) {
+          self.commonNavbar.notifications = data.notifications;
+        })
+        .fail(UI.apiError);
+
+      function updateGraderStatus() {
+        API.Grader.status()
+          .then(stats => {
+            self.commonNavbar.graderInfo = stats.grader;
+            if (stats.status !== 'ok') {
+              self.commonNavbar.errorMessage = T.generalError;
+              return;
+            }
+            if (stats.grader.queue) {
+              self.commonNavbar.graderQueueLength =
+                stats.grader.queue.run_queue_length +
+                stats.grader.queue.running.length;
+            }
+            self.commonNavbar.errorMessage = null;
+          })
+          .fail(stats => {
+            self.commonNavbar.errorMessage = stats.error;
+          });
+      }
+
+      updateGraderStatus();
+      setInterval(updateGraderStatus, 30000);
+    }
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -1165,11 +1225,11 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
-    let clarifications = self.clarificationNotifications;
+    let clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
       if (self.problemsetAdmin) {
-        self.clarificationNotifications = clarifications.filter(
+        self.commonNavbar.initialClarifications = clarifications.filter(
           notification =>
             notification.clarification_id !== clarification.clarification_id,
         );
@@ -1292,9 +1352,9 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
-    if (self.clarificationNotifications !== null) {
+    if (self.commonNavbar !== null) {
       // Removing to the notifications list all unsolved clarifications
-      self.clarificationNotifications = data.clarifications
+      self.commonNavbar.initialClarifications = data.clarifications
         .filter(clarification =>
           self.problemsetAdmin
             ? clarification.answer === null
@@ -1303,7 +1363,7 @@ export class Arena {
         .reverse();
 
       // Removing to the notifications list all marked as solved clarifications
-      self.clarificationNotifications = self.clarificationNotifications.filter(
+      self.commonNavbar.initialClarifications = self.commonNavbar.initialClarifications.filter(
         clarification =>
           localStorage.getItem(
             `clarification-${clarification.clarification_id}`,

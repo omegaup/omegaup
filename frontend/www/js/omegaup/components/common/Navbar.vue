@@ -226,9 +226,10 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: omegaup.Grader;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string;
+  @Prop() initialClarifications!: omegaup.Clarification[];
 
   notifications: omegaup.Notification[] = [];
-  initialClarifications: omegaup.Clarification[] = [];
+  clarifications: omegaup.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {
@@ -242,8 +243,5 @@ export default class Navbar extends Vue {
       !this.header.inContest
     );
   }
-
-  @Watch('initialClarifications')
-  onPropertyHasChange(newValue: omegaup.Clarification[]): void {}
 }
 </script>

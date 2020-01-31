@@ -7,7 +7,6 @@ OmegaUp.on('ready', function() {
   const headerPayload = JSON.parse(
     document.getElementById('header-payload').innerText,
   );
-
   let commonNavbar = new Vue({
     el: '#common-navbar',
     render: function(createElement) {
@@ -62,12 +61,5 @@ OmegaUp.on('ready', function() {
 
     updateGraderStatus();
     setInterval(updateGraderStatus, 30000);
-  }
-  if (headerPayload.inContest) {
-    let arenaInstance = new arena.Arena(
-      arena.GetOptionsFromLocation(window.location),
-    );
-    commonNavbar.initialClarifications =
-      arenaInstance.clarificationNotifications;
   }
 });
