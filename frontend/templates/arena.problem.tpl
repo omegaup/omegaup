@@ -58,7 +58,7 @@
       {/if}
       {if $LOGGED_IN}
       <div>
-        <script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
+        <script type="text/json" id="qualitynomination-reportproblem-payload">{$nomination_payload|json_encode}</script>
         <div id="qualitynomination-demotionpopup"></div>
         {js_include entrypoint="qualitynomination_demotionpopup"}
       </div>

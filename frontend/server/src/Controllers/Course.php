@@ -1149,7 +1149,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Converts a Course object into an array
      *
-     * @return array{alias: string, name: string, start_time: int, finish_time: int|null, counts: array<string, int>}
+     * @return array{alias: string, name: string, start_time: int, finish_time: int|null, public: bool, counts: array<string, int>}
      */
     private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
@@ -1157,9 +1157,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'courseNotFound'
             );
         }
-        $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
-        /** @var array{alias: string, name: string, start_time: int, finish_time: int} */
-        $arr = $course->asFilteredArray($relevant_columns);
+        $relevantColumns = [
+            'alias',
+            'name',
+            'start_time',
+            'finish_time',
+            'public',
+        ];
+        /** @var array{alias: string, name: string, start_time: int, finish_time: int, public: bool} */
+        $arr = $course->asFilteredArray($relevantColumns);
 
         $arr['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
             $course->course_id
@@ -1173,7 +1179,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>}
+     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, public: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>, student: list<array{alias: string, counts: array<string, int>, finish_time: int|null, name: string, start_time: int}>}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListCourses(\OmegaUp\Request $r) {
@@ -1191,16 +1197,16 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
-        $admin_courses = [];
+        $adminCourses = [];
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $admin_courses = \OmegaUp\DAO\Courses::getAll(
+            $adminCourses = \OmegaUp\DAO\Courses::getAll(
                 $page,
                 $pageSize,
                 'course_id',
                 'DESC'
             );
         } else {
-            $admin_courses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+            $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
                 $pageSize
@@ -1208,78 +1214,98 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Courses the user is a student in.
-        $student_courses = \OmegaUp\DAO\Courses::getCoursesForStudent(
+        $studentCourses = \OmegaUp\DAO\Courses::getCoursesForStudent(
             $r->identity->identity_id
         );
 
         $response = [
             'admin' => [],
             'student' => [],
+            'public' => [],
         ];
-        foreach ($admin_courses as $course) {
+        foreach ($adminCourses as $course) {
             $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
         }
-        foreach ($student_courses as $course) {
-            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+        foreach ($studentCourses as $course) {
+            $courseAsArray = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
+            $response['student'][] = $courseAsArray;
+            if ($course->public) {
+                $response['public'][] = $courseAsArray;
+            }
         }
+
         return $response;
     }
 
     /**
-     * Returns true when logged user has previous activity in any course
+     * It checks whether user has previous activity in any course in order to
+     * redirect to right location
+     *
+     * @return array{smartyProperties: array<empty, empty>, template: string}
      */
-    public static function userHasActivityInCourses(\OmegaUp\Request $r): bool {
+    public static function schoolsIndexForSmarty(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        $identity = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        )['identity'];
-
-        // User doesn't have activity because is not logged.
-        if (is_null($identity)) {
-            return false;
-        }
-
-        if (is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // User is not logged. Anyways, we need to show intro school page
+            return [
+                'smartyProperties' => [],
+                'template' => 'schools.intro.tpl',
+            ];
         }
 
         if (
             !empty(
                 \OmegaUp\DAO\Courses::getCoursesForStudent(
-                    $identity->identity_id
+                    $r->identity->identity_id
                 )
             )
         ) {
-            return true;
+            die(header('Location: /course/'));
         }
 
-        // Default values to search courses for legged user
+        // Default values to search courses for logged user
         $page = 1;
         $pageSize = 1;
-        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
-            $result = \OmegaUp\DAO\Courses::getAll(
-                $page,
-                $pageSize,
-                'course_id',
-                'DESC'
-            );
-            if (!empty($result)) {
-                return true;
+        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            if (
+                !empty(
+                    \OmegaUp\DAO\Courses::getAll(
+                        $page,
+                        $pageSize,
+                        'course_id',
+                        'DESC'
+                    )
+                )
+            ) {
+                die(header('Location: /course/'));
             }
         }
-        $result = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-            $identity->identity_id,
-            $page,
-            $pageSize
-        );
-        return !empty($result);
+
+        if (
+            !empty(
+                \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                    $r->identity->identity_id,
+                    $page,
+                    $pageSize
+                )
+            )
+        ) {
+            die(header('Location: /course/'));
+        }
+        // User is logged in, but there is no information about courses
+        return [
+            'smartyProperties' => [],
+            'template' => 'schools.intro.tpl',
+        ];
     }
 
     /**
@@ -2450,7 +2476,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $nominationStatus['language'] = \OmegaUp\Controllers\Problem::getProblemStatement(
                     $problem['alias'],
                     $problem['commit'],
-                    \OmegaUp\Controllers\Identity::getPreferredLanguage($r)
+                    \OmegaUp\Controllers\Identity::getPreferredLanguage(
+                        self::resolveTargetIdentity($r)
+                    )
                 )['language'];
                 $nominationStatus['can_nominate_problem'] = !is_null($r->user);
             }
