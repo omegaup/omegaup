@@ -258,7 +258,9 @@ export default {
       result.start_time = new Date(result.start_time * 1000);
       result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
       });
       return result;
     }),
@@ -278,7 +280,9 @@ export default {
       data.start_time = new Date(data.start_time * 1000);
       data.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
       });
       return data;
     }),
@@ -287,7 +291,13 @@ export default {
 
     createAssignment: _call('/api/course/createAssignment/'),
 
-    getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
+    getAssignment: _call('/api/course/assignmentDetails', function(data) {
+      data.start_time = new Date(data.start_time * 1000);
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      return data;
+    }),
 
     /**
      * Returns the list of users signed up for the course that have
@@ -302,11 +312,12 @@ export default {
     listAssignments: _call('/api/course/listAssignments/', function(result) {
       // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
       // be able to get the unmodified times.
-      for (var i = 0; i < result.assignments.length; ++i) {
-        var assignment = result.assignments[i];
+      result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
-      }
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
@@ -318,6 +329,12 @@ export default {
         }
       });
       result.student.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.public.forEach(res => {
         res.start_time = new Date(res.start_time * 1000);
         if (res.finish_time) {
           res.finish_time = new Date(res.finish_time * 1000);

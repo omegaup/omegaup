@@ -50,11 +50,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $r['participating']
             )
             : \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
-        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
-            'public',
-            'private',
-            'registration'
-        ], false);
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                'public',
+                'private',
+                'registration',
+            ]
+        );
 
         // admission mode status in contest is public
         $public = (
@@ -1472,11 +1476,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
-            'public',
-            'private',
-            'registration'
-        ], false);
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                'public',
+                'private',
+                'registration',
+            ]
+        );
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
             'alias',
@@ -1500,23 +1508,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['feedback'],
             'feedback',
             ['no', 'yes', 'partial'],
             $isRequired
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['penalty_type'],
             'penalty_type',
             ['contest_start', 'problem_open', 'runtime', 'none'],
             $isRequired
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['penalty_calc_policy'],
             'penalty_calc_policy',
-            ['sum', 'max'],
-            false
+            ['sum', 'max']
         );
 
         // Problems is optional
@@ -1561,11 +1568,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                \OmegaUp\Validators::validateInEnum(
+                \OmegaUp\Validators::validateOptionalInEnum(
                     $language,
                     'languages',
-                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-                    false
+                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
                 );
             }
         }
@@ -2351,7 +2357,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [$contest, $problemset] = self::validateBasicDetails(
@@ -3021,17 +3027,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready'],
-            false
+            ['new', 'waiting', 'compiling', 'running', 'ready']
         );
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],
             'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS,
-            false
+            \OmegaUp\Controllers\Run::VERDICTS
         );
 
         $problem = null;
@@ -3050,11 +3054,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['language'],
             'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
-            false
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
 
         // Get user if we have something in username
@@ -3206,7 +3209,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a detailed report of the contest
      *
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     public static function apiReport(\OmegaUp\Request $r): array {
         return self::getContestReportDetails($r);
@@ -3215,7 +3218,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a detailed report of the contest. Only Admins can get the report
      *
-     * @return array{finish_time: int, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: array<int, array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();

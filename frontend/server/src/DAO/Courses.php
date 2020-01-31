@@ -98,7 +98,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     INNER JOIN Groups g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
-                ON c.group_id = gg.group_id;
+                ON c.group_id = gg.group_id
+                UNION(
+                    SELECT cc.*
+                    FROM Courses cc
+                    WHERE cc.public = 1
+                );
                ';
         /** @var list<array{acl_id: int, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, public: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(

@@ -1092,6 +1092,39 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys = [
                 'Virtual-ESCOM2018' => 50,
             ];
+        } elseif ($r['contest_type'] == 'OMI_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMI_CHH-2020' => 50
+            ];
+        } elseif ($r['contest_type'] == 'OMIP_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIP_CHH-2020' => 50
+            ];
+        } elseif ($r['contest_type'] == 'OMIS_CHH-2020') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIS_CHH-2020' => 70
+            ];
         } elseif ($r['contest_type'] == 'CONTESTCAC') {
             if (
                 $r->identity->username != 'Franco1010'
@@ -2034,8 +2067,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $r['gender'],
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                true
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
             $r->identity->gender = $r['gender'];
         }
@@ -2146,11 +2178,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
-            ['', 'country', 'state', 'school'],
-            false
+            ['', 'country', 'state', 'school']
         );
 
         $filter = is_null($r['filter']) ? '' : strval($r['filter']);
@@ -3018,11 +3049,10 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
-            ['', 'country', 'state', 'school'],
-            /*$required=*/false
+            ['', 'country', 'state', 'school']
         );
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
