@@ -893,7 +893,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys =  [
                 'Pr8oUAIE' => 20
             ];
-            elseif ($r['contest_type'] == 'OMICHH') {
+        } elseif ($r['contest_type'] == 'OMICHH') {
             if (
                 $r->identity->username != 'LaloRivero'
                 && !$is_system_admin
