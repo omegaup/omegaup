@@ -51,14 +51,16 @@ def test_create_group_with_identities_and_restrictions(driver):
         # Trying to see the list of contests created by the identity
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH, '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-contests "'
+                      ')]//a[@href = "/contest/mine/"]')))).click()
 
         assert_page_not_found_is_shown(driver)
 
@@ -66,13 +68,15 @@ def test_create_group_with_identities_and_restrictions(driver):
         # Trying to see the list of problems created by the identity
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
+                (By.XPATH, '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-problems ")]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-problems ")]'
                       '//a[@href = "/problem/mine/"]')))).click()
 
         assert_page_not_found_is_shown(driver)

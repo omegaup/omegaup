@@ -163,8 +163,8 @@ def create_problem(driver, problem_alias):
                 EC.element_to_be_clickable(
                     (By.XPATH,
                      ('//div[@id="root"]//li[contains(concat(" ", '
-                      'normalize-space(@class), " "), " nav-problems "'
-                      ')]//a[@href = "/problem/new/"]')))).click()
+                      'normalize-space(@class), " "), " nav-problems ")]'
+                      '//a[@href = "/problem/new/"]')))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(
