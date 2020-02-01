@@ -44,9 +44,10 @@ class StatusBarIsDismissed:
         self.counter = int(
             self.status_element.get_attribute('data-counter') or '0')
         self.clicked = False
+        self.message_class = message_class
         self.already_opened = already_opened
 
-    def _click_button(self, driver):
+    def _click_button(self):
         if self.clicked:
             return
         message_class = self.status_element.get_attribute('class')
@@ -61,7 +62,7 @@ class StatusBarIsDismissed:
             # the button immediately.
             if not self.status_element.is_displayed():
                 return self.status_element
-            self._click_button(driver)
+            self._click_button()
             return False
         counter = int(self.status_element.get_attribute('data-counter') or '0')
         if counter in (self.counter, self.counter + 1):
@@ -69,7 +70,7 @@ class StatusBarIsDismissed:
             return False
         if counter == self.counter + 2:
             # Status has finished animating. Time to click the close button.
-            self._click_button(driver)
+            self._click_button()
             return False
         if counter == self.counter + 3:
             # Status is currently closing down.
@@ -106,13 +107,14 @@ def dismiss_status(driver, *, message_class='', already_opened=False):
     '''Closes the status bar and waits for it to disappear.'''
     status_element = driver.wait.until(
         EC.presence_of_element_located((By.ID, 'status')))
-    status_bar_dismissed = StatusBarIsDismissed(status_element,
-                                                message_class=message_class,
-                                                already_opened=already_opened)
+    status_bar_is_dismissed = StatusBarIsDismissed(
+        status_element,
+        message_class=message_class,
+        already_opened=already_opened)
     try:
         yield
     finally:
-        driver.wait.until(status_bar_dismissed)
+        driver.wait.until(status_bar_is_dismissed)
 
 
 def create_run(driver, problem_alias, filename):
