@@ -38,26 +38,38 @@ Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
 class StatusBarIsDismissed:
     """A class that can wait for the status bar to be dismissed."""
 
-    def __init__(self, status_element, message_class):
+    def __init__(self, status_element, message_class, already_opened=False):
         self.status_element = status_element
         self.message_class = message_class
         self.counter = int(
             self.status_element.get_attribute('data-counter') or '0')
         self.clicked = False
+        self.already_opened = already_opened
+
+    def _click_button(self, driver):
+        if self.clicked:
+            return
+        message_class = self.status_element.get_attribute('class')
+        assert self.message_class in message_class, message_class
+        self.status_element.find_element_by_css_selector(
+            'button.close').click()
+        self.clicked = True
 
     def __call__(self, driver):
+        if self.already_opened:
+            # The status was opened since the page was rendered. We can click
+            # the button immediately.
+            if not self.status_element.is_displayed():
+                return self.status_element
+            self._click_button(driver)
+            return False
         counter = int(self.status_element.get_attribute('data-counter') or '0')
         if counter in (self.counter, self.counter + 1):
             # We're still waiting for the status bar to open.
             return False
         if counter == self.counter + 2:
             # Status has finished animating. Time to click the close button.
-            if not self.clicked:
-                message_class = self.status_element.get_attribute('class')
-                assert self.message_class in message_class, message_class
-                self.status_element.find_element_by_css_selector(
-                    'button.close').click()
-                self.clicked = True
+            self._click_button(driver)
             return False
         if counter == self.counter + 3:
             # Status is currently closing down.
@@ -90,11 +102,13 @@ def add_students(driver, users, *, tab_xpath,
 
 
 @contextlib.contextmanager
-def dismiss_status(driver, *, message_class=''):
+def dismiss_status(driver, *, message_class='', already_opened=False):
     '''Closes the status bar and waits for it to disappear.'''
     status_element = driver.wait.until(
         EC.presence_of_element_located((By.ID, 'status')))
-    status_bar_dismissed = StatusBarIsDismissed(status_element, message_class)
+    status_bar_dismissed = StatusBarIsDismissed(status_element,
+                                                message_class=message_class,
+                                                already_opened=already_opened)
     try:
         yield
     finally:
@@ -124,9 +138,10 @@ def create_run(driver, problem_alias, filename):
             'document.querySelector("#submit .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
-    with driver.page_transition():
-        driver.browser.find_element_by_css_selector(
-            '#submit input[type="submit"]').submit()
+    original_url = driver.browser.current_url
+    driver.browser.find_element_by_css_selector(
+        '#submit input[type="submit"]').submit()
+    driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
 
