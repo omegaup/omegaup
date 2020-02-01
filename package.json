@@ -48,6 +48,7 @@
   "scripts": {
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
     "dev": "cross-env webpack --config-name=frontend --watch --mode=development",
+    "dev-all": "cross-env webpack --watch --mode=development",
     "build": "cross-env webpack --progress --hide-modules --mode=production",
     "build-development": "cross-env webpack --hide-modules --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --hide-modules --mode=development",
@@ -59,6 +60,7 @@
     "codemirror": "^5.38.0",
     "jszip": "^3.1.5",
     "mocha": "^6.2.1",
+    "moment": "^2.24.0",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "pako": "^1.0.7",

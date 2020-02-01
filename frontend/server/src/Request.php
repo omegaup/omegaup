@@ -147,6 +147,37 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures that the value associated with the key is an int or null
+     */
+    public function ensureOptionalInt(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required = false
+    ): void {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        if (!is_null($val)) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $val,
+                $key,
+                $lowerBound,
+                $upperBound
+            );
+            $this[$key] = intval($val);
+        }
+    }
+
+    /**
      * Ensures that the value associated with the key is a timestamp.
      */
     public function ensureTimestamp(
@@ -277,6 +308,43 @@ class Request extends \ArrayObject {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+    }
+
+    /**
+     * Returns an array of strings from a request parameter
+     * containing a single string with comma-separated values.
+     *
+     * @param list<string> $default
+     * @return list<string>
+     */
+    public function getStringList(
+        string $param,
+        array $default = [],
+        bool $required = false
+    ): array {
+        if (is_null($this[$param])) {
+            if ($required) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $param
+                );
+            }
+            return $default;
+        }
+
+        if (is_array($this[$param])) {
+            /** @var list<string> */
+            return $this[$param];
+        }
+
+        if (empty($this[$param])) {
+            return [];
+        }
+
+        $strings = explode(',', strval($this[$param]));
+
+        /** @var list<string> */
+        return array_unique($strings);
     }
 
     /**

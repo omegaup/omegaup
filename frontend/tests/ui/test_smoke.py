@@ -124,13 +124,16 @@ def prepare_run(driver, problem_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-problems'))).click()
+            (By.XPATH,
+             '//div[@id="root"]//li[contains(concat(" ", '
+             'normalize-space(@class), " "), " nav-problems ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-problems"]'
-                  '//a[@href = "/problem/"]')))).click()
+                 ('//div[@id="root"]//li[contains(concat(" ", '
+                  'normalize-space(@class), " "), " nav-problems ")]//a[@href '
+                  '= "/problem/"]')))).click()
 
     search_box_element = driver.wait.until(
         EC.visibility_of_element_located(
@@ -152,13 +155,16 @@ def create_problem(driver, problem_alias):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
+                (By.XPATH,
+                 '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-problems ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
-                      '//a[@href = "/problem/new/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-problems "'
+                      ')]//a[@href = "/problem/new/"]')))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(

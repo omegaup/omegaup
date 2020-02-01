@@ -360,12 +360,12 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
-        $this->assertEquals(25, $details['owners_percentage']);
-
+        $this->assertEquals(1, $details['owners_count']);
+        $this->assertEquals(4, $details['total_users']);
         $details = \OmegaUp\Controllers\Badge::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
-        $this->assertEquals(0, $details['owners_percentage']);
+        $this->assertEquals(0, $details['owners_count']);
         $this->assertNull($details['first_assignation']);
     }
 

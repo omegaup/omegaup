@@ -349,7 +349,6 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             true,
             $response['users'][$unregisteredIdentity->username]
@@ -385,7 +384,6 @@ class CreateUserTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Check user was not added into the mailing list
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayNotHasKey(
             $identityNotVerified->username,
             $response['users']

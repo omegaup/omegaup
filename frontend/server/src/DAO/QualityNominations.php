@@ -102,6 +102,31 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         return $response;
     }
 
+    public static function reviewerHasQualityTagNominatedProblem(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ): bool {
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?";
+
+        return (
+            /** @var int */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$identity->identity_id, $problem->problem_id]
+            )
+        ) > 0;
+    }
+
     /**
      * Returns the votes from all the assigned reviewers for a particular
      * nomination.
@@ -229,59 +254,58 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      *
      * @param list<string> $types
      *
-     * @return list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}|null>}
      */
     public static function getNominations(
         ?int $nominatorUserId,
         ?int $asigneeUserId,
-        int $page = 1,
-        int $pageSize = 1000,
+        int $page,
+        int $rowcount,
         array $types = ['demotion', 'promotion']
     ): array {
-        $page = max(0, $page - 1);
+        $offset = ($page - 1) * $rowcount;
+
+        $sqlFrom = '
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Problems p ON p.problem_id = qn.problem_id
+            INNER JOIN
+                Users nominator ON nominator.user_id = qn.user_id
+            INNER JOIN
+                Identities nominatorIdentity ON nominatorIdentity.identity_id = nominator.main_identity_id
+            INNER JOIN
+                ACLs acl ON acl.acl_id = p.acl_id
+            INNER JOIN
+                Users author ON author.user_id = acl.owner_id
+            INNER JOIN
+                Identities authorIdentity ON authorIdentity.identity_id = author.main_identity_id
+        ';
+
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+        ';
+
         $sql = '
-        SELECT
-            qn.qualitynomination_id,
-            qn.nomination,
-            UNIX_TIMESTAMP(qn.time) as time,
-            qn.status,
-            nominatorIdentity.username as nominator_username,
-            nominatorIdentity.name as nominator_name,
-            p.alias,
-            p.title,
-            authorIdentity.username as author_username,
-            authorIdentity.name as author_name
-        FROM
-            QualityNominations qn
-        INNER JOIN
-            Problems p
-        ON
-            p.problem_id = qn.problem_id
-        INNER JOIN
-            Users nominator
-        ON
-            nominator.user_id = qn.user_id
-        INNER JOIN
-            Identities nominatorIdentity
-        ON
-            nominatorIdentity.identity_id = nominator.main_identity_id
-        INNER JOIN
-            ACLs acl
-        ON
-            acl.acl_id = p.acl_id
-        INNER JOIN
-            Users author
-        ON
-            author.user_id = acl.owner_id
-        INNER JOIN
-            Identities authorIdentity
-        ON
-            authorIdentity.identity_id = author.main_identity_id';
+            SELECT
+                qn.qualitynomination_id,
+                qn.nomination,
+                UNIX_TIMESTAMP(qn.time) as time,
+                qn.status,
+                nominatorIdentity.username as nominator_username,
+                nominatorIdentity.name as nominator_name,
+                p.alias,
+                p.title,
+                authorIdentity.username as author_username,
+                authorIdentity.name as author_name
+        ';
+
         $params = [];
         $conditions = [];
 
         if (!is_null($asigneeUserId)) {
-            $sql .= '
+            $sqlFrom .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
             ON
@@ -290,6 +314,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $conditions[] = ' qnr.user_id = ?';
             $params[] = $asigneeUserId;
         }
+
         if (!empty($types)) {
             $conditions[] =
                 ' qn.nomination in ("' . implode(
@@ -304,30 +329,42 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                     )
                 ) . '")';
         }
+
         if (!is_null($nominatorUserId)) {
             $conditions[] = ' qn.user_id = ?';
             $params[] = $nominatorUserId;
         }
+
         if (!empty($conditions)) {
-            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+            $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
-        $sql .= ' LIMIT ?, ?;';
-        $params[] = intval($page * $pageSize);
-        $params[] = intval(($page + 1) * $pageSize);
+        $sqlLimit = ' LIMIT ?, ?;';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount . $sqlFrom,
+            $params
+        ) ?? 0;
+
+        $params[] = $offset;
+        $params[] = $rowcount;
 
         $nominations = [];
         /** @var array{alias: string, author_name: null|string, author_username: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
+                $sql . $sqlFrom . $sqlLimit,
                 $params
             ) as $nomination
         ) {
             $nominations[] = self::processNomination($nomination);
         }
 
-        return $nominations;
+        return [
+            'totalRows' => $totalRows,
+            'nominations' => $nominations,
+        ];
     }
 
     /**

@@ -32,6 +32,7 @@ let config = [
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
       coder_of_the_month_notice:
         './frontend/www/js/omegaup/coderofthemonth/notice.js',
+      common_navbar: './frontend/www/js/omegaup/common/navbar.js',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
@@ -42,6 +43,7 @@ let config = [
       contest_stats: './frontend/www/js/omegaup/contest/stats.js',
       course_edit: './frontend/www/js/omegaup/course/edit.js',
       course_intro: './frontend/www/js/omegaup/course/intro.js',
+      course_list: './frontend/www/js/omegaup/course/list.js',
       course_new: './frontend/www/js/omegaup/course/new.js',
       course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
       course_student: './frontend/www/js/omegaup/course/student.js',
@@ -209,6 +211,11 @@ let config = [
     devServer: { historyApiFallback: true, noInfo: true },
     performance: { hints: false },
     devtool: 'cheap-source-map',
+    watchOptions: {
+      aggregateTimeout: 300,
+      poll: 1000,
+      ignored: /node_modules/,
+    },
   },
   {
     name: 'style',

@@ -7,6 +7,7 @@ import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
@@ -418,6 +419,8 @@ export class Arena {
     self.digitsAfterDecimalPoint = 2;
 
     self.qualityNominationForm = null;
+
+    self.elements.assignmentsNav = null;
   }
 
   installLibinteractiveHooks() {
@@ -637,6 +640,36 @@ export class Arena {
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
+
+    if (
+      typeof problemset.courseAssignments !== 'undefined' &&
+      document.getElementById('arena-navbar-assignments') !== null &&
+      self.elements.assignmentsNav === null
+    ) {
+      self.elements.assignmentsNav = new Vue({
+        el: '#arena-navbar-assignments',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-assignments', {
+            props: {
+              assignments: this.assignments,
+              currentAssignmentAlias: this.currentAssignmentAlias,
+            },
+            on: {
+              'navigate-to-assignment': function(assignmentAlias) {
+                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+              },
+            },
+          });
+        },
+        data: {
+          assignments: problemset.courseAssignments,
+          currentAssignmentAlias: problemset.alias,
+        },
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
+      });
+    }
   }
 
   initProblems(problemset) {
@@ -1038,7 +1071,9 @@ export class Arena {
     for (let i in dataInSeries) {
       if (dataInSeries.hasOwnProperty(i)) {
         dataInSeries[i].push([
-          Math.min(this.finishTime.getTime(), Date.now()),
+          this.finishTime
+            ? Math.min(this.finishTime.getTime(), Date.now())
+            : Date.now(),
           dataInSeries[i][dataInSeries[i].length - 1][1],
         ]);
         series.push({
@@ -1055,7 +1090,9 @@ export class Arena {
     });
 
     navigatorData.push([
-      Math.min(this.finishTime.getTime(), Date.now()),
+      this.finishTime
+        ? Math.min(this.finishTime.getTime(), Date.now())
+        : Date.now(),
       navigatorData[navigatorData.length - 1][1],
     ]);
     this.createChart(series, navigatorData);
@@ -2050,16 +2087,26 @@ export class Arena {
     }
     self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
-    let duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    let duration = null;
+    if (contest.finish_time) {
+      duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    }
     self.summaryView.windowLength(
-      UI.formatDelta(contest.window_length * 60000 || duration),
+      duration
+        ? UI.formatDelta(contest.window_length * 60000 || duration)
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(
       Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
     );
     self.summaryView.finishTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()),
+      contest.finish_time
+        ? Highcharts.dateFormat(
+            '%Y-%m-%d %H:%M:%S',
+            contest.finish_time.getTime(),
+          )
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.scoreboardCutoff(
       Highcharts.dateFormat(

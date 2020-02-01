@@ -4,6 +4,40 @@ require('../dist/commons.js');
 var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
+  describe('formatDateLocal', function() {
+    const expectedValue = '2010-01-01';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateLocal(omegaup.UI.parseDateLocal(expectedValue)),
+      ).toEqual(expectedValue);
+    });
+  });
+
+  describe('formatDateTimeLocal', function() {
+    const expectedValue = '2010-01-01T11:22';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(
+          omegaup.UI.parseDateTimeLocal(expectedValue),
+        ),
+      ).toEqual(expectedValue);
+    });
+  });
+
   describe('formatString', function() {
     it('Should handle strings without replacements', function() {
       expect(omegaup.UI.formatString('hello', {})).toEqual('hello');
@@ -55,6 +89,28 @@ describe('omegaup.ui', function() {
     it('Should reject invalid inputs', function() {
       expect(omegaup.UI.parseDuration('-1s')).toBe(null);
       expect(omegaup.UI.parseDuration('.s')).toBe(null);
+    });
+  });
+
+  describe('formatDelta', function() {
+    it('Should handle valid dates with countdown time format', function() {
+      expect(omegaup.UI.formatDelta(1000)).toEqual('00:00:01');
+      expect(omegaup.UI.formatDelta(10000)).toEqual('00:00:10');
+      expect(omegaup.UI.formatDelta(100000)).toEqual('00:01:40');
+      expect(omegaup.UI.formatDelta(1000000)).toEqual('00:16:40');
+      expect(omegaup.UI.formatDelta(10000000)).toEqual('02:46:40');
+      expect(omegaup.UI.formatDelta(100000000)).toEqual('1:03:46:40');
+      expect(omegaup.UI.formatDelta(1000000000)).toEqual('11:13:46:40');
+      expect(omegaup.UI.formatDelta(2500000000)).toEqual('28:22:26:40');
+    });
+
+    it('Should handle valid human readable dates', function() {
+      expect(omegaup.UI.formatDelta(3000000000)).toEqual('en un mes');
+      expect(omegaup.UI.formatDelta(5000000000)).toEqual('en 2 meses');
+      expect(omegaup.UI.formatDelta(7500000000)).toEqual('en 3 meses');
+      expect(omegaup.UI.formatDelta(10000000000)).toEqual('en 4 meses');
+      expect(omegaup.UI.formatDelta(50000000000)).toEqual('en 2 años');
+      expect(omegaup.UI.formatDelta(100000000000)).toEqual('en 3 años');
     });
   });
 

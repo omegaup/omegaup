@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleGroups#}" inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroups#}" inline}
 
 <div id="group_list"></div>
 

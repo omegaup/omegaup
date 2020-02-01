@@ -25,14 +25,22 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         return new \OmegaUp\DAO\VO\Tags($row);
     }
 
+    /**
+     * @return list<\OmegaUp\DAO\VO\Tags>
+     */
     public static function findByName(string $name): array {
         $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
-        foreach ($rs as $row) {
-            array_push($result, new \OmegaUp\DAO\VO\Tags($row));
+        /** @var array{name: string, tag_id: int} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $args
+            ) as $row
+        ) {
+            $result[] = new \OmegaUp\DAO\VO\Tags($row);
         }
         return $result;
     }

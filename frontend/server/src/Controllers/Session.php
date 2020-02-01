@@ -127,10 +127,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
         ) {
-            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
+                /** @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
                 function () use ($r) {
                     return self::getCurrentSessionImpl($r);
                 },

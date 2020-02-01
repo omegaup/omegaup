@@ -1,7 +1,10 @@
 import API from './api.js';
 import { T } from './omegaup.js';
+import * as moment from 'moment';
 
 let UI = {
+  momentInitialized: false,
+
   navigateTo: function(url) {
     window.location = url;
   },
@@ -29,6 +32,18 @@ let UI = {
   },
 
   formatDelta: function(delta) {
+    if (!UI.momentInitialized) {
+      moment.locale(T.locale);
+      UI.momentInitialized = true;
+    }
+
+    let months = delta / (30 * 24 * 60 * 60 * 1000);
+    if (months >= 1.0) {
+      return moment(delta + Date.now())
+        .endOf()
+        .fromNow();
+    }
+
     let days = Math.floor(delta / (24 * 60 * 60 * 1000));
     delta -= days * (24 * 60 * 60 * 1000);
     let hours = Math.floor(delta / (60 * 60 * 1000));
@@ -480,6 +495,70 @@ let UI = {
       country +
       '" />'
     );
+  },
+
+  formatDateLocal: function(date) {
+    // The expected format is yyyy-MM-dd in the local timezone, which is
+    // why we cannot use date.toISOSTring().
+    return (
+      String(date.getFullYear()).padStart(4, '0') +
+      '-' +
+      // Months in JavaScript start at 0.
+      String(date.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(date.getDate()).padStart(2, '0')
+    );
+  },
+
+  parseDateLocal: function(dateString) {
+    // The expected format is yyyy-MM-dd in the local timezone. Date.parse()
+    // will use UTC if given a timestamp with that format, instead of the local timezone.
+    const result = new Date();
+    const matches = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (matches !== null) {
+      result.setFullYear(Number.parseInt(matches[1], 10));
+      // Months in JavaScript start at 0.
+      result.setMonth(Number.parseInt(matches[2], 10) - 1);
+      result.setDate(Number.parseInt(matches[3], 10));
+    }
+    result.setHours(0);
+    result.setMinutes(0);
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
+  },
+
+  formatDateTimeLocal: function(date) {
+    // The expected format is yyyy-MM-ddTHH:MM in the local timezone, which
+    // is why we cannot use date.toISOSTring().
+    return (
+      UI.formatDateLocal(date) +
+      'T' +
+      String(date.getHours()).padStart(2, '0') +
+      ':' +
+      String(date.getMinutes()).padStart(2, '0')
+    );
+  },
+
+  parseDateTimeLocal: function(dateString) {
+    // The expected format is yyyy-MM-ddTHH:MM in the local timezone.
+    // Date.parse() will use UTC if given a timestamp with that format, instead
+    // of the local timezone.
+    const result = new Date();
+    const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(
+      dateString,
+    );
+    if (matches !== null) {
+      result.setFullYear(Number.parseInt(matches[1], 10));
+      // Months in JavaScript start at 0.
+      result.setMonth(Number.parseInt(matches[2], 10) - 1);
+      result.setDate(Number.parseInt(matches[3], 10));
+      result.setHours(Number.parseInt(matches[4], 10));
+      result.setMinutes(Number.parseInt(matches[5], 10));
+    }
+    result.setSeconds(0);
+    result.setMilliseconds(0);
+    return result;
   },
 
   formatDateTime: function(date) {
