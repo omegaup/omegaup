@@ -893,6 +893,16 @@ class User extends \OmegaUp\Controllers\Controller {
             $keys =  [
                 'Pr8oUAIE' => 20
             ];
+        } elseif ($r['contest_type'] == 'OMICHH') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+            $keys =  [
+                'OMICHH_2020' => 50
+            ];
         } elseif ($r['contest_type'] == 'OMIZAC') {
             if (
                 $r->identity->username != 'rsolis'
