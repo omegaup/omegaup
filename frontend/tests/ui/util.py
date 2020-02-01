@@ -40,7 +40,6 @@ class StatusBarIsDismissed:
 
     def __init__(self, status_element, message_class, already_opened=False):
         self.status_element = status_element
-        self.message_class = message_class
         self.counter = int(
             self.status_element.get_attribute('data-counter') or '0')
         self.clicked = False
