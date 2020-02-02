@@ -1,5 +1,5 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
-import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import { API, UI, OmegaUp } from '../omegaup.js';
+import qualitynomination_ReviewerPopup from '../components/qualitynomination/ReviewerPopup.vue';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -11,18 +11,14 @@ OmegaUp.on('ready', function() {
     const qualityNominationForm = new Vue({
       el: '#qualitynomination-qualityreview',
       render: function(createElement) {
-        return createElement('qualitynomination-popup', {
-          props: {
-            linkTitle: T.reviewerNomination,
-            reviewerNomination: true,
-          },
+        return createElement('qualitynomination-reviewerpopup', {
           on: {
-            submit: function(ev) {
+            submit: function(tag, qualitySeal) {
               const contents = {};
-              if (ev.tags.length) {
-                contents.tag = ev.tags;
+              if (tag) {
+                contents.tag = tag;
               }
-              contents.quality_seal = ev.qualitySeal;
+              contents.quality_seal = qualitySeal;
               API.QualityNomination.create({
                 problem_alias: nominationPayload.problem_alias,
                 nomination: 'quality_tag',
@@ -32,11 +28,8 @@ OmegaUp.on('ready', function() {
           },
         });
       },
-      data: {
-        nominated: true,
-      },
       components: {
-        'qualitynomination-popup': qualitynomination_Popup,
+        'qualitynomination-reviewerpopup': qualitynomination_ReviewerPopup,
       },
     });
   }

@@ -4,8 +4,11 @@
       v-bind:href="suggestLink"
       v-on:click="onShowSuggestion"
       v-show="showSuggestLink"
-      >{{ linkTitle }}</a
     >
+      <slot name="link-title">
+        {{ T.qualityNominationRateProblem }}
+      </slot>
+    </a>
     <transition name="fade">
       <form
         class="panel panel-default popup"
@@ -14,19 +17,25 @@
       >
         <button class="close" type="button" v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
-          <template v-if="currentView === 'suggestion'">
-            <div class="title-text">
-              {{ formTitle }}
-            </div>
-            <div class="form-group">
-              <label class="control-label">
+          <template v-if="currentView === 'content'">
+            <slot
+              name="popup-content"
+              v-bind:onSubmit="onSubmit"
+              v-bind:sortedProblemTags="sortedProblemTags"
+              v-bind:onHide="onHide"
+            >
+              <div class="title-text">
                 {{
-                  reviewerNomination
-                    ? T.reviewerNominationQuality
-                    : T.qualityFormDifficulty
-                }} </label
-              ><br />
-              <template v-if="!reviewerNomination">
+                  this.solved
+                    ? T.qualityFormCongrats
+                    : T.qualityFormRateBeforeAC
+                }}
+              </div>
+              <div class="form-group">
+                <label class="control-label">
+                  {{ T.qualityFormDifficulty }}
+                </label>
+                <br />
                 <label class="radio-inline"
                   ><input type="radio" v-model="difficulty" value="0" />
                   {{ T.qualityFormDifficultyVeryEasy }}</label
@@ -47,92 +56,72 @@
                   ><input type="radio" v-model="difficulty" value="4" />
                   {{ T.qualityFormDifficultyVeryHard }}</label
                 >
-              </template>
-              <template v-else>
-                <label class="radio-inline"
-                  ><input
-                    type="radio"
-                    v-model="qualitySeal"
-                    v-bind:value="true"
-                  />
-                  {{ T.wordsYes }}</label
-                >
-                <label class="radio-inline"
-                  ><input
-                    type="radio"
-                    v-model="qualitySeal"
-                    v-bind:value="false"
-                  />
-                  {{ T.wordsNo }}</label
-                >
-              </template>
-            </div>
-            <div class="form-group">
-              <label class="control-label"
-                >{{
-                  reviewerNomination
-                    ? T.reviewerNominationCategory
-                    : T.qualityFormTags
-                }}
-                <ul class="tag-select">
-                  <li
-                    class="tag-select"
-                    v-for="problemTopic in sortedProblemTags"
-                  >
-                    <label class="tag-select"
-                      ><input
-                        v-bind:type="reviewerNomination ? 'radio' : 'checkbox'"
-                        v-bind:value="problemTopic.value"
-                        v-model="tags"
-                      />
-                      {{ problemTopic.text }}</label
+              </div>
+              <div class="form-group">
+                <label class="control-label">
+                  {{ T.qualityFormTags }}
+                  <ul class="tag-select">
+                    <li
+                      class="tag-select"
+                      v-for="problemTopic in sortedProblemTags"
                     >
-                  </li>
-                </ul></label
-              >
-            </div>
-            <div class="formGroup" v-if="!reviewerNomination">
-              <label class="control-label">{{ T.qualityFormQuality }}</label
-              ><br />
-              <label class="radio-inline"
-                ><input type="radio" v-model="quality" value="0" />
-                {{ T.qualityFormQualityVeryBad }}</label
-              >
-              <label class="radio-inline"
-                ><input type="radio" v-model="quality" value="1" />
-                {{ T.qualityFormQualityBad }}</label
-              >
-              <label class="radio-inline"
-                ><input type="radio" v-model="quality" value="2" />
-                {{ T.qualityFormQualityFair }}</label
-              >
-              <label class="radio-inline"
-                ><input type="radio" v-model="quality" value="3" />
-                {{ T.qualityFormQualityGood }}</label
-              >
-              <label class="radio-inline"
-                ><input type="radio" v-model="quality" value="4" />
-                {{ T.qualityFormQualityVeryGood }}</label
-              >
-            </div>
-            <div class="button-row">
-              <div class="col-md-4"></div>
-              <button
-                class="col-md-4 btn btn-primary"
-                type="submit"
-                v-bind:disabled="disableSubmitButton"
-                v-on:click="onSubmit"
-              >
-                {{ T.wordsSend }}
-              </button>
-              <button
-                class="col-md-4 btn btn-default"
-                type="button"
-                v-on:click="onHide(true)"
-              >
-                {{ T.wordsCancel }}
-              </button>
-            </div>
+                      <label class="tag-select"
+                        ><input
+                          type="checkbox"
+                          v-bind:value="problemTopic.value"
+                          v-model="tags"
+                        />
+                        {{ problemTopic.text }}</label
+                      >
+                    </li>
+                  </ul></label
+                >
+              </div>
+              <div class="formGroup">
+                <label class="control-label">{{ T.qualityFormQuality }}</label
+                ><br />
+                <label class="radio-inline"
+                  ><input type="radio" v-model="quality" value="0" />
+                  {{ T.qualityFormQualityVeryBad }}</label
+                >
+                <label class="radio-inline"
+                  ><input type="radio" v-model="quality" value="1" />
+                  {{ T.qualityFormQualityBad }}</label
+                >
+                <label class="radio-inline"
+                  ><input type="radio" v-model="quality" value="2" />
+                  {{ T.qualityFormQualityFair }}</label
+                >
+                <label class="radio-inline"
+                  ><input type="radio" v-model="quality" value="3" />
+                  {{ T.qualityFormQualityGood }}</label
+                >
+                <label class="radio-inline"
+                  ><input type="radio" v-model="quality" value="4" />
+                  {{ T.qualityFormQualityVeryGood }}</label
+                >
+              </div>
+              <div class="button-row">
+                <div class="col-md-4"></div>
+                <button
+                  class="col-md-4 btn btn-primary"
+                  type="submit"
+                  v-bind:disabled="
+                    !this.quality && !this.tags.length && !this.difficulty
+                  "
+                  v-on:click="onSubmit"
+                >
+                  {{ T.wordsSend }}
+                </button>
+                <button
+                  class="col-md-4 btn btn-default"
+                  type="button"
+                  v-on:click="onHide(true)"
+                >
+                  {{ T.wordsCancel }}
+                </button>
+              </div>
+            </slot>
           </template>
           <template v-if="currentView === 'thanks'">
             <div class="thanks-title">
@@ -250,8 +239,6 @@ interface ProblemTag {
 
 @Component
 export default class QualityNominationPopup extends Vue {
-  @Prop() linkTitle!: string;
-  @Prop({ default: false }) reviewerNomination!: boolean;
   @Prop({ default: false }) solved!: boolean;
   @Prop({ default: true }) tried!: boolean;
   @Prop({ default: false }) nominated!: boolean;
@@ -259,11 +246,57 @@ export default class QualityNominationPopup extends Vue {
   @Prop({ default: false }) dismissed!: boolean;
   @Prop({ default: true }) dismissedBeforeAC!: boolean;
   @Prop({ default: true }) canNominateProblem!: boolean;
+  @Prop({
+    default: () => [
+      'problemTopic2Sat',
+      'problemTopicArrays',
+      'problemTopicBacktracking',
+      'problemTopicBigNumbers',
+      'problemTopicBinarySearch',
+      'problemTopicBitmasks',
+      'problemTopicBreadthDepthFirstSearch',
+      'problemTopicBruteForce',
+      'problemTopicBuckets',
+      'problemTopicCombinatorics',
+      'problemTopicDataStructures',
+      'problemTopicDisjointSets',
+      'problemTopicDivideAndConquer',
+      'problemTopicDynamicProgramming',
+      'problemTopicFastFourierTransform',
+      'problemTopicGameTheory',
+      'problemTopicGeometry',
+      'problemTopicGraphTheory',
+      'problemTopicGreedy',
+      'problemTopicHashing',
+      'problemTopicIfElseSwitch',
+      'problemTopicImplementation',
+      'problemTopicInputOutput',
+      'problemTopicLoops',
+      'problemTopicMath',
+      'problemTopicMatrices',
+      'problemTopicMaxFlow',
+      'problemTopicMeetInTheMiddle',
+      'problemTopicNumberTheory',
+      'problemTopicParsing',
+      'problemTopicProbability',
+      'problemTopicShortestPath',
+      'problemTopicSimulation',
+      'problemTopicSorting',
+      'problemTopicStackQueue',
+      'problemTopicStrings',
+      'problemTopicSuffixArray',
+      'problemTopicSuffixTree',
+      'problemTopicTernarySearch',
+      'problemTopicTrees',
+      'problemTopicTwoPointers',
+    ],
+  })
+  possibleTags!: string[];
   @Prop() problemAlias!: boolean;
 
   T = T;
   UI = UI;
-  currentView = 'suggestion';
+  currentView = 'content';
   difficulty = '';
   quality = '';
   qualitySeal = false;
@@ -271,61 +304,6 @@ export default class QualityNominationPopup extends Vue {
   localDismissed = this.dismissed || (this.dismissedBeforeAC && !this.solved);
   localNominated = this.nominated || (this.nominatedBeforeAC && !this.solved);
   tags: string[] = [];
-
-  static readonly PROBLEM_TOPICS = [
-    'problemTopic2Sat',
-    'problemTopicArrays',
-    'problemTopicBacktracking',
-    'problemTopicBigNumbers',
-    'problemTopicBinarySearch',
-    'problemTopicBitmasks',
-    'problemTopicBreadthDepthFirstSearch',
-    'problemTopicBruteForce',
-    'problemTopicBuckets',
-    'problemTopicCombinatorics',
-    'problemTopicDataStructures',
-    'problemTopicDisjointSets',
-    'problemTopicDivideAndConquer',
-    'problemTopicDynamicProgramming',
-    'problemTopicFastFourierTransform',
-    'problemTopicGameTheory',
-    'problemTopicGeometry',
-    'problemTopicGraphTheory',
-    'problemTopicGreedy',
-    'problemTopicHashing',
-    'problemTopicIfElseSwitch',
-    'problemTopicImplementation',
-    'problemTopicInputOutput',
-    'problemTopicLoops',
-    'problemTopicMath',
-    'problemTopicMatrices',
-    'problemTopicMaxFlow',
-    'problemTopicMeetInTheMiddle',
-    'problemTopicNumberTheory',
-    'problemTopicParsing',
-    'problemTopicProbability',
-    'problemTopicShortestPath',
-    'problemTopicSimulation',
-    'problemTopicSorting',
-    'problemTopicStackQueue',
-    'problemTopicStrings',
-    'problemTopicSuffixArray',
-    'problemTopicSuffixTree',
-    'problemTopicTernarySearch',
-    'problemTopicTrees',
-    'problemTopicTwoPointers',
-  ];
-
-  static readonly PROBLEM_CATEGORIES = [
-    'problemCategoryOpenResponse',
-    'problemCategoryKarelEducation',
-    'problemCategoryIntroductionToProgramming',
-    'problemCategoryMathematicalProblems',
-    'problemCategoryElementaryDataStructures',
-    'problemCategoryAlgorithmAndNetworkOptimization',
-    'problemCategoryCompetitiveProgramming',
-    'problemCategorySpecializedTopics',
-  ];
 
   get showForm(): boolean {
     return (
@@ -341,19 +319,9 @@ export default class QualityNominationPopup extends Vue {
     return (this.tried || this.solved) && !this.localNominated;
   }
 
-  get disableSubmitButton(): boolean {
-    if (this.reviewerNomination) {
-      return this.qualitySeal && !this.tags.length;
-    }
-    return !this.quality && !this.tags.length && !this.difficulty;
-  }
-
   get sortedProblemTags(): ProblemTag[] {
     const self = this;
-    const tags = this.reviewerNomination
-      ? QualityNominationPopup.PROBLEM_CATEGORIES
-      : QualityNominationPopup.PROBLEM_TOPICS;
-    return tags
+    return this.possibleTags
       .map(
         (x: string): ProblemTag => {
           return {
@@ -375,16 +343,9 @@ export default class QualityNominationPopup extends Vue {
     return `#problems/${self.problemAlias}`;
   }
 
-  get formTitle(): string {
-    if (this.reviewerNomination) {
-      return T.reviewerNominationFormTitle;
-    }
-    return this.solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC;
-  }
-
   onHide(isDismissed: boolean): void {
     this.showFormOverride = false;
-    if (isDismissed && !this.reviewerNomination) {
+    if (isDismissed) {
       this.$emit('dismiss', this);
     }
   }

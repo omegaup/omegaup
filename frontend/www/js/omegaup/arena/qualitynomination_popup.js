@@ -14,7 +14,6 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('qualitynomination-popup', {
         props: {
-          linkTitle: T.qualityNominationRateProblem,
           nominated: this.nominated,
           nominatedBeforeAC: this.nominatedBeforeAC,
           solved: this.solved,
