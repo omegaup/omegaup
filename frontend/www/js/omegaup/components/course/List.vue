@@ -4,7 +4,7 @@
       <h3 class="panel-title">{{ T.courseList }}</h3>
     </div>
 
-    <div class="page-header">
+    <div class="page-header" v-if="isMainUserIdentity">
       <div class="pull-right">
         <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
       </div>
@@ -42,6 +42,7 @@ import course_FilteredList from './FilteredList.vue';
 })
 export default class CourseList extends Vue {
   @Prop() courses!: omegaup.Course[];
+  @Prop() isMainUserIdentity!: boolean;
 
   T = T;
   UI = UI;

@@ -33,7 +33,7 @@
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: header.navbarSection === 'contests' }"
-            v-show="header.isLoggedIn && header.isMainUserIdentity"
+            v-if="header.isLoggedIn && header.isMainUserIdentity"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
