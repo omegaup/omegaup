@@ -219,6 +219,58 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check that user in private group list can view private contest
+     */
+    public function testShowValidPrivateContestFromGroup() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+
+        // Get some problems into the contest
+        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
+
+        // Get a user for our scenario
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our private contest
+        {
+            $login = self::login($contestData['director']);
+            $groupData = GroupsFactory::createGroup(
+                /*$owner=*/null,
+                /*$name=*/null,
+                /*$description=*/null,
+                /*$alias=*/null,
+                $login
+            );
+            GroupsFactory::addUserToGroup($groupData, $identity, $login);
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval($contestData['request']['alias']),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+        }
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertContestDetails($contestData, $problems, $response);
+    }
+
+    /**
      * Dont show private contests for users that are not in the private list
      *
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException

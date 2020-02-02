@@ -365,28 +365,59 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         i.username,
                         i.name,
                         IFNULL(i.country_id, 'xx') AS country_id,
-                        CAST(pi.is_invited AS UNSIGNED) AS is_invited,
+                        IFNULL(ri.is_invited, FALSE) AS is_invited,
                         $classNameQuery
                     FROM
-                        Identities i
+                        (
+                            SELECT
+                                raw_identities.identity_id,
+                                MAX(raw_identities.is_invited) AS is_invited
+                            FROM
+                                (
+                                    SELECT
+                                        pi.identity_id,
+                                        CAST(pi.is_invited AS UNSIGNED) AS is_invited
+                                    FROM
+                                        Problemset_Identities pi
+                                    WHERE
+                                        pi.problemset_id = ?
+                                    UNION
+                                    SELECT
+                                        gi.identity_id,
+                                        TRUE AS is_invited
+                                    FROM
+                                        Group_Roles gr
+                                    INNER JOIN
+                                        Groups_Identities gi
+                                    ON
+                                        gi.group_id = gr.group_id
+                                    WHERE
+                                        gr.acl_id = ? AND gr.role_id = ?
+                                ) AS raw_identities
+                            GROUP BY
+                                raw_identities.identity_id
+                        ) AS ri
                     INNER JOIN
-                        Problemset_Identities pi ON i.identity_id = pi.identity_id
+                        Identities i ON i.identity_id = ri.identity_id
                     WHERE
-                        pi.problemset_id = ? AND
-                        (i.user_id NOT IN (
-                            SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?
-                        )";
+                        (
+                            i.user_id NOT IN (
+                                SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?
+                            )
+                ";
                 $val = [
                     $problemsetId,
+                    $aclId,
+                    \OmegaUp\Authorization::CONTESTANT_ROLE,
                     $aclId,
                     \OmegaUp\Authorization::SYSTEM_ACL,
                     \OmegaUp\Authorization::ADMIN_ROLE,
                 ];
                 if ($excludeAdmin) {
-                    $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
+                    $sql .= ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
                     $val[] =  $aclId;
                 }
-                $sql = $sql . 'OR i.user_id IS NULL);';
+                $sql .= ' OR i.user_id IS NULL);';
             } else {
                 $sql = "
                     SELECT

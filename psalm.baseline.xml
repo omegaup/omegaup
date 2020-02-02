@@ -131,12 +131,10 @@
       <code>$start_time</code>
     </PossiblyNullOperand>
     <PossiblyNullPropertyFetch occurrences="5">
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$contest-&gt;start_time</code>
       <code>$contest-&gt;finish_time</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($identity)</code>
