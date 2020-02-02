@@ -14,7 +14,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         'kj' => 'Karel (Java)',
         'c11-gcc' => 'C11 (gcc 7.4)',
         'c11-clang' => 'C11 (clang 6.0)',
-        'cpp11' => 'C++11 (gcc 7.4)',
         'cpp11-gcc' => 'C++11 (g++ 7.4)',
         'cpp11-clang' => 'C++11 (clang++ 6.0)',
         'cpp17-gcc' => 'C++17 (g++ 7.4)',
