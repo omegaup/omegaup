@@ -78,8 +78,10 @@ def test_create_group_with_identities_and_restrictions(driver):
                               '/nomination/mine/', '/contest/new/',
                               '/contest/mine/', '/group/', '/course/new/']
         for inaccessible_path in inaccessible_paths:
-            with util.assert_js_errors(driver,
-                                       expected_paths=(inaccessible_path,)):
+            # Not using assert_js_errors() since this only produces JS errors
+            # with chromedriver, not with saucelabs/Travis.
+            with util.assert_no_js_errors(driver,
+                                          path_whitelist=(inaccessible_path,)):
                 with driver.page_transition():
                     driver.browser.get(driver.url(inaccessible_path))
                     assert_page_not_found_is_shown(driver, inaccessible_path)
