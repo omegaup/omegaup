@@ -141,12 +141,11 @@
     </TypeDoesNotContainNull>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MissingParamType occurrences="14">
+    <MissingParamType occurrences="13">
       <code>$username</code>
       <code>$name</code>
       <code>$gender</code>
       <code>$aliasGroup</code>
-      <code>$groupId</code>
       <code>$username</code>
       <code>$name</code>
       <code>$gender</code>
