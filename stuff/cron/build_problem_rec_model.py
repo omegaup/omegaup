@@ -214,7 +214,7 @@ class Model:
         '''
         try:
             recs = self.model.loc[latest_problem].reset_index(  # type: ignore
-                'target').sort_values(y='weight', ascending=False)['target']
+                'target').sort_values(by='weight', ascending=False)['target']
             unsolved_recs = recs[~recs.isin(banned_problems)]
             return None if unsolved_recs.empty else unsolved_recs.iloc[0:k]
         except KeyError:

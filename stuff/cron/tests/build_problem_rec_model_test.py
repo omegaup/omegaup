@@ -10,6 +10,10 @@ import os.path
 import sys
 import unittest
 
+from typing import Tuple
+
+import MySQLdb.connections
+
 import pandas as pd  # type: ignore
 
 sys.path.insert(
@@ -75,14 +79,64 @@ class TestFirstAcPerProblem(unittest.TestCase):
         self.assertCountEqual(first_ac, expected)
 
 
+class ModelWithMockData(build_problem_rec_model.Model):
+    '''Model subclass to allow using Mock data.'''
+
+    def __init__(self, runs: pd.DataFrame, train_users: pd.Series,
+                 test_users: pd.Series):
+        parser = build_problem_rec_model.build_parser()
+        args = parser.parse_args()
+        config = build_problem_rec_model.TrainingConfig(args)
+        super().__init__(config)
+
+        self.runs = runs
+        self.train_users = train_users
+        self.test_users = test_users
+
+    def load(
+            self,
+            dbconn: MySQLdb.connections.Connection
+    ) -> Tuple[pd.DataFrame, pd.Series, pd.Series]:
+        '''Simply return the stored mock data.'''
+        # pylint: disable=unused-argument
+        return self.runs, self.train_users, self.test_users
+
+
 class TestModelGeneration(unittest.TestCase):
-    '''Test...'''
-    pass
+    '''Test model generation'''
+
+    def test_single_recommendation(self) -> None:
+        '''Tests single recommendation.'''
+        runs = pd.DataFrame([(1, 1, 0),
+                             (2, 1, 0),
+                             (2, 2, 1),
+                             (2, 3, 2)],
+                            columns=['identity_id', 'problem_id', 'time'])
+        train_users = pd.Series([2])
+        test_users = pd.Series([1])
+        model = ModelWithMockData(runs, train_users, test_users)
+        model.build(None)
+        recs = model.recommend(1, [], 1)
+        self.assertCountEqual(recs, [2])
+
+    def test_banned_recommendation(self) -> None:
+        '''Tests single recommendation after solving the top recommendation.'''
+        runs = pd.DataFrame([(1, 1, 0),
+                             (2, 1, 0),
+                             (2, 2, 1),
+                             (2, 3, 2)],
+                            columns=['identity_id', 'problem_id', 'time'])
+        train_users = pd.Series([2])
+        test_users = pd.Series([1])
+        model = ModelWithMockData(runs, train_users, test_users)
+        model.build(None)
+        recs = model.recommend(1, [2], 1)
+        self.assertCountEqual(recs, [3],
+                              "Recommend 3 because 2 has already been solved.")
 
 
 class TestModelEvaluation(unittest.TestCase):
-    '''Test...'''
-    pass
+    '''Test model evaluation.'''
 
 
 if __name__ == '__main__':
