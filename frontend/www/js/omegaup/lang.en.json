@@ -146,6 +146,8 @@
 	"contestEditTagPublic": "Public",
 	"contestEditWithTitle": "Edit contest %(title)",
 	"contestFullList": "See full list",
+	"contestGroupAdded": "Group successfully added.",
+	"contestGroupRemoved": "Group successfully removed.",
 	"contestInformationNotRequired": "User information for this contest was not required.",
 	"contestIntroDifferentStarts": "Once the contest has started, its duration will be %(window_length).",
 	"contestIntroPenaltyDesc": "Each incorrect submission will be penalized with a time of %(window_length).",

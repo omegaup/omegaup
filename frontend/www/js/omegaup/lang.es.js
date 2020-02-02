@@ -147,6 +147,8 @@ const translations = {
 	contestEditTagPublic: "P\u00fablico",
 	contestEditWithTitle: "Editar concurso %(title)",
 	contestFullList: "Ver listado completo",
+	contestGroupAdded: "Grupo agregado correctamente",
+	contestGroupRemoved: "Grupo eliminado correctamente",
 	contestInformationNotRequired: "La informaci\u00f3n de usuario para este concurso no fue requerida.",
 	contestIntroDifferentStarts: "Una vez iniciado el concurso, su duraci\u00f3n ser\u00e1 de %(window_length).",
 	contestIntroPenaltyDesc: "Se penalizar\u00e1 con un tiempo de %(window_length) cada env\u00edo incorrecto.",

@@ -146,6 +146,8 @@
 	"contestEditTagPublic": "(Pub1ic)",
 	"contestEditWithTitle": "(Edi7 c0n7357 %(title))",
 	"contestFullList": "(S33 fu11 1i57)",
+	"contestGroupAdded": "(Gr0up 5ucc355fu11y add3d.)",
+	"contestGroupRemoved": "(Gr0up 5ucc355fu11y r3m0v3d.)",
 	"contestInformationNotRequired": "(U53r inf0rma7i0n f0r 7hi5 c0n7357 wa5 n07 r3quir3d.)",
 	"contestIntroDifferentStarts": "(Onc3 7h3 c0n7357 ha5 57ar73d, i75 dura7i0n wi11 b3 %(window_length).)",
 	"contestIntroPenaltyDesc": "(Each inc0rr3c7 5ubmi55i0n wi11 b3 p3na1iz3d wi7h a 7im3 0f %(window_length).)",
