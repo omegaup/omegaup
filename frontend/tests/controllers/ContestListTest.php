@@ -49,12 +49,11 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Assert our contest is there.
-        foreach ($response['results'] as $contest) {
-            if ($contest['title'] == $contestData['request']['title']) {
-                return;
-            }
-        }
-        $this->assertFalse(true, 'Array does not contain created contest');
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
     /**
@@ -88,22 +87,26 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateContestForInvitedUser() {
         // Create new private contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams(
-                ['admissionMode' => 'private']
-            )
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+            ])
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
         $login = self::login($identity);
-
-        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]));
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
@@ -111,10 +114,72 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertDurationIsCorrect($response, $contestData);
 
-        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'query' => 'thiscontestdoesnotexist',
-        ]));
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => 'thiscontestdoesnotexist',
+            ])
+        );
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
+    }
+
+    public function testPrivateContestForInvitedGroup() {
+        // Create new private contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+            ])
+        );
+
+        // Get a user for our scenario
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our private contest
+        {
+            $login = self::login($contestData['director']);
+            $groupData = GroupsFactory::createGroup(
+                /*$owner=*/null,
+                /*$name=*/null,
+                /*$description=*/null,
+                /*$alias=*/null,
+                $login
+            );
+            GroupsFactory::addUserToGroup($groupData, $identity, $login);
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval($contestData['request']['alias']),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+        }
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
+        $this->assertDurationIsCorrect($response, $contestData);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => 'thiscontestdoesnotexist',
+            ])
+        );
         $this->assertArrayNotContainsInKey(
             $response['results'],
             'title',
@@ -496,17 +561,25 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testPrivateContestListForInvitedUser() {
         // Create three new private contests, and one public contest
-        for ($i = 0; $i < 4; $i++) {
-            $admissionMode = ($i === 0) ? 'public' : 'private';
-            $contestData[$i] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams(
-                    ['admissionMode' => $admissionMode]
-                )
+        $contestData = [];
+        $contestData[] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+            ])
+        );
+        for ($i = 1; $i < 4; $i++) {
+            $contestData[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'private',
+                ])
             );
         }
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to two private contest
         $numberOfPrivateContests = 2;
@@ -518,16 +591,66 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiListParticipating($r);
-
+        $response = \OmegaUp\Controllers\Contest::apiListParticipating(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
         $this->assertEquals(
             $numberOfPrivateContests,
-            count(
-                $response['contests']
-            )
+            count($response['contests'])
+        );
+    }
+
+    public function testPrivateContestListForInvitedGroup() {
+        // Create three new private contests, and one public contest
+        $contestData = [];
+        $contestData[] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'public',
+            ])
+        );
+        for ($i = 1; $i < 4; $i++) {
+            $contestData[] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'private',
+                ])
+            );
+        }
+
+        // Get a user for our scenario
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $groupData = GroupsFactory::createGroup();
+        GroupsFactory::addUserToGroup($groupData, $identity);
+
+        // Add user to two private contest
+        $numberOfPrivateContests = 2;
+        for ($i = 0; $i < $numberOfPrivateContests; $i++) {
+            $login = self::login($contestData[$i]['director']);
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval(
+                        $contestData[$i]['request']['alias']
+                    ),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+        }
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Contest::apiListParticipating(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $this->assertEquals(
+            $numberOfPrivateContests,
+            count($response['contests'])
         );
     }
 
