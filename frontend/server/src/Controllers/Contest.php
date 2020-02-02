@@ -539,7 +539,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{contests: list<array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}>}, privateContestsAlert: bool}
+     * @return array{smartyProperties: array{payload: array{contests: list<array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}>}, privateContestsAlert: bool}, template: string}
      */
     public static function getContestListMineForSmarty(
         \OmegaUp\Request $r
@@ -564,39 +564,62 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'payload' => self::getContestListInternal(
-                $r,
-                function (
-                    int $identityId,
-                    int $page,
-                    int $pageSize,
-                    ?string $query
-                ) {
-                    return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
-                        $identityId,
-                        $page,
-                        $pageSize
-                    );
-                }
-            ),
-            'privateContestsAlert' => $privateContestsAlert,
+            'smartyProperties' => [
+                'payload' => self::getContestListInternal(
+                    $r,
+                    function (
+                        int $identityId,
+                        int $page,
+                        int $pageSize,
+                        ?string $query
+                    ) {
+                        return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                            $identityId,
+                            $page,
+                            $pageSize
+                        );
+                    }
+                ),
+                'privateContestsAlert' => $privateContestsAlert,
+            ],
+            'template' => 'contest.mine.tpl',
         ];
     }
 
     /**
-     * @return array{LANGUAGES: list<string>, IS_UPDATE: bool}
+     * @return array{smartyProperties: array{LANGUAGES: list<string>, IS_UPDATE: bool}, template: string}
      */
-    public static function getContestNewDetailsForSmarty(
-        \OmegaUp\Request $r,
-        bool $isUpdate = false
+    public static function getContestNewForSmarty(
+        \OmegaUp\Request $r
     ): array {
-        $result = [
-            'LANGUAGES' => array_keys(
-                \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-            ),
-            'IS_UPDATE' => $isUpdate,
+        $r->ensureMainUserIdentity();
+        return [
+            'smartyProperties' => [
+                'LANGUAGES' => array_keys(
+                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+                ),
+                'IS_UPDATE' => false,
+            ],
+            'template' => 'contest.new.tpl',
         ];
-        return $result;
+    }
+
+    /**
+     * @return array{smartyProperties: array{LANGUAGES: list<string>, IS_UPDATE: bool}, template: string}
+     */
+    public static function getContestEditForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        return [
+            'smartyProperties' => [
+                'LANGUAGES' => array_keys(
+                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+                ),
+                'IS_UPDATE' => true,
+            ],
+            'template' => 'contest.edit.tpl',
+        ];
     }
 
     /**
