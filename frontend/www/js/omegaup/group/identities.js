@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
               }
               for (let cells of dataset.records) {
                 identitiesComponent.identities.push({
-                  username: identitiesComponent.groupAlias + ':' + cells[0],
+                  username: `${identitiesComponent.groupAlias}:${cells[0]}`,
                   name: cells[1],
                   password: generatePassword(),
                   country_id: cells[2],
