@@ -285,6 +285,7 @@ declare namespace omegaup {
     gravatarURL51: string;
     currentUsername: string;
     isAdmin: boolean;
+    isMainUserIdentity: boolean;
     lockDownImage: string;
     navbarSection: string;
   }

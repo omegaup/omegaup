@@ -4,6 +4,14 @@ omegaup.OmegaUp.on('ready', function() {
   var contestListConfigs = [
     // List Id, Active, Recommended, List, Public header
     [
+      '#participating-current-contests',
+      'ACTIVE',
+      'NOT_RECOMMENDED',
+      'YES',
+      'NO',
+      omegaup.T.arenaMyActiveContests,
+    ],
+    [
       '#recommended-current-contests',
       'ACTIVE',
       'RECOMMENDED',
@@ -50,14 +58,6 @@ omegaup.OmegaUp.on('ready', function() {
       'NO',
       'NO',
       omegaup.T.arenaOldContests,
-    ],
-    [
-      '#participating-current-contests',
-      'ACTIVE',
-      'NOT_RECOMMENDED',
-      'YES',
-      'NO',
-      omegaup.T.arenaMyActiveContests,
     ],
   ];
 
