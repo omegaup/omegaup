@@ -386,6 +386,36 @@ def aggregate_feedback(dbconn: MySQLdb.connections.Connection) -> None:
                                        global_difficulty_average)
 
 
+def aggregate_reviewers_feedback_for_problem(
+        dbconn: MySQLdb.connections.Connection,
+        problem_id: int) -> None:
+    '''Aggregates the reviewers feedback for a certain problem'''
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT qn.`contents`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag'
+                       AND qn.`problem_id` = %s;""",
+                    (problem_id,))
+
+        seal_positive_votes = 0
+        categories_votes = {}
+        for row in cur:
+            try:
+                contents = json.loads(row[0])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+
+            if contents['quality_seal']:
+                seal_positive_votes += 1
+
+            if 'category' in contents and not contents['category'] is None:
+                categories_votes[contents['category']] += 1
+
+        logging.debug(seal_positive_votes)
+        logging.debug(categories_votes)
+
+
 def aggregate_reviewers_feedback(
         dbconn: MySQLdb.connections.Connection) -> None:
     '''Aggregates the quality_tag nominations sent by reviewers
@@ -393,7 +423,13 @@ def aggregate_reviewers_feedback(
     Updates the quality_seal field on Problems table and updates the
     problem category tag.
     '''
-    logging.info('Aggregating problem quality tag.')
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT DISTINCT qn.`problem_id`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag';""")
+        for row in cur:
+            aggregate_reviewers_feedback_for_problem(dbconn, row[0])
+
 
 
 def get_last_friday() -> datetime.date:
