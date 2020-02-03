@@ -44,6 +44,7 @@
               <label class="radio-inline"
                 ><input
                   type="radio"
+                  name="show-scoreboard"
                   v-bind:value="true"
                   v-model="showScoreboard"
                 />{{ T.wordsYes }}</label
@@ -51,6 +52,7 @@
               <label class="radio-inline"
                 ><input
                   type="radio"
+                  name="show-scoreboard"
                   v-bind:value="false"
                   v-model="showScoreboard"
                 />{{ T.wordsNo }}</label

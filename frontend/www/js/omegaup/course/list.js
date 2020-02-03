@@ -3,12 +3,16 @@ import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
+  const headerPayload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
   let courseList = new Vue({
     el: '#course-list',
     render: function(createElement) {
       return createElement('omegaup-course-list', {
         props: {
           courses: this.courses,
+          isMainUserIdentity: headerPayload && headerPayload.isMainUserIdentity,
         },
       });
     },
@@ -27,10 +31,28 @@ OmegaUp.on('ready', function() {
         PAST: 1,
       };
       const accessModes = {
-        STUDENT: 0,
-        ADMIN: 1,
+        PUBLIC: 0,
+        STUDENT: 1,
+        ADMIN: 2,
       };
       const allCourses = [
+        {
+          accessMode: 'public',
+          filteredCourses: [
+            {
+              timeType: 'current',
+              courses: [],
+              tabName: T.courseListCurrentCourses,
+            },
+            {
+              timeType: 'past',
+              courses: [],
+              tabName: T.courseListPastCourses,
+            },
+          ],
+          description: T.courseListPublicCourses,
+          activeTab: '',
+        },
         {
           accessMode: 'student',
           filteredCourses: [
@@ -45,7 +67,7 @@ OmegaUp.on('ready', function() {
               tabName: T.courseListPastCourses,
             },
           ],
-          description: T.courseList,
+          description: T.courseListIStudy,
           activeTab: '',
         },
         {

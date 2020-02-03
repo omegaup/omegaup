@@ -157,8 +157,7 @@ class ProblemParams {
             \OmegaUp\Validators::validateInEnum(
                 $params['visibility'],
                 'visibility',
-                $visibilityStatements,
-                $isRequired
+                $visibilityStatements
             );
         }
         if (isset($params['validator'])) {
@@ -171,8 +170,7 @@ class ProblemParams {
                     \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC,
                     \OmegaUp\ProblemParams::VALIDATOR_LITERAL,
                     \OmegaUp\ProblemParams::VALIDATOR_CUSTOM,
-                ],
-                $isRequired
+                ]
             );
         }
         if (isset($params['time_limit'])) {

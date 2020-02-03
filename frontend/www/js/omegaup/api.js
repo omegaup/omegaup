@@ -118,6 +118,8 @@ export default {
 
     addAdmin: _call('/api/contest/addAdmin/'),
 
+    addGroup: _call('/api/contest/addGroup/'),
+
     addGroupAdmin: _call('/api/contest/addGroupAdmin/'),
 
     addProblem: _call('/api/contest/addProblem/'),
@@ -198,7 +200,9 @@ export default {
 
     removeAdmin: _call('/api/contest/removeAdmin/'),
 
-    removeGroupAdminFromContest: _call('/api/contest/removeGroupAdmin/'),
+    removeGroup: _call('/api/contest/removeGroup/'),
+
+    removeGroupAdmin: _call('/api/contest/removeGroupAdmin/'),
 
     removeProblem: _call('/api/contest/removeProblem/'),
 
@@ -329,6 +333,12 @@ export default {
         }
       });
       result.student.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.public.forEach(res => {
         res.start_time = new Date(res.start_time * 1000);
         if (res.finish_time) {
           res.finish_time = new Date(res.finish_time * 1000);

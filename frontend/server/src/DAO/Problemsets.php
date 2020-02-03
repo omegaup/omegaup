@@ -47,27 +47,32 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
     }
 
     /**
-     *  Check whether a submission is before the deadline.
-     *  If the deadline is null, the submission could be made, otherwise,
-     *  no one, including admins, can submit after the deadline.
+     * Check whether a submission is before the deadline.
+     * If the deadline is null, the submission could be made, otherwise, no
+     * one, including admins, can submit after the deadline.
+     *
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $problemsetContainer
      */
     public static function isLateSubmission(
-        object $container,
+        $problemsetContainer,
         ?\OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
     ): bool {
         if (is_null($problemsetIdentity)) {
-            return isset($container->finish_time) &&
-                   (\OmegaUp\Time::get() > $container->finish_time);
+            return isset($problemsetContainer->finish_time) &&
+                   (\OmegaUp\Time::get() > $problemsetContainer->finish_time);
         }
         return (
-            !is_null($container->finish_time) &&
+            !empty($problemsetContainer->finish_time) &&
             (\OmegaUp\Time::get() > $problemsetIdentity->end_time)
         );
     }
 
-    public static function isSubmissionWindowOpen(object $container): bool {
-        return isset($container->start_time) &&
-                \OmegaUp\Time::get() >= $container->start_time;
+    /**
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $problemsetContainer
+     */
+    public static function isSubmissionWindowOpen($problemsetContainer): bool {
+        return isset($problemsetContainer->start_time) &&
+                \OmegaUp\Time::get() >= $problemsetContainer->start_time;
     }
 
     /**

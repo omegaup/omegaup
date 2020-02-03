@@ -3,12 +3,9 @@
     <div class="panel-body">
       <div class="upload-csv">
         <div class="panel-heading">
-          {{ T.groupsUploadCsvFile }} <input name="identities" type="file" />
-        </div>
-        <div class="panel-heading">
-          <a class="btn btn-primary" v-on:click.prevent="readCsv">{{
-            T.groupsUploadCsvFile
-          }}</a>
+          <div v-html="T.groupsCsvHelp"></div>
+          {{ T.groupsUploadCsvFile }}
+          <input name="identities" type="file" v-on:change="readCsv" />
         </div>
       </div>
       <br />
@@ -54,7 +51,16 @@
             {{ T.groupCreateIdentities }}
           </button>
         </div>
-        <div>
+        <div class="panel-footer">
+          <button
+            class="btn"
+            v-on:click.prevent="$emit('download-identities', identities)"
+          >
+            <span
+              class="glyphicon glyphicon-download-alt"
+              aria-hidden="true"
+            ></span>
+          </button>
           {{ T.groupsIdentityWarning }}
         </div>
       </div>
@@ -75,10 +81,12 @@ export default class Identities extends Vue {
   T = T;
   identities: omegaup.Identity[] = [];
 
-  readCsv(): void {
-    const fileUpload = <HTMLInputElement>(
-      this.$el.querySelector('input[type=file]')
-    );
+  readCsv(ev: InputEvent): void {
+    const fileUpload = <HTMLInputElement>ev.target;
+    this.identities = [];
+    if (fileUpload.value == '') {
+      return;
+    }
     const regex = /.*\.(?:csv|txt)$/;
 
     if (!regex.test(fileUpload.value.toLowerCase())) {
