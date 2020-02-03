@@ -26,6 +26,7 @@ OmegaUp.on('ready', function() {
   )
     .done((contest, problems, users, requests, admins) => {
       problems = problems.problems;
+      let groups = users.groups;
       users = users.users;
       let groupAdmins = admins.group_admins;
       requests = requests.users;
@@ -41,6 +42,7 @@ OmegaUp.on('ready', function() {
                 users: users,
                 requests: requests,
                 admins: admins,
+                groups: groups,
                 groupAdmins: groupAdmins,
               },
             },
@@ -220,6 +222,28 @@ OmegaUp.on('ready', function() {
                   })
                   .fail(UI.apiError);
               },
+              'add-group': function(ev) {
+                API.Contest.addGroup({
+                  contest_alias: contestAlias,
+                  group: ev.groupName,
+                })
+                  .then(function(response) {
+                    UI.success(T.contestGroupAdded);
+                    refresh(ev, API.Contest.users, 'groups', 'groups');
+                  })
+                  .fail(UI.apiError);
+              },
+              'remove-group': function(ev) {
+                API.Contest.removeGroup({
+                  contest_alias: contestAlias,
+                  group: ev.selected.alias,
+                })
+                  .then(function(response) {
+                    UI.success(T.contestGroupRemoved);
+                    refresh(ev, API.Contest.users, 'groups', 'groups');
+                  })
+                  .fail(UI.apiError);
+              },
               'add-admin': function(ev) {
                 API.Contest.addAdmin({
                   contest_alias: contestAlias,
@@ -263,7 +287,7 @@ OmegaUp.on('ready', function() {
                   .fail(UI.apiError);
               },
               'remove-group-admin': function(ev) {
-                API.Contest.removeGroupAdminFromContest({
+                API.Contest.removeGroupAdmin({
                   contest_alias: contestAlias,
                   group: ev.selected.alias,
                 })

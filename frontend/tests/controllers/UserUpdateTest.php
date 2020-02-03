@@ -61,8 +61,9 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
         $states = \OmegaUp\DAO\States::getByCountry('US');
+        $token = $login->auth_token;
         $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
@@ -75,10 +76,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user from db
-        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
-            $r['auth_token']
-        );
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($token);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($token);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -105,11 +104,11 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
-        $this->assertEquals($locale->name, \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            new \OmegaUp\Request([
-                'username' => $identity->username
-            ])
-        ));
+        $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken($token);
+        $this->assertEquals(
+            $locale->name,
+            \OmegaUp\Controllers\Identity::getPreferredLanguage($identity)
+        );
     }
 
     /**

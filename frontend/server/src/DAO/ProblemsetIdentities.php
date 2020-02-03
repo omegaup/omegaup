@@ -31,7 +31,19 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             intval($container->problemset_id)
         );
         if (is_null($problemsetIdentity)) {
-            if (!$grantAccess) {
+            // Identities that were added through a group are still considered
+            // to be granted access.
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                intval($container->problemset_id)
+            );
+            $isInvited = (
+                !is_null($problemset) &&
+                \OmegaUp\DAO\GroupRoles::isContestant(
+                    intval($identity->identity_id),
+                    intval($problemset->acl_id)
+                )
+            );
+            if (!$grantAccess && !$isInvited) {
                 // User was not authorized to do this.
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
@@ -40,7 +52,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 'problemset_id' => intval($container->problemset_id),
                 'score' => 0,
                 'time' => 0,
-                'is_invited' => false,
+                'is_invited' => $isInvited,
                 'share_user_information' => $shareUserInformation,
             ]);
         }
@@ -157,8 +169,11 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
+    /**
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $container
+     */
     public static function recalculateEndTimeAsFinishTime(
-        \OmegaUp\DAO\VO\Contests $contest
+        $container
     ): int {
         $sql = 'UPDATE
                     `Problemset_Identities`
@@ -169,7 +184,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             $sql,
-            [$contest->finish_time, $contest->problemset_id]
+            [
+                $container->finish_time,
+                $container->problemset_id
+            ]
         );
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

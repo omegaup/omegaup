@@ -51,7 +51,8 @@ abstract class Problems {
                 `email_clarifications` = ?,
                 `quality` = ?,
                 `quality_histogram` = ?,
-                `difficulty_histogram` = ?
+                `difficulty_histogram` = ?,
+                `quality_seal` = ?
             WHERE
                 (
                     `problem_id` = ?
@@ -91,6 +92,7 @@ abstract class Problems {
             ),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
+            intval($Problems->quality_seal),
             intval($Problems->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -132,7 +134,8 @@ abstract class Problems {
                 `Problems`.`email_clarifications`,
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
-                `Problems`.`difficulty_histogram`
+                `Problems`.`difficulty_histogram`,
+                `Problems`.`quality_seal`
             FROM
                 `Problems`
             WHERE
@@ -234,7 +237,8 @@ abstract class Problems {
                 `Problems`.`email_clarifications`,
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
-                `Problems`.`difficulty_histogram`
+                `Problems`.`difficulty_histogram`,
+                `Problems`.`quality_seal`
             FROM
                 `Problems`
         ';
@@ -304,8 +308,10 @@ abstract class Problems {
                     `email_clarifications`,
                     `quality`,
                     `quality_histogram`,
-                    `difficulty_histogram`
+                    `difficulty_histogram`,
+                    `quality_seal`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -362,6 +368,7 @@ abstract class Problems {
             ),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
+            intval($Problems->quality_seal),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

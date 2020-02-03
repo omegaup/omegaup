@@ -1071,7 +1071,9 @@ export class Arena {
     for (let i in dataInSeries) {
       if (dataInSeries.hasOwnProperty(i)) {
         dataInSeries[i].push([
-          Math.min(this.finishTime.getTime(), Date.now()),
+          this.finishTime
+            ? Math.min(this.finishTime.getTime(), Date.now())
+            : Date.now(),
           dataInSeries[i][dataInSeries[i].length - 1][1],
         ]);
         series.push({
@@ -1088,7 +1090,9 @@ export class Arena {
     });
 
     navigatorData.push([
-      Math.min(this.finishTime.getTime(), Date.now()),
+      this.finishTime
+        ? Math.min(this.finishTime.getTime(), Date.now())
+        : Date.now(),
       navigatorData[navigatorData.length - 1][1],
     ]);
     this.createChart(series, navigatorData);
@@ -1679,6 +1683,12 @@ export class Arena {
       }
 
       if (problemChanged) {
+        // Ping Analytics with updated problem id
+        let page = window.location.pathname + window.location.hash;
+        if (typeof ga == 'function') {
+          ga('set', 'page', page);
+          ga('send', 'pageview');
+        }
         if (problem.statement) {
           update(problem);
         } else {
@@ -2083,16 +2093,26 @@ export class Arena {
     }
     self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
-    let duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    let duration = null;
+    if (contest.finish_time) {
+      duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    }
     self.summaryView.windowLength(
-      UI.formatDelta(contest.window_length * 60000 || duration),
+      duration
+        ? UI.formatDelta(contest.window_length * 60000 || duration)
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(
       Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
     );
     self.summaryView.finishTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()),
+      contest.finish_time
+        ? Highcharts.dateFormat(
+            '%Y-%m-%d %H:%M:%S',
+            contest.finish_time.getTime(),
+          )
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.scoreboardCutoff(
       Highcharts.dateFormat(

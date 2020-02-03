@@ -24,7 +24,7 @@ CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('/api/grader/status/',)
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -38,23 +38,38 @@ Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
 class StatusBarIsDismissed:
     """A class that can wait for the status bar to be dismissed."""
 
-    def __init__(self, status_element):
+    def __init__(self, status_element, message_class, already_opened=False):
         self.status_element = status_element
         self.counter = int(
             self.status_element.get_attribute('data-counter') or '0')
         self.clicked = False
+        self.message_class = message_class
+        self.already_opened = already_opened
+
+    def _click_button(self):
+        if self.clicked:
+            return
+        message_class = self.status_element.get_attribute('class')
+        assert self.message_class in message_class, message_class
+        self.status_element.find_element_by_css_selector(
+            'button.close').click()
+        self.clicked = True
 
     def __call__(self, driver):
+        if self.already_opened:
+            # The status was opened since the page was rendered. We can click
+            # the button immediately.
+            if not self.status_element.is_displayed():
+                return self.status_element
+            self._click_button()
+            return False
         counter = int(self.status_element.get_attribute('data-counter') or '0')
         if counter in (self.counter, self.counter + 1):
             # We're still waiting for the status bar to open.
             return False
         if counter == self.counter + 2:
             # Status has finished animating. Time to click the close button.
-            if not self.clicked:
-                self.status_element.find_element_by_css_selector(
-                    'button.close').click()
-                self.clicked = True
+            self._click_button()
             return False
         if counter == self.counter + 3:
             # Status is currently closing down.
@@ -87,11 +102,14 @@ def add_students(driver, users, *, tab_xpath,
 
 
 @contextlib.contextmanager
-def dismiss_status(driver):
+def dismiss_status(driver, *, message_class='', already_opened=False):
     '''Closes the status bar and waits for it to disappear.'''
     status_element = driver.wait.until(
         EC.presence_of_element_located((By.ID, 'status')))
-    status_bar_is_dismissed = StatusBarIsDismissed(status_element)
+    status_bar_is_dismissed = StatusBarIsDismissed(
+        status_element,
+        message_class=message_class,
+        already_opened=already_opened)
     try:
         yield
     finally:
@@ -121,9 +139,10 @@ def create_run(driver, problem_alias, filename):
             'document.querySelector("#submit .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
-    with driver.page_transition():
-        driver.browser.find_element_by_css_selector(
-            '#submit input[type="submit"]').submit()
+    original_url = driver.browser.current_url
+    driver.browser.find_element_by_css_selector(
+        '#submit input[type="submit"]').submit()
+    driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
 
@@ -327,13 +346,16 @@ def create_group(driver, group_title, description):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH,
+             '//div[@id="root"]//li[contains(concat(" ", '
+             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                 ('//div[@id="root"]//li[contains(concat(" ", '
+                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
+                  '= "/group/"]')))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -366,13 +388,16 @@ def add_identities_group(driver, group_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH,
+             '//div[@id="root"]//li[contains(concat(" ", '
+             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                 ('//div[@id="root"]//li[contains(concat(" ", '
+                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
+                  '= "/group/"]')))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -386,11 +411,6 @@ def add_identities_group(driver, group_alias):
     identities_element = driver.browser.find_element_by_name('identities')
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "), '
-             '" upload-csv ")]/div/a'))).click()
 
     username_elements = driver.browser.find_elements_by_xpath(
         '//table[contains(concat(" ", normalize-space(@class), " "), " '
@@ -409,10 +429,7 @@ def add_identities_group(driver, group_alias):
         EC.element_to_be_clickable(
             (By.XPATH,
              '//button[starts-with(@name, "create-identities")]')))
-    create_identities_button.click()
-    message = driver.wait.until(
-        EC.visibility_of_element_located((By.ID, 'status')))
-    message_class = message.get_attribute('class')
-    assert 'success' in message_class, message_class
+    with dismiss_status(driver, message_class='success'):
+        create_identities_button.click()
 
     return identities

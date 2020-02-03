@@ -28,7 +28,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+        $exception = new \OmegaUp\Exceptions\NotFoundException(
+            'userOrMailNotFound'
+        );
+        $exception->addCustomMessageToArray(
+            'userEmail',
+            $userOrEmail
+        );
+        throw $exception;
     }
 
     /**
@@ -104,9 +111,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
 
             // Save in DB
-            self::saveIdentityGroup(
-                $identity,
-                intval($group->group_id)
+            \OmegaUp\DAO\Identities::create($identity);
+            \OmegaUp\DAO\GroupsIdentities::create(
+                new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => intval($group->group_id),
+                    'identity_id' => $identity->identity_id,
+                ])
             );
 
             // Create IdentitySchool
@@ -143,12 +153,24 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         $group = self::validateGroupOwnership($r);
 
+        /** @var list<array<string, string>> */
+        $identities = $r['identities'];
+        /** @var array<string, bool> */
+        $seenUsernames = [];
+        foreach ($identities as $identity) {
+            if (isset($seenUsernames[$identity['username']])) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse'
+                );
+            }
+            $seenUsernames[$identity['username']] = true;
+        }
+
         // Save objects into DB
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            /** @var array<string, string> $identity */
-            foreach ($r['identities'] as $identity) {
+            foreach ($identities as $identity) {
                 // Prepare DAOs
                 $countryId = empty(
                     $identity['country_id']
@@ -182,9 +204,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $state
                 );
 
-                self::saveIdentityGroup(
+                self::saveIdentityGroupInsideTransaction(
                     $newIdentity,
-                    intval($group->group_id)
+                    $group
                 );
 
                 // Create IdentitySchool
@@ -273,34 +295,29 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
     /**
      * Save object Identities in DB, and add user into group.
-     * This function is called inside a transaction.
-     *
-     * @return void
+     * This function is expected to be called inside a transaction.
      */
-    private static function saveIdentityGroup(
+    private static function saveIdentityGroupInsideTransaction(
         \OmegaUp\DAO\VO\Identities $identity,
-        $groupId
+        \OmegaUp\DAO\VO\Groups $group
     ): void {
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
-            \OmegaUp\DAO\Identities::create($identity);
-            \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => $groupId,
-                'identity_id' => $identity->identity_id,
-            ]));
-
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse',
-                    $e
-                );
-            }
-            throw $e;
+        $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $identity->username
+        );
+        if (!is_null($preexistingIdentity)) {
+            $identity->identity_id = $preexistingIdentity->identity_id;
+            $identity->user_id = $preexistingIdentity->user_id;
+            // No need to save the object here since it will be updated a bit
+            // later.
+            return;
         }
+        \OmegaUp\DAO\Identities::create($identity);
+        \OmegaUp\DAO\GroupsIdentities::create(
+            new \OmegaUp\DAO\VO\GroupsIdentities([
+                'group_id' => intval($group->group_id),
+                'identity_id' => $identity->identity_id,
+            ])
+        );
     }
 
     /**
@@ -365,7 +382,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::USER_PROFILE,
-            $identity->username
+            strval($identity->username)
         );
 
         return [
@@ -481,8 +498,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $gender,
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                false
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
         }
     }
@@ -627,7 +643,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Returns the prefered language as a string (en,es,fra) of the identity given
      * If no identity is given, language is retrived from the browser.
      */
-    public static function getPreferredLanguage(\OmegaUp\Request $r): string {
+    public static function getPreferredLanguage(
+        ?\OmegaUp\DAO\VO\Identities $identity
+    ): string {
         // for quick debugging
         if (isset($_GET['lang'])) {
             return self::convertToSupportedLanguage(
@@ -636,7 +654,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            $identity = self::resolveTargetIdentity($r);
             if (!is_null($identity) && !is_null($identity->language_id)) {
                 $result = \OmegaUp\DAO\Languages::getByPK(
                     $identity->language_id
