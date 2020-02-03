@@ -16,7 +16,7 @@ import operator
 import os
 import sys
 import warnings
-from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple, Text
 
 import MySQLdb.constants.ER
 
@@ -397,23 +397,57 @@ def aggregate_reviewers_feedback_for_problem(
                        AND qn.`problem_id` = %s;""",
                     (problem_id,))
 
+        total_votes = 0
         seal_positive_votes = 0
-        categories_votes = {}
+        categories_votes: Dict[Text, int] = {}
         for row in cur:
             try:
                 contents = json.loads(row[0])
             except json.JSONDecodeError:  # pylint: disable=no-member
                 logging.exception('Failed to parse contents')
                 continue
-
+            total_votes += 1
             if contents['quality_seal']:
                 seal_positive_votes += 1
 
-            if 'category' in contents and not contents['category'] is None:
-                categories_votes[contents['category']] += 1
+            if 'tag' in contents and not contents['tag'] is None:
+                if contents['tag'] not in categories_votes:
+                    categories_votes[contents['tag']] = 1
+                else:
+                    categories_votes[contents['tag']] += 1
 
-        logging.debug(seal_positive_votes)
-        logging.debug(categories_votes)
+        # Update the quality_seal for problem
+        cur.execute(
+            """
+            UPDATE
+                `Problems` as p
+            SET
+                p.`quality_seal` = %s
+            WHERE
+                p.`problem_id` = %s;""",
+            (seal_positive_votes > (total_votes / 2), problem_id))
+
+        # Delete old category for problem and add the new one
+        most_voted_category = max(categories_votes, key=categories_votes.get)
+        cur.execute("""DELETE FROM
+                               `Problems_Tags`
+                           WHERE
+                               `problem_id` = %s AND `source` = 'quality';""",
+                    (problem_id,))
+
+        cur.execute("""INSERT INTO
+                               `Problems_Tags`(`problem_id`, `tag_id`,
+                                               `public`, `source`)
+                           SELECT
+                               %s AS `problem_id`,
+                               `t`.`tag_id` AS `tag_id`,
+                               1 AS `public`,
+                               'quality' AS `source`
+                           FROM
+                               `Tags` AS `t`
+                           WHERE
+                               `t`.`name` = %s;""",
+                    (problem_id, most_voted_category))
 
 
 def aggregate_reviewers_feedback(
@@ -429,7 +463,7 @@ def aggregate_reviewers_feedback(
                        WHERE qn.`nomination` = 'quality_tag';""")
         for row in cur:
             aggregate_reviewers_feedback_for_problem(dbconn, row[0])
-
+        dbconn.commit()
 
 
 def get_last_friday() -> datetime.date:
