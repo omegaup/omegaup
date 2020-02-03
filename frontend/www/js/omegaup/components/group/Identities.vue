@@ -51,7 +51,16 @@
             {{ T.groupCreateIdentities }}
           </button>
         </div>
-        <div>
+        <div class="panel-footer">
+          <button
+            class="btn"
+            v-on:click.prevent="$emit('download-identities', identities)"
+          >
+            <span
+              class="glyphicon glyphicon-download-alt"
+              aria-hidden="true"
+            ></span>
+          </button>
           {{ T.groupsIdentityWarning }}
         </div>
       </div>
