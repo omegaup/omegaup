@@ -314,7 +314,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $args[] = intval($offset);
         $args[] = intval($rowcount);
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, ratio: float|null, score: float, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql};",
             $args
@@ -359,7 +359,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [$alias];
 
-        /** @var array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
+        /** @var array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
                 return null;
@@ -455,7 +455,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $val = [$identityId];
 
         $problems = [];
-        /** @var array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int} $row */
+        /** @var array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -499,7 +499,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [$identityId];
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -534,7 +534,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $identityId];
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -879,7 +879,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             intval($pageSize),
         ];
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -921,7 +921,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             intval($pageSize),
         ];
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -1085,7 +1085,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     title = ?;';
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $problems = [];

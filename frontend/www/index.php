@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r): array {
+    function (\OmegaUp\Request $r) {
         return \OmegaUp\Controllers\User::getIndexDetailsForSmarty(
             $r
         );

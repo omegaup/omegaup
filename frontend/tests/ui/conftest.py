@@ -135,13 +135,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
+        html_node = self.browser.find_element_by_tag_name('html')
         prev_url = self.browser.current_url
-        logging.debug('Waiting for the URL to change from %s', prev_url)
+        logging.debug('Waiting for a page transition on %s', prev_url)
         yield
-        self.wait.until(lambda _: self.browser.current_url != prev_url)
+        self.wait.until(EC.staleness_of(html_node))
         logging.debug('New URL: %s', self.browser.current_url)
         if target_url:
-            self.wait.until(lambda _: self.browser.current_url == target_url)
+            self.wait.until(EC.url_to_be(target_url))
             logging.debug('Target URL: %s', self.browser.current_url)
         if wait_for_ajax:
             self._wait_for_page_loaded()

@@ -119,6 +119,11 @@ declare namespace omegaup {
     role: string;
   }
 
+  export interface ContestGroup {
+    alias: string;
+    name: string;
+  }
+
   export interface ContestGroupAdmin {
     role?: string;
     name?: string;
@@ -285,6 +290,7 @@ declare namespace omegaup {
     gravatarURL51: string;
     currentUsername: string;
     isAdmin: boolean;
+    isMainUserIdentity: boolean;
     lockDownImage: string;
     navbarSection: string;
   }

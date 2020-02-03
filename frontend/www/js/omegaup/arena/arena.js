@@ -1683,6 +1683,12 @@ export class Arena {
       }
 
       if (problemChanged) {
+        // Ping Analytics with updated problem id
+        let page = window.location.pathname + window.location.hash;
+        if (typeof ga == 'function') {
+          ga('set', 'page', page);
+          ga('send', 'pageview');
+        }
         if (problem.statement) {
           update(problem);
         } else {

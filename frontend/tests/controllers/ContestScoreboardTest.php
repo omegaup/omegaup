@@ -21,7 +21,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         bool $runForAdmin = true,
         bool $runForDirector = true
     ) {
-        $problemData = [\OmegaUp\Test\Factories\Problem::createProblem(), \OmegaUp\Test\Factories\Problem::createProblem()];
+        $problemData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problems to the contest
@@ -38,10 +41,16 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
-            ['user' => $contestants[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+            [
+                'user' => $contestants[],
+                'identity' => $identities[],
+            ] = \OmegaUp\Test\Factories\User::createUser();
         }
         $contestDirector = $contestData['director'];
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestAdmin,
+            'identity' => $contestIdentityAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Contest::addAdminUser(
             $contestData,
             $contestIdentityAdmin
@@ -86,7 +95,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             'contestData' => $contestData,
             'contestants' => $identities,
             'contestAdmin' => $contestAdmin,
-            'runMap' => $runMap
+            'runMap' => $runMap,
         ];
     }
 
