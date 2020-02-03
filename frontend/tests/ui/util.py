@@ -411,11 +411,6 @@ def add_identities_group(driver, group_alias):
     identities_element = driver.browser.find_element_by_name('identities')
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "), '
-             '" upload-csv ")]/div/a'))).click()
 
     username_elements = driver.browser.find_elements_by_xpath(
         '//table[contains(concat(" ", normalize-space(@class), " "), " '
@@ -434,10 +429,7 @@ def add_identities_group(driver, group_alias):
         EC.element_to_be_clickable(
             (By.XPATH,
              '//button[starts-with(@name, "create-identities")]')))
-    create_identities_button.click()
-    message = driver.wait.until(
-        EC.visibility_of_element_located((By.ID, 'status')))
-    message_class = message.get_attribute('class')
-    assert 'success' in message_class, message_class
+    with dismiss_status(driver, message_class='success'):
+        create_identities_button.click()
 
     return identities

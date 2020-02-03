@@ -338,16 +338,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         if ($contest->admission_mode == 'private') {
             if (
-                is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                !is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
                     $identity->identity_id,
                     $contest->problemset_id
-                )) &&
-                !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
+                ))
             ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'userNotAllowed'
-                );
+                return;
             }
+            if (
+                \OmegaUp\Authorization::canSubmitToProblemset(
+                    $identity,
+                    \OmegaUp\DAO\Problemsets::getByPK(
+                        $contest->problemset_id
+                    )
+                )
+            ) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         } elseif (
             $contest->admission_mode == 'registration' &&
             !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
@@ -2136,6 +2146,105 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Adds an group to a contest
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     */
+    public static function apiAddGroup(\OmegaUp\Request $r): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check contest_alias
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group'],
+            'group'
+        );
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            intval($contest->problemset_id)
+        );
+        if (is_null($problemset)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        \OmegaUp\DAO\GroupRoles::create(
+            new \OmegaUp\DAO\VO\GroupRoles([
+                'acl_id' => $problemset->acl_id,
+                'group_id' => $group->group_id,
+                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+            ])
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Removes a group from a contest
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     */
+    public static function apiRemoveGroup(\OmegaUp\Request $r): array {
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check contest_alias
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group'],
+            'group'
+        );
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            intval($contest->problemset_id)
+        );
+        \OmegaUp\DAO\GroupRoles::delete(
+            new \OmegaUp\DAO\VO\GroupRoles([
+                'acl_id' => $problemset->acl_id,
+                'group_id' => $group->group_id,
+                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+            ])
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Adds an admin to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -2163,7 +2272,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        \OmegaUp\Controllers\ACL::addUser($contest->acl_id, $user->user_id);
+        \OmegaUp\Controllers\ACL::addUser(
+            $contest->acl_id,
+            intval($user->user_id)
+        );
 
         return ['status' => 'ok'];
     }
@@ -2658,7 +2770,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiArbitrateRequest(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
@@ -2713,7 +2825,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'identity_id' => $request->identity_id,
             'problemset_id' => $contest->problemset_id,
             'time' => $request->last_update,
-            'admin_id' => $r->user->user_id,
+            'admin_id' => intval($r->user->user_id),
             'accepted' => $request->accepted,
         ]));
 
@@ -2728,7 +2840,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns ALL identities participating in a contest
      *
-     * @return array{users: list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}>}
+     * @return array{users: list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}>, groups: list<array{alias: string, name: string}>}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -2745,6 +2857,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return [
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
+                intval($contest->problemset_id)
+            ),
+            'groups' => \OmegaUp\DAO\GroupRoles::getContestantGroups(
                 intval($contest->problemset_id)
             ),
         ];

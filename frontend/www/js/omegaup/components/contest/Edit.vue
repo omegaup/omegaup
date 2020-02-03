@@ -87,6 +87,16 @@
           v-on:emit-accept-request="(requestsComponent, username) =&gt; $emit('accept-request', requestsComponent, username)"
           v-on:emit-deny-request="(requestsComponent, username) =&gt; $emit('deny-request', requestsComponent, username)"
         ></omegaup-contest-requests>
+        <omegaup-contest-groups
+          v-bind:data="groups"
+          v-if="isIdentitiesExperimentEnabled"
+          v-on:emit-add-group="
+            groupsComponent => $emit('add-group', groupsComponent)
+          "
+          v-on:emit-remove-group="
+            groupsComponent => $emit('remove-group', groupsComponent)
+          "
+        ></omegaup-contest-groups>
       </div>
       <div class="tab-pane active" v-if="showTab === 'admins'">
         <omegaup-contest-admins
@@ -114,7 +124,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { OmegaUp, T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
 import contest_AddProblem from './AddProblem.vue';
@@ -122,6 +132,7 @@ import contest_Admins from './Admins.vue';
 import contest_Clone from './Clone.vue';
 import contest_Contestant from './Contestant.vue';
 import contest_Requests from './Requests.vue';
+import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from './GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
@@ -134,6 +145,7 @@ interface ContestEdit {
   problems: omegaup.Problem[];
   requests: omegaup.IdentityContestRequest[];
   users: omegaup.IdentityContest[];
+  groups: omegaup.ContestGroup[];
 }
 
 @Component({
@@ -143,6 +155,7 @@ interface ContestEdit {
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-contestant': contest_Contestant,
     'omegaup-contest-requests': contest_Requests,
+    'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
@@ -159,8 +172,12 @@ export default class Edit extends Vue {
   contest = this.data.contest;
   problems = this.data.problems;
   users = this.data.users;
+  groups = this.data.groups;
   requests = this.data.requests;
   admins = this.data.admins;
   groupAdmins = this.data.groupAdmins;
+
+  isIdentitiesExperimentEnabled =
+    OmegaUp.experiments && OmegaUp.experiments.isEnabled('identities');
 }
 </script>
