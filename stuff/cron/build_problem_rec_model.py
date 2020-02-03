@@ -16,19 +16,17 @@ import os
 import sqlite3
 import sys
 import warnings
-
 from typing import List, Optional, Tuple
 
 import MySQLdb.connections
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-from sklearn.model_selection import train_test_split  # type: ignore
+import sklearn.model_selection  # type: ignore
 
 sys.path.insert(
     0,
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
@@ -131,7 +129,7 @@ class Model:
 
         # Split dataset into test/train
         users = pd.Series(runs.identity_id.unique())
-        train_users, test_users = train_test_split(
+        train_users, test_users = sklearn.model_selection.train_test_split(
             users, train_size=self.config.train_fraction,
             random_state=self.config.rng_seed)
         logging.info('Training users: %d', len(train_users))
@@ -250,9 +248,9 @@ class Model:
 
         return score / user_count if user_count else 0
 
-    def build(self, dbconn: MySQLdb.connections.Connection) -> None:
+    def build(self, runs: pd.DataFrame, train_users: pd.Series,
+              test_users: pd.Series) -> None:
         '''Builds a recommendation model.'''
-        runs, train_users, test_users = self.load(dbconn)
 
         # All AC runs groups by user.
         self.train_runs = runs[runs.identity_id.isin(train_users)]
@@ -319,7 +317,7 @@ def main() -> None:
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
         model = Model(TrainingConfig(args))
-        model.build(dbconn)
+        model.build(*model.load(dbconn))
 
         score = model.evaluate()
         logging.info('Model MAP score: %f', score)
