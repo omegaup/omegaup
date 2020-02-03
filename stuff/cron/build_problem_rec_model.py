@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 '''Builds the user recommendation model.
 
 This script reads user submissions and builds a recommendation model for
@@ -11,18 +10,17 @@ up to the latest one.
 '''
 
 import argparse
+import collections
 import logging
 import os
+import os.path
 import sqlite3
 import sys
-import warnings
-from typing import List, Optional, Tuple
-
-import MySQLdb.connections
+from typing import (DefaultDict, Dict, List, Mapping, Optional, Sequence, Set,
+                    Tuple)
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-import sklearn.model_selection  # type: ignore
 
 sys.path.insert(
     0,
@@ -30,15 +28,14 @@ sys.path.insert(
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
-
 # Default training parameters.
 _TRAIN_FRACTION = 0.8
 _NUM_FOLLOWUPS = 3
 _FOLLOWUP_DECAY = 0.4
 
-
 # Type aliases for type checking
 ProblemList = List[int]
+ProblemSet = Set[int]
 
 
 def mean_average_precision(predicted: ProblemList,
@@ -52,67 +49,42 @@ def mean_average_precision(predicted: ProblemList,
                (1. / np.arange(1, num_problems + 1)))
 
 
-def get_first_run_per_problem(runs: pd.DataFrame) -> pd.DataFrame:
-    '''Get ordered lists of AC runs keyed by user.
+def load_sqlite(database: str) -> pd.DataFrame:
+    '''Load runs from SQLite.'''
+    logging.info('Reading runs from SQLite')
+    dbconn = sqlite3.connect(database)
+    try:
+        runs = pd.read_sql_query(
+            """
+            SELECT
+                identity_id,
+                problem_id
+            FROM
+                Runs;
+            """, dbconn)
+        logging.info('Found %d runs', len(runs))
+        return runs
+    finally:
+        dbconn.close()
 
-    Args:
-        runs (pd.DataFrame): Unordered DataFrame with AC runs with at least
-                             identity_id, problem_id and time columns.
-    Returns:
-        pd.DataFrame indexed by identity_id with ordered list of
-        recomendations.
+
+def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
+    '''Load runs from MySQL.
+
+    Relevant runs are AC runs that were not part of a problemset.
+
+    Ignoring problem sets helps remove bias in recommendations
+    introduced by problem ordering in contests and tests.
     '''
-    first_ac = runs.groupby(['identity_id', 'problem_id']).apply(
-        lambda x: x.sort_values(['time']).head(1))
-    logging.info('Found %d first AC runs', len(first_ac))
-    return first_ac.reset_index(drop=True).groupby(
-        ['identity_id'], as_index=False, sort=False).apply(
-            lambda x: x.sort_values(['time']))
-
-
-class TrainingConfig:
-    '''A class to store the configuration for training a model.'''
-    def __init__(self, args: argparse.Namespace):
-        self.train_fraction: float = args.train_fraction
-        assert 0 < self.train_fraction < 1
-        self.rng_seed: Optional[int] = args.rng_seed
-        self.num_followups: int = args.num_followups
-        self.followup_decay: float = args.followup_decay
-
-
-class Model:
-    '''A class that represents a prediction model.
-    '''
-    def __init__(self, config: TrainingConfig):
-        self.config = config
-
-        # Train/test runs
-        self.train_runs: Optional[pd.DataFrame] = None
-        self.test_runs: Optional[pd.DataFrame] = None
-        self.train_ac: Optional[pd.DataFrame] = None
-        self.test_ac: Optional[pd.DataFrame] = None
-
-        # Actual recommendation model
-        self.model: Optional[pd.DataFrame] = None
-
-    def load(
-            self,
-            dbconn: MySQLdb.connections.Connection
-    ) -> Tuple[pd.DataFrame, pd.Series, pd.Series]:
-        '''Load runs and split them into test/train sets by user.
-
-        Relevant runs are AC runs that were not part of a problemset.
-
-        Ignoring problem sets helps remove bias in recommendations
-        introduced by problem ordering in contests and tests.
-
-        The split is done based on `self.config.train_fraction`.
-        '''
-        runs: pd.DataFrame = pd.read_sql_query("""
+    dbconn = lib.db.connect(args)
+    try:
+        logging.info('Reading runs from MySQL')
+        runs: pd.DataFrame = pd.read_sql_query(
+            """
             SELECT
                 s.identity_id,
                 s.problem_id,
-                s.time
+                MIN(s.time) `time`
             FROM
                 Submissions s
             INNER JOIN
@@ -123,19 +95,125 @@ class Model:
                 s.problemset_id IS NULL AND
                 s.type = "normal" AND
                 r.status = "ready" AND
-                r.verdict = "AC";
+                r.verdict = "AC"
+            GROUP BY
+                s.identity_id,
+                s.problem_id
+            ORDER BY
+                s.identity_id ASC,
+                s.time ASC;
             """, dbconn)
-        logging.info('Found %d runs', len(runs))
 
-        # Split dataset into test/train
-        users = pd.Series(runs.identity_id.unique())
-        train_users, test_users = sklearn.model_selection.train_test_split(
-            users, train_size=self.config.train_fraction,
-            random_state=self.config.rng_seed)
+        # MySQL needs to select any columns that appear in the ORDER BY
+        # section, but we want to not propagate the values of that column to
+        # the rest of the script.
+        runs.drop(['time'], axis=1, inplace=True)
+
+        # There's no need to preserve the original identities, so we will
+        # anonymize them to be able to (more) safely share the database
+        # (although that still wouldn't make the dataset k-anonymous or robust
+        # against differential attacks).
+        identity_map: Dict[int, int] = {}
+        for identity_id in runs['identity_id']:
+            if identity_id in identity_map:
+                continue
+            identity_map[identity_id] = len(identity_map)
+        runs.loc[:, 'identity_id'] = runs.identity_id.apply(
+            lambda x: identity_map[x])
+
+        logging.info('Found %d runs', len(runs))
+        return runs
+    finally:
+        dbconn.close()
+
+
+def train_test_split(runs: pd.DataFrame,
+                     train_fraction: float = _TRAIN_FRACTION,
+                     random_seed: Optional[int] = None
+                     ) -> Tuple[pd.Series, pd.Series]:
+    '''Splits runs into test/train sets by user.
+
+    The split is done based on `train_fraction`.
+    '''
+
+    # Split dataset into test/train
+    users = pd.Series(runs.identity_id.unique())
+    train_users = users.sample(frac=train_fraction, random_state=random_seed)
+    test_users = users.drop(train_users.index)
+
+    return train_users, test_users
+
+
+def generate_model(train_ac: Mapping[int, Sequence[int]],
+                   num_followups: int = _NUM_FOLLOWUPS,
+                   followup_decay: float = _FOLLOWUP_DECAY
+                   ) -> Mapping[int, Sequence[Tuple[int, float]]]:
+    '''Assumes runs are sorted by submission time'''
+    tuples: List[Tuple[int, int, float]] = []
+    for problems in train_ac.values():
+        for i, source in enumerate(problems):
+            for j in range(1, min(num_followups + 1, len(problems) - i)):
+                tuples.append(
+                    (source, problems[i + j], followup_decay**(j - 1)))
+
+    weighted_pairs = pd.DataFrame(tuples,
+                                  columns=('source', 'target', 'weight'))
+    logging.info('Weighted pairs: %d', len(tuples))
+    model: DefaultDict[int, List[Tuple[int, float]]] = collections.defaultdict(
+        list)
+    for (recommended_problem_id,
+         solved_problem_id), score in weighted_pairs.groupby(
+             ['source', 'target']).aggregate(sum).itertuples():
+        model[recommended_problem_id].append((solved_problem_id, score))
+    # Sort by score descending.
+    for recommendations in model.values():
+        recommendations.sort(key=lambda x: x[1], reverse=True)
+    return model
+
+
+class TrainingConfig:
+    '''A class to store the configuration for training a model.'''
+    def __init__(self,
+                 train_fraction: float = _TRAIN_FRACTION,
+                 rng_seed: int = 0,
+                 num_followups: int = _NUM_FOLLOWUPS,
+                 followup_decay: float = _FOLLOWUP_DECAY):
+        self.train_fraction: float = train_fraction
+        assert 0 < self.train_fraction < 1
+        self.rng_seed: Optional[int] = rng_seed
+        self.num_followups: int = num_followups
+        self.followup_decay: float = followup_decay
+
+
+class Model:
+    '''A class that represents a prediction model.
+    '''
+    def __init__(self, config: TrainingConfig, runs: pd.DataFrame):
+        self.config = config
+
+        train_users, test_users = train_test_split(runs, config.train_fraction,
+                                                   config.rng_seed)
         logging.info('Training users: %d', len(train_users))
         logging.info('Testing users: %d', len(test_users))
 
-        return runs, train_users, test_users
+        # All AC runs groups by user.
+        train_ac = runs[runs.identity_id.isin(train_users)]
+        logging.info('Found %d first AC runs', len(train_ac))
+        test_ac = runs[runs.identity_id.isin(test_users)]
+        logging.info('Found %d first AC runs', len(test_ac))
+
+        train_ac_map = {
+            identity_id: list(runs['problem_id'])
+            for identity_id, runs in train_ac.groupby('identity_id')
+        }
+        self.test_ac_map = {
+            identity_id: list(runs['problem_id'])
+            for identity_id, runs in test_ac.groupby('identity_id')
+        }
+
+        self.model = generate_model(train_ac_map, config.num_followups,
+                                    config.followup_decay)
+        logging.info('Trained')
 
     def save(self, output_path: str) -> None:
         '''Save a model to an Sqlite3 db in `output_path`.
@@ -148,75 +226,53 @@ class Model:
 
         The DB also has an index on `solved` for efficient lookups.
         '''
+        if os.path.isfile(output_path):
+            os.unlink(output_path)
         with sqlite3.connect(output_path) as conn:
             try:
                 cur = conn.cursor()
-                cur.executescript(
-                    '''CREATE TABLE ProblemRecommendations (
+                cur.executescript('''CREATE TABLE ProblemRecommendations (
                         solved_problem_id INTEGER,
                         recommended_problem_id INTEGER,
                         score REAL
                     );
-                    CREATE INDEX Recs_index ON ProblemRecommendations(solved);
                     ''')
-                for solved_problem_id, recs in self.model:  # type: ignore
-                    for recommended_problem_id, score in recs:
-                        cur.execute('''
+                cur.executescript('''CREATE INDEX Recs_index
+                    ON ProblemRecommendations(solved_problem_id);
+                    ''')
+                for solved_problem_id, recommendations in self.model.items():
+                    for recommended_problem_id, score in recommendations:
+                        cur.execute(
+                            '''
                             INSERT INTO
                                 ProblemRecommendations
                             VALUES
-                                (?, ?, ?)
+                                (?, ?, ?);
                             ''',
-                                    (solved_problem_id, recommended_problem_id,
-                                     score))
+                            (solved_problem_id, recommended_problem_id, score))
             finally:
                 conn.commit()
 
-    def generate_weighted_pairs(self) -> pd.DataFrame:
-        '''Assumes runs are sorted by submission time'''
-        tuples: List[Tuple[int, int, float]] = []
-        for _, problems in self.train_ac.groupby(  # type: ignore
-                'identity_id'):
-            num_problems = len(problems)
-            # TODO: Figure out how to ask Pandas nicely for this.
-            for i in range(num_problems):
-                source = problems.iloc[i]['problem_id']
-                weight = 1.0
-                for j in range(1, self.config.num_followups + 1):
-                    if i + j >= num_problems:
-                        break
-                    current = problems.iloc[i + j]['problem_id']
-                    tuples.append((source, current, weight))
-                    weight *= self.config.followup_decay
-
-        return pd.DataFrame(tuples, columns=('source', 'target', 'weight'))
-
-    def recommend(self,
-                  latest_problem: int,
-                  banned_problems: ProblemList,
+    def recommend(self, latest_problem: int, banned_problems: ProblemSet,
                   k: int) -> Optional[ProblemList]:
         '''Recommends the a problem given that a user just solved last_problem.
 
         Args:
             model:
-            latest_problem (int): The problem after which to make a
-                                  recomendation.
-            banned_problems (list(int)): A list or problems that shouldn't be
-                                         recommended, for example, because the
-                                         user already solved (or tried) them.
+            latest_problem: The problem after which to make a recomendation.
+            banned_problems: A list or problems that shouldn't be recommended,
+                             for example, because the user already solved (or
+                             tried) them.
 
         Returns:
-            list(int): A list of recommended problem_id to try next of the
-                       recommended problem or None if no recommendation can be
-                       made.
+            A list of recommended problem_id to try next of the recommended
+            problem or None if no recommendation can be made.
         '''
-        try:
-            recs = self.model.loc[latest_problem].reset_index(  # type: ignore
-                'target').sort_values(by='weight', ascending=False)['target']
-            unsolved_recs = recs[~recs.isin(banned_problems)]
-            return None if unsolved_recs.empty else unsolved_recs.iloc[0:k]
-        except KeyError:
-            return None
+        return [
+            problem_id
+            for (problem_id, _) in self.model.get(latest_problem, [])
+            if problem_id not in banned_problems
+        ][:k] or None
 
     def evaluate(self, k: Optional[int] = None) -> float:
         '''Compute a score about how good the model is.'''
@@ -224,8 +280,7 @@ class Model:
             k = self.config.num_followups
         score = 0.
         user_count = 0
-        for _, runs in self.test_ac.groupby('identity_id'):  # type: ignore
-            problems = runs['problem_id']
+        for problems in self.test_ac_map.values():
             num_problems = len(problems)
             if num_problems <= 1:
                 continue
@@ -233,7 +288,8 @@ class Model:
             user_count += 1
             cur_score = 0.
             for i in range(1, num_problems):
-                recs = self.recommend(problems[i - 1], problems[:i - 1], k)
+                recs = self.recommend(problems[i - 1], set(problems[:i - 1]),
+                                      k)
                 # TODO: Use mean_average_precision() instead of manually
                 #       computing something like it here.
                 if recs is None:
@@ -246,24 +302,7 @@ class Model:
 
             score += cur_score / (num_problems - 1)
 
-        return score / user_count if user_count else 0
-
-    def build(self, runs: pd.DataFrame, train_users: pd.Series,
-              test_users: pd.Series) -> None:
-        '''Builds a recommendation model.'''
-
-        # All AC runs groups by user.
-        self.train_runs = runs[runs.identity_id.isin(train_users)]
-        self.test_runs = runs[runs.identity_id.isin(test_users)]
-
-        # Get the sequence of first AC runs grouped by user.
-        self.train_ac = get_first_run_per_problem(self.train_runs)
-        self.test_ac = get_first_run_per_problem(self.test_runs)
-
-        weighted_pairs = self.generate_weighted_pairs()
-        self.model = weighted_pairs.groupby(['source', 'target']).aggregate(
-            sum)
-        logging.info('Trained')
+        return score / user_count
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -276,32 +315,51 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Model params
     model_args = parser.add_argument_group('Model')
-    model_args.add_argument('--num-followups', type=int,
+    model_args.add_argument('--num-followups',
+                            type=int,
                             default=_NUM_FOLLOWUPS,
                             help='Number of problems to count')
-    model_args.add_argument('--followup-decay', type=float,
+    model_args.add_argument('--followup-decay',
+                            type=float,
                             default=_FOLLOWUP_DECAY,
                             help='The decay factor in followup problems\'s'
-                                 'weight')
+                            'weight')
 
     # Training params
     training_args = parser.add_argument_group('Training')
-    training_args.add_argument('--train-fraction', type=float,
+    training_args.add_argument('--train-fraction',
+                               type=float,
                                default=_TRAIN_FRACTION,
                                help='Fraction of data to use for training, '
-                                    'leaving the rest for testing.')
-    training_args.add_argument('--rng-seed', type=int,
+                               'leaving the rest for testing.')
+    training_args.add_argument('--rng-seed',
+                               type=int,
                                default=None,
                                help='Seed value for the Random Number '
-                                    'Generator so that tests behave '
-                                    'deterministically.')
-    training_args.add_argument('--min-map-score', type=float, default=0.3,
+                               'Generator so that tests behave '
+                               'deterministically.')
+    training_args.add_argument('--min-map-score',
+                               type=float,
+                               default=0.3,
                                help='Minimum MAP score to consider the '
-                                    'training sucessful. Use to ensure we '
-                                    'don\'t push bad models to prod.')
-    # Output
-    parser.add_argument('--output', type=str, help='Name of the output file '
-                                                   'to write the model to.')
+                               'training sucessful. Use to ensure we '
+                               'don\'t push bad models to prod.')
+    # Input/Output
+    io_args = parser.add_argument_group('Input/Output')
+    io_args.add_argument('--sqlite-database',
+                         type=str,
+                         help=('Path of the sqlite3 database to read runs '
+                               'from instead of MySQL.'))
+    io_args.add_argument('--save-sqlite-database',
+                         type=str,
+                         help='Path of the sqlite3 database to save runs to')
+    io_args.add_argument('--num-rows',
+                         type=int,
+                         help='Number of rows to consider.')
+    io_args.add_argument('--output',
+                         type=str,
+                         required=True,
+                         help='Name of the output file to write the model to.')
 
     return parser
 
@@ -313,11 +371,22 @@ def main() -> None:
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = lib.db.connect(args)
-    warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        model = Model(TrainingConfig(args))
-        model.build(*model.load(dbconn))
+        if args.sqlite_database:
+            runs = load_sqlite(args.sqlite_database)
+        else:
+            runs = load_mysql(args)
+        if args.save_sqlite_database:
+            with sqlite3.connect(args.save_sqlite_database) as conn:
+                runs.to_sql('Runs', con=conn, if_exists='replace')
+        if args.num_rows is not None:
+            runs = runs[:args.num_rows]
+
+        model = Model(
+            TrainingConfig(train_fraction=args.train_fraction,
+                           rng_seed=args.rng_seed,
+                           num_followups=args.num_followups,
+                           followup_decay=args.followup_decay), runs)
 
         score = model.evaluate()
         logging.info('Model MAP score: %f', score)
@@ -325,13 +394,13 @@ def main() -> None:
             # Save current model
             model.save(args.output)
         else:
-            logging.error('Model NOT saved. Resulting accuracy was too low: '
-                          '%f below %f', score, args.min_map_score)
+            logging.error(
+                'Model NOT saved. Resulting accuracy was too low: '
+                '%f below %f', score, args.min_map_score)
     except:  # noqa: bare-except
         logging.exception('Failed to update recommendation model.')
         raise
     finally:
-        dbconn.close()
         logging.info('Done')
 
 
