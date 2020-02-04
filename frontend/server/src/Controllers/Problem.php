@@ -3896,7 +3896,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
-
             try {
                 self::createProblem(
                     $r->user,
@@ -3918,17 +3917,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'TITLE' => strval($r['title']),
                         'ALIAS' => strval($r['problem_alias']),
                         'VALIDATOR' => strval($r['validator']),
-                        'TIME_LIMIT' => strval($r['time_limit']),
-                        'VALIDATOR_TIME_LIMIT' => strval(
-                            $r['validator_time_limit']
-                        ),
-                        'OVERALL_WALL_TIME_LIMIT' => strval(
-                            $r['overall_wall_time_limit']
-                        ),
-                        'EXTRA_WALL_TIME' => strval($r['extra_wall_time']),
-                        'OUTPUT_LIMIT' => strval($r['output_limit']),
-                        'INPUT_LIMIT' => strval($r['input_limit']),
-                        'MEMORY_LIMIT' => strval($r['memory_limit']),
                         'EMAIL_CLARIFICATIONS' => strval(
                             $r['email_clarifications']
                         ),
@@ -3938,18 +3926,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'SELECTED_TAGS' => strval($r['selected_tags']),
                         'STATUS_ERROR' => $statusError,
                         'IS_UPDATE' => false,
+                        'payload' => [
+                            'timeLimit' => 1000,
+                            'validatorTimeLimit' => 1000,
+                            'overallWallTimeLimit' => 60000,
+                            'extraWallTime' => 0,
+                            'outputLimit' => 10240,
+                            'inputLimit' => 10240,
+                            'memoryLimit' => 32768,
+                            'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                        ],
                     ],
                     'template' => 'problem.new.tpl',
-                    'payload' => [
-                        'timeLimit' => 1000,
-                        'validatorTimeLimit' => 1000,
-                        'overallWallTimeLimit' => 60000,
-                        'extraWallTime' => 0,
-                        'outputLimit' => 10240,
-                        'inputLimit' => 10240,
-                        'memoryLimit' => 32768,
-                        'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-                    ],
                 ];
             }
         }
@@ -3958,13 +3946,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'TITLE' => '',
                 'ALIAS' => '',
                 'VALIDATOR' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                'TIME_LIMIT' => '1000',
-                'VALIDATOR_TIME_LIMIT' => '1000',
-                'OVERALL_WALL_TIME_LIMIT' => '60000',
-                'EXTRA_WALL_TIME' => '0',
-                'OUTPUT_LIMIT' => '10240',
-                'INPUT_LIMIT' => '10240',
-                'MEMORY_LIMIT' => '32768',
                 'EMAIL_CLARIFICATIONS' => '0',
                 'SOURCE' => '',
                 'VISIBILITY' => '0',
@@ -3974,18 +3955,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
+                'payload' => [
+                    'timeLimit' => 1000,
+                    'validatorTimeLimit' => 1000,
+                    'overallWallTimeLimit' => 60000,
+                    'extraWallTime' => 0,
+                    'outputLimit' => 10240,
+                    'inputLimit' => 10240,
+                    'memoryLimit' => 32768,
+                    'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                ]
             ],
             'template' => 'problem.new.tpl',
-            'payload' => [
-                'timeLimit' => 1000,
-                'validatorTimeLimit' => 1000,
-                'overallWallTimeLimit' => 60000,
-                'extraWallTime' => 0,
-                'outputLimit' => 10240,
-                'inputLimit' => 10240,
-                'memoryLimit' => 32768,
-                'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-            ]
         ];
     }
 
