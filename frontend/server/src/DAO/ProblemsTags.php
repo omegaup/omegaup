@@ -36,7 +36,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
             $sql .= ' AND pt.public = 1';
         }
         if (!$includeVoted) {
-            $sql .= ' AND pt.source = "voted"';
+            $sql .= ' AND pt.source != "voted"';
         }
         $sql .= ';';
 
