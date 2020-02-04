@@ -1358,13 +1358,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $tags1 = array_map($extractName, $tagArrayForProblem1);
         $this->assertEquals(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemTopicMatrices']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemTopicMatrices', 'lenguaje']
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
 
         \OmegaUp\Test\Utils::runUpdateRanks();
@@ -1433,13 +1433,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $tags1 = array_map($extractName, $tagArrayForProblem1);
         $this->assertEquals(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'lenguaje']
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
     }
 
@@ -1720,7 +1720,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ));
         $this->assertEquals(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
+            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'lenguaje']
         );
     }
 
@@ -1999,7 +1999,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
         );
 
         $tags = array_map(function ($tag) {
@@ -2012,7 +2012,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         sort($tags);
         $this->assertEquals(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
+            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
         );
     }
 }
