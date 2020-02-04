@@ -569,11 +569,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Tags::create($tag);
         }
 
-        \OmegaUp\DAO\ProblemsTags::create(new \OmegaUp\DAO\VO\ProblemsTags([
+        \OmegaUp\DAO\ProblemsTags::replace(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
             'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
-            'source' => 'voted',
+            'source' => 'owner',
         ]));
     }
 
