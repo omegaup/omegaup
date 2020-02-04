@@ -3820,7 +3820,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
                 ),
                 'payload' => [
-                    'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     ]
             ];
         }
@@ -3873,7 +3873,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'problemEditUpdatedSuccessfully'
             ),
             'payload' => [
-                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
             ]
         ];
     }
@@ -3937,7 +3937,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'outputLimit' => 10240,
                         'inputLimit' => 10240,
                         'memoryLimit' => 32768,
-                        'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                        'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     ]
                 ];
             }
@@ -3970,7 +3970,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'outputLimit' => 10240,
                 'inputLimit' => 10240,
                 'memoryLimit' => 32768,
-                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
             ]
         ];
     }

@@ -43,7 +43,7 @@ OmegaUp.on('ready', function() {
       OVERALL_WALL_TIME_LIMIT: 0,
       EXTRA_WALL_TIME: 0,
       VALIDATOR_TIME_LIMIT: 0,
-      LANGUAGES: payload.LANGUAGES,
+      LANGUAGES: payload.languages,
     },
     components: {
       'omegaup-problem-validator': problem_Validator,
