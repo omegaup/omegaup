@@ -25,7 +25,7 @@
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul
           class="nav navbar-nav"
-          v-if="!header.omegaUpLockDown &amp;&amp; !header.inContest"
+          v-if="!header.omegaUpLockDown && !header.inContest"
         >
           <li v-bind:class="{ active: header.navbarSection === 'arena' }">
             <a href="/arena/">{{ T.navArena }}</a>
@@ -33,7 +33,7 @@
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: header.navbarSection === 'contests' }"
-            v-show="header.isLoggedIn"
+            v-if="header.isLoggedIn && header.isMainUserIdentity"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
@@ -56,7 +56,7 @@
           <li
             class="dropdown nav-problems"
             v-bind:class="{ active: header.navbarSection === 'problems' }"
-            v-if="header.isLoggedIn"
+            v-if="header.isLoggedIn && header.isMainUserIdentity"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsProblems }}</span> <span class="caret"></span

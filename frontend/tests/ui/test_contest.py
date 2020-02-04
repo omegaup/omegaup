@@ -157,6 +157,10 @@ def test_user_ranking_contest(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
+                    (By.XPATH,
+                     '//a[@href = "#list-current-contest"]'))).click()
+            driver.wait.until(
+                EC.element_to_be_clickable(
                     (By.CSS_SELECTOR,
                      '#current-contests a[href="/arena/%s"]' %
                      contest_alias))).click()
