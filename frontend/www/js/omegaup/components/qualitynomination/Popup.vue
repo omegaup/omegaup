@@ -299,7 +299,6 @@ export default class QualityNominationPopup extends Vue {
   currentView = 'content';
   difficulty = '';
   quality = '';
-  qualitySeal = false;
   showFormOverride = true;
   localDismissed = this.dismissed || (this.dismissedBeforeAC && !this.solved);
   localNominated = this.nominated || (this.nominatedBeforeAC && !this.solved);
@@ -320,18 +319,17 @@ export default class QualityNominationPopup extends Vue {
   }
 
   get sortedProblemTags(): ProblemTag[] {
-    const self = this;
     return this.possibleTags
       .map(
         (x: string): ProblemTag => {
           return {
             value: x,
-            text: self.T[x],
+            text: this.T[x],
           };
         },
       )
       .sort((a: ProblemTag, b: ProblemTag): number => {
-        return a.text.localeCompare(b.text, self.T.lang);
+        return a.text.localeCompare(b.text, this.T.lang);
       });
   }
 
