@@ -167,13 +167,17 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Tests apiRankByProblemsSolved filters
+     * Testing filters via API and Smarty
      */
     public function testUserRankFiltered() {
         // Create a school
         $school = SchoolsFactory::createSchool();
         // Create a user with no country, state and school
-        ['user' => $contestantWithNoCountry, 'identity' => $identityWithNoCountry] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'identity' => $identityWithNoCountry,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identityWithNoCountry);
+
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
@@ -181,9 +185,21 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantWithNoCountry);
 
+        // User should not have filters
+        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['rankTablePayload']['availableFilters'];
+        $this->assertArrayNotHasKey('country', $availableFilters);
+        $this->assertArrayNotHasKey('state', $availableFilters);
+        $this->assertArrayNotHasKey('school', $availableFilters);
+
         // Create a user with country, state and school
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
+        [
+            'identity' => $identityWithCountryAndSchool,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identityWithCountryAndSchool);
 
         $states = \OmegaUp\DAO\States::getByCountry('MX');
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -196,7 +212,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // create runs
         $runDataContestant = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
-            $identity,
+            $identityWithCountryAndSchool,
             $login
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runDataContestant);
@@ -204,21 +220,37 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Refresh Rank
         \OmegaUp\Test\Utils::runUpdateRanks();
 
+        // Getting available filters from identities
+        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['rankTablePayload']['availableFilters'];
+
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'country'
-        ]));
+        $this->assertArrayHasKey('country', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'country',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'state'
-        ]));
+        $this->assertArrayHasKey('state', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'state',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'school'
-        ]));
+        $this->assertArrayHasKey('school', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'school',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
     }
 
