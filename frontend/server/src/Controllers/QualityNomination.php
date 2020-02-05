@@ -570,7 +570,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $r['message'] = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $r['visibility'] = $newProblemVisibility;
 
@@ -583,9 +583,21 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ]);
         $qualitynomination->status = $qualitynominationlog->to_status;
 
+        $problemParams = \OmegaUp\Controllers\Problem::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
+
         \OmegaUp\DAO\DAO::transBegin();
         try {
-            \OmegaUp\Controllers\Problem::apiUpdate($r);
+            \OmegaUp\Controllers\Problem::updateProblem(
+                $r->identity,
+                $r->user,
+                $problemParams,
+                $message,
+                $problemParams->updatePublished,
+                /*$redirect=*/ false
+            );
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();

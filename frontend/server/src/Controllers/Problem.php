@@ -56,7 +56,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a ProblemParams instance from the Request values.
      *
      */
-    private static function convertRequestToProblemParams(
+    public static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
         bool $isRequired = true
     ): \OmegaUp\ProblemParams {
@@ -1098,7 +1098,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{rejudged: bool}
      */
-    private static function updateProblem(
+    public static function updateProblem(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\ProblemParams $params,
