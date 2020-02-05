@@ -115,6 +115,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $r->identity->identity_id,
                 $page,
                 $page_size,
+                $activeContests,
                 $query
             );
         } elseif ($public) {
@@ -314,6 +315,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $identityId,
                     $page,
                     $pageSize,
+                    \OmegaUp\DAO\Enum\ActiveStatus::ALL,
                     $query
                 );
             }
