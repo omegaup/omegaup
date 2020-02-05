@@ -3920,7 +3920,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, TITLE: string, VISIBILITY: string, payload: array{timeLimit: int,validatorTimeLimit: int, overallWallTimeLimit: int, extraWallTime: int, outputLimit: int, inputLimit: int, memoryLimit: int, languages: arry{string}, validLanguages: array<string, string>, validatorsTypes: array<string, string>, validator: string}}, template: string }
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, TITLE: string, VISIBILITY: string, payload: array{timeLimit: int,validatorTimeLimit: int, overallWallTimeLimit: int, extraWallTime: int, outputLimit: int, inputLimit: int, memoryLimit: int, languages: string, validLanguages: array<string, string>, validatorsTypes: array<string, string>, validator: string}}, template: string }
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
