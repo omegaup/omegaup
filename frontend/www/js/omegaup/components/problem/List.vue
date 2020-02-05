@@ -49,11 +49,7 @@
               <a v-bind:href="`/arena/problem/${problem.alias}`">{{
                 problem.title
               }}</a>
-              <div
-                class="tag-list"
-                v-bind:title="`${problem.tags.map(tag =&gt; tag.name).join(' ')}`"
-                v-if="problem.tags.length"
-              >
+              <div class="tag-list" v-if="problem.tags.length">
                 <a
                   v-bind:class="`tag tag-${tag.source}`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
@@ -103,6 +99,10 @@
 <style>
 .tag {
   margin-right: 0.25em;
+}
+
+.tag-quality {
+  background: #ffeb3b;
 }
 
 .omegaup-quality-badge {
