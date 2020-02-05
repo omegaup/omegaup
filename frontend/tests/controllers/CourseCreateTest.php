@@ -11,11 +11,16 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 
-        ['user' => self::$curator, 'identity' => self::$curatorIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-            'group_id' => $curatorGroup->group_id,
-            'identity_id' => self::$curatorIdentity->identity_id,
-        ]));
+        [
+            'user' => self::$curator,
+            'identity' => self::$curatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\DAO\GroupsIdentities::create(
+            new \OmegaUp\DAO\VO\GroupsIdentities([
+                'group_id' => $curatorGroup->group_id,
+                'identity_id' => self::$curatorIdentity->identity_id,
+            ])
+        );
     }
 
     /**
@@ -294,7 +299,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $adminLogin,
-            false,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             'no',
             'true'
         );
@@ -388,7 +393,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
             'finish_time' => (\OmegaUp\Time::get() + 120),
-            'public' => 1,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
         ]);
 
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
@@ -408,7 +413,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'start_time' => (\OmegaUp\Time::get() + 60),
             'finish_time' => (\OmegaUp\Time::get() + 120),
             'school_id' => $school->school_id,
-            'public' => 1,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
         ]);
 
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
@@ -441,7 +446,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $adminLogin,
-            false,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             'no',
             'true'
         );
@@ -512,7 +517,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $adminLogin,
-            false,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             'no',
             'true'
         );
@@ -584,5 +589,64 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData['request']['course']->course_id
         );
         $this->assertEquals($newFinishTime, $newCourse->finish_time);
+    }
+
+    /**
+     * Updating admission_mode for Courses, testing all the diferent modes to
+     * join a course: Public, Prvate, With registration
+     */
+    public function testUpdateCourseAdmissionMode() {
+        $adminLogin = self::login(self::$curatorIdentity);
+        $school = SchoolsFactory::createSchool()['school'];
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        $r = new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => $alias,
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'school_id' => $school->school_id,
+        ]);
+
+        $response = \OmegaUp\Controllers\Course::apiCreate($r);
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+
+        // The admission mode for a course should be default private
+        $this->assertEquals(
+            $course->admission_mode,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
+        );
+
+        // Should update to public the admission mode
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $alias,
+            'name' => $course->name,
+            'description' => $course->description,
+            'alias' => $course->alias,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+        $this->assertEquals(
+            $course->admission_mode,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        // Now should update to registration the admission mode
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $alias,
+            'name' => $course->name,
+            'description' => $course->description,
+            'alias' => $course->alias,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+        $this->assertEquals(
+            $course->admission_mode,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION
+        );
     }
 }

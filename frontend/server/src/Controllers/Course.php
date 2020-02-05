@@ -11,6 +11,11 @@
  * @author joemmanuel
  */
 class Course extends \OmegaUp\Controllers\Controller {
+    // Admision mode constants
+    const ADMISSION_MODE_PUBLIC = 'public';
+    const ADMISSION_MODE_REGISTRATION = 'registration';
+    const ADMISSION_MODE_PRIVATE = 'private';
+
     /**
      * Validate assignment_alias existis into the course and
      * return Assignments object
@@ -223,8 +228,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             ['no', 'optional', 'required']
         );
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                self::ADMISSION_MODE_PUBLIC,
+                self::ADMISSION_MODE_REGISTRATION,
+                self::ADMISSION_MODE_PRIVATE,
+            ]
+        );
 
-        $r->ensureBool('public', false /*isRequired*/);
         $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
         if (is_null($r['school_id'])) {
@@ -240,8 +253,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Only curator can set public
         if (
-            !is_null($r['public'])
-            && $r['public'] == true
+            !is_null($r['admission_mode'])
+            && $r['admission_mode'] === self::ADMISSION_MODE_PUBLIC
             && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -325,7 +338,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'school_id' => $originalCourse->school_id,
                 'start_time' => $r['start_time'],
                 'finish_time' => $cloneCourseFinishTime,
-                'public' => 0,
+                'admission_mode' => self::ADMISSION_MODE_PRIVATE,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
                 'requests_user_information' => $originalCourse->requests_user_information
@@ -406,7 +419,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'school_id' => $r['school_id'],
             'start_time' => $r['start_time'],
             'finish_time' => $r['finish_time'],
-            'public' => $r['public'] ?: false,
+            'admission_mode' => $r['admission_mode'] ?: self::ADMISSION_MODE_PRIVATE,
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
             'requests_user_information' => $r['requests_user_information'],
@@ -1162,7 +1175,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'name',
             'start_time',
             'finish_time',
-            'public',
+            'admission_mode',
         ];
         /** @var array{alias: string, name: string, start_time: int, finish_time: int, public: bool} */
         $arr = $course->asFilteredArray($relevantColumns);
@@ -1233,7 +1246,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course
             );
             $response['student'][] = $courseAsArray;
-            if ($course->public) {
+            if ($course->admission_mode === self::ADMISSION_MODE_PUBLIC) {
                 $response['public'][] = $courseAsArray;
             }
         }
@@ -1510,7 +1523,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Only course admins or users adding themselves when the course is public
         if (
             !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
-            && ($course->public == false
+            && ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC
             || $resolvedIdentity->identity_id !== $r->identity->identity_id)
             && $course->requests_user_information == 'no'
             && is_null($r['accept_teacher'])
@@ -1999,7 +2012,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $group
             );
         }
-        if ($shouldShowIntro && !$course->public) {
+        if (
+            $shouldShowIntro &&
+            $course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2160,7 +2176,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $course->finish_time
                 ),
                 'is_admin' => $isAdmin,
-                'public' => $course->public,
+                'admission_mode' => $course->admission_mode,
                 'basic_information_required' => boolval(
                     $course->needs_basic_information
                 ),
@@ -2742,9 +2758,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 return boolval($value);
             }],
             'requests_user_information',
-            'public' => ['transform' => function (?bool $value): bool {
-                return is_null($value) ? false : boolval($value);
-            }],
+            'admission_mode',
         ];
         self::updateValueProperties($r, $originalCourse, $valueProperties);
 
