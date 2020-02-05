@@ -19,9 +19,15 @@ const languageModeMap: {
   [language: string]: string;
 } = {
   c: 'text/x-csrc',
+  'c11-gcc': 'text/x-csrc',
+  'c11-clang': 'text/x-csrc',
   cpp: 'text/x-c++src',
+  'cpp17-gcc': 'text/x-c++src',
+  'cpp17-clang': 'text/x-c++src',
   java: 'text/x-java',
   py: 'text/x-python',
+  py2: 'text/x-python',
+  py3: 'text/x-python',
   rb: 'text/x-ruby',
   pl: 'text/x-perl',
   cs: 'text/x-csharp',
@@ -29,6 +35,8 @@ const languageModeMap: {
   cat: 'text/plain',
   hs: 'text/x-haskell',
   cpp11: 'text/x-c++src',
+  'cpp11-gcc': 'text/x-c++src',
+  'cpp11-clang': 'text/x-c++src',
   lua: 'text/x-lua',
 };
 
@@ -65,7 +73,7 @@ export default class ArenaCodeView extends Vue {
   @Prop() value!: string;
 
   T = T;
-  mode = languageModeMap[this.language] || languageModeMap['cpp11'];
+  mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
 
   get editorOptions(): EditorOptions {
     return {

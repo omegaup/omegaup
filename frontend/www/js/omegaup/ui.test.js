@@ -4,6 +4,40 @@ require('../dist/commons.js');
 var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
+  describe('formatDateLocal', function() {
+    const expectedValue = '2010-01-01';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateLocal(omegaup.UI.parseDateLocal(expectedValue)),
+      ).toEqual(expectedValue);
+    });
+  });
+
+  describe('formatDateTimeLocal', function() {
+    const expectedValue = '2010-01-01T11:22';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(
+          omegaup.UI.parseDateTimeLocal(expectedValue),
+        ),
+      ).toEqual(expectedValue);
+    });
+  });
+
   describe('formatString', function() {
     it('Should handle strings without replacements', function() {
       expect(omegaup.UI.formatString('hello', {})).toEqual('hello');
@@ -58,6 +92,28 @@ describe('omegaup.ui', function() {
     });
   });
 
+  describe('formatDelta', function() {
+    it('Should handle valid dates with countdown time format', function() {
+      expect(omegaup.UI.formatDelta(1000)).toEqual('00:00:01');
+      expect(omegaup.UI.formatDelta(10000)).toEqual('00:00:10');
+      expect(omegaup.UI.formatDelta(100000)).toEqual('00:01:40');
+      expect(omegaup.UI.formatDelta(1000000)).toEqual('00:16:40');
+      expect(omegaup.UI.formatDelta(10000000)).toEqual('02:46:40');
+      expect(omegaup.UI.formatDelta(100000000)).toEqual('1:03:46:40');
+      expect(omegaup.UI.formatDelta(1000000000)).toEqual('11:13:46:40');
+      expect(omegaup.UI.formatDelta(2500000000)).toEqual('28:22:26:40');
+    });
+
+    it('Should handle valid human readable dates', function() {
+      expect(omegaup.UI.formatDelta(3000000000)).toEqual('en un mes');
+      expect(omegaup.UI.formatDelta(5000000000)).toEqual('en 2 meses');
+      expect(omegaup.UI.formatDelta(7500000000)).toEqual('en 3 meses');
+      expect(omegaup.UI.formatDelta(10000000000)).toEqual('en 4 meses');
+      expect(omegaup.UI.formatDelta(50000000000)).toEqual('en 2 años');
+      expect(omegaup.UI.formatDelta(100000000000)).toEqual('en 3 años');
+    });
+  });
+
   describe('markdownConverter', function() {
     let converter = omegaup.UI.markdownConverter();
 
@@ -88,6 +144,80 @@ Case #2: 15
 <thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead><tbody><tr><td><pre>1
 2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr><tr><td><pre>5
 10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr></tbody>
+</table>`);
+    });
+
+    it('Should handle sample I/O tables with markdown', function() {
+      expect(
+        converter.makeHtml(`# Ejemplo
+
+||input
+5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+> hi <
+> hello <
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags <b>hello</b>
+||output
+0
+||end`),
+      ).toEqual(`<h1>Ejemplo</h1>
+
+<table class="sample_io">
+<thead><tr><th>Entrada</th><th>Salida</th></tr></thead><tbody><tr><td><pre>5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+&gt; hi &lt;
+&gt; hello &lt;
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags &lt;b&gt;hello&lt;/b&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
 </table>`);
     });
 

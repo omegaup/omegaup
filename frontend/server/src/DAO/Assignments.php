@@ -30,6 +30,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     AND a.alias = ?';
         $params = [$courseId, $assignmentAlias];
 
+        /** @var array{access_mode: string, acl_id: int, assignment_id: int|null, contest_id: int|null, interview_id: int|null, languages: null|string, needs_basic_information: bool, problemset_id: int, requests_user_information: string, scoreboard_url: string, scoreboard_url_admin: string, type: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -58,23 +59,23 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return $counts;
     }
 
-    public static function getAssignmentForProblemset($problemset_id) {
-        if (is_null($problemset_id)) {
+    public static function getAssignmentForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
+        if (is_null($problemsetId)) {
             return null;
         }
 
-        return self::getByProblemset($problemset_id);
+        return self::getByProblemset($problemsetId);
     }
 
-    final public static function getByProblemset($problemset_id) {
+    final public static function getByProblemset(int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
         $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
-        $params = [$problemset_id];
+        $params = [$problemsetId];
 
+        /** @var array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: null|string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-
         return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
@@ -92,7 +93,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     alias = ?
                 LIMIT 1;';
 
-        /** @var null|array{assignment_id: int, course_id: int, problemset_id: int, acl_id: int, name: string, description: string, alias: string, publish_time_delay: null|int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int} */
+        /** @var array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: null|string, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, start_time: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$courseId, $assignmentAlias]
@@ -129,17 +130,15 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
 
     /**
       * Update assignments order.
-      *
-      * @return Affected Rows
       */
     final public static function updateAssignmentsOrder(
-        $assignment_id,
-        $order
-    ) {
+        int $assignmentId,
+        int $order
+    ): int {
         $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';
         $params = [
             $order,
-            $assignment_id,
+            $assignmentId,
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -149,7 +148,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Get the course assigments sorted by order and start_time
      *
-     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     final public static function getSortedCourseAssignments(
         int $courseId
@@ -176,15 +175,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 
-        /** @var list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int, order: int, scoreboard_url: string, scoreboard_url_admin: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
         );
-        $ar = [];
-        foreach ($rs as $row) {
-            $ar[] = $row;
-        }
-        return $ar;
     }
 }

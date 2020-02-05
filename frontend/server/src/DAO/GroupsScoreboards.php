@@ -15,22 +15,19 @@ namespace OmegaUp\DAO;
  */
 class GroupsScoreboards extends \OmegaUp\DAO\Base\GroupsScoreboards {
     /**
-     * @return \OmegaUp\DAO\VO\GroupsScoreboards[]
+     * @return list<\OmegaUp\DAO\VO\GroupsScoreboards>
      */
     public static function getByGroup(
         int $groupId
     ): array {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE group_id = ?;';
+        /** @var list<array{alias: string, create_time: string, description: null|string, group_id: int, group_scoreboard_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupId]);
 
-        /** @var \OmegaUp\DAO\VO\GroupsScoreboards[] */
         $groupsScoreboards = [];
         foreach ($rs as $row) {
-            array_push(
-                $groupsScoreboards,
-                new \OmegaUp\DAO\VO\GroupsScoreboards(
-                    $row
-                )
+            $groupsScoreboards[] = new \OmegaUp\DAO\VO\GroupsScoreboards(
+                $row
             );
         }
         return $groupsScoreboards;
@@ -40,11 +37,11 @@ class GroupsScoreboards extends \OmegaUp\DAO\Base\GroupsScoreboards {
         string $alias
     ): ?\OmegaUp\DAO\VO\GroupsScoreboards {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE alias = ? LIMIT 1;';
+        /** @var array{alias: string, create_time: string, description: null|string, group_id: int, group_scoreboard_id: int, name: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;
         }
-
         return new \OmegaUp\DAO\VO\GroupsScoreboards($row);
     }
 }

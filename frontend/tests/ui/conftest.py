@@ -38,6 +38,16 @@ class JavaScriptLogCollector:
         self._log_index = 0
         self._log_stack = [[]]
 
+    def empty(self) -> bool:
+        '''Returns whether the stack is empty.'''
+        # There is one catch-all frame at the bottom of the stack when nobody
+        # has called push().
+        return len(self._log_stack) <= 1
+
+    def extend(self, errors):
+        '''Injects errors into the current log frame.'''
+        self._log_stack[-1].extend(errors)
+
     def push(self):
         '''Pushes a new error list.'''
         self._log_stack[-1].extend(self._get_last_console_logs())
@@ -59,7 +69,16 @@ class JavaScriptLogCollector:
         for entry in browser_logs[current_index:]:
             if entry['level'] != 'SEVERE':
                 continue
+
             logging.info(entry)
+            if 'WebSocket' in entry['message']:
+                # Travis does not have broadcaster yet.
+                continue
+            if 'https://www.facebook.com/' in entry['message']:
+                # Let's not block submissions when Facebook is
+                # having a bad day.
+                continue
+
             yield entry
 
 
@@ -113,14 +132,18 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         assert self.eval_script(script) == value, script
 
     @contextlib.contextmanager
-    def page_transition(self, wait_for_ajax=True):
+    def page_transition(self, wait_for_ajax=True, target_url=None):
         '''Waits for a page transition to finish.'''
 
+        html_node = self.browser.find_element_by_tag_name('html')
         prev_url = self.browser.current_url
-        logging.debug('Waiting for the URL to change from %s', prev_url)
+        logging.debug('Waiting for a page transition on %s', prev_url)
         yield
-        self.wait.until(lambda _: self.browser.current_url != prev_url)
+        self.wait.until(EC.staleness_of(html_node))
         logging.debug('New URL: %s', self.browser.current_url)
+        if target_url:
+            self.wait.until(EC.url_to_be(target_url))
+            logging.debug('Target URL: %s', self.browser.current_url)
         if wait_for_ajax:
             self._wait_for_page_loaded()
 
@@ -221,7 +244,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             self._wait_for_page_loaded()
             with self.page_transition():
                 self.browser.get(self.url(_BLANK))
-            with self.page_transition():
+            with self.page_transition(target_url=home_page_url):
                 self.browser.get(self.url('/logout/?redirect=/'))
             assert self.browser.current_url == home_page_url, (
                 'Invalid URL redirect. Expected %s, got %s' % (
@@ -273,7 +296,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         # Home screen
         with self.page_transition():
             self.browser.get(self.url(_BLANK))
-        with self.page_transition():
+        with self.page_transition(target_url=home_page_url):
             self.browser.get(self.url('/logout/?redirect=/'))
         assert self.browser.current_url == home_page_url, (
             'Invalid URL redirect. Expected %s, got %s' % (

@@ -5,14 +5,34 @@
         {{ title }} <span class="badge">{{ items.length }}</span>
       </h2>
     </div>
+    <div class="panel-body text-center" v-if="sortOptions.length > 0">
+      <div class="form-check form-check-inline">
+        <label v-for="sortOption in sortOptions" class="radio-inline">
+          <input
+            name="sort-selector"
+            type="radio"
+            v-bind:value="sortOption.value"
+            v-model="currentSortOption"
+          />
+          {{ sortOption.title }}
+        </label>
+      </div>
+    </div>
     <table class="table table-striped" v-if="items.length &gt; 0">
-      <slot></slot>
+      <slot name="table-header"></slot>
       <tbody>
-        <tr v-for="group in paginatedItems">
-          <td v-for="item in group">
-            <a v-bind:href="item.getUrl()">{{ item.toString() }}</a>
+        <tr v-for="(group, index) in paginatedItems">
+          <td v-if="showPageOffset" class="text-center">
+            {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </td>
-          <td v-if="!group[0].getBadge().isEmpty()">
+          <td v-for="item in group">
+            <slot name="item-data" v-bind:item="item">
+              <a v-bind:href="item.getUrl()">
+                {{ item.toString() }}
+              </a>
+            </slot>
+          </td>
+          <td class="numericColumn" v-if="!group[0].getBadge().isEmpty()">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
@@ -44,10 +64,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { T } from '../omegaup.js';
 import omegaup from '../api.js';
 import { LinkableResource } from '../types.ts';
+
+interface SortOption {
+  value: string;
+  title: string;
+}
 
 /**
   Creates a two-dimensional paginated table, with the number of columns passed
@@ -60,9 +85,13 @@ export default class GridPaginator extends Vue {
   @Prop() itemsPerPage!: number;
   @Prop({ default: 3 }) columns!: number;
   @Prop() title!: string;
+  @Prop({ default: false }) showPageOffset!: boolean;
+  @Prop({ default: () => [] }) sortOptions!: SortOption[];
 
   private T = T;
   private currentPageNumber: number = 0;
+  private currentSortOption =
+    this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
 
   private nextPage(): void {
     this.currentPageNumber++;
@@ -93,6 +122,11 @@ export default class GridPaginator extends Vue {
     const start = this.currentPageNumber * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     return this.itemsRows.slice(start, end);
+  }
+
+  @Watch('currentSortOption')
+  onCurrentSortOptionChange(newSelector: string) {
+    this.$emit('sort-option-change', newSelector);
   }
 }
 </script>

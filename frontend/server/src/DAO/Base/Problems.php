@@ -51,7 +51,8 @@ abstract class Problems {
                 `email_clarifications` = ?,
                 `quality` = ?,
                 `quality_histogram` = ?,
-                `difficulty_histogram` = ?
+                `difficulty_histogram` = ?,
+                `quality_seal` = ?
             WHERE
                 (
                     `problem_id` = ?
@@ -91,6 +92,7 @@ abstract class Problems {
             ),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
+            intval($Problems->quality_seal),
             intval($Problems->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -132,7 +134,8 @@ abstract class Problems {
                 `Problems`.`email_clarifications`,
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
-                `Problems`.`difficulty_histogram`
+                `Problems`.`difficulty_histogram`,
+                `Problems`.`quality_seal`
             FROM
                 `Problems`
             WHERE
@@ -203,10 +206,8 @@ abstract class Problems {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Problems[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Problems> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Problems}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Problems>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -236,7 +237,8 @@ abstract class Problems {
                 `Problems`.`email_clarifications`,
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
-                `Problems`.`difficulty_histogram`
+                `Problems`.`difficulty_histogram`,
+                `Problems`.`quality_seal`
             FROM
                 `Problems`
         ';
@@ -306,8 +308,10 @@ abstract class Problems {
                     `email_clarifications`,
                     `quality`,
                     `quality_histogram`,
-                    `difficulty_histogram`
+                    `difficulty_histogram`,
+                    `quality_seal`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -364,6 +368,7 @@ abstract class Problems {
             ),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
+            intval($Problems->quality_seal),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

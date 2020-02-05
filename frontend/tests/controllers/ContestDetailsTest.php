@@ -144,14 +144,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['languages' => ['c','cpp','java']]
+                ['languages' => ['c11-gcc','cpp17-gcc','java']]
             )
         );
 
         // Get some problems into the contest
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
-            'languages' => 'cpp,java,py'
+            'languages' => 'cpp17-gcc,java,py3'
         ]));
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problemData,
@@ -177,7 +177,10 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($response['problems']));
         // Verify that the allowed languages for the problem are the intersection of
         // the allowed languages.
-        $this->assertEquals('cpp,java', $response['problems'][0]['languages']);
+        $this->assertEquals(
+            'cpp17-gcc,java',
+            $response['problems'][0]['languages']
+        );
     }
 
     /**
@@ -212,6 +215,58 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api
         $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
+        $this->assertContestDetails($contestData, $problems, $response);
+    }
+
+    /**
+     * Check that user in private group list can view private contest
+     */
+    public function testShowValidPrivateContestFromGroup() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+
+        // Get some problems into the contest
+        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
+
+        // Get a user for our scenario
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our private contest
+        {
+            $login = self::login($contestData['director']);
+            $groupData = GroupsFactory::createGroup(
+                /*$owner=*/null,
+                /*$name=*/null,
+                /*$description=*/null,
+                /*$alias=*/null,
+                $login
+            );
+            GroupsFactory::addUserToGroup($groupData, $identity, $login);
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval($contestData['request']['alias']),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+        }
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
         $this->assertContestDetails($contestData, $problems, $response);
     }
 

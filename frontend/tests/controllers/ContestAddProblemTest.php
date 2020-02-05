@@ -199,13 +199,13 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddBannedProblemToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'author' => $contestData['director']
         ]));
         $problem = $problemData['problem'];
 
         // Ban the problem.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
         \OmegaUp\DAO\Problems::update($problem);
 
         $directorLogin = self::login($contestData['director']);
@@ -225,7 +225,7 @@ class AddProblemToContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Make it private. Now it should be possible to add it.
-        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
         \OmegaUp\DAO\Problems::update($problem);
 
         $r = new \OmegaUp\Request([

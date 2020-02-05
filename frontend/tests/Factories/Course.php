@@ -11,7 +11,8 @@ class Course {
         \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
         bool $public = false,
         string $requestsUserInformation = 'no',
-        string $showScoreboard = 'false'
+        string $showScoreboard = 'false',
+        ?int $courseDuration = 120
     ): array {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -43,8 +44,10 @@ class Course {
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => (\OmegaUp\Time::get()),
-            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => !is_null(
+                $courseDuration
+            ) ? \OmegaUp\Time::get() + $courseDuration : null,
             'public' => $public,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -68,7 +71,9 @@ class Course {
         bool $public = false,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
-        int $startTimeDelay = 0
+        int $startTimeDelay = 0,
+        ?int $courseDuration = 120,
+        ?int $assignmentDuration = 120
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -81,7 +86,8 @@ class Course {
             $adminLogin,
             $public,
             $requestsUserInformation,
-            $showScoreboard
+            $showScoreboard,
+            $courseDuration
         );
         $courseAlias = $courseFactoryResult['course_alias'];
 
@@ -101,7 +107,9 @@ class Course {
             'alias' => $assignmentAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => \OmegaUp\Time::get() + $startTimeDelay,
-            'finish_time' => \OmegaUp\Time::get() + 120,
+            'finish_time' => !is_null(
+                $assignmentDuration
+            ) ? \OmegaUp\Time::get() + $assignmentDuration : null,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework',
             'course' => $course,
@@ -142,23 +150,29 @@ class Course {
 
     /**
      * @param array{homework?: int, test?: int} $assignmentsPerType
-     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string}
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string, assignment_problemset_ids: list<int>}
      */
     public static function createCourseWithNAssignmentsPerType(
         array $assignmentsPerType
     ): array {
         $courseFactoryResult = self::createCourse();
         $courseAlias = $courseFactoryResult['course_alias'];
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course) || is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         $admin = $courseFactoryResult['admin'];
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
-        $assignmentAlias = [];
+        $assignmentAliases = [];
+        $assignmentProblemsetIds = [];
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
+                $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
                 $r = new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => \OmegaUp\Test\Utils::createRandomString(),
-                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $assignmentAlias,
                     'description' => \OmegaUp\Test\Utils::createRandomString(),
                     'start_time' => (\OmegaUp\Time::get()),
                     'finish_time' => (\OmegaUp\Time::get() + 120),
@@ -166,15 +180,29 @@ class Course {
                     'assignment_type' => $assignmentType
                 ]);
 
-                $assignmentAlias[] = strval($r['alias']);
                 \OmegaUp\Controllers\Course::apiCreateAssignment($r);
+                $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                    $assignmentAlias,
+                    $course->course_id
+                );
+                if (
+                    is_null($assignment) ||
+                    is_null($assignment->problemset_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
+                $assignmentAliases[] = $assignmentAlias;
+                $assignmentProblemsetIds[] = $assignment->problemset_id;
             }
         }
 
         return [
             'admin' => $admin,
             'course_alias' => $courseAlias,
-            'assignment_aliases' => $assignmentAlias
+            'assignment_aliases' => $assignmentAliases,
+            'assignment_problemset_ids' => $assignmentProblemsetIds,
         ];
     }
 
@@ -294,7 +322,7 @@ class Course {
                             'auth_token' => $studentLogin->auth_token,
                             'problemset_id' => $assignment->problemset_id,
                             'problem_alias' => $problemData['request']['problem_alias'],
-                            'language' => 'c',
+                            'language' => 'c11-gcc',
                             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                         ]));
                         \OmegaUp\Test\Factories\Run::gradeRun(
@@ -312,7 +340,7 @@ class Course {
                                 'auth_token' => $studentLogin->auth_token,
                                 'problemset_id' => $assignment->problemset_id,
                                 'problem_alias' => $problemData['request']['problem_alias'],
-                                'language' => 'c',
+                                'language' => 'c11-gcc',
                                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
                             ]));
                             \OmegaUp\Test\Factories\Run::gradeRun(

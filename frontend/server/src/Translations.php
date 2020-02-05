@@ -26,7 +26,7 @@ class Translations {
      */
     private function __construct() {
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            new \OmegaUp\Request()
+            /*$identity=*/ null
         );
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
         /** @var array<int, string> $match */

@@ -106,6 +106,10 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
             'appenders' => ['jserror'],
             'additivity' => false,
         ],
+        'mysqltypes' => [
+            'appenders' => ['mysqltypes'],
+            'additivity' => false,
+        ],
     ],
     'appenders' => [
         'default' => [
@@ -148,6 +152,19 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
             ],
             'params' => [
                 'file' => OMEGAUP_JSERROR_LOG_FILE,
+                'append' => true,
+            ],
+        ],
+        'mysqltypes' => [
+            'class' => 'LoggerAppenderFile',
+            'layout' => [
+                'class' => 'LoggerLayoutPattern',
+                'params' => [
+                    'conversionPattern' => '%message %newline',
+                ],
+            ],
+            'params' => [
+                'file' => OMEGAUP_MYSQL_TYPES_LOG_FILE,
                 'append' => true,
             ],
         ],

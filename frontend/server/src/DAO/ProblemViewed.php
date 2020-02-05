@@ -12,9 +12,12 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemViewed extends \OmegaUp\DAO\Base\ProblemViewed {
-    public static function MarkProblemViewed($identity_id, $problem_id) {
+    public static function MarkProblemViewed(
+        int $identityId,
+        int $problemId
+    ): void {
         $sql = 'INSERT IGNORE Problem_Viewed (identity_id, problem_id) VALUES (?, ?);';
-        $values = [$identity_id, $problem_id];
+        $values = [$identityId, $problemId];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $values);
     }
 }

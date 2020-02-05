@@ -296,12 +296,12 @@ class Authorization {
     ): bool {
         return (
             \OmegaUp\DAO\GroupRoles::hasRole(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $acl_id,
                 $role_id
             ) ||
             \OmegaUp\DAO\UserRoles::hasRole(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $acl_id,
                 $role_id
             )
@@ -351,9 +351,9 @@ class Authorization {
 
     /**
      * Only last two days of the month mentor is available to choose
-     * the coder of the month
+     * the coder and school of the month
      */
-    public static function canChooseCoder(int $currentTimestamp): bool {
+    public static function canChooseCoderOrSchool(int $currentTimestamp): bool {
         $today = date('Y-m-d', $currentTimestamp);
         $lastDayOfMonth = intval(date('t', $currentTimestamp));
         $availableDateToChooseCoder = [];
@@ -473,12 +473,12 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Problemsets $problemset
     ): bool {
-        if (is_null($problemset)) {
+        if (is_null($problemset) || is_null($problemset->acl_id)) {
             return false;
         }
         return self::isAdmin($identity, $problemset) ||
             \OmegaUp\DAO\GroupRoles::isContestant(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $problemset->acl_id
             );
     }

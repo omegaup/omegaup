@@ -12,7 +12,10 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
-    public static function getAdmins($acl_id) {
+    /**
+     * @return list<array{alias: string, name: string, role: string}>
+     */
+    public static function getAdmins(int $aclId): array {
         $sql = '
             SELECT
                 g.alias, g.name, gr.acl_id AS acl
@@ -25,27 +28,68 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
         $params = [
             \OmegaUp\Authorization::ADMIN_ROLE,
             \OmegaUp\Authorization::SYSTEM_ACL,
-            $acl_id,
+            $aclId,
         ];
 
-        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{acl: int, alias: string, name: string}> */
+        $rawAdmins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
         );
 
-        for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
-                $admins[$i]['role'] = 'site-admin';
+        $admins = [];
+        foreach ($rawAdmins as &$admin) {
+            if ($admin['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
+                $admins[] = [
+                    'alias' => $admin['alias'],
+                    'name' => $admin['name'],
+                    'role' => 'site-admin',
+                ];
             } else {
-                $admins[$i]['role'] = 'admin';
+                $admins[] = [
+                    'alias' => $admin['alias'],
+                    'name' => $admin['name'],
+                    'role' => 'admin',
+                ];
             }
-            unset($admins[$i]['acl']);
         }
-
         return $admins;
     }
 
-    public static function hasRole($identity_id, $acl_id, $role_id) {
+    /**
+     * @return list<array{alias: string, name: string}>
+     */
+    public static function getContestantGroups(int $problemsetId): array {
+        $sql = '
+            SELECT
+                g.alias, g.name
+            FROM
+                Problemsets p
+            INNER JOIN
+                Group_Roles gr ON gr.acl_id = p.acl_id
+            INNER JOIN
+                Groups g ON g.group_id = gr.group_id
+            WHERE
+                p.problemset_id = ? AND
+                gr.role_id = ?;
+        ';
+        $params = [
+            $problemsetId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+        ];
+
+        /** @var list<array{alias: string, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+    }
+
+    public static function hasRole(
+        int $identityId,
+        int $aclId,
+        int $roleId
+    ): bool {
         $sql = '
             SELECT
                 COUNT(*) > 0
@@ -56,15 +100,18 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             WHERE
                 gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
-            $identity_id,
-            $role_id,
+            $identityId,
+            $roleId,
             \OmegaUp\Authorization::SYSTEM_ACL,
-            $acl_id,
+            $aclId,
         ];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return boolval(
+            /** @var int|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
-    public static function isContestant($identity_id, $acl_id) {
+    public static function isContestant(int $identityId, int $aclId): bool {
         $sql = '
             SELECT
                 COUNT(*) > 0
@@ -75,26 +122,41 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             WHERE
                 gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
         $params = [
-            $identity_id,
+            $identityId,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
-            $acl_id,
+            $aclId,
         ];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return boolval(
+            /** @var int|null */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params)
+        );
     }
 
-    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
-        return self::getAdmins($contest->acl_id);
+    /**
+     * @return list<array{alias: string, name: string, role: string}>
+     */
+    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest): array {
+        return self::getAdmins(intval($contest->acl_id));
     }
 
-    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course) {
-        return self::getAdmins($course->acl_id);
+    /**
+     * @return list<array{alias: string, name: string, role: string}>
+     */
+    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course): array {
+        return self::getAdmins(intval($course->acl_id));
     }
 
-    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem) {
-        return self::getAdmins($problem->acl_id);
+    /**
+     * @return list<array{alias: string, name: string, role: string}>
+     */
+    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem): array {
+        return self::getAdmins(intval($problem->acl_id));
     }
 
-    public static function getSystemRoles($identity_id) {
+    /**
+     * @return list<string>
+     */
+    public static function getSystemRoles(int $identityId): array {
         $sql = '
             SELECT
                 r.name
@@ -107,11 +169,12 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             WHERE
                 gi.identity_id = ? AND gr.acl_id = ?;';
         $params = [
-            $identity_id,
+            $identityId,
             \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];
+        /** @var array{name: string} $role */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

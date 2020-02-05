@@ -23,7 +23,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
-        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
 
         // Verify DB
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
@@ -169,9 +169,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         // Double check language update with the appropiate API
         $this->assertEquals(
             $locale->name,
-            \OmegaUp\Controllers\Identity::getPreferredLanguage(new \OmegaUp\Request([
-                'username' => $identityDb->username
-            ]))
+            \OmegaUp\Controllers\Identity::getPreferredLanguage($identityDb)
         );
 
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);

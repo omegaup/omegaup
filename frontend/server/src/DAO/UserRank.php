@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
     /**
      * @param null|string|int $value
-     * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getFilteredRank(
         int $page,
@@ -33,38 +33,42 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`name`,
                 `ur`.`country_id`,
-                (SELECT
-                    `urc`.`classname`
-                 FROM
-                    `User_Rank_Cutoffs` `urc`
-                 WHERE
-                    `urc`.`score` <= `ur`.`score`
-                 ORDER BY
-                    `urc`.`percentile` ASC
-                 LIMIT
-                    1) as `classname`';
-        $sql_count = '
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`';
+        $sqlCount = '
               SELECT
                 COUNT(1)';
         $params = [];
-        $sql_from = '
+        $sqlFrom = '
               FROM
                 `User_Rank` `ur`';
-        if ($filteredBy == 'state' && is_string($value)) {
+        if ($filteredBy === 'state' && is_string($value)) {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
-            $sql_from .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
+            $sqlFrom .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+            $sqlFrom .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $filteredBy
             ) . '_id` = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+            $sqlFrom .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
-            ) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            ) . '` ' . ($orderType === 'DESC' ? 'DESC' : 'ASC');
         }
         $paramsLimit = [
             (($page - 1) * intval($colsPerPage)), // Offset
@@ -74,16 +78,16 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         // Get total rows
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql_count . $sql_from,
+            "{$sqlCount}{$sqlFrom}",
             $params
         ) ?? 0;
 
         $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        /** @var array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[] */
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sql_from . $sqlLimit,
+            "{$sql}{$sqlFrom}{$sqlLimit}",
             $params
         );
         return [

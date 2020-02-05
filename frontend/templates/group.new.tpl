@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleGroupsNew#}" inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroupsNew#}" inline}
 
 {if !isset($IS_UPDATE)}
 	{assign "IS_UPDATE" 0}

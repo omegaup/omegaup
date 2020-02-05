@@ -39,22 +39,24 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Reset my password
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'username' => $identity->username,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
-            'old_password' => 'bad old password',
-        ]);
 
-        // Call api
-        \OmegaUp\Controllers\User::apiChangePassword($r);
+        try {
+            \OmegaUp\Controllers\User::apiChangePassword(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identity->username,
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'old_password' => 'bad old password',
+            ]));
+            $this->fail('should have failed due to bad old password');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertEquals('old_password', $e->parameter);
+        }
     }
 }

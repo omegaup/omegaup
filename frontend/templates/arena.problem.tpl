@@ -56,11 +56,17 @@
       {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
         <iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
       {/if}
+      {if $LOGGED_IN}
       <div>
-        <script type="text/json" id="qualitynomination-reportproblem-payload">{$qualitynomination_reportproblem_payload|json_encode}</script>
+        <div id="qualitynomination-qualityreview"></div>
+        {js_include entrypoint="qualitynomination_qualityreview"}
+      </div>
+      <div>
+        <script type="text/json" id="qualitynomination-reportproblem-payload">{$nomination_payload|json_encode}</script>
         <div id="qualitynomination-demotionpopup"></div>
         {js_include entrypoint="qualitynomination_demotionpopup"}
       </div>
+      {/if}
       <div id="qualitynomination">
         <script type="text/json" id="quality-payload">{$quality_payload|json_encode}</script>
         <div id="qualitynomination-popup"></div>

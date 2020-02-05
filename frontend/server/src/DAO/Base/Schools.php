@@ -34,7 +34,9 @@ abstract class Schools {
             SET
                 `country_id` = ?,
                 `state_id` = ?,
-                `name` = ?
+                `name` = ?,
+                `rank` = ?,
+                `score` = ?
             WHERE
                 (
                     `school_id` = ?
@@ -43,6 +45,12 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
+            floatval($Schools->score),
             intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -67,7 +75,9 @@ abstract class Schools {
                 `Schools`.`school_id`,
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
-                `Schools`.`name`
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
             FROM
                 `Schools`
             WHERE
@@ -138,10 +148,8 @@ abstract class Schools {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Schools[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Schools> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Schools}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Schools>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -154,7 +162,9 @@ abstract class Schools {
                 `Schools`.`school_id`,
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
-                `Schools`.`name`
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
             FROM
                 `Schools`
         ';
@@ -207,8 +217,12 @@ abstract class Schools {
                 Schools (
                     `country_id`,
                     `state_id`,
-                    `name`
+                    `name`,
+                    `rank`,
+                    `score`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?
@@ -217,6 +231,12 @@ abstract class Schools {
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
+            floatval($Schools->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
