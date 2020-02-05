@@ -3920,7 +3920,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, TITLE: string, VISIBILITY: string, payload: array{timeLimit: int,validatorTimeLimit: int, overallWallTimeLimit: int, extraWallTime: int, outputLimit: int, inputLimit: int, memoryLimit: int, languages: string, validLanguages: array<string, string>, validatorsTypes: array<string, string>, validator: string}}, template: string }
+     * 
+     * @param \OmegaUp\Request $r The request object.
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR?: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array{extraWallTime: int, inputLimit: int, languages: string, memoryLimit: int, outputLimit: int, overallWallTimeLimit: int, timeLimit: int, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int, validatorsTypes: array{custom: null|string, literal: null|string, token-caseless: null|string, token-numeric: null|string, token: null|string}}}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4014,6 +4016,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'EMAIL_CLARIFICATIONS' => '0',
                 'SOURCE' => '',
                 'VISIBILITY' => '0',
+                'STATUS_ERROR' => '',
                 'LANGUAGES' => join(
                     ',',
                     \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
@@ -4028,7 +4031,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'outputLimit' => 10240,
                     'inputLimit' => 10240,
                     'memoryLimit' => 32768,
-                    'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    'languages' => join(
+                        ',',
+                        \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                    ),
                     'validLanguages' => $validLanguages,
                     'validatorsTypes' => $validatorsTypes,
                     'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
