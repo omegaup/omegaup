@@ -16,7 +16,8 @@ import operator
 import os
 import sys
 import warnings
-from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple, Text
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import DefaultDict
 
 import MySQLdb.constants.ER
 
@@ -399,7 +400,7 @@ def aggregate_reviewers_feedback_for_problem(
 
         total_votes = 0
         seal_positive_votes = 0
-        categories_votes: Dict[Text, int] = {}
+        categories_votes: DefaultDict[str, int] = collections.defaultdict(int)
         for row in cur:
             try:
                 contents = json.loads(row[0])

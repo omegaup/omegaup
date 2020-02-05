@@ -1444,30 +1444,64 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Creates two problems that are qualified by reviewers
-     *
-     * - First problem receives two positive votes and one negative => quality_seal = true
-     * - Second problem receives one positive vote and two negatives => quality_seal = false
+     * Test if the problem's quality_seal sets to true after receiving
+     * the feedback of reviewers.
      */
-    public function testAggregateReviewersFeedback() {
-        $problems = [
-            \OmegaUp\Test\Factories\Problem::createProblem(),
-            \OmegaUp\Test\Factories\Problem::createProblem()
-        ];
+    public function testReviewersFeedbackPostive() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[0]['request']['problem_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemCategoryKarelEducation',
             ]),
         ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[1]['request']['problem_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertTrue($problem->quality_seal);
+    }
+
+    /**
+     * Test if the problem's quality_seal remains as false after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackNegative() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
@@ -1478,16 +1512,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[0]['request']['problem_alias'],
-            'nomination' => 'quality_tag',
-            'contents' => json_encode([
-                'quality_seal' => true,
-                'tag' => 'problemCategoryKarelEducation',
-            ]),
-        ]));
-        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[1]['request']['problem_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
@@ -1498,16 +1523,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[0]['request']['problem_alias'],
-            'nomination' => 'quality_tag',
-            'contents' => json_encode([
-                'quality_seal' => false,
-                'tag' => 'problemCategoryOpenResponse',
-            ]),
-        ]));
-        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problems[1]['request']['problem_alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => true,
@@ -1518,12 +1534,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
         $problem = \OmegaUp\DAO\Problems::getByPK(
-            $problems[0]['problem']->problem_id
-        );
-        $this->assertTrue($problem->quality_seal);
-
-        $problem = \OmegaUp\DAO\Problems::getByPK(
-            $problems[1]['problem']->problem_id
+            $problemData['problem']->problem_id
         );
         $this->assertFalse($problem->quality_seal);
     }
