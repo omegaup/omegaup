@@ -410,12 +410,8 @@ def aggregate_reviewers_feedback_for_problem(
             total_votes += 1
             if contents['quality_seal']:
                 seal_positive_votes += 1
-
             if 'tag' in contents and not contents['tag'] is None:
-                if contents['tag'] not in categories_votes:
-                    categories_votes[contents['tag']] = 1
-                else:
-                    categories_votes[contents['tag']] += 1
+                categories_votes[contents['tag']] += 1
 
         # Update the quality_seal for problem
         cur.execute(
