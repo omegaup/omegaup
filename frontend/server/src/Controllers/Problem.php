@@ -3816,7 +3816,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r,
             /*$isRequired=*/ false
         );
-
+        $validatorsTypes = [
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormTokenCaseless'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormNumericTokensWithTolerance'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormTokenByToken'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_LITERAL => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormLiteral'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormCustom'
+            )
+        ];
+        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
+        sort($sortedLanguages);
+        $validLanguages = [ join(
+            ',',
+            $sortedLanguages
+        ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+        'kj,kp' => 'Karel',
+        'cat' => \OmegaUp\Translations::getInstance()->get(
+            'wordsJustOutput'
+        ),
+        '' => \OmegaUp\Translations::getInstance()->get(
+            'wordsNoSubmissions'
+        )];
         if (!isset($r['request'])) {
             return [
                 'IS_UPDATE' => true,
@@ -3829,6 +3858,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'payload' => [
                     'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    'validLanguages' => $validLanguages,
+                    'validatorsTypes' => $validatorsTypes,
                     ]
             ];
         }
@@ -3882,17 +3913,49 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             'payload' => [
                 'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                'validLanguages' => $validLanguages,
+                'validatorsTypes' => $validatorsTypes,
             ]
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, EXTRA_WALL_TIME: string, INPUT_LIMIT: string, LANGUAGES: string, MEMORY_LIMIT: string, OUTPUT_LIMIT: string, OVERALL_WALL_TIME_LIMIT: string, SELECTED_TAGS: string, SOURCE: string, TIME_LIMIT: string, TITLE: string, VALIDATOR: string, VALIDATOR_TIME_LIMIT: string, VISIBILITY: string}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, TITLE: string, VISIBILITY: string, payload: array{timeLimit: int,validatorTimeLimit: int, overallWallTimeLimit: int, extraWallTime: int, outputLimit: int, inputLimit: int, memoryLimit: int, languages: arry{string}, validLanguages: array<string, string>, validatorsTypes: array<string, string>, validator: string}}, template: string }
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
+        $validatorsTypes = [
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormTokenCaseless'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormNumericTokensWithTolerance'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormTokenByToken'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_LITERAL => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormLiteral'
+            ),
+            \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
+                'problemEditFormCustom'
+            )
+        ];
+        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
+        sort($sortedLanguages);
+        $validLanguages = [ join(
+            ',',
+            $sortedLanguages
+        ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+        'kj,kp' => 'Karel',
+        'cat' => \OmegaUp\Translations::getInstance()->get(
+            'wordsJustOutput'
+        ),
+        '' => \OmegaUp\Translations::getInstance()->get(
+            'wordsNoSubmissions'
+        )];
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
@@ -3916,7 +3979,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'smartyProperties' => [
                         'TITLE' => strval($r['title']),
                         'ALIAS' => strval($r['problem_alias']),
-                        'VALIDATOR' => strval($r['validator']),
                         'EMAIL_CLARIFICATIONS' => strval(
                             $r['email_clarifications']
                         ),
@@ -3934,7 +3996,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             'outputLimit' => 10240,
                             'inputLimit' => 10240,
                             'memoryLimit' => 32768,
-                            'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                            'languages' => strval($r['languages']),
+                            'validLanguages' => $validLanguages,
+                            'validatorsTypes' => $validatorsTypes,
+                            'validator' => strval($r['validator']),
                         ],
                     ],
                     'template' => 'problem.new.tpl',
@@ -3964,6 +4029,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'inputLimit' => 10240,
                     'memoryLimit' => 32768,
                     'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    'validLanguages' => $validLanguages,
+                    'validatorsTypes' => $validatorsTypes,
+                    'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
                 ]
             ],
             'template' => 'problem.new.tpl',

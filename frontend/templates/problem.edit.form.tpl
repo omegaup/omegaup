@@ -34,28 +34,6 @@
 
 			</div>
 
-			<div class="row">
-				<div class="form-group col-md-6">
-					<label for="validator">{#problemEditFormValidatorType#}</label>
-					<select name='validator' id='validator' class="form-control" >
-							<option value="token-caseless" {if $IS_UPDATE eq false && $VALIDATOR eq "token-caseless"}selected{/if}>{#problemEditFormTokenCaseless#}</option>
-							<option value="token-numeric" {if $IS_UPDATE eq false && $VALIDATOR eq "token-numeric"}selected{/if}>{#problemEditFormNumericTokensWithTolerance#}</option>
-							<option value="token" {if $IS_UPDATE eq false && $VALIDATOR eq "token"}selected{/if}>{#problemEditFormTokenByToken#}</option>
-							<option value="literal" {if $IS_UPDATE eq false && $VALIDATOR eq "literal"}selected{/if}>{#problemEditFormLiteral#}</option>
-							<option value="custom" {if $IS_UPDATE eq false && $VALIDATOR eq "custom"}selected{/if}>{#problemEditFormCustom#}</option>
-					</select>
-				</div>
-
-				<div class="form-group col-md-6">
-					<label for="languages">{#problemEditFormLanguages#}</label>
-					<select name="languages" id="languages" class="form-control">
-						<option value="c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb" {if $IS_UPDATE eq false && $LANGUAGES eq "c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb"}selected{/if}>C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua</option>
-						<option value="kj,kp" {if $IS_UPDATE eq false && $LANGUAGES eq "kj,kp"}selected{/if}>Karel</option>
-						<option value="cat" {if $IS_UPDATE eq false && $LANGUAGES eq "cat"}selected{/if}>{#wordsJustOutput#}</option>
-						<option value="" {if $IS_UPDATE eq false && $LANGUAGES eq ""}selected{/if}>{#wordsNoSubmissions#}</option>
-					</select>
-				</div>
-			</div>
 			<div id="problem-validator"></div>
 			<script type="text/json" id="problem-payload">{$payload|json_encode}</script>
 			{if $IS_UPDATE eq false}

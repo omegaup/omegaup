@@ -20,6 +20,9 @@ OmegaUp.on('ready', function() {
           EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
           VALIDATOR_TIME_LIMIT: this.VALIDATOR_TIME_LIMIT,
           LANGUAGES: this.LANGUAGES,
+          VALID_LANGUAGES: this.VALID_LANGUAGES,
+          VALIDATOR: this.VALIDATOR,
+          VALIDATORS_TYPES: this.VALIDATORS_TYPES,
         },
       });
     },
@@ -31,7 +34,10 @@ OmegaUp.on('ready', function() {
       OVERALL_WALL_TIME_LIMIT: payload.overallWallTimeLimit,
       EXTRA_WALL_TIME: payload.extraWallTime,
       VALIDATOR_TIME_LIMIT: payload.validatorTimeLimit,
-      LANGUAGES: document.getElementById('languages').value,
+      LANGUAGES: payload.languages,
+      VALID_LANGUAGES: payload.validLanguages,
+      VALIDATOR: payload.validator,
+      VALIDATORS_TYPES: payload.validatorsTypes,
     },
     components: {
       'omegaup-problem-validator': problem_Validator,

@@ -1,6 +1,32 @@
 <template>
   <div>
     <div class="row">
+      <div class="form-group col-md-6">
+        <label>{{ T.problemEditFormValidatorType }}</label>
+        <select name="validator" class="form-control">
+          <option
+            v-for="(validatorText, validatorIndex) in VALIDATORS_TYPES"
+            v-bind:value="validatorIndex"
+            v-bind:selected="validatorIndex === VALIDATOR"
+          >
+            {{ validatorText }}</option
+          >
+        </select>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>{{ T.problemEditFormLanguages }}</label>
+        <select name="languages" class="form-control">
+          <option
+            v-for="(languageText, languageIndex) in VALID_LANGUAGES"
+            v-bind:value="languageIndex"
+            v-bind:selected="languageIndex === LANGUAGES"
+            >{{ languageText }}</option
+          >
+        </select>
+      </div>
+    </div>
+    <div class="row">
       <div class="form-group  col-md-6">
         <label for="validator_time_limit">{{
           T.problemEditFormValidatorTimeLimit
@@ -96,6 +122,9 @@ export default class ProblemValidator extends Vue {
   @Prop() INPUT_LIMIT!: number;
   @Prop() VALIDATOR_TIME_LIMIT!: number;
   @Prop() LANGUAGES!: string;
+  @Prop() VALID_LANGUAGES!: Array<string>;
+  @Prop() VALIDATOR!: string;
+  @Prop() VALIDATORS_TYPES!: Array<string>;
 
   T = T;
   UI = UI;
