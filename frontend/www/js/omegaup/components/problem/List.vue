@@ -57,7 +57,7 @@
                 <a
                   v-bind:class="`tag tag-${tag.source}`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
-                  v-for="tag in problem.tags"
+                  v-for="tag in sortedTags(problem.tags)"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
                 >
               </div>
@@ -103,6 +103,10 @@
 <style>
 .tag {
   margin-right: 0.25em;
+}
+
+.tag-quality {
+  background: #d0c532;
 }
 
 .omegaup-quality-badge {
@@ -154,6 +158,14 @@ export default class ProblemList extends Vue {
     T.qualityFormDifficultyHard,
     T.qualityFormDifficultyVeryHard,
   ];
+
+  sortedTags(tags: omegaup.Tag[]): omegaup.Tag[] {
+    return tags.sort((a: omegaup.Tag, b: omegaup.Tag): number => {
+      if (a.source === 'quality' && b.source !== 'quality') return -1;
+      else if (a.source !== 'quality' && b.source === 'quality') return 1;
+      return a.name.localeCompare(b.name, this.T.lang);
+    });
+  }
 
   rowClassForProblem(problemVisibility: number): string {
     return problemVisibility >= 2 ? 'high-quality' : '';
