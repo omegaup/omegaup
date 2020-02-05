@@ -37,7 +37,7 @@
         <tbody>
           <tr v-for="problem in problems">
             <td>
-              <a v-bind:href="`/arena/problem/${problem.alias}`">{{
+              <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
                 problem.title
               }}</a
               ><span
