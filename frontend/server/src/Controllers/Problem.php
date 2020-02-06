@@ -3901,6 +3901,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 if (empty($response['error'])) {
                     $statusError = '{error}';
                 } else {
+                    if ($response['errorname'] === 'problemDeployerExceededZipSizeLimit') {
+                        $response['error'] = \OmegaUp\ApiUtils::formatString(
+                            \OmegaUp\Translations::getInstance()->get(
+                                'problemDeployerExceededZipSizeLimit'
+                            )
+                                ?: 'problemDeployerExceededZipSizeLimit',
+                            [
+                                'size' => $response['size'],
+                                'max_size' => $response['max_size'],
+                            ]
+                        );
+                    }
                     $statusError = $response['error'];
                 }
                 return [

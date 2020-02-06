@@ -10,7 +10,7 @@ class ProblemDeployer {
     const UPDATE_CASES = 1;
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
-
+    const ZIP_MAX_SIZE = '100000000';
     /** @var \Logger */
     private $log;
 
@@ -365,6 +365,20 @@ class ProblemDeployer {
         $zipFile = fopen($zipPath, 'r');
         /** @var int */
         $zipFileSize = fstat($zipFile)['size'];
+        if ($zipFileSize > self::ZIP_MAX_SIZE) {
+            $exception = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerExceededZipSizeLimit'
+            );
+            $exception->addCustomMessageToArray(
+                'size',
+                $zipFileSize
+            );
+            $exception->addCustomMessageToArray(
+                'max_size',
+                self::ZIP_MAX_SIZE
+            );
+            throw $exception;
+        }
         try {
             $queryParams = [
                 'message' => $commitMessage,
