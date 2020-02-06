@@ -2076,7 +2076,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get the extra problem details with all the validations
-     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: list<string>, email_clarifications: bool, runs?: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}>, admin?: bool, solvers?: list<array{username: string, language: string, runtime: float, memory: float, time: int}>, points: float, score: float}
+     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, quality_seal: bool, languages: list<string>, email_clarifications: bool, runs?: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string}>, admin?: bool, solvers?: list<array{username: string, language: string, runtime: float, memory: float, time: int}>, points: float, score: float}
      */
     private static function getProblemDetails(
         \OmegaUp\Request $r,
@@ -2155,6 +2155,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['order'] = $problem->order;
         $response['visibility'] = $problem->visibility;
         $response['email_clarifications'] = $problem->email_clarifications;
+        $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
 
@@ -3142,7 +3143,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * List of public and user's private problems
      *
      * @param \OmegaUp\Request $r
-     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int}[], total: int}
+     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[], total: int}
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3190,7 +3191,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $tags
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
-     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int}[], total: int}
+     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[], total: int}
      */
     private static function getList(
         int $page,
@@ -3572,7 +3573,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, mixed>, limits: array{MemoryLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: mixed}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, visibility: int}
+     * @return array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, mixed>, limits: array{MemoryLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: mixed}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}
      */
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3617,6 +3618,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result = [
             'problem_alias' => $details['alias'],
             'visibility' => $details['visibility'],
+            'quality_seal' => $details['quality_seal'],
             'source' => (
                 isset($details['source']) ?
                 strval($details['source']) :
@@ -3727,7 +3729,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int}[]}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[]}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r

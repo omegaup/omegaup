@@ -17,6 +17,7 @@ import os
 import sys
 import warnings
 from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import DefaultDict
 
 import MySQLdb.constants.ER
 
@@ -386,6 +387,82 @@ def aggregate_feedback(dbconn: MySQLdb.connections.Connection) -> None:
                                        global_difficulty_average)
 
 
+def aggregate_reviewers_feedback_for_problem(
+        dbconn: MySQLdb.connections.Connection,
+        problem_id: int) -> None:
+    '''Aggregates the reviewers feedback for a certain problem'''
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT qn.`contents`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag'
+                       AND qn.`problem_id` = %s;""",
+                    (problem_id,))
+
+        total_votes = 0
+        seal_positive_votes = 0
+        categories_votes: DefaultDict[str, int] = collections.defaultdict(int)
+        for row in cur:
+            try:
+                contents = json.loads(row[0])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+            total_votes += 1
+            if contents['quality_seal']:
+                seal_positive_votes += 1
+            if 'tag' in contents and not contents['tag'] is None:
+                categories_votes[contents['tag']] += 1
+
+        # Update the quality_seal for problem
+        cur.execute(
+            """
+            UPDATE
+                `Problems` as p
+            SET
+                p.`quality_seal` = %s
+            WHERE
+                p.`problem_id` = %s;""",
+            (seal_positive_votes > (total_votes / 2), problem_id))
+
+        # Delete old category for problem and add the new one
+        most_voted_category = max(categories_votes, key=categories_votes.get)
+        cur.execute("""DELETE FROM
+                               `Problems_Tags`
+                           WHERE
+                               `problem_id` = %s AND `source` = 'quality';""",
+                    (problem_id,))
+
+        cur.execute("""INSERT INTO
+                               `Problems_Tags`(`problem_id`, `tag_id`,
+                                               `public`, `source`)
+                           SELECT
+                               %s AS `problem_id`,
+                               `t`.`tag_id` AS `tag_id`,
+                               1 AS `public`,
+                               'quality' AS `source`
+                           FROM
+                               `Tags` AS `t`
+                           WHERE
+                               `t`.`name` = %s;""",
+                    (problem_id, most_voted_category))
+
+
+def aggregate_reviewers_feedback(
+        dbconn: MySQLdb.connections.Connection) -> None:
+    '''Aggregates the quality_tag nominations sent by reviewers
+
+    Updates the quality_seal field on Problems table and updates the
+    problem category tag.
+    '''
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT DISTINCT qn.`problem_id`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag';""")
+        for row in cur:
+            aggregate_reviewers_feedback_for_problem(dbconn, row[0])
+        dbconn.commit()
+
+
 def get_last_friday() -> datetime.date:
     '''Returns datetime object corresponding to last Friday.
     '''
@@ -489,6 +566,13 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
+        try:
+            aggregate_reviewers_feedback(dbconn)
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to calculate problem quality seal and category.')
+            raise
+
         try:
             aggregate_feedback(dbconn)
         except:  # noqa: bare-except

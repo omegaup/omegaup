@@ -1443,6 +1443,102 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Test if the problem's quality_seal sets to true after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackPostive() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertTrue($problem->quality_seal);
+    }
+
+    /**
+     * Test if the problem's quality_seal remains as false after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackNegative() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryIntroductionToProgramming',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryIntroductionToProgramming',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertFalse($problem->quality_seal);
+    }
+
     public function setUpRankForUsers(
         $problems,
         $users,

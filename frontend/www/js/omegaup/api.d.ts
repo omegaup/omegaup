@@ -347,6 +347,7 @@ declare namespace omegaup {
     percent?: number;
     points: number;
     quality?: number;
+    quality_seal?: boolean;
     ratio?: number;
     run_details?: omegaup.RunDetails;
     runs?: CourseProblemRun[];
