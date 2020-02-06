@@ -572,8 +572,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $message = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
-        $r['visibility'] = $newProblemVisibility;
-
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
             'qualitynomination_id' => $qualitynomination->qualitynomination_id,
@@ -583,10 +581,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ]);
         $qualitynomination->status = $qualitynominationlog->to_status;
 
-        $problemParams = \OmegaUp\Controllers\Problem::convertRequestToProblemParams(
-            $r,
-            /*$isRequired=*/ false
-        );
+        $problemParams = new \OmegaUp\ProblemParams([
+            'visibility' => $newProblemVisibility,
+            'problem_alias' => $r['problem_alias'],
+        ], /*$isRequired=*/ false);
 
         \OmegaUp\DAO\DAO::transBegin();
         try {

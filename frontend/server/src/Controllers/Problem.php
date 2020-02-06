@@ -56,7 +56,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a ProblemParams instance from the Request values.
      *
      */
-    public static function convertRequestToProblemParams(
+    private static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
         bool $isRequired = true
     ): \OmegaUp\ProblemParams {
@@ -277,7 +277,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $params->inputLimit,
+            $params->input_limit,
             'input_limit',
             0,
             null,
@@ -346,14 +346,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'visibility' => $params->visibility ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'title' => $params->title,
             'visits' => 0,
-            'input_limit' => $params->inputLimit,
+            'input_limit' => $params->input_limit,
             'submissions' => 0,
             'accepted' => 0,
             'source' => $params->source,
             'order' => 'normal', /* defaulting to normal */
             'alias' => $params->problemAlias,
             'languages' => $languages,
-            'email_clarifications' => $params->emailClarifications,
+            'email_clarifications' => $params->email_clarifications,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
@@ -1124,8 +1124,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $valueProperties = [
             'visibility',
             'title',
-            'inputLimit',
-            'emailClarifications',
+            'input_limit',
+            'email_clarifications',
             'source',
             'order',
             'languages',
