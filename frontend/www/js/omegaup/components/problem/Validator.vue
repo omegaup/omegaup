@@ -5,9 +5,9 @@
         <label>{{ T.problemEditFormValidatorType }}</label>
         <select name="validator" class="form-control">
           <option
-            v-for="(validatorText, validatorIndex) in VALIDATORS_TYPES"
+            v-for="(validatorText, validatorIndex) in validatorsTypes"
             v-bind:value="validatorIndex"
-            v-bind:selected="validatorIndex === VALIDATOR"
+            v-bind:selected="validatorIndex === validator"
           >
             {{ validatorText }}</option
           >
@@ -18,9 +18,9 @@
         <label>{{ T.problemEditFormLanguages }}</label>
         <select name="languages" class="form-control">
           <option
-            v-for="(languageText, languageIndex) in VALID_LANGUAGES"
+            v-for="(languageText, languageIndex) in validLanguages"
             v-bind:value="languageIndex"
-            v-bind:selected="languageIndex === LANGUAGES"
+            v-bind:selected="languageIndex === languages"
             >{{ languageText }}</option
           >
         </select>
@@ -33,7 +33,7 @@
         }}</label>
         <input
           name="validator_time_limit"
-          v-bind:value="VALIDATOR_TIME_LIMIT"
+          v-bind:value="validatorTimeLimit"
           type="text"
           class="form-control"
         />
@@ -43,7 +43,7 @@
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
-          v-bind:value="TIME_LIMIT"
+          v-bind:value="timeLimit"
           type="text"
           class="form-control"
         />
@@ -57,7 +57,7 @@
         }}</label>
         <input
           name="overall_wall_time_limit"
-          v-bind:value="OVERALL_WALL_TIME_LIMIT"
+          v-bind:value="overallWallTimeLimit"
           type="text"
           class="form-control"
         />
@@ -67,7 +67,7 @@
         <label for="extra_wall_time">{{ T.wordsExtraWallTimeMs }}</label>
         <input
           name="extra_wall_time"
-          v-bind:value="EXTRA_WALL_TIME"
+          v-bind:value="extraWallTime"
           type="text"
           class="form-control"
         />
@@ -79,7 +79,7 @@
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"
-          v-bind:value="MEMORY_LIMIT"
+          v-bind:value="memoryLimit"
           type="text"
           class="form-control"
         />
@@ -89,7 +89,7 @@
         <label for="output_limit">{{ T.problemEditFormOutputLimit }}</label>
         <input
           name="output_limit"
-          v-bind:value="OUTPUT_LIMIT"
+          v-bind:value="outputLimit"
           type="text"
           class="form-control"
         />
@@ -98,7 +98,7 @@
         <label for="input_limit">{{ T.problemEditFormInputLimit }}</label>
         <input
           name="input_limit"
-          v-bind:value="INPUT_LIMIT"
+          v-bind:value="inputLimit"
           type="text"
           class="form-control"
         />
@@ -114,17 +114,17 @@ import UI from '../../ui.js';
 
 @Component
 export default class ProblemValidator extends Vue {
-  @Prop() TIME_LIMIT!: number;
-  @Prop() EXTRA_WALL_TIME!: number;
-  @Prop() MEMORY_LIMIT!: number;
-  @Prop() OUTPUT_LIMIT!: number;
-  @Prop() OVERALL_WALL_TIME_LIMIT!: number;
-  @Prop() INPUT_LIMIT!: number;
-  @Prop() VALIDATOR_TIME_LIMIT!: number;
-  @Prop() LANGUAGES!: string;
-  @Prop() VALID_LANGUAGES!: Array<string>;
-  @Prop() VALIDATOR!: string;
-  @Prop() VALIDATORS_TYPES!: Array<string>;
+  @Prop() timeLimit!: number;
+  @Prop() extraWallTime!: number;
+  @Prop() memoryLimit!: number;
+  @Prop() outputLimit!: number;
+  @Prop() inputLimit!: number;
+  @Prop() overallWallTimeLimit!: number;
+  @Prop() validatorTimeLimit!: number;
+  @Prop() languages!: string;
+  @Prop() validLanguages!: Array<string>;
+  @Prop() validator!: string;
+  @Prop() validatorsTypes!: Array<string>;
 
   T = T;
   UI = UI;

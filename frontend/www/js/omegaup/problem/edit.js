@@ -17,38 +17,37 @@ OmegaUp.on('ready', function() {
   const payload = JSON.parse(
     document.getElementById('problem-payload').innerText,
   );
-  let problemsNewValidator = new Vue({
+  let problemsValidator = new Vue({
     el: '#problem-validator',
     render: function(createElement) {
       return createElement('omegaup-problem-validator', {
         props: {
-          TIME_LIMIT: this.TIME_LIMIT,
-          EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
-          MEMORY_LIMIT: this.MEMORY_LIMIT,
-          OUTPUT_LIMIT: this.OUTPUT_LIMIT,
-          INPUT_LIMIT: this.INPUT_LIMIT,
-          OVERALL_WALL_TIME_LIMIT: this.OVERALL_WALL_TIME_LIMIT,
-          EXTRA_WALL_TIME: this.EXTRA_WALL_TIME,
-          VALIDATOR_TIME_LIMIT: this.VALIDATOR_TIME_LIMIT,
-          LANGUAGES: this.LANGUAGES,
-          VALID_LANGUAGES: this.VALID_LANGUAGES,
-          VALIDATOR: this.VALIDATOR,
-          VALIDATORS_TYPES: this.VALIDATORS_TYPES,
+          timeLimit: this.timeLimit,
+          extraWallTime: this.extraWallTime,
+          memoryLimit: this.memoryLimit,
+          outputLimit: this.outputLimit,
+          inputLimit: this.inputLimit,
+          overallWallTimeLimit: this.overallWallTimeLimit,
+          validatorTimeLimit: this.validatorTimeLimit,
+          languages: this.languages,
+          validLanguages: this.validLanguages,
+          validator: this.validator,
+          validatorsTypes: this.validatorsTypes,
         },
       });
     },
     data: {
-      TIME_LIMIT: payload.timeLimit,
-      MEMORY_LIMIT: payload.memoryLimit,
-      OUTPUT_LIMIT: payload.outputLimit,
-      INPUT_LIMIT: payload.inputLimit,
-      OVERALL_WALL_TIME_LIMIT: payload.overallWallTimeLimit,
-      EXTRA_WALL_TIME: payload.extraWallTime,
-      VALIDATOR_TIME_LIMIT: payload.validatorTimeLimit,
-      LANGUAGES: payload.languages,
-      VALID_LANGUAGES: payload.validLanguages,
-      VALIDATOR: payload.validator,
-      VALIDATORS_TYPES: payload.validatorsTypes,
+      timeLimit: 0,
+      extraWallTime: 0,
+      memoryLimit: 0,
+      outputLimit: 0,
+      inputLimit: 0,
+      overallWallTimeLimit: 0,
+      validatorTimeLimit: 0,
+      languages: payload.languages,
+      validLanguages: payload.validLanguages,
+      validator: payload.validator,
+      validatorsTypes: payload.validatorsTypes,
     },
     components: {
       'omegaup-problem-validator': problem_Validator,
@@ -616,9 +615,9 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemsNewValidator.LANGUAGES = languages;
+    problemsValidator.languages = languages;
     $('input[name=title]').val(problem.title);
-    problemsNewValidator.TIME_LIMIT = UI.parseDuration(
+    problemsValidator.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,
     );
 
@@ -626,22 +625,21 @@ OmegaUp.on('ready', function() {
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      problemsNewValidator.VALIDATOR_TIME_LIMIT = UI.parseDuration(
+      problemsValidator.validatorTimeLimit = UI.parseDuration(
         problem.settings.validator.custom_validator.limits.TimeLimit,
       );
     } else {
-      problemsNewValidator.VALIDATOR_TIME_LIMIT = 0;
+      problemsValidator.validatorTimeLimit = 0;
     }
-    problemsNewValidator.OVERALL_WALL_TIME_LIMIT = UI.parseDuration(
+    problemsValidator.overallWallTimeLimit = UI.parseDuration(
       problem.settings.limits.OverallWallTimeLimit,
     );
-    problemsNewValidator.EXTRA_WALL_TIME = UI.parseDuration(
+    problemsValidator.extraWallTime = UI.parseDuration(
       problem.settings.limits.ExtraWallTime,
     );
-    problemsNewValidator.MEMORY_LIMIT =
-      problem.settings.limits.MemoryLimit / 1024;
-    problemsNewValidator.OUTPUT_LIMIT = problem.settings.limits.OutputLimit;
-    problemsNewValidator.INPUT_LIMIT = problem.input_limit;
+    problemsValidator.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
+    problemsValidator.outputLimit = problem.settings.limits.OutputLimit;
+    problemsValidator.inputLimit = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -700,7 +698,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    problemsNewValidator.LANGUAGES = chosenLanguage;
+    problemsValidator.languages = chosenLanguage;
     API.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',
