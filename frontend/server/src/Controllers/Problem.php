@@ -3908,8 +3908,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             )
                                 ?: 'problemDeployerExceededZipSizeLimit',
                             [
-                                'size' => $response['size'],
-                                'max_size' => $response['max_size'],
+                                'size' => strval($response['size']),
+                                'max_size' => strval($response['max_size']),
                             ]
                         );
                     }
