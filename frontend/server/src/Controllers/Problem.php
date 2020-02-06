@@ -277,7 +277,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
         \OmegaUp\Validators::validateNumberInRange(
-            $params->input_limit,
+            $params->inputLimit,
             'input_limit',
             0,
             null,
@@ -346,14 +346,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'visibility' => $params->visibility ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'title' => $params->title,
             'visits' => 0,
-            'input_limit' => $params->input_limit,
+            'input_limit' => $params->inputLimit,
             'submissions' => 0,
             'accepted' => 0,
             'source' => $params->source,
             'order' => 'normal', /* defaulting to normal */
             'alias' => $params->problemAlias,
             'languages' => $languages,
-            'email_clarifications' => $params->email_clarifications,
+            'email_clarifications' => $params->emailClarifications,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
@@ -1124,8 +1124,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $valueProperties = [
             'visibility',
             'title',
-            'input_limit',
-            'email_clarifications',
+            'inputLimit',
+            'emailClarifications',
             'source',
             'order',
             'languages',
