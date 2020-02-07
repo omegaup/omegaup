@@ -35,25 +35,26 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-bind:class="rowClassForProblem(problem.visibility)"
-            v-for="problem in problems"
-          >
+          <tr v-for="problem in problems">
             <td>
-              <span
+              <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                problem.title
+              }}</a
+              ><span
                 v-bind:class="
-                  `glyphicon ${iconClassForProblem(problem.visibility)}`
+                  `glyphicon ${iconClassForProblem(
+                    problem.quality_seal,
+                    problem.visibility,
+                  )}`
                 "
-                v-bind:title="iconTitleForProblem(problem.visibility)"
+                v-bind:title="
+                  iconTitleForProblem(problem.quality_seal, problem.visibility)
+                "
               ></span>
               <a v-bind:href="`/arena/problem/${problem.alias}`">{{
                 problem.title
               }}</a>
-              <div
-                class="tag-list"
-                v-bind:title="`${problem.tags.map(tag =&gt; tag.name).join(' ')}`"
-                v-if="problem.tags.length"
-              >
+              <div class="tag-list" v-if="problem.tags.length">
                 <a
                   v-bind:class="`tag tag-${tag.source}`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
@@ -103,6 +104,10 @@
 <style>
 .tag {
   margin-right: 0.25em;
+}
+
+.tag-quality {
+  background: #ffeb3b;
 }
 
 .omegaup-quality-badge {
@@ -155,21 +160,17 @@ export default class ProblemList extends Vue {
     T.qualityFormDifficultyVeryHard,
   ];
 
-  rowClassForProblem(problemVisibility: number): string {
-    return problemVisibility >= 2 ? 'high-quality' : '';
-  }
-
-  iconClassForProblem(problemVisibility: number): string {
-    if (problemVisibility < 0) return 'glyphicon-ban-circle';
-    else if (problemVisibility == 0) return 'glyphicon-eye-close';
-    else if (problemVisibility >= 2) return 'omegaup-quality-badge';
+  iconClassForProblem(qualitySeal: boolean, visibility: number): string {
+    if (qualitySeal || visibility >= 2) return 'omegaup-quality-badge';
+    else if (visibility < 0) return 'glyphicon-ban-circle';
+    else if (visibility == 0) return 'glyphicon-eye-close';
     return '';
   }
 
-  iconTitleForProblem(problemVisibility: number): string {
-    if (problemVisibility < 0) return this.T.wordsBannedProblem;
-    else if (problemVisibility == 0) return this.T.wordsPrivate;
-    else if (problemVisibility >= 2) return this.T.wordsHighQualityProblem;
+  iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
+    if (qualitySeal || visibility >= 2) return this.T.wordsHighQualityProblem;
+    else if (visibility < 0) return this.T.wordsBannedProblem;
+    else if (visibility == 0) return this.T.wordsPrivate;
     return '';
   }
 
