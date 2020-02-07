@@ -220,7 +220,7 @@ class ProblemParams {
      * Update properties of $object based on what is provided in this class.
      *
      * @param object $object
-     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
+     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool, alias?: string}> $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
     public function updateValueParams(
@@ -232,6 +232,7 @@ class ProblemParams {
             /** @var null|callable(mixed):mixed */
             $transform = null;
             $important = false;
+            $fieldAlias = null;
             if (is_int($source)) {
                 $fieldName = $info;
             } else {
@@ -244,6 +245,9 @@ class ProblemParams {
                 }
                 if (isset($info['important']) && $info['important'] === true) {
                     $important = $info['important'];
+                }
+                if (!empty($info['alias'])) {
+                    $fieldAlias = strval($info['alias']);
                 }
             }
             $value = null;
@@ -264,9 +268,7 @@ class ProblemParams {
             if ($important) {
                 $importantChange |= ($value != $object->$fieldName);
             }
-            if (!is_int($source) && isset($info['alias'])) {
-                $fieldName = $info['alias'];
-            }
+            $fieldName = $fieldAlias ?: $fieldName;
             $object->$fieldName = $value;
         }
         return $importantChange;
