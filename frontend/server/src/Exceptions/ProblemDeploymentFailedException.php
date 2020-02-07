@@ -29,6 +29,10 @@ class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException 
         if (!empty($this->_context)) {
             $localizedText .= ": {$this->_context}";
         }
-        return $localizedText;
+        return \OmegaUp\ApiUtils::formatString(
+            $localizedText,
+            $this->_customMessage
+        );
+        ;
     }
 }

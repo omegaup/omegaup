@@ -13,7 +13,7 @@ abstract class ApiException extends \Exception {
     protected $header;
 
     /** @var array<string, mixed> */
-    private $_customMessage;
+    protected $_customMessage;
 
     /**
      * Builds an API exception

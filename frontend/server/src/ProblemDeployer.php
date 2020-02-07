@@ -10,7 +10,7 @@ class ProblemDeployer {
     const UPDATE_CASES = 1;
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
-    const ZIP_MAX_SIZE = '100000000';
+    const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
     /** @var \Logger */
     private $log;
 
@@ -371,11 +371,11 @@ class ProblemDeployer {
             );
             $exception->addCustomMessageToArray(
                 'size',
-                $zipFileSize
+                $zipFileSize / 1024 / 1024
             );
             $exception->addCustomMessageToArray(
                 'max_size',
-                self::ZIP_MAX_SIZE
+                self::ZIP_MAX_SIZE / 1024 / 1024
             );
             throw $exception;
         }
