@@ -2,22 +2,39 @@
   <div class="panel panel-primary problems-container">
     <div class="panel-body">
       <form class="form" v-on:submit.prevent="onSubmit">
-        <div class="form-group">
+        <div class="form-group col-md-6">
           <label>{{ T.wordsProblem }}</label>
-          <span class="label label-info">{{
-            T.selectProblemToGetVersions
-          }}</span>
           <omegaup-autocomplete
             v-bind:init="el =&gt; UI.problemTypeahead(el)"
             v-model="alias"
           ></omegaup-autocomplete>
         </div>
-        <div class="form-group">
-          <button class="btn btn-primary get-versions" type="submit">
-            {{ T.wordsGetVersions }}
-          </button>
+        <div class="form-group col-md-6">
+          <label for="use-latest-version">{{
+            T.contestAddproblemChooseVersion
+          }}</label>
+          <div class="form-control">
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="use-latest-version"
+                v-model="useLatestVersion"
+                v-bind:value="true"
+              />
+              {{ T.contestAddproblemLatestVersion }}
+            </label>
+            <label class="radio-inline">
+              <input
+                type="radio"
+                name="use-latest-version"
+                v-model="useLatestVersion"
+                v-bind:value="false"
+              />
+              {{ T.contestAddproblemOtherVersion }}
+            </label>
+          </div>
         </div>
-        <div class="form-group">
+        <div class="form-group col-md-6">
           <label>{{ T.contestAddproblemProblemPoints }}</label>
           <input
             class="form-control problem-points"
@@ -25,7 +42,7 @@
             v-model="points"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group col-md-6">
           <label>{{ T.contestAddproblemContestOrder }}</label>
           <input
             class="form-control"
@@ -35,20 +52,34 @@
             v-model="order"
           />
         </div>
+        <div class="form-group col-md-12" v-show="!useLatestVersion">
+          <button
+            class="btn btn-primary get-versions"
+            type="submit"
+            v-bind:disabled="alias == ''"
+            v-on:click.prevent="onSubmit"
+          >
+            {{ T.wordsGetVersions }}
+          </button>
+          <span class="label label-info">{{
+            T.selectProblemToGetVersions
+          }}</span>
+        </div>
         <omegaup-problem-versions
           v-bind:log="versionLog"
           v-bind:published-revision="publishedRevision"
           v-bind:show-footer="false"
           v-model="selectedRevision"
           v-on:runs-diff="onRunsDiff"
+          v-show="!useLatestVersion"
         ></omegaup-problem-versions>
       </form>
-      <div class="form-group">
+      <div class="form-group col-md-12">
         <button
           class="btn btn-primary add-problem"
           type="submit"
           v-on:click.prevent="onAddProblem"
-          v-show="selectedRevision.commit !== ''"
+          v-bind:disabled="addProblemButtonDisabled"
         >
           {{ addProblemButtonLabel }}
         </button>
@@ -131,11 +162,16 @@ export default class AddProblem extends Vue {
   problems = this.data;
   selected: omegaup.Problem = { alias: '', order: 1, points: 100, title: '' };
   versionLog: omegaup.Commit[] = [];
+  useLatestVersion = true;
   publishedRevision = emptyCommit;
   selectedRevision = emptyCommit;
 
   onSubmit(): void {
-    this.$emit('emit-change-alias', this, this.alias);
+    if (this.useLatestVersion) {
+      this.$emit('emit-change-alias', this, this.alias);
+    } else {
+      this.onAddProblem();
+    }
   }
 
   onAddProblem(): void {
@@ -174,6 +210,14 @@ export default class AddProblem extends Vue {
       }
     }
     return T.wordsAddProblem;
+  }
+
+  get addProblemButtonDisabled(): boolean {
+    if (this.useLatestVersion) {
+      return this.alias === '';
+    } else {
+      return this.selectedRevision.commit === '';
+    }
   }
 
   @Watch('problems')

@@ -947,17 +947,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         /** @var list<string> $match */
         foreach ($matches as $match) {
             if ($match[2] == 'h') {
-                $milliseconds += intval($match[1]) * 3600 * 1000;
+                $milliseconds += floatval($match[1]) * 3600 * 1000;
             } elseif ($match[2] == 'm') {
-                $milliseconds += intval($match[1]) * 60 * 1000;
+                $milliseconds += floatval($match[1]) * 60 * 1000;
             } elseif ($match[2] == 's') {
-                $milliseconds += intval($match[1]) * 1000;
+                $milliseconds += floatval($match[1]) * 1000;
             } elseif ($match[2] == 'ms') {
-                $milliseconds += intval($match[1]);
+                $milliseconds += floatval($match[1]);
             } elseif ($match[2] == 'us' || $match[2] == 'µs') {
-                $milliseconds += intval($match[1]) / 1000.0;
+                $milliseconds += floatval($match[1]) / 1000.0;
             } elseif ($match[2] == 'ns') {
-                $milliseconds += intval($match[1]) / (1000.0 * 1000.0);
+                $milliseconds += floatval($match[1]) / (1000.0 * 1000.0);
             } else {
                 throw new \Exception("Unrecognized suffix: {$match[2]}");
             }
@@ -1009,43 +1009,43 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function diffProblemSettings(array $a, array $b): bool {
         if (
-            self::parseDuration($a['limits']['TimeLimit']) !=
+            self::parseDuration($a['limits']['TimeLimit']) !==
             self::parseDuration($b['limits']['TimeLimit'])
         ) {
             return true;
         }
         if (
-            self::parseDuration($a['limits']['ExtraWallTime']) !=
+            self::parseDuration($a['limits']['ExtraWallTime']) !==
             self::parseDuration($b['limits']['ExtraWallTime'])
         ) {
             return true;
         }
         if (
-            self::parseDuration($a['limits']['OverallWallTimeLimit']) !=
+            self::parseDuration($a['limits']['OverallWallTimeLimit']) !==
             self::parseDuration($b['limits']['OverallWallTimeLimit'])
         ) {
             return true;
         }
         if (
-            self::parseSize($a['limits']['MemoryLimit']) !=
+            self::parseSize($a['limits']['MemoryLimit']) !==
             self::parseSize($b['limits']['MemoryLimit'])
         ) {
             return true;
         }
         if (
-            self::parseSize($a['limits']['OutputLimit']) !=
+            self::parseSize($a['limits']['OutputLimit']) !==
             self::parseSize($b['limits']['OutputLimit'])
         ) {
             return true;
         }
-        if ($a['validator']['name'] != $b['validator']['name']) {
+        if ($a['validator']['name'] !== $b['validator']['name']) {
             return true;
         }
-        if ($a['validator']['tolerance'] != $b['validator']['tolerance']) {
+        if ($a['validator']['tolerance'] !== $b['validator']['tolerance']) {
             return true;
         }
         if (
-            empty($a['validator']['limits']) !=
+            empty($a['validator']['limits']) !==
             empty($b['validator']['limits'])
         ) {
             return true;
@@ -1059,13 +1059,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            self::parseDuration($a['validator']['limits']['TimeLimit']) !=
+            self::parseDuration($a['validator']['limits']['TimeLimit']) !==
             self::parseDuration($b['validator']['limits']['TimeLimit'])
         ) {
             return true;
         }
         if (
-            self::parseDuration($a['validator']['limits']['ExtraWallTime']) !=
+            self::parseDuration($a['validator']['limits']['ExtraWallTime']) !==
             self::parseDuration($b['validator']['limits']['ExtraWallTime'])
         ) {
             return true;
@@ -1073,7 +1073,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (
             self::parseDuration(
                 $a['validator']['limits']['OverallWallTimeLimit']
-            ) !=
+            ) !==
             self::parseDuration(
                 $b['validator']['limits']['OverallWallTimeLimit']
             )
@@ -1081,13 +1081,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return true;
         }
         if (
-            self::parseSize($a['validator']['limits']['MemoryLimit']) !=
+            self::parseSize($a['validator']['limits']['MemoryLimit']) !==
             self::parseSize($b['validator']['limits']['MemoryLimit'])
         ) {
             return true;
         }
         if (
-            self::parseSize($a['validator']['limits']['OutputLimit']) !=
+            self::parseSize($a['validator']['limits']['OutputLimit']) !==
             self::parseSize($b['validator']['limits']['OutputLimit'])
         ) {
             return true;
@@ -1098,7 +1098,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{rejudged: bool}
      */
-    private static function updateProblem(
+    public static function updateProblem(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\ProblemParams $params,
@@ -1151,6 +1151,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $acceptsSubmissions = $problem->languages !== '';
         $updatedStatementLanguages = [];
+        $response['rejudged'] = false;
 
         try {
             //Begin transaction
@@ -1166,7 +1167,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
-            if ($operation != \OmegaUp\ProblemDeployer::UPDATE_SETTINGS || $settingsUpdated) {
+            if ($operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS || $settingsUpdated) {
                 $problemDeployer = new \OmegaUp\ProblemDeployer(
                     $problem->alias,
                     $acceptsSubmissions,
@@ -3526,7 +3527,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($params->validator)) {
             $problemSettings['validator']['name'] = "{$params->validator}";
         }
-        if ($problemSettings['validator']['name'] == 'custom') {
+        if ($problemSettings['validator']['name'] === 'custom') {
             if (empty($problemSettings['validator']['limits'])) {
                 $problemSettings['validator']['limits'] = [
                     'ExtraWallTime' => '0s',
