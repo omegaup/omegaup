@@ -1080,6 +1080,54 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testUpdateProblemInputLimitAndEmailClarifications() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create our contestant
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($problemData['author']);
+
+        // Update input_limit to verify its value changes properly
+        $newInputLimit = 10000;
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'input_limit' => $newInputLimit,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed input limit',
+            ])
+        );
+
+        // Verify data in DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+
+        $this->assertEquals($newInputLimit, $problem->input_limit);
+
+        // Update email_clarifications to verify its value changes properly
+        $newEmailClarifications = 'true';
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'email_clarifications' => $newEmailClarifications,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed email clarifications',
+            ])
+        );
+
+        // Verify data in DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+
+        $this->assertEquals($newInputLimit, $problem->email_clarifications);
+    }
+
     private function updateProblemsetProblemWithRuns(
         string $updatePublished,
         ?\OmegaUp\DAO\VO\Identities $problemAuthor = null,
