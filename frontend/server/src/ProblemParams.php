@@ -264,6 +264,9 @@ class ProblemParams {
             if ($important) {
                 $importantChange |= ($value != $object->$fieldName);
             }
+            if (!is_int($source) && isset($info['alias'])) {
+                $fieldName = $info['alias'];
+            }
             $object->$fieldName = $value;
         }
         return $importantChange;
