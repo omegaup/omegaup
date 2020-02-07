@@ -12,7 +12,7 @@ abstract class ApiException extends \Exception {
     /** @var string */
     protected $header;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, string> */
     protected $_customMessage;
 
     /**
@@ -37,7 +37,7 @@ abstract class ApiException extends \Exception {
      * @param mixed $value
      */
     final public function addCustomMessageToArray(string $key, $value): void {
-        $this->_customMessage[$key] = $value;
+        $this->_customMessage[$key] = strval($value);
     }
 
     /**

@@ -33,6 +33,5 @@ class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException 
             $localizedText,
             $this->_customMessage
         );
-        ;
     }
 }
