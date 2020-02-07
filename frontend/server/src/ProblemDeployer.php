@@ -367,15 +367,13 @@ class ProblemDeployer {
         $zipFileSize = fstat($zipFile)['size'];
         if ($zipFileSize > self::ZIP_MAX_SIZE) {
             $exception = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
-                'problemDeployerExceededZipSizeLimit'
-            );
-            $exception->addCustomMessageToArray(
-                'size',
-                $zipFileSize / 1024 / 1024
-            );
-            $exception->addCustomMessageToArray(
-                'max_size',
-                self::ZIP_MAX_SIZE / 1024 / 1024
+                'problemDeployerExceededZipSizeLimit',
+                null,
+                ['size' => strval(
+                    $zipFileSize / 1024 / 1024
+                ), 'max_size' => strval(
+                    self::ZIP_MAX_SIZE / 1024 / 1024
+                )]
             );
             throw $exception;
         }

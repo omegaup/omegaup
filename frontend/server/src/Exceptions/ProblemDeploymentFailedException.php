@@ -6,16 +6,22 @@ class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException 
     /** @var null|string|int */
     private $_context;
 
+    /** @var array<string, string> */
+    private $additionalParameters;
+
     /**
      * @param string $message
      * @param null|string|int $context
+     * @param array<string, string> $additionalParameters
      */
     public function __construct(
         $message = 'problemDeployerFailed',
-        $context = null
+        $context = null,
+        array $additionalParameters = []
     ) {
         parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412);
         $this->_context = $context;
+        $this->additionalParameters = $additionalParameters;
     }
 
     public function getErrorMessage(): string {
@@ -31,7 +37,7 @@ class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException 
         }
         return \OmegaUp\ApiUtils::formatString(
             $localizedText,
-            $this->_customMessage
+            $this->additionalParameters
         );
     }
 }

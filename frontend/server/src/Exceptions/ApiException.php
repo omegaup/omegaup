@@ -12,8 +12,8 @@ abstract class ApiException extends \Exception {
     /** @var string */
     protected $header;
 
-    /** @var array<string, string> */
-    protected $_customMessage;
+    /** @var array<string, mixed> */
+    private $_customMessage;
 
     /**
      * Builds an API exception
@@ -37,7 +37,7 @@ abstract class ApiException extends \Exception {
      * @param mixed $value
      */
     final public function addCustomMessageToArray(string $key, $value): void {
-        $this->_customMessage[$key] = strval($value);
+        $this->_customMessage[$key] = $value;
     }
 
     /**
