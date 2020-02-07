@@ -19,9 +19,9 @@
             <th class="contains-long-desc">
               {{ T.wordsTitle }}
               <div>
-                <span class="tag tag-quality">Categoría</span>
-                <span class="tag tag-owner">Etiqueta del autor</span>
-                <span class="tag tag-voted">Etiqueta de los usuarios</span>
+                <span class="tag tag-quality">{{ T.tagSourceQuality }}</span>
+                <span class="tag tag-owner">{{ T.tagSourceOwner }}</span>
+                <span class="tag tag-voted">{{ T.tagSourceVoted }}</span>
               </div>
             </th>
             <th class="numericColumn">{{ T.wordsQuality }}</th>
@@ -58,9 +58,6 @@
                   iconTitleForProblem(problem.quality_seal, problem.visibility)
                 "
               ></span>
-              <a v-bind:href="`/arena/problem/${problem.alias}`">{{
-                problem.title
-              }}</a>
               <div class="tag-list" v-if="problem.tags.length">
                 <a
                   v-bind:class="`tag tag-${tag.source}`"
