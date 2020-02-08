@@ -234,9 +234,10 @@ class ProblemParams {
             $important = false;
             $fieldAlias = null;
             if (is_int($source)) {
-                $fieldName = $info;
+                $thisFieldName = $info;
+                $objectFieldName = $info;
             } else {
-                $fieldName = $source;
+                $thisFieldName = $source;
                 if (
                     isset($info['transform']) &&
                     is_callable($info['transform'])
@@ -247,16 +248,14 @@ class ProblemParams {
                     $important = $info['important'];
                 }
                 if (!empty($info['alias'])) {
-                    $fieldAlias = strval($info['alias']);
+                    $objectFieldName = $info['alias'];
+                } else {
+                    $objectFieldName = $thisFieldName;
                 }
-            }
-            $value = null;
-            if (is_null($this->$fieldName)) {
-                continue;
             }
             // Get or calculate new value.
             /** @var null|mixed */
-            $value = $this->$fieldName;
+            $value = $this->$thisFieldName;
             if (is_null($value)) {
                 continue;
             }
@@ -266,10 +265,9 @@ class ProblemParams {
             }
             // Important property, so check if it changes.
             if ($important) {
-                $importantChange |= ($value != $object->$fieldName);
+                $importantChange |= ($value != $object->$objectFieldName);
             }
-            $fieldName = $fieldAlias ?: $fieldName;
-            $object->$fieldName = $value;
+            $object->$objectFieldName = $value;
         }
         return $importantChange;
     }

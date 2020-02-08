@@ -1093,7 +1093,7 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update input_limit to verify its value changes properly
         $newInputLimit = 10000;
-        $response = \OmegaUp\Controllers\Problem::apiUpdate(
+        \OmegaUp\Controllers\Problem::apiUpdate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'input_limit' => $newInputLimit,
@@ -1110,8 +1110,8 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($newInputLimit, $problem->input_limit);
 
         // Update email_clarifications to verify its value changes properly
-        $newEmailClarifications = 'true';
-        $response = \OmegaUp\Controllers\Problem::apiUpdate(
+        $newEmailClarifications = true;
+        \OmegaUp\Controllers\Problem::apiUpdate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'email_clarifications' => $newEmailClarifications,
@@ -1125,7 +1125,30 @@ class UpdateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['request']['problem_alias']
         );
 
-        $this->assertEquals($newInputLimit, $problem->email_clarifications);
+        $this->assertEquals(
+            $newEmailClarifications,
+            $problem->email_clarifications
+        );
+
+        $newEmailClarifications = false;
+        \OmegaUp\Controllers\Problem::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'email_clarifications' => $newEmailClarifications,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed email clarifications',
+            ])
+        );
+
+        // Verify data in DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+
+        $this->assertEquals(
+            $newEmailClarifications,
+            $problem->email_clarifications
+        );
     }
 
     private function updateProblemsetProblemWithRuns(
