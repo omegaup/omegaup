@@ -1124,8 +1124,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $valueProperties = [
             'visibility',
             'title',
-            'inputLimit',
-            'emailClarifications',
+            'inputLimit' => [
+                'alias' => 'input_limit',
+            ],
+            'emailClarifications' => [
+                'alias' => 'email_clarifications',
+            ],
             'source',
             'order',
             'languages',
