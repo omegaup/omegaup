@@ -87,6 +87,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
@@ -97,16 +99,15 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['count'],
             $firstMonthExpectedCount
         );
+        */
 
-        /**
-         * One month ago:
-         * user2 => problem0, problem1 = 2 distinct problems
-         * user0 => problem0 (the user has solved it the last month and also so it has
-         *                      been solved by user3 this month) = 0 distinct problems
-         * user1 => problem2 = 1 distinct problem
-         *
-         * Total expected count: 3
-         */
+        // One month ago:
+        // user2 => problem0, problem1 = 2 distinct problems
+        // user0 => problem0 (the user has solved it the last month and also so it has
+        //                      been solved by user3 this month) = 0 distinct problems
+        // user1 => problem2 = 1 distinct problem
+        //
+        // Total expected count: 3
         $runCreationDate = date_create($runCreationDate);
         date_add(
             $runCreationDate,
@@ -159,6 +160,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
@@ -174,14 +177,13 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $response[1]['count'],
             $secondMonthExpectedCount
         );
+        */
 
-        /**
-         * This month:
-         * user1 => problem1 (he has already solved it, doesn't count)
-         *
-         * Total expected count: 0, the month/year won't be retrieved as no distinct
-         * problems are going to be found
-         */
+        // This month:
+        // user1 => problem1 (he has already solved it, doesn't count)
+        //
+        // Total expected count: 0, the month/year won't be retrieved as no distinct
+        // problems are going to be found
         $currentMonth = intval(date_create($today)->format('m'));
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -190,11 +192,14 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
         ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // just two months (first and second)
+        */
     }
 
     /**
