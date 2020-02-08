@@ -183,7 +183,7 @@
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <MixedArgument occurrences="9">
+    <MixedArgument occurrences="7">
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
@@ -191,9 +191,7 @@
       <code>$r['group']</code>
       <code>$run</code>
       <code>$r['problem_alias']</code>
-      <code>$r['contest_alias']</code>
       <code>$run</code>
-      <code>$r['contest_alias']</code>
     </MixedArgument>
     <MixedAssignment occurrences="7">
       <code>$run</code>
