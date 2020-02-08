@@ -13,10 +13,10 @@
   <div id="problems" class="tab">
     <div id="problem" class="main">
       <h1 class="title">
+        {$title|escape}
+        {if $quality_seal || $visibility >= 2}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
         {if $visibility < 0}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
         {if $visibility == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
-        {if $visibility >= 2}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-        {$title|escape}
         {if $problem_admin}
           (<a href="/problem/{$problem_alias}/edit/">{#wordsEdit#}</a>)
         {/if}
@@ -57,6 +57,10 @@
         <iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
       {/if}
       {if $LOGGED_IN}
+      <div>
+        <div id="qualitynomination-qualityreview"></div>
+        {js_include entrypoint="qualitynomination_qualityreview"}
+      </div>
       <div>
         <script type="text/json" id="qualitynomination-reportproblem-payload">{$nomination_payload|json_encode}</script>
         <div id="qualitynomination-demotionpopup"></div>

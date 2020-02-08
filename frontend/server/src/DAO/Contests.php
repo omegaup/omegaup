@@ -18,17 +18,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     private static $getContestsColumns = '
                                 Contests.contest_id,
                                 Contests.problemset_id,
-                                title,
-                                description,
-                                finish_time as original_finish_time,
-                                UNIX_TIMESTAMP (start_time) as start_time,
-                                UNIX_TIMESTAMP (finish_time) as finish_time,
-                                admission_mode,
-                                alias,
-                                recommended,
-                                window_length,
-                                UNIX_TIMESTAMP (last_updated) as last_updated,
-                                rerun_id
+                                Contests.title,
+                                Contests.description,
+                                Contests.finish_time as original_finish_time,
+                                UNIX_TIMESTAMP(Contests.start_time) as start_time,
+                                UNIX_TIMESTAMP(Contests.finish_time) as finish_time,
+                                Contests.admission_mode,
+                                Contests.alias,
+                                Contests.recommended,
+                                Contests.window_length,
+                                UNIX_TIMESTAMP(Contests.last_updated) as last_updated,
+                                Contests.rerun_id
                                 ';
 
     final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
@@ -178,9 +178,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             // We need to get contest_id just to be able to ORDER BY it, but we
             // should not return it to users.
             unset($row['contest_id']);
-            $row['start_time'] = intval($row['start_time']);
-            $row['finish_time'] = intval($row['finish_time']);
-            $row['last_updated'] = intval($row['last_updated']);
         }
         return $result;
     }
@@ -337,48 +334,81 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $identityId,
         int $page = 1,
         int $pageSize = 1000,
+        int $active = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         ?string $query = null
     ) {
-        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
+        $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            $active
         );
-        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+        $recommendedCondition = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ALL
+        );
+        $filter = self::formatSearch($query);
+        $queryCondition = \OmegaUp\DAO\Enum\FilteredStatus::sql(
+            $filter['type']
         );
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $offset = ($page - 1) * $pageSize;
-        $filter = self::formatSearch($query);
-        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
 
         $sql = "
             SELECT
                 $columns,
-                Problemsets.scoreboard_url,
-                Problemsets.scoreboard_url_admin
+                p.scoreboard_url,
+                p.scoreboard_url_admin
             FROM
                 Contests
             INNER JOIN
-                Problemset_Identities
+                Problemsets p
             ON
-                Contests.problemset_id = Problemset_Identities.problemset_id
+                p.problemset_id = Contests.problemset_id
             INNER JOIN
-                Problemsets
+                (
+                    SELECT
+                        pi.identity_id,
+                        pi.problemset_id
+                    FROM
+                        Problemset_Identities pi
+                    UNION DISTINCT
+                    SELECT
+                        gi.identity_id,
+                        p.problemset_id
+                    FROM
+                        Problemsets p
+                    INNER JOIN
+                        Group_Roles gr
+                    ON
+                        gr.acl_id = p.acl_id AND
+                        gr.role_id = ?
+                    INNER JOIN
+                        Groups_Identities gi
+                    ON
+                        gi.group_id = gr.group_id
+                ) pi
             ON
-                Problemsets.problemset_id = Contests.problemset_id
+                pi.problemset_id = p.problemset_id AND
+                pi.identity_id = ?
             WHERE
-                Problemset_Identities.identity_id = ? AND
-                $recommended_check  AND $end_check AND $query_check
-            ORDER BY
-                recommended DESC,
-                finish_time DESC
-            LIMIT ?, ?;";
-        $params = [$identityId];
+                $recommendedCondition AND
+                $activeCondition AND
+                $queryCondition
+        ";
+        $params = [
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            $identityId,
+        ];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
+
+        $sql .= '
+            ORDER BY
+                recommended DESC,
+                finish_time DESC
+            LIMIT ?, ?;
+        ';
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
@@ -504,7 +534,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         $sql .= "
-                 UNION
+                 UNION DISTINCT
                  (
                     SELECT
                         $columns
@@ -527,7 +557,41 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         $sql .= "
-                 UNION
+                 UNION DISTINCT
+                 (
+                    SELECT
+                        $columns
+                    FROM
+                        Contests
+                    INNER JOIN
+                        Problemsets
+                    ON
+                        Problemsets.problemset_id = Contests.problemset_id
+                    INNER JOIN
+                        Group_Roles gr
+                    ON
+                        gr.acl_id = Problemsets.acl_id AND
+                        gr.role_id = ?
+                    INNER JOIN
+                        Groups_Identities gi
+                    ON
+                        gi.group_id = gr.group_id
+                    WHERE
+                        Contests.admission_mode = 'private' AND
+                        gi.identity_id = ? AND
+                        $recommended_check AND $end_check AND $query_check
+                 ) ";
+        $params[] = \OmegaUp\Authorization::CONTESTANT_ROLE;
+        $params[] = $identityId;
+        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
+        }
+
+        $sql .= "
+                 UNION DISTINCT
                  (
                      SELECT
                          $columns
@@ -557,7 +621,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         $sql .= "
-                 UNION
+                 UNION DISTINCT
                  (
                      SELECT
                          $columns
@@ -584,7 +648,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
         }
         $sql .= "
-                 UNION
+                 UNION DISTINCT
                  (
                      SELECT
                          $columns

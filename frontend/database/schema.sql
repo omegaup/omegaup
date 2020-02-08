@@ -490,6 +490,7 @@ CREATE TABLE `Problems` (
   `quality` double DEFAULT NULL,
   `quality_histogram` text COMMENT 'Valores del histograma de calidad del problema.',
   `difficulty_histogram` text COMMENT 'Valores del histograma de dificultad del problema.',
+  `quality_seal` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problem_id`),
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
