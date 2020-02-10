@@ -24,8 +24,6 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $finishDate,
         int $limit
     ): array {
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return [];
         $sql = '
             SELECT
                 s.school_id,
