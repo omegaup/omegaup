@@ -337,7 +337,7 @@ class Cache {
         /** @var null|T */
         $returnValue = $cache->get();
 
-        // If there wasn't a value in the cache for the key ($prefix, $id)
+        // If there was a value in the cache for the key ($prefix, $id)
         if (!is_null($returnValue)) {
             if (!is_null($cacheUsed)) {
                 $cacheUsed = true;
@@ -345,15 +345,62 @@ class Cache {
             return $returnValue;
         }
 
-        // Get the value from the function provided
-        /** @var T */
-        $returnValue = call_user_func($setFunc);
-        $cache->set($returnValue, $timeout);
+        // Get a lock to prevent multiple requests from trying to create the
+        // same cache entry. The name of the lockfile is derived from the
+        // prefix, not the full key, since it is still preferred to rate-limit
+        // all possible cache interactions with the same prefix, since they
+        // typically deal with pagination. That way multiple independent caches
+        // can still make progress.
+        //
+        // This is preferred over apcu_entry() because that function grabs a
+        // *global* lock that blocks evey single APCu function call!
+        $lockFile = '/tmp/omegaup-cache-' . sha1($prefix) . '.lock';
 
-        if (!is_null($cacheUsed)) {
-            $cacheUsed = false;
+        $f = fopen($lockFile, 'w');
+        try {
+            flock($f, LOCK_EX);
+
+            // Maybe by the time we acquired the lock it had already been
+            // populated by another request.
+            /** @var null|T */
+            $returnValue = $cache->get();
+            if (!is_null($returnValue)) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = true;
+                }
+                return $returnValue;
+            }
+
+            // Get the value from the function provided
+            $cache->log->info('Calling $setFunc');
+            /** @var T */
+            $returnValue = call_user_func($setFunc);
+            $cache->set($returnValue, $timeout);
+            $cache->log->info('Committed value');
+
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = false;
+            }
+            return $returnValue;
+        } finally {
+            flock($f, LOCK_UN);
+            fclose($f);
+            // By the time the code reaches this point, it might be the case
+            // that another request managed to reach the critical section and
+            // also opened the file. In that case, it could be the case that
+            // multiple requests will attempt to unlink the lock file, so it's
+            // totally okay for them to fail.
+            //
+            // Additionally, since this is performed after the call to set(),
+            // even if we somehow managed to unlink the file between the time
+            // another request checked if the cache was set and it tried to
+            // open the lockfile (thus opening a completely unrelated file that
+            // is not synchronized with the current one at all), that other
+            // request will finish acquiring the lockfile and then see that the
+            // cache value had already been set, causing no additional
+            // evaluations of $setFunc.
+            @unlink($lockFile);
         }
-        return $returnValue;
     }
 
     /**

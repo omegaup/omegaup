@@ -55,6 +55,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         int $offset,
         int $rowcount
     ): array {
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        return [];
         $sql = '
             SELECT
                 s.school_id,
@@ -111,6 +113,8 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         int $schoolId,
         int $monthsNumber
     ): array {
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        return [];
         $sql = '
         SELECT
             IFNULL(YEAR(su.time), 0) AS year,
