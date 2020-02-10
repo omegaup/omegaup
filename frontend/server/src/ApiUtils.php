@@ -135,7 +135,7 @@ class ApiUtils {
         string $format,
         array $namedArgs
     ): string {
-        /** @var mixed ,@var mixed*/
+        /** @var mixed $value*/
         foreach ($namedArgs as $key => $value) {
             $format = str_replace("%($key)", strval($value), $format);
         }
