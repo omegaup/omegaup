@@ -178,9 +178,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             // We need to get contest_id just to be able to ORDER BY it, but we
             // should not return it to users.
             unset($row['contest_id']);
-            $row['start_time'] = intval($row['start_time']);
-            $row['finish_time'] = intval($row['finish_time']);
-            $row['last_updated'] = intval($row['last_updated']);
         }
         return $result;
     }
@@ -337,10 +334,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $identityId,
         int $page = 1,
         int $pageSize = 1000,
+        int $active = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
         ?string $query = null
     ) {
-        $endCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
+        $activeCondition = \OmegaUp\DAO\Enum\ActiveStatus::sql(
+            $active
         );
         $recommendedCondition = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ALL
@@ -391,7 +389,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 pi.identity_id = ?
             WHERE
                 $recommendedCondition AND
-                $endCondition AND
+                $activeCondition AND
                 $queryCondition
         ";
         $params = [

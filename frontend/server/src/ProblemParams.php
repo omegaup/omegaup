@@ -220,7 +220,7 @@ class ProblemParams {
      * Update properties of $object based on what is provided in this class.
      *
      * @param object $object
-     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
+     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool, alias?: string}> $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
     public function updateValueParams(
@@ -232,10 +232,12 @@ class ProblemParams {
             /** @var null|callable(mixed):mixed */
             $transform = null;
             $important = false;
+            $fieldAlias = null;
             if (is_int($source)) {
-                $fieldName = $info;
+                $thisFieldName = $info;
+                $objectFieldName = $info;
             } else {
-                $fieldName = $source;
+                $thisFieldName = $source;
                 if (
                     isset($info['transform']) &&
                     is_callable($info['transform'])
@@ -245,14 +247,15 @@ class ProblemParams {
                 if (isset($info['important']) && $info['important'] === true) {
                     $important = $info['important'];
                 }
-            }
-            $value = null;
-            if (is_null($this->$fieldName)) {
-                continue;
+                if (!empty($info['alias'])) {
+                    $objectFieldName = $info['alias'];
+                } else {
+                    $objectFieldName = $thisFieldName;
+                }
             }
             // Get or calculate new value.
             /** @var null|mixed */
-            $value = $this->$fieldName;
+            $value = $this->$thisFieldName;
             if (is_null($value)) {
                 continue;
             }
@@ -262,9 +265,9 @@ class ProblemParams {
             }
             // Important property, so check if it changes.
             if ($important) {
-                $importantChange |= ($value != $object->$fieldName);
+                $importantChange |= ($value != $object->$objectFieldName);
             }
-            $object->$fieldName = $value;
+            $object->$objectFieldName = $value;
         }
         return $importantChange;
     }

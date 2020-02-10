@@ -2820,19 +2820,19 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             return ['filteredBy' => null, 'value' => null];
         }
-        if ($filteredBy == 'country') {
+        if ($filteredBy === 'country') {
             return [
                 'filteredBy' => $filteredBy,
                 'value' => $identity->country_id
             ];
         }
-        if ($filteredBy == 'state') {
+        if ($filteredBy === 'state') {
             return [
                 'filteredBy' => $filteredBy,
                 'value' => "{$identity->country_id}-{$identity->state_id}"
             ];
         }
-        if ($filteredBy == 'school') {
+        if ($filteredBy === 'school') {
             $schoolId = null;
             if (!is_null($identity->current_identity_school_id)) {
                 $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -3110,6 +3110,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
+        $response['smartyProperties']['rankTablePayload']['availableFilters'] = $availableFilters;
         return $response;
     }
 
