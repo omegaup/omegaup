@@ -589,7 +589,7 @@ const translations = {
 	problemDeployerConfigSubdirectoryMissingTarget: "El repositorio a ser publicado no tiene un destino en 'target'.",
 	problemDeployerCorruptZip: "No se pudo abrir el archivo .zip. Ya sea est\u00e1 corrupto o no se subi\u00f3 correctamente.",
 	problemDeployerEmptyStatement: "La redacci\u00f3n en \"%(file)\" est\u00e1 vac\u00eda",
-	problemDeployerExceededZipSizeLimit: "El tama\u00f1o del .zip despu\u00e9s de descomprimir (%(size)) es mayor al l\u00edmite de (%(max_size)). Rechazando.",
+	problemDeployerExceededZipSizeLimit: "El tama\u00f1o del .zip despu\u00e9s de descomprimir (%(size) MiB) es mayor al l\u00edmite de (%(max_size) MiB). Rechazando.",
 	problemDeployerFailed: "Hubo un error al instalar el problema",
 	problemDeployerIdlMissing: "Los problemas interactivos necesitan un archivo .idl",
 	problemDeployerInteractiveBadLayout: "El problema interactivo no tiene la estructura esperada.",
