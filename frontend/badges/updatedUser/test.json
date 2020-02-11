@@ -1,0 +1,56 @@
+{
+    "testType": "apicall",
+    "actions": [
+        {
+            "type": "apicalls",
+            "apicalls": [
+                {    
+                    "username": "admintest",
+                    "password": "testtesttest",
+                    "requests": [          
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_0",
+                                "email": "user_0@domain.com",
+                                "password": "test_user_0"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_1",
+                                "email": "user_1@domain.com",
+                                "password": "test_user_1"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Identity::apiUpdate",
+                            "params": {
+                                "original_username": "test_user_0",
+                                "country_id": "MX",
+                                "state_id": "GUA",
+                                "username": "test_user_0",
+                                "name": "usuario verificado",
+                                "gender": "Masculino",
+                                "school_name":"Prueba school"
+                            },
+                            "gradeResult": {
+                                "verdict": "ok"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expectedResults": [
+        "test_user_0 "
+    ]
+}

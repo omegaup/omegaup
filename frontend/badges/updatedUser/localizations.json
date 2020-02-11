@@ -1,0 +1,14 @@
+{
+    "es": {
+      "name": "Usuario actualizado",
+      "description": "El usuario ha actualizado su información."
+    },
+    "en": {
+      "name": "Updated User",
+      "description": "The user has updated their information."
+    },
+    "pt": {
+      "name": "Usuário atualizado",
+      "description": "O usuário tem atualizou suas informações."
+    }
+  }
