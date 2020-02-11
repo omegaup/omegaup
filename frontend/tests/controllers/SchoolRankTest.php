@@ -87,6 +87,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
@@ -97,6 +99,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $response[0]['count'],
             $firstMonthExpectedCount
         );
+        */
 
         // One month ago:
         // user2 => problem0, problem1 = 2 distinct problems
@@ -157,6 +160,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
@@ -172,6 +177,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $response[1]['count'],
             $secondMonthExpectedCount
         );
+        */
 
         // This month:
         // user1 => problem1 (he has already solved it, doesn't count)
@@ -186,11 +192,14 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        /*
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
             'months_count' => 3,
         ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // just two months (first and second)
+        */
     }
 
     /**
