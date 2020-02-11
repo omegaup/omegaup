@@ -30,7 +30,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     AND a.alias = ?';
         $params = [$courseId, $assignmentAlias];
 
-        /** @var array{access_mode: string, acl_id: int, assignment_id: int|null, contest_id: int|null, interview_id: int|null, languages: null|string, needs_basic_information: bool, problemset_id: int, requests_user_information: string, scoreboard_url: string, scoreboard_url_admin: string, type: string}|null */
+        /** @var array{admission_mode: string, acl_id: int, assignment_id: int|null, contest_id: int|null, interview_id: int|null, languages: null|string, needs_basic_information: bool, problemset_id: int, requests_user_information: string, scoreboard_url: string, scoreboard_url_admin: string, type: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -171,7 +171,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 ON
                     `ps`.`problemset_id` = `a`.`problemset_id`
                 WHERE
-                    course_id = ?
+                    `a`.`course_id` = ?
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 

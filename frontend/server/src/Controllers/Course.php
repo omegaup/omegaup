@@ -318,18 +318,27 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         try {
             // Create the course (and group)
-            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-                'name' => $r['name'],
-                'description' => $originalCourse->description,
-                'alias' => $r['alias'],
-                'school_id' => $originalCourse->school_id,
-                'start_time' => $r['start_time'],
-                'finish_time' => $cloneCourseFinishTime,
-                'public' => 0,
-                'show_scoreboard' => $originalCourse->show_scoreboard,
-                'needs_basic_information' => $originalCourse->needs_basic_information,
-                'requests_user_information' => $originalCourse->requests_user_information
-            ]), $r->user);
+            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(
+                new \OmegaUp\DAO\VO\Courses([
+                    'name' => $r['name'],
+                    'description' => $originalCourse->description,
+                    'alias' => $r['alias'],
+                    'school_id' => $originalCourse->school_id,
+                    'start_time' => $r['start_time'],
+                    'finish_time' => $cloneCourseFinishTime,
+                    'public' => 0,
+                    'show_scoreboard' => $originalCourse->show_scoreboard,
+                    'needs_basic_information' => $originalCourse->needs_basic_information,
+                    'requests_user_information' => $originalCourse->requests_user_information
+                ]),
+                new \OmegaUp\DAO\VO\Problemsets([
+                    'admission_mode' => 'Private',
+                    'needs_basic_information' => $originalCourse->needs_basic_information,
+                    'requests_user_information' => $originalCourse->requests_user_information,
+                    'type' => 'Course',
+                ]),
+                $r->user
+            );
 
             $assignmentsProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsAssignmentByCourseAlias(
                 $originalCourse
@@ -399,18 +408,27 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         self::validateCreate($r);
 
-        self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-            'name' => $r['name'],
-            'description' => $r['description'],
-            'alias' => $r['alias'],
-            'school_id' => $r['school_id'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'public' => $r['public'] ?: false,
-            'show_scoreboard' => $r['show_scoreboard'],
-            'needs_basic_information' => $r['needs_basic_information'],
-            'requests_user_information' => $r['requests_user_information'],
-        ]), $r->user);
+        self::createCourseAndGroup(
+            new \OmegaUp\DAO\VO\Courses([
+                'name' => $r['name'],
+                'description' => $r['description'],
+                'alias' => $r['alias'],
+                'school_id' => $r['school_id'],
+                'start_time' => $r['start_time'],
+                'finish_time' => $r['finish_time'],
+                'public' => $r['public'] ?: false,
+                'show_scoreboard' => $r['show_scoreboard'],
+                'needs_basic_information' => $r['needs_basic_information'],
+                'requests_user_information' => $r['requests_user_information'],
+            ]),
+            new \OmegaUp\DAO\VO\Problemsets([
+                'admission_mode' => 'Private',
+                'needs_basic_information' => $r['needs_basic_information'],
+                'requests_user_information' => $r['requests_user_information'],
+                'type' => 'Course',
+            ]),
+            $r->user
+        );
 
         return [
             'status' => 'ok',
@@ -422,6 +440,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function createCourseAndGroup(
         \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Problemsets $problemset,
         \OmegaUp\DAO\VO\Users $creator
     ): \OmegaUp\DAO\VO\Courses {
         if (is_null($course->alias)) {
@@ -459,6 +478,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->acl_id = $acl->acl_id;
 
             \OmegaUp\DAO\Courses::create($course);
+            $problemset->acl_id = $acl->acl_id;
+            $problemset->course_id = $course->course_id;
+            \OmegaUp\DAO\Problemsets::create($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {

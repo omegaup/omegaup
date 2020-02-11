@@ -33,7 +33,7 @@ abstract class Problemsets {
                 `Problemsets`
             SET
                 `acl_id` = ?,
-                `access_mode` = ?,
+                `admission_mode` = ?,
                 `languages` = ?,
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
@@ -42,7 +42,8 @@ abstract class Problemsets {
                 `type` = ?,
                 `contest_id` = ?,
                 `assignment_id` = ?,
-                `interview_id` = ?
+                `interview_id` = ?,
+                `course_id` = ?
             WHERE
                 (
                     `problemset_id` = ?
@@ -53,7 +54,7 @@ abstract class Problemsets {
                 null :
                 intval($Problemsets->acl_id)
             ),
-            $Problemsets->access_mode,
+            $Problemsets->admission_mode,
             $Problemsets->languages,
             intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
@@ -74,6 +75,11 @@ abstract class Problemsets {
                 is_null($Problemsets->interview_id) ?
                 null :
                 intval($Problemsets->interview_id)
+            ),
+            (
+                is_null($Problemsets->course_id) ?
+                null :
+                intval($Problemsets->course_id)
             ),
             intval($Problemsets->problemset_id),
         ];
@@ -98,7 +104,7 @@ abstract class Problemsets {
             SELECT
                 `Problemsets`.`problemset_id`,
                 `Problemsets`.`acl_id`,
-                `Problemsets`.`access_mode`,
+                `Problemsets`.`admission_mode`,
                 `Problemsets`.`languages`,
                 `Problemsets`.`needs_basic_information`,
                 `Problemsets`.`requests_user_information`,
@@ -107,7 +113,8 @@ abstract class Problemsets {
                 `Problemsets`.`type`,
                 `Problemsets`.`contest_id`,
                 `Problemsets`.`assignment_id`,
-                `Problemsets`.`interview_id`
+                `Problemsets`.`interview_id`,
+                `Problemsets`.`course_id`
             FROM
                 `Problemsets`
             WHERE
@@ -191,7 +198,7 @@ abstract class Problemsets {
             SELECT
                 `Problemsets`.`problemset_id`,
                 `Problemsets`.`acl_id`,
-                `Problemsets`.`access_mode`,
+                `Problemsets`.`admission_mode`,
                 `Problemsets`.`languages`,
                 `Problemsets`.`needs_basic_information`,
                 `Problemsets`.`requests_user_information`,
@@ -200,7 +207,8 @@ abstract class Problemsets {
                 `Problemsets`.`type`,
                 `Problemsets`.`contest_id`,
                 `Problemsets`.`assignment_id`,
-                `Problemsets`.`interview_id`
+                `Problemsets`.`interview_id`,
+                `Problemsets`.`course_id`
             FROM
                 `Problemsets`
         ';
@@ -252,7 +260,7 @@ abstract class Problemsets {
             INSERT INTO
                 Problemsets (
                     `acl_id`,
-                    `access_mode`,
+                    `admission_mode`,
                     `languages`,
                     `needs_basic_information`,
                     `requests_user_information`,
@@ -261,8 +269,10 @@ abstract class Problemsets {
                     `type`,
                     `contest_id`,
                     `assignment_id`,
-                    `interview_id`
+                    `interview_id`,
+                    `course_id`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -281,7 +291,7 @@ abstract class Problemsets {
                 null :
                 intval($Problemsets->acl_id)
             ),
-            $Problemsets->access_mode,
+            $Problemsets->admission_mode,
             $Problemsets->languages,
             intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
@@ -302,6 +312,11 @@ abstract class Problemsets {
                 is_null($Problemsets->interview_id) ?
                 null :
                 intval($Problemsets->interview_id)
+            ),
+            (
+                is_null($Problemsets->course_id) ?
+                null :
+                intval($Problemsets->course_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

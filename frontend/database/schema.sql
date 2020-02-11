@@ -641,26 +641,30 @@ CREATE TABLE `Problemset_Problems` (
 CREATE TABLE `Problemsets` (
   `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
-  `access_mode` enum('private','public','registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
+  `admission_mode` enum('private','public','registration') NOT NULL DEFAULT 'private' COMMENT 'La modalidad de acceso a este conjunto de problemas',
   `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
-  `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
-  `scoreboard_url_admin` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard de admin en problemsets',
-  `type` enum('Contest','Assignment','Interview') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
+  `scoreboard_url` varchar(30) DEFAULT NULL COMMENT 'Token para la url del scoreboard en problemsets',
+  `scoreboard_url_admin` varchar(30) DEFAULT NULL COMMENT 'Token para la url del scoreboard de admin en problemsets',
+  `type` enum('Contest','Assignment','Interview','Course') NOT NULL DEFAULT 'Contest' COMMENT 'Almacena el tipo de problemset que se ha creado',
   `contest_id` int(11) DEFAULT NULL COMMENT 'Id del concurso',
-  `assignment_id` int(11) DEFAULT NULL COMMENT 'Id del curso',
+  `assignment_id` int(11) DEFAULT NULL COMMENT 'Id de la tarea o examen del curso',
   `interview_id` int(11) DEFAULT NULL COMMENT 'Id de la entrevista',
+  `course_id` int(11) DEFAULT NULL COMMENT 'Id del curso',
   PRIMARY KEY (`problemset_id`),
   UNIQUE KEY `problemset_id` (`problemset_id`,`contest_id`,`assignment_id`,`interview_id`),
+  UNIQUE KEY `problemset_id_2` (`problemset_id`,`contest_id`,`course_id`,`assignment_id`,`interview_id`),
   KEY `acl_id` (`acl_id`),
   KEY `contest_id` (`contest_id`),
   KEY `assignment_id` (`assignment_id`),
   KEY `interview_id` (`interview_id`),
+  KEY `fk_psc_course_id` (`course_id`),
   CONSTRAINT `Problemsets_ibfk_1` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Problemsets_ibfk_2` FOREIGN KEY (`assignment_id`) REFERENCES `Assignments` (`assignment_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Problemsets_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `Interviews` (`interview_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_psc_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Conjunto de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

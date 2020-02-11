@@ -197,7 +197,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 AND p.visibility >= ?
                 AND (
                     s.problemset_id IS NULL
-                    OR ps.access_mode = "public"
+                    OR ps.admission_mode = "public"
                 )
                 AND (
                     c.contest_id IS NULL

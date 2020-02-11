@@ -18,7 +18,7 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'problemset_id' => true,
         'acl_id' => true,
-        'access_mode' => true,
+        'admission_mode' => true,
         'languages' => true,
         'needs_basic_information' => true,
         'requests_user_information' => true,
@@ -28,6 +28,7 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
         'contest_id' => true,
         'assignment_id' => true,
         'interview_id' => true,
+        'course_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -50,9 +51,9 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
                 $data['acl_id']
             );
         }
-        if (isset($data['access_mode'])) {
-            $this->access_mode = strval(
-                $data['access_mode']
+        if (isset($data['admission_mode'])) {
+            $this->admission_mode = strval(
+                $data['admission_mode']
             );
         }
         if (isset($data['languages'])) {
@@ -100,6 +101,11 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
                 $data['interview_id']
             );
         }
+        if (isset($data['course_id'])) {
+            $this->course_id = intval(
+                $data['course_id']
+            );
+        }
     }
 
     /**
@@ -123,7 +129,7 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
      *
      * @var string
      */
-    public $access_mode = 'public';
+    public $admission_mode = 'private';
 
     /**
      * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
@@ -175,7 +181,7 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
     public $contest_id = null;
 
     /**
-     * Id del curso
+     * Id de la tarea o examen del curso
      *
      * @var int|null
      */
@@ -187,4 +193,11 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $interview_id = null;
+
+    /**
+     * Id del curso
+     *
+     * @var int|null
+     */
+    public $course_id = null;
 }

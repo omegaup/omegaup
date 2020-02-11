@@ -1298,7 +1298,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
-            'access_mode' => 'private', // Virtual contest must be private
+            'admission_mode' => 'private', // Virtual contest must be private
         ]);
 
         self::createContest(
