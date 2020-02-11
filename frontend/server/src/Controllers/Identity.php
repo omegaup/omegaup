@@ -154,7 +154,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $group = self::validateGroupOwnership($r);
 
         /** @var list<array<string, string>> */
-        $identities = $r['identities'];
+        $identities = json_decode($r['identities'], true);
         /** @var array<string, bool> */
         $seenUsernames = [];
         foreach ($identities as $identity) {
