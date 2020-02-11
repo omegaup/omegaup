@@ -37,7 +37,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>
      */
     public static function getAllAssignments(
         string $alias,

@@ -1065,7 +1065,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * List course assignments
      *
-     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: null|int, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}>}
+     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, has_runs: bool, name: string, order: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListAssignments(\OmegaUp\Request $r) {
@@ -1947,7 +1947,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{course: array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
+     * @return array{payload: array{course: array{alias: string, assignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>, basic_information_required: bool, description: string, finish_time?: int|null, is_admin?: bool, name: string, public?: bool, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}, student?: string, students: list<array{name: null|string, progress: array<string, float>, username: string}>}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2146,7 +2146,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns course details common between admin & non-admin
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
+     * @return array{alias: string, assignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>, basic_information_required: bool, description: string, finish_time?: int|null, is_admin?: bool, name: string, public?: bool, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
@@ -2222,7 +2222,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all details of a given Course
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return array{alias: string, assignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>, basic_information_required: bool, description: string, finish_time?: int|null, is_admin?: bool, name: string, public?: bool, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}
      */
     public static function apiAdminDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2691,7 +2691,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given course
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return array{alias: string, assignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>, basic_information_required: bool, description: string, finish_time?: int|null, is_admin?: bool, name: string, public?: bool, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {

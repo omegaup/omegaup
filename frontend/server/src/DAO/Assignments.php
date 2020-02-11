@@ -148,7 +148,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Get the course assigments sorted by order and start_time
      *
-     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, name: string, order: int, problemset_id: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, start_time: int}>
      */
     final public static function getSortedCourseAssignments(
         int $courseId
