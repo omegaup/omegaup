@@ -10,13 +10,14 @@
 
 class IdentityFactory {
     /**
-     * @return array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[]
+     * @return array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[]|string
      */
     public static function getCsvData(
         string $file,
         string $group_alias,
-        string $password = ''
-    ): array {
+        string $password = '',
+        bool $asJson = true
+    ) {
         $row = 0;
         /** @var array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[] */
         $identities = [];
@@ -47,6 +48,9 @@ class IdentityFactory {
             ]);
         }
         fclose($handle);
+        if ($asJson) {
+            return json_encode($identities);
+        }
         return $identities;
     }
 
