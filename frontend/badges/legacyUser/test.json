@@ -3,7 +3,7 @@
   "actions": [
     {
       "type": "changeTime",
-      "time": "2011-05-01"
+      "time": "2011-01-01"
     },
     {
       "type": "apicalls",
@@ -16,8 +16,8 @@
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
                 "visibility": 1,
-                "title": "Sumas",
-                "problem_alias": "sumas",
+                "title": "BLU_Sumas_1",
+                "problem_alias": "BLU_Sumas_1",
                 "validator": "token-numeric",
                 "time_limit": 1000,
                 "validator_time_limit": 0,
@@ -59,12 +59,12 @@
             {
               "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
               "params": {
-                "problem_alias": "sumas",
+                "problem_alias": "BLU_Sumas_1",
                 "language": "py3",
                 "source": "print(sum(int(x) for x in input().strip().split()))"
               },
               "gradeResult": {
-                "verdict": "PE"
+                "verdict": "AC"
               }
             }
           ]
@@ -79,18 +79,65 @@
       "type": "apicalls",
       "apicalls": [
         {
-          "username": "test_user_1",
-          "password": "test_user_1",
+          "username": "test_user_0",
+          "password": "test_user_0",
           "requests": [
             {
-              "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Contest::apiCreate",
               "params": {
-                "problem_alias": "sumas",
-                "language": "py3",
-                "source": "print(sum(int(x) for x in input().strip().split()))"
+                "visibility": 1,
+                "title": "Prueba",
+                "alias": "prueba",
+                "description": "Concurso de prueba",
+                "start_time": "1560872590",
+                "finish_time": "1560958990",
+                "window_length": "0",
+                "scoreboard": 100,
+                "points_decay_factor": 0,
+                "partial_score": 1,
+                "submissions_gap": 1200,
+                "feedback": "yes",
+                "penalty_type": "contest_start",
+                "penalty_calc_policy": "sum",
+                "admission_mode": "private",
+                "show_scoreboard_after": "true"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changeTime",
+      "time": "2018-01-01"
+    },
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "test_user_0",
+          "password": "test_user_0",
+          "requests": [
+            {
+              "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+              "params": {
+                "visibility": 1,
+                "title": "BLU_Sumas_2",
+                "problem_alias": "BLU_Sumas_2",
+                "validator": "token-numeric",
+                "time_limit": 1000,
+                "validator_time_limit": 0,
+                "overall_wall_time_limit": 1000,
+                "extra_wall_time": 0,
+                "memory_limit": 32768,
+                "output_limit": 10240,
+                "input_limit": 10240,
+                "source": "omegaUp classics",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                "email_clarifications": 1
               },
-              "gradeResult": {
-                "verdict": "WA"
+              "files": {
+                "problem_contents": "frontend/tests/resources/testproblem.zip"
               }
             }
           ]

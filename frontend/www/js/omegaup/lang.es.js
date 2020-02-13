@@ -64,7 +64,7 @@ const translations = {
 	badge_javaExpert_name: "Usuario Experto en Java",
 	badge_karelExpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Karel.",
 	badge_karelExpert_name: "Usuario Experto en Karel",
-	badge_legacyUser_description: "El usuario realiz\u00f3 alg\u00fan env\u00edo dentro del primer a\u00f1o desde el lanzamiento de omegaUp.",
+	badge_legacyUser_description: "El usuario ha realizado alg\u00fan env\u00edo durante tres a\u00f1os seguidos.",
 	badge_legacyUser_name: "Usuario Hist\u00f3rico",
 	badge_pascalExpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Pascal.",
 	badge_pascalExpert_name: "Usuario Experto en Pascal",
