@@ -183,8 +183,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}> $identities */
-        $identities = $r['identities'];
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['identities'],
+            'identities'
+        );
+
+        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}>|null $identities */
+        $identities = json_decode($r['identities'], true);
+
+        if (!is_array($identities)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
         /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
         foreach ($identities as $identity) {

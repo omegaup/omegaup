@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
         on: {
           'bulk-identities': function(identities) {
             API.Identity.bulkCreate({
-              identities: identities,
+              identities: JSON.stringify(identities),
               group_alias: groupAlias,
             })
               .then(function(data) {
