@@ -153,8 +153,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
         );
         $group = self::validateGroupOwnership($r);
 
-        /** @var list<array<string, string>> */
-        $identities = $r['identities'];
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['identities'],
+            'identities'
+        );
+
+        /** @var list<array<string, string>>|null $identities */
+        $identities = json_decode($r['identities'], true);
+
+        if (!is_array($identities)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
         /** @var array<string, bool> */
         $seenUsernames = [];
         foreach ($identities as $identity) {
