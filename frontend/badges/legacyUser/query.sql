@@ -1,6 +1,5 @@
 SELECT
- `u`.`user_id`,
- `u`.`user_id` AS 'id'
+    `u`.`user_id`
 FROM
     `Users` AS `u`
 GROUP BY
@@ -17,11 +16,11 @@ INNER JOIN
 INNER JOIN
     `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id`
+    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
 WHERE
     `r`.`verdict` = "AC" AND
     YEAR(`s`.`time`) = YEAR(NOW())
-    AND `u`.`user_id` = id
+    AND `u2`.`user_id` = `u`.`user_id`
  ) >= 1 OR
 (SELECT
     COUNT(DISTINCT `p`.`problem_id`)
@@ -30,10 +29,10 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
 WHERE
-`u`.`user_id` = id AND
-YEAR(`p`.`creation_date`) = YEAR(NOW())) >= 1 OR
+	`u2`.`user_id` = `u`.`user_id` AND
+	YEAR(`p`.`creation_date`) = YEAR(NOW())) >= 1 OR
 (SELECT
     COUNT(DISTINCT `c`.`contest_id`)
 FROM
@@ -41,8 +40,8 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id`=`c`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
-WHERE `u`.`user_id`=id AND
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
+WHERE `u2`.`user_id`=`u`.`user_id` AND
     YEAR(`c`.`last_updated`) = YEAR(NOW())) AND (SELECT
     COUNT(DISTINCT `p`.`problem_id`)
 FROM
@@ -54,11 +53,11 @@ INNER JOIN
 INNER JOIN
     `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id`
+    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
 WHERE
     (`r`.`verdict`= "AC" ) AND
     YEAR(`s`.`time`) = YEAR(NOW())-1
-    AND `u`.`user_id` = id
+    AND `u2`.`user_id` = `u`.`user_id`
  )>=1 OR
  (SELECT
     COUNT(DISTINCT `p`.`problem_id`)
@@ -67,9 +66,9 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
 WHERE
-    `u`.`user_id` = id AND
+    `u2`.`user_id` = `u`.`user_id` AND
     YEAR(`p`.`creation_date`) = YEAR(NOW())-1) >= 1 OR
 (SELECT
     COUNT(DISTINCT `c`.`contest_id`)
@@ -78,8 +77,8 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
-    where `u`.`user_id` = id AND
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
+    where `u2`.`user_id` = `u`.`user_id` AND
     YEAR(`c`.`last_updated`) = YEAR(NOW())-1) AND
 (SELECT
     COUNT(DISTINCT `p`.`problem_id`)
@@ -92,11 +91,11 @@ INNER JOIN
 INNER JOIN
     `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`main_identity_id` = `i`.`identity_id`
+    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
 WHERE
     (`r`.`verdict`= "AC" ) AND
     YEAR(`s`.`time`) = YEAR(NOW())-2
-    AND `u`.`user_id` = id
+    AND `u2`.`user_id` = `u`.`user_id`
  )>=1 OR
  (SELECT
     COUNT(DISTINCT `p`.`problem_id`)
@@ -105,8 +104,8 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
-where `u`.`user_id` = id AND
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
+where `u2`.`user_id` = `u`.`user_id` AND
 YEAR(`p`.`creation_date`) = YEAR(NOW())-2) >= 1 OR
 (SELECT
     COUNT(DISTINCT `c`.`contest_id`)
@@ -115,6 +114,6 @@ FROM
 INNER JOIN
 	`ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id`
 INNER JOIN
-    `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
-    where `u`.`user_id` = id AND
+    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
+    where `u2`.`user_id` = `u`.`user_id` AND
     YEAR(`c`.`last_updated`) = YEAR(NOW())-2 >=1 );
