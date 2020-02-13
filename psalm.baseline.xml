@@ -141,9 +141,7 @@
     </TypeDoesNotContainNull>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MixedArgument occurrences="3">
-      <code>$r['username']</code>
-    </MixedArgument>
+    <MixedArgument occurrences="2"/>
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$langCode</code>
     </MixedArgumentTypeCoercion>

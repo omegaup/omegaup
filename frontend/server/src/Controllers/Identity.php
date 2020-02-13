@@ -76,6 +76,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         $group = self::validateGroupOwnership($r);
+        if (is_null($group->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['name'],
+            'name'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password'],
+            'password'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['gender'],
+            'gender'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['school_name'],
+            'school_name'
+        );
 
         // Save objects into DB
         try {
@@ -89,13 +114,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
             $stateId = is_null($r['state_id']) ? null : strval($r['state_id']);
             $identity = self::createIdentity(
-                strval($r['username']),
-                strval($r['name']),
-                strval($r['password']),
+                $r['username'],
+                $r['name'],
+                $r['password'],
                 $countryId,
                 $stateId,
-                strval($r['gender']),
-                strval($r['group_alias'])
+                $r['gender'],
+                $group->alias
             );
 
             $state = null;
@@ -106,7 +131,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
             }
             $schoolId = \OmegaUp\Controllers\School::createSchool(
-                trim(strval($r['school_name'])),
+                trim($r['school_name']),
                 $state
             );
 
@@ -152,10 +177,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         $group = self::validateGroupOwnership($r);
+        if (is_null($group->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
 
-        /** @var list<array<string, string>> */
+        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}> $identities */
         $identities = $r['identities'];
-        /** @var array<string, bool> */
+        /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
         foreach ($identities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
@@ -183,13 +213,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $identity['state_id']
                 );
                 $newIdentity = self::createIdentity(
-                    strval($identity['username']),
-                    strval($identity['name']),
-                    strval($identity['password']),
+                    $identity['username'],
+                    $identity['name'],
+                    $identity['password'],
                     $countryId,
                     $stateId,
-                    strval($identity['gender']),
-                    strval($r['group_alias'])
+                    $identity['gender'],
+                    $group->alias
                 );
 
                 $state = null;
@@ -200,7 +230,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $schoolId = \OmegaUp\Controllers\School::createSchool(
-                    trim(strval($identity['school_name'])),
+                    trim($identity['school_name']),
                     $state
                 );
 
@@ -335,11 +365,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         self::validateUpdateRequest($r);
-        $originalIdentity = self::resolveIdentity(
-            strval(
-                $r['original_username']
-            )
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['original_username'],
+            'original_username'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['name'],
+            'name'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['gender'],
+            'gender'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group_alias'],
+            'group_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['school_name'],
+            'school_name'
+        );
+
+        $originalIdentity = self::resolveIdentity($r['original_username']);
 
         $originalSchoolId = null;
         if (!is_null($originalIdentity->current_identity_school_id)) {
@@ -361,19 +412,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $identity = self::updateIdentity(
             $r['username'],
-            strval($r['name']),
+            $r['name'],
             $state,
-            strval($r['gender']),
-            strval($r['group_alias']),
+            $r['gender'],
+            $r['group_alias'],
             $originalIdentity
         );
 
         $identity->identity_id = $originalIdentity->identity_id;
 
         $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                strval($r['school_name'])
-            ),
+            trim($r['school_name']),
             $state
         );
 
@@ -410,12 +459,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
             \OmegaUp\Experiments::IDENTITIES
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password'],
+            'password'
+        );
         self::validateUpdateRequest($r);
-        $identity = self::resolveIdentity(strval($r['username']));
+        $identity = self::resolveIdentity($r['username']);
 
-        \OmegaUp\SecurityTools::testStrongPassword(strval($r['password']));
+        \OmegaUp\SecurityTools::testStrongPassword($r['password']);
         $identity->password = \OmegaUp\SecurityTools::hashString(
-            strval($r['password'])
+            $r['password']
         );
 
         // Save object into DB
@@ -445,8 +502,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group_alias'],
+            'group_alias'
+        );
         \OmegaUp\Controllers\Group::validateGroup(
-            strval($r['group_alias']),
+            $r['group_alias'],
             $r->identity
         );
         if (
