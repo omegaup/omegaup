@@ -29,7 +29,7 @@
 				</div>
 				<p class="text-center top-margin">{#frontPageJoinCourse#}</p>
 				<div class="text-center">
-					<a href="/course/Curso-OMI" class="btn btn-primary btn-lg">{#frontPageJoinCourseButton#}</a>
+					<a href="/course/introduccion_a_cpp/" class="btn btn-primary btn-lg">{#frontPageJoinCourseButton#}</a>
 				</div>
 			</div>
 		</div>
