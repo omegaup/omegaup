@@ -32,7 +32,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$name];
 
         $result = [];
-        /** @var array{country_id: null|string, name: string, rank: int|null, rank_in_the_month: int, school_id: int, score: float, state_id: null|string} $row */
+        /** @var array{country_id: null|string, name: string, rank: int|null, rank_in_the_month: int|null, school_id: int, score: float, state_id: null|string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
