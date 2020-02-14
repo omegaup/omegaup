@@ -1249,6 +1249,7 @@ const translations = {
 	wordsTitle: "Title",
 	wordsTopics: "Topics",
 	wordsTotal: "Total",
+	wordsTotalRuns: "Total Submissions",
 	wordsTotalVotes: "total votes",
 	wordsUnimplemented: "This feature has not been implemented yet :(",
 	wordsUnlimitedDuration: "Unlimited duration",

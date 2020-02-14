@@ -105,6 +105,7 @@
 
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
+			{js_include entrypoint="common_runs_chart" async}
 		</div>
 	</div>
 </div>
