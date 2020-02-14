@@ -3818,7 +3818,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_SUCCESS: null|string}
+     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
