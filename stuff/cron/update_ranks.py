@@ -3,10 +3,12 @@
 '''Updates the user ranking.'''
 
 import argparse
+import datetime
 import logging
 import os
 import sys
 from typing import Sequence, NamedTuple
+from dateutil.relativedelta import relativedelta
 
 import MySQLdb
 import MySQLdb.cursors
@@ -243,6 +245,100 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                     (row['score'], rank, row['school_id']))
 
 
+def update_school_of_the_month_candidates(
+        cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the list of candidates to school of the current month'''
+
+    logging.info('Updating the candidates to school of the month...')
+    cur.execute(
+        '''
+        UPDATE
+            `Schools` as s
+        SET
+            s.`rank_in_the_month` = NULL;''')
+
+    today = datetime.date.today()
+    first_day_of_current_month = today.replace(day=1)
+    first_day_of_last_month = (
+        first_day_of_current_month - relativedelta(months=1))
+    cur.execute(
+        '''
+        SELECT
+                s.school_id,
+                IFNULL(
+                    SUM(
+                        ROUND(
+                            100 / LOG(2, distinct_school_problems.accepted+1),
+                            0
+                        )
+                    ),
+                    0.0
+                ) AS score
+            FROM
+                Schools s
+            INNER JOIN
+                (
+                    SELECT
+                        su.school_id,
+                        p.accepted,
+                        MIN(su.time) AS first_ac_time
+                    FROM
+                        Submissions su
+                    INNER JOIN
+                        Runs r ON r.run_id = su.current_run_id
+                    INNER JOIN
+                        Problems p ON p.problem_id = su.problem_id
+                    WHERE
+                        r.verdict = "AC"
+                        AND p.visibility >= 1
+                        AND su.school_id IS NOT NULL
+                    GROUP BY
+                        su.school_id,
+                        su.problem_id
+                    HAVING
+                        first_ac_time BETWEEN %s AND %s
+                ) AS distinct_school_problems
+            ON
+                distinct_school_problems.school_id = s.school_id
+            WHERE
+                NOT EXISTS (
+                    SELECT
+                        sotm.school_id,
+                        MAX(time) latest_time
+                    FROM
+                        School_Of_The_Month as sotm
+                    WHERE
+                        sotm.school_id = s.school_id
+                        AND (sotm.selected_by IS NOT NULL OR sotm.rank = 1)
+                    GROUP BY
+                        sotm.school_id
+                    HAVING
+                        DATE_ADD(latest_time, INTERVAL 1 YEAR) >= %s
+                )
+            GROUP BY
+                s.school_id
+            ORDER BY
+                score DESC
+            LIMIT 100;
+        ''',
+        (
+            first_day_of_last_month,
+            first_day_of_current_month,
+            first_day_of_current_month
+        ))
+
+    for index, row in enumerate(cur):
+        cur.execute('''
+                        UPDATE
+                            Schools as s
+                        SET
+                            s.rank_in_the_month = %s
+                        WHERE
+                            s.school_id = %s;
+                    ''',
+                    (index + 1, row['school_id']))
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
@@ -271,6 +367,14 @@ def main() -> None:
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update school ranking')
+                raise
+
+            try:
+                update_school_of_the_month_candidates(cur)
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to school of the month')
                 raise
     finally:
         dbconn.close()
