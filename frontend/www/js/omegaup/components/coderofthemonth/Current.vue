@@ -20,7 +20,7 @@
         </div>
         <div>{{ name }}</div>
         <div>{{ school }}</div>
-        <div v-if="state && country !== 'xx">{{ state }}, {{ country }}</div>
+        <div v-if="state && country !== 'xx'">{{ state }}, {{ country }}</div>
       </div>
     </div>
     <div class="panel-body">
@@ -39,7 +39,7 @@ import countryFlag from '../CountryFlag.vue';
     'omegaup-country-flag': countryFlag,
   },
 })
-export default class CoderOfTheMonthIndex extends Vue {
+export default class Current extends Vue {
   @Prop() username!: string;
   @Prop() name!: string;
   @Prop() country!: string;
@@ -51,7 +51,7 @@ export default class CoderOfTheMonthIndex extends Vue {
   T = T;
 
   get profileLink(): string {
-    return `/profile/${username}/`;
+    return `/profile/${this.username}/`;
   }
 }
 </script>

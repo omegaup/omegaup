@@ -18,7 +18,7 @@
       </div>
       <p class="text-center top-margin">{{ T.frontPageJoinCourse }}</p>
       <div class="text-center">
-        <a href="/course/Curso-OMI" class="btn btn-primary btn-lg">{{
+        <a href="/course/introduccion_a_cpp" class="btn btn-primary btn-lg">{{
           T.frontPageJoinCourseButton
         }}</a>
       </div>
