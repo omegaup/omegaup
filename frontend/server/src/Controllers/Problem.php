@@ -3843,14 +3843,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         if ($r['request'] === 'submit') {
-            self::updateProblem(
-                $r->identity,
-                $r->user,
-                $problemParams,
-                strval($r['message']),
-                $problemParams->updatePublished,
-                boolval($r['redirect'])
-            );
+            try {
+                self::updateProblem(
+                    $r->identity,
+                    $r->user,
+                    $problemParams,
+                    strval($r['message']),
+                    $problemParams->updatePublished,
+                    boolval($r['redirect'])
+                );
+            } catch (\OmegaUp\Exceptions\ApiException $e) {
+                /** @var array{error?: string} */
+                $response = $e->asResponseArray();
+                if (empty($response['error'])) {
+                    $statusError = '{error}';
+                } else {
+                    $statusError = $response['error'];
+                }
+                return [
+                    'IS_UPDATE' => true,
+                    'LOAD_MATHJAX' => true,
+                    'LOAD_PAGEDOWN' => true,
+                    'STATUS_ERROR' => $statusError,
+                ];
+            }
         } elseif ($r['request'] === 'markdown') {
             [
                 'problem' => $problem,
