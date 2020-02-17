@@ -9,14 +9,11 @@
  */
 
 class IdentityFactory {
-    /**
-     * @return array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[]
-     */
     public static function getCsvData(
         string $file,
         string $group_alias,
         string $password = ''
-    ): array {
+    ): string {
         $row = 0;
         /** @var array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[] */
         $identities = [];
@@ -47,7 +44,8 @@ class IdentityFactory {
             ]);
         }
         fclose($handle);
-        return $identities;
+
+        return json_encode($identities);
     }
 
     public static function createIdentitiesFromAGroup(
