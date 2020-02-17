@@ -105,6 +105,7 @@
 
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
+            <script type="text/json" id="runs-chart-payload">{$runsChartPayload|json_encode}</script>
 			{js_include entrypoint="common_runs_chart" async}
 		</div>
 	</div>

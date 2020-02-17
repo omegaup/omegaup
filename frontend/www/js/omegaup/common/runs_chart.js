@@ -3,7 +3,15 @@ import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  let commonRunsChart = new Vue({
+  const payload = JSON.parse(
+    document.getElementById('runs-chart-payload').innerText,
+  );
+
+  if (payload.total.length === 0) return;
+
+  const minY = payload.total[0] - payload.total[0] / 2.0;
+
+  const commonRunsChart = new Vue({
     el: '#runs-chart',
     render: function(createElement) {
       return createElement('omegaup-common-runschart', {
@@ -13,41 +21,18 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      chartOptions: {},
-    },
-    components: {
-      'omegaup-common-runschart': common_RunsChart,
-    },
-  });
-
-  API.Run.counts()
-    .then(series => {
-      if (series.total.length === 0) return;
-
-      let dataInSeries = [];
-      let acInSeries = [];
-      for (let i in series.total) {
-        if (series.total.hasOwnProperty(i)) {
-          dataInSeries.push(parseInt(series.total[i]));
-        }
-        if (series.ac.hasOwnProperty(i)) {
-          acInSeries.push(parseInt(series.ac[i]));
-        }
-      }
-
-      let minDate = new Date();
-      minDate.setDate(minDate.getDate() - 30 * 3);
-
-      let minY = dataInSeries[0] - dataInSeries[0] * 0.5;
-
-      commonRunsChart.chartOptions = {
+      chartOptions: {
         chart: {
           type: 'area',
           height: 300,
           spacingTop: 20,
         },
         title: { text: T.wordsTotalRuns },
-        xAxis: { type: 'datetime', title: { text: null } },
+        xAxis: {
+          type: 'datetime',
+          title: { text: null },
+          categories: payload.date.reverse(),
+        },
         yAxis: { title: { text: T.wordsRuns }, min: minY },
         legend: { enabled: false },
         plotOptions: {
@@ -63,9 +48,7 @@ OmegaUp.on('ready', function() {
           {
             type: 'area',
             name: T.wordsRuns,
-            pointInterval: 24 * 3600 * 1000,
-            pointStart: minDate.getTime(),
-            data: dataInSeries.reverse(),
+            data: payload.total.reverse(),
             fillColor: {
               linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
               stops: [
@@ -80,7 +63,10 @@ OmegaUp.on('ready', function() {
             },
           },
         ],
-      };
-    })
-    .fail(UI.apiError);
+      },
+    },
+    components: {
+      'omegaup-common-runschart': common_RunsChart,
+    },
+  });
 });
