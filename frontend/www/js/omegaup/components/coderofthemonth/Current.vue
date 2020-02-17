@@ -6,15 +6,17 @@
     <div class="panel-body">
       <div class="rss_element">
         <h4 class="text-center">
-          <a v-bind:href="profileLink">
-            {{ username }}
-          </a>
+          <omegaup-user-username
+            v-bind:classname="classname"
+            v-bind:linkify="true"
+            v-bind:username="username"
+          ></omegaup-user-username>
           <omegaup-country-flag
             v-bind:country="country_id"
           ></omegaup-country-flag>
         </h4>
         <div class="text-center">
-          <a v-bind:href="profileLink">
+          <a v-bind:href="`/profile/${username}/`">
             <img v-bind:src="gravatar_92" />
           </a>
         </div>
@@ -33,14 +35,17 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import countryFlag from '../CountryFlag.vue';
+import user_Username from '../user/Username.vue';
 
 @Component({
   components: {
     'omegaup-country-flag': countryFlag,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Current extends Vue {
   @Prop() username!: string;
+  @Prop() classname!: string;
   @Prop() name!: string;
   @Prop() country!: string;
   @Prop() country_id!: string;
@@ -49,9 +54,5 @@ export default class Current extends Vue {
   @Prop() gravatar_92!: string;
 
   T = T;
-
-  get profileLink(): string {
-    return `/profile/${this.username}/`;
-  }
 }
 </script>

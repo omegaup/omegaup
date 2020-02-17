@@ -8,7 +8,7 @@
       v-for="(contest, index) in contests"
       v-if="index < 10"
     >
-      <a class="list-group-item" v-bind:href="contestLink(contest.alias)">{{
+      <a class="list-group-item" v-bind:href="`/arena/${contest.alias}/`">{{
         contest.title
       }}</a>
     </ul>
@@ -25,9 +25,5 @@ export default class Upcoming extends Vue {
   @Prop() contests!: omegaup.Contest[];
 
   T = T;
-
-  contestLink(alias: string): string {
-    return `/arena/${alias}/`;
-  }
 }
 </script>
