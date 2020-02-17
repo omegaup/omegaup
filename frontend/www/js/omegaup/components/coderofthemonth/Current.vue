@@ -10,10 +10,8 @@
             v-bind:classname="classname"
             v-bind:linkify="true"
             v-bind:username="username"
-          ></omegaup-user-username>
-          <omegaup-country-flag
             v-bind:country="country_id"
-          ></omegaup-country-flag>
+          ></omegaup-user-username>
         </h4>
         <div class="text-center">
           <a v-bind:href="`/profile/${username}/`">
@@ -34,12 +32,10 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
-import countryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 
 @Component({
   components: {
-    'omegaup-country-flag': countryFlag,
     'omegaup-user-username': user_Username,
   },
 })
