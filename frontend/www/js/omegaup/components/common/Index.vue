@@ -38,7 +38,7 @@
           <omegaup-common-social-media
             v-if="enableSocialMediaResources"
           ></omegaup-common-social-media>
-          <omegaup-coder-of-the-month-current
+          <omegaup-coder-of-the-month
             v-if="coderOfTheMonth"
             v-bind:username="coderOfTheMonth.username"
             v-bind:classname="coderOfTheMonth.classname"
@@ -48,7 +48,7 @@
             v-bind:state="coderOfTheMonth.state"
             v-bind:gravatar_92="coderOfTheMonth.gravatar_92"
             v-bind:school="coderOfTheMonth.school"
-          ></omegaup-coder-of-the-month-current>
+          ></omegaup-coder-of-the-month>
           <omegaup-common-recomended-material></omegaup-common-recomended-material>
           <omegaup-contest-upcoming
             v-bind:contests="upcomingContests"
