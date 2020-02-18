@@ -13,7 +13,6 @@
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
     const ADMISSION_MODE_PUBLIC = 'public';
-    const ADMISSION_MODE_REGISTRATION = 'registration';
     const ADMISSION_MODE_PRIVATE = 'private';
 
     /**
@@ -233,7 +232,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admission_mode',
             [
                 self::ADMISSION_MODE_PUBLIC,
-                self::ADMISSION_MODE_REGISTRATION,
                 self::ADMISSION_MODE_PRIVATE,
             ]
         );
@@ -410,6 +408,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
+        if (isset($r['public'])) {
+            $r['admission_mode'] = boolval(
+                $r['public']
+            ) ? self::ADMISSION_MODE_PUBLIC : self::ADMISSION_MODE_PRIVATE;
+        }
         self::validateCreate($r);
 
         self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([

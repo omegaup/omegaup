@@ -593,7 +593,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Updating admission_mode for Courses, testing all the diferent modes to
-     * join a course: Public, Prvate, With registration
+     * join a course: Public, Private
      */
     public function testUpdateCourseAdmissionMode() {
         $adminLogin = self::login(self::$curatorIdentity);
@@ -632,21 +632,6 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $course->admission_mode,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
-        );
-
-        // Now should update to registration the admission mode
-        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $alias,
-            'name' => $course->name,
-            'description' => $course->description,
-            'alias' => $course->alias,
-            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
-        ]));
-        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
-        $this->assertEquals(
-            $course->admission_mode,
-            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION
         );
     }
 }
