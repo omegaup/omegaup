@@ -1,6 +1,6 @@
 import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
-import coder_of_the_month from '../components/coderofthemonth/CoderOfTheMonth.vue';
+import coder_of_the_month from '../components/coderofthemonth/CoderOfTheMonthList.vue';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);

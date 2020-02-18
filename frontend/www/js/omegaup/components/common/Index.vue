@@ -73,7 +73,7 @@ import common_SocialMedia from './SocialMedia.vue';
 import common_RecomendedMaterial from './RecomendedMaterial.vue';
 import contest_Upcoming from '../contest/Upcoming.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
-import coderofthemonth_Current from '../coderofthemonth/Current.vue';
+import coderofthemonth from '../coderofthemonth/CoderOfTheMonth.vue';
 import rankTable from '../RankTable.vue';
 import schools_Rank from '../schools/Rank.vue';
 
@@ -84,7 +84,7 @@ import schools_Rank from '../schools/Rank.vue';
     'omegaup-common-recomended-material': common_RecomendedMaterial,
     'omegaup-contest-upcoming': contest_Upcoming,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
-    'omegaup-coder-of-the-month-current': coderofthemonth_Current,
+    'omegaup-coder-of-the-month': coderofthemonth,
     'omegaup-rank-table': rankTable,
     'omegaup-schools-rank': schools_Rank,
   },
