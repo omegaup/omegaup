@@ -102,7 +102,7 @@ import country_Flag from '../CountryFlag.vue';
     'omegaup-countryflag': country_Flag,
   },
 })
-export default class CoderOfTheMonth extends Vue {
+export default class CoderOfTheMonthList extends Vue {
   @Prop() codersOfCurrentMonth!: omegaup.CoderOfTheMonth[];
   @Prop() codersOfPreviousMonth!: omegaup.CoderOfTheMonth[];
   @Prop() candidatesToCoderOfTheMonth!: omegaup.CoderOfTheMonth[];
