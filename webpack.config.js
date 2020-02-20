@@ -32,6 +32,7 @@ let config = [
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
       common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.js',
+      common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:

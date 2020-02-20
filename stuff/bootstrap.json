@@ -130,7 +130,7 @@
 					"description": "Curso de prueba",
 					"start_time": "$NOW$",
 					"finish_time": "$NOW$+18000",
-					"public": 0,
+					"admission_mode": "private",
 					"school_id": 1,
 					"needs_basic_information": 0,
 					"requests_user_information": "required"

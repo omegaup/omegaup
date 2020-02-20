@@ -130,22 +130,24 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
-        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $userLogin->auth_token,
-            'alias' => $courseData['course_alias']
-        ]));
+        $response = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ])
+        );
     }
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

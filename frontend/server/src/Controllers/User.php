@@ -3116,7 +3116,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}, runsChartPayload: array{date: list<string>, total: list<int>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3150,6 +3150,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] : [],
                     'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
                 ],
+                'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
             ],
             'template' => 'index.tpl',
         ];
