@@ -1253,6 +1253,7 @@ const translations = {
 	wordsTitle: "T\u00edtulo",
 	wordsTopics: "Temas",
 	wordsTotal: "Total",
+	wordsTotalRuns: "Total de execu\u00e7\u00f5es",
 	wordsTotalVotes: "votos totais",
 	wordsUnimplemented: "Este recurso ainda n\u00e3o foi implementado :(",
 	wordsUnlimitedDuration: "Dura\u00e7\u00e3o ilimitada",

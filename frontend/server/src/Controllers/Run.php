@@ -1130,6 +1130,37 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get total of runs have been submitted last 3 months.
+     *
+     * @return array{date: list<string>, total: list<int>}
+     */
+    public static function getCounts() {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::RUN_TOTAL_COUNTS,
+            '',
+            function () {
+                $result = [];
+                $result['date'] = [];
+                $result['total'] = [];
+                $runCounts = \OmegaUp\DAO\RunCounts::getAll(
+                    1,
+                    90,
+                    'date',
+                    'DESC'
+                );
+
+                foreach ($runCounts as $runCount) {
+                    $result['date'][] = strval($runCount->date);
+                    $result['total'][] = intval($runCount->total);
+                }
+
+                return $result;
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
+    }
+
+    /**
      * Validator for List API
      *
      * @return array{problem: null|\OmegaUp\DAO\VO\Problems, identity: null|\OmegaUp\DAO\VO\Identities}
