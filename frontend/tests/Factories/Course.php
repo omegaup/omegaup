@@ -9,16 +9,16 @@ class Course {
     public static function createCourse(
         \OmegaUp\DAO\VO\Identities $admin = null,
         \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
-        bool $public = false,
+        string $admissionMode = \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
         ?int $courseDuration = 120
     ): array {
         if (is_null($admin)) {
-            ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         }
-        if ($public != false) {
+        if ($admissionMode === \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC) {
             $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
@@ -48,7 +48,7 @@ class Course {
             'finish_time' => !is_null(
                 $courseDuration
             ) ? \OmegaUp\Time::get() + $courseDuration : null,
-            'public' => $public,
+            'admission_mode' => $admissionMode,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
         ]);
@@ -68,7 +68,7 @@ class Course {
     public static function createCourseWithOneAssignment(
         \OmegaUp\DAO\VO\Identities $admin = null,
         \OmegaUp\Test\ScopedLoginToken $adminLogin = null,
-        bool $public = false,
+        string $admissionMode = \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
         int $startTimeDelay = 0,
@@ -84,7 +84,7 @@ class Course {
         $courseFactoryResult = self::createCourse(
             $admin,
             $adminLogin,
-            $public,
+            $admissionMode,
             $requestsUserInformation,
             $showScoreboard,
             $courseDuration
