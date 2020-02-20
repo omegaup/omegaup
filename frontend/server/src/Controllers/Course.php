@@ -13,6 +13,7 @@
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
     const ADMISSION_MODE_PUBLIC = 'public';
+    const ADMISSION_MODE_REGISTRATION = 'registration';
     const ADMISSION_MODE_PRIVATE = 'private';
 
     /**
@@ -232,6 +233,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admission_mode',
             [
                 self::ADMISSION_MODE_PUBLIC,
+                self::ADMISSION_MODE_REGISTRATION,
                 self::ADMISSION_MODE_PRIVATE,
             ]
         );
