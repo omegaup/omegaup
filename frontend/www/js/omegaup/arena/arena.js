@@ -1605,6 +1605,11 @@ export class Arena {
           }
           self.qualityNominationForm = new Vue({
             el: '#qualitynomination-popup',
+            mounted: function() {
+              if (typeof ga == 'function') {
+                ga('send', 'event', 'quality-nomination', 'shown');
+              }
+            },
             render: function(createElement) {
               return createElement('qualitynomination-popup', {
                 props: {
@@ -1633,7 +1638,13 @@ export class Arena {
                       problem_alias: qualityPayload.problem_alias,
                       nomination: 'suggestion',
                       contents: JSON.stringify(contents),
-                    }).fail(UI.apiError);
+                    })
+                      .then(() => {
+                        if (typeof ga == 'function') {
+                          ga('send', 'event', 'quality-nomination', 'submit');
+                        }
+                      })
+                      .fail(UI.apiError);
                   },
                   dismiss: function(ev) {
                     const contents = {
@@ -1646,6 +1657,9 @@ export class Arena {
                     })
                       .then(function(data) {
                         UI.info(T.qualityNominationRateProblemDesc);
+                        if (typeof ga == 'function') {
+                          ga('send', 'event', 'quality-nomination', 'dismiss');
+                        }
                       })
                       .fail(UI.apiError);
                   },
@@ -2053,6 +2067,9 @@ export class Arena {
       }),
     )
       .then(function(run) {
+        if (typeof ga == 'function') {
+          ga('send', 'event', 'submission', 'submit');
+        }
         if (self.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem('run:' + run.guid, code);
         }
@@ -2081,6 +2098,9 @@ export class Arena {
       .fail(function(run) {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
+        if (typeof ga == 'function') {
+          ga('send', 'event', 'submission', 'submit-fail');
+        }
       });
   }
 

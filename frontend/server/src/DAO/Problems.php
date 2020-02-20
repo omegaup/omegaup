@@ -74,7 +74,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}[]
+     * @return array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}[]
      */
     final public static function byIdentityType(
         string $identityType,
@@ -323,7 +323,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
             'title','quality', 'difficulty', 'alias', 'visibility',
-            'quality_histogram', 'difficulty_histogram',
+            'quality_histogram', 'difficulty_histogram', 'quality_seal',
         ];
         $problems = [];
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? \OmegaUp\DAO\Users::getHideTags(
@@ -336,8 +336,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,
-            quality_histogram: list<int>, difficulty_histogram: list<int>} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.

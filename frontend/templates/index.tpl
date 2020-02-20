@@ -29,7 +29,7 @@
 				</div>
 				<p class="text-center top-margin">{#frontPageJoinCourse#}</p>
 				<div class="text-center">
-					<a href="/course/Curso-OMI" class="btn btn-primary btn-lg">{#frontPageJoinCourseButton#}</a>
+					<a href="/course/introduccion_a_cpp/" class="btn btn-primary btn-lg">{#frontPageJoinCourseButton#}</a>
 				</div>
 			</div>
 		</div>
@@ -105,6 +105,8 @@
 
 		<div class="panel panel-default">
 			<div id="runs-chart"></div>
+			<script type="text/json" id="runs-chart-payload">{$runsChartPayload|json_encode}</script>
+			{js_include entrypoint="common_runs_chart" async}
 		</div>
 	</div>
 </div>
