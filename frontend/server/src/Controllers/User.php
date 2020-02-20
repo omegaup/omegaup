@@ -3149,8 +3149,8 @@ class User extends \OmegaUp\Controllers\Controller {
                         'username' => $r->identity->username,
                     ] : [],
                     'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
+                    'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
                 ],
-                'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
             ],
             'template' => 'index.tpl',
         ];
