@@ -22,8 +22,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     public static function calculateCoderOfTheMonth(
         string $startTime,
-        string $endTime
+        string $endTime,
+        string $category = 'all'
     ): ?array {
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = "
           SELECT DISTINCT
             IFNULL(i.user_id, 0) AS user_id,
@@ -86,14 +88,14 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             ) AS cm on i.user_id = cm.user_id
           WHERE
             (cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?) AND
-            i.user_id IS NOT NULL
+            i.user_id IS NOT NULL " . $gender . '
           GROUP BY
             up.identity_id
           ORDER BY
             score DESC,
             ProblemsSolved DESC
           LIMIT 100
-        ";
+        ';
 
         $val = [$startTime, $endTime, $endTime];
 
@@ -109,7 +111,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Get all first coders of the month
      * @return list<array{time: string, username: string, country_id: string, email: string|null}>
      */
-    final public static function getCodersOfTheMonth(): array {
+    final public static function getCodersOfTheMonth(string $category = 'all'): array {
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = '
             SELECT
                 cm.time,
@@ -125,7 +128,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             LEFT JOIN
                 Emails e ON e.user_id = u.user_id
             WHERE
-                cm.selected_by IS NOT NULL
+                cm.selected_by IS NOT NULL ' . $gender . '
                 OR (
                     cm.rank = 1 AND
                     NOT EXISTS (
@@ -151,8 +154,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * @return list<array{time: string, username: string, classname: string}>
      */
     final public static function getCodersOfTheMonthFromSchool(
-        int $schoolId
+        int $schoolId,
+        string $category = 'all'
     ): array {
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = '
             SELECT
               cm.time,
@@ -186,7 +191,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
               Emails e ON e.user_id = u.user_id
             WHERE
               (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
-              cm.school_id = ?
+              cm.school_id = ? ' . $gender . '
             ORDER BY
               cm.time DESC;
         ';
@@ -202,8 +207,12 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Get all coder of the months based on month
      * @return list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}>
      */
-    final public static function getMonthlyList(string $firstDay): array {
+    final public static function getMonthlyList(
+        string $firstDay,
+        string $category = 'all'
+    ): array {
         $date = date('Y-m-01', strtotime($firstDay));
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = '
           SELECT
             cm.time,
@@ -221,7 +230,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LEFT JOIN
             Emails e ON e.email_id = u.main_email_id
           WHERE
-            cm.time = ?
+            cm.time = ? ' . $gender . '
           ORDER BY
             cm.time DESC,
             cm.rank ASC
@@ -234,7 +243,11 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     /**
      * Get true whether user is the last Coder of the month
      */
-    final public static function isLastCoderOfTheMonth(string $username): bool {
+    final public static function isLastCoderOfTheMonth(
+        string $username,
+        string $category = 'all'
+    ): bool {
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = '
           SELECT
             i.username
@@ -245,7 +258,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
-            cm.rank = 1
+            cm.rank = 1 ' . $gender . '
           ORDER BY
             cm.time DESC
           LIMIT 1
@@ -264,15 +277,17 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     final public static function getByTimeAndSelected(
         string $time,
-        bool $autoselected = false
+        bool $autoselected = false,
+        string $category = 'all'
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = 'SELECT
                     *
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ?
+                    `time` = ? ' . $gender . '
                 AND
                     `selected_by` ' . $clause . ';';
         /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
@@ -289,13 +304,17 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * @param string $time
      * @return \OmegaUp\DAO\VO\CoderOfTheMonth[]
      */
-    final public static function getByTime(string $time): array {
+    final public static function getByTime(
+        string $time,
+        string $category = 'all'
+    ): array {
+        $gender = ($category == 'female') ? " AND i.gender = 'female'" : '';
         $sql = 'SELECT
                     *
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ?;';
+                    `time` = ? ' . $gender . ';';
 
         /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
@@ -311,13 +330,22 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfMonthByGivenDate(
-        string $date
+        string $date,
+        string $category = 'all'
     ): ?array {
         $date = new \DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth($startTime, $endTime);
+        if ($category == 'female') {
+            return self::calculateCoderOfTheMonth(
+                $startTime,
+                $endTime,
+                $category
+            );
+        } else {
+            return self::calculateCoderOfTheMonth($startTime, $endTime);
+        }
     }
 }
