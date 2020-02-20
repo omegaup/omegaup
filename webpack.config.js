@@ -199,6 +199,15 @@ let config = [
           test: /\.css$/,
           loader: 'style-loader!css-loader',
         },
+        // inline scss styles on vue components
+        {
+          test: /\.scss$/,
+          use: [
+            'vue-style-loader',
+            'css-loader',
+            'sass-loader'
+          ]
+        },
       ],
     },
     resolve: {
