@@ -181,7 +181,7 @@ CREATE TABLE `Courses` (
   `acl_id` int(11) NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NULL DEFAULT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
+  `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un curso.',
   `school_id` int(11) DEFAULT NULL,
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',

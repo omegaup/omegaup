@@ -1253,6 +1253,7 @@ const translations = {
 	wordsTitle: "(Ti713)",
 	wordsTopics: "(T0pic5)",
 	wordsTotal: "(T07a1)",
+	wordsTotalRuns: "(T07a1 Submi55i0n5)",
 	wordsTotalVotes: "(707a1 v0735)",
 	wordsUnimplemented: "(Thi5 f3a7ur3 ha5 n07 b33n imp13m3n73d y37 :()",
 	wordsUnlimitedDuration: "(Un1imi73d dura7i0n)",
