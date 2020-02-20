@@ -97,6 +97,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
   `school_id` int(11) DEFAULT NULL,
+  `category` enum('all','female') NOT NULL DEFAULT 'all',
   PRIMARY KEY (`coder_of_the_month_id`),
   UNIQUE KEY `rank_time` (`rank`,`time`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
