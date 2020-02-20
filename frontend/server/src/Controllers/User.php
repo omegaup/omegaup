@@ -1177,7 +1177,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @return array{birth_date: int|null, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+     * @return array{birth_date: int|null, classname: null|string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1214,6 +1214,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $userDb['graduation_date']
         );
         $response['email'] = $userDb['email'];
+        $response['classname'] = $userDb['classname'];
         $response['country'] = $userDb['country'];
         $response['country_id'] = $userDb['country_id'];
         $response['state'] = $userDb['state'];
@@ -1389,7 +1390,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{coderinfo: array{birth_date: int|null, classname: null|string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
     private static function getCodersOfTheMonth(string $firstDay) {
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime($firstDay);
@@ -3115,26 +3116,39 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: null|string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
+        try {
+            $r->ensureIdentity();
+            $isLogged = true;
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Not logged, but there is no problem with this
+            $isLogged = false;
+        }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
         return [
             'smartyProperties' => [
-                'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                    $firstDay
-                )['coderinfo'],
-                'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
-                'rankTablePayload' => [
-                    'length' => $rowCount,
-                    'isIndex' => true,
-                    'availableFilters' => [],
-                ],
-                'schoolRankPayload' => [
-                    'length' => $rowCount,
-                    'showHeader' => true,
+                'payload' => [
+                    'coderOfTheMonthData' => self::getCodersOfTheMonth(
+                        $firstDay
+                    )['coderinfo'],
+                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'rankTablePayload' => [
+                        'length' => $rowCount,
+                        'isIndex' => true,
+                        'availableFilters' => [],
+                    ],
+                    'schoolRankPayload' => [
+                        'length' => $rowCount,
+                        'showHeader' => true,
+                    ],
+                    'currentUserInfo' => $isLogged ? [
+                        'username' => $r->identity->username,
+                    ] : [],
+                    'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
                 ],
             ],
             'template' => 'index.tpl',

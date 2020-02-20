@@ -90,20 +90,4 @@
       })
       .fail(omegaup.UI.apiError);
   });
-
-  omegaup.API.Contest.list({ active: 'ACTIVE' })
-    .then(function(data) {
-      var list = data.results;
-      var now = new Date();
-
-      var nextContestsList = document.getElementById('next-contests-list');
-      for (var i = 0, len = list.length; i < len && i < 10; i++) {
-        var link = document.createElement('a');
-        link.href = '/arena/' + omegaup.UI.escape(list[i].alias) + '/';
-        link.className = 'list-group-item';
-        link.appendChild(document.createTextNode(list[i].title));
-        nextContestsList.appendChild(link);
-      }
-    })
-    .fail(omegaup.UI.apiError);
 })();

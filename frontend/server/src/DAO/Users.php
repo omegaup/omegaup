@@ -79,7 +79,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
     /**
      * @param int $user_id
-     * @return array{country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
+     * @return array{country: string, classname: null|string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
     */
     final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
@@ -91,7 +91,27 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     sc.`school_id` AS school_id,
                     isc.`graduation_date` AS graduation_date,
                     e.`email`,
-                    l.`name` AS locale
+                    l.`name` AS locale,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
                 FROM
                     Users u
                 INNER JOIN
@@ -113,7 +133,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LIMIT
                     1;';
         $params = [$user_id];
-        /** @var array{country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
+        /** @var array{country: string, classname: null|string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
     }
 
