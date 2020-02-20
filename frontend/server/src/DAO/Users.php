@@ -79,7 +79,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
     /**
      * @param int $user_id
-     * @return array{country: string, classname: null|string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
+     * @return array{classname: string, country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
     */
     final public static function getExtendedProfileDataByPk(int $user_id): ?array {
         $sql = 'SELECT
@@ -133,7 +133,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 LIMIT
                     1;';
         $params = [$user_id];
-        /** @var array{country: string, classname: null|string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
+        /** @var array{classname: string, country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
     }
 
