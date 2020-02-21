@@ -22,7 +22,6 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         'name' => true,
         'rank' => true,
         'score' => true,
-        'rank_in_the_month' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -63,11 +62,6 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         if (isset($data['score'])) {
             $this->score = floatval(
                 $data['score']
-            );
-        }
-        if (isset($data['rank_in_the_month'])) {
-            $this->rank_in_the_month = intval(
-                $data['rank_in_the_month']
             );
         }
     }
@@ -115,11 +109,4 @@ class Schools extends \OmegaUp\DAO\VO\VO {
      * @var float
      */
     public $score = 0.00;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var int|null
-     */
-    public $rank_in_the_month = null;
 }

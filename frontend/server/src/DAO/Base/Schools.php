@@ -36,8 +36,7 @@ abstract class Schools {
                 `state_id` = ?,
                 `name` = ?,
                 `rank` = ?,
-                `score` = ?,
-                `rank_in_the_month` = ?
+                `score` = ?
             WHERE
                 (
                     `school_id` = ?
@@ -52,11 +51,6 @@ abstract class Schools {
                 intval($Schools->rank)
             ),
             floatval($Schools->score),
-            (
-                is_null($Schools->rank_in_the_month) ?
-                null :
-                intval($Schools->rank_in_the_month)
-            ),
             intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -83,8 +77,7 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`rank`,
-                `Schools`.`score`,
-                `Schools`.`rank_in_the_month`
+                `Schools`.`score`
             FROM
                 `Schools`
             WHERE
@@ -171,8 +164,7 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`rank`,
-                `Schools`.`score`,
-                `Schools`.`rank_in_the_month`
+                `Schools`.`score`
             FROM
                 `Schools`
         ';
@@ -227,10 +219,8 @@ abstract class Schools {
                     `state_id`,
                     `name`,
                     `rank`,
-                    `score`,
-                    `rank_in_the_month`
+                    `score`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -247,11 +237,6 @@ abstract class Schools {
                 intval($Schools->rank)
             ),
             floatval($Schools->score),
-            (
-                is_null($Schools->rank_in_the_month) ?
-                null :
-                intval($Schools->rank_in_the_month)
-            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
