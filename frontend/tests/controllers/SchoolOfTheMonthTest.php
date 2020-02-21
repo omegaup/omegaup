@@ -167,6 +167,8 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         self::setUpSchoolsRuns($schoolsData);
 
         // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        \OmegaUp\Test\Utils::runUpdateRanks();
+        //TODO: Hay que obtener todos los candidatos, deben coincidir con los tests de más abajo.
         return;
 
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(

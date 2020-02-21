@@ -250,17 +250,38 @@ def update_school_of_the_month_candidates(
     '''Updates the list of candidates to school of the current month'''
 
     logging.info('Updating the candidates to school of the month...')
-    cur.execute(
-        '''
-        UPDATE
-            `Schools` as s
-        SET
-            s.`rank_in_the_month` = NULL;''')
 
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
-    first_day_of_last_month = (
-        first_day_of_current_month - relativedelta(months=1))
+    first_day_of_next_month = (
+        first_day_of_current_month + relativedelta(months=1))
+
+    # First make sure there are not already selected schools of the month
+    cur.execute(
+        '''
+        SELECT
+            *
+        FROM
+            School_Of_The_Month
+        WHERE
+            time = %s AND
+            selected_by IS NOT NULL;
+        ''',
+        (first_day_of_next_month,))
+
+    if len(cur.fetchall()) > 0:
+        logging.info('Skipping because there are already selected schools.')
+        return
+
+    cur.execute(
+        '''
+        DELETE FROM
+            School_Of_The_Month
+        WHERE
+            time = %s;
+        ''',
+        (first_day_of_next_month,))
+
     cur.execute(
         '''
         SELECT
@@ -322,21 +343,26 @@ def update_school_of_the_month_candidates(
             LIMIT 100;
         ''',
         (
-            first_day_of_last_month,
             first_day_of_current_month,
-            first_day_of_current_month
+            first_day_of_next_month,
+            first_day_of_next_month
         ))
 
     for index, row in enumerate(cur):
         cur.execute('''
-                        UPDATE
-                            Schools as s
-                        SET
-                            s.rank_in_the_month = %s
-                        WHERE
-                            s.school_id = %s;
+                        INSERT INTO
+                            School_Of_The_Month (
+                                school_id,
+                                time,
+                                rank
+                            )
+                        VALUES (
+                            %s,
+                            %s,
+                            %s
+                        );
                     ''',
-                    (index + 1, row['school_id']))
+                    (row['school_id'], first_day_of_next_month, index + 1))
 
 
 def main() -> None:
