@@ -3273,16 +3273,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
-        return self::getStats($r);
+        // Get user
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateValidAlias(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
+        return self::getStats($r, $contest);
     }
 
     /**
      * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+        // Get user
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateValidAlias(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($r),
+                'payload' => self::getStats($r, $contest),
             ],
             'template' => 'contest.stats.tpl',
         ];
@@ -3291,15 +3305,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
      */
-    private static function getStats(\OmegaUp\Request $r) {
-        // Get user
-        $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['contest_alias'],
-            'contest_alias'
-        );
-        $contest = self::validateStats($r['contest_alias'], $r->identity);
-
+    private static function getStats(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Contests $contest
+    ) {
         $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset(
             intval(
                 $contest->problemset_id
@@ -3467,13 +3476,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $i = 0;
         foreach ($contestReport['problems'] as $entry) {
             $problemAlias = $entry['alias'];
-            $problemStatsRequest = new \OmegaUp\Request([
-                        'problem_alias' => $problemAlias,
-                        'auth_token' => $r['auth_token'],
-                    ]);
+            $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+            if (is_null($problem)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
 
-            $problemStats[$i] = \OmegaUp\Controllers\Problem::apiStats(
-                $problemStatsRequest
+            $problemStats[$i] = \OmegaUp\Controllers\Problem::getStats(
+                $problem,
+                $r->identity
             );
             $problemAliasStats[$problemAlias] = $problemStats[$i];
 
