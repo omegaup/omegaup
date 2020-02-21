@@ -269,7 +269,7 @@ def update_school_of_the_month_candidates(
         ''',
         (first_day_of_next_month,))
 
-    if len(cur.fetchall()) > 0:
+    if cur.rowcount > 0:
         logging.info('Skipping because there are already selected schools.')
         return
 
