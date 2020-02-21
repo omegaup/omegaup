@@ -281,7 +281,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
+<<<<<<< HEAD
         $categoryClause = ($category == 'female') ? " AND category = 'female'" : '';
+=======
+>>>>>>> upstream/master
         $sql = "SELECT
                     *
                 FROM
@@ -321,7 +324,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
+            $coders[] = new \OmegaUp\DAO\VO\CoderOfTheMonth($row);
         }
         return $coders;
     }
