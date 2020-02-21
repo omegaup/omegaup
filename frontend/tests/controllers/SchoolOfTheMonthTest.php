@@ -127,7 +127,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateRanks();
+        // \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Now solve more problems:
         // user0=>problem1, user1=>problem0 the school0 might be the first one now, but, as the problems
@@ -153,7 +153,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateRanks();
+        // \OmegaUp\Test\Utils::runUpdateRanks();
     }
 
     public function testCalculateSchoolsOfMonth() {
@@ -164,16 +164,11 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ];
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
-        self::setUpSchoolsRuns($schoolsData);
+        self::setUpSchoolsRuns($schoolsData, $today);
 
         // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
         \OmegaUp\Test\Utils::runUpdateRanks();
-        //TODO: Hay que obtener todos los candidatos, deben coincidir con los tests de más abajo.
-        return;
-
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $today
-        );
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
@@ -187,7 +182,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
-
+        return;
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
         // again by the DAO as it has already been selected current year.
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([

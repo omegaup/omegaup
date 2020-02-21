@@ -104,6 +104,30 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
+     * Returns the list of candidates to school of the month
+     *
+     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
+     */
+    public static function getCandidatesToSchoolOfTheMonth(): array {
+        $date = new \DateTimeImmutable();
+        $firstDayOfNextMonth = $date->modify(
+            'first day of next month'
+        )->format(
+            'Y-m-d'
+        );
+
+        $alreadySelectedSchools = self::getByTimeAndSelected(
+            $firstDayOfNextMonth
+        );
+        if (!empty($alreadySelectedSchools)) {
+            return [];
+        }
+
+        //TODO: Hacer que se seleccionen los datos que son necesarios para escuela del mes.
+        return [];
+    }
+
+    /**
      * Gets all the best schools based on the month
      * of a certain date.
      *
