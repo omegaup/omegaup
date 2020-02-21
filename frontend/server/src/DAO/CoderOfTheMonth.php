@@ -275,7 +275,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     `time` = ?
                 AND
                     `selected_by` {$clause}";
-        /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
+        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
@@ -302,7 +302,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
+            $coders[] = new \OmegaUp\DAO\VO\CoderOfTheMonth($row);
         }
         return $coders;
     }

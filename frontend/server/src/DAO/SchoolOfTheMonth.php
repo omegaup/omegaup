@@ -193,7 +193,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
+     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
      */
     public static function getByTimeAndSelected(
         string $time,
@@ -218,13 +218,13 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 [$time]
             ) as $row
         ) {
-            array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
+            $schools[] = new \OmegaUp\DAO\VO\SchoolOfTheMonth($row);
         }
         return $schools;
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
+     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
      */
     public static function getByTime(
         string $time
@@ -245,7 +245,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 [$time]
             ) as $row
         ) {
-            array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
+            $schools[] = new \OmegaUp\DAO\VO\SchoolOfTheMonth($row);
         }
         return $schools;
     }
