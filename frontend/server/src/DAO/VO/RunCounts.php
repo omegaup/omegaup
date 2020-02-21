@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -21,22 +21,30 @@ class RunCounts extends \OmegaUp\DAO\VO\VO {
         'ac_count' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['date'])) {
-            $this->date = strval($data['date']);
+            $this->date = strval(
+                $data['date']
+            );
         }
         if (isset($data['total'])) {
-            $this->total = (int)$data['total'];
+            $this->total = intval(
+                $data['total']
+            );
         }
         if (isset($data['ac_count'])) {
-            $this->ac_count = (int)$data['ac_count'];
+            $this->ac_count = intval(
+                $data['ac_count']
+            );
         }
     }
 

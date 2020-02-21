@@ -3,19 +3,22 @@
 /**
  * Tests getting runs of a problem.
  */
-class ProblemRunsTest extends OmegaupTestCase {
+class ProblemRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them.
      */
     public function testGetRunsForProblem() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $contestants = [];
         $runs = [];
         for ($i = 0; $i < 2; ++$i) {
-            $user = UserFactory::createUser();
-            $runData = RunsFactory::createRunToProblem($problemData, $user);
-            RunsFactory::gradeRun($runData);
-            $contestants[] = $user;
+            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+            $contestants[] = $identity;
             $runs[] = $runData;
         }
 
@@ -76,5 +79,43 @@ class ProblemRunsTest extends OmegaupTestCase {
                 $response['runs'][count($contestants) - $i - 1]['guid']
             );
         }
+    }
+
+    public function testUserHasTriedToSolvedProblem() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Never tried, never solved
+        $this->assertFalse(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
+            $problemData['problem'],
+            $identity->identity_id
+        ));
+        // Tried, but didn't solve the problem
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
+        $this->assertFalse(\OmegaUp\DAO\Problems::isProblemSolved(
+            $problemData['problem'],
+            $identity->identity_id
+        ));
+        $this->assertTrue(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
+            $problemData['problem'],
+            $identity->identity_id
+        ));
+        // Already tried and solved also
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        $this->assertTrue(\OmegaUp\DAO\Problems::isProblemSolved(
+            $problemData['problem'],
+            $identity->identity_id
+        ));
+        $this->assertTrue(\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
+            $problemData['problem'],
+            $identity->identity_id
+        ));
     }
 }

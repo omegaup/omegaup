@@ -1,5 +1,5 @@
-{include file='head.tpl' jsfile={version_hash src='/ux/arena.js' inArena=true}}
-{include file='arena.contest_list.tpl'}
+{include file='head.tpl' navbarSection='arena' headerPayload=$headerPayload jsfile={version_hash src='/ux/arena.js' inArena=true} inline}
+{include file='arena.contest_list.tpl' inline}
 				<div id="content">
 					<div class="panel">
 						<div class="panel-heading panel-default">
@@ -25,6 +25,12 @@
 
 						<div class="panel-body">
 							<ul class="nav nav-pills arena-tabs">
+								{if $LOGGED_IN == 1}
+								<li class="nav-item">
+									<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
+										{#arenaMyActiveContests#}</a>
+								</li>
+								{/if}
 								<li class="nav-item">
 									<a class="nav-link" href="#list-recommended-current-contest" data-toggle="tab">
 										{#arenaRecommendedCurrentContests#}</a>
@@ -49,21 +55,15 @@
 									<a class="nav-link" href="#list-past-contest" data-toggle="tab">
 										{#arenaOldContests#}</a>
 								</li>
-								{if $LOGGED_IN == 1}
-								<li class="nav-item">
-									<a class="nav-link" href="#list-current-participating-contest" data-toggle="tab">
-										{#arenaMyActiveContests#}</a>
-								</li>
-								{/if}
 							</ul>
 
 							<div class="tab-content">
-								<div class="tab-pane" id="list-recommended-current-contest">
-									<div class="panel panel-primary" id="recommended-current-contests"
-										 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
-								</div>
 								<div class="tab-pane" id="list-current-participating-contest">
 									<div class="panel panel-primary" id="participating-current-contests"
+										 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
+								</div>
+								<div class="tab-pane" id="list-recommended-current-contest">
+									<div class="panel panel-primary" id="recommended-current-contests"
 										 data-bind="template: { name: 'contest-list', if: page().length > 0 }"></div>
 								</div>
 								<div class="tab-pane" id="list-current-contest">
@@ -93,6 +93,6 @@
 				</div> <!-- panel-default -->
 			</div> <!-- container -->
 		</div> <!-- root -->
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 	</body>
 </html>

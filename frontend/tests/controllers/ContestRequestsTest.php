@@ -6,15 +6,18 @@
  *
  * @author juan.pablo@omegaup.com
  */
-class ContestRequestsTest extends OmegaupTestCase {
-    private function preparePublicContestWithRegistration() : array {
+class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
+    private function preparePublicContestWithRegistration(): array {
         // create a contest and its admin
-        $contestAdmin = UserFactory::createUser();
-        $contestData = ContestsFactory::createContest(new ContestParams([
+        ['user' => $user, 'identity' => $contestAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
             'contestDirector' => $contestAdmin,
         ]));
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         $adminLogin = self::login($contestAdmin);
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
@@ -32,9 +35,9 @@ class ContestRequestsTest extends OmegaupTestCase {
     }
 
     private function registerUserForContest(
-        \OmegaUp\DAO\VO\Users $contestant,
+        \OmegaUp\DAO\VO\Identities $contestant,
         \OmegaUp\Request $contest
-    ) : void {
+    ): void {
         $contestantLogin = self::login($contestant);
 
         \OmegaUp\Controllers\Contest::apiRegisterForContest(new \OmegaUp\Request([
@@ -46,7 +49,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     private function assertDefaultParamsInRequest(
         array $userRequest,
         bool $hasRequestResponse = false
-    ) : void {
+    ): void {
         $this->assertArrayHasKey('username', $userRequest);
         $this->assertArrayHasKey('country', $userRequest);
         $this->assertArrayHasKey('request_time', $userRequest);
@@ -67,7 +70,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         int $numberOfContestants,
         array $contestants,
         array $result,
-        \OmegaUp\DAO\VO\Users $mainAdmin,
+        \OmegaUp\DAO\VO\Identities $mainAdmin,
         array $arbitratedUsers,
         array $acceptedUsers
     ) {
@@ -98,9 +101,9 @@ class ContestRequestsTest extends OmegaupTestCase {
         ] = $this->preparePublicContestWithRegistration();
 
         // some user asks for contest
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $this->registerUserForContest($contestant, $contestData['request']);
+        $this->registerUserForContest($identity, $contestData['request']);
 
         // admin lists registrations
         $adminLogin = self::login($admin);
@@ -121,18 +124,22 @@ class ContestRequestsTest extends OmegaupTestCase {
         ] = $this->preparePublicContestWithRegistration();
 
         // Adding secondary admin
-        $secondaryAdminLogin = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $secondaryAdminLogin);
+        ['user' => $user, 'identity' => $secondaryAdminLogin] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $secondaryAdminLogin
+        );
 
         // some users ask for contest
         $contestants = [];
+        $identities = [];
         $numberOfContestants = 4;
         $arbitratedUsers = [];
         $acceptedUsers = [];
         for ($i = 0; $i < $numberOfContestants; $i++) {
-            $contestants[$i] = UserFactory::createUser();
+            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             $this->registerUserForContest(
-                $contestants[$i],
+                $identities[$i],
                 $contestData['request']
             );
         }
@@ -141,7 +148,7 @@ class ContestRequestsTest extends OmegaupTestCase {
             $rejectedContestantByMainAdminAndAcceptedByTheSecondOne,
             $rejectedContestantAndThenAcceptedByTheSameAdmin,
             $nonAcceptedNorRejectedContestant,
-        ] = $contestants;
+        ] = $identities;
 
         // admin lists registrations
         $adminLogin = self::login($mainAdmin);
@@ -179,7 +186,7 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         $this->assertParamsInRequest(
             $numberOfContestants,
-            $contestants,
+            $identities,
             $result,
             $mainAdmin,
             $arbitratedUsers,
@@ -209,7 +216,7 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         $this->assertParamsInRequest(
             $numberOfContestants,
-            $contestants,
+            $identities,
             $result,
             $mainAdmin,
             $arbitratedUsers,

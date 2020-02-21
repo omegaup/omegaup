@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class UserIdentityAssociationTest extends OmegaupTestCase {
+class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
     private function assertUsernameInArray($username, array $identities) {
         foreach ($identities as $identity) {
             if ($identity['username'] == $username) {
@@ -21,19 +21,19 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registred user
      */
     public function testAssociateIdentityWithUser() {
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
             $creatorLogin
         );
 
-        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -43,13 +43,13 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
-            'school_name' => Utils::CreateRandomString(),
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
             'group_alias' => $group['group']->alias,
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         $associatedIdentities = \OmegaUp\Controllers\User::apiListAssociatedIdentities(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -58,7 +58,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         // User has one default associated identity when joins omegaUp
         $this->assertEquals(1, count($associatedIdentities['identities']));
         $this->assertEquals(
-            $user->username,
+            $identity->username,
             $associatedIdentities['identities'][0]['username']
         );
 
@@ -79,7 +79,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $associatedIdentities['identities']
         );
         $this->assertUsernameInArray(
-            $user->username,
+            $identity->username,
             $associatedIdentities['identities']
         );
 
@@ -87,12 +87,17 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $identity->password = $password;
         $identityLogin = self::login($identity);
 
-        $details = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]));
+        $details = \OmegaUp\Controllers\User::apiProfile(
+            new \OmegaUp\Request([
+                'auth_token' => $identityLogin->auth_token,
+            ])
+        );
 
         // apiProfile must show associated user's info
-        $this->assertEquals($details['userinfo']['username'], $user->username);
+        $this->assertEquals(
+            $details['username'],
+            $identity->username
+        );
     }
 
     /**
@@ -100,19 +105,19 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registered user, but wrong username
      */
     public function testAssociateIdentityWithWrongUser() {
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
             $creatorLogin
         );
 
-        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -122,13 +127,13 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
-            'school_name' => Utils::CreateRandomString(),
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
             'group_alias' => $group['group']->alias,
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         try {
             $identityName = 'wrong_username';
@@ -151,40 +156,40 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registered user, but wrong password
      */
     public function testAssociateIdentityWithWrongPassword() {
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
             $creatorLogin
         );
 
-        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
-            'school_name' => Utils::CreateRandomString(),
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
             'group_alias' => $group['group']->alias,
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         try {
             $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
-                'password' => Utils::CreateRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomString(),
             ]));
             $this->fail('Identity should not be associated because identity ' .
                         'password does not match');
@@ -200,16 +205,16 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      */
     public function testAssociateDuplicatedIdentitiesOfAGroup() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
             $creatorLogin
         );
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
@@ -229,8 +234,8 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
         // Trying to associate first identity to the logged user
         $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([

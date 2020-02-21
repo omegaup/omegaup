@@ -31,5 +31,4 @@ export default class DistributionChart extends Vue {
     this.distributionChart.series[0].setData(oGraph.getDistribution(newValue));
   }
 }
-
 </script>

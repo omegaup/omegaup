@@ -6,20 +6,24 @@
  * @author carlosabcs
  */
 
-class ProblemsForfeitedTest extends OmegaupTestCase {
+class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCounts() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
 
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
-            $problem = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run);
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
-        $problemForfeited = ProblemsFactory::createProblem();
+        $problemForfeited = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
@@ -34,18 +38,22 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
     }
 
     public function testGetSolution() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
         $problems = [];
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
-            $problems[] = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
-            RunsFactory::gradeRun($run);
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
-        $extraProblem = ProblemsFactory::createProblem();
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -66,15 +74,15 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $this->assertTrue(
             \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
-                \OmegaUp\DAO\Identities::findByUsername($user->username)
+                \OmegaUp\DAO\Identities::findByUsername($identity->username)
             )
         );
     }
 
     public function testGetSolutionForbiddenAccessException() {
-        $user = UserFactory::createUser();
-        $login = self::login($user);
-        $problem = ProblemsFactory::createProblem()['problem'];
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -83,7 +91,10 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'allowedSolutionsLimitReached');
+            $this->assertEquals(
+                $e->getMessage(),
+                'allowedSolutionsLimitReached'
+            );
         }
     }
 }

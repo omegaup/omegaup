@@ -31,5 +31,4 @@ export default class VerdictChart extends Vue {
     this.runCountsChart.series[0].setData(oGraph.normalizeRunCounts(newValue));
   }
 }
-
 </script>

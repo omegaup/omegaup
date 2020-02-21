@@ -22,13 +22,14 @@ class ProblemsForfeited extends \OmegaUp\DAO\Base\ProblemsForfeited {
                 WHERE
                     user_id = ?;';
         $args = [$user->user_id];
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     public static function isProblemForfeited(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : bool {
+    ): bool {
         $sql = 'SELECT
                     COUNT(*)
                 FROM
@@ -36,6 +37,8 @@ class ProblemsForfeited extends \OmegaUp\DAO\Base\ProblemsForfeited {
                 WHERE
                     problem_id = ? AND user_id = ?;';
         $args = [$problem->problem_id, $identity->user_id];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args) > 0;
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args);
+        return $count > 0;
     }
 }

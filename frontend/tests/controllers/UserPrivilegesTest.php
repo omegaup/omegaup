@@ -5,15 +5,19 @@
  *
  * @author juan.pablo
  */
-class UserPrivilegesTest extends OmegaupTestCase {
+class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Test for the functions add/remove roles
      */
     public function testAddRemoveRoles() {
         $username = 'testuserrole';
-        $user = UserFactory::createUser(new UserParams(['username' => $username]));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
 
-        $login = self::login($user);
+        $login = self::login($identity);
         // Call to API Add Role
         $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -51,10 +55,13 @@ class UserPrivilegesTest extends OmegaupTestCase {
      */
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
-        $user = UserFactory::createUser(new UserParams(['username' => $username]));
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
 
-        $login = self::login($user);
+        $login = self::login($identity);
         // Call to API Add Group
         $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -72,7 +79,9 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'group' => 'omegaup:mentor'
         ]));
 
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($identity->identity_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $identity->identity_id
+        );
         $this->assertContains('omegaup:quality-reviewer', $systemGroups);
         $this->assertContains('omegaup:course-curator', $systemGroups);
         $this->assertContains('omegaup:mentor', $systemGroups);
@@ -83,7 +92,9 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $identity->user_id
+        );
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

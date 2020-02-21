@@ -8,5 +8,5 @@ interface EmailSender {
      * @param string $subject
      * @param string $body
      */
-    public function sendEmail(array $emails, string $subject, string $body) : void;
+    public function sendEmail(array $emails, string $subject, string $body): void;
 }

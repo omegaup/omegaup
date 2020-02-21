@@ -1,5 +1,5 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleMyProblemsList#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleMyProblemsList#}" inline}
 
 {if $privateProblemsAlert eq true}
 	<div class="alert alert-info">
@@ -62,4 +62,4 @@
   </table>
 </div>
 <script type="text/javascript" src="{version_hash src="/js/problem.mine.js"}"></script>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

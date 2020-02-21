@@ -18,7 +18,12 @@ abstract class ApiException extends \Exception {
     /**
      * Builds an API exception
      */
-    public function __construct(string $message, string $header, int $code, ?\Exception $previous = null) {
+    public function __construct(
+        string $message,
+        string $header,
+        int $code,
+        ?\Exception $previous = null
+    ) {
         parent::__construct($message, $code, $previous);
 
         $this->header = $header;
@@ -31,16 +36,14 @@ abstract class ApiException extends \Exception {
      * @param string $key
      * @param mixed $value
      */
-    final public function addCustomMessageToArray(string $key, $value) : void {
+    final public function addCustomMessageToArray(string $key, $value): void {
         $this->_customMessage[$key] = $value;
     }
 
     /**
-     * @return array
-     *
-     * @psalm-return array<string, mixed>
+     * @return array<string, mixed>
      */
-    final public function asArray() : array {
+    final public function asArray(): array {
         $previous = $this->getPrevious();
         return array_merge(
             [
@@ -60,7 +63,7 @@ abstract class ApiException extends \Exception {
      *
      * @return array<string, mixed>
      */
-    final public function asResponseArray() : array {
+    final public function asResponseArray(): array {
         return array_merge(
             [
                 'status' => 'error',
@@ -73,13 +76,18 @@ abstract class ApiException extends \Exception {
         );
     }
 
-    public function getErrorMessage() : string {
-        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
+    public function getErrorMessage(): string {
+        $localizedText = \OmegaUp\Translations::getInstance()->get(
+            $this->message
+        );
         if (is_null($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
         }
-        return $localizedText;
+        return \OmegaUp\ApiUtils::formatString(
+            $localizedText,
+            $this->_customMessage
+        );
     }
 }
 

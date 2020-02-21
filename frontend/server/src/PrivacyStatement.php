@@ -15,7 +15,7 @@ class PrivacyStatement {
         ?int $languageId,
         string $problemsetType,
         string $requestsUserInformation
-    ) : ?string {
+    ): ?string {
         if ($requestsUserInformation == 'no') {
             return null;
         }
@@ -36,7 +36,10 @@ class PrivacyStatement {
      * @param null|int $languageId
      * @param 'accept_teacher'|'privacy_policy' $type
      */
-    public static function getForConsent(?int $languageId, string $type) : string {
+    public static function getForConsent(
+        ?int $languageId,
+        string $type
+    ): string {
         $language = self::getLanguage($languageId);
 
         return file_get_contents(
@@ -49,8 +52,9 @@ class PrivacyStatement {
      * @param null|int $languageId
      * @return 'en'|'pt'|'es'
      */
-    private static function getLanguage(?int $languageId) : string {
-        if ($languageId == \OmegaUp\Controllers\User::LANGUAGE_EN
+    private static function getLanguage(?int $languageId): string {
+        if (
+            $languageId == \OmegaUp\Controllers\User::LANGUAGE_EN
             || $languageId == \OmegaUp\Controllers\User::LANGUAGE_PSEUDO
         ) {
             return 'en';

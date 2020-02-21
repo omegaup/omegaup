@@ -15,32 +15,48 @@ class ProblemArtifacts {
     private $alias;
 
     /** @var string */
-    private $commit;
+    private $revision;
 
-    public function __construct(string $alias, string $commit = 'published') {
+    public function __construct(string $alias, string $revision = 'published') {
         $this->log = \Logger::getLogger('ProblemArtifacts');
         $this->alias = $alias;
-        $this->commit = $commit;
+        $this->revision = $revision;
     }
 
-    public function get(string $path, bool $quiet = false) : string {
+    public function get(string $path, bool $quiet = false): string {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildShowURL($this->alias, $this->commit, $path)
+            GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/octet-stream';
         /** @var string */
         return $browser->exec();
     }
 
-    public function exists(string $path) : bool {
+    public function exists(string $path): bool {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildShowURL($this->alias, $this->commit, $path)
+            GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/json';
         curl_setopt($browser->curl, CURLOPT_NOBODY, 1);
-        return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
+        return (
+            $browser->exec() !== false &&
+            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
+        );
+    }
+
+    public function getByRevision(bool $quiet = false): string {
+        $browser = new GitServerBrowser(
+            $this->alias,
+            GitServerBrowser::buildShowRevisionURL(
+                $this->alias,
+                $this->revision
+            )
+        );
+        $browser->headers[] = 'Accept: application/octet-stream';
+        /** @var string */
+        return $browser->exec();
     }
 
     /**
@@ -50,16 +66,20 @@ class ProblemArtifacts {
      * @return array{mode: int, type: string, name: string}[] The list of
      * direct entries in $path.
      */
-    public function lsTree(string $path) : array {
+    public function lsTree(string $path): array {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildShowURL($this->alias, $this->commit, "{$path}/")
+            GitServerBrowser::buildShowURL(
+                $this->alias,
+                $this->revision,
+                "{$path}/"
+            )
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
         if (!is_string($response)) {
             $this->log->error(
-                "Failed to get entries of {$path} for problem {$this->alias} at commit {$this->commit}"
+                "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
@@ -67,7 +87,7 @@ class ProblemArtifacts {
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
-                "Failed to get entries of {$path} for problem {$this->alias} at commit {$this->commit}"
+                "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
@@ -75,7 +95,7 @@ class ProblemArtifacts {
         $entries = $response['entries'];
         if (!is_iterable($entries)) {
             $this->log->error(
-                "Invalid entries of {$path} for problem {$this->alias} at commit {$this->commit}"
+                "Invalid entries of {$path} for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
@@ -89,7 +109,7 @@ class ProblemArtifacts {
      * @return array{path: string, mode: int, type: string}[] The list of files
      * that are transitively reachable from $path.
      */
-    public function lsTreeRecursive(string $path = '.') : array {
+    public function lsTreeRecursive(string $path = '.'): array {
         /** @var array{path: string, mode: int, type: string}[] */
         $entries = [];
         /** @var string[] */
@@ -111,7 +131,7 @@ class ProblemArtifacts {
                 array_push($entries, $entry);
             }
         }
-        usort($entries, function (array $lhs, array $rhs) : int {
+        usort($entries, function (array $lhs, array $rhs): int {
             if ($lhs['path'] == $rhs['path']) {
                 return 0;
             }
@@ -121,16 +141,19 @@ class ProblemArtifacts {
         return $entries;
     }
 
-    public function commit() : ?array {
+    /**
+     * @return null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}
+     */
+    public function commit(): ?array {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildShowCommitURL($this->alias, $this->commit)
+            GitServerBrowser::buildShowCommitURL($this->alias, $this->revision)
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
         if (!is_string($response)) {
             $this->log->error(
-                "Invalid commit for problem {$this->alias} at commit {$this->commit}"
+                "Invalid commit for problem {$this->alias} at revision {$this->revision}"
             );
             return null;
         }
@@ -138,7 +161,7 @@ class ProblemArtifacts {
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response)) {
             $this->log->error(
-                "Invalid commit for problem {$this->alias} at commit {$this->commit}"
+                "Invalid commit for problem {$this->alias} at revision {$this->revision}"
             );
             return null;
         }
@@ -148,16 +171,16 @@ class ProblemArtifacts {
     /**
      * @return array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}[]
      */
-    public function log() : array {
+    public function log(): array {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildLogURL($this->alias, $this->commit)
+            GitServerBrowser::buildLogURL($this->alias, $this->revision)
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
         if (!is_string($response)) {
             $this->log->error(
-                "Failed to get log for problem {$this->alias} at commit {$this->commit}"
+                "Failed to get log for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
@@ -165,7 +188,7 @@ class ProblemArtifacts {
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('log', $response)) {
             $this->log->error(
-                "Failed to get log for problem {$this->alias} at commit {$this->commit}"
+                "Failed to get log for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
@@ -173,21 +196,24 @@ class ProblemArtifacts {
         $logEntries = $response['log'];
         if (!is_iterable($logEntries)) {
             $this->log->error(
-                "Invalid log for problem {$this->alias} at commit {$this->commit}"
+                "Invalid log for problem {$this->alias} at revision {$this->revision}"
             );
             return [];
         }
         return $logEntries;
     }
 
-    public function download() : bool {
+    public function download(): bool {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildArchiveURL($this->alias, $this->commit),
+            GitServerBrowser::buildArchiveURL($this->alias, $this->revision),
             /*passthru=*/true
         );
         $browser->headers[] = 'Accept: application/zip';
-        return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
+        return (
+            $browser->exec() !== false &&
+            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
+        );
     }
 }
 
@@ -201,10 +227,17 @@ class GitServerBrowser {
     /** @var bool */
     private $passthru;
 
-    public function __construct(string $alias, string $url, bool $passthru = false) {
+    public function __construct(
+        string $alias,
+        string $url,
+        bool $passthru = false
+    ) {
         $this->curl = curl_init();
         $this->headers = [
-            \OmegaUp\SecurityTools::getGitserverAuthorizationHeader($alias, 'omegaup:system'),
+            \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
+                $alias,
+                'omegaup:system'
+            ),
         ];
         $this->passthru = $passthru;
         curl_setopt_array(
@@ -218,31 +251,38 @@ class GitServerBrowser {
 
     public static function buildShowURL(
         string $alias,
-        string $commit,
+        string $revision,
         string $path
-    ) : string {
-        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}/{$path}";
+    ): string {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$revision}/{$path}";
+    }
+
+    public static function buildShowRevisionURL(
+        string $alias,
+        string $revision
+    ): string {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$revision}";
     }
 
     public static function buildShowCommitURL(
         string $alias,
-        string $commit
-    ) : string {
-        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}";
+        string $revision
+    ): string {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$revision}";
     }
 
     public static function buildArchiveURL(
         string $alias,
-        string $commit
-    ) : string {
-        return OMEGAUP_GITSERVER_URL . "/{$alias}/+archive/{$commit}.zip";
+        string $revision
+    ): string {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+archive/{$revision}.zip";
     }
 
     public static function buildLogURL(
         string $alias,
-        string $commit
-    ) : string {
-        return OMEGAUP_GITSERVER_URL . "/{$alias}/+log/{$commit}";
+        string $revision
+    ): string {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+log/{$revision}";
     }
 
     public function __destruct() {

@@ -1,25 +1,40 @@
 <template>
   <div class="panel">
-    <div class="solution"
-         v-html="solution"
-         v-if="status === 'unlocked' &amp;&amp; solution !== null"></div>
-    <div class="interstitial"
-         v-else="">
+    <div
+      class="solution"
+      v-html="solution"
+      v-if="status === 'unlocked' &amp;&amp; solution !== null"
+    ></div>
+    <div class="interstitial" v-else="">
       <p>{{ statusMessage }}</p>
-      <p v-html=
-      "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })"
-         v-show="allTokens !== null &amp;&amp; availableTokens !== null"></p>
+      <p
+        v-html="
+          UI.formatString(T.solutionTokens, {
+            available: availableTokens,
+            total: allTokens,
+          })
+        "
+        v-show="allTokens !== null &amp;&amp; availableTokens !== null"
+      ></p>
       <div class="text-center">
-        <a class="btn btn-primary btn-md"
-             v-if="status === 'unlocked'"
-             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a> <a class=
-             "btn btn-primary btn-md"
-             v-else-if=
-             "status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
-             v-on:click="$emit('get-tokens')">{{ T.solutionViewCurrentTokens }}</a> <a class=
-             "btn btn-primary btn-md"
-             v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
-             v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
+        <a
+          class="btn btn-primary btn-md"
+          v-if="status === 'unlocked'"
+          v-on:click="$emit('get-solution')"
+          >{{ T.wordsSeeSolution }}</a
+        >
+        <a
+          class="btn btn-primary btn-md"
+          v-else-if="status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
+          v-on:click="$emit('get-tokens')"
+          >{{ T.solutionViewCurrentTokens }}</a
+        >
+        <a
+          class="btn btn-primary btn-md"
+          v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
+          v-on:click="$emit('unlock-solution')"
+          >{{ T.wordsUnlockSolution }}</a
+        >
       </div>
     </div>
   </div>
@@ -69,5 +84,4 @@ export default class ProblemSolution extends Vue {
     }
   }
 }
-
 </script>

@@ -16,15 +16,20 @@ class ProblemForfeited extends \OmegaUp\Controllers\Controller {
      * and the number of solutions already seen
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{allowed: int, seen: int}
      */
     public static function apiGetCounts(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
         return [
-            'status' => 'ok',
-            'allowed' => intval(\OmegaUp\DAO\Problems::getProblemsSolvedCount($r->identity) /
-                                static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION),
-            'seen' => \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount($r->user),
+            'allowed' => intval(
+                \OmegaUp\DAO\Problems::getProblemsSolvedCount(
+                    $r->identity
+                ) /
+                intval(static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION)
+            ),
+            'seen' => \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount(
+                $r->user
+            ),
         ];
     }
 }

@@ -12,45 +12,6 @@ class Controller {
     public static $log;
 
     /**
-     * List of verdicts
-     *
-     * @var array
-     */
-    public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
-
-    /**
-     * Given the request, returns what user is performing the request by
-     * looking at the auth_token, when requireMainUserIdentity flag is true, we
-     * need to ensure that the request is made by the main identity of the
-     * logged user
-     *
-     * @param \OmegaUp\Request $r
-     * @param bool $requireMainUserIdentity
-     * @throws \OmegaUp\Exceptions\UnauthorizedException
-     */
-    protected static function authenticateRequest(
-        \OmegaUp\Request $r,
-        bool $requireMainUserIdentity = false
-    ) : void {
-        $r->user = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
-        if (is_null($session) || is_null($session['identity'])) {
-            $r->user = null;
-            $r->identity = null;
-            throw new \OmegaUp\Exceptions\UnauthorizedException();
-        }
-        if (!is_null($session['user'])) {
-            $r->user = $session['user'];
-        }
-        $r->identity = $session['identity'];
-        if ($requireMainUserIdentity && (is_null($r->user) ||
-            $r->user->main_identity_id != $r->identity->identity_id)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-    }
-
-    /**
      * Calls authenticateRequest and throws only if authentication fails AND
      * there's no target username in Request.
      * This is to allow unauthenticated access to APIs that work for both
@@ -60,9 +21,9 @@ class Controller {
      */
     protected static function authenticateOrAllowUnauthenticatedRequest(
         \OmegaUp\Request $r
-    ) : void {
+    ): void {
         try {
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // allow unauthenticated only if it has $r["username"]
             if (is_null($r['username'])) {
@@ -82,12 +43,15 @@ class Controller {
      */
     protected static function resolveTargetUser(
         \OmegaUp\Request $r
-    ) : ?\OmegaUp\DAO\VO\Users {
+    ): ?\OmegaUp\DAO\VO\Users {
         // By default use current user
         $user = $r->user;
 
         if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['username'],
+                'username'
+            );
             $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -108,12 +72,15 @@ class Controller {
      */
     protected static function resolveTargetIdentity(
         \OmegaUp\Request $r
-    ) : ?\OmegaUp\DAO\VO\Identities {
+    ): ?\OmegaUp\DAO\VO\Identities {
         // By default use current identity
         $identity = $r->identity;
 
         if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['username'],
+                'username'
+            );
             $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -121,6 +88,24 @@ class Controller {
         }
 
         return $identity;
+    }
+
+    /**
+     * Gets the current month's first day date.
+     */
+    protected static function getCurrentMonthFirstDay(?string $date): string {
+        if (empty($date)) {
+            // Get first day of the current month
+            return date('Y-m-01', \OmegaUp\Time::get());
+        }
+        $date = strtotime($date);
+        if ($date === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'date'
+            );
+        }
+        return date('Y-m-01', $date);
     }
 
     /**
@@ -146,7 +131,7 @@ class Controller {
         \OmegaUp\Request $request,
         object $object,
         array $properties
-    ) : bool {
+    ): bool {
         $importantChange = false;
         foreach ($properties as $source => $info) {
             /** @var null|callable(mixed):mixed */
@@ -156,7 +141,10 @@ class Controller {
                 $fieldName = $info;
             } else {
                 $fieldName = $source;
-                if (isset($info['transform']) && is_callable($info['transform'])) {
+                if (
+                    isset($info['transform']) &&
+                    is_callable($info['transform'])
+                ) {
                     $transform = $info['transform'];
                 }
                 if (isset($info['important']) && $info['important'] === true) {
@@ -167,7 +155,7 @@ class Controller {
                 continue;
             }
             // Get or calculate new value.
-            /** @var mixed */
+            /** @var null|mixed */
             $value = $request[$fieldName];
             if (!is_null($transform)) {
                 /** @var mixed */
