@@ -281,10 +281,7 @@ final public static function getByTimeAndSelected(
     string $category = 'all'
 ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
-<<  << <<< HEAD
         $categoryClause = ($category == 'female') ? " AND category = 'female'" : '';
-=======
->>>>>>> upstream/master
         $sql = "SELECT
                     *
                 FROM
