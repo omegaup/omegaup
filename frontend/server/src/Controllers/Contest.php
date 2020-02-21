@@ -3266,13 +3266,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Stats of a problem
+     * Stats of a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
+        return self::getStats($r);
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
+     */
+    public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+        return [
+            'smartyProperties' => [
+                'payload' => self::getStats($r),
+            ],
+            'template' => 'contest.stats.tpl',
+        ];
+    }
+
+    /**
+     * @return array{total_runs: int, pending_runs: array, max_wait_time: int|mixed, max_wait_time_guid: int|mixed, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
+     */
+    private static function getStats(\OmegaUp\Request $r) {
         // Get user
         $r->ensureIdentity();
         \OmegaUp\Validators::validateValidAlias(
@@ -3345,7 +3364,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'total_points' => $totalPoints,
         ];
     }
-
     /**
      * Returns a detailed report of the contest
      *
