@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Perfil Actualizado",
+    "description": "El usuario ha completado la información en su perfil."
+  },
+  "en": {
+    "name": "Updated Profile",
+    "description": "The user has completed the information in his profile."
+  },
+  "pt": {
+    "name": "Perfil Atualizado",
+    "description": "O usuário hem completou as informações em seu perfil."
+  }
+}

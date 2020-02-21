@@ -41,7 +41,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
             'optional'
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -196,7 +196,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true /*public*/
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -227,7 +227,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseDataPublic = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
