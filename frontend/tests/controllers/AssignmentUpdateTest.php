@@ -263,7 +263,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             /*$admin=*/ null,
             /*$adminLogin=*/ null,
-            /*$public=*/ false,
+            /*$accessMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             /*$requestsUserInformation=*/ 'no',
             /*$showScoreboard=*/ 'false',
             /*$startTimeDelay=*/ 0,

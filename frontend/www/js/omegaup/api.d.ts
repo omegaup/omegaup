@@ -64,6 +64,9 @@ declare namespace omegaup {
     date?: string;
     ProblemsSolved?: number;
     score?: number;
+    country?: string;
+    state?: string;
+    school?: string;
   }
 
   export interface Commit {
@@ -462,6 +465,14 @@ declare namespace omegaup {
     rank?: number;
   }
 
+  export interface SchoolRankTable {
+    page: number;
+    length: number;
+    showHeader: boolean;
+    totalRows: number;
+    rank: omegaup.SchoolsRank[];
+  }
+
   interface Signature {
     email: string;
     name: string;
@@ -508,12 +519,26 @@ declare namespace omegaup {
   }
 
   export interface UserRank {
-    penalty: number
-    points: number;
-    position: number;
+    penalty?: number
+    points?: number;
+    position?: number;
     username: string;
     classname: string;
     country: string;
+    name?: string;
+    score?: number;
+    problemsSolvedUser?: number;
+  }
+
+  export interface UserRankTable {
+    page: number;
+    length: number;
+    isIndex: boolean;
+    isLogged: boolean;
+    availableFilters: { [key: string]: string };
+    filter: string;
+    ranking: omegaup.UserRank[];
+    resultTotal: number;
   }
 
   export interface User {

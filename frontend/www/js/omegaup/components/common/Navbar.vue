@@ -200,6 +200,177 @@
   </div>
 </template>
 
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+#root .navbar-default {
+  border-color: transparent;
+  margin: 0;
+  border-bottom-width: 0;
+
+  background-color: $header-primary-color;
+
+  & .caret {
+    border-top-color: $white;
+    border-bottom-color: $white;
+  }
+
+  & .active {
+    > a {
+      background-color: $header-active-color;
+    }
+  }
+
+  & .navbar-header {
+    margin: 0;
+
+    img {
+      height: 20px;
+    }
+
+    .navbar-brand {
+      background-color: $white;
+      background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
+    }
+  }
+
+  & .user-dropdown {
+    // Elimina el padding del elemento dropdown del nombre
+    // del usuario para la redimesion de la imagen de perfil.
+    padding: 0 12px 0 0;
+
+    span {
+      vertical-align: middle;
+
+      &.username {
+        display: inline-block;
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    img {
+      width: 51px;
+      height: 51px;
+      margin-right: 10px;
+    }
+  }
+
+  & .navbar-text {
+    color: $header-font-primary-color;
+  }
+
+  & .navbar-nav {
+    margin: 0;
+    li {
+      a {
+        color: $header-font-primary-color;
+
+        &:hover {
+          background-color: $header-accent-color;
+        }
+      }
+    }
+  }
+
+  & .nav {
+    li {
+      a {
+        &:hover {
+          background-color: $header-accent-color;
+        }
+
+        &:focus {
+          background-color: $header-accent-color;
+        }
+      }
+    }
+
+    .dropdown-menu {
+      li {
+        a {
+          color: $header-font-secondary-color;
+
+          &:hover {
+            background-color: $header-dropdown-active-item;
+          }
+        }
+      }
+    }
+
+    & .dropdown:hover {
+      & .dropdown-menu {
+        display: block;
+      }
+    }
+  }
+
+  & .navbar-right {
+    background-color: $header-primary-color;
+
+    & .caret {
+      border-top-color: $black;
+      border-bottom-color: $black;
+    }
+
+    a {
+      color: $black;
+
+      & .grader-error {
+        color: $status-error;
+        background-image: linear-gradient(
+          rgb(242, 222, 222) 0px,
+          rgb(231, 195, 195) 100%
+        );
+      }
+
+      & .grader-ok {
+        color: $status-success;
+        background-image: linear-gradient(
+          rgb(223, 240, 216) 0px,
+          rgb(200, 229, 188) 100%
+        );
+        background-color: rgb(223, 240, 216);
+      }
+
+      & .grader-warning {
+        color: $status-warning;
+        background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+        border-color: #f5e79e;
+      }
+    }
+  }
+
+  .container {
+    @media (max-width: 991px) {
+      max-width: 100% !important;
+    }
+  }
+
+  .navbar-inner {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+
+    @media (max-width: 991px) {
+      width: 100% !important;
+    }
+  }
+
+  .navbar-collapse {
+    max-height: none;
+
+    &.in {
+      overflow-y: visible;
+    }
+  }
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
