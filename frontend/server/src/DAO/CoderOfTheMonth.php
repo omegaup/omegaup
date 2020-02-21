@@ -267,14 +267,14 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         bool $autoselected = false
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
-        $sql = 'SELECT
+        $sql = "SELECT
                     *
                 FROM
                     Coder_Of_The_Month
                 WHERE
                     `time` = ?
                 AND
-                    `selected_by` ' . $clause . ';';
+                    `selected_by` {$clause}";
         /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 

@@ -200,7 +200,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         bool $autoselected = false
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
-        $sql = '
+        $sql = "
             SELECT
                 *
             FROM
@@ -208,7 +208,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             WHERE
                 time = ?
             AND
-                selected_by' . $clause . ';';
+                selected_by {$clause};";
 
         $schools = [];
         /** @var array{rank: int, school_id: int, school_of_the_month_id: int, selected_by: int|null, time: string} $row */
