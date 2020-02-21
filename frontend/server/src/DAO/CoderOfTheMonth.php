@@ -20,13 +20,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      *
      * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
-public static function calculateCoderOfTheMonth(
-    string $startTime,
-    string $endTime,
-    string $category = 'all'
-): ?array {
-    $genderClause = ($category == 'female') ? " AND i.gender = 'female'" : '';
-    $sql = "
+    public static function calculateCoderOfTheMonth(
+        string $startTime,
+        string $endTime,
+        string $category = 'all'
+    ): ?array {
+        $genderClause = ($category == 'female') ? " AND i.gender = 'female'" : '';
+        $sql = "
           SELECT DISTINCT
             IFNULL(i.user_id, 0) AS user_id,
             i.username,
@@ -97,23 +97,23 @@ public static function calculateCoderOfTheMonth(
           LIMIT 100
         ";
 
-    $val = [$startTime, $endTime, $endTime];
+        $val = [$startTime, $endTime, $endTime];
 
-    /** @var list<array{ProblemsSolved: int, classname: string, country_id: string, school_id: int|null, score: float, user_id: int, username: string}> */
-    $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
-    if (empty($results)) {
-        return null;
+        /** @var list<array{ProblemsSolved: int, classname: string, country_id: string, school_id: int|null, score: float, user_id: int, username: string}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
+        if (empty($results)) {
+            return null;
+        }
+        return $results;
     }
-    return $results;
-}
 
     /**
      * Get all first coders of the month
      * @return list<array{time: string, username: string, country_id: string, email: string|null}>
      */
-final public static function getCodersOfTheMonth(string $category = 'all'): array {
-    $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
-    $sql = "
+    final public static function getCodersOfTheMonth(string $category = 'all'): array {
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $sql = "
             SELECT
                 cm.time,
                 i.username,
@@ -144,21 +144,21 @@ final public static function getCodersOfTheMonth(string $category = 'all'): arra
                 cm.time DESC;
         ";
 
-    /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
-    return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
-}
+        /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
 
     /**
      * Gets all coders of the month from a certain school
      *
      * @return list<array{time: string, username: string, classname: string}>
      */
-final public static function getCodersOfTheMonthFromSchool(
-    int $schoolId,
-    string $category = 'all'
-): array {
-    $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
-    $sql = "
+    final public static function getCodersOfTheMonthFromSchool(
+        int $schoolId,
+        string $category = 'all'
+    ): array {
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $sql = "
             SELECT
               cm.time,
               i.username,
@@ -196,24 +196,24 @@ final public static function getCodersOfTheMonthFromSchool(
               cm.time DESC;
         ";
 
-    /** @var list<array{classname: string, time: string, username: string}> */
-    return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-        $sql,
-        [$schoolId]
-    );
-}
+        /** @var list<array{classname: string, time: string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$schoolId]
+        );
+    }
 
     /**
      * Get all coder of the months based on month
      * @return list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}>
      */
-final public static function getMonthlyList(
-    string $firstDay,
-    string $category = 'all'
-): array {
-    $date = date('Y-m-01', strtotime($firstDay));
-    $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
-    $sql = "
+    final public static function getMonthlyList(
+        string $firstDay,
+        string $category = 'all'
+    ): array {
+        $date = date('Y-m-01', strtotime($firstDay));
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $sql = "
           SELECT
             cm.time,
             cm.rank,
@@ -236,19 +236,19 @@ final public static function getMonthlyList(
             cm.rank ASC
           LIMIT 100
         ";
-    /** @var list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}> */
-    return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
-}
+        /** @var list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
+    }
 
     /**
      * Get true whether user is the last Coder of the month
      */
-final public static function isLastCoderOfTheMonth(
-    string $username,
-    string $category = 'all'
-): bool {
-    $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
-    $sql = "
+    final public static function isLastCoderOfTheMonth(
+        string $username,
+        string $category = 'all'
+    ): bool {
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $sql = "
           SELECT
             i.username
           FROM
@@ -264,22 +264,22 @@ final public static function isLastCoderOfTheMonth(
           LIMIT 1
         ";
 
-    /** @var array{username: string}|null */
-    $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, []);
-    if (empty($rs)) {
-        return false;
+        /** @var array{username: string}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, []);
+        if (empty($rs)) {
+            return false;
+        }
+        return $username == $rs['username'];
     }
-    return $username == $rs['username'];
-}
 
     /**
      * @return list<\OmegaUp\DAO\VO\CoderOfTheMonth>
      */
-final public static function getByTimeAndSelected(
-    string $time,
-    bool $autoselected = false,
-    string $category = 'all'
-): array {
+    final public static function getByTimeAndSelected(
+        string $time,
+        bool $autoselected = false,
+        string $category = 'all'
+    ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $categoryClause = ($category == 'female') ? " AND category = 'female'" : '';
         $sql = "SELECT
