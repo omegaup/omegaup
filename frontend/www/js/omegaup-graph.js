@@ -8,10 +8,16 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
       plotShadow: false,
       renderTo: renderTo,
     },
-    title: { text: 'veredictos de ' + title },
+    title: {
+      text: omegaup.UI.formatString(omegaup.T.wordsVerdictsOf, {
+        entity: title,
+      }),
+    },
     tooltip: {
       formatter: function() {
-        return '<b>Envíos</b>: ' + this.point.y;
+        return omegaup.UI.formatString(omegaup.T.wordsNumberOfRuns, {
+          number: this.point.y,
+        });
       },
     },
     plotOptions: {
@@ -39,7 +45,7 @@ OmegaupGraph.prototype.verdictCounts = function(renderTo, title, stats) {
     series: [
       {
         type: 'pie',
-        name: 'Proporción',
+        name: omegaup.T.wordsProportion,
         data: this.normalizeRunCounts(stats),
       },
     ],
@@ -84,7 +90,7 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
         },
       },
     },
-    title: { text: 'Envíos aun no revisados' },
+    title: { text: omegaup.T.wordsSubmissionsNotYetReviewed },
     xAxis: { type: 'datetime', tickPixelInterval: 200 },
     yAxis: {
       title: { text: 'Total' },
@@ -106,7 +112,7 @@ OmegaupGraph.prototype.pendingRuns = function(refreshRate, updateStatsFn) {
     exporting: { enabled: false },
     series: [
       {
-        name: 'Runs pendientes',
+        name: omegaup.T.wordsPendingRuns,
         data: (function() {
           // generate an array of random data
           var data = [],
@@ -143,10 +149,14 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
 
   return new Highcharts.Chart({
     chart: { type: 'column', renderTo: renderTo },
-    title: { text: 'Distribución de puntajes del concurso ' + title },
+    title: {
+      text: omegaup.UI.formatString(omegaup.T.wordsPointsDistribution, {
+        number: title,
+      }),
+    },
     xAxis: {
       categories: categories_vals,
-      title: { text: 'Distribución de puntos en 100 intervalos' },
+      title: { text: omegaup.T.wordsPointsDistributionInIntervals },
       labels: {
         formatter: function() {
           if (this.value % 10 == 0) {
@@ -157,11 +167,14 @@ OmegaupGraph.prototype.distributionChart = function(renderTo, title, stats) {
         },
       },
     },
-    yAxis: { min: 0, title: { text: '# Concursantes' } },
+    yAxis: { min: 0, title: { text: omegaup.T.wordsNumberOfContestants } },
     tooltip: {},
     plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
     series: [
-      { name: 'Número de concursantes', data: this.getDistribution(stats) },
+      {
+        name: omegaup.T.wordsNumberOfContestants,
+        data: this.getDistribution(stats),
+      },
     ],
   });
 };
