@@ -2895,11 +2895,44 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        return self::getStats($problem, $r->identity);
+    }
 
+    /**
+     * @return array{smartyProperties: array{payload: array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}}, template: string}
+     */
+    public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+        // Get user
+        $r->ensureIdentity();
+
+        // Validate request
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+        return [
+            'smartyProperties' => [
+                'payload' => self::getStats($problem, $r->identity),
+            ],
+            'template' => 'problem.stats.tpl',
+        ];
+    }
+
+    /**
+     * @return array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}
+     */
+    public static function getStats(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
         // We need to check that the user has privileges on the problem
         if (
             !\OmegaUp\Authorization::isProblemAdmin(
-                $r->identity,
+                $identity,
                 $problem
             )
         ) {
