@@ -3298,7 +3298,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
+     * @return array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         // Get user
@@ -3312,7 +3312,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
+     * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3331,7 +3331,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{total_runs: int, pending_runs: list<string>, max_wait_time: int, max_wait_time_guid: string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
+     * @return array{total_runs: int, pending_runs: list<string>, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}
      */
     private static function getStats(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -3406,7 +3406,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ) ? 0 : $waitTimeArray['time'],
             'max_wait_time_guid' => empty(
                 $waitTimeArray
-            ) ? '0' : $waitTimeArray['guid'],
+            ) ? null : $waitTimeArray['guid'],
             'verdict_counts' => $verdictCounts,
             'distribution' => $distribution,
             'size_of_bucket' => $sizeOfBucket,
