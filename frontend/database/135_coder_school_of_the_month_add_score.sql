@@ -8,4 +8,4 @@ ADD COLUMN
 ALTER TABLE
     `School_Of_The_Month`
 ADD COLUMN
-  `score` double NOT NULL DEFAULT '0';
+    `score` double NOT NULL DEFAULT '0';
