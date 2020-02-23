@@ -388,14 +388,12 @@ class School extends \OmegaUp\Controllers\Controller {
      */
     public static function getSchoolOfTheMonth(string $date = null): array {
         $firstDay = self::getCurrentMonthFirstDay($date);
-        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTimeAndSelected(
             $firstDay
         );
         if (empty($schoolsOfTheMonth)) {
             // Calculate and store new schools of the month
-            $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-                $firstDay
-            );
+            $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
             if (empty($schools)) {
                 return [
                     'schoolinfo' => null,

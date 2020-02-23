@@ -354,15 +354,22 @@ def update_school_of_the_month_candidates(
                             School_Of_The_Month (
                                 school_id,
                                 time,
-                                rank
+                                rank,
+                                score
                             )
                         VALUES (
+                            %s,
                             %s,
                             %s,
                             %s
                         );
                     ''',
-                    (row['school_id'], first_day_of_next_month, index + 1))
+                    (
+                        row['school_id'],
+                        first_day_of_next_month,
+                        index + 1,
+                        row['score']
+                    ))
 
 
 def main() -> None:

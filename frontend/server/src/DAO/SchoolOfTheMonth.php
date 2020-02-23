@@ -106,7 +106,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     /**
      * Returns the list of candidates to school of the month
      *
-     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
+     * @return list<array{school_id: int, name: string, score: flot, rank: int}>
      */
     public static function getCandidatesToSchoolOfTheMonth(): array {
         $date = new \DateTimeImmutable();
@@ -123,8 +123,27 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             return [];
         }
 
-        //TODO: Hacer que se seleccionen los datos que son necesarios para escuela del mes.
-        return [];
+        $sql = '
+            SELECT
+                s.school_id,
+                s.name,
+                sotm.score,
+                sotm.rank
+            FROM
+                School_Of_The_Month sotm
+            INNER JOIN
+                Schools s ON s.school_id = sotm.school_id
+            WHERE
+                sotm.time = ? AND
+                sotm.selected_by IS NULL
+            ORDER BY
+                s.rank IS NULL, s.rank ASC;';
+
+        /** @var list<array{school_id: int, name: string, score: flot, rank: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->getAll(
+            $sql,
+            [ $firstDayOfNextMonth ]
+        );
     }
 
     /**
