@@ -193,7 +193,38 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\SchoolOfTheMonth[]
+     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
+     */
+    public static function getByTimeAndSelected(
+        string $time,
+        bool $autoselected = false
+    ): array {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
+        $sql = "
+            SELECT
+                *
+            FROM
+                School_Of_The_Month
+            WHERE
+                time = ?
+            AND
+                selected_by {$clause};";
+
+        $schools = [];
+        /** @var array{rank: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$time]
+            ) as $row
+        ) {
+            $schools[] = new \OmegaUp\DAO\VO\SchoolOfTheMonth($row);
+        }
+        return $schools;
+    }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth>
      */
     public static function getByTime(
         string $time
@@ -207,14 +238,14 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 time = ?;';
 
         $schools = [];
-        /** @var array{rank: int, school_id: int, school_of_the_month_id: int, selected_by: int|null, time: string} $row */
+        /** @var array{rank: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 [$time]
             ) as $row
         ) {
-            array_push($schools, new \OmegaUp\DAO\VO\SchoolOfTheMonth($row));
+            $schools[] = new \OmegaUp\DAO\VO\SchoolOfTheMonth($row);
         }
         return $schools;
     }
