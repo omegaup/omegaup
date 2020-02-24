@@ -3116,7 +3116,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}, runsChartPayload: array{date: list<string>, total: list<int>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3136,20 +3136,26 @@ class User extends \OmegaUp\Controllers\Controller {
                         $firstDay
                     )['coderinfo'],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
-                    'rankTablePayload' => [
-                        'length' => $rowCount,
-                        'isIndex' => true,
-                        'availableFilters' => [],
-                    ],
-                    'schoolRankPayload' => [
-                        'length' => $rowCount,
-                        'showHeader' => true,
-                    ],
+                    'rankTable' => self::getRankByProblemsSolved(
+                        $isLogged ? $r->identity : null,
+                        /*$filter=*/ '',
+                        /*$offset=*/ 1,
+                        $rowCount
+                    ),
+                    'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
+                        $rowCount
+                    ),
                     'currentUserInfo' => $isLogged ? [
                         'username' => $r->identity->username,
                     ] : [],
                     'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
                     'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
+                    // TODO: Refactor Contest::apiList
+                    'upcomingContests' => \OmegaUp\Controllers\Contest::apiList(
+                        new \OmegaUp\Request([
+                            'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                        ])
+                    ),
                 ],
             ],
             'template' => 'index.tpl',
