@@ -69,8 +69,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
     /**
      * Gets an array of the guids of the pending runs
-     *
-     * @return list<string>
      */
     final public static function getPendingRunGuidsOfProblemset(
         int $problemsetId
@@ -296,12 +294,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
     /**
      * Gets the largest queued time of a run in seconds.
-     *
-     * @return array{guid: string, time: int}|null
      */
     final public static function getLargestWaitTimeOfProblemset(
         int $problemsetId
-    ) {
+    ): ?array {
         $sql = '
             SELECT
                 s.guid, UNIX_TIMESTAMP(s.time) AS time
