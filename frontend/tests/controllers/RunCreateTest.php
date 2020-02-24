@@ -89,7 +89,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             null,
             null,
-            false,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             'no',
             'false',
             $startTimeDelay

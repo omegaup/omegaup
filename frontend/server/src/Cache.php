@@ -212,6 +212,7 @@ class Cache {
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
+    const RUN_TOTAL_COUNTS = 'run-total-counts';
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
