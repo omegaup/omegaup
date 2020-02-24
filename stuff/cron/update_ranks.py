@@ -8,7 +8,6 @@ import logging
 import os
 import sys
 from typing import Sequence, NamedTuple
-import dateutil.relativedelta
 
 import MySQLdb
 import MySQLdb.cursors
@@ -261,10 +260,14 @@ def update_school_of_the_month_candidates(
     '''Updates the list of candidates to school of the current month'''
 
     logging.info('Updating the candidates to school of the month...')
-    first_day_of_next_month = (
-        first_day_of_current_month + dateutil.relativedelta.relativedelta(
-            months=1
-        )
+    first_day_of_next_month = datetime.date(
+        first_day_of_current_month.year + int(
+            first_day_of_current_month.month / 12
+        ),
+        (
+            (first_day_of_current_month.month % 12) + 1
+        ),
+        1
     )
 
     # First make sure there are not already selected schools of the month
