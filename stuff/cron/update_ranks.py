@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 from typing import Sequence, NamedTuple
-from dateutil.relativedelta import relativedelta
+import dateutil.relativedelta
 
 import MySQLdb
 import MySQLdb.cursors
@@ -25,6 +25,16 @@ class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     percentile: float
     classname: str
+
+
+def _default_date() -> datetime.date:
+    today = datetime.date.today()
+    return today.replace(day=1)
+
+
+def _parse_date(s: str) -> datetime.date:
+    today = datetime.datetime.strptime(s, '%Y-%m-%d').date()
+    return today.replace(day=1)
 
 
 def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
@@ -246,21 +256,22 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
 
 
 def update_school_of_the_month_candidates(
-        cur: MySQLdb.cursors.BaseCursor) -> None:
+        cur: MySQLdb.cursors.BaseCursor,
+        first_day_of_current_month: datetime.date) -> None:
     '''Updates the list of candidates to school of the current month'''
 
     logging.info('Updating the candidates to school of the month...')
-
-    today = datetime.date.today()
-    first_day_of_current_month = today.replace(day=1)
     first_day_of_next_month = (
-        first_day_of_current_month + relativedelta(months=1))
+        first_day_of_current_month + dateutil.relativedelta.relativedelta(
+            months=1
+        )
+    )
 
     # First make sure there are not already selected schools of the month
     cur.execute(
         '''
         SELECT
-            *
+            COUNT(*)
         FROM
             School_Of_The_Month
         WHERE
@@ -379,6 +390,10 @@ def main() -> None:
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
+    parser.add_argument('--date',
+                        type=_parse_date,
+                        default=_default_date(),
+                        help='The date the command should take as today')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -403,7 +418,7 @@ def main() -> None:
                 raise
 
             try:
-                update_school_of_the_month_candidates(cur)
+                update_school_of_the_month_candidates(cur, args.date)
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception(
