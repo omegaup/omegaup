@@ -1509,7 +1509,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
             $dateToSelect
         );
 
