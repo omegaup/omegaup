@@ -34,6 +34,10 @@ class User extends \OmegaUp\Controllers\Controller {
     const LANGUAGE_PT = 3;
     const LANGUAGE_PSEUDO = 4;
 
+    const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
+        'all', 'female',
+    ];
+
     /**
      * Entry point for Create a User API
      *
@@ -1382,7 +1386,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
-        $category = !empty($r['category']) ? strval($r['category']) : 'all';
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = !empty($r['category']) ? $r['category'] : 'all';
         $firstDay = self::getCurrentMonthFirstDay($date);
         $response = self::getCodersOfTheMonth($firstDay, $category);
         $response['status'] = 'ok';
@@ -1412,7 +1421,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'coderinfo' => null,
                 ];
             }
-
+            error_log($category);
             try {
                 \OmegaUp\DAO\DAO::transBegin();
                 // First place of list is going to be returned
@@ -1423,6 +1432,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'school_id' => $user['school_id'],
                         'time' => $firstDay,
                         'rank' => $index + 1,
+                        'category' => $category,
                     ]));
                 }
                 \OmegaUp\DAO\DAO::transEnd();
@@ -1476,7 +1486,12 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateOptionalDate($r['date'], 'date');
-        $category = !is_null($r['category']) ? strval($r['category']) : 'all';
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = !empty($r['category']) ? $r['category'] : 'all';
         if (!is_null($r['date'])) {
             $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
                 $r['date'],
@@ -1521,8 +1536,12 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth = new \DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
-
-        $category = !is_null($r['category']) ? strval($r['category']) : 'all';
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = !empty($r['category']) ? $r['category'] : 'all';
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
             $dateToSelect,
             $category
@@ -2068,6 +2087,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
+            \OmegaUp\Validators::validateOptionalStringNonEmpty(
+                $r['locale'],
+                'locale'
+            );
             $language = \OmegaUp\DAO\Languages::getByName(strval($r['locale']));
             if (is_null($language)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -3181,8 +3204,16 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity
         );
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = !empty($r['category']) ? $r['category'] : 'all';
+
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
         $bestCoders = [];
         if (!is_null($candidates)) {
@@ -3194,10 +3225,13 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth($category)
             ),
             'codersOfPreviousMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
+                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                    $currentDate,
+                    $category
+                )
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
@@ -3215,7 +3249,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     $currentTimeStamp
                 ),
             'coderIsSelected' =>
-                !empty(\OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect)),
+                !empty(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+                        $dateToSelect,
+                        $category
+                    )
+                ),
         ];
         return [
             'payload' => $response,

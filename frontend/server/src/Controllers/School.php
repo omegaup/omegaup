@@ -164,14 +164,20 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
-
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = !empty($r['category']) ? $r['category'] : 'all';
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
         return [
             'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
-                intval($school->school_id)
+                intval($school->school_id),
+                $category
             )
         ];
     }
