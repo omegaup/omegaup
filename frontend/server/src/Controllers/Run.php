@@ -1046,49 +1046,122 @@ class Run extends \OmegaUp\Controllers\Controller {
             return null;
         }
 
-        $descriptorspec = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
+        if (strpos($resourcePath, '/') !== 0) {
+            $resourcePath = "/{$resourcePath}";
+        }
+        $accessKeyId = strval(AWS_CLI_ACCESS_KEY_ID);
+        $secretAccessKey = strval(AWS_CLI_SECRET_ACCESS_KEY);
+        $regionName = 'us-east-1';
+        $bucketName = 'omegaup-runs';
+        $serviceName = 's3';
+        $signingAlgorithm = 'AWS4-HMAC-SHA256';
+
+        $now = \OmegaUp\Time::get();
+        $datestamp = gmstrftime('%Y%m%d', $now);
+        $timestamp = gmstrftime('%Y%m%dT%H%M%SZ', $now);
+        $emptySHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+        $headers = [
+            'Host' => "{$bucketName}.{$serviceName}.amazonaws.com",
+            'X-Amz-Content-Sha256' => $emptySHA256,
+            'X-Amz-Date' => $timestamp,
         ];
-        $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/{$resourcePath} -",
-            $descriptorspec,
-            $pipes,
-            '/tmp',
+        $signedHeaders = join(
+            ';',
+            array_map(
+                function (string $key): string {
+                    return strtolower($key);
+                },
+                array_keys($headers)
+            )
+        );
+        $canonicalRequest = join(
+            "\n",
             [
-                'AWS_ACCESS_KEY_ID' => AWS_CLI_ACCESS_KEY_ID,
-                'AWS_SECRET_ACCESS_KEY' => AWS_CLI_SECRET_ACCESS_KEY,
+                'GET',
+                $resourcePath,
+                '',
+                join(
+                    '',
+                    array_map(
+                        function (string $key) use ($headers): string {
+                            return strtolower($key) . ":{$headers[$key]}\n";
+                        },
+                        array_keys($headers)
+                    )
+                ),
+                $signedHeaders,
+                $emptySHA256,
             ]
         );
 
-        if (!is_resource($proc)) {
-            $errors = error_get_last();
-            if (is_null($errors)) {
-                self::$log->error("Getting {$resourcePath} failed");
-            } else {
-                self::$log->error(
-                    "Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}"
-                );
-            }
-            return null;
-        }
+        $scope = "{$datestamp}/{$regionName}/{$serviceName}/aws4_request";
+        $stringToSign = join(
+            "\n",
+            [
+                $signingAlgorithm,
+                $timestamp,
+                $scope,
+                hash('sha256', $canonicalRequest),
+            ]
+        );
 
-        fclose($pipes[0]);
-        $err = trim(stream_get_contents($pipes[2]));
-        fclose($pipes[2]);
+        $dateSignature = hash_hmac(
+            'sha256',
+            $datestamp,
+            "AWS4{$secretAccessKey}",
+            true
+        );
+        $regionSignature = hash_hmac(
+            'sha256',
+            $regionName,
+            $dateSignature,
+            true
+        );
+        $serviceSignature = hash_hmac(
+            'sha256',
+            $serviceName,
+            $regionSignature,
+            true
+        );
+        $signingKey = hash_hmac(
+            'sha256',
+            'aws4_request',
+            $serviceSignature,
+            true
+        );
+        $signature = hash_hmac(
+            'sha256',
+            $stringToSign,
+            $signingKey,
+            false
+        );
+        $headers['Authorization'] = "{$signingAlgorithm} Credential={$accessKeyId}/{$scope}, SignedHeaders={$signedHeaders}, Signature={$signature}";
+
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl,
+            [
+                CURLOPT_URL => "https://{$headers['Host']}{$resourcePath}",
+                CURLOPT_HTTPHEADER => array_map(
+                    function (string $key) use ($headers): string {
+                        return "{$key}: {$headers[$key]}";
+                    },
+                    array_keys($headers)
+                ),
+                CURLOPT_RETURNTRANSFER => intval(!$passthru),
+            ]
+        );
+
+        $output = curl_exec($curl);
         if ($passthru) {
-            fpassthru($pipes[1]);
             $result = '';
         } else {
-            $result = stream_get_contents($pipes[1]);
+            $result = strval($output);
         }
-        fclose($pipes[1]);
-
-        $retval = proc_close($proc);
-
-        if ($retval != 0) {
-            self::$log->error("Getting {$resourcePath} failed: $retval $err");
+        /** @var int */
+        $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($output === false || $retval != 200) {
+            self::$log->error("Getting {$resourcePath} failed: {$output}");
             return null;
         }
         return $result;

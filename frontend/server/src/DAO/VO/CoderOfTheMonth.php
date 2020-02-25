@@ -25,6 +25,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'selected_by' => true,
         'school_id' => true,
         'category' => true,
+        'score' => true,
+        'problems_solved' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -80,6 +82,16 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         if (isset($data['category'])) {
             $this->category = strval(
                 $data['category']
+            );
+        }
+        if (isset($data['score'])) {
+            $this->score = floatval(
+                $data['score']
+            );
+        }
+        if (isset($data['problems_solved'])) {
+            $this->problems_solved = intval(
+                $data['problems_solved']
             );
         }
     }
@@ -148,4 +160,18 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
      * @var string
      */
     public $category = 'all';
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var float
+     */
+    public $score = 0.00;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $problems_solved = 0;
 }
