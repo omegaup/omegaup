@@ -109,7 +109,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * @return list<array{school_id: int, name: string, score: flot, rank: int}>
      */
     public static function getCandidatesToSchoolOfTheMonth(): array {
-        $date = new \DateTimeImmutable();
+        $date = new \DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $date->modify(
             'first day of next month'
         )->format(
