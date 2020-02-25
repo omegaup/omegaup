@@ -116,13 +116,6 @@ class UITools {
                 'CURRENT_USER_GRAVATAR_URL_51',
                 \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '51')
             );
-
-            $smarty->assign(
-                'currentUserInfo',
-                [
-                    'username' => $identity->username,
-                ]
-            );
         } else {
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
