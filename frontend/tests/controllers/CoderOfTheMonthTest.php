@@ -575,7 +575,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($canChooseCoder);
     }
 
-
     public function testCoderOfTheMonthCalcFemale() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity, 'female');
@@ -650,7 +649,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $response['coders'][1]['username']
         );
     }
-
 
     public function testCoderOfTheMonthListFemale() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
