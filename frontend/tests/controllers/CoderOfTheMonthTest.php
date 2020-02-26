@@ -622,7 +622,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCoderOfTheMonthCalcFemale() {
-
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
             'verify' => true
@@ -658,7 +657,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->createRuns($extraIdentityMale, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($extraIdentityMale, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($extraIdentityMale, $runCreationDate, 1 /*numRuns*/);
-
 
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request(['category' => 'female'])
