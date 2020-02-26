@@ -622,20 +622,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCoderOfTheMonthCalcFemale() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity, 'female');
-        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($extraIdentity, 'female');
-        ['user' => $extraUserMale, 'identity' => $extraIdentityMale] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $extraUserMale, 'identity' => $extraIdentityMale] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($extraIdentityMale, 'male');
 
         // Add a custom school
@@ -729,23 +720,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCodersOfTheMonthBySchoolFemale() {
-        ['user' => $user_1, 'identity' => $identity_1] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $user_1, 'identity' => $identity_1] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity_1, 'female');
 
-        ['user' => $user_2, 'identity' => $identity_2] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $user_2, 'identity' => $identity_2] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity_2, 'female');
 
         // Identity 3 won't have school_id
-        ['user' => $user_3, 'identity' => $identity_3] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => (\OmegaUp\Test\Utils::createRandomString() . '@mail.com'),
-            'verify' => true
-        ]));
+        ['user' => $user_3, 'identity' => $identity_3] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity_3, 'female');
 
         // Add a custom school for identities 1 and 2
@@ -932,7 +914,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * Mentor can see the last coder of the month email
      */
     public function testMentorCanSeeLastCoderOfTheMonthEmailFemale() {
-        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        ['identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         $login = self::login($mentorIdentity);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
@@ -951,6 +933,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'username' => $coder,
+                    'category' => 'female',
                 ])
             );
 
@@ -975,6 +958,148 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
             $this->assertArrayNotHasKey('email', $profile);
         }
+    }
+
+    /**
+     * Sending several submissions at next month to verify
+     * apiSelectCoderOfTheMonth is working correctly, current month
+     * already has a coder of the month selected
+     */
+    public function testMentorSelectsUserAsCoderOfTheMonthFemale() {
+        ['user' => $mentor, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+
+        // Setting time to the 15th of next month.
+        $runCreationDate = new DateTimeImmutable(
+            date(
+                'Y-m-d',
+                \OmegaUp\Time::get()
+            )
+        );
+        $runCreationDate = $runCreationDate->modify('first day of next month');
+        $runCreationDate = new DateTimeImmutable(
+            $runCreationDate->format(
+                'Y-m-15'
+            )
+        );
+        \OmegaUp\Time::setTimeForTesting(
+            strtotime(
+                $runCreationDate->format(
+                    'Y-m-d'
+                )
+            )
+        );
+
+        // Submitting some runs with new users
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($identity1, 'female');
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($identity2, 'female');
+        ['identity' => $identity3] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($identity3, 'female');
+        $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 2);
+        $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 4);
+        $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 4);
+        $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 1);
+        $this->createRuns($identity3, $runCreationDate->format('Y-m-d'), 2);
+
+        // Setting new date to the first of the month following the run
+        // creation.
+        $firstDayOfNextMonth = $runCreationDate->modify(
+            'first day of next month'
+        );
+        \OmegaUp\Time::setTimeForTesting(
+            strtotime(
+                $firstDayOfNextMonth->format(
+                    'Y-m-d'
+                )
+            )
+        );
+
+        // Selecting one user as coder of the month
+        $login = self::login($mentorIdentity);
+
+        // Call api. This should fail.
+        try {
+            \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identity3->username,
+                'category' => 'female'
+            ]));
+            $this->fail(
+                'Exception was expected, because date is not in the range to select coder'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'coderOfTheMonthIsNotInPeriodToBeChosen'
+            );
+            // Pass
+        }
+
+        // Changing date to the last day of the month in which the run was created.
+        \OmegaUp\Time::setTimeForTesting(
+            strtotime(
+                $runCreationDate->format(
+                    'Y-m-t'
+                )
+            )
+        );
+
+        // Call api again.
+        \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity3->username,
+            'category' => 'female'
+        ]));
+
+        // Set date to first day of next month
+        \OmegaUp\Time::setTimeForTesting(
+            strtotime(
+                $firstDayOfNextMonth->format(
+                    'Y-m-d'
+                )
+            )
+        );
+
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => 'female'])
+        );
+        $this->assertNotNull(
+            $response['coderinfo'],
+            'A user has been selected by a mentor'
+        );
+        $this->assertEquals(
+            $response['coderinfo']['username'],
+            $identity3->username
+        );
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+            new \OmegaUp\Request(['category' => 'female'])
+        );
+
+        $this->assertEquals(
+            $firstDayOfNextMonth->format(
+                'Y-m-d'
+            ),
+            $response['coders'][0]['date']
+        );
+
+        // Should get all other candidates for coder of the month that had not been
+        // selected, and also the coder of the month previously selected.
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+            new \OmegaUp\Request([
+                'date' => date('Y-m-d', \OmegaUp\Time::get()),
+                'category' => 'female'
+            ])
+        );
+        $coders = [];
+        foreach ($response['coders'] as $coder) {
+            $coders[] = $coder['username'];
+        }
+        
+        $this->assertContains($identity1->username, $coders);
+        $this->assertContains($identity2->username, $coders);
+        $this->assertContains($identity3->username, $coders);
+        
     }
 
     /**

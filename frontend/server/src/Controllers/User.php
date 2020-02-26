@@ -1245,6 +1245,13 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $identity = self::resolveTargetIdentity($r);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1256,7 +1263,8 @@ class User extends \OmegaUp\Controllers\Controller {
         return self::getUserProfile(
             $r->identity,
             $identity,
-            $r['omit_rank'] ?: false
+            $r['omit_rank'] ?: false,
+            $category
         );
     }
 
@@ -1266,7 +1274,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getUserProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $omitRank = false
+        bool $omitRank = false,
+        string $category = 'all'
     ) {
         $user = is_null(
             $identity->user_id
@@ -1312,7 +1321,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 $loggedIdentity,
                 $identity,
                 $user,
-                $omitRank
+                $omitRank,
+                $category
             );
         }
         $response['classname'] = \OmegaUp\DAO\Users::getRankingClassName(

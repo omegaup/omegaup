@@ -345,14 +345,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        if ($category == 'female') {
-            return self::calculateCoderOfTheMonth(
-                $startTime,
-                $endTime,
-                $category
-            );
-        } else {
-            return self::calculateCoderOfTheMonth($startTime, $endTime);
-        }
+        return self::calculateCoderOfTheMonth(
+          $startTime,
+          $endTime,
+          $category
+        );
     }
 }
