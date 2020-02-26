@@ -1392,7 +1392,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = !empty($r['category']) ? $r['category'] : 'all';
+        $category = $r['category'] ?? 'all';
         $firstDay = self::getCurrentMonthFirstDay($date);
         $response = self::getCodersOfTheMonth($firstDay, $category);
         $response['status'] = 'ok';
@@ -1422,7 +1422,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'coderinfo' => null,
                 ];
             }
-            error_log($category);
+            
             try {
                 \OmegaUp\DAO\DAO::transBegin();
                 // First place of list is going to be returned
@@ -1492,7 +1492,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = !empty($r['category']) ? $r['category'] : 'all';
+        $category = $r['category'] ?? 'all';
         if (!is_null($r['date'])) {
             $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
                 $r['date'],
@@ -1542,7 +1542,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = !empty($r['category']) ? $r['category'] : 'all';
+        $category = $r['category'] ?? 'all';
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
             $dateToSelect,
             $category
@@ -2088,11 +2088,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            \OmegaUp\Validators::validateStringNonEmpty(
                 $r['locale'],
                 'locale'
             );
-            $language = \OmegaUp\DAO\Languages::getByName(strval($r['locale']));
+            $language = \OmegaUp\DAO\Languages::getByName($r['locale']);
             if (is_null($language)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'invalidLanguage',
@@ -3229,7 +3229,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = !empty($r['category']) ? $r['category'] : 'all';
+        $category = $r['category'] ?? 'all';
 
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
             $dateToSelect,

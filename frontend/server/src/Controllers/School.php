@@ -169,7 +169,7 @@ class School extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = !empty($r['category']) ? $r['category'] : 'all';
+        $category = $r['category'] ?? 'all';
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
