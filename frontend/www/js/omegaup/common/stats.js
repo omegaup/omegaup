@@ -8,7 +8,7 @@ OmegaUp.on('ready', function() {
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
-  const pointsDistribution =
+  const pointsDistributionLabel =
     payload.entity_type === 'contest'
       ? T.wordsPointsDistribution
       : T.wordsPointsDistributionProblem;
@@ -102,7 +102,7 @@ OmegaUp.on('ready', function() {
       distributionChartOptions: {
         chart: { type: 'column' },
         title: {
-          text: UI.formatString(pointsDistribution, {
+          text: UI.formatString(pointsDistributionLabel, {
             alias: payload.alias,
           }),
         },
@@ -228,10 +228,10 @@ OmegaUp.on('ready', function() {
 
   function getCategories(stats) {
     const categoriesDistributionValues = [];
-    let distributionSeparator = 0;
+    let startOfBucket = 0;
     for (const val in stats.distribution) {
-      categoriesDistributionValues[val] = distributionSeparator;
-      distributionSeparator += stats.size_of_bucket;
+      categoriesDistributionValues[val] = startOfBucket;
+      startOfBucket += stats.size_of_bucket;
     }
     return categoriesDistributionValues;
   }
