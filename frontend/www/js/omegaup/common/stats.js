@@ -8,26 +8,20 @@ OmegaUp.on('ready', function() {
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
-  let textPointsDistribution =
-    payload.entity === 'contest'
+  const pointsDistribution =
+    payload.entity_type === 'contest'
       ? T.wordsPointsDistribution
       : T.wordsPointsDistributionProblem;
-  let stats = {
+  const stats = {
     total_runs: 0,
     pending_runs: [],
     max_wait_time: 0,
     max_wait_time_guid: 0,
     verdict_counts: {},
     distribution: [],
-    size_of_bucket: [],
+    size_of_bucket: 10,
     total_points: 0,
   };
-  let categories_vals = [];
-  let separator = 0;
-  for (const val in stats.distribution) {
-    categories_vals[val] = separator;
-    separator += stats.size_of_bucket;
-  }
 
   let statsChart = new Vue({
     el: '#common-stats',
@@ -45,6 +39,9 @@ OmegaUp.on('ready', function() {
               series,
             );
             statsChart.distributionChartOptions.series[0].data = getDistribution(
+              series,
+            );
+            statsChart.distributionChartOptions.xAxis.categories = getCategories(
               series,
             );
             statsChart.stats.pending_runs = series.pending_runs;
@@ -105,12 +102,12 @@ OmegaUp.on('ready', function() {
       distributionChartOptions: {
         chart: { type: 'column' },
         title: {
-          text: UI.formatString(textPointsDistribution, {
+          text: UI.formatString(pointsDistribution, {
             alias: payload.alias,
           }),
         },
         xAxis: {
-          categories: categories_vals,
+          categories: getCategories(payload),
           title: { text: T.wordsPointsDistributionInIntervals },
           labels: {
             formatter: function() {
@@ -189,8 +186,8 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  function getStats(entity) {
-    if (payload.entity === 'contest') {
+  function getStats(entityType) {
+    if (entityType === 'contest') {
       API.Contest.stats({ contest_alias: payload.alias })
         .then(s => Vue.set(statsChart, 'stats', s))
         .fail(omegaup.UI.apiError);
@@ -221,14 +218,23 @@ OmegaUp.on('ready', function() {
   }
 
   function getDistribution(stats) {
-    let distribution = [];
-
-    for (let val in stats.distribution) {
+    const distribution = [];
+    for (const val in stats.distribution) {
       distribution.push(parseInt(stats.distribution[val]));
     }
 
     return distribution;
   }
 
-  setInterval(() => getStats(payload.entity), callStatsApiTimeout);
+  function getCategories(stats) {
+    const categoriesDistributionValues = [];
+    let distributionSeparator = 0;
+    for (const val in stats.distribution) {
+      categoriesDistributionValues[val] = distributionSeparator;
+      distributionSeparator += stats.size_of_bucket;
+    }
+    return categoriesDistributionValues;
+  }
+
+  setInterval(() => getStats(payload.entity_type), callStatsApiTimeout);
 });

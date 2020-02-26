@@ -2919,7 +2919,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'payload' => array_merge(
                     [
                         'alias' => $r['problem_alias'],
-                        'entity' => 'problem',
+                        'entity_type' => 'problem',
                     ],
                     self::getStats($problem, $r->identity)
                 ),

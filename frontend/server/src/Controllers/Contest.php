@@ -3327,7 +3327,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => array_merge(
                     [
                         'alias' => $r['contest_alias'],
-                        'entity' => 'contest',
+                        'entity_type' => 'contest',
                     ],
                     self::getStats($contest, $r->identity)
                 ),
