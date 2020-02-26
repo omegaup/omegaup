@@ -346,9 +346,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth(
-          $startTime,
-          $endTime,
-          $category
+            $startTime,
+            $endTime,
+            $category
         );
     }
 }

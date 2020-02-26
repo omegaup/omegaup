@@ -1095,11 +1095,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($response['coders'] as $coder) {
             $coders[] = $coder['username'];
         }
-        
+
         $this->assertContains($identity1->username, $coders);
         $this->assertContains($identity2->username, $coders);
         $this->assertContains($identity3->username, $coders);
-        
     }
 
     /**
