@@ -88,7 +88,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             ) AS cm on i.user_id = cm.user_id
           WHERE
             (cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?) AND
-            i.user_id IS NOT NULL 
+            i.user_id IS NOT NULL
             {$genderClause}
           GROUP BY
             up.identity_id
@@ -129,7 +129,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             LEFT JOIN
                 Emails e ON e.user_id = u.user_id
             WHERE
-                (cm.selected_by IS NOT NULL 
+                (cm.selected_by IS NOT NULL
                 OR (
                     cm.rank = 1 AND
                     NOT EXISTS (
@@ -233,7 +233,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LEFT JOIN
             Emails e ON e.email_id = u.main_email_id
           WHERE
-            cm.time = ? 
+            cm.time = ?
             {$categoryClause}
           ORDER BY
             cm.time DESC,
@@ -262,7 +262,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
-            cm.rank = 1 
+            cm.rank = 1
             {$categoryClause}
           ORDER BY
             cm.time DESC
@@ -292,7 +292,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ? 
+                    `time` = ?
                     {$categoryClause}
                 AND
                     `selected_by` {$clause};";
@@ -320,7 +320,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ? 
+                    `time` = ?
                     {$categoryClause};";
 
         /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, rank: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */

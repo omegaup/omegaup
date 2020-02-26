@@ -1422,7 +1422,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'coderinfo' => null,
                 ];
             }
-            
+
             try {
                 \OmegaUp\DAO\DAO::transBegin();
                 // First place of list is going to be returned

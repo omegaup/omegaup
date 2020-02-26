@@ -1036,5 +1036,5 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $timestampTest
         );
         $this->assertFalse($canChooseCoder);
-    }   
+    }
 }
