@@ -1194,7 +1194,7 @@ const translations = {
 	wordsPoints: "Puntos",
 	wordsPointsDistribution: "Distribuci\u00f3n de puntajes del concurso: %(alias)",
 	wordsPointsDistributionInIntervals: "Distribuci\u00f3n de puntos en intervalos de 100",
-	wordsPointsDistributionProblem: "Distribuci\u00f3n de puntajes del concurso: %(alias)",
+	wordsPointsDistributionProblem: "Distribuci\u00f3n de puntajes del problema: %(alias)",
 	wordsPointsForRank: "Puntos para ranking",
 	wordsPointsForRankTooltip: "Estos puntos representan el valor actual del problema. Resolver el problema har\u00e1 que valga menos puntos. Para m\u00e1s detalles visita este link.",
 	wordsPoor: "Baja",
