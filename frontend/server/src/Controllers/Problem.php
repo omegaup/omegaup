@@ -2916,7 +2916,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($problem, $r->identity),
+                'payload' => array_merge(
+                    [
+                        'alias' => $r['problem_alias'],
+                        'entity' => 'problem',
+                    ],
+                    self::getStats($problem, $r->identity)
+                ),
             ],
             'template' => 'problem.stats.tpl',
         ];

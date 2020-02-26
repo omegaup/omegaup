@@ -3,15 +3,15 @@ import Vue from 'vue';
 import { API, OmegaUp, T, UI } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
-  const contestAlias = /\/contest\/([^\/]+)\/stats\/?.*/.exec(
-    window.location.pathname,
-  )[1];
-
   Highcharts.setOptions({ global: { useUTC: false } });
+  const payload = JSON.parse(document.getElementById('payload').innerText);
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
+  let textPointsDistribution =
+    payload.entity === 'contest'
+      ? T.wordsPointsDistribution
+      : T.wordsPointsDistributionProblem;
   let stats = {
     total_runs: 0,
     pending_runs: [],
@@ -35,7 +35,6 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-contest-stats', {
         props: {
           stats: this.stats,
-          contestAlias: this.contestAlias,
           verdictChartOptions: this.verdictChartOptions,
           distributionChartOptions: this.distributionChartOptions,
           pendingChartOptions: this.pendingChartOptions,
@@ -55,16 +54,17 @@ OmegaUp.on('ready', function() {
     },
     data: {
       stats: payload,
-      contestAlias: contestAlias,
       verdictChartOptions: {
         chart: {
           plotBackgroundColor: null,
           plotBorderWidth: null,
           plotShadow: false,
         },
-        title: { text: UI.formatString(T.wordsVerdictsOf, {
-          entity: contestAlias,
-        }) },
+        title: {
+          text: UI.formatString(T.wordsVerdictsOf, {
+            alias: payload.alias,
+          }),
+        },
         tooltip: {
           formatter() {
             return UI.formatString(T.wordsNumberOfRuns, {
@@ -105,8 +105,8 @@ OmegaUp.on('ready', function() {
       distributionChartOptions: {
         chart: { type: 'column' },
         title: {
-          text: UI.formatString(T.wordsPointsDistribution, {
-            contest: contestAlias,
+          text: UI.formatString(textPointsDistribution, {
+            alias: payload.alias,
           }),
         },
         xAxis: {
@@ -190,7 +190,7 @@ OmegaUp.on('ready', function() {
   });
 
   function getStats() {
-    API.Contest.stats({ contest_alias: contestAlias })
+    API.Contest.stats({ contest_alias: payload.alias })
       .then(s => Vue.set(statsChart, 'stats', s))
       .fail(omegaup.UI.apiError);
   }

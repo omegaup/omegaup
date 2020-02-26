@@ -3324,7 +3324,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($contest, $r->identity),
+                'payload' => array_merge(
+                    [
+                        'alias' => $r['contest_alias'],
+                        'entity' => 'contest',
+                    ],
+                    self::getStats($contest, $r->identity)
+                ),
             ],
             'template' => 'contest.stats.tpl',
         ];
