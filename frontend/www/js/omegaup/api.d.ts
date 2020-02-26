@@ -473,10 +473,6 @@ declare namespace omegaup {
     rank: omegaup.SchoolsRank[];
   }
 
-  export interface Series {
-    setData(data: Array<number>): void;
-  }
-
   interface Signature {
     email: string;
     name: string;
@@ -488,7 +484,6 @@ declare namespace omegaup {
   }
 
   export interface Stats {
-    series: Series[];
     total_runs: string;
     pending_runs: Array<string>;
     max_wait_time: number;
