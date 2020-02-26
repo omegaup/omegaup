@@ -14,166 +14,178 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates an instance of Broadcaster if not already created
      */
-    private static function initializeBroadcaster() : void {
+    private static function getBroadcasterInstance(): \OmegaUp\Broadcaster {
         if (is_null(self::$broadcaster)) {
             // Create new grader
             self::$broadcaster = new \OmegaUp\Broadcaster();
         }
-    }
-
-    /**
-     * Validate the request of apiCreate
-     *
-     * @param \OmegaUp\Request $r
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     */
-    private static function validateCreate(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['username'], 'username');
-        \OmegaUp\Validators::validateStringOfLengthInRange($r['message'], 'message', 1, 200);
-
-        $r['contest'] = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
-        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        $r['identity'] = !is_null($r['username']) ?
-            \OmegaUp\DAO\Identities::findByUsername($r['username']) : null;
-
-        if (is_null($r['contest'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
-        }
-
-        if (is_null($r['problem'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        // Is the combination problemset_id and problem_id valid?
-        if (is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFoundInContest');
-        }
+        return self::$broadcaster;
     }
 
     /**
      * Creates a Clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{clarification_id: int}
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
         // Validate request
-        self::validateCreate($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['message'],
+            'message',
+            1,
+            200
+        );
 
-        $receiverId = $r['identity'] ? $r['identity']->identity_id : null;
-        $r['clarification'] = new \OmegaUp\DAO\VO\Clarifications([
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $identity = !is_null($r['username']) ?
+            \OmegaUp\DAO\Identities::findByUsername($r['username']) : null;
+
+        // Is the combination problemset_id and problem_id valid?
+        if (
+            is_null(
+                \OmegaUp\DAO\ProblemsetProblems::getByPK(
+                    $contest->problemset_id,
+                    $problem->problem_id
+                )
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFoundInContest'
+            );
+        }
+
+        $receiverId = $identity ? $identity->identity_id : null;
+        $clarification = new \OmegaUp\DAO\VO\Clarifications([
             'author_id' => $r->identity->identity_id,
             'receiver_id' => $receiverId,
-            'problemset_id' => $r['contest']->problemset_id,
-            'problem_id' => $r['problem']->problem_id,
+            'problemset_id' => $contest->problemset_id,
+            'problem_id' => $problem->problem_id,
             'message' => $r['message'],
             'time' => \OmegaUp\Time::get(),
-            'public' => $receiverId == $r->identity->identity_id ? '1' : '0',
+            'public' => $receiverId == $r->identity->identity_id,
         ]);
 
-        \OmegaUp\DAO\Clarifications::create($r['clarification']);
-        self::clarificationUpdated($r, $r['clarification']);
+        \OmegaUp\DAO\Clarifications::create($clarification);
+        self::clarificationUpdated(
+            $r,
+            $clarification,
+            $r->identity,
+            $problem,
+            $contest
+        );
 
         return [
-            'status' => 'ok',
-            'clarification_id' => $r['clarification']->clarification_id,
+            'clarification_id' => intval($clarification->clarification_id),
         ];
-    }
-
-    /**
-     * Validate Details API request
-     *
-     * @param \OmegaUp\Request $r
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     */
-    private static function validateDetails(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
-        $r->ensureInt('clarification_id');
-
-        // Check that the clarification actually exists
-        $r['clarification'] = \OmegaUp\DAO\Clarifications::getByPK($r['clarification_id']);
-        if (is_null($r['clarification'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
-        }
-
-        // If the clarification is private, verify that our user is invited or is contest director
-        if ($r['clarification']->public != 1) {
-            if (!\OmegaUp\Authorization::canViewClarification(
-                $r->identity,
-                $r['clarification']
-            )) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-            }
-        }
     }
 
     /**
      * API for getting a clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
         $r->ensureIdentity();
 
         // Validate request
-        self::validateDetails($r);
-
-        // Create array of relevant columns
-        $relevant_columns = ['message', 'answer', 'time', 'problem_id', 'problemset_id'];
-
-        // Add the clarificatoin the response
-        $response = $r['clarification']->asFilteredArray($relevant_columns);
-        $response['status'] = 'ok';
-
-        return $response;
-    }
-
-    /**
-     * Validate update API request
-     *
-     * @param \OmegaUp\Request $r
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     */
-    private static function validateUpdate(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
-        $r->ensureBool('public', false /* not required */);
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['answer'], 'answer');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['message'], 'message');
 
-        // Check that clarification exists
-        $r['clarification'] = \OmegaUp\DAO\Clarifications::GetByPK($r['clarification_id']);
-        if (is_null($r['clarification'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
+        // Check that the clarification actually exists
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK(
+            intval($r['clarification_id'])
+        );
+        if (is_null($clarification)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'clarificationNotFound'
+            );
         }
 
-        if (!\OmegaUp\Authorization::canEditClarification(
-            $r->identity,
-            $r['clarification']
-        )) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        // If the clarification is private, verify that our user is invited or is contest director
+        if ($clarification->public != 1) {
+            if (
+                !\OmegaUp\Authorization::canViewClarification(
+                    $r->identity,
+                    $clarification
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
         }
+
+        /** @var array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null} */
+        return $clarification->asFilteredArray([
+            'message',
+            'answer',
+            'time',
+            'problem_id',
+            'problemset_id',
+        ]);
     }
 
     /**
      * Update a clarification
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      */
-    public static function apiUpdate(\OmegaUp\Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
         // Validate request
-        self::validateUpdate($r);
+        $r->ensureInt('clarification_id');
+        $r->ensureBool('public', false /* not required */);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['answer'],
+            'answer'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['message'],
+            'message'
+        );
+
+        // Check that clarification exists
+        $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
+            intval($r['clarification_id'])
+        );
+        if (is_null($clarification)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'clarificationNotFound'
+            );
+        }
+
+        if (
+            !\OmegaUp\Authorization::canEditClarification(
+                $r->identity,
+                $clarification
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         // Update clarification
         $valueProperties = [
@@ -181,47 +193,64 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             'answer',
             'public',
         ];
-        $clarification = $r['clarification'];
         self::updateValueProperties($r, $clarification, $valueProperties);
-        $r['clarification'] = $clarification;
 
         // Save the clarification
         $clarification->time = \OmegaUp\Time::get();
         \OmegaUp\DAO\Clarifications::update($clarification);
 
-        $r['problem'] = $r['contest'] = $r['user'] = null;
-        self::clarificationUpdated($r, $clarification);
+        self::clarificationUpdated($r, $clarification, null, null, null);
 
-        $response = [];
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+        ];
     }
 
     private static function clarificationUpdated(
         \OmegaUp\Request $r,
-        \OmegaUp\DAO\VO\Clarifications $clarification
-    ) : void {
+        \OmegaUp\DAO\VO\Clarifications $clarification,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Problems $problem,
+        ?\OmegaUp\DAO\VO\Contests $contest
+    ): void {
         try {
-            if (is_null($r['problem'])) {
-                $r['problem'] = \OmegaUp\DAO\Problems::GetByPK($clarification->problem_id);
+            if (is_null($problem)) {
+                $problem = \OmegaUp\DAO\Problems::GetByPK(
+                    intval($clarification->problem_id)
+                );
+                if (is_null($problem)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemNotFound'
+                    );
+                }
             }
-            if (is_null($r['contest']) && !is_null($clarification->problemset_id)) {
-                $r['contest'] = \OmegaUp\DAO\Contests::getByProblemset($clarification->problemset_id);
+            if (
+                is_null($contest) &&
+                !is_null($clarification->problemset_id)
+            ) {
+                $contest = \OmegaUp\DAO\Contests::getByProblemset(
+                    $clarification->problemset_id
+                );
             }
-            if (is_null($r['user'])) {
-                $r['user'] = \OmegaUp\DAO\Identities::GetByPK($clarification->author_id);
+            if (is_null($identity)) {
+                $identity = \OmegaUp\DAO\Identities::GetByPK(
+                    intval($clarification->author_id)
+                );
+                if (is_null($identity)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'userNotFound'
+                    );
+                }
             }
         } catch (\Exception $e) {
             self::$log->error('Failed to broadcast clarification', $e);
             return;
         }
-        self::initializeBroadcaster();
-        self::$broadcaster->broadcastClarification(
+        self::getBroadcasterInstance()->broadcastClarification(
             $clarification,
-            $r['problem'],
-            $r['user'],
-            $r['contest']
+            $problem,
+            $identity,
+            $contest
         );
     }
 }

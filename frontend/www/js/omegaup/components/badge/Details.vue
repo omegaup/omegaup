@@ -2,8 +2,11 @@
   <div class="panel badge-details-panel">
     <h1 class="text-center">{{ name }}</h1>
     <figure class="badge-info-grid">
-      <img class="badge-icon"
-              v-bind:src="iconUrl">
+      <img
+        class="badge-icon"
+        v-bind:class="{ 'badge-gray': !this.badge.assignation_time }"
+        v-bind:src="iconUrl"
+      />
       <figcaption class="badge-description">
         {{ description }}
       </figcaption>
@@ -11,11 +14,11 @@
     <div class="badge-details-grid">
       <div class="badge-detail">
         <div class="badge-detail-data">
-          {{ ownersPercentage }}
+          {{ ownersNumber }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">👥</span> {{ this.T['badgeOwnersPercentageMessage']
-          }}
+          <span class="badge-detail-text-icon">👥</span>
+          {{ this.T['badgeOwnersMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -23,16 +26,15 @@
           {{ firstAssignationDate }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">📅</span> {{ this.T['badgeFirstAssignationMessage']
-          }}
+          <span class="badge-detail-text-icon">📅</span>
+          {{ this.T['badgeFirstAssignationMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
         <div class="badge-detail-data">
           {{ assignationDate }}
         </div>
-        <div class="badge-detail-text"
-             v-html="ownedMessage"></div>
+        <div class="badge-detail-text" v-html="ownedMessage"></div>
       </div>
     </div>
   </div>
@@ -42,53 +44,47 @@
 .badge-details-panel {
   padding: 15px;
 }
-
 .badge-info-grid,
 .badge-details-grid {
   display: grid;
   justify-content: center;
-  justify-items:center;
+  justify-items: center;
   align-items: center;
   text-align: center;
   row-gap: 40px;
   column-gap: 20px;
   padding: 30px 20px;
 }
-
 .badge-info-grid {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
-
 .badge-details-grid {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
-
 .badge-icon {
   max-width: 300px;
 }
-
 .badge-description {
   font-size: 20px;
 }
-
 .badge-detail {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
 .badge-detail-data {
   font-size: 45px;
   font-weight: bold;
 }
-
 .badge-detail-text {
   font-size: 18px;
 }
-
 .badge-detail-text-icon {
   font-size: 30px;
+}
+.badge-gray {
+  filter: grayscale(100%);
 }
 </style>
 
@@ -114,9 +110,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get iconUrl(): string {
-    return !!this.badge.assignation_time
-      ? `/media/dist/badges/${this.badge.badge_alias}.svg`
-      : '/media/locked_badge.svg';
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 
   get ownedMessage(): string {
@@ -137,11 +131,8 @@ export default class BadgeDetails extends Vue {
       : '';
   }
 
-  get ownersPercentage(): string {
-    return this.badge.owners_percentage
-      ? `${this.badge.owners_percentage.toFixed(2)}%`
-      : '';
+  get ownersNumber(): string {
+    return `${this.badge.owners_count}/${this.badge.total_users}`;
   }
 }
-
 </script>

@@ -4,6 +4,8 @@
 
 stage_before_install() {
 	init_submodules
+
+	sudo ln -sf python3.6 /usr/bin/python3
 }
 
 stage_install() {
@@ -34,9 +36,18 @@ stage_script() {
 		--configuration=frontend/tests/phpunit.xml \
 		--coverage-clover=coverage.xml \
 		frontend/tests/controllers
+	mv frontend/tests/controllers/mysql_types.log \
+		frontend/tests/controllers/mysql_types.log.1
 	phpunit --bootstrap frontend/tests/bootstrap.php \
 		--configuration=frontend/tests/phpunit.xml \
 		frontend/tests/badges
+	mv frontend/tests/controllers/mysql_types.log \
+		frontend/tests/controllers/mysql_types.log.2
+	cat frontend/tests/controllers/mysql_types.log.1 \
+		frontend/tests/controllers/mysql_types.log.2 > \
+		frontend/tests/controllers/mysql_types.log
+	python3 stuff/process_mysql_return_types.py \
+		frontend/tests/controllers/mysql_types.log
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
 	python3 stuff/policy-tool.py --database=omegaup-test validate
 

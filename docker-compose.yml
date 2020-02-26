@@ -1,0 +1,94 @@
+version: '3.3'
+
+services:
+
+  frontend:
+    build:
+      dockerfile: ./Dockerfile.dev-php
+      context: ./stuff/docker/
+    image: omegaup/dev-php:latest
+    restart: always
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/omegaup
+      - 'omegaupdata:/var/lib/omegaup'
+    depends_on:
+      - mysql
+      - gitserver
+      - grader
+    ports:
+      - target: 8000
+        published: 8001
+        protocol: tcp
+        mode: host
+
+  gitserver:
+    build:
+      dockerfile: ./Dockerfile.gitserver
+      context: ./stuff/docker/
+    image: omegaup/dev-gitserver:latest
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+      - 'omegaupdata:/var/lib/omegaup'
+    expose:
+      - '33681'
+      - '33682'
+      - '6060'
+
+  broadcaster:
+    build:
+      dockerfile: ./Dockerfile.broadcaster
+      context: ./stuff/docker/
+    image: omegaup/dev-broadcaster:latest
+    restart: always
+    depends_on:
+      - mysql
+    expose:
+      - '6060'
+      - '32672'
+      - '22291'
+
+  grader:
+    build:
+      dockerfile: ./Dockerfile.grader
+      context: ./stuff/docker/
+    image: omegaup/dev-grader:latest
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+      - 'omegaupdata:/var/lib/omegaup'
+    expose:
+      - '6060'
+      - '21680'
+
+  runner:
+    build:
+      dockerfile: ./Dockerfile.runner
+      context: ./stuff/docker/
+    image: omegaup/dev-runner:latest
+    restart: always
+    depends_on:
+      - grader
+    expose:
+      - '6060'
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'omegaup'
+      MYSQL_USER: 'omegaup'
+      MYSQL_PASSWORD: 'omegaup'
+      MYSQL_ROOT_PASSWORD: 'omegaup'
+    expose:
+      - '3306'
+    volumes:
+      - 'dbdata:/var/lib/mysql'
+
+volumes:
+  dbdata:
+  omegaupdata:

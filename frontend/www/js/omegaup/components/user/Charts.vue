@@ -1,30 +1,41 @@
 <template>
   <div class="panel-body">
-    <label><input type="radio"
-           v-model="type"
-           value="delta"> {{ T.profileStatisticsDelta }}</label> <label><input type="radio"
-           v-model="type"
-           value="cumulative"> {{ T.profileStatisticsCumulative }}</label> <label><input type=
-           "radio"
-           v-model="type"
-           value="total"> {{ T.profileStatisticsTotal }}</label>
-    <div class="period-group text-center"
-         v-if="type != 'total' &amp;&amp; type != ''">
-      <label><input name="period"
-             type="radio"
-             v-model="period"
-             value="day"> {{ T.profileStatisticsDay }}</label> <label><input name="period"
-             type="radio"
-             v-model="period"
-             value="week"> {{ T.profileStatisticsWeek }}</label> <label><input name="period"
-             type="radio"
-             v-model="period"
-             value="month"> {{ T.profileStatisticsMonth }}</label> <label><input name="period"
-             type="radio"
-             v-model="period"
-             value="year"> {{ T.profileStatisticsYear }}</label>
-    </div><!-- id-lint off -->
-    <div id="verdict-chart"></div><!-- id-lint on -->
+    <label
+      ><input type="radio" v-model="type" value="delta" />
+      {{ T.profileStatisticsDelta }}</label
+    >
+    <label
+      ><input type="radio" v-model="type" value="cumulative" />
+      {{ T.profileStatisticsCumulative }}</label
+    >
+    <label
+      ><input type="radio" v-model="type" value="total" />
+      {{ T.profileStatisticsTotal }}</label
+    >
+    <div
+      class="period-group text-center"
+      v-if="type != 'total' &amp;&amp; type != ''"
+    >
+      <label
+        ><input name="period" type="radio" v-model="period" value="day" />
+        {{ T.profileStatisticsDay }}</label
+      >
+      <label
+        ><input name="period" type="radio" v-model="period" value="week" />
+        {{ T.profileStatisticsWeek }}</label
+      >
+      <label
+        ><input name="period" type="radio" v-model="period" value="month" />
+        {{ T.profileStatisticsMonth }}</label
+      >
+      <label
+        ><input name="period" type="radio" v-model="period" value="year" />
+        {{ T.profileStatisticsYear }}</label
+      >
+    </div>
+    <!-- id-lint off -->
+    <div id="verdict-chart"></div>
+    <!-- id-lint on -->
   </div>
 </template>
 
@@ -89,7 +100,7 @@ export default class UserCharts extends Vue {
   chart: any = null;
 
   @Watch('type')
-  onPropertyChanged(newValue: string): void {
+  onTypeChanged(newValue: string): void {
     let self = this;
     if (newValue == 'total') {
       self.renderAggregateStatistics();
@@ -99,7 +110,7 @@ export default class UserCharts extends Vue {
   }
 
   @Watch('period')
-  onPropertyChanged(newValue: string): void {
+  onPeriodChanged(newValue: string): void {
     let self = this;
     self.renderPeriodStatistics();
   }
@@ -134,7 +145,7 @@ export default class UserCharts extends Vue {
         total[amount.verdict] += amount.runs;
         return total;
       },
-      { WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0 },
+      { WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0, VE: 0 },
     );
     let verdicts = Object.keys(runs);
     let response: NormalizedRunCounts[] = [];
@@ -213,7 +224,7 @@ export default class UserCharts extends Vue {
     }
     let periodStats: GroupedPeriods = {};
     for (let period of periods) {
-      periodStats[period] = stats.reduce(function(groups, item) {
+      periodStats[period] = stats.reduce((groups, item) => {
         let val = item[period];
         groups[val] = groups[val] || { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 };
         groups[val][item.verdict] += item.runs;
@@ -337,5 +348,4 @@ export default class UserCharts extends Vue {
     self.chart.redraw();
   }
 }
-
 </script>

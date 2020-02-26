@@ -1,7 +1,7 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleProblemEdit#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemEdit#}" inline}
 
-<script src="{version_hash src="/js/dist/problem_edit.js"}" type="text/javascript"></script>
+{js_include entrypoint="problem_edit"}
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
@@ -23,7 +23,7 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="edit">
-    {include file='problem.edit.form.tpl'}
+    {include file='problem.edit.form.tpl' inline}
   </div>
 
   <div class="tab-pane" id="markdown">
@@ -216,4 +216,4 @@
   </div>
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

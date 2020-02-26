@@ -1,10 +1,27 @@
 <template>
-  <span v-if="linkify"><a v-bind:class="classname"
-     v-bind:href="`/profile/${username}/`">{{ username }}</a></span> <span v-bind:class="classname"
-        v-else="">{{ username }}</span>
+  <span v-if="linkify">
+    <omegaup-countryflag
+      v-bind:country="country"
+      v-if="country != null"
+    ></omegaup-countryflag>
+    <a
+      v-bind:class="classname"
+      v-bind:title="username"
+      v-bind:href="`/profile/${username}/`"
+      >{{ username }}</a
+    ></span
+  >
+  <span v-bind:class="classname" v-bind:title="username" v-else="">
+    <omegaup-countryflag
+      v-bind:country="country"
+      v-if="country != null"
+    ></omegaup-countryflag
+    >{{ username }}</span
+  >
 </template>
 
 <style>
+.user-rank-unranked,
 .user-rank-beginner,
 .user-rank-specialist,
 .user-rank-expert,
@@ -14,34 +31,39 @@
 }
 
 .user-rank-beginner {
-   color: #919191;
+  color: #919191;
 }
 
 .user-rank-specialist {
-  color: #598C4C;
+  color: #598c4c;
 }
 
 .user-rank-expert {
-  color: #1C52C7;
+  color: #1c52c7;
 }
 
 .user-rank-master {
-  color: #F0C245;
+  color: #f0c245;
 }
 
 .user-rank-international-master {
-  color: #CB000A;
+  color: #cb000a;
 }
 </style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import CountryFlag from '../CountryFlag.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-countryflag': CountryFlag,
+  },
+})
 export default class UserName extends Vue {
   @Prop() username!: string;
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
+  @Prop() country!: string;
 }
-
 </script>

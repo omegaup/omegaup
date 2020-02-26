@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import badge_List from '../components/badge/List.vue';
-import {OmegaUp, T, API} from '../omegaup.js';
+import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
           allBadges: this.allBadges,
           visitorBadges: this.visitorBadges,
           showAllBadgesLink: false,
-        }
+        },
       });
     },
     data: {
@@ -26,14 +26,17 @@ OmegaUp.on('ready', function() {
   });
   if (payload.logged_in) {
     API.Badge.myList({})
-        .then(function(data) {
-          badgeList.visitorBadges =
-              new Set(data['badges'].map(badge => badge.badge_alias));
-        })
-        .fail(UI.apiError);
+      .then(function(data) {
+        badgeList.visitorBadges = new Set(
+          data['badges'].map(badge => badge.badge_alias),
+        );
+      })
+      .fail(UI.apiError);
   }
 
   API.Badge.list({})
-      .then(function(data) { badgeList.allBadges = new Set(data); })
-      .fail(UI.apiError);
+    .then(function(data) {
+      badgeList.allBadges = new Set(data);
+    })
+    .fail(UI.apiError);
 });

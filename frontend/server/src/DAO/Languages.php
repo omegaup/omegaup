@@ -14,7 +14,9 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Languages extends \OmegaUp\DAO\Base\Languages {
-    final public static function getByName($name) {
+    final public static function getByName(
+        string $name
+    ): ?\OmegaUp\DAO\VO\Languages {
         $sql = 'SELECT
                     *
                 FROM
@@ -24,11 +26,11 @@ class Languages extends \OmegaUp\DAO\Base\Languages {
                 LIMIT
                     0, 1;';
 
+        /** @var array{country_id: null|string, language_id: int, name: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
-
         return new \OmegaUp\DAO\VO\Languages($row);
     }
 }

@@ -1,0 +1,2 @@
+ALTER TABLE `Tags`
+  MODIFY COLUMN `name` varchar(50) NOT NULL;

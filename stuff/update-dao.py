@@ -14,7 +14,7 @@ import dao_utils
 _OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _main():
+def _main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--script',
@@ -23,7 +23,7 @@ def _main():
     )
     args = parser.parse_args()
 
-    for dao in dao_utils.generate_dao(args.script.read()):
+    for dao in dao_utils.generate_dao(args.script.read()):  # type: ignore
         if dao.file_type == 'dao':
             filename = os.path.join(
                 _OMEGAUP_ROOT, 'frontend/server/src/DAO/Base', dao.filename)

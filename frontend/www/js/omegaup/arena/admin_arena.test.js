@@ -2,10 +2,10 @@
 
 require('../../dist/commons.js');
 var omegaup = require('../../dist/omegaup.js');
-var Markdown =
-    require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
+var arena = require('../../dist/arena.js');
+var Markdown = require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
 
-describe('omegaup.arena', function() {
+describe('arena', function() {
   describe('ArenaAdmin', function() {
     beforeAll(function() {
       omegaup.OmegaUp.ready = true;
@@ -13,12 +13,12 @@ describe('omegaup.arena', function() {
     });
 
     it('can be instantiated', function() {
-      if (typeof(global) !== 'undefined' && !global.Markdown) {
+      if (typeof global !== 'undefined' && !global.Markdown) {
         global.Markdown = Markdown;
       }
-      var arena = new omegaup.arena.Arena({contestAlias: 'test'});
-      var admin = new omegaup.arena.ArenaAdmin(arena);
-      expect(arena.problemsetAdmin).toEqual(true);
+      var arenaInstance = new arena.Arena({ contestAlias: 'test' });
+      var adminInstance = new arena.ArenaAdmin(arenaInstance);
+      expect(arenaInstance.problemsetAdmin).toEqual(true);
     });
   });
 });

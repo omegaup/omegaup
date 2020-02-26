@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -20,19 +20,25 @@ class RolesPermissions extends \OmegaUp\DAO\VO\VO {
         'permission_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['role_id'])) {
-            $this->role_id = (int)$data['role_id'];
+            $this->role_id = intval(
+                $data['role_id']
+            );
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = (int)$data['permission_id'];
+            $this->permission_id = intval(
+                $data['permission_id']
+            );
         }
     }
 

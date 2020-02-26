@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -24,67 +24,99 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'acl_id' => true,
         'start_time' => true,
         'finish_time' => true,
-        'public' => true,
+        'admission_mode' => true,
         'school_id' => true,
         'needs_basic_information' => true,
         'requests_user_information' => true,
         'show_scoreboard' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['course_id'])) {
-            $this->course_id = (int)$data['course_id'];
+            $this->course_id = intval(
+                $data['course_id']
+            );
         }
         if (isset($data['name'])) {
-            $this->name = strval($data['name']);
+            $this->name = strval(
+                $data['name']
+            );
         }
         if (isset($data['description'])) {
-            $this->description = strval($data['description']);
+            $this->description = strval(
+                $data['description']
+            );
         }
         if (isset($data['alias'])) {
-            $this->alias = strval($data['alias']);
+            $this->alias = strval(
+                $data['alias']
+            );
         }
         if (isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+            $this->group_id = intval(
+                $data['group_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['start_time'])) {
             /**
              * @var string|int|float $data['start_time']
              * @var int $this->start_time
              */
-            $this->start_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['start_time']);
+            $this->start_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['start_time']
+                )
+            );
         }
         if (isset($data['finish_time'])) {
             /**
              * @var string|int|float $data['finish_time']
              * @var int $this->finish_time
              */
-            $this->finish_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['finish_time']);
+            $this->finish_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['finish_time']
+                )
+            );
         }
-        if (isset($data['public'])) {
-            $this->public = boolval($data['public']);
+        if (isset($data['admission_mode'])) {
+            $this->admission_mode = strval(
+                $data['admission_mode']
+            );
         }
         if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
+            $this->school_id = intval(
+                $data['school_id']
+            );
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = boolval($data['needs_basic_information']);
+            $this->needs_basic_information = boolval(
+                $data['needs_basic_information']
+            );
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = strval($data['requests_user_information']);
+            $this->requests_user_information = strval(
+                $data['requests_user_information']
+            );
         }
         if (isset($data['show_scoreboard'])) {
-            $this->show_scoreboard = boolval($data['show_scoreboard']);
+            $this->show_scoreboard = boolval(
+                $data['show_scoreboard']
+            );
         }
     }
 
@@ -140,18 +172,18 @@ class Courses extends \OmegaUp\DAO\VO\VO {
     public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-     * Hora de finalizacion de este curso
+     * [Campo no documentado]
      *
-     * @var int
+     * @var int|null
      */
-    public $finish_time = 946706400; // 2000-01-01 06:00:00
+    public $finish_time = null;
 
     /**
-     * True implica que cualquier usuario puede entrar al curso
+     * Modalidad en la que se registra un curso.
      *
-     * @var bool
+     * @var string
      */
-    public $public = false;
+    public $admission_mode = 'private';
 
     /**
      * [Campo no documentado]

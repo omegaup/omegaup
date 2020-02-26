@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -34,27 +34,46 @@ abstract class UserRankCutoffs {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\UserRankCutoffs[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\UserRankCutoffs> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\UserRankCutoffs}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\UserRankCutoffs>
      */
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `User_Rank_Cutoffs`.`score`, `User_Rank_Cutoffs`.`percentile`, `User_Rank_Cutoffs`.`classname` from User_Rank_Cutoffs';
+    ): array {
+        $sql = '
+            SELECT
+                `User_Rank_Cutoffs`.`score`,
+                `User_Rank_Cutoffs`.`percentile`,
+                `User_Rank_Cutoffs`.`classname`
+            FROM
+                `User_Rank_Cutoffs`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\UserRankCutoffs($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\UserRankCutoffs(
+                $row
+            );
         }
         return $allData;
     }
@@ -67,15 +86,37 @@ abstract class UserRankCutoffs {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRankCutoffs} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRankCutoffs}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs) : int {
-        $sql = 'INSERT INTO User_Rank_Cutoffs (`score`, `percentile`, `classname`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs
+    ): int {
+        $sql = '
+            INSERT INTO
+                User_Rank_Cutoffs (
+                    `score`,
+                    `percentile`,
+                    `classname`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($User_Rank_Cutoffs->score) ? null : (float)$User_Rank_Cutoffs->score,
-            is_null($User_Rank_Cutoffs->percentile) ? null : (float)$User_Rank_Cutoffs->percentile,
+            (
+                is_null($User_Rank_Cutoffs->score) ?
+                null :
+                floatval($User_Rank_Cutoffs->score)
+            ),
+            (
+                is_null($User_Rank_Cutoffs->percentile) ?
+                null :
+                floatval($User_Rank_Cutoffs->percentile)
+            ),
             $User_Rank_Cutoffs->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

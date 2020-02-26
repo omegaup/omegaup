@@ -1,28 +1,30 @@
 <?php
 
-class UserRankTest extends OmegaupTestCase {
+class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Tests apiRankByProblemsSolved
      */
     public function testFullRankByProblemSolved() {
         // Create a user and sumbit a run with him
-        $contestant = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestantIdentity
         );
-        $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestant->username) {
+            if ($entry['username'] == $contestantIdentity->username) {
                 $found = true;
                 $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
@@ -38,22 +40,31 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testPrivateUserInRanking() {
         // Create a private user
-        $contestantPrivate = UserFactory::createUser(new UserParams(['is_private' => true]));
+        ['user' => $contestantPrivate, 'identity' => $identityPrivate] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['isPrivate' => true]
+            )
+        );
         // Create one problem and a submission by the private user
-        $problemData = ProblemsFactory::createProblem();
-        $runDataPrivate = RunsFactory::createRunToProblem($problemData, $contestantPrivate);
-        RunsFactory::gradeRun($runDataPrivate);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identityPrivate
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         // Contestants should not appear in the rank as they're private.
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestantPrivate->username) {
+            if ($entry['username'] == $identityPrivate->username) {
                 $found = true;
                 break;
             }
@@ -66,38 +77,43 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testFullRankByProblemSolvedNoPrivateProblems() {
         // Create a user and sumbit a run with him
-        $contestant = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestantIdentity
         );
-        $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create a user and sumbit a run with him
-        $contestant2 = UserFactory::createUser();
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
-        $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
-        RunsFactory::gradeRun($runDataPrivate);
+        $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemDataPrivate,
+            $identity2
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestant->username) {
+            if ($entry['username'] === $contestantIdentity->username) {
                 $found = true;
                 $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
 
-            if ($entry['username'] == $contestant2->username) {
+            if ($entry['username'] === $identity2->username) {
                 $this->fail('User with private problem solved showed in rank.');
             }
         }
@@ -110,20 +126,20 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testUserRankByProblemsSolved() {
         // Create a user and sumbit a run with him
-        $contestant = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestantIdentity
         );
-        $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $contestant->username
+            'username' => $contestantIdentity->username
         ]));
 
         $this->assertEquals($response['name'], $contestantIdentity->name);
@@ -135,17 +151,14 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testUserRankByProblemsSolvedWith0Runs() {
         // Create a user with no runs
-        $contestant = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
-        );
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $contestant->username
+            'username' => $contestantIdentity->username
         ]));
 
         $this->assertEquals($response['name'], $contestantIdentity->name);
@@ -154,20 +167,39 @@ class UserRankTest extends OmegaupTestCase {
     }
 
     /**
-     * Tests apiRankByProblemsSolved filters
+     * Testing filters via API and Smarty
      */
     public function testUserRankFiltered() {
         // Create a school
         $school = SchoolsFactory::createSchool();
         // Create a user with no country, state and school
-        $contestantWithNoCountry = UserFactory::createUser();
-        $problemData = ProblemsFactory::createProblem();
-        $runDataContestantWithNoCountry = RunsFactory::createRunToProblem($problemData, $contestantWithNoCountry);
-        RunsFactory::gradeRun($runDataContestantWithNoCountry);
+        [
+            'identity' => $identityWithNoCountry,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identityWithNoCountry);
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identityWithNoCountry
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantWithNoCountry);
+
+        // User should not have filters
+        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['rankTablePayload']['availableFilters'];
+        $this->assertArrayNotHasKey('country', $availableFilters);
+        $this->assertArrayNotHasKey('state', $availableFilters);
+        $this->assertArrayNotHasKey('school', $availableFilters);
 
         // Create a user with country, state and school
-        $contestant = UserFactory::createUser();
-        $login = self::login($contestant);
+        [
+            'identity' => $identityWithCountryAndSchool,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identityWithCountryAndSchool);
 
         $states = \OmegaUp\DAO\States::getByCountry('MX');
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -178,27 +210,47 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // create runs
-        $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant, $login);
-        RunsFactory::gradeRun($runDataContestant);
+        $runDataContestant = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identityWithCountryAndSchool,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestant);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Getting available filters from identities
+        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['rankTablePayload']['availableFilters'];
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'country'
-        ]));
+        $this->assertArrayHasKey('country', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'country',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'state'
-        ]));
+        $this->assertArrayHasKey('state', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'state',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'filter' => 'school'
-        ]));
+        $this->assertArrayHasKey('school', $availableFilters);
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'filter' => 'school',
+            ])
+        );
         $this->assertCount(1, $response['rank']);
     }
 
@@ -207,12 +259,15 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testUserRankWithStateCollision() {
         // Create two problems
-        $problemData[] = ProblemsFactory::createProblem();
-        $problemData[] = ProblemsFactory::createProblem();
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create two users from Maranhao, Brasil
-        $contestantFromMaranhao1 = UserFactory::createUser();
-        $maranhao1Login = self::login($contestantFromMaranhao1);
+        [
+            'user' => $contestantFromMaranhao1,
+            'identity' => $identityFromMaranhao1
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $maranhao1Login = self::login($identityFromMaranhao1);
 
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $maranhao1Login->auth_token,
@@ -221,21 +276,24 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // Create two runs of different problems
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+        $runDataContestantFromMaranhao1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMaranhao1,
+            $identityFromMaranhao1,
             $maranhao1Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
-        $runDataContestantFromMaranhao1 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
+        $runDataContestantFromMaranhao1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[1],
-            $contestantFromMaranhao1,
+            $identityFromMaranhao1,
             $maranhao1Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao1);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao1);
 
-        $contestantFromMaranhao2 = UserFactory::createUser();
-        $maranhao2Login = self::login($contestantFromMaranhao2);
+        [
+            'user' => $contestantFromMaranhao2,
+            'identity' => $identityFromMaranhao2
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $maranhao2Login = self::login($identityFromMaranhao2);
 
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $maranhao2Login->auth_token,
@@ -244,16 +302,19 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // Create o run of one problem
-        $runDataContestantFromMaranhao2 = RunsFactory::createRunToProblem(
+        $runDataContestantFromMaranhao2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMaranhao2,
+            $identityFromMaranhao2,
             $maranhao2Login
         );
-        RunsFactory::gradeRun($runDataContestantFromMaranhao2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantFromMaranhao2);
 
         // Create a user from Massachusetts, USA
-        $contestantFromMassachusetts = UserFactory::createUser();
-        $massachusettsLogin = self::login($contestantFromMassachusetts);
+        [
+            'user' => $contestantFromMassachusetts,
+            'identity' => $identityFromMassachusetts
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $massachusettsLogin = self::login($identityFromMassachusetts);
 
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $massachusettsLogin->auth_token,
@@ -262,15 +323,17 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // create a run of one problem
-        $runDataContestantFromMassachusetts = RunsFactory::createRunToProblem(
+        $runDataContestantFromMassachusetts = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData[0],
-            $contestantFromMassachusetts,
+            $identityFromMassachusetts,
             $massachusettsLogin
         );
-        RunsFactory::gradeRun($runDataContestantFromMassachusetts);
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runDataContestantFromMassachusetts
+        );
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
@@ -296,44 +359,64 @@ class UserRankTest extends OmegaupTestCase {
 
     public function testUserRankingClassName() {
         // Create a user and sumbit a run with them
-        $contestant = UserFactory::createUser();
-        $problemData = ProblemsFactory::createProblem();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
-            'username' => $contestant->username
-        ]));
+        $response = \OmegaUp\Controllers\User::apiProfile(
+            new \OmegaUp\Request([
+                'username' => $identity->username
+            ])
+        );
 
-        $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
+        $this->assertNotEquals(
+            $response['classname'],
+            'user-rank-unranked'
+        );
     }
 
     public function testUserRankWithForfeitedProblem() {
-        $firstPlaceUser = UserFactory::createUser();
-        $login = self::login($firstPlaceUser);
+        ['user' => $firstPlaceUser, 'identity' => $firstPlaceIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($firstPlaceIdentity);
         $problems = [];
-        $extraProblem = ProblemsFactory::createProblem();
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
-            $problems[] = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problems[$i], $firstPlaceUser, $login);
-            RunsFactory::gradeRun($run);
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $firstPlaceIdentity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
-        $run = RunsFactory::createRunToProblem($extraProblem, $firstPlaceUser, $login);
-        RunsFactory::gradeRun($run);
+        $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $extraProblem,
+            $firstPlaceIdentity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run);
 
-        $user = UserFactory::createUser();
-        $login = self::login($user);
-        for ($i = 0;
-            $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-            $i++) {
-            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
-            RunsFactory::gradeRun($run);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
@@ -342,17 +425,21 @@ class UserRankTest extends OmegaupTestCase {
             'forfeit_problem' => true,
         ]));
 
-        $run = RunsFactory::createRunToProblem($extraProblem, $user, $login);
-        RunsFactory::gradeRun($run);
+        $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $extraProblem,
+            $identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run);
 
         // Refresh Rank
-        Utils::RunUpdateUserRank();
+        \OmegaUp\Test\Utils::runUpdateRanks();
 
         $firstPlaceUserRank = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $firstPlaceUser->username
+            'username' => $firstPlaceIdentity->username
         ]));
         $userRank = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $user->username
+            'username' => $identity->username
         ]));
 
         $this->assertTrue($firstPlaceUserRank['rank'] < $userRank['rank']);

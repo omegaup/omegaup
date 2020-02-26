@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../bootstrap.php');
+require_once(__DIR__ . '/../bootstrap.php');
 
 Logger::configure([
     'rootLogger' => [
@@ -28,7 +28,7 @@ Logger::configure([
 /**
  * @return Generator<int, string>
  */
-function listDir(string $path) : Generator {
+function listDir(string $path): Generator {
     $dh = opendir($path);
     if (!is_resource($dh)) {
         die("Failed to open {$path}");
@@ -42,7 +42,7 @@ function listDir(string $path) : Generator {
     closedir($dh);
 }
 
-function pathJoin(string $parent, string... $components) : string {
+function pathJoin(string $parent, string ...$components): string {
     $path = rtrim($parent, '/');
     foreach ($components as $component) {
         if (strpos('/', $component) === 0) {
@@ -56,7 +56,14 @@ function pathJoin(string $parent, string... $components) : string {
 
 foreach (listDir(TEMPLATES_PATH) as $problemAlias) {
     $problemDeployer = new \OmegaUp\ProblemDeployer($problemAlias);
-    foreach (listDir(pathJoin(TEMPLATES_PATH, $problemAlias)) as $problemCommit) {
+    foreach (
+        listDir(
+            pathJoin(
+                TEMPLATES_PATH,
+                $problemAlias
+            )
+        ) as $problemCommit
+    ) {
         $problemDeployer->generateLibinteractiveTemplates($problemCommit);
     }
 }

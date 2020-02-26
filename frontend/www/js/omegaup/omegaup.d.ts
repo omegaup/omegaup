@@ -1,5 +1,6 @@
 declare namespace omegaup {
   export interface Experiments {
+    isEnabled: (name: string) => bool;
   };
 
   export interface EventListenerList {

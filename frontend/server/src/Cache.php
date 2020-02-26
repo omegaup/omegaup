@@ -9,7 +9,7 @@ abstract class CacheAdapter {
     /** @var CacheAdapter|null */
     private static $_instance = null;
 
-    public static function getInstance() : CacheAdapter {
+    public static function getInstance(): CacheAdapter {
         if (is_null(CacheAdapter::$_instance)) {
             if (function_exists('apcu_clear_cache')) {
                 CacheAdapter::$_instance = new APCCacheAdapter();
@@ -34,10 +34,10 @@ abstract class CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    abstract public function add(string $key, $var, int $ttl = 0) : bool;
-    abstract public function cas(string $key, int $old, int $new) : bool;
-    abstract public function clear() : void;
-    abstract public function delete(string $key) : bool;
+    abstract public function add(string $key, $var, int $ttl = 0): bool;
+    abstract public function cas(string $key, int $old, int $new): bool;
+    abstract public function clear(): void;
+    abstract public function delete(string $key): bool;
 
     /**
      * @param string $key
@@ -50,7 +50,7 @@ abstract class CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    abstract public function store(string $key, $var, int $ttl = 0) : bool;
+    abstract public function store(string $key, $var, int $ttl = 0): bool;
 }
 
 /**
@@ -80,19 +80,19 @@ class APCCacheAdapter extends CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    public function add(string $key, $var, int $ttl = 0) : bool {
+    public function add(string $key, $var, int $ttl = 0): bool {
         return apcu_add($key, $var, $ttl);
     }
 
-    public function cas(string $key, int $old, int $new) : bool {
+    public function cas(string $key, int $old, int $new): bool {
         return apcu_cas($key, $old, $new);
     }
 
-    public function clear() : void {
+    public function clear(): void {
         apcu_clear_cache();
     }
 
-    public function delete(string $key) : bool {
+    public function delete(string $key): bool {
         return apcu_delete($key);
     }
 
@@ -109,7 +109,7 @@ class APCCacheAdapter extends CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    public function store(string $key, $var, int $ttl = 0) : bool {
+    public function store(string $key, $var, int $ttl = 0): bool {
         return apcu_store($key, $var, $ttl);
     }
 }
@@ -141,7 +141,7 @@ class InProcessCacheAdapter extends CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    public function add(string $key, $var, int $ttl = 0) : bool {
+    public function add(string $key, $var, int $ttl = 0): bool {
         if (array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -149,19 +149,22 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function cas(string $key, int $old, int $new) : bool {
-        if (!array_key_exists($key, $this->cache) || $this->cache[$key] !== $old) {
+    public function cas(string $key, int $old, int $new): bool {
+        if (
+            !array_key_exists($key, $this->cache) ||
+            $this->cache[$key] !== $old
+        ) {
             return false;
         }
         $this->cache[$key] = $new;
         return true;
     }
 
-    public function clear() : void {
+    public function clear(): void {
         $this->cache = [];
     }
 
-    public function delete(string $key) : bool {
+    public function delete(string $key): bool {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -185,7 +188,7 @@ class InProcessCacheAdapter extends CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    public function store(string $key, $var, int $ttl = 0) : bool {
+    public function store(string $key, $var, int $ttl = 0): bool {
         $this->cache[$key] = $var;
         return true;
     }
@@ -209,12 +212,14 @@ class Cache {
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
+    const RUN_TOTAL_COUNTS = 'run-total-counts';
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
+    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
 
     /** @var \Logger */
     private $log;
@@ -248,11 +253,17 @@ class Cache {
      * @param int $timeout (seconds)
      * @return boolean
      */
-    public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT) : bool {
+    public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT): bool {
         if (!self::isEnabled()) {
             return false;
         }
-        if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) !== true) {
+        if (
+            CacheAdapter::getInstance()->store(
+                $this->key,
+                $value,
+                $timeout
+            ) !== true
+        ) {
             $this->log->debug("Cache store failed for key: {$this->key}");
             return false;
         }
@@ -267,12 +278,14 @@ class Cache {
      *
      * @return boolean
      */
-    public function delete() : bool {
+    public function delete(): bool {
         if (!self::isEnabled()) {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
-            $this->log->warn("Failed to invalidate cache for key: {$this->key}");
+            $this->log->warn(
+                "Failed to invalidate cache for key: {$this->key}"
+            );
             return false;
         }
         return true;
@@ -283,13 +296,13 @@ class Cache {
      *
      * Si el cache está prendido y la clave está en el cache, regresa el valor. Si no está, regresa null
      *
-     * @return mixed
+     * @return null|mixed
      */
     public function get() {
         if (!self::isEnabled()) {
             return null;
         }
-        /** @var mixed */
+        /** @var false|mixed */
         $result = CacheAdapter::getInstance()->fetch($this->key);
         if ($result === false) {
             $this->log->info("Cache miss for key: {$this->key}");
@@ -304,12 +317,15 @@ class Cache {
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
      *
+     * @template T
+     *
      * @param string $prefix
      * @param string $id
-     * @param callable():mixed $setFunc
+     * @param callable():T $setFunc
      * @param int $timeout (seconds)
      * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
-     * @return mixed the value returned from the cache or $setFunc().
+     *
+     * @return T the value returned from the cache or $setFunc().
      */
     public static function getFromCacheOrSet(
         string $prefix,
@@ -319,10 +335,10 @@ class Cache {
         ?bool &$cacheUsed = null
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
-        /** @var mixed */
+        /** @var null|T */
         $returnValue = $cache->get();
 
-        // If there wasn't a value in the cache for the key ($prefix, $id)
+        // If there was a value in the cache for the key ($prefix, $id)
         if (!is_null($returnValue)) {
             if (!is_null($cacheUsed)) {
                 $cacheUsed = true;
@@ -330,15 +346,62 @@ class Cache {
             return $returnValue;
         }
 
-        // Get the value from the function provided
-        /** @var mixed */
-        $returnValue = call_user_func($setFunc);
-        $cache->set($returnValue, $timeout);
+        // Get a lock to prevent multiple requests from trying to create the
+        // same cache entry. The name of the lockfile is derived from the
+        // prefix, not the full key, since it is still preferred to rate-limit
+        // all possible cache interactions with the same prefix, since they
+        // typically deal with pagination. That way multiple independent caches
+        // can still make progress.
+        //
+        // This is preferred over apcu_entry() because that function grabs a
+        // *global* lock that blocks evey single APCu function call!
+        $lockFile = '/tmp/omegaup-cache-' . sha1($prefix) . '.lock';
 
-        if (!is_null($cacheUsed)) {
-            $cacheUsed = false;
+        $f = fopen($lockFile, 'w');
+        try {
+            flock($f, LOCK_EX);
+
+            // Maybe by the time we acquired the lock it had already been
+            // populated by another request.
+            /** @var null|T */
+            $returnValue = $cache->get();
+            if (!is_null($returnValue)) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = true;
+                }
+                return $returnValue;
+            }
+
+            // Get the value from the function provided
+            $cache->log->info('Calling $setFunc');
+            /** @var T */
+            $returnValue = call_user_func($setFunc);
+            $cache->set($returnValue, $timeout);
+            $cache->log->info('Committed value');
+
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = false;
+            }
+            return $returnValue;
+        } finally {
+            flock($f, LOCK_UN);
+            fclose($f);
+            // By the time the code reaches this point, it might be the case
+            // that another request managed to reach the critical section and
+            // also opened the file. In that case, it could be the case that
+            // multiple requests will attempt to unlink the lock file, so it's
+            // totally okay for them to fail.
+            //
+            // Additionally, since this is performed after the call to set(),
+            // even if we somehow managed to unlink the file between the time
+            // another request checked if the cache was set and it tried to
+            // open the lockfile (thus opening a completely unrelated file that
+            // is not synchronized with the current one at all), that other
+            // request will finish acquiring the lockfile and then see that the
+            // cache value had already been set, causing no additional
+            // evaluations of $setFunc.
+            @unlink($lockFile);
         }
-        return $returnValue;
     }
 
     /**
@@ -347,7 +410,7 @@ class Cache {
      * @param string $prefix
      * @param string $id
      */
-    public static function deleteFromCache($prefix, $id = '') : void {
+    public static function deleteFromCache($prefix, $id = ''): void {
         $cache = new \OmegaUp\Cache($prefix, $id);
         $cache->delete();
     }
@@ -357,9 +420,9 @@ class Cache {
      *
      * @param string $prefix
      */
-    private static function getVersion(string $prefix) : int {
+    private static function getVersion(string $prefix): int {
         $key = "v{$prefix}";
-        return (int) CacheAdapter::getInstance()->entry($key, 0);
+        return intval(CacheAdapter::getInstance()->entry($key, 0));
     }
 
     /**
@@ -370,7 +433,7 @@ class Cache {
      *
      * @param string $prefix
      */
-    public static function invalidateAllKeys(string $prefix) : void {
+    public static function invalidateAllKeys(string $prefix): void {
         if (!self::isEnabled()) {
             return;
         }
@@ -380,10 +443,16 @@ class Cache {
         do {
             // Ensure the version key exists.
             $version = self::getVersion($prefix);
-        } while (!CacheAdapter::getInstance()->cas($key, $version, $version + 1));
+        } while (
+            !CacheAdapter::getInstance()->cas(
+                $key,
+                $version,
+                $version + 1
+            )
+        );
     }
 
-    private static function isEnabled() : bool {
+    private static function isEnabled(): bool {
         return defined('APC_USER_CACHE_ENABLED') &&
             APC_USER_CACHE_ENABLED === true;
     }
@@ -393,7 +462,7 @@ class Cache {
      *
      * Only use this for testing purposes.
      */
-    public static function clearCacheForTesting() : void {
+    public static function clearCacheForTesting(): void {
         CacheAdapter::getInstance()->clear();
     }
 }
