@@ -237,7 +237,7 @@
       <code>$value</code>
       <code>$value</code>
     </MissingClosureParamType>
-    <MixedArgument occurrences="8">
+    <MixedArgument occurrences="9">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
