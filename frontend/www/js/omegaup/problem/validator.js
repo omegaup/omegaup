@@ -6,7 +6,7 @@ OmegaUp.on('ready', function() {
   const payload = JSON.parse(
     document.getElementById('problem-payload').innerText,
   );
-  let problemsValidator = new Vue({
+  let problemValidator = new Vue({
     el: '#problem-validator',
     render: function(createElement) {
       return createElement('omegaup-problem-validator', {

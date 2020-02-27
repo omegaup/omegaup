@@ -3885,36 +3885,31 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
                 'problemEditFormCustom'
-            )
+            ),
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        $validLanguages = [ join(
+        $validLanguages = [ 
+            join(
             ',',
             $sortedLanguages
-        ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
-        'kj,kp' => 'Karel',
-        'cat' => \OmegaUp\Translations::getInstance()->get(
-            'wordsJustOutput'
-        ),
-        '' => \OmegaUp\Translations::getInstance()->get(
-            'wordsNoSubmissions'
-        )];
+            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+            'kj,kp' => 'Karel',
+            'cat' => \OmegaUp\Translations::getInstance()->get('wordsJustOutput'),
+            '' => \OmegaUp\Translations::getInstance()->get('wordsNoSubmissions' ),
+        ];
         if (!isset($r['request'])) {
             return [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
                 'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
-                'LANGUAGES' => join(
-                    ',',
-                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
-                ),
+                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                 'payload' => [
                     'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     'validLanguages' => $validLanguages,
                     'validatorsTypes' => $validatorsTypes,
-                    ]
+                ],
             ];
         }
         // Validate commit message.
@@ -4013,21 +4008,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
                 'problemEditFormCustom'
-            )
+            ),
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        $validLanguages = [ join(
+        $validLanguages = [ 
+            join(
             ',',
             $sortedLanguages
-        ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
-        'kj,kp' => 'Karel',
-        'cat' => \OmegaUp\Translations::getInstance()->get(
-            'wordsJustOutput'
-        ),
-        '' => \OmegaUp\Translations::getInstance()->get(
-            'wordsNoSubmissions'
-        )];
+            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+            'kj,kp' => 'Karel',
+            'cat' => \OmegaUp\Translations::getInstance()->get('wordsJustOutput'),
+            '' => \OmegaUp\Translations::getInstance()->get('wordsNoSubmissions' ),
+        ];
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
@@ -4087,10 +4080,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'SOURCE' => '',
                 'VISIBILITY' => '0',
                 'STATUS_ERROR' => '',
-                'LANGUAGES' => join(
-                    ',',
-                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
-                ),
+                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
                 'payload' => [

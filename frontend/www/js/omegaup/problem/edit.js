@@ -17,7 +17,7 @@ OmegaUp.on('ready', function() {
   const payload = JSON.parse(
     document.getElementById('problem-payload').innerText,
   );
-  let problemsValidator = new Vue({
+  let problemValidator = new Vue({
     el: '#problem-validator',
     render: function(createElement) {
       return createElement('omegaup-problem-validator', {
@@ -615,9 +615,9 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemsValidator.languages = languages;
+    problemValidator.languages = languages;
     $('input[name=title]').val(problem.title);
-    problemsValidator.timeLimit = UI.parseDuration(
+    problemValidator.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,
     );
 
@@ -625,21 +625,21 @@ OmegaUp.on('ready', function() {
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      problemsValidator.validatorTimeLimit = UI.parseDuration(
+      problemValidator.validatorTimeLimit = UI.parseDuration(
         problem.settings.validator.custom_validator.limits.TimeLimit,
       );
     } else {
-      problemsValidator.validatorTimeLimit = 0;
+      problemValidator.validatorTimeLimit = 0;
     }
-    problemsValidator.overallWallTimeLimit = UI.parseDuration(
+    problemValidator.overallWallTimeLimit = UI.parseDuration(
       problem.settings.limits.OverallWallTimeLimit,
     );
-    problemsValidator.extraWallTime = UI.parseDuration(
+    problemValidator.extraWallTime = UI.parseDuration(
       problem.settings.limits.ExtraWallTime,
     );
-    problemsValidator.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
-    problemsValidator.outputLimit = problem.settings.limits.OutputLimit;
-    problemsValidator.inputLimit = problem.input_limit;
+    problemValidator.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
+    problemValidator.outputLimit = problem.settings.limits.OutputLimit;
+    problemValidator.inputLimit = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -698,7 +698,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    problemsValidator.languages = chosenLanguage;
+    problemValidator.languages = chosenLanguage;
     API.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',
