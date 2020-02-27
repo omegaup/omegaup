@@ -29,8 +29,6 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js" defer}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js" defer}"></script>
-{else}
-		<script type="text/javascript" src="{version_hash src="/js/omegaup-graph.js"}" defer></script>
 {/if}
 
 {if isset($jsfile)}
