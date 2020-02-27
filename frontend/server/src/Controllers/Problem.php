@@ -3889,14 +3889,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        $validLanguages = [ 
+        $validLanguages = [
             join(
-            ',',
-            $sortedLanguages
+                ',',
+                $sortedLanguages
             ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
             'kj,kp' => 'Karel',
-            'cat' => \OmegaUp\Translations::getInstance()->get('wordsJustOutput'),
-            '' => \OmegaUp\Translations::getInstance()->get('wordsNoSubmissions' ),
+            'cat' => \OmegaUp\Translations::getInstance()->get(
+                'wordsJustOutput'
+            ),
+            '' => \OmegaUp\Translations::getInstance()->get(
+                'wordsNoSubmissions'
+            ),
         ];
         if (!isset($r['request'])) {
             return [
@@ -4012,14 +4016,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        $validLanguages = [ 
+        $validLanguages = [
             join(
-            ',',
-            $sortedLanguages
+                ',',
+                $sortedLanguages
             ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
             'kj,kp' => 'Karel',
-            'cat' => \OmegaUp\Translations::getInstance()->get('wordsJustOutput'),
-            '' => \OmegaUp\Translations::getInstance()->get('wordsNoSubmissions' ),
+            'cat' => \OmegaUp\Translations::getInstance()->get(
+                'wordsJustOutput'
+            ),
+            '' => \OmegaUp\Translations::getInstance()->get(
+                'wordsNoSubmissions'
+            ),
         ];
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
