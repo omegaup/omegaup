@@ -9,8 +9,6 @@ omegaup.arena.ContestList = function(domElement, apiParams, uiParams) {
     {
       active: 'ALL',
       recommended: 'ALL',
-      participating: 'NO',
-      public: 'NO',
       // TODO: Make this match uiParams.pageSize and do smaller requests.
       page_size: 1000,
     },
@@ -20,9 +18,7 @@ omegaup.arena.ContestList = function(domElement, apiParams, uiParams) {
     {
       header: omegaup.T.wordsContests,
       pageSize: 10,
-      showTimes:
-        actualApiParams.active == 'ACTIVE' ||
-        actualApiParams.active == 'FUTURE',
+      showTimes: actualApiParams.active != 'PAST',
       showPractice: actualApiParams.active == 'PAST',
       showVirtual: actualApiParams.active == 'PAST',
       showPublicUpdated: actualApiParams.public == 'YES',

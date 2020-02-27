@@ -227,7 +227,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Gets the top X schools of the month
      * @return list<array{school_id: int, name: string, country_id: string, score: float}>
      */
-    private static function getTopSchoolsOfTheMonth(
+    public static function getTopSchoolsOfTheMonth(
         int $rowcount
     ): array {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
@@ -258,10 +258,6 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiSchoolsOfTheMonth(\OmegaUp\Request $r) {
         $r->ensureInt('rowcount', null, null, false);
         $rowcount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
-        $firstDayOfNextMonth = $currentDate->modify('first day of next month');
-        $date = $firstDayOfNextMonth->format('Y-m-d');
 
         return [
             'rank' => self::getTopSchoolsOfTheMonth(
@@ -494,7 +490,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTimeAndSelected(
             $dateToSelect
         );
         if (!empty($schoolsOfTheMonth)) {

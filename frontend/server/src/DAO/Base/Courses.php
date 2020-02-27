@@ -39,7 +39,7 @@ abstract class Courses {
                 `acl_id` = ?,
                 `start_time` = ?,
                 `finish_time` = ?,
-                `public` = ?,
+                `admission_mode` = ?,
                 `school_id` = ?,
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
@@ -68,7 +68,7 @@ abstract class Courses {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->finish_time
             ),
-            intval($Courses->public),
+            $Courses->admission_mode,
             (
                 is_null($Courses->school_id) ?
                 null :
@@ -106,7 +106,7 @@ abstract class Courses {
                 `Courses`.`acl_id`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
-                `Courses`.`public`,
+                `Courses`.`admission_mode`,
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
@@ -200,7 +200,7 @@ abstract class Courses {
                 `Courses`.`acl_id`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
-                `Courses`.`public`,
+                `Courses`.`admission_mode`,
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
@@ -262,7 +262,7 @@ abstract class Courses {
                     `acl_id`,
                     `start_time`,
                     `finish_time`,
-                    `public`,
+                    `admission_mode`,
                     `school_id`,
                     `needs_basic_information`,
                     `requests_user_information`,
@@ -301,7 +301,7 @@ abstract class Courses {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->finish_time
             ),
-            intval($Courses->public),
+            $Courses->admission_mode,
             (
                 is_null($Courses->school_id) ?
                 null :

@@ -84,9 +84,10 @@ OmegaUp.on('ready', function() {
                   order_in_contest: ev.order,
                   problem_alias: ev.alias,
                   points: ev.points,
-                  commit: ev.selectedRevision
-                    ? ev.selectedRevision.commit
-                    : undefined,
+                  commit:
+                    !ev.useLatestVersion && ev.selectedRevision
+                      ? ev.selectedRevision.commit
+                      : undefined,
                 })
                   .then(function(response) {
                     if (response.status != 'ok') {

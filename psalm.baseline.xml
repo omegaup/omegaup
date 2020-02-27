@@ -141,33 +141,7 @@
     </TypeDoesNotContainNull>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MissingParamType occurrences="13">
-      <code>$username</code>
-      <code>$name</code>
-      <code>$gender</code>
-      <code>$aliasGroup</code>
-      <code>$username</code>
-      <code>$name</code>
-      <code>$gender</code>
-      <code>$groupAlias</code>
-      <code>$username</code>
-      <code>$name</code>
-      <code>$password</code>
-      <code>$gender</code>
-      <code>$aliasGroup</code>
-    </MissingParamType>
-    <MixedArgument occurrences="14">
-      <code>$r['group_alias']</code>
-      <code>$r['original_username']</code>
-      <code>$r['username']</code>
-      <code>$r['password']</code>
-      <code>$r['password']</code>
-      <code>$r['group_alias']</code>
-      <code>$username</code>
-      <code>$name</code>
-      <code>$gender</code>
-      <code>$password</code>
-    </MixedArgument>
+    <MixedArgument occurrences="2"/>
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$langCode</code>
     </MixedArgumentTypeCoercion>
@@ -175,15 +149,12 @@
       <code>$val</code>
       <code>$langWeight</code>
     </MixedAssignment>
-    <PossiblyNullArgument occurrences="1">
-      <code>$identity-&gt;username</code>
-    </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Problem.php">
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <MixedArgument occurrences="9">
+    <MixedArgument occurrences="7">
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['group']</code>
@@ -191,9 +162,7 @@
       <code>$r['group']</code>
       <code>$run</code>
       <code>$r['problem_alias']</code>
-      <code>$r['contest_alias']</code>
       <code>$run</code>
-      <code>$r['contest_alias']</code>
     </MixedArgument>
     <MixedAssignment occurrences="7">
       <code>$run</code>
