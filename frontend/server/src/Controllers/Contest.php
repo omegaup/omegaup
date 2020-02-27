@@ -3333,7 +3333,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
+     * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3345,7 +3345,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($contest, $r->identity),
+                'payload' => array_merge(
+                    [
+                        'alias' => $r['contest_alias'],
+                        'entity_type' => 'contest',
+                    ],
+                    self::getStats($contest, $r->identity)
+                ),
             ],
             'template' => 'contest.stats.tpl',
         ];
