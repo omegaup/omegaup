@@ -3991,7 +3991,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      *
      * @param \OmegaUp\Request $r The request object.
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR?: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array{extraWallTime: int, inputLimit: int, languages: string, memoryLimit: int, outputLimit: int, overallWallTimeLimit: int, timeLimit: int, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int, validatorsTypes: array{custom: null|string, literal: null|string, token-caseless: null|string, token-numeric: null|string, token: null|string}}}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: array{string}|string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array{extraWallTime: int, inputLimit: int, languages: string, memoryLimit: int, outputLimit: int, overallWallTimeLimit: int, timeLimit: int, validLanguages: non-empty-array<string, string>, validator: string, validatorTimeLimit: int, validatorsTypes: array{custom: null|string, literal: null|string, token-caseless: null|string, token-numeric: null|string, token: null|string}}}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4088,7 +4088,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'SOURCE' => '',
                 'VISIBILITY' => '0',
                 'STATUS_ERROR' => '',
-                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                'LANGUAGES' => join(
+                    ',',
+                    \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                ),
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
                 'payload' => [
