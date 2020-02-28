@@ -135,7 +135,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // First user solves two problems, second user solves just one, third solves same problems than first
-        $runCreationDate = new DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
+        $runCreationDate = new DateTimeImmutable(
+            date(
+                'Y-m-d',
+                \OmegaUp\Time::get()
+            )
+        );
         $runCreationDate = $runCreationDate->modify('first day of last month');
         $runCreationDate = $runCreationDate->format('Y-m-d');
 
