@@ -134,10 +134,11 @@ export default class List extends Vue {
 
   next() {
     // TODO: Update history so the back button works correctly.
-    if (this.pageNumber < this.totalPages) {
-      this.pageNumber++;
-      document.querySelectorAll('li.nav-item.active')[0].scrollIntoView();
+    if (this.pageNumber >= this.totalPages) {
+      return;
     }
+    this.pageNumber++;
+    document.querySelectorAll('li.nav-item.active')[0].scrollIntoView();
   }
 
   previous() {
