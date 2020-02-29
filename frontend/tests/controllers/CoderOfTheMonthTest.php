@@ -550,9 +550,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     \OmegaUp\Time::get()
                 )
             ))
-                ->modify('first day of next month')->format(
-                    'Y-m-15'
-                )
+                ->modify('first day of next month')
+                ->format('Y-m-15')
         );
         \OmegaUp\Time::setTimeForTesting(
             strtotime(
