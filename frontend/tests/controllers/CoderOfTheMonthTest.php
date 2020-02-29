@@ -154,14 +154,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // First user solves two problems, second user solves just one, third
         // solves same problems than first.
-        $runCreationDate = new DateTimeImmutable(
+        $runCreationDate = (new DateTimeImmutable(
             date(
                 'Y-m-d',
                 \OmegaUp\Time::get()
             )
-        );
-        $runCreationDate = $runCreationDate->modify('first day of last month');
-        $runCreationDate = $runCreationDate->format('Y-m-d');
+        ))
+            ->modify('first day of last month')
+            ->format('Y-m-d');
 
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
@@ -544,16 +544,15 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Setting time to the 15th of next month.
         $runCreationDate = new DateTimeImmutable(
-            date(
-                'Y-m-d',
-                \OmegaUp\Time::get()
-            )
-        );
-        $runCreationDate = $runCreationDate->modify('first day of next month');
-        $runCreationDate = new DateTimeImmutable(
-            $runCreationDate->format(
-                'Y-m-15'
-            )
+            (new DateTimeImmutable(
+                date(
+                    'Y-m-d',
+                    \OmegaUp\Time::get()
+                )
+            ))
+                ->modify('first day of next month')->format(
+                    'Y-m-15'
+                )
         );
         \OmegaUp\Time::setTimeForTesting(
             strtotime(
