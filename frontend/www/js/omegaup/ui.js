@@ -1031,6 +1031,13 @@ let UI = {
 
     return converter;
   },
+
+  reportEvent: function(category, action, label) {
+    if (typeof ga !== 'function') {
+      return;
+    }
+    ga('send', 'event', category, action, label);
+  },
 };
 
 export { UI as default };
