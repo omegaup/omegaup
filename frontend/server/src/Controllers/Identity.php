@@ -620,7 +620,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
-        bool $omitRank
+        bool $omitRank,
+        string $category = 'all'
     ): array {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -670,7 +671,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             !is_null($loggedIdentity)
             && \OmegaUp\Authorization::canViewEmail($loggedIdentity)
             && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth(
-                $identity->username
+                $identity->username,
+                $category
             )
         ) {
             return $response;
