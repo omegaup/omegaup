@@ -432,7 +432,14 @@ declare namespace omegaup {
   }
 
   export interface Run {
-    [period: string]: string,
+    [period: string]: number;
+  }
+
+  export interface RunInfo {
+    date: string;
+    verdict: string;
+    runs: number;
+    [period: string]: string;
   }
 
   export interface RunCounts {
@@ -563,6 +570,10 @@ declare namespace omegaup {
 
   interface Verdict {
     [verdict: string]: number;
+  }
+
+  export interface VerdictByDate {
+    [date: string]: Verdict;
   }
 }
 

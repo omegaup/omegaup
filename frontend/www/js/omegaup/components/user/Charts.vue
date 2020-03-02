@@ -47,10 +47,14 @@ import UI from '../../ui.js';
 import omegaup from '../../api.js';
 
 interface Data {
-  runs: omegaup.Run[];
+  runs: omegaup.RunInfo[];
 }
 
 interface GroupedPeriods {
+  [period: string]: omegaup.VerdictByDate;
+}
+
+interface GroupedVerdicts {
   [period: string]: omegaup.Verdict;
 }
 
@@ -64,6 +68,13 @@ interface NormalizedRunCounts {
   sliced?: boolean;
   selected?: boolean;
 }
+
+const emptyGroupedPeriods = {
+  day: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
+  week: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
+  month: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
+  year: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
+};
 
 const emptyPeriodRunCount = {
   day: {
@@ -101,56 +112,62 @@ export default class UserCharts extends Vue {
 
   @Watch('type')
   onTypeChanged(newValue: string): void {
-    let self = this;
     if (newValue == 'total') {
-      self.renderAggregateStatistics();
+      this.renderAggregateStatistics();
     } else {
-      self.renderPeriodStatistics();
+      this.renderPeriodStatistics();
     }
   }
 
   @Watch('period')
   onPeriodChanged(newValue: string): void {
-    let self = this;
-    self.renderPeriodStatistics();
+    this.renderPeriodStatistics();
   }
 
   mounted(): void {
-    let self = this;
-    self.chart = Highcharts.chart('verdict-chart', {
+    this.chart = Highcharts.chart('verdict-chart', {
       title: {
         text: this.UI.formatString(this.T.profileStatisticsVerdictsOf, {
           user: this.username,
         }),
       },
     });
-    self.renderPeriodStatistics();
+    this.renderPeriodStatistics();
   }
 
   get totalRuns(): number {
-    let self = this;
     let total = 0;
-    for (let runs of self.data.runs) {
-      total += parseInt(runs['runs']);
+    for (const runs of this.data.runs) {
+      total += runs['runs'];
     }
     return total;
   }
 
   get normalizedRunCounts(): NormalizedRunCounts[] {
-    let self = this;
-    let total = self.totalRuns;
-    let stats: omegaup.Run[] = self.data.runs;
-    let runs = stats.reduce(
-      (total, amount) => {
+    const total = this.totalRuns;
+    const stats = this.data.runs;
+    const runs = stats.reduce(
+      (total: omegaup.Run, amount: omegaup.RunInfo) => {
         total[amount.verdict] += amount.runs;
         return total;
       },
-      { WA: 0, PA: 0, AC: 0, TLE: 0, MLE: 0, OLE: 0, RTE: 0, CE: 0, JE: 0, VE: 0 },
+      {
+        WA: 0,
+        PA: 0,
+        AC: 0,
+        TLE: 0,
+        MLE: 0,
+        OLE: 0,
+        RTE: 0,
+        CE: 0,
+        JE: 0,
+        VE: 0,
+      },
     );
-    let verdicts = Object.keys(runs);
-    let response: NormalizedRunCounts[] = [];
-    for (let verdict of verdicts) {
-      let numRuns = parseInt(runs[verdict]);
+    const verdicts = Object.keys(runs);
+    const response: NormalizedRunCounts[] = [];
+    for (const verdict of verdicts) {
+      const numRuns = runs[verdict];
       if (verdict == 'AC') {
         response.push({
           name: verdict,
@@ -166,30 +183,29 @@ export default class UserCharts extends Vue {
   }
 
   get normalizedPeriodRunCounts(): NormalizedPeriodRunCounts {
-    let self = this;
-    let runs: GroupedPeriods = self.groupedPeriods;
-    let periods = Object.keys(runs);
-    let response: NormalizedPeriodRunCounts = emptyPeriodRunCount;
-    for (let period of periods) {
+    const runs: GroupedPeriods = this.groupedPeriods;
+    const periods = Object.keys(runs);
+    const response: NormalizedPeriodRunCounts = emptyPeriodRunCount;
+    const runsByVerdict: GroupedVerdicts = emptyGroupedPeriods;
+    for (const period of periods) {
       response[period] = {
         categories: Object.keys(runs[period]),
         delta: [],
         cumulative: [],
       };
-      let verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
-      for (let verdict of verdicts) {
-        runs[period][verdict] = 0;
+      const verdicts = ['AC', 'PA', 'WA', 'TLE', 'RTE'];
+      for (const verdict of verdicts) {
+        runsByVerdict[period][verdict] = 0;
       }
-      for (let [index, verdict] of verdicts.entries()) {
+      for (const [index, verdict] of verdicts.entries()) {
         response[period].delta[index] = { name: verdict, data: [] };
         response[period].cumulative[index] = { name: verdict, data: [] };
-        for (let [ind, date] of response[period].categories.entries()) {
-          runs[period][verdict] += parseInt(runs[period][date][verdict]);
-          response[period].delta[index]['data'][ind] = parseInt(
-            runs[period][date][verdict],
-          );
+        for (const [ind, date] of response[period].categories.entries()) {
+          runsByVerdict[period][verdict] += runs[period][date][verdict];
+          response[period].delta[index]['data'][ind] =
+            runs[period][date][verdict];
           response[period].cumulative[index]['data'][ind] =
-            runs[period][verdict];
+            runsByVerdict[period][verdict];
         }
       }
     }
@@ -197,22 +213,18 @@ export default class UserCharts extends Vue {
   }
 
   get groupedPeriods(): GroupedPeriods {
-    let self = this;
-    let stats: omegaup.Run[] = self.data.runs;
-    let periods = ['day', 'week', 'month', 'year'];
-    for (let [index, run] of stats.entries()) {
-      for (let period of periods) {
-        if (typeof stats[index][period] !== 'undefined') break;
-      }
-      let date = new Date(run.date);
-      let day = date.getDay();
+    const stats = this.data.runs;
+    const periods = ['day', 'week', 'month', 'year'];
+    for (const [index, run] of stats.entries()) {
+      const date = new Date(run.date);
+      const day = date.getDay();
       // group by days
       stats[index]['day'] = date.toLocaleDateString(T.locale);
       // group by weeks
-      let diffMonday = date.getDate() - day + (day == 0 ? -6 : 1);
-      let diffSunday = date.getDate() + (7 - day);
-      let firstDay = new Date(date.setDate(diffMonday));
-      let lastDay = new Date(date.setDate(diffSunday));
+      const diffMonday = date.getDate() - day + (day == 0 ? -6 : 1);
+      const diffSunday = date.getDate() + (7 - day);
+      const firstDay = new Date(date.setDate(diffMonday));
+      const lastDay = new Date(date.setDate(diffSunday));
       stats[index]['week'] =
         firstDay.toLocaleDateString(T.locale) +
         ' - ' +
@@ -222,28 +234,29 @@ export default class UserCharts extends Vue {
       // group by year
       stats[index]['year'] = run.date.substring(0, 4);
     }
-    let periodStats: GroupedPeriods = {};
-    for (let period of periods) {
-      periodStats[period] = stats.reduce((groups, item) => {
-        let val = item[period];
-        groups[val] = groups[val] || { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 };
-        groups[val][item.verdict] += item.runs;
-        return groups;
-      }, {});
+    const periodStats: GroupedPeriods = {};
+    for (const period of periods) {
+      periodStats[period] = stats.reduce(
+        (groups: GroupedVerdicts, item: omegaup.RunInfo) => {
+          const val = item[period];
+          groups[val] = groups[val] || { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 };
+          groups[val][item.verdict] += item.runs;
+          return groups;
+        },
+        {},
+      );
     }
     return periodStats;
   }
 
   get normalizedRunCountsForPeriod(): omegaup.RunCounts {
-    let self = this;
-    return self.normalizedPeriodRunCounts[self.period];
+    return this.normalizedPeriodRunCounts[this.period];
   }
 
   renderPeriodStatistics(): void {
-    let self = this;
-    let runs: omegaup.RunCounts = self.normalizedRunCountsForPeriod;
-    let data = runs[self.type];
-    self.chart.update({
+    const runs: omegaup.RunCounts = this.normalizedRunCountsForPeriod;
+    const data = this.type === 'delta' ? runs.delta : runs.cumulative;
+    this.chart.update({
       chart: { type: 'column' },
       xAxis: {
         categories: runs.categories,
@@ -259,7 +272,7 @@ export default class UserCharts extends Vue {
           enabled: false,
           style: {
             fontWeight: 'bold',
-            color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray',
+            color: 'gray',
           },
         },
       },
@@ -269,8 +282,7 @@ export default class UserCharts extends Vue {
         verticalAlign: 'top',
         y: 25,
         floating: true,
-        backgroundColor:
-          (Highcharts.theme && Highcharts.theme.background2) || 'white',
+        backgroundColor: 'white',
         borderColor: '#CCC',
         borderWidth: 1,
         shadow: false,
@@ -284,30 +296,28 @@ export default class UserCharts extends Vue {
           stacking: 'normal',
           dataLabels: {
             enabled: false,
-            color:
-              (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+            color: 'white',
           },
         },
       },
       series: [],
     });
     // Removing old series
-    while (self.chart.series.length) self.chart.series[0].remove(false);
+    while (this.chart.series.length) this.chart.series[0].remove(false);
     // Adding new series
-    let numSeries = data.length;
+    const numSeries = data.length;
     for (let i = 0; i < numSeries; i++) {
-      self.chart.addSeries(data[i]);
+      this.chart.addSeries(data[i]);
     }
-    self.chart.redraw();
+    this.chart.redraw();
   }
 
   renderAggregateStatistics(): void {
-    let self = this;
-    let runs = self.normalizedRunCounts;
-    // Removing all series, except last one, because here is where the
-    // data will be placed. Otherwise, the chart will not be shown
-    while (self.chart.series.length > 1) self.chart.series[0].remove(false);
-    self.chart.update({
+    const runs = this.normalizedRunCounts;
+    // Removing all series, except last one, because here is where the data
+    // will be placed. Otherwise, the chart will not be shown
+    while (this.chart.series.length > 1) this.chart.series[0].remove(false);
+    this.chart.update({
       chart: {
         plotBackgroundColor: null,
         plotBorderWidth: null,
@@ -322,7 +332,7 @@ export default class UserCharts extends Vue {
       },
       title: {
         text: this.UI.formatString(this.T.profileStatisticsVerdictsOf, {
-          user: self.username,
+          user: this.username,
         }),
       },
       tooltip: { pointFormat: '{series.name}: {point.y}' },
@@ -345,7 +355,7 @@ export default class UserCharts extends Vue {
         },
       ],
     });
-    self.chart.redraw();
+    this.chart.redraw();
   }
 }
 </script>
