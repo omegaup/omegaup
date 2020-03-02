@@ -9,20 +9,20 @@ namespace OmegaUp\DAO;
  * @abstract
  */
 final class DAO {
-    final public static function transBegin() : void {
+    final public static function transBegin(): void {
         \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 
-    final public static function transEnd() : void {
+    final public static function transEnd(): void {
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
     }
 
-    final public static function transRollback() : void {
+    final public static function transRollback(): void {
         \OmegaUp\MySQLConnection::getInstance()->FailTrans();
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
     }
 
-    final public static function isDuplicateEntryException(\Exception $e) : bool {
+    final public static function isDuplicateEntryException(\Exception $e): bool {
         if (!($e instanceof \OmegaUp\Exceptions\DatabaseOperationException)) {
             return false;
         }
@@ -36,7 +36,7 @@ final class DAO {
      * @param string|int|null $timestamp the POSIX timestamp.
      * @return string|null the timestamp in MySQL format.
      */
-    final public static function toMySQLTimestamp($timestamp) : ?string {
+    final public static function toMySQLTimestamp($timestamp): ?string {
         if (is_null($timestamp)) {
             return null;
         }
@@ -55,7 +55,7 @@ final class DAO {
      * @param string|int|float|null $timestamp the MySQL timestamp.
      * @return int|null the POSIX timestamp.
      */
-    final public static function fromMySQLTimestamp($timestamp) : ?int {
+    final public static function fromMySQLTimestamp($timestamp): ?int {
         if (is_null($timestamp)) {
             return null;
         }

@@ -1,5 +1,5 @@
 import admin_User from '../components/admin/User.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -22,41 +22,51 @@ OmegaUp.on('ready', function() {
           'change-experiment': function(experiment) {
             if (experiment.selected) {
               omegaup.API.User.addExperiment({
-                                username: payload.username,
-                                experiment: experiment.value.name,
-                              })
-                  .then(function() { omegaup.UI.success(T.userEditSuccess); })
-                  .fail(omegaup.UI.apiError);
+                username: payload.username,
+                experiment: experiment.value.name,
+              })
+                .then(function() {
+                  omegaup.UI.success(T.userEditSuccess);
+                })
+                .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeExperiment({
-                                username: payload.username,
-                                experiment: experiment.value.name,
-                              })
-                  .then(function() { omegaup.UI.success(T.userEditSuccess); })
-                  .fail(omegaup.UI.apiError);
+                username: payload.username,
+                experiment: experiment.value.name,
+              })
+                .then(function() {
+                  omegaup.UI.success(T.userEditSuccess);
+                })
+                .fail(omegaup.UI.apiError);
             }
           },
           'change-role': function(role) {
             if (role.selected) {
               omegaup.API.User.addRole({
-                                username: payload.username,
-                                role: role.value.name,
-                              })
-                  .then(function() { omegaup.UI.success(T.userEditSuccess); })
-                  .fail(omegaup.UI.apiError);
+                username: payload.username,
+                role: role.value.name,
+              })
+                .then(function() {
+                  omegaup.UI.success(T.userEditSuccess);
+                })
+                .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
-                                username: payload.username,
-                                role: role.value.name,
-                              })
-                  .then(function() { omegaup.UI.success(T.userEditSuccess); })
-                  .fail(omegaup.UI.apiError);
+                username: payload.username,
+                role: role.value.name,
+              })
+                .then(function() {
+                  omegaup.UI.success(T.userEditSuccess);
+                })
+                .fail(omegaup.UI.apiError);
             }
           },
           'verify-user': function() {
-            omegaup.API.User.verifyEmail({usernameOrEmail: payload.username})
-                .then(function() { adminUser.verified = true; })
-                .fail(omegaup.UI.apiError);
+            omegaup.API.User.verifyEmail({ usernameOrEmail: payload.username })
+              .then(function() {
+                adminUser.verified = true;
+              })
+              .fail(omegaup.UI.apiError);
           },
         },
       });

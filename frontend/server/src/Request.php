@@ -31,6 +31,12 @@ class Request extends \ArrayObject {
     public $method = null;
 
     /**
+     * The name of the method that will be called.
+     * @var null|string
+     */
+    public $methodName = null;
+
+    /**
      * A global per-request unique(-ish) ID.
      * @var string
      */
@@ -54,7 +60,7 @@ class Request extends \ArrayObject {
      *
      * @return array<int, mixed>|array<string, mixed>
      */
-    public function execute() : array {
+    public function execute(): array {
         if (is_null($this->method)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -80,7 +86,7 @@ class Request extends \ArrayObject {
      *
      * @return string the global per-request unique(-ish) ID
      */
-    public static function requestId() : string {
+    public static function requestId(): string {
         return \OmegaUp\Request::$_requestId;
     }
 
@@ -90,7 +96,7 @@ class Request extends \ArrayObject {
     public function ensureBool(
         string $key,
         bool $required = true
-    ) : void {
+    ): void {
         /** @var mixed */
         $val = $this->offsetGet($key);
         if (is_int($val)) {
@@ -102,7 +108,10 @@ class Request extends \ArrayObject {
                 if (!$required) {
                     return;
                 }
-                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $key
+                );
             }
             $this[$key] = $val == '1' || $val == 'true';
         }
@@ -116,16 +125,106 @@ class Request extends \ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
             }
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
+        $this[$key] = intval($val);
+    }
+
+    /**
+     * Ensures that the value associated with the key is an int or null
+     */
+    public function ensureOptionalInt(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required = false
+    ): void {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        if (!is_null($val)) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $val,
+                $key,
+                $lowerBound,
+                $upperBound
+            );
+            $this[$key] = intval($val);
+        }
+    }
+
+    /**
+     * Ensures that the value associated with the key is a timestamp.
+     */
+    public function ensureTimestamp(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null
+    ): void {
+        if (!self::offsetExists($key)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        \OmegaUp\Validators::validateTimestampInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
+        $this[$key] = intval($val);
+    }
+
+    public function ensureOptionalTimestamp(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required
+    ): void {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        \OmegaUp\Validators::validateTimestampInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
         $this[$key] = intval($val);
     }
 
@@ -137,16 +236,24 @@ class Request extends \ArrayObject {
         ?float $lowerBound = null,
         ?float $upperBound = null,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
             }
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange(
+            $val,
+            $key,
+            $lowerBound,
+            $upperBound
+        );
         $this[$key] = floatval($val);
     }
 
@@ -158,14 +265,16 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->identity->identity_id
      * @psalm-assert !null $this->identity->username
      */
-    public function ensureIdentity() : void {
+    public function ensureIdentity(): void {
         if (!is_null($this->user) || !is_null($this->identity)) {
             return;
         }
         $this->user = null;
         $this->identity = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($this)['session'];
-        if (is_null($session) || is_null($session['identity'])) {
+        $session = \OmegaUp\Controllers\Session::getCurrentSession(
+            $this
+        );
+        if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];
@@ -188,16 +297,69 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->user->user_id
      * @psalm-assert !null $this->user->username
      */
-    public function ensureMainUserIdentity() : void {
+    public function ensureMainUserIdentity(): void {
         if (!is_null($this->user) && !is_null($this->identity)) {
             return;
         }
         $this->ensureIdentity();
-        if (is_null($this->user)
+        if (
+            is_null($this->user)
             || $this->user->main_identity_id != $this->identity->identity_id
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+    }
+
+    /**
+     * Returns an array of strings from a request parameter
+     * containing a single string with comma-separated values.
+     *
+     * @param list<string> $default
+     * @return list<string>
+     */
+    public function getStringList(
+        string $param,
+        array $default = [],
+        bool $required = false
+    ): array {
+        if (is_null($this[$param])) {
+            if ($required) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    $param
+                );
+            }
+            return $default;
+        }
+
+        if (is_array($this[$param])) {
+            /** @var list<string> */
+            return $this[$param];
+        }
+
+        if (empty($this[$param])) {
+            return [];
+        }
+
+        $strings = explode(',', strval($this[$param]));
+
+        /** @var list<string> */
+        return array_unique($strings);
+    }
+
+    /**
+     * Returns a real array from the Request values. This is useful to build
+     * Params objects.
+     *
+     * @return array<string, string>
+     */
+    public function toStringArray(): array {
+        $result = [];
+        /** @var mixed $value */
+        foreach ($this as $key => $value) {
+            $result[strval($key)] = strval($value);
+        }
+        return $result;
     }
 }
 

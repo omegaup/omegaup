@@ -1,15 +1,21 @@
 <template>
   <div>
     <div class="panel-body controls">
-      <label>{{ T.problemVersionDiffMode }} <select v-model="diffMode">
-        <option value="files">
-          {{ T.problemVersionDiffModeFiles }}
-        </option>
-        <option value="submissions">
-          {{ T.problemVersionDiffModeSubmissions }}
-        </option>
-      </select></label> <label>{{ T.problemVersionShowOnlyChanges }} <input type="checkbox"
-             v-model="showOnlyChanges"></label>
+      <label
+        >{{ T.problemVersionDiffMode }}
+        <select v-model="diffMode">
+          <option value="files">
+            {{ T.problemVersionDiffModeFiles }}
+          </option>
+          <option value="submissions">
+            {{ T.problemVersionDiffModeSubmissions }}
+          </option>
+        </select></label
+      >
+      <label
+        >{{ T.problemVersionShowOnlyChanges }}
+        <input type="checkbox" v-model="showOnlyChanges"
+      /></label>
     </div>
     <div class="panel-body no-padding">
       <div class="container-fluid">
@@ -27,44 +33,70 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="revision in log"
-                    v-on:click="selectedRevision = revision">
-                  <td><span v-bind:title="T.problemVersionPublishedRevision"
-                        v-if="publishedRevision == revision">✔️</span></td>
-                  <td><input name="version"
-                         type="radio"
-                         v-bind:value="revision"
-                         v-model="selectedRevision"></td>
-                  <td>{{ UI.formatDateTime(new Date(revision.committer.time)) }}<br>
-                  <acronym v-bind:title="revision.commit"><tt>{{ revision.commit.substr(0, 8)
-                  }}</tt></acronym></td>
+                <tr
+                  v-for="revision in log"
+                  v-on:click="selectedRevision = revision"
+                >
+                  <td>
+                    <span
+                      v-bind:title="T.problemVersionPublishedRevision"
+                      v-if="publishedRevision == revision"
+                      >✔️</span
+                    >
+                  </td>
+                  <td>
+                    <input
+                      name="version"
+                      type="radio"
+                      v-bind:value="revision"
+                      v-model="selectedRevision"
+                    />
+                  </td>
+
+                  <td>
+                    {{ UI.formatDateTime(new Date(revision.committer.time))
+                    }}<br />
+                    <acronym v-bind:title="revision.commit"
+                      ><tt>{{ revision.commit.substr(0, 8) }}</tt></acronym
+                    >
+                  </td>
                   <td>{{ revision.author.name }}</td>
-                  <td><acronym v-bind:title="revision.version"><tt>{{ revision.version.substr(0, 8)
-                  }}</tt></acronym></td>
+                  <td>
+                    <acronym v-bind:title="revision.version"
+                      ><tt>{{ revision.version.substr(0, 8) }}</tt></acronym
+                    >
+                  </td>
                   <td>{{ revision.message }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="col-md-6 scrollable">
-            <ul class="list-group no-margin"
-                v-if="diffMode == 'files'">
-              <li class="list-group-item"
-                  v-bind:class="diffEntry[1]"
-                  v-for="diffEntry in diffFiles">{{ diffEntry[0] }}</li>
+            <ul class="list-group no-margin" v-if="diffMode == 'files'">
+              <li
+                class="list-group-item"
+                v-bind:class="diffEntry[1]"
+                v-for="diffEntry in diffFiles"
+              >
+                {{ diffEntry[0] }}
+              </li>
             </ul>
-            <table class="table table-condensed"
-                   v-if="diffMode == 'submissions'">
+            <table
+              class="table table-condensed"
+              v-if="diffMode == 'submissions'"
+            >
               <thead>
                 <tr>
-                  <th class="text-center"
-                      rowspan="2">GUID</th>
-                  <th class="text-center"
-                      rowspan="2">{{ T.problemVersionUsername }}</th>
-                  <th class="text-center"
-                      colspan="2">{{ T.problemVersionCurrentVersion }}</th>
-                  <th class="text-center"
-                      colspan="2">{{ T.problemVersionNewVersion }}</th>
+                  <th class="text-center" rowspan="2">GUID</th>
+                  <th class="text-center" rowspan="2">
+                    {{ T.problemVersionUsername }}
+                  </th>
+                  <th class="text-center" colspan="2">
+                    {{ T.problemVersionCurrentVersion }}
+                  </th>
+                  <th class="text-center" colspan="2">
+                    {{ T.problemVersionNewVersion }}
+                  </th>
                 </tr>
                 <tr>
                   <th class="text-right">{{ T.rankScore }}</th>
@@ -74,14 +106,23 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-bind:class="diffEntry[1]"
-                    v-for="diffEntry in diffSubmissions">
-                  <td class="text-center"><acronym v-bind:title="diffEntry[0].guid"><tt>{{
-                  diffEntry[0].guid.substr(0, 8) }}</tt></acronym></td>
+                <tr
+                  v-bind:class="diffEntry[1]"
+                  v-for="diffEntry in diffSubmissions"
+                >
+                  <td class="text-center">
+                    <acronym v-bind:title="diffEntry[0].guid"
+                      ><tt>{{ diffEntry[0].guid.substr(0, 8) }}</tt></acronym
+                    >
+                  </td>
                   <td class="text-center">{{ diffEntry[0].username }}</td>
-                  <td class="text-right">{{ diffEntry[0].old_score.toFixed(2) }}</td>
+                  <td class="text-right">
+                    {{ diffEntry[0].old_score.toFixed(2) }}
+                  </td>
                   <td class="text-center">{{ diffEntry[0].old_verdict }}</td>
-                  <td class="text-right">{{ diffEntry[0].new_score.toFixed(2) }}</td>
+                  <td class="text-right">
+                    {{ diffEntry[0].new_score.toFixed(2) }}
+                  </td>
                   <td class="text-center">{{ diffEntry[0].new_verdict }}</td>
                 </tr>
               </tbody>
@@ -90,12 +131,16 @@
         </div>
       </div>
     </div>
-    <div class="panel-footer"
-         v-if="showFooter">
-      <form v-on:submit.prevent="$emit('select-version', selectedRevision, updatePublished)">
-        <button class="btn btn-primary"
-              type="submit">{{ T.problemVersionUpdate }}</button> <select v-model=
-              "updatePublished">
+    <div class="panel-footer" v-if="showFooter">
+      <form
+        v-on:submit.prevent="
+          $emit('select-version', selectedRevision, updatePublished)
+        "
+      >
+        <button class="btn btn-primary" type="submit">
+          {{ T.problemVersionUpdate }}
+        </button>
+        <select v-model="updatePublished">
           <option value="non-problemset">
             {{ T.problemVersionUpdatePublishedNonProblemset }}
           </option>
@@ -233,5 +278,4 @@ export default class ProblemVersions extends Vue {
     this.$emit('runs-diff', this, this.selectedRevision);
   }
 }
-
 </script>

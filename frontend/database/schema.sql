@@ -39,7 +39,7 @@ CREATE TABLE `Assignments` (
   `publish_time_delay` int(11) DEFAULT NULL,
   `assignment_type` enum('homework','test') NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
-  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
+  `finish_time` timestamp NULL DEFAULT NULL,
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
   `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
@@ -96,10 +96,17 @@ CREATE TABLE `Coder_Of_The_Month` (
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   `rank` int(11) NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   `selected_by` int(11) DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
+  `school_id` int(11) DEFAULT NULL,
+  `category` enum('all','female') NOT NULL DEFAULT 'all',
+  `score` double NOT NULL DEFAULT '0',
+  `problems_solved` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
+  KEY `school_id` (`school_id`),
+  KEY `rank_time_category` (`category`,`rank`,`time`),
+  CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.';
@@ -145,7 +152,7 @@ CREATE TABLE `Contests` (
   `penalty_calc_policy` enum('sum','max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
   `show_scoreboard_after` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Mostrar el scoreboard automáticamente después del concurso',
   `urgent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
-  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Mostrar el concurso en la lista de recomendados.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
@@ -175,8 +182,8 @@ CREATE TABLE `Courses` (
   `group_id` int(11) NOT NULL,
   `acl_id` int(11) NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
-  `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
-  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'True implica que cualquier usuario puede entrar al curso',
+  `finish_time` timestamp NULL DEFAULT NULL,
+  `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un curso.',
   `school_id` int(11) DEFAULT NULL,
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
@@ -302,22 +309,38 @@ CREATE TABLE `Identities` (
   `language_id` int(11) DEFAULT NULL,
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
-  `school_id` int(11) DEFAULT NULL,
   `gender` enum('female','male','other','decline') DEFAULT NULL COMMENT 'Género de la identidad',
+  `current_identity_school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`identity_id`),
   UNIQUE KEY `username` (`username`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
-  KEY `school_id` (`school_id`),
   KEY `user_id` (`user_id`),
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
+  KEY `current_identity_school_id` (`current_identity_school_id`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_is_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_is_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_iu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Identidades registradas.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Identities_Schools` (
+  `identity_school_id` int(11) NOT NULL AUTO_INCREMENT,
+  `identity_id` int(11) NOT NULL,
+  `school_id` int(11) NOT NULL,
+  `graduation_date` date DEFAULT NULL,
+  `creation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `end_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`identity_school_id`),
+  KEY `identity_id` (`identity_id`),
+  KEY `school_id` (`school_id`),
+  CONSTRAINT `fk_isi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_iss_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Todas las escuelas por las que un usuario ha estudiado desde que se unió a omegaUp';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -456,7 +479,7 @@ CREATE TABLE `Problems` (
   `alias` varchar(32) NOT NULL,
   `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
   `current_version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
-  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL DEFAULT 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua',
   `input_limit` int(11) NOT NULL DEFAULT '10240',
   `visits` int(11) NOT NULL DEFAULT '0',
   `submissions` int(11) NOT NULL DEFAULT '0',
@@ -470,6 +493,7 @@ CREATE TABLE `Problems` (
   `quality` double DEFAULT NULL,
   `quality_histogram` text COMMENT 'Valores del histograma de calidad del problema.',
   `difficulty_histogram` text COMMENT 'Valores del histograma de dificultad del problema.',
+  `quality_seal` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problem_id`),
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
@@ -508,7 +532,7 @@ CREATE TABLE `Problems_Tags` (
   `problem_id` int(11) NOT NULL,
   `tag_id` int(11) NOT NULL,
   `public` tinyint(1) NOT NULL DEFAULT '0',
-  `autogenerated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la etiqueta fue generada automaticamente a partir de votos de los usuarios',
+  `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `problem_id` (`problem_id`),
   KEY `tag_id` (`tag_id`),
@@ -621,7 +645,7 @@ CREATE TABLE `Problemsets` (
   `problemset_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `acl_id` int(11) NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
   `access_mode` enum('private','public','registration') NOT NULL DEFAULT 'public' COMMENT 'La modalidad de acceso a este conjunto de problemas',
-  `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
+  `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas',
   `needs_basic_information` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil',
   `requests_user_information` enum('no','optional','required') NOT NULL DEFAULT 'no' COMMENT 'Se solicita información de los participantes para contactarlos posteriormente.',
   `scoreboard_url` varchar(30) NOT NULL COMMENT 'Token para la url del scoreboard en problemsets',
@@ -692,7 +716,7 @@ CREATE TABLE `QualityNominations` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que nominó el problema',
   `problem_id` int(11) NOT NULL COMMENT 'El problema que fue nominado',
-  `nomination` enum('suggestion','promotion','demotion','dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
+  `nomination` enum('suggestion','quality_tag','promotion','demotion','dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
   `contents` text NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
   `status` enum('open','approved','denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
@@ -742,7 +766,7 @@ CREATE TABLE `Runs` (
   `submission_id` int(11) NOT NULL COMMENT 'El envío',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
-  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE') NOT NULL,
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `runtime` int(11) NOT NULL DEFAULT '0',
   `penalty` int(11) NOT NULL DEFAULT '0',
   `memory` int(11) NOT NULL DEFAULT '0',
@@ -752,8 +776,27 @@ CREATE TABLE `Runs` (
   `judged_by` char(32) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_versions` (`submission_id`,`version`),
+  KEY `submission_id` (`submission_id`),
   CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `School_Of_The_Month` (
+  `school_of_the_month_id` int(11) NOT NULL AUTO_INCREMENT,
+  `school_id` int(11) NOT NULL,
+  `time` date NOT NULL DEFAULT '2000-01-01',
+  `rank` int(11) NOT NULL COMMENT 'El lugar que tuvo la escuela en el mes.',
+  `selected_by` int(11) DEFAULT NULL COMMENT 'Identidad que seleccionó a la escuela.',
+  `score` double NOT NULL DEFAULT '0',
+  PRIMARY KEY (`school_of_the_month_id`),
+  UNIQUE KEY `rank_time` (`rank`,`time`),
+  KEY `school_of_the_month_id` (`school_of_the_month_id`),
+  KEY `school_id` (`school_id`),
+  KEY `selected_by` (`selected_by`),
+  CONSTRAINT `fk_sotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_sotms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Escuelas del Mes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -762,7 +805,10 @@ CREATE TABLE `Schools` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
+  `rank` int(11) DEFAULT NULL,
+  `score` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_id`),
+  UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -806,27 +852,31 @@ CREATE TABLE `Submissions` (
   `problem_id` int(11) NOT NULL,
   `problemset_id` int(11) DEFAULT NULL,
   `guid` char(32) NOT NULL,
-  `language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') NOT NULL,
+  `language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `submit_delay` int(11) NOT NULL DEFAULT '0',
   `type` enum('normal','test','disqualified') DEFAULT 'normal',
+  `school_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`submission_id`),
   UNIQUE KEY `submissions_guid` (`guid`),
   KEY `problem_id` (`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_s_current_run_id` (`current_run_id`),
+  KEY `school_id` (`school_id`),
+  KEY `school_id_problem_id` (`school_id`,`problem_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ss_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Tags` (
   `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) NOT NULL,
+  `name` varchar(50) NOT NULL,
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.';
@@ -880,14 +930,11 @@ CREATE TABLE `User_Roles` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
-  `password` varchar(128) DEFAULT NULL COMMENT 'Contraseña del usuario, usando Argon2i o Blowfish',
   `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
-  `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
   `verification_id` varchar(50) DEFAULT NULL,
@@ -896,9 +943,8 @@ CREATE TABLE `Users` (
   `hide_problem_tags` tinyint(1) DEFAULT NULL COMMENT 'Determina si el usuario quiere ocultar las etiquetas de los problemas',
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',
-  `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
+  `preferred_language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `username` (`username`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

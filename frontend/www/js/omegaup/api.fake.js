@@ -4,7 +4,7 @@
   $.ajax = function() {
     console.error('Unexpected Ajax call');
     var dfd = $.Deferred();
-    dfd.reject({status: 'error'});
+    dfd.reject({ status: 'error' });
     return dfd.promise();
   };
 
@@ -23,9 +23,9 @@
       status: 'ok',
       session: {
         valid: true,
-        user: {'username': 'omegaup'},
-        email: 'omegaup@omegaup.com'
-      }
+        user: { username: 'omegaup' },
+        email: 'omegaup@omegaup.com',
+      },
     });
   };
 })();

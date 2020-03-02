@@ -1,8 +1,8 @@
 #!/usr/bin/python3
+# type: ignore
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.
-
 '''
 A tool that helps perform database schema migrations.
 
@@ -24,12 +24,12 @@ automatically.
 from __future__ import print_function
 
 import argparse
+import contextlib
 import logging
 import os.path
 import sys
 
 import database_utils
-
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
@@ -40,9 +40,11 @@ def _revision(args, auth):
     Returns 0 if no revision has been applied.
     '''
     ensure(args, auth)
-    return int(database_utils.mysql(
-        'SELECT COALESCE(MAX(id), 0) FROM `Revision`;',
-        dbname='_omegaup_metadata', auth=auth).strip())
+    return int(
+        database_utils.mysql(
+            'SELECT COALESCE(MAX(id), 0) FROM `Revision`;',
+            dbname='_omegaup_metadata',
+            auth=auth).strip())
 
 
 def _scripts():
@@ -58,10 +60,51 @@ def _scripts():
         parts = filename.split('_', 1)
         if len(parts) != 2 or not all(x.isdigit() for x in parts[0]):
             continue
-        scripts.append(
-            (int(parts[0]), parts[1], os.path.join(scripts_dir, filename)))
+        scripts.append((int(parts[0]), parts[1],
+                        os.path.join(scripts_dir, filename)))
     scripts.sort()
     return scripts
+
+
+@contextlib.contextmanager
+def _kill_other_connections_wrapper(args, auth):
+    '''A context manager that temporarily lowers the wait timeout.
+
+    This also kills any existing connections to the database. By doing so, the
+    next time they connect, they will use the lowered wait timeout, which in
+    turn should make this script be able to grab any locks within ~10s.
+    '''
+    if not args.kill_other_connections:
+        yield
+        return
+
+    try:
+        logging.info('Lowering MySQL timeout...')
+        database_utils.mysql(
+            'SET GLOBAL interactive_timeout = 10;', dbname='mysql', auth=auth)
+        database_utils.mysql(
+            'SET GLOBAL wait_timeout = 10;', dbname='mysql', auth=auth)
+        logging.info('Killing all other MySQL connections...')
+        for line in database_utils.mysql(
+                'SHOW FULL PROCESSLIST;', dbname='mysql',
+                auth=auth).strip().split('\n'):
+            try:
+                database_utils.mysql(
+                    'KILL %s;' % line.split()[0], dbname='mysql', auth=auth)
+            except:  # noqa: bare-except
+                # The command already logged the error. There is one unkillable
+                # system thread and one dead thread (the one that issued the
+                # `SHOW FULL PROCESSLIST;` query.
+                pass
+        yield
+    finally:
+        logging.info('Restoring MySQL timeout...')
+        database_utils.mysql(
+            'SET GLOBAL wait_timeout = DEFAULT;', dbname='mysql', auth=auth)
+        database_utils.mysql(
+            'SET GLOBAL interactive_timeout = DEFAULT;',
+            dbname='mysql',
+            auth=auth)
 
 
 def exists(args, auth):  # pylint: disable=unused-argument
@@ -70,11 +113,12 @@ def exists(args, auth):  # pylint: disable=unused-argument
     Exits with 1 (error) if the metadata database has not been installed.
     This is a helper command for Puppet.
     '''
-    if not database_utils.mysql('SHOW DATABASES LIKE "_omegaup_metadata";',
-                                auth=auth):
+    if not database_utils.mysql(
+            'SHOW DATABASES LIKE "_omegaup_metadata";', auth=auth):
         sys.exit(1)
-    if not database_utils.mysql('SHOW TABLES LIKE "Revision";',
-                                dbname='_omegaup_metadata', auth=auth):
+    if not database_utils.mysql(
+            'SHOW TABLES LIKE "Revision";', dbname='_omegaup_metadata',
+            auth=auth):
         sys.exit(1)
 
 
@@ -98,29 +142,33 @@ def migrate(args, auth, update_metadata=True):
     latest_revision = 0
     if update_metadata:
         latest_revision = _revision(args, auth)
-    for revision, name, path in _scripts():
-        if latest_revision >= revision:
-            continue
-        if args.limit and revision > args.limit:
-            break
-        if args.noop:
-            sys.stderr.write('Installing %s\n' % path)
-            continue
-        logging.info('Running script for revision %d...', revision)
-        comment = "migrate"
-        if name.startswith('test_') and not args.development_environment:
-            comment = "skipped"
-        else:
-            for dbname in args.databases.split(','):
-                database_utils.mysql('source %s;' %
-                                     database_utils.quote(path),
-                                     dbname=dbname, auth=auth)
-        if update_metadata:
-            database_utils.mysql(
-                ('INSERT INTO `Revision` '
-                 'VALUES(%d, CURRENT_TIMESTAMP, "%s");') %
-                (revision, comment), dbname='_omegaup_metadata', auth=auth)
-        logging.info('Done running script for revision %d', revision)
+    with _kill_other_connections_wrapper(args, auth):
+        for revision, name, path in _scripts():
+            if latest_revision >= revision:
+                continue
+            if args.limit and revision > args.limit:
+                break
+            if args.noop:
+                sys.stderr.write('Installing %s\n' % path)
+                continue
+            logging.info('Running script for revision %d...', revision)
+            comment = "migrate"
+            if name.startswith('test_') and not args.development_environment:
+                comment = "skipped"
+            else:
+                for dbname in args.databases.split(','):
+                    database_utils.mysql(
+                        'source %s;' % database_utils.quote(path),
+                        dbname=dbname,
+                        auth=auth)
+            if update_metadata:
+                database_utils.mysql(
+                    ('INSERT INTO `Revision` '
+                     'VALUES(%d, CURRENT_TIMESTAMP, "%s");') % (revision,
+                                                                comment),
+                    dbname='_omegaup_metadata',
+                    auth=auth)
+            logging.info('Done running script for revision %d', revision)
 
 
 def validate(args, auth):  # pylint: disable=unused-argument
@@ -131,8 +179,8 @@ def validate(args, auth):  # pylint: disable=unused-argument
     for revision, _, path in _scripts():
         expected_revision += 1
         if expected_revision != revision:
-            print('Expected revision %d for path %s' % (expected_revision,
-                                                        path))
+            print(
+                'Expected revision %d for path %s' % (expected_revision, path))
             valid = False
     if not valid:
         sys.exit(1)
@@ -141,8 +189,8 @@ def validate(args, auth):  # pylint: disable=unused-argument
 def ensure(args, auth):  # pylint: disable=unused-argument
     '''Creates both the metadata database and table, if they don't exist yet.
     '''
-    database_utils.mysql('CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;',
-                         auth=auth)
+    database_utils.mysql(
+        'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;', auth=auth)
     # This is the table that tracks the migrations. |id| is the revision,
     # |applied| is the timestamp the operation was made and |comment| is a
     # human-readable comment about the migration. It can be either 'migrate' if
@@ -153,7 +201,9 @@ def ensure(args, auth):  # pylint: disable=unused-argument
         'CREATE TABLE IF NOT EXISTS `Revision`'
         '(`id` INTEGER NOT NULL PRIMARY KEY, '
         '`applied` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, '
-        '`comment` VARCHAR(50));', dbname='_omegaup_metadata', auth=auth)
+        '`comment` VARCHAR(50));',
+        dbname='_omegaup_metadata',
+        auth=auth)
 
 
 def reset(args, auth):
@@ -165,12 +215,14 @@ def reset(args, auth):
     ensure(args, auth)
     database_utils.mysql(
         'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision,
-        dbname='_omegaup_metadata', auth=auth)
+        dbname='_omegaup_metadata',
+        auth=auth)
     if args.revision > 0:
         database_utils.mysql(
             ('INSERT INTO `Revision` '
-             'VALUES(%d, CURRENT_TIMESTAMP, "manual reset");') %
-            args.revision, dbname='_omegaup_metadata', auth=auth)
+             'VALUES(%d, CURRENT_TIMESTAMP, "manual reset");') % args.revision,
+            dbname='_omegaup_metadata',
+            auth=auth)
 
 
 def print_revision(args, auth):
@@ -184,14 +236,17 @@ def purge(args, auth):
     Drops & re-creates databases including the metadata. Note that purge will
     not re-apply the schema.
     '''
-    for dbname in args.databases.split(','):
-        logging.info('Dropping database %s', dbname)
-        database_utils.mysql('DROP DATABASE IF EXISTS `%s`;' % dbname,
-                             auth=auth)
-        logging.info('Creating database %s', dbname)
-        database_utils.mysql('CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
-                             'utf8_general_ci;' % dbname, auth=auth)
-        logging.info('Done creating database %s', dbname)
+    with _kill_other_connections_wrapper(args, auth):
+        for dbname in args.databases.split(','):
+            logging.info('Dropping database %s', dbname)
+            database_utils.mysql(
+                'DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
+            logging.info('Creating database %s', dbname)
+            database_utils.mysql(
+                'CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
+                'utf8_general_ci;' % dbname,
+                auth=auth)
+            logging.info('Done creating database %s', dbname)
 
 
 def schema(args, auth):
@@ -208,8 +263,8 @@ def schema(args, auth):
     migrate(args, auth, update_metadata=False)
     # This is a false positive.
     # pylint: disable=no-member
-    sys.stdout.buffer.write(database_utils.mysqldump(dbname=_SCHEMA_DB,
-                                                     auth=auth))
+    sys.stdout.buffer.write(
+        database_utils.mysqldump(dbname=_SCHEMA_DB, auth=auth))
     database_utils.mysql('DROP DATABASE `%s`;' % _SCHEMA_DB, auth=auth)
 
 
@@ -217,13 +272,19 @@ def main():
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mysql-config-file',
-                        default=database_utils.default_config_file(),
-                        help='.my.cnf file that stores credentials')
-    parser.add_argument('--username', default='root',
-                        help='MySQL root username')
+    parser.add_argument(
+        '--mysql-config-file',
+        default=database_utils.default_config_file(),
+        help='.my.cnf file that stores credentials')
+    parser.add_argument(
+        '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument(
+        '--kill-other-connections',
+        action='store_true',
+        help=('Kill all connections to MySQL and '
+              'temporarily lower the wait timeout.'))
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
@@ -238,17 +299,22 @@ def main():
 
     parser_migrate = subparsers.add_parser(
         'migrate', help='Migrates the database to the latest revision')
-    parser_migrate.add_argument('--noop', action='store_true',
-                                help=('Only print scripts that would be '
-                                      'installed'))
-    parser_migrate.add_argument('--development-environment',
-                                dest='development_environment',
-                                action='store_true',
-                                help='Installs scripts flagged as for testing')
-    parser_migrate.add_argument('--databases', default='omegaup,omegaup-test',
-                                help='Comma-separated list of databases')
-    parser_migrate.add_argument('--limit', type=int,
-                                help='Last revision to include')
+    parser_migrate.add_argument(
+        '--noop',
+        action='store_true',
+        help=('Only print scripts that would be '
+              'installed'))
+    parser_migrate.add_argument(
+        '--development-environment',
+        dest='development_environment',
+        action='store_true',
+        help='Installs scripts flagged as for testing')
+    parser_migrate.add_argument(
+        '--databases',
+        default='omegaup,omegaup-test',
+        help='Comma-separated list of databases')
+    parser_migrate.add_argument(
+        '--limit', type=int, help='Last revision to include')
     parser_migrate.set_defaults(func=migrate)
 
     # Commands for development.
@@ -261,10 +327,9 @@ def main():
     parser_ensure.set_defaults(func=ensure)
 
     parser_reset = subparsers.add_parser(
-        'reset',
-        help='Resets the migration table to a particular revision')
-    parser_reset.add_argument('revision', help='The desired revision',
-                              type=int)
+        'reset', help='Resets the migration table to a particular revision')
+    parser_reset.add_argument(
+        'revision', help='The desired revision', type=int)
     parser_reset.set_defaults(func=reset)
 
     parser_revision = subparsers.add_parser(
@@ -273,17 +338,19 @@ def main():
 
     parser_purge = subparsers.add_parser(
         'purge', help='Start from scratch - Drop & Create empty databases')
-    parser_purge.add_argument('--databases',
-                              default=('omegaup,omegaup-test,'
-                                       '_omegaup_metadata'),
-                              help='Comma-separated list of databases')
+    parser_purge.add_argument(
+        '--databases',
+        default=('omegaup,omegaup-test,'
+                 '_omegaup_metadata'),
+        help='Comma-separated list of databases')
     parser_purge.set_defaults(func=purge)
 
     parser_schema = subparsers.add_parser(
-        'schema', help=('Show the database schema. Does not actually '
-                        'read/write from the database'))
-    parser_schema.add_argument('--limit', type=int,
-                               help='Last revision to include')
+        'schema',
+        help=('Show the database schema. Does not actually '
+              'read/write from the database'))
+    parser_schema.add_argument(
+        '--limit', type=int, help='Last revision to include')
     parser_schema.set_defaults(func=schema)
 
     args = parser.parse_args()
@@ -291,14 +358,12 @@ def main():
     if args.verbose:
         logging.getLogger().setLevel('DEBUG')
 
-    auth = database_utils.authentication(config_file=args.mysql_config_file,
-                                         username=args.username,
-                                         password=args.password)
+    auth = database_utils.authentication(
+        config_file=args.mysql_config_file,
+        username=args.username,
+        password=args.password)
     args.func(args, auth)
 
 
 if __name__ == '__main__':
     main()
-
-
-# vim: expandtab shiftwidth=4 tabstop=4

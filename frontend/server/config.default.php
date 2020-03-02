@@ -15,6 +15,8 @@ try_define('OMEGAUP_MAINTENANCE', null);
 # ####################################
 # TEST CONFIG
 # ####################################
+try_define('IS_TEST', false);
+try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
 try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
 try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
@@ -41,15 +43,25 @@ try_define('OMEGAUP_LOG_LEVEL', 'info');
 try_define('OMEGAUP_LOG_FILE', '/var/log/omegaup/omegaup.log');
 try_define('OMEGAUP_CSP_LOG_FILE', '/var/log/omegaup/csp.log');
 try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
+try_define('OMEGAUP_MYSQL_TYPES_LOG_FILE', '/var/log/omegaup/omegaup.log');
 
 # ####################################
 # GRADER CONFIG
 # ####################################
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
 try_define('OMEGAUP_GITSERVER_PORT', '33861');
-try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:' . OMEGAUP_GITSERVER_PORT);
-try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
-try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
+try_define(
+    'OMEGAUP_GITSERVER_URL',
+    'http://localhost:' . OMEGAUP_GITSERVER_PORT
+);
+try_define(
+    'OMEGAUP_GITSERVER_SECRET_KEY',
+    'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA=='
+);
+try_define(
+    'OMEGAUP_GITSERVER_PUBLIC_KEY',
+    'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw='
+);
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
@@ -122,7 +134,6 @@ try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 # SMARTY
 # #########################
 try_define('SMARTY_CACHE_DIR', '/var/tmp');
-try_define('IS_TEST', false);
 
 # #########################
 # PAGER CONSTANTS
@@ -152,7 +163,6 @@ try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 # ########################
 try_define('AWS_CLI_ACCESS_KEY_ID', null);
 try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
-try_define('AWS_CLI_BINARY', '/usr/bin/aws');
 
 # ########################
 # NEW RELIC CONFIG

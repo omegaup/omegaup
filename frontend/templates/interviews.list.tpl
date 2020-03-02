@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#interviewList#}"}
+{include file='head.tpl' htmlTitle="{#interviewList#}" inline}
 
 <span id="form-data" data-name="interviews" data-page="new"></span>
 <script src="{version_hash src="/js/alias.generate.js"}"></script>
@@ -55,5 +55,5 @@
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/interviews.list.js"}"></script>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}
 

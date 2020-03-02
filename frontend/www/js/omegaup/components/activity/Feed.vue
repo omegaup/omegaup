@@ -1,36 +1,41 @@
 <template>
   <div class="post">
     <div class="copy">
-      <h1><a v-bind:href="`/${type}/${alias}/`">{{ alias }}</a> — {{ T.wordsActivityReport }}</h1>
-      <p>{{ wordsReportSummary }}</p><!-- Nav tabs -->
-      <ul class="nav nav-tabs"
-          role="tablist">
-        <li class="active"
-            role="presentation">
-          <a aria-controls="report"
-              data-toggle="tab"
-              href="#report"
-              role="tab">{{ T.wordsActivityReportReport }}</a>
+      <h1>
+        <a v-bind:href="`/${type}/${alias}/`">{{ alias }}</a> —
+        {{ T.wordsActivityReport }}
+      </h1>
+      <p>{{ wordsReportSummary }}</p>
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="active" role="presentation">
+          <a
+            aria-controls="report"
+            data-toggle="tab"
+            href="#report"
+            role="tab"
+            >{{ T.wordsActivityReportReport }}</a
+          >
         </li>
         <li role="presentation">
-          <a aria-controls="users"
-              data-toggle="tab"
-              href="#users"
-              role="tab">{{ T.wordsActivityReportUsers }}</a>
+          <a aria-controls="users" data-toggle="tab" href="#users" role="tab">{{
+            T.wordsActivityReportUsers
+          }}</a>
         </li>
         <li role="presentation">
-          <a aria-controls="origins"
-              data-toggle="tab"
-              href="#origins"
-              role="tab">{{ T.wordsActivityReportOrigins }}</a>
+          <a
+            aria-controls="origins"
+            data-toggle="tab"
+            href="#origins"
+            role="tab"
+            >{{ T.wordsActivityReportOrigins }}</a
+          >
         </li>
-      </ul><!-- Tab panes -->
+      </ul>
+      <!-- Tab panes -->
       <div class="tab-content">
         <!-- id-lint off -->
-        <div class="tab-pane active"
-             id="report"
-             name="report"
-             role="tabpanel">
+        <div class="tab-pane active" id="report" name="report" role="tabpanel">
           <!-- id-lint on -->
           <table class="table">
             <thead>
@@ -44,32 +49,40 @@
             <tbody>
               <tr v-for="event in report">
                 <td>
-                  <a v-bind:href=
-                  "`/profile/${event.username}`"><strong><omegaup-user-username v-bind:classname=
-                  "event.classname"
-                                         v-bind:username=
-                                         "event.username"></omegaup-user-username></strong></a>
+                  <a v-bind:href="`/profile/${event.username}`"
+                    ><strong
+                      ><omegaup-user-username
+                        v-bind:classname="event.classname"
+                        v-bind:username="event.username"
+                      ></omegaup-user-username></strong
+                  ></a>
                 </td>
                 <td>{{ UI.formatDateTime(event.time) }}</td>
                 <td>{{ event.ip.toString() }}</td>
                 <td>{{ event.event.name }}</td>
-                <td><span v-if="event.event.problem"><a v-bind:href=
-                "`/arena/problem/${event.event.problem}/`">{{ event.event.problem
-                }}</a></span></td>
+                <td>
+                  <span v-if="event.event.problem"
+                    ><a
+                      v-bind:href="`/arena/problem/${event.event.problem}/`"
+                      >{{ event.event.problem }}</a
+                    ></span
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
-        </div><!-- id-lint off -->
-        <div class="tab-pane"
-             id="users"
-             name="users"
-             role="tabpanel">
+        </div>
+        <!-- id-lint off -->
+        <div class="tab-pane" id="users" name="users" role="tabpanel">
           <!-- id-lint on -->
-          <p v-if="users.length &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForUsers }}</p>
-          <table class="table"
-                 v-else="">
+          <p v-if="users.length &lt;= 0">
+            {{ T.wordsActivityReportNoDuplicatesForUsers }}
+          </p>
+          <table class="table" v-else="">
             <caption>
-              {{ T.wordsActivityReportDuplicatesForUsersDescription }}
+              {{
+                T.wordsActivityReportDuplicatesForUsersDescription
+              }}
             </caption>
             <thead>
               <tr>
@@ -80,27 +93,32 @@
             <tbody>
               <tr v-for="user in users">
                 <td>
-                  <a v-bind:href=
-                  "`/profile/${user.username}`"><strong><omegaup-user-username v-bind:classname=
-                  "user.classname"
-                                         v-bind:username=
-                                         "user.username"></omegaup-user-username></strong></a>
+                  <a v-bind:href="`/profile/${user.username}`"
+                    ><strong
+                      ><omegaup-user-username
+                        v-bind:classname="user.classname"
+                        v-bind:username="user.username"
+                      ></omegaup-user-username></strong
+                  ></a>
                 </td>
-                <td><span v-for="ip in user.ips">{{ ip }}&nbsp;</span></td>
+                <td>
+                  <span v-for="ip in user.ips">{{ ip }}&nbsp;</span>
+                </td>
               </tr>
             </tbody>
           </table>
-        </div><!-- id-lint off -->
-        <div class="tab-pane"
-             id="origins"
-             name="origins"
-             role="tabpanel">
+        </div>
+        <!-- id-lint off -->
+        <div class="tab-pane" id="origins" name="origins" role="tabpanel">
           <!-- id-lint on -->
-          <p v-if="origins.length &lt;= 0">{{ T.wordsActivityReportNoDuplicatesForOrigins }}</p>
-          <table class="table"
-                 v-else="">
+          <p v-if="origins.length &lt;= 0">
+            {{ T.wordsActivityReportNoDuplicatesForOrigins }}
+          </p>
+          <table class="table" v-else="">
             <caption>
-              {{ T.wordsActivityReportDuplicatesForOriginsDescription }}
+              {{
+                T.wordsActivityReportDuplicatesForOriginsDescription
+              }}
             </caption>
             <thead>
               <tr>
@@ -111,11 +129,17 @@
             <tbody>
               <tr v-for="origin in origins">
                 <td>{{ origin.origin }}</td>
-                <td><span v-for="user in origin.usernames"><a v-bind:href=
-                "`/profile/${user.username}`"><strong><omegaup-user-username v-bind:classname=
-                "user.classname"
-                                       v-bind:username=
-                                       "user.username"></omegaup-user-username></strong></a>&nbsp;</span></td>
+                <td>
+                  <span v-for="user in origin.usernames"
+                    ><a v-bind:href="`/profile/${user.username}`"
+                      ><strong
+                        ><omegaup-user-username
+                          v-bind:classname="user.classname"
+                          v-bind:username="user.username"
+                        ></omegaup-user-username></strong></a
+                    >&nbsp;</span
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -231,5 +255,4 @@ export default class ActivityFeed extends Vue {
     return origins;
   }
 }
-
 </script>

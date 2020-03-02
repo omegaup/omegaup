@@ -13,14 +13,11 @@ class Time extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for /time API
      *
-     * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{time: int}
      */
-    public static function apiGet(\OmegaUp\Request $r = null) {
-        $response = [];
-        $response['time'] = \OmegaUp\Time::get();
-        $response['status'] = 'ok';
-
-        return $response;
+    public static function apiGet(?\OmegaUp\Request $r = null): array {
+        return [
+            'time' => \OmegaUp\Time::get(),
+        ];
     }
 }

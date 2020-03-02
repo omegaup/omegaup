@@ -25,48 +25,53 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
     omegaup.UI.error(
-        omegaup.UI.formatString(omegaup.T.aliasAlreadyInUse,
-                                {alias: omegaup.UI.escape($('#alias').val())}));
+      omegaup.UI.formatString(omegaup.T.aliasAlreadyInUse, {
+        alias: omegaup.UI.escape($('#alias').val()),
+      }),
+    );
     $('#alias').trigger('focus');
   }
 
-  function onAliasNew() { omegaup.UI.dismissNotifications(); }
+  function onAliasNew() {
+    omegaup.UI.dismissNotifications();
+  }
 
   switch (formName) {
     case 'problems':
       existsFn = function(alias) {
-        omegaup.API.Problem.details({problem_alias: alias})
-            .then(onAliasReady)
-            .fail(omegaup.UI.apiError);
+        omegaup.API.Problem.details({ problem_alias: alias })
+          .then(onAliasReady)
+          .fail(omegaup.UI.apiError);
       };
       aliasLength = 32;
       break;
 
     case 'groups':
       existsFn = function(alias) {
-        omegaup.API.Group.details({group_alias: alias})
-            .then(onAliasReady)
-            .fail(omegaup.UI.apiError);
+        omegaup.API.Group.details({ group_alias: alias })
+          .then(onAliasReady)
+          .fail(omegaup.UI.apiError);
       };
       aliasLength = 50;
       break;
 
     case 'interviews':
       existsFn = function(alias) {
-        omegaup.API.Interview.details({interview_alias: alias})
-            .then(onAliasReady)
-            .fail(omegaup.UI.apiError);
+        omegaup.API.Interview.details({ interview_alias: alias })
+          .then(onAliasReady)
+          .fail(omegaup.UI.apiError);
       };
       aliasLength = 32;
       break;
   }
 
-  $('#title')
-      .on('blur', function() {
-        $('#alias')
-            .val(generateAlias($(this).val(), aliasLength))
-            .trigger('change');
-      });
+  $('#title').on('blur', function() {
+    $('#alias')
+      .val(generateAlias($(this).val(), aliasLength))
+      .trigger('change');
+  });
 
-  $('#alias').on('change', function() { existsFn($('#alias').val()); });
+  $('#alias').on('change', function() {
+    existsFn($('#alias').val());
+  });
 });

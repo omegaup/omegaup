@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -22,25 +22,35 @@ class GroupsScoreboardsProblemsets extends \OmegaUp\DAO\VO\VO {
         'weight' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['group_scoreboard_id'])) {
-            $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];
+            $this->group_scoreboard_id = intval(
+                $data['group_scoreboard_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['only_ac'])) {
-            $this->only_ac = boolval($data['only_ac']);
+            $this->only_ac = boolval(
+                $data['only_ac']
+            );
         }
         if (isset($data['weight'])) {
-            $this->weight = (int)$data['weight'];
+            $this->weight = intval(
+                $data['weight']
+            );
         }
     }
 

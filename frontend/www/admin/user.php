@@ -1,27 +1,36 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+namespace OmegaUp;
+
+require_once('../../server/bootstrap.php');
 
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 \OmegaUp\UITools::redirectIfNoAdmin();
 
-$user = \OmegaUp\DAO\Users::FindByUsername($_REQUEST['username']);
-if (is_null($user)) {
+$username = strval($_REQUEST['username']);
+$user = \OmegaUp\DAO\Users::FindByUsername($username);
+if (is_null($user) || is_null($user->user_id)) {
     header('HTTP/1.1 404 Not found');
     die();
 }
 $emails = \OmegaUp\DAO\Emails::getByUserId($user->user_id);
-$userExperiments = \OmegaUp\DAO\UsersExperiments::getByUserId($user->user_id);
+$userExperiments = \OmegaUp\DAO\UsersExperiments::getByUserId(
+    $user->user_id
+);
 // TODO: Also support GroupRoles.
 $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
 $roles = \OmegaUp\DAO\Roles::getAll();
 $systemExperiments = [];
+/** @var array<string, mixed> */
 $defines = get_defined_constants(true)['user'];
 foreach (\OmegaUp\Experiments::getInstance()->getAllKnownExperiments() as $experiment) {
     $systemExperiments[] = [
         'name' => $experiment,
         'hash' => \OmegaUp\Experiments::getExperimentHash($experiment),
-        'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig($experiment, $defines),
+        'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig(
+            $experiment,
+            $defines
+        ),
     ];
 }
 
@@ -37,9 +46,11 @@ $payload = [
         return ['name' => $role->name];
     }, $roles),
     'systemRoles' => $systemRoles,
-    'username' => $user->username,
+    'username' => $username,
     'verified' => $user->verified != 0,
 ];
-$smarty->assign('payload', $payload);
 
-$smarty->display('../templates/admin.user.tpl');
+\OmegaUp\UITools::getSmartyInstance()->assign('payload', $payload);
+\OmegaUp\UITools::getSmartyInstance()->display(
+    '../templates/admin.user.tpl'
+);

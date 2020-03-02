@@ -35,32 +35,41 @@ class LinkedIn {
         }
     }
 
-    public function getLoginUrl() : string {
+    public function getLoginUrl(): string {
         $query_string = http_build_query([
             'response_type' => 'code',
             'client_id' => $this->_clientId,
             'redirect_uri' => $this->_redirectUrl,
             'state' => json_encode($this->_state),
         ]);
-        $_SESSION['li-state'] = $this->_state['ct'];
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+            $_SESSION['li-state'] = $this->_state['ct'];
+        }
         return "https://www.linkedin.com/oauth/v2/authorization?$query_string";
     }
 
-    public function getAuthToken(string $code, string $state) : string {
+    public function getAuthToken(string $code, string $state): string {
         /** @var null|array{ct: string} */
         $stateArray = json_decode($state, true);
-        if (!isset($_SESSION['li-state'])
-            || empty($stateArray)
-            || !isset($stateArray['ct'])
-            || $_SESSION['li-state'] != $stateArray['ct']
+        {
+            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+        if (
+                !isset($_SESSION['li-state'])
+                || empty($stateArray)
+                || !isset($stateArray['ct'])
+                || $_SESSION['li-state'] != $stateArray['ct']
         ) {
             throw new \OmegaUp\Exceptions\CSRFException('invalidCsrfToken');
         }
 
-        // If we make it here, the CSRF token has been consumed
-        unset($_SESSION['li-state']);
+            // If we make it here, the CSRF token has been consumed
+            unset($_SESSION['li-state']);
+        }
 
-        $curl = new \OmegaUp\CurlSession('https://www.linkedin.com/oauth/v2/accessToken');
+        $curl = new \OmegaUp\CurlSession(
+            'https://www.linkedin.com/oauth/v2/accessToken'
+        );
         $authArray = $curl->get([
             'grant_type' => 'authorization_code',
             'client_id' => $this->_clientId,
@@ -78,7 +87,7 @@ class LinkedIn {
      * @param string $accessToken
      * @return array<string, string>
      */
-    public function getProfileInfo(string $accessToken) : array {
+    public function getProfileInfo(string $accessToken): array {
         $curl = new \OmegaUp\CurlSession(
             'https://api.linkedin.com/v1/people/~:(first-name,last-name,email-address)?format=json',
             ["Authorization: Bearer {$accessToken}"]
@@ -92,7 +101,7 @@ class LinkedIn {
         return $profile;
     }
 
-    public function extractRedirect(string $state) : ?string {
+    public function extractRedirect(string $state): ?string {
         /** @var null|array<string, string> */
         $stateArray = json_decode($state, true);
         if (is_null($stateArray) || !isset($stateArray['rd'])) {

@@ -1,8 +1,6 @@
 <template>
-  <div class="alert alert-warning"
-       name="notice"
-       v-if="show">
-    {{ UI.formatString(T.coderOfTheMonthNotice, {username: coderUsername}) }}
+  <div class="alert alert-warning" name="notice" v-if="show">
+    {{ UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
   </div>
 </template>
 
@@ -27,5 +25,4 @@ export default class CoderOfTheMonthNotice extends Vue {
     );
   }
 }
-
 </script>

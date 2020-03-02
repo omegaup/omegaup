@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,13 +25,33 @@ abstract class Schools {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Schools $Schools) : int {
-        $sql = 'UPDATE `Schools` SET `country_id` = ?, `state_id` = ?, `name` = ? WHERE `school_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Schools $Schools
+    ): int {
+        $sql = '
+            UPDATE
+                `Schools`
+            SET
+                `country_id` = ?,
+                `state_id` = ?,
+                `name` = ?,
+                `rank` = ?,
+                `score` = ?
+            WHERE
+                (
+                    `school_id` = ?
+                );';
         $params = [
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
-            (int)$Schools->school_id,
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
+            floatval($Schools->score),
+            intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -40,15 +60,31 @@ abstract class Schools {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Schools} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Schools}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Schools}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Schools Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Schools} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $school_id) : ?\OmegaUp\DAO\VO\Schools {
-        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name` FROM Schools WHERE (school_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $school_id
+    ): ?\OmegaUp\DAO\VO\Schools {
+        $sql = '
+            SELECT
+                `Schools`.`school_id`,
+                `Schools`.`country_id`,
+                `Schools`.`state_id`,
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
+            FROM
+                `Schools`
+            WHERE
+                (
+                    `school_id` = ?
+                )
+            LIMIT 1;';
         $params = [$school_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -76,9 +112,19 @@ abstract class Schools {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Schools $Schools) : void {
-        $sql = 'DELETE FROM `Schools` WHERE school_id = ?;';
-        $params = [$Schools->school_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Schools $Schools
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Schools`
+            WHERE
+                (
+                    `school_id` = ?
+                );';
+        $params = [
+            $Schools->school_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -102,27 +148,49 @@ abstract class Schools {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Schools[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Schools> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Schools}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Schools>
      */
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Schools`.`school_id`, `Schools`.`country_id`, `Schools`.`state_id`, `Schools`.`name` from Schools';
+    ): array {
+        $sql = '
+            SELECT
+                `Schools`.`school_id`,
+                `Schools`.`country_id`,
+                `Schools`.`state_id`,
+                `Schools`.`name`,
+                `Schools`.`rank`,
+                `Schools`.`score`
+            FROM
+                `Schools`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Schools($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Schools(
+                $row
+            );
         }
         return $allData;
     }
@@ -135,23 +203,49 @@ abstract class Schools {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Schools $Schools El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Schools} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Schools}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Schools $Schools) : int {
-        $sql = 'INSERT INTO Schools (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Schools $Schools
+    ): int {
+        $sql = '
+            INSERT INTO
+                Schools (
+                    `country_id`,
+                    `state_id`,
+                    `name`,
+                    `rank`,
+                    `score`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Schools->country_id,
             $Schools->state_id,
             $Schools->name,
+            (
+                is_null($Schools->rank) ?
+                null :
+                intval($Schools->rank)
+            ),
+            floatval($Schools->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Schools->school_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Schools->school_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

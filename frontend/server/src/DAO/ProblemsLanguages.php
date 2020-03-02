@@ -14,15 +14,20 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
-    final public static function deleteProblemLanguages(\OmegaUp\DAO\VO\ProblemsLanguages $problems_languages) {
+    final public static function deleteProblemLanguages(
+        \OmegaUp\DAO\VO\ProblemsLanguages $problemsLanguages
+    ): int {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ?;';
-        $params = [$problems_languages->problem_id];
+        $params = [$problemsLanguages->problem_id];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getByProblemId($problemId) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\ProblemsLanguages>
+     */
+    final public static function getByProblemId(int $problemId): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -30,11 +35,17 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
                 WHERE
                     problem_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemId]);
+        /** @var list<array{language_id: int, problem_id: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId]
+        );
 
         $problemsLanguages = [];
         foreach ($rs as $row) {
-            array_push($problemsLanguages, new \OmegaUp\DAO\VO\ProblemsLanguages($row));
+            $problemsLanguages[] = new \OmegaUp\DAO\VO\ProblemsLanguages(
+                $row
+            );
         }
         return $problemsLanguages;
     }

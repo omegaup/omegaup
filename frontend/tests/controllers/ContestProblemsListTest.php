@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class ContestProblemsListTest extends OmegaupTestCase {
+class ContestProblemsListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Sets the context for a basic scoreboard test
      * @param  integer $numUsers
@@ -15,36 +15,46 @@ class ContestProblemsListTest extends OmegaupTestCase {
      */
     private function prepareContestData($numUsers = 3, $numProblems = 9) {
         // Create the contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         $problemData = [];
         for ($i = 0; $i < $numProblems; $i++) {
             // Create the problems
-            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+            $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Problem ' . ($i + 1),
             ]));
 
             // Add the problems to the contest
-            ContestsFactory::addProblemToContest($problemData[$i], $contestData);
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData[$i],
+                $contestData
+            );
         }
 
         $contestants = [];
+        $identities = [];
         for ($i = 0; $i < $numUsers; $i++) {
             // Create our contestants
-            $contestants[] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]]  = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to contest
-            ContestsFactory::addUser($contestData, $contestants[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
         $contestDirector = $contestData['director'];
-        $contestAdmin = UserFactory::createUser();
-        ContestsFactory::addAdminUser($contestData, $contestAdmin);
+        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin]  = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contestData,
+            $contestIdentityAdmin
+        );
 
         return [
             'problemData' => $problemData,
             'contestData' => $contestData,
-            'contestants' => $contestants,
-            'contestAdmin' => $contestAdmin,
+            'contestants' => $identities,
+            'contestAdmin' => $contestIdentityAdmin,
         ];
     }
 
@@ -75,8 +85,14 @@ class ContestProblemsListTest extends OmegaupTestCase {
         ]));
 
         foreach ($scoreboardResponse['problems'] as $index => $problem) {
-            $this->assertEquals($problem['alias'], $detailsResponse['problems'][$index]['alias']);
-            $this->assertEquals($problem['alias'], $problemsResponse['problems'][$index]['alias']);
+            $this->assertEquals(
+                $problem['alias'],
+                $detailsResponse['problems'][$index]['alias']
+            );
+            $this->assertEquals(
+                $problem['alias'],
+                $problemsResponse['problems'][$index]['alias']
+            );
         }
     }
 }
