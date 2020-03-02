@@ -15,8 +15,8 @@
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.4.1.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js"}" defer></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
@@ -38,9 +38,8 @@
 		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>
 		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
 {/if}
-		<link rel="stylesheet" href="/third_party/css/reset.css" />
-		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
+		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
 		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/third_party/bootstrap-3.4.1/css/bootstrap.min.css">
