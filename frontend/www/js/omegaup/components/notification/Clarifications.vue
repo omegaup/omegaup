@@ -12,8 +12,7 @@
       <span
         class="notification-counter label"
         v-bind:class="{ 'label-danger': unread }"
-        v-if="clarifications &amp;&amp; clarifications.length &gt; 0"
-        v-model="unread"
+        v-if="clarifications && clarifications.length > 0"
         >{{ clarifications.length }}</span
       ></a
     >
@@ -36,25 +35,23 @@
               ><span>{{ clarification.problem_alias }}</span> —
               <span>{{ clarification.author }}</span>
               <pre>{{ clarification.message }}</pre>
-              <hr v-if="clarification.answer" />
-              <pre v-if="clarification.answer">{{
-                clarification.answer
-              }}</pre></a
+              <template v-if="clarification.answer">
+                <hr />
+                <pre>{{ clarification.answer }}</pre>
+              </template></a
             >
           </li>
         </ul>
       </li>
-      <li
-        class="divider"
-        role="separator"
-        v-if="clarifications &amp;&amp; clarifications.length &gt; 1"
-      ></li>
-      <li v-if="clarifications &amp;&amp; clarifications.length &gt; 1">
-        <a href="#" v-on:click.prevent="onMarkAllAsRead"
-          ><span class="glyphicon glyphicon-align-right"></span>
-          {{ T.notificationsMarkAllAsRead }}</a
-        >
-      </li>
+      <template v-if="clarifications && clarifications.length > 1">
+        <li class="divider" role="separator"></li>
+        <li>
+          <a href="#" v-on:click.prevent="onMarkAllAsRead"
+            ><span class="glyphicon glyphicon-align-right"></span>
+            {{ T.notificationsMarkAllAsRead }}</a
+          >
+        </li>
+      </template>
     </ul>
   </li>
 </template>
@@ -146,7 +143,7 @@ export default class Clarifications extends Vue {
   @Prop() initialClarifications!: omegaup.Clarification[];
   T = T;
 
-  unread: boolean = true;
+  unread: boolean = false;
   flashInterval: number = 0;
   clarifications: omegaup.Clarification[] = this.initialClarifications;
 
@@ -156,7 +153,9 @@ export default class Clarifications extends Vue {
     oldValue: Array<omegaup.Clarification>,
   ): void {
     this.clarifications = newValue;
-    this.unread = true;
+    if (this.clarifications.length > 0) {
+      this.unread = true;
+    }
     const audio = <HTMLMediaElement>(
       document.getElementById('notification-audio')
     );
@@ -188,7 +187,7 @@ export default class Clarifications extends Vue {
     if (document.title.indexOf('!') === 0) {
       document.title = document.title.substring(2);
     } else if (!reset) {
-      document.title = '! ' + document.title;
+      document.title = `! ${document.title}`;
     }
   }
 
@@ -201,8 +200,8 @@ export default class Clarifications extends Vue {
   }
 
   onMarkAllAsRead(): void {
-    for (const key in this.clarifications) {
-      const id = `clarification-${this.clarifications[key].clarification_id}`;
+    for (const clarification of this.clarifications) {
+      const id = `clarification-${clarification.clarification_id}`;
       localStorage.setItem(id, Date.now().toString());
     }
     this.clarifications = [];
