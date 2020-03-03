@@ -11,6 +11,15 @@
         <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'">
           <a data-toggle="tab">{{ T.codersOfTheMonthListCandidate }}</a>
         </li>
+        <li v-on:click="selectedTab = 'codersOfTheMonthFemale'">
+          <a data-toggle="tab">{{ T.codersOfTheMonthFemale }}</a>
+        </li>
+        <li v-on:click="selectedTab = 'codersOfPreviousMonthFemale'">
+          <a data-toggle="tab">{{ T.codersOfTheMonthFemaleRank }}</a>
+        </li>
+        <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonthFemale'">
+          <a data-toggle="tab">{{ T.codersOfTheMonthFemaleListCandidate }}</a>
+        </li>
       </ul>
     </div>
     <div class="panel-body"></div>
@@ -109,6 +118,7 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() canChooseCoder!: boolean;
   @Prop() coderIsSelected!: boolean;
   @Prop() isMentor!: boolean;
+  @Prop() category!: string;
 
   T = T;
   selectedTab = 'codersOfTheMonth';
@@ -116,8 +126,9 @@ export default class CoderOfTheMonthList extends Vue {
   get visibleCoders(): omegaup.CoderOfTheMonth[] {
     switch (this.selectedTab) {
       case 'codersOfTheMonth':
-      default:
         return this.codersOfCurrentMonth;
+      default:
+        return  [];
       case 'codersOfPreviousMonth':
         return this.codersOfPreviousMonth;
       case 'candidatesToCoderOfTheMonth':

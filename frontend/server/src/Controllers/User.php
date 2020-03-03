@@ -3265,6 +3265,7 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
+            'category' => $category,
         ];
 
         if (!$isMentor) {
