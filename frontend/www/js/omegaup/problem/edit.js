@@ -31,7 +31,7 @@ OmegaUp.on('ready', function() {
           validatorTimeLimit: this.validatorTimeLimit,
           languages: this.languages,
           validLanguages: this.validLanguages,
-          validator: this.validator,
+          initialValidator: this.validator,
           validatorsTypes: this.validatorsTypes,
         },
       });
@@ -650,7 +650,7 @@ OmegaUp.on('ready', function() {
         (problem.email_clarifications ? '1' : '0') +
         ']',
     ).attr('checked', 1);
-    $('select[name=validator]').val(problem.settings.validator.name);
+    problemValidator.validator = problem.settings.validator.name;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {

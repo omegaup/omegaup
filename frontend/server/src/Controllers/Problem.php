@@ -3941,6 +3941,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'LOAD_MATHJAX' => true,
                     'LOAD_PAGEDOWN' => true,
                     'STATUS_ERROR' => $statusError,
+                    'payload' => [
+                        'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                        'validLanguages' => $validLanguages,
+                        'validatorsTypes' => $validatorsTypes,
+                    ],
                 ];
             }
         } elseif ($r['request'] === 'markdown') {

@@ -3,11 +3,10 @@
     <div class="row">
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormValidatorType }}</label>
-        <select name="validator" class="form-control">
+        <select name="validator" class="form-control" v-model="validator">
           <option
             v-for="(validatorText, validatorIndex) in validatorsTypes"
             v-bind:value="validatorIndex"
-            v-bind:selected="validatorIndex === validator"
           >
             {{ validatorText }}</option
           >
@@ -123,10 +122,21 @@ export default class ProblemValidator extends Vue {
   @Prop() validatorTimeLimit!: number;
   @Prop() languages!: string;
   @Prop() validLanguages!: Array<string>;
-  @Prop() validator!: string;
+  @Prop() initialValidator!: string;
   @Prop() validatorsTypes!: Array<string>;
 
   T = T;
   UI = UI;
+  validatorSave="";
+
+  get validator(): string{
+      return this.initialValidator;
+  }
+
+  
+  set validator(validator : string) {
+    this.validatorSave = validator;
+  }
+  
 }
 </script>

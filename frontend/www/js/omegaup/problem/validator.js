@@ -20,7 +20,7 @@ OmegaUp.on('ready', function() {
           validatorTimeLimit: this.validatorTimeLimit,
           languages: this.languages,
           validLanguages: this.validLanguages,
-          validator: this.validator,
+          initialValidator: this.initialValidator,
           validatorsTypes: this.validatorsTypes,
         },
       });
@@ -35,7 +35,7 @@ OmegaUp.on('ready', function() {
       validatorTimeLimit: payload.validatorTimeLimit,
       languages: payload.languages,
       validLanguages: payload.validLanguages,
-      validator: payload.validator,
+      initialValidator: payload.validator,
       validatorsTypes: payload.validatorsTypes,
     },
     components: {
