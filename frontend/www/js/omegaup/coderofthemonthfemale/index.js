@@ -11,11 +11,13 @@ OmegaUp.on('ready', function() {
         props: {
           codersOfCurrentMonthFemale: this.codersOfCurrentMonthFemale,
           codersOfPreviousMonthFemale: this.codersOfPreviousMonthFemale,
-          candidatesToCoderOfTheMonthFemale: this.candidatesToCoderOfTheMonthFemale,
+          candidatesToCoderOfTheMonthFemale: this
+            .candidatesToCoderOfTheMonthFemale,
           isMentor: this.isMentor,
           canChooseCoder: this.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
-        },on: {
+        },
+        on: {
           'select-coder': function(coderUsername) {
             API.User.selectCoderOfTheMonth({
               username: coderUsername,
@@ -37,6 +39,8 @@ OmegaUp.on('ready', function() {
       canChooseCoder: payload.isMentor && payload.options.canChooseCoder,
       coderIsSelected: payload.isMentor && payload.options.coderIsSelected,
     },
-    components: { 'omegaup-coder-of-the-month-female-list': coderofthemonthfemale_List },
+    components: {
+      'omegaup-coder-of-the-month-female-list': coderofthemonthfemale_List,
+    },
   });
 });

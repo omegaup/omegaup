@@ -58,7 +58,9 @@
               v-bind:username="coder.username"
             ></omegaup-user-username>
           </td>
-          <td v-if="selectedTab == 'codersOfTheMonthFemale'">{{ coder.date }}</td>
+          <td v-if="selectedTab == 'codersOfTheMonthFemale'">
+            {{ coder.date }}
+          </td>
           <td
             class="numericColumn"
             v-if="selectedTab == 'candidatesToCoderOfTheMonthFemale'"
@@ -73,7 +75,9 @@
           </td>
           <td
             class="numericColumn"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonthFemale' && isMentor"
+            v-if="
+              selectedTab == 'candidatesToCoderOfTheMonthFemale' && isMentor
+            "
           >
             <button
               class="btn btn-primary"
