@@ -80,12 +80,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             false /* not required */
         );
         $query = $r['query'];
-        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
 
         $contests = self::getContestList(
             $r->identity,
             $query,
-            $cacheKey,
             $page,
             $pageSize,
             $activeContests,
@@ -115,7 +113,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function getContestList(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $query,
-        string $cacheKey,
         int $page,
         int $pageSize,
         int $activeContests,
@@ -123,6 +120,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         bool $public = false,
         ?int $participating = null
     ) {
+        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
         if (is_null($identity)) {
             // Get all public contests
             $callback = /**
@@ -584,6 +582,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if ($privateContestsAlert) {
             $_SESSION['private_contests_alert'] = true;
         }
+        unset($scopedSession);
 
         return [
             'smartyProperties' => [

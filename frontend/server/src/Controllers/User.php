@@ -3129,19 +3129,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
 
-        $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-        $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
-        $page = 1;
-        $pageSize = 20;
-        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
         $contests = \OmegaUp\Controllers\Contest::getContestList(
             $r->identity,
             /*$query=*/ null,
-            $cacheKey,
-            $page,
-            $pageSize,
-            $activeContests,
-            $recommended
+            /*$page=*/ 1,
+            /*$pageSize=*/ 20,
+            /*$activeContests=*/ \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            /*$recommended=*/ \OmegaUp\DAO\Enum\RecommendedStatus::ALL
         );
         $addedContests = [];
         foreach ($contests as $key => $contestInfo) {
