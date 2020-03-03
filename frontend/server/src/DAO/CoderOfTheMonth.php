@@ -82,6 +82,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                 selected_by
               FROM
                 Coder_Of_The_Month
+              WHERE
+                category = '{$category}'
               GROUP BY
                 user_id,
                 selected_by
@@ -113,7 +115,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * @return list<array{time: string, username: string, country_id: string, email: string|null}>
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
             SELECT
                 cm.time,
@@ -159,7 +161,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         int $schoolId,
         string $category = 'all'
     ): array {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
             SELECT
               cm.time,
@@ -215,7 +217,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $date = date('Y-m-01', strtotime($firstDay));
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female' " : '';
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female' " : " AND cm.category = 'all'";
         $sql = "
           SELECT
             cm.time,
@@ -251,7 +253,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $username,
         string $category = 'all'
     ): bool {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : '';
+        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
           SELECT
             i.username
@@ -286,7 +288,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
-        $categoryClause = ($category == 'female') ? " AND category = 'female'" : '';
+        $categoryClause = ($category == 'female') ? " AND category = 'female'" : " AND category = 'all'";
         $sql = "SELECT
                     *
                 FROM
@@ -314,7 +316,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $time,
         string $category = 'all'
     ): array {
-        $categoryClause = ($category == 'female') ? " AND category = 'female' " : '';
+        $categoryClause = ($category == 'female') ? " AND category = 'female' " : " AND category = 'all'";
         $sql = "SELECT
                     *
                 FROM
