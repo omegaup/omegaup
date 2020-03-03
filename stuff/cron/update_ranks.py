@@ -260,21 +260,22 @@ def update_school_of_the_month_candidates(
     '''Updates the list of candidates to school of the current month'''
 
     logging.info('Updating the candidates to school of the month...')
-    first_day_of_next_month = datetime.date(
-        first_day_of_current_month.year + int(
-            first_day_of_current_month.month / 12
-        ),
-        (
-            (first_day_of_current_month.month % 12) + 1
-        ),
-        1
-    )
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1,
+            1,
+            1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1,
+            1)
 
     # First make sure there are not already selected schools of the month
     cur.execute(
         '''
         SELECT
-            COUNT(*)
+            COUNT(*) as count
         FROM
             School_Of_The_Month
         WHERE
@@ -283,9 +284,10 @@ def update_school_of_the_month_candidates(
         ''',
         (first_day_of_next_month,))
 
-    if cur.rowcount > 0:
-        logging.info('Skipping because there are already selected schools.')
-        return
+    for row in cur:
+        if row['count'] > 0:
+            logging.info('Skipping because already exist selected schools.')
+            return
 
     cur.execute(
         '''

@@ -319,8 +319,13 @@ class Utils {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
-        $date = is_null($runDate) ? '' : (' --date ' . escapeshellarg(strval($runDate)));
-        print_r($date);
+        $date = is_null(
+            $runDate
+        ) ? '' : (' --date ' . escapeshellarg(
+            strval(
+                $runDate
+            )
+        ));
         self::shellExec(
             ('python3 ' .
              escapeshellarg(strval(OMEGAUP_ROOT)) .
