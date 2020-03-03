@@ -1,0 +1,211 @@
+<template>
+  <li class="dropdown">
+    <a
+      aria-expanded="false"
+      aria-haspopup="true"
+      class="notification-button dropdown-toggle"
+      data-toggle="dropdown"
+      href="#"
+      role="button"
+      v-on:click="unread = false"
+      ><span class="glyphicon glyphicon-bell"></span>
+      <span
+        class="notification-counter label"
+        v-bind:class="{ 'label-danger': unread }"
+        v-if="clarifications &amp;&amp; clarifications.length &gt; 0"
+        v-model="unread"
+        >{{ clarifications.length }}</span
+      ></a
+    >
+    <ul class="dropdown-menu">
+      <li class="empty" v-if="!clarifications || clarifications.length === 0">
+        {{ T.notificationsNoNewNotifications }}
+      </li>
+      <li v-else="">
+        <ul class="notification-drawer">
+          <li v-for="clarification in clarifications">
+            <button
+              v-bind:aria-label="T.wordsClose"
+              class="close"
+              type="button"
+              v-on:click.prevent="onCloseClicked(clarification)"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+            <a v-bind:href="anchor(clarification)"
+              ><span>{{ clarification.problem_alias }}</span> —
+              <span>{{ clarification.author }}</span>
+              <pre>{{ clarification.message }}</pre>
+              <hr v-if="clarification.answer" />
+              <pre v-if="clarification.answer">{{
+                clarification.answer
+              }}</pre></a
+            >
+          </li>
+        </ul>
+      </li>
+      <li
+        class="divider"
+        role="separator"
+        v-if="clarifications &amp;&amp; clarifications.length &gt; 1"
+      ></li>
+      <li v-if="clarifications &amp;&amp; clarifications.length &gt; 1">
+        <a href="#" v-on:click.prevent="onMarkAllAsRead"
+          ><span class="glyphicon glyphicon-align-right"></span>
+          {{ T.notificationsMarkAllAsRead }}</a
+        >
+      </li>
+    </ul>
+  </li>
+</template>
+
+<style>
+.notification-button {
+  padding-top: 6px !important;
+  padding-bottom: 20px !important;
+  padding-right: 12px !important;
+  padding-left: 12px !important;
+  font-size: 22px;
+}
+
+.notification-counter {
+  position: absolute;
+  font-size: 16px;
+  padding: 2px 4px;
+  bottom: 4px;
+  right: 0px;
+}
+
+.notification-drawer::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+.notification-drawer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #f5f5f5;
+}
+
+.notification-drawer::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #7f7f7f;
+}
+
+.notification-drawer {
+  width: 320px;
+  max-width: 320px;
+  max-height: 380px;
+  overflow-y: scroll;
+}
+
+.notification-drawer li {
+  padding: 3px 20px;
+  border-top: 1px solid #f1f1f1;
+}
+
+.notification-drawer li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.notification-drawer li a pre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.notification-drawer li:hover,
+.notification-drawer li:focus,
+.notification-drawer li:active {
+  cursor: pointer;
+  background-color: #678dd7;
+  text-decoration: none;
+}
+
+.notification-drawer li:hover > a,
+.notification-drawer li:focus > a,
+.notification-drawer li:active > a {
+  color: #fff;
+}
+
+.notification-drawer li a > h4,
+.notification-drawer li a > p {
+  word-wrap: break-word;
+}
+</style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+
+@Component
+export default class Clarifications extends Vue {
+  @Prop() initialClarifications!: omegaup.Clarification[];
+  T = T;
+
+  unread: boolean = true;
+  flashInterval: number = 0;
+  clarifications: omegaup.Clarification[] = this.initialClarifications;
+
+  @Watch('initialClarifications')
+  onPropertyChanged(
+    newValue: Array<omegaup.Clarification>,
+    oldValue: Array<omegaup.Clarification>,
+  ): void {
+    this.clarifications = newValue;
+    this.unread = true;
+    const audio = <HTMLMediaElement>(
+      document.getElementById('notification-audio')
+    );
+    if (audio !== null) {
+      audio.play();
+    }
+  }
+
+  @Watch('unread')
+  onPropertyChange(newValue: boolean, oldValue: boolean): void {
+    if (newValue) {
+      if (this.flashInterval) return;
+      this.flashInterval = setInterval(this.flashTitle, 1000);
+    } else {
+      if (!this.flashInterval) return;
+      clearInterval(this.flashInterval);
+      this.flashInterval = 0;
+      if (document.title.indexOf('!') === 0) {
+        document.title = document.title.substring(2);
+      }
+    }
+  }
+
+  anchor(clarification: omegaup.Clarification): string {
+    return `#clarifications/clarification-${clarification.clarification_id}`;
+  }
+
+  flashTitle(reset: boolean): void {
+    if (document.title.indexOf('!') === 0) {
+      document.title = document.title.substring(2);
+    } else if (!reset) {
+      document.title = '! ' + document.title;
+    }
+  }
+
+  onCloseClicked(clarification: omegaup.Clarification): void {
+    const id = `clarification-${clarification.clarification_id}`;
+    this.clarifications = this.clarifications.filter(
+      element => element.clarification_id !== clarification.clarification_id,
+    );
+    localStorage.setItem(id, Date.now().toString());
+  }
+
+  onMarkAllAsRead(): void {
+    for (const key in this.clarifications) {
+      const id = `clarification-${this.clarifications[key].clarification_id}`;
+      localStorage.setItem(id, Date.now().toString());
+    }
+    this.clarifications = [];
+  }
+}
+</script>
