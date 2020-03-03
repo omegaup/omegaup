@@ -106,7 +106,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     /**
      * Returns the list of candidates to school of the month
      *
-     * @return list<array{school_id: int, name: string, score: flot, rank: int}>
+     * @return list<array{name: string, rank: int, school_id: int, score: float}>
      */
     public static function getCandidatesToSchoolOfTheMonth(): array {
         $date = new \DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
@@ -139,7 +139,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             ORDER BY
                 s.rank IS NULL, s.rank ASC;';
 
-        /** @var list<array{school_id: int, name: string, score: flot, rank: int}> */
+        /** @var list<array{name: string, rank: int, school_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [ $firstDayOfNextMonth ]
