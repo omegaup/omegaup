@@ -9,19 +9,19 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** GroupsIdentities Data Access Object (DAO) Base.
+/** CourseIdentityRequest Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
+ * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
  * @access public
  * @abstract
  */
-abstract class GroupsIdentities {
+abstract class CourseIdentityRequest {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,31 +30,29 @@ abstract class GroupsIdentities {
      * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
      * llave primaria están vacías.
      *
-     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities}.
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(
-        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         if (
-            empty($Groups_Identities->group_id) ||
-            empty($Groups_Identities->identity_id)
+            empty($Course_Identity_Request->identity_id) ||
+            empty($Course_Identity_Request->course_id)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = '
             REPLACE INTO
-                Groups_Identities (
-                    `group_id`,
+                Course_Identity_Request (
                     `identity_id`,
-                    `share_user_information`,
-                    `privacystatement_consent_id`,
-                    `accept_teacher`,
-                    `is_invited`
+                    `course_id`,
+                    `request_time`,
+                    `last_update`,
+                    `accepted`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -62,24 +60,19 @@ abstract class GroupsIdentities {
                     ?
                 );';
         $params = [
-            $Groups_Identities->group_id,
-            $Groups_Identities->identity_id,
-            (
-                !is_null($Groups_Identities->share_user_information) ?
-                intval($Groups_Identities->share_user_information) :
-                null
+            $Course_Identity_Request->identity_id,
+            $Course_Identity_Request->course_id,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
             ),
             (
-                !is_null($Groups_Identities->privacystatement_consent_id) ?
-                intval($Groups_Identities->privacystatement_consent_id) :
+                !is_null($Course_Identity_Request->accepted) ?
+                intval($Course_Identity_Request->accepted) :
                 null
             ),
-            (
-                !is_null($Groups_Identities->accept_teacher) ?
-                intval($Groups_Identities->accept_teacher) :
-                null
-            ),
-            intval($Groups_Identities->is_invited),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -88,52 +81,46 @@ abstract class GroupsIdentities {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a actualizar.
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El objeto de tipo CourseIdentityRequest a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         $sql = '
             UPDATE
-                `Groups_Identities`
+                `Course_Identity_Request`
             SET
-                `share_user_information` = ?,
-                `privacystatement_consent_id` = ?,
-                `accept_teacher` = ?,
-                `is_invited` = ?
+                `request_time` = ?,
+                `last_update` = ?,
+                `accepted` = ?
             WHERE
                 (
-                    `group_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 );';
         $params = [
-            (
-                is_null($Groups_Identities->share_user_information) ?
-                null :
-                intval($Groups_Identities->share_user_information)
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
             ),
             (
-                is_null($Groups_Identities->privacystatement_consent_id) ?
+                is_null($Course_Identity_Request->accepted) ?
                 null :
-                intval($Groups_Identities->privacystatement_consent_id)
+                intval($Course_Identity_Request->accepted)
             ),
             (
-                is_null($Groups_Identities->accept_teacher) ?
+                is_null($Course_Identity_Request->identity_id) ?
                 null :
-                intval($Groups_Identities->accept_teacher)
-            ),
-            intval($Groups_Identities->is_invited),
-            (
-                is_null($Groups_Identities->group_id) ?
-                null :
-                intval($Groups_Identities->group_id)
+                intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Groups_Identities->identity_id) ?
+                is_null($Course_Identity_Request->course_id) ?
                 null :
-                intval($Groups_Identities->identity_id)
+                intval($Course_Identity_Request->course_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -141,48 +128,47 @@ abstract class GroupsIdentities {
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\GroupsIdentities} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\CourseIdentityRequest} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\GroupsIdentities Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\GroupsIdentities} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\CourseIdentityRequest Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        ?int $group_id,
-        ?int $identity_id
-    ): ?\OmegaUp\DAO\VO\GroupsIdentities {
+        ?int $identity_id,
+        ?int $course_id
+    ): ?\OmegaUp\DAO\VO\CourseIdentityRequest {
         $sql = '
             SELECT
-                `Groups_Identities`.`group_id`,
-                `Groups_Identities`.`identity_id`,
-                `Groups_Identities`.`share_user_information`,
-                `Groups_Identities`.`privacystatement_consent_id`,
-                `Groups_Identities`.`accept_teacher`,
-                `Groups_Identities`.`is_invited`
+                `Course_Identity_Request`.`identity_id`,
+                `Course_Identity_Request`.`course_id`,
+                `Course_Identity_Request`.`request_time`,
+                `Course_Identity_Request`.`last_update`,
+                `Course_Identity_Request`.`accepted`
             FROM
-                `Groups_Identities`
+                `Course_Identity_Request`
             WHERE
                 (
-                    `group_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 )
             LIMIT 1;';
-        $params = [$group_id, $identity_id];
+        $params = [$identity_id, $course_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\GroupsIdentities($row);
+        return new \OmegaUp\DAO\VO\CourseIdentityRequest($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\GroupsIdentities} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -191,26 +177,26 @@ abstract class GroupsIdentities {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
-     * objeto de tipo \OmegaUp\DAO\VO\GroupsIdentities a eliminar
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo \OmegaUp\DAO\VO\CourseIdentityRequest a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): void {
         $sql = '
             DELETE FROM
-                `Groups_Identities`
+                `Course_Identity_Request`
             WHERE
                 (
-                    `group_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 );';
         $params = [
-            $Groups_Identities->group_id,
-            $Groups_Identities->identity_id
+            $Course_Identity_Request->identity_id,
+            $Course_Identity_Request->course_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -224,7 +210,7 @@ abstract class GroupsIdentities {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -235,8 +221,8 @@ abstract class GroupsIdentities {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\GroupsIdentities> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
+     * @return list<\OmegaUp\DAO\VO\CourseIdentityRequest> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -246,14 +232,13 @@ abstract class GroupsIdentities {
     ): array {
         $sql = '
             SELECT
-                `Groups_Identities`.`group_id`,
-                `Groups_Identities`.`identity_id`,
-                `Groups_Identities`.`share_user_information`,
-                `Groups_Identities`.`privacystatement_consent_id`,
-                `Groups_Identities`.`accept_teacher`,
-                `Groups_Identities`.`is_invited`
+                `Course_Identity_Request`.`identity_id`,
+                `Course_Identity_Request`.`course_id`,
+                `Course_Identity_Request`.`request_time`,
+                `Course_Identity_Request`.`last_update`,
+                `Course_Identity_Request`.`accepted`
             FROM
-                `Groups_Identities`
+                `Course_Identity_Request`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -275,7 +260,7 @@ abstract class GroupsIdentities {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\GroupsIdentities(
+            $allData[] = new \OmegaUp\DAO\VO\CourseIdentityRequest(
                 $row
             );
         }
@@ -286,30 +271,28 @@ abstract class GroupsIdentities {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         $sql = '
             INSERT INTO
-                Groups_Identities (
-                    `group_id`,
+                Course_Identity_Request (
                     `identity_id`,
-                    `share_user_information`,
-                    `privacystatement_consent_id`,
-                    `accept_teacher`,
-                    `is_invited`
+                    `course_id`,
+                    `request_time`,
+                    `last_update`,
+                    `accepted`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -318,31 +301,26 @@ abstract class GroupsIdentities {
                 );';
         $params = [
             (
-                is_null($Groups_Identities->group_id) ?
+                is_null($Course_Identity_Request->identity_id) ?
                 null :
-                intval($Groups_Identities->group_id)
+                intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Groups_Identities->identity_id) ?
+                is_null($Course_Identity_Request->course_id) ?
                 null :
-                intval($Groups_Identities->identity_id)
+                intval($Course_Identity_Request->course_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
             ),
             (
-                is_null($Groups_Identities->share_user_information) ?
+                is_null($Course_Identity_Request->accepted) ?
                 null :
-                intval($Groups_Identities->share_user_information)
+                intval($Course_Identity_Request->accepted)
             ),
-            (
-                is_null($Groups_Identities->privacystatement_consent_id) ?
-                null :
-                intval($Groups_Identities->privacystatement_consent_id)
-            ),
-            (
-                is_null($Groups_Identities->accept_teacher) ?
-                null :
-                intval($Groups_Identities->accept_teacher)
-            ),
-            intval($Groups_Identities->is_invited),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
