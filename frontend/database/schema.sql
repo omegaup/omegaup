@@ -101,11 +101,11 @@ CREATE TABLE `Coder_Of_The_Month` (
   `score` double NOT NULL DEFAULT '0',
   `problems_solved` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`coder_of_the_month_id`),
-  UNIQUE KEY `rank_time` (`rank`,`time`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
+  KEY `rank_time_category` (`category`,`rank`,`time`),
   CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
