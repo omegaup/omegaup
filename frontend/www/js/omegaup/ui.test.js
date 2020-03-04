@@ -182,6 +182,8 @@ github flavored markdown
 Other escapes: $~~T~D~E32E
 
 Tags <b>hello</b>
+
+<pre>hi</pre>
 ||output
 0
 ||end`),
@@ -217,7 +219,9 @@ github flavored markdown
 
 Other escapes: $~~T~D~E32E
 
-Tags &lt;b&gt;hello&lt;/b&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
+Tags &lt;b&gt;hello&lt;/b&gt;
+
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
 </table>`);
     });
 

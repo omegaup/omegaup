@@ -54,9 +54,7 @@
             v-bind:contests="upcomingContests"
           ></omegaup-contest-upcoming>
           <div class="panel panel-default">
-            <!-- id-lint off -->
-            <div id="runs-chart"></div>
-            <!-- id-lint on -->
+            <highcharts v-bind:options="chartOptions"></highcharts>
           </div>
         </div>
       </div>
@@ -66,6 +64,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Chart } from 'highcharts-vue';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import common_Welcome from './Welcome.vue';
@@ -87,6 +86,7 @@ import schools_Rank from '../schools/Rank.vue';
     'omegaup-coder-of-the-month': coderofthemonth,
     'omegaup-rank-table': rankTable,
     'omegaup-schools-rank': schools_Rank,
+    highcharts: Chart,
   },
 })
 export default class Index extends Vue {
@@ -96,6 +96,7 @@ export default class Index extends Vue {
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
   @Prop() enableSocialMediaResources!: boolean;
   @Prop() upcomingContests!: omegaup.Contest[];
+  @Prop() chartOptions!: Chart;
 
   T = T;
 }

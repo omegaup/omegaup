@@ -792,7 +792,7 @@ let UI = {
       );
       return text;
     });
-    converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
+    converter.hooks.chain('postNormalization', function(text, blockGamut) {
       // Sample I/O table.
       let settings = converter._settings || options.settings || { cases: {} };
       return text.replace(
@@ -1030,6 +1030,13 @@ let UI = {
     };
 
     return converter;
+  },
+
+  reportEvent: function(category, action, label) {
+    if (typeof ga !== 'function') {
+      return;
+    }
+    ga('send', 'event', category, action, label);
   },
 };
 

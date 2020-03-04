@@ -111,7 +111,6 @@
       <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset</code>
-      <code>$problemsetProblem-&gt;version</code>
       <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$contest-&gt;problemset_id</code>
@@ -237,7 +236,7 @@
       <code>$value</code>
       <code>$value</code>
     </MissingClosureParamType>
-    <MixedArgument occurrences="9">
+    <MixedArgument occurrences="8">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
