@@ -61,7 +61,7 @@ class SessionManager {
                 /*secure=*/!empty($_SERVER['HTTPS']),
                 /*httponly=*/true
             );
-        } else {
+        } elseif (PHP_VERSION_ID < 70400) {
             /**
              * @psalm-suppress TooManyArguments this is needed to support
              *                                  Same-Site cookies.
@@ -75,6 +75,19 @@ class SessionManager {
                 /*secure=*/!empty($_SERVER['HTTPS']),
                 /*httponly=*/true,
                 /*samesite=*/'Lax'
+            );
+        } else {
+            setcookie(
+                $name,
+                $value,
+                [
+                    'expires' => $expire,
+                    'path' => $path,
+                    'domain' => $domain,
+                    'secure' => !empty($_SERVER['HTTPS']),
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]
             );
         }
     }

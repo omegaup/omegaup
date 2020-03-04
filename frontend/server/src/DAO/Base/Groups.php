@@ -216,7 +216,7 @@ abstract class Groups {
     ): int {
         $sql = '
             INSERT INTO
-                Groups (
+                `Groups` (
                     `acl_id`,
                     `create_time`,
                     `alias`,

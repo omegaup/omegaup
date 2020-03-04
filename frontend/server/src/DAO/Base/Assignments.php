@@ -258,7 +258,7 @@ abstract class Assignments {
     ): int {
         $sql = '
             INSERT INTO
-                Assignments (
+                `Assignments` (
                     `course_id`,
                     `problemset_id`,
                     `acl_id`,

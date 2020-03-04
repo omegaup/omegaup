@@ -96,7 +96,7 @@ abstract class UsersExperiments {
     ): int {
         $sql = '
             INSERT INTO
-                Users_Experiments (
+                `Users_Experiments` (
                     `user_id`,
                     `experiment`
                 ) VALUES (

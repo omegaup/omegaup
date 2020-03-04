@@ -331,8 +331,10 @@ class MySQLConnection {
             $resultmode
         );
         if ($result === false) {
+            $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
+            \Logger::getLogger('mysql')->debug($errorMessage);
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
-                "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}",
+                $errorMessage,
                 intval($this->_connection->errno)
             );
         } elseif ($result === true) {

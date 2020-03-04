@@ -171,7 +171,7 @@ abstract class RolesPermissions {
     ): int {
         $sql = '
             INSERT INTO
-                Roles_Permissions (
+                `Roles_Permissions` (
                     `role_id`,
                     `permission_id`
                 ) VALUES (

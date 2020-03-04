@@ -224,7 +224,7 @@ abstract class QualityNominationLog {
     ): int {
         $sql = '
             INSERT INTO
-                QualityNomination_Log (
+                `QualityNomination_Log` (
                     `qualitynomination_id`,
                     `time`,
                     `user_id`,

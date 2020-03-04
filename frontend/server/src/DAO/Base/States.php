@@ -248,7 +248,7 @@ abstract class States {
     ): int {
         $sql = '
             INSERT INTO
-                States (
+                `States` (
                     `country_id`,
                     `state_id`,
                     `name`
