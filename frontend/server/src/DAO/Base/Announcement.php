@@ -208,7 +208,7 @@ abstract class Announcement {
     ): int {
         $sql = '
             INSERT INTO
-                Announcement (
+                `Announcement` (
                     `user_id`,
                     `time`,
                     `description`

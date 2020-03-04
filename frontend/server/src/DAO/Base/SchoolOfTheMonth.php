@@ -222,7 +222,7 @@ abstract class SchoolOfTheMonth {
     ): int {
         $sql = '
             INSERT INTO
-                School_Of_The_Month (
+                `School_Of_The_Month` (
                     `school_id`,
                     `time`,
                     `rank`,

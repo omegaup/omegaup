@@ -216,7 +216,7 @@ abstract class GroupsScoreboards {
     ): int {
         $sql = '
             INSERT INTO
-                Groups_Scoreboards (
+                `Groups_Scoreboards` (
                     `group_id`,
                     `create_time`,
                     `alias`,

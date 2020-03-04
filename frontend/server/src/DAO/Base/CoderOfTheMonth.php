@@ -246,7 +246,7 @@ abstract class CoderOfTheMonth {
     ): int {
         $sql = '
             INSERT INTO
-                Coder_Of_The_Month (
+                `Coder_Of_The_Month` (
                     `user_id`,
                     `description`,
                     `time`,
