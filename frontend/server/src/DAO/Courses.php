@@ -102,7 +102,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 UNION(
                     SELECT cc.*
                     FROM Courses cc
-                    WHERE cc.admission_mode = ?
+                    WHERE cc.admission_mode <> ?
                 );
                ';
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
@@ -110,7 +110,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sql,
             [
                 $identityId,
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+                \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             ]
         );
         $courses = [];

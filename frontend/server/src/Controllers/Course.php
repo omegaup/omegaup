@@ -1251,7 +1251,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $course
             );
             $response['student'][] = $courseAsArray;
-            if ($course->admission_mode === self::ADMISSION_MODE_PUBLIC) {
+            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
                 $response['public'][] = $courseAsArray;
             }
         }
@@ -2007,6 +2007,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $hasSharedUserInformation = true;
         $hasAcceptedTeacher = true;
+        $registrtionResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
                 'share_user_information' => $hasSharedUserInformation,
@@ -2019,9 +2020,26 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         if (
             $shouldShowIntro &&
-            $course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+            $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        } elseif ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+            $registration = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+                $r->identity->identity_id,
+                $course->course_id
+            );
+
+            $registrtionResponse['userRegistrationRequested'] = !is_null(
+                $registration
+            );
+            if (is_null($registration)) {
+                $registrtionResponse['userRegistrationAnswered'] = false;
+            } else {
+                $registrtionResponse['userRegistrationAnswered'] = !is_null(
+                    $registration->accepted
+                );
+                $registrtionResponse['userRegistrationAccepted'] = $registration->accepted;
+            }
         }
 
         $courseDetails = self::getCommonCourseDetails(
@@ -2035,7 +2053,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $shouldShowIntro
             || !$hasAcceptedTeacher
             || (!$hasSharedUserInformation
-            && $requestUserInformation != 'no'
+            && $requestUserInformation !== 'no'
             )
         ) {
             $needsBasicInformation = $courseDetails['basic_information_required']
@@ -2088,22 +2106,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
 
             $smartyProperties = [
-                'coursePayload' => [
-                    'name' => $courseDetails['name'],
-                    'description' => $courseDetails['description'],
-                    'alias' => $courseDetails['alias'],
-                    'currentUsername' => $r->identity->username,
-                    'needsBasicInformation' => $needsBasicInformation,
-                    'requestsUserInformation' =>
-                        $courseDetails['requests_user_information'],
-                    'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
-                    'statements' => [
-                        'privacy' => $privacyStatement,
-                        'acceptTeacher' => $acceptTeacherStatement,
-                    ],
-                    'isFirstTimeAccess' => !$hasSharedUserInformation,
-                    'shouldShowResults' => $shouldShowIntro,
-                ]
+                'coursePayload' => array_merge(
+                    $registrtionResponse,
+                    [
+                        'name' => $courseDetails['name'],
+                        'description' => $courseDetails['description'],
+                        'alias' => $courseDetails['alias'],
+                        'currentUsername' => $r->identity->username,
+                        'needsBasicInformation' => $needsBasicInformation,
+                        'requestsUserInformation' =>
+                            $courseDetails['requests_user_information'],
+                        'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
+                        'statements' => [
+                            'privacy' => $privacyStatement,
+                            'acceptTeacher' => $acceptTeacherStatement,
+                        ],
+                        'isFirstTimeAccess' => !$hasSharedUserInformation,
+                        'shouldShowResults' => $shouldShowIntro,
+                    ]
+                ),
             ];
             $template = 'arena.course.intro.tpl';
         } elseif ($showAssignment) {
@@ -2141,6 +2162,37 @@ class Course extends \OmegaUp\Controllers\Controller {
             'template' => $template,
             'inContest' => $inContest,
         ];
+    }
+
+    /**
+     * @return array{status: string}
+     */
+    public static function apiRegisterForCourse(\OmegaUp\Request $r): array {
+        // Authenticate request
+        $r->ensureIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+
+        $course = self::validateCourseExists($r['course_alias']);
+
+        if ($course->admission_mode !== self::ADMISSION_MODE_REGISTRATION) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'courseDoesNotAdmitRegistration'
+            );
+        }
+
+        \OmegaUp\DAO\CourseIdentityRequest::create(
+            new \OmegaUp\DAO\VO\CourseIdentityRequest([
+                'identity_id' => $r->identity->identity_id,
+                'course_id' => $course->course_id,
+                'request_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        return ['status' => 'ok'];
     }
 
     /**
