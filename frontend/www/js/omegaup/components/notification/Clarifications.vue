@@ -7,11 +7,10 @@
       data-toggle="dropdown"
       href="#"
       role="button"
-      v-on:click="unread = false"
       ><span class="glyphicon glyphicon-bell"></span>
       <span
         class="notification-counter label"
-        v-bind:class="{ 'label-danger': unread }"
+        v-bind:class="{ 'label-danger': clarifications.length > 0 }"
         v-if="clarifications && clarifications.length > 0"
         >{{ clarifications.length }}</span
       ></a
@@ -143,7 +142,6 @@ export default class Clarifications extends Vue {
   @Prop() initialClarifications!: omegaup.Clarification[];
   T = T;
 
-  unread: boolean = false;
   flashInterval: number = 0;
   clarifications: omegaup.Clarification[] = this.initialClarifications;
 
@@ -153,9 +151,6 @@ export default class Clarifications extends Vue {
     oldValue: Array<omegaup.Clarification>,
   ): void {
     this.clarifications = newValue;
-    if (this.clarifications.length > 0) {
-      this.unread = true;
-    }
     const audio = <HTMLMediaElement>(
       document.getElementById('notification-audio')
     );
@@ -164,9 +159,12 @@ export default class Clarifications extends Vue {
     }
   }
 
-  @Watch('unread')
-  onPropertyChange(newValue: boolean, oldValue: boolean): void {
-    if (newValue) {
+  @Watch('clarifications')
+  onPropertyChange(
+    newValue: Array<omegaup.Clarification>,
+    oldValue: Array<omegaup.Clarification>,
+  ): void {
+    if (newValue.length > 0) {
       if (this.flashInterval) return;
       this.flashInterval = setInterval(this.flashTitle, 1000);
     } else {
