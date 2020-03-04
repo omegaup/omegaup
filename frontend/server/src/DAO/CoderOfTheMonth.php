@@ -115,7 +115,6 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * @return list<array{time: string, username: string, country_id: string, email: string|null}>
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
             SELECT
                 cm.time,
@@ -143,7 +142,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                             time = cm.time AND selected_by IS NOT NULL
                     )
                 ))
-                {$categoryClause}
+                AND cm.category = '{$category}'
             ORDER BY
                 cm.time DESC;
         ";
@@ -161,7 +160,6 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         int $schoolId,
         string $category = 'all'
     ): array {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
             SELECT
               cm.time,
@@ -195,8 +193,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
               Emails e ON e.user_id = u.user_id
             WHERE
               (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
-              cm.school_id = ?
-              {$categoryClause}
+              cm.school_id = ? AND
+              cm.category = '{$category}'
             ORDER BY
               cm.time DESC;
         ";
@@ -217,7 +215,6 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $date = date('Y-m-01', strtotime($firstDay));
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female' " : " AND cm.category = 'all'";
         $sql = "
           SELECT
             cm.time,
@@ -235,8 +232,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LEFT JOIN
             Emails e ON e.email_id = u.main_email_id
           WHERE
-            cm.time = ?
-            {$categoryClause}
+            cm.time = ? AND 
+            cm.category = '{$category}'
           ORDER BY
             cm.time DESC,
             cm.rank ASC
@@ -253,7 +250,6 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $username,
         string $category = 'all'
     ): bool {
-        $categoryClause = ($category == 'female') ? " AND cm.category = 'female'" : " AND cm.category = 'all'";
         $sql = "
           SELECT
             i.username
@@ -264,8 +260,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
-            cm.rank = 1
-            {$categoryClause}
+            cm.rank = 1 AND
+            cm.category = '{$category}'
           ORDER BY
             cm.time DESC
           LIMIT 1
@@ -288,14 +284,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $category = 'all'
     ): array {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
-        $categoryClause = ($category == 'female') ? " AND category = 'female'" : " AND category = 'all'";
         $sql = "SELECT
                     *
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ?
-                    {$categoryClause}
+                    `time` = ? AND
+                    category = '{$category}'
                 AND
                     `selected_by` {$clause};";
         /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
@@ -316,14 +311,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $time,
         string $category = 'all'
     ): array {
-        $categoryClause = ($category == 'female') ? " AND category = 'female' " : " AND category = 'all'";
         $sql = "SELECT
                     *
                 FROM
                     Coder_Of_The_Month
                 WHERE
-                    `time` = ?
-                    {$categoryClause};";
+                    `time` = ? AND
+                    category = '{$category}';";
 
         /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, rank: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
