@@ -14,6 +14,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
     const ADMISSION_MODE_PUBLIC = 'public';
     const ADMISSION_MODE_PRIVATE = 'private';
+    const ADMISSION_MODE_REGISTRATION = 'registration';
 
     /**
      * Validate assignment_alias existis into the course and
@@ -233,6 +234,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             [
                 self::ADMISSION_MODE_PUBLIC,
                 self::ADMISSION_MODE_PRIVATE,
+                self::ADMISSION_MODE_REGISTRATION,
             ]
         );
 
