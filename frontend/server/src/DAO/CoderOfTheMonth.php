@@ -232,7 +232,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LEFT JOIN
             Emails e ON e.email_id = u.main_email_id
           WHERE
-            cm.time = ? AND 
+            cm.time = ? AND
             cm.category = '{$category}'
           ORDER BY
             cm.time DESC,
