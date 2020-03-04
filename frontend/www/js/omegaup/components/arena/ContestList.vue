@@ -64,7 +64,7 @@
           >
         </li>
         <li class="nav-item" v-on:click="showTab = 'future'">
-          <a class="nav-link" data-toggle="tab"> {{ T.arenaFutureContests }}</a>
+          <a class="nav-link" data-toggle="tab">{{ T.arenaFutureContests }}</a>
         </li>
         <li class="nav-item" v-on:click="showTab = 'recommended-past'">
           <a class="nav-link" data-toggle="tab">
