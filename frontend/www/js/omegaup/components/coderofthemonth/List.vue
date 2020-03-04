@@ -3,22 +3,23 @@
     <div class="panel-heading">
       <ul class="nav nav-tabs">
         <li class="active" v-on:click="selectedTab = 'codersOfTheMonth'">
-          <a data-toggle="tab">{{ T.codersOfTheMonth }}</a>
+          <a data-toggle="tab">{{
+            category == 'all' ? T.codersOfTheMonth : T.codersOfTheMonthFemale
+          }}</a>
         </li>
         <li v-on:click="selectedTab = 'codersOfPreviousMonth'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthRank }}</a>
+          <a data-toggle="tab">{{
+            category == 'all'
+              ? T.codersOfTheMonthRank
+              : T.codersOfTheMonthFemaleRank
+          }}</a>
         </li>
         <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthListCandidate }}</a>
-        </li>
-        <li v-on:click="selectedTab = 'codersOfTheMonthFemale'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthFemale }}</a>
-        </li>
-        <li v-on:click="selectedTab = 'codersOfPreviousMonthFemale'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthFemaleRank }}</a>
-        </li>
-        <li v-on:click="selectedTab = 'candidatesToCoderOfTheMonthFemale'">
-          <a data-toggle="tab">{{ T.codersOfTheMonthFemaleListCandidate }}</a>
+          <a data-toggle="tab">{{
+            category == 'all'
+              ? T.codersOfTheMonthListCandidate
+              : T.codersOfTheMonthFemaleListCandidate
+          }}</a>
         </li>
       </ul>
     </div>
@@ -89,7 +90,11 @@
               v-if="canChooseCoder &amp;&amp; !coderIsSelected"
               v-on:click="$emit('select-coder', coder.username)"
             >
-              {{ T.coderOfTheMonthChooseAsCoder }}
+              {{
+                category == 'all'
+                  ? T.coderOfTheMonthChooseAsCoder
+                  : T.coderOfTheMonthFemaleChooseAsCoder
+              }}
             </button>
           </td>
         </tr>
@@ -126,9 +131,8 @@ export default class CoderOfTheMonthList extends Vue {
   get visibleCoders(): omegaup.CoderOfTheMonth[] {
     switch (this.selectedTab) {
       case 'codersOfTheMonth':
-        return this.codersOfCurrentMonth;
       default:
-        return  [];
+        return this.codersOfCurrentMonth;
       case 'codersOfPreviousMonth':
         return this.codersOfPreviousMonth;
       case 'candidatesToCoderOfTheMonth':

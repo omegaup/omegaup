@@ -23,7 +23,11 @@ OmegaUp.on('ready', function() {
               username: coderUsername,
             })
               .then(function(data) {
-                UI.success(T.coderOfTheMonthSelectedSuccessfully);
+                UI.success(
+                  category == 'all'
+                    ? T.coderOfTheMonthSelectedSuccessfully
+                    : T.coderOfTheMonthFemaleSelectedSuccessfully,
+                );
                 coderOfTheMonthList.coderIsSelected = true;
               })
               .fail(UI.apiError);
