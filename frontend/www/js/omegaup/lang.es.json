@@ -164,6 +164,7 @@
 	"contestLengthTooLong": "La duraci\u00f3n del concurso no puede ser mayor a 31 dias.",
 	"contestListAddAdmins": "Agregar administradores",
 	"contestListAddContestants": "Agregar concursantes",
+	"contestListEmpty": "No hay concursos en esta lista",
 	"contestListShowAdminContests": "Tambi\u00e9n muestra concursos que administro",
 	"contestListSubmissions": "Env\u00edos",
 	"contestMustBeCreatedInPrivateMode": "El concurso debe ser creado en modo privado",
