@@ -9,12 +9,13 @@
 class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Tests problem with submissions in a contest or a course can't be deleted anymore
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user
-        ['user' => $userLogin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $userLogin,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
@@ -34,7 +35,10 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = \OmegaUp\Test\Factories\Run::createRun(
@@ -48,11 +52,18 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($problemData['author']);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
+        try {
+            \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'problemHasBeenUsedInContestOrCourse',
+                $e->getMessage()
+            );
+        }
     }
 
     /**

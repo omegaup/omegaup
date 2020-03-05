@@ -37,32 +37,43 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * List can only be retreived by an admin
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Call apiStudentList by another random user
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
-        $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
-            'auth_token' => $userLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-        ]));
+        try {
+            \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Course does not exists test
-     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
-        $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
-            'auth_token' => $userLogin->auth_token,
-            'course_alias' => 'foo'
-        ]));
+        try {
+            \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'course_alias' => 'foo',
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotfoundException $e) {
+            $this->assertEquals('courseNotFound', $e->getMessage());
+        }
     }
 
     /**

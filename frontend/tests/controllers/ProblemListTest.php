@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of ProblemList
+ * Description of ProblemListTest
  *
  * @author joemmanuel
  */
-class ProblemList extends \OmegaUp\Test\ControllerTestCase {
+class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Gets the list of problems
      */

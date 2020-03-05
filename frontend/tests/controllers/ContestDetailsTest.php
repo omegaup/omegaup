@@ -271,9 +271,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Dont show private contests for users that are not in the private list
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
+     * Don't show private contests for users that are not in the private list
      */
     public function testDontShowPrivateContestForAnyUser() {
         // Get a contest
@@ -293,13 +291,16 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Prepare our request
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $login->auth_token,
-        ]);
 
-        // Call api
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
@@ -449,8 +450,6 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Try to view a contest before it has started
-     *
-     * @expectedException \OmegaUp\Exceptions\PreconditionFailedException
      */
     public function testContestNotStartedYet() {
         // Get a contest
@@ -468,13 +467,16 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Prepare our request
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $login->auth_token,
-        ]);
 
-        // Call api
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals('contestNotStarted', $e->getMessage());
+        }
     }
 
     /**
@@ -576,8 +578,6 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test accesing api with invalid scoreboard token. Should fail.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDetailsUsingInvalidToken() {
         // Get a private contest
@@ -592,12 +592,16 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call details using token
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'token' => 'invalid token',
-        ]);
-        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'token' => 'invalid token',
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('invalidScoreboardUrl', $e->getMessage());
+        }
     }
 
     /**
@@ -911,7 +915,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 $files["runs/{$runData['response']['guid']}.{$runData['request']['language']}"],
                 $runData['request']['source']
             );
-            $this->assertContains(
+            $this->assertStringContainsString(
                 "{$runData['response']['guid']},{$runData['contestant']->username},{$problemData['problem']->alias}",
                 $summary
             );

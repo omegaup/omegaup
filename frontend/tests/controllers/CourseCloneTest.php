@@ -90,8 +90,6 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Creating a clone with the original course alias
-     *
-     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateCourseCloneWithTheSameAlias() {
         $homeworkCount = 2;
@@ -136,13 +134,18 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Clone the course
         $adminLogin = self::login($courseData['admin']);
-        $courseClonedData = \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias'],
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => $courseData['course_alias'],
-            'start_time' => \OmegaUp\Time::get()
-        ]));
+        try {
+            \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $courseData['course_alias'],
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('aliasInUse', $e->getMessage());
+        }
     }
 
     /**
