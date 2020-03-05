@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of ProblemList
+ * Description of ProblemListTest
  *
  * @author joemmanuel
  */
-class ProblemList extends \OmegaUp\Test\ControllerTestCase {
+class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Gets the list of problems
      */
@@ -1097,7 +1097,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         for ($i = 1; $i <= $pages; $i++) {
             $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
                 $request
-            );
+            )['smartyProperties'];
             $nextPage = end($response['pager_items']);
             $nextPageURL = $nextPage['url'];
             $nextPageURLQuery = parse_url($nextPageURL);

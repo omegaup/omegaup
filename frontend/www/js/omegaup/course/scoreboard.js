@@ -26,9 +26,9 @@ OmegaUp.on('ready', function() {
     token: arena.options.scoreboardToken,
   })
     .then(function(course) {
+      arena.initProblemsetId(course);
       arena.initProblems(course);
       arena.initClock(course.start_time, course.finish_time);
-      arena.initProblemsetId(course);
       $('#title .course-title').text(course.name);
 
       API.Problemset.scoreboard({

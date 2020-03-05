@@ -34,6 +34,10 @@ class User extends \OmegaUp\Controllers\Controller {
     const LANGUAGE_PT = 3;
     const LANGUAGE_PSEUDO = 4;
 
+    const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
+        'all', 'female',
+    ];
+
     /**
      * Entry point for Create a User API
      *
@@ -647,39 +651,39 @@ class User extends \OmegaUp\Controllers\Controller {
 
             // Arreglo de estados de MX
             $keys = [
-                'OMI2019-AGU' => 4,
-                'OMI2019-BCN' => 4,
-                'OMI2019-BCS' => 4,
-                'OMI2019-CAM' => 4,
-                'OMI2019-CHH' => 4,
-                'OMI2019-CHP' => 4,
-                'OMI2019-CMX' => 4,
-                'OMI2019-COA' => 4,
-                'OMI2019-COL' => 4,
-                'OMI2019-DUR' => 4,
-                'OMI2019-GRO' => 4,
-                'OMI2019-GUA' => 4,
-                'OMI2019-HID' => 4,
-                'OMI2019-JAL' => 4,
-                'OMI2019-MEX' => 4,
-                'OMI2019-MIC' => 4,
-                'OMI2019-MOR' => 4,
-                'OMI2019-NAY' => 4,
-                'OMI2019-NLE' => 4,
-                'OMI2019-OAX' => 4,
-                'OMI2019-PUE' => 4,
-                'OMI2019-QTO' => 4,
-                'OMI2019-ROO' => 4,
-                'OMI2019-SIN' => 8,
-                'OMI2019-SLP' => 4,
-                'OMI2019-SON' => 4,
-                'OMI2019-TAB' => 4,
-                'OMI2019-TAM' => 4,
-                'OMI2019-TLA' => 4,
-                'OMI2019-VER' => 4,
-                'OMI2019-YUC' => 4,
-                'OMI2019-ZAC' => 4,
-                'OMI2019-INV' => 4,
+                'OMI2020-AGU' => 4,
+                'OMI2020-BCN' => 4,
+                'OMI2020-BCS' => 4,
+                'OMI2020-CAM' => 4,
+                'OMI2020-CHH' => 4,
+                'OMI2020-CHP' => 4,
+                'OMI2020-CMX' => 4,
+                'OMI2020-COA' => 4,
+                'OMI2020-COL' => 4,
+                'OMI2020-DUR' => 4,
+                'OMI2020-GRO' => 4,
+                'OMI2020-GUA' => 4,
+                'OMI2020-HID' => 4,
+                'OMI2020-JAL' => 4,
+                'OMI2020-MEX' => 4,
+                'OMI2020-MIC' => 4,
+                'OMI2020-MOR' => 4,
+                'OMI2020-NAY' => 4,
+                'OMI2020-NLE' => 4,
+                'OMI2020-OAX' => 4,
+                'OMI2020-PUE' => 4,
+                'OMI2020-QTO' => 4,
+                'OMI2020-ROO' => 4,
+                'OMI2020-SIN' => 4,
+                'OMI2020-SLP' => 4,
+                'OMI2020-SON' => 4,
+                'OMI2020-TAB' => 4,
+                'OMI2020-TAM' => 4,
+                'OMI2020-TLA' => 4,
+                'OMI2020-VER' => 4,
+                'OMI2020-YUC' => 4,
+                'OMI2020-ZAC' => 8,
+                'OMI2020-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMIP') {
             if (
@@ -690,38 +694,38 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             $keys = [
-                'OMIP2019-AGU' => 25,
-                'OMIP2019-BCN' => 25,
-                'OMIP2019-BCS' => 25,
-                'OMIP2019-CAM' => 25,
-                'OMIP2019-CHH' => 25,
-                'OMIP2019-CHP' => 25,
-                'OMIP2019-CMX' => 25,
-                'OMIP2019-COA' => 25,
-                'OMIP2019-COL' => 25,
-                'OMIP2019-DUR' => 25,
-                'OMIP2019-GRO' => 25,
-                'OMIP2019-GUA' => 25,
-                'OMIP2019-HID' => 25,
-                'OMIP2019-JAL' => 25,
-                'OMIP2019-MEX' => 25,
-                'OMIP2019-MIC' => 25,
-                'OMIP2019-MOR' => 25,
-                'OMIP2019-NAY' => 25,
-                'OMIP2019-NLE' => 25,
-                'OMIP2019-OAX' => 25,
-                'OMIP2019-PUE' => 25,
-                'OMIP2019-QTO' => 25,
-                'OMIP2019-ROO' => 25,
-                'OMIP2019-SIN' => 25,
-                'OMIP2019-SLP' => 25,
-                'OMIP2019-SON' => 25,
-                'OMIP2019-TAB' => 25,
-                'OMIP2019-TAM' => 25,
-                'OMIP2019-TLA' => 25,
-                'OMIP2019-VER' => 25,
-                'OMIP2019-YUC' => 25,
-                'OMIP2019-ZAC' => 25,
+                'OMIP2020-AGU' => 25,
+                'OMIP2020-BCN' => 25,
+                'OMIP2020-BCS' => 25,
+                'OMIP2020-CAM' => 25,
+                'OMIP2020-CHH' => 25,
+                'OMIP2020-CHP' => 25,
+                'OMIP2020-CMX' => 25,
+                'OMIP2020-COA' => 25,
+                'OMIP2020-COL' => 25,
+                'OMIP2020-DUR' => 25,
+                'OMIP2020-GRO' => 25,
+                'OMIP2020-GUA' => 25,
+                'OMIP2020-HID' => 25,
+                'OMIP2020-JAL' => 25,
+                'OMIP2020-MEX' => 25,
+                'OMIP2020-MIC' => 25,
+                'OMIP2020-MOR' => 25,
+                'OMIP2020-NAY' => 25,
+                'OMIP2020-NLE' => 25,
+                'OMIP2020-OAX' => 25,
+                'OMIP2020-PUE' => 25,
+                'OMIP2020-QTO' => 25,
+                'OMIP2020-ROO' => 25,
+                'OMIP2020-SIN' => 25,
+                'OMIP2020-SLP' => 25,
+                'OMIP2020-SON' => 25,
+                'OMIP2020-TAB' => 25,
+                'OMIP2020-TAM' => 25,
+                'OMIP2020-TLA' => 25,
+                'OMIP2020-VER' => 25,
+                'OMIP2020-YUC' => 25,
+                'OMIP2020-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIS') {
             if (
@@ -732,38 +736,38 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             $keys = [
-                'OMIS2019-AGU' => 25,
-                'OMIS2019-BCN' => 25,
-                'OMIS2019-BCS' => 25,
-                'OMIS2019-CAM' => 25,
-                'OMIS2019-CHH' => 25,
-                'OMIS2019-CHP' => 25,
-                'OMIS2019-CMX' => 25,
-                'OMIS2019-COA' => 25,
-                'OMIS2019-COL' => 25,
-                'OMIS2019-DUR' => 25,
-                'OMIS2019-GRO' => 25,
-                'OMIS2019-GUA' => 25,
-                'OMIS2019-HID' => 25,
-                'OMIS2019-JAL' => 25,
-                'OMIS2019-MEX' => 25,
-                'OMIS2019-MIC' => 25,
-                'OMIS2019-MOR' => 25,
-                'OMIS2019-NAY' => 25,
-                'OMIS2019-NLE' => 25,
-                'OMIS2019-OAX' => 25,
-                'OMIS2019-PUE' => 25,
-                'OMIS2019-QTO' => 25,
-                'OMIS2019-ROO' => 25,
-                'OMIS2019-SIN' => 25,
-                'OMIS2019-SLP' => 25,
-                'OMIS2019-SON' => 25,
-                'OMIS2019-TAB' => 25,
-                'OMIS2019-TAM' => 25,
-                'OMIS2019-TLA' => 25,
-                'OMIS2019-VER' => 25,
-                'OMIS2019-YUC' => 25,
-                'OMIS2019-ZAC' => 25,
+                'OMIS2020-AGU' => 25,
+                'OMIS2020-BCN' => 25,
+                'OMIS2020-BCS' => 25,
+                'OMIS2020-CAM' => 25,
+                'OMIS2020-CHH' => 25,
+                'OMIS2020-CHP' => 25,
+                'OMIS2020-CMX' => 25,
+                'OMIS2020-COA' => 25,
+                'OMIS2020-COL' => 25,
+                'OMIS2020-DUR' => 25,
+                'OMIS2020-GRO' => 25,
+                'OMIS2020-GUA' => 25,
+                'OMIS2020-HID' => 25,
+                'OMIS2020-JAL' => 25,
+                'OMIS2020-MEX' => 25,
+                'OMIS2020-MIC' => 25,
+                'OMIS2020-MOR' => 25,
+                'OMIS2020-NAY' => 25,
+                'OMIS2020-NLE' => 25,
+                'OMIS2020-OAX' => 25,
+                'OMIS2020-PUE' => 25,
+                'OMIS2020-QTO' => 25,
+                'OMIS2020-ROO' => 25,
+                'OMIS2020-SIN' => 25,
+                'OMIS2020-SLP' => 25,
+                'OMIS2020-SON' => 25,
+                'OMIS2020-TAB' => 25,
+                'OMIS2020-TAM' => 25,
+                'OMIS2020-TLA' => 25,
+                'OMIS2020-VER' => 25,
+                'OMIS2020-YUC' => 25,
+                'OMIS2020-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIPN') {
             if (
@@ -774,39 +778,39 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             $keys = [
-                'OMIP2019-AGU' => 4,
-                'OMIP2019-BCN' => 4,
-                'OMIP2019-BCS' => 4,
-                'OMIP2019-CAM' => 4,
-                'OMIP2019-CHH' => 4,
-                'OMIP2019-CHP' => 4,
-                'OMIP2019-CMX' => 4,
-                'OMIP2019-COA' => 4,
-                'OMIP2019-COL' => 4,
-                'OMIP2019-DUR' => 4,
-                'OMIP2019-GRO' => 4,
-                'OMIP2019-GUA' => 4,
-                'OMIP2019-HID' => 4,
-                'OMIP2019-JAL' => 4,
-                'OMIP2019-MEX' => 4,
-                'OMIP2019-MIC' => 4,
-                'OMIP2019-MOR' => 4,
-                'OMIP2019-NAY' => 4,
-                'OMIP2019-NLE' => 4,
-                'OMIP2019-OAX' => 4,
-                'OMIP2019-PUE' => 4,
-                'OMIP2019-QTO' => 4,
-                'OMIP2019-ROO' => 4,
-                'OMIP2019-SIN' => 4,
-                'OMIP2019-SLP' => 4,
-                'OMIP2019-SON' => 4,
-                'OMIP2019-TAB' => 4,
-                'OMIP2019-TAM' => 4,
-                'OMIP2019-TLA' => 4,
-                'OMIP2019-VER' => 4,
-                'OMIP2019-YUC' => 4,
-                'OMIP2019-ZAC' => 4,
-                'OMIP2019-INV' => 4,
+                'OMIP2020-AGU' => 4,
+                'OMIP2020-BCN' => 4,
+                'OMIP2020-BCS' => 4,
+                'OMIP2020-CAM' => 4,
+                'OMIP2020-CHH' => 4,
+                'OMIP2020-CHP' => 4,
+                'OMIP2020-CMX' => 4,
+                'OMIP2020-COA' => 4,
+                'OMIP2020-COL' => 4,
+                'OMIP2020-DUR' => 4,
+                'OMIP2020-GRO' => 4,
+                'OMIP2020-GUA' => 4,
+                'OMIP2020-HID' => 4,
+                'OMIP2020-JAL' => 4,
+                'OMIP2020-MEX' => 4,
+                'OMIP2020-MIC' => 4,
+                'OMIP2020-MOR' => 4,
+                'OMIP2020-NAY' => 4,
+                'OMIP2020-NLE' => 4,
+                'OMIP2020-OAX' => 4,
+                'OMIP2020-PUE' => 4,
+                'OMIP2020-QTO' => 4,
+                'OMIP2020-ROO' => 4,
+                'OMIP2020-SIN' => 4,
+                'OMIP2020-SLP' => 4,
+                'OMIP2020-SON' => 4,
+                'OMIP2020-TAB' => 4,
+                'OMIP2020-TAM' => 4,
+                'OMIP2020-TLA' => 4,
+                'OMIP2020-VER' => 4,
+                'OMIP2020-YUC' => 4,
+                'OMIP2020-ZAC' => 4,
+                'OMIP2020-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMISN') {
             if (
@@ -817,39 +821,39 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             $keys = [
-                'OMIS2019-AGU' => 4,
-                'OMIS2019-BCN' => 4,
-                'OMIS2019-BCS' => 4,
-                'OMIS2019-CAM' => 4,
-                'OMIS2019-CHH' => 4,
-                'OMIS2019-CHP' => 4,
-                'OMIS2019-CMX' => 4,
-                'OMIS2019-COA' => 4,
-                'OMIS2019-COL' => 4,
-                'OMIS2019-DUR' => 4,
-                'OMIS2019-GRO' => 4,
-                'OMIS2019-GUA' => 4,
-                'OMIS2019-HID' => 4,
-                'OMIS2019-JAL' => 4,
-                'OMIS2019-MEX' => 4,
-                'OMIS2019-MIC' => 4,
-                'OMIS2019-MOR' => 4,
-                'OMIS2019-NAY' => 4,
-                'OMIS2019-NLE' => 4,
-                'OMIS2019-OAX' => 4,
-                'OMIS2019-PUE' => 4,
-                'OMIS2019-QTO' => 4,
-                'OMIS2019-ROO' => 4,
-                'OMIS2019-SIN' => 4,
-                'OMIS2019-SLP' => 4,
-                'OMIS2019-SON' => 4,
-                'OMIS2019-TAB' => 4,
-                'OMIS2019-TAM' => 4,
-                'OMIS2019-TLA' => 4,
-                'OMIS2019-VER' => 4,
-                'OMIS2019-YUC' => 4,
-                'OMIS2019-ZAC' => 4,
-                'OMIS2019-INV' => 4,
+                'OMIS2020-AGU' => 4,
+                'OMIS2020-BCN' => 4,
+                'OMIS2020-BCS' => 4,
+                'OMIS2020-CAM' => 4,
+                'OMIS2020-CHH' => 4,
+                'OMIS2020-CHP' => 4,
+                'OMIS2020-CMX' => 4,
+                'OMIS2020-COA' => 4,
+                'OMIS2020-COL' => 4,
+                'OMIS2020-DUR' => 4,
+                'OMIS2020-GRO' => 4,
+                'OMIS2020-GUA' => 4,
+                'OMIS2020-HID' => 4,
+                'OMIS2020-JAL' => 4,
+                'OMIS2020-MEX' => 4,
+                'OMIS2020-MIC' => 4,
+                'OMIS2020-MOR' => 4,
+                'OMIS2020-NAY' => 4,
+                'OMIS2020-NLE' => 4,
+                'OMIS2020-OAX' => 4,
+                'OMIS2020-PUE' => 4,
+                'OMIS2020-QTO' => 4,
+                'OMIS2020-ROO' => 4,
+                'OMIS2020-SIN' => 4,
+                'OMIS2020-SLP' => 4,
+                'OMIS2020-SON' => 4,
+                'OMIS2020-TAB' => 4,
+                'OMIS2020-TAM' => 4,
+                'OMIS2020-TLA' => 4,
+                'OMIS2020-VER' => 4,
+                'OMIS2020-YUC' => 4,
+                'OMIS2020-ZAC' => 4,
+                'OMIS2020-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'ORIG') {
             if (
@@ -892,6 +896,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $keys =  [
                 'Pr8oUAIE' => 20
+            ];
+        } elseif ($r['contest_type'] == 'OMICHH') {
+            if (
+                $r->identity->username != 'LaloRivero'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+            $keys =  [
+                'OMICHH_2020' => 50
             ];
         } elseif ($r['contest_type'] == 'OMIZAC') {
             if (
@@ -1167,7 +1181,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @return array{birth_date: int|null, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+     * @return array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1204,6 +1218,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $userDb['graduation_date']
         );
         $response['email'] = $userDb['email'];
+        $response['classname'] = $userDb['classname'];
         $response['country'] = $userDb['country'];
         $response['country_id'] = $userDb['country_id'];
         $response['state'] = $userDb['state'];
@@ -1230,6 +1245,13 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $identity = self::resolveTargetIdentity($r);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1241,7 +1263,8 @@ class User extends \OmegaUp\Controllers\Controller {
         return self::getUserProfile(
             $r->identity,
             $identity,
-            $r['omit_rank'] ?: false
+            $r['omit_rank'] ?: false,
+            $category
         );
     }
 
@@ -1251,7 +1274,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getUserProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $omitRank = false
+        bool $omitRank = false,
+        string $category = 'all'
     ) {
         $user = is_null(
             $identity->user_id
@@ -1297,7 +1321,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 $loggedIdentity,
                 $identity,
                 $user,
-                $omitRank
+                $omitRank,
+                $category
             );
         }
         $response['classname'] = \OmegaUp\DAO\Users::getRankingClassName(
@@ -1372,22 +1397,35 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
         $date = !empty($r['date']) ? strval($r['date']) : null;
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
         $firstDay = self::getCurrentMonthFirstDay($date);
-        $response = self::getCodersOfTheMonth($firstDay);
+        $response = self::getCodersOfTheMonth($firstDay, $category);
         $response['status'] = 'ok';
         return $response;
     }
 
     /**
-     * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{coderinfo: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
-    private static function getCodersOfTheMonth(string $firstDay) {
-        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime($firstDay);
+    private static function getCodersOfTheMonth(
+        string $firstDay,
+        string $category = 'all'
+    ) {
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+            $firstDay,
+            $category
+        );
 
         if (empty($codersOfTheMonth)) {
             // Generate the coder
             $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-                $firstDay
+                $firstDay,
+                $category
             );
             if (is_null($users)) {
                 return [
@@ -1405,6 +1443,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'school_id' => $user['school_id'],
                         'time' => $firstDay,
                         'rank' => $index + 1,
+                        'category' => $category,
                     ]));
                 }
                 \OmegaUp\DAO\DAO::transEnd();
@@ -1458,10 +1497,21 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateOptionalDate($r['date'], 'date');
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
         if (!is_null($r['date'])) {
-            $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($r['date']);
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                $r['date'],
+                $category
+            );
         } else {
-            $coders = \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth();
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth(
+                $category
+            );
         }
         return [
             'coders' => self::processCodersList($coders),
@@ -1497,9 +1547,15 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth = new \DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
-
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
 
         if (!empty($codersOfTheMonth)) {
@@ -1509,7 +1565,8 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         // Generate the coder
         $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
 
         if (empty($users)) {
@@ -1524,6 +1581,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'school_id' => $user['school_id'],
                     'time' => $dateToSelect,
                     'rank' => $index + 1,
+                    'category' => $category,
                 ]);
                 // All users calculated as CoderOfTheMonth are going to be saved on database,
                 // the one selected by the mentor is gonna have the field 'selected_by' filled.
@@ -2040,6 +2098,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['locale'],
+                'locale'
+            );
             $language = \OmegaUp\DAO\Languages::getByName($r['locale']);
             if (is_null($language)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2057,8 +2119,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $r['gender'],
                 'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
-                true
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
             $r->identity->gender = $r['gender'];
         }
@@ -2169,11 +2230,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
-            ['', 'country', 'state', 'school'],
-            false
+            ['', 'country', 'state', 'school']
         );
 
         $filter = is_null($r['filter']) ? '' : strval($r['filter']);
@@ -2812,19 +2872,19 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             return ['filteredBy' => null, 'value' => null];
         }
-        if ($filteredBy == 'country') {
+        if ($filteredBy === 'country') {
             return [
                 'filteredBy' => $filteredBy,
                 'value' => $identity->country_id
             ];
         }
-        if ($filteredBy == 'state') {
+        if ($filteredBy === 'state') {
             return [
                 'filteredBy' => $filteredBy,
                 'value' => "{$identity->country_id}-{$identity->state_id}"
             ];
         }
-        if ($filteredBy == 'school') {
+        if ($filteredBy === 'school') {
             $schoolId = null;
             if (!is_null($identity->current_identity_school_id)) {
                 $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -3041,11 +3101,10 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
+        \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
-            ['', 'country', 'state', 'school'],
-            /*$required=*/false
+            ['', 'country', 'state', 'school']
         );
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
@@ -3103,30 +3162,65 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
+        $response['smartyProperties']['rankTablePayload']['availableFilters'] = $availableFilters;
         return $response;
     }
 
     /**
-     * @return array{smartyProperties: array{coderOfTheMonthData: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, rankTablePayload: array{availableFilters: array<empty, empty>, isIndex: true, length: int}, schoolRankPayload: array{showHeader: true, length: int}, schoolOfTheMonthData: null|array{school_id: int, name: string, country_id: string|null}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Not logged, but there is no problem with this
+            /** @var null $r->identity */
+        }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
+
+        $contests = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            /*$query=*/ null,
+            /*$page=*/ 1,
+            /*$pageSize=*/ 20,
+            /*$activeContests=*/ \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            /*$recommended=*/ \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
+        $addedContests = [];
+        foreach ($contests as $key => $contestInfo) {
+            $addedContests[] = [
+                'alias' => $contestInfo['alias'],
+                'title' => $contestInfo['title'],
+            ];
+        }
+
         return [
             'smartyProperties' => [
-                'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                    $firstDay
-                )['coderinfo'],
-                'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
-                'rankTablePayload' => [
-                    'length' => $rowCount,
-                    'isIndex' => true,
-                    'availableFilters' => [],
-                ],
-                'schoolRankPayload' => [
-                    'length' => $rowCount,
-                    'showHeader' => true,
+                'payload' => [
+                    'coderOfTheMonthData' => self::getCodersOfTheMonth(
+                        $firstDay
+                    )['coderinfo'],
+                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'rankTable' => self::getRankByProblemsSolved(
+                        $r->identity,
+                        /*$filter=*/ '',
+                        /*$offset=*/ 1,
+                        $rowCount
+                    ),
+                    'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
+                        $rowCount
+                    ),
+                    'currentUserInfo' => !is_null($r->identity) ? [
+                        'username' => $r->identity->username,
+                    ] : [],
+                    'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
+                    'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
+                    'upcomingContests' => [
+                        'number_of_results' => count($addedContests),
+                        'results' => $addedContests,
+                    ],
                 ],
             ],
             'template' => 'index.tpl',
@@ -3154,8 +3248,16 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity
         );
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
         $bestCoders = [];
         if (!is_null($candidates)) {
@@ -3167,10 +3269,13 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth($category)
             ),
             'codersOfPreviousMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
+                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                    $currentDate,
+                    $category
+                )
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
@@ -3188,7 +3293,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     $currentTimeStamp
                 ),
             'coderIsSelected' =>
-                !empty(\OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect)),
+                !empty(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+                        $dateToSelect,
+                        $category
+                    )
+                ),
         ];
         return [
             'payload' => $response,

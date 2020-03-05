@@ -13,13 +13,34 @@ OmegaUp.on('ready', function() {
         on: {
           'bulk-identities': function(identities) {
             API.Identity.bulkCreate({
-              identities: identities,
+              identities: JSON.stringify(identities),
               group_alias: groupAlias,
             })
               .then(function(data) {
                 UI.success(T.groupsIdentitiesSuccessfullyCreated);
               })
               .fail(UI.apiError);
+          },
+          'download-identities': function(identities) {
+            const csv = CSV.serialize({
+              fields: [
+                { id: 'username' },
+                { id: 'name' },
+                { id: 'password' },
+                { id: 'country_id' },
+                { id: 'state_id' },
+                { id: 'gender' },
+                { id: 'school_name' },
+              ],
+              records: identities,
+            });
+            const hiddenElement = document.createElement('a');
+            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURI(
+              csv,
+            )}`;
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'identities.csv';
+            hiddenElement.click();
           },
           'read-csv': function(identitiesComponent, fileUpload) {
             identitiesComponent.identities = [];
@@ -32,7 +53,7 @@ OmegaUp.on('ready', function() {
               }
               for (let cells of dataset.records) {
                 identitiesComponent.identities.push({
-                  username: identitiesComponent.groupAlias + ':' + cells[0],
+                  username: `${identitiesComponent.groupAlias}:${cells[0]}`,
                   name: cells[1],
                   password: generatePassword(),
                   country_id: cells[2],

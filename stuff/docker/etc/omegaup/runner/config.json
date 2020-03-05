@@ -4,7 +4,7 @@
 	},
 	"Runner": {
 		"RuntimePath": "/var/lib/omegaup/runner",
-		"GraderURL": "https://localhost:11302"
+		"GraderURL": "https://grader:11302"
 	},
 	"TLS": {
 		"CertFile": "/etc/omegaup/runner/certificate.pem",

@@ -22,7 +22,7 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups g ON g.group_id = gr.group_id
+                `Groups` AS g ON g.group_id = gr.group_id
             WHERE
                 gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
@@ -54,6 +54,35 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             }
         }
         return $admins;
+    }
+
+    /**
+     * @return list<array{alias: string, name: string}>
+     */
+    public static function getContestantGroups(int $problemsetId): array {
+        $sql = '
+            SELECT
+                g.alias, g.name
+            FROM
+                Problemsets p
+            INNER JOIN
+                Group_Roles gr ON gr.acl_id = p.acl_id
+            INNER JOIN
+                `Groups` AS g ON g.group_id = gr.group_id
+            WHERE
+                p.problemset_id = ? AND
+                gr.role_id = ?;
+        ';
+        $params = [
+            $problemsetId,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+        ];
+
+        /** @var list<array{alias: string, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
     }
 
     public static function hasRole(

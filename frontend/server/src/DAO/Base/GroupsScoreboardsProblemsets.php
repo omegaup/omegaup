@@ -263,7 +263,7 @@ abstract class GroupsScoreboardsProblemsets {
     ): int {
         $sql = '
             INSERT INTO
-                Groups_Scoreboards_Problemsets (
+                `Groups_Scoreboards_Problemsets` (
                     `group_scoreboard_id`,
                     `problemset_id`,
                     `only_ac`,

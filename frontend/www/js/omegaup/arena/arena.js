@@ -1670,6 +1670,9 @@ export class Arena {
           }
           self.qualityNominationForm = new Vue({
             el: '#qualitynomination-popup',
+            mounted: function() {
+              UI.reportEvent('quality-nomination', 'shown');
+            },
             render: function(createElement) {
               return createElement('qualitynomination-popup', {
                 props: {
@@ -1698,7 +1701,11 @@ export class Arena {
                       problem_alias: qualityPayload.problem_alias,
                       nomination: 'suggestion',
                       contents: JSON.stringify(contents),
-                    }).fail(UI.apiError);
+                    })
+                      .then(() => {
+                        UI.reportEvent('quality-nomination', 'submit');
+                      })
+                      .fail(UI.apiError);
                   },
                   dismiss: function(ev) {
                     const contents = {
@@ -1711,6 +1718,7 @@ export class Arena {
                     })
                       .then(function(data) {
                         UI.info(T.qualityNominationRateProblemDesc);
+                        UI.reportEvent('quality-nomination', 'dismiss');
                       })
                       .fail(UI.apiError);
                   },
@@ -1748,6 +1756,12 @@ export class Arena {
       }
 
       if (problemChanged) {
+        // Ping Analytics with updated problem id
+        let page = window.location.pathname + window.location.hash;
+        if (typeof ga == 'function') {
+          ga('set', 'page', page);
+          ga('send', 'pageview');
+        }
         if (problem.statement) {
           update(problem);
         } else {
@@ -2112,6 +2126,7 @@ export class Arena {
       }),
     )
       .then(function(run) {
+        UI.reportEvent('submission', 'submit');
         if (self.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem('run:' + run.guid, code);
         }
@@ -2140,6 +2155,7 @@ export class Arena {
       .fail(function(run) {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
+        UI.reportEvent('submission', 'submit-fail', run.errorname);
       });
   }
 

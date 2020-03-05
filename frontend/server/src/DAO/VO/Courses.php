@@ -24,7 +24,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'acl_id' => true,
         'start_time' => true,
         'finish_time' => true,
-        'public' => true,
+        'admission_mode' => true,
         'school_id' => true,
         'needs_basic_information' => true,
         'requests_user_information' => true,
@@ -93,9 +93,9 @@ class Courses extends \OmegaUp\DAO\VO\VO {
                 )
             );
         }
-        if (isset($data['public'])) {
-            $this->public = boolval(
-                $data['public']
+        if (isset($data['admission_mode'])) {
+            $this->admission_mode = strval(
+                $data['admission_mode']
             );
         }
         if (isset($data['school_id'])) {
@@ -179,11 +179,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
     public $finish_time = null;
 
     /**
-     * True implica que cualquier usuario puede entrar al curso
+     * Modalidad en la que se registra un curso.
      *
-     * @var bool
+     * @var string
      */
-    public $public = false;
+    public $admission_mode = 'private';
 
     /**
      * [Campo no documentado]

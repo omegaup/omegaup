@@ -4,6 +4,40 @@ require('../dist/commons.js');
 var omegaup = require('../dist/omegaup.js');
 
 describe('omegaup.ui', function() {
+  describe('formatDateLocal', function() {
+    const expectedValue = '2010-01-01';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateLocal(omegaup.UI.parseDateLocal(expectedValue)),
+      ).toEqual(expectedValue);
+    });
+  });
+
+  describe('formatDateTimeLocal', function() {
+    const expectedValue = '2010-01-01T11:22';
+
+    it('Should format dates correctly', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should be able to roundtrip', function() {
+      expect(
+        omegaup.UI.formatDateTimeLocal(
+          omegaup.UI.parseDateTimeLocal(expectedValue),
+        ),
+      ).toEqual(expectedValue);
+    });
+  });
+
   describe('formatString', function() {
     it('Should handle strings without replacements', function() {
       expect(omegaup.UI.formatString('hello', {})).toEqual('hello');
@@ -148,6 +182,8 @@ github flavored markdown
 Other escapes: $~~T~D~E32E
 
 Tags <b>hello</b>
+
+<pre>hi</pre>
 ||output
 0
 ||end`),
@@ -183,7 +219,9 @@ github flavored markdown
 
 Other escapes: $~~T~D~E32E
 
-Tags &lt;b&gt;hello&lt;/b&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
+Tags &lt;b&gt;hello&lt;/b&gt;
+
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
 </table>`);
     });
 

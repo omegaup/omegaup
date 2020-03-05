@@ -276,7 +276,7 @@ abstract class ProblemsetProblemOpened {
     ): int {
         $sql = '
             INSERT INTO
-                Problemset_Problem_Opened (
+                `Problemset_Problem_Opened` (
                     `problemset_id`,
                     `problem_id`,
                     `identity_id`,

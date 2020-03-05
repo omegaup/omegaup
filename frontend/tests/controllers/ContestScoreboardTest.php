@@ -21,7 +21,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         bool $runForAdmin = true,
         bool $runForDirector = true
     ) {
-        $problemData = [\OmegaUp\Test\Factories\Problem::createProblem(), \OmegaUp\Test\Factories\Problem::createProblem()];
+        $problemData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problems to the contest
@@ -38,10 +41,16 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
-            ['user' => $contestants[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
+            [
+                'user' => $contestants[],
+                'identity' => $identities[],
+            ] = \OmegaUp\Test\Factories\User::createUser();
         }
         $contestDirector = $contestData['director'];
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestAdmin,
+            'identity' => $contestIdentityAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Contest::addAdminUser(
             $contestData,
             $contestIdentityAdmin
@@ -86,7 +95,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             'contestData' => $contestData,
             'contestants' => $identities,
             'contestAdmin' => $contestAdmin,
-            'runMap' => $runMap
+            'runMap' => $runMap,
         ];
     }
 
@@ -589,8 +598,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test invalid token
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testScoreboardUrlInvalidToken() {
         // Create our user not added to the contest
@@ -601,14 +608,16 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call scoreboard api from the user
         $login = self::login($externalIdentity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problemset_id' =>  $contestData['contest']->problemset_id,
-            'token' => 'invalid token',
-        ]);
-        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard(
-            $r
-        );
+        try {
+            \OmegaUp\Controllers\Problemset::apiScoreboard(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' =>  $contestData['contest']->problemset_id,
+                'token' => 'invalid token',
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('invalidScoreboardUrl', $e->getMessage());
+        }
     }
 
     /**
@@ -798,23 +807,24 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $event['problem']['alias'] === $problemAlias
             ) {
                 $eventFound = $event;
+                break;
             }
         }
 
-        if ($shouldBeIn === true) {
-            if (is_null($eventFound)) {
-                $this->fail(
-                    "$username $problemAlias combination not found on events."
-                );
-            }
-        } else {
+        if ($shouldBeIn !== true) {
             if (!is_null($eventFound)) {
                 $this->fail(
                     "$username $problemAlias combination was found on events when it was not expected."
                 );
             }
+            return;
         }
 
+        if (is_null($eventFound)) {
+            $this->fail(
+                "$username $problemAlias combination not found on events."
+            );
+        }
         if ($eventFound['problem']['points'] != $runMapEntry['points'] * 100) {
             $this->fail("$username $problemAlias has unexpected points.");
         }

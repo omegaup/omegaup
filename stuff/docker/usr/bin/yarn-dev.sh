@@ -4,4 +4,4 @@ set -e
 
 cd /opt/omegaup
 yarn install
-exec yarn run dev
+exec yarn run dev-all

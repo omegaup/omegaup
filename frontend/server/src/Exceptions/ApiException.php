@@ -84,7 +84,10 @@ abstract class ApiException extends \Exception {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
         }
-        return $localizedText;
+        return \OmegaUp\ApiUtils::formatString(
+            $localizedText,
+            $this->_customMessage
+        );
     }
 }
 

@@ -270,7 +270,7 @@ abstract class AuthTokens {
     ): int {
         $sql = '
             INSERT INTO
-                Auth_Tokens (
+                `Auth_Tokens` (
                     `user_id`,
                     `identity_id`,
                     `token`,

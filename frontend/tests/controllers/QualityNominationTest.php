@@ -184,6 +184,77 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check if only a category tag is allowed for a nomination of
+     * type 'quality tag'.
+     */
+    public function testCategoryTagOnQualityTagNomination() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategoryOpenResponse',
+                ]),
+            ]));
+            $this->fail('The user must be a reviewer.');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategory',
+                ]),
+            ]));
+            $this->fail('The tag should be one of the category tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemCategoryOpenResponse',
+                ]),
+            ]));
+            $this->fail(
+                'Reviewer can not send again a nomination for the same problem'
+            );
+        } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                'reviewerHasAlreadySentNominationForProblem',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Check that before suggesting improvements to a problem, the user must
      * have solved it first.
      */
@@ -417,16 +488,19 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $request
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             $problemData['problem']->title,
             $emailSender::$listEmails[0]['subject']
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             $problemData['author']->name,
             $emailSender::$listEmails[0]['body']
         );
-        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
-        $this->assertContains(
+        $this->assertStringContainsString(
+            'qwert',
+            $emailSender::$listEmails[0]['body']
+        );
+        $this->assertStringContainsString(
             'something else',
             $emailSender::$listEmails[0]['body']
         );
@@ -1234,17 +1308,17 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[0]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.971428571,
             $newProblem[0]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.2,
             $newProblem[0]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
         $this->assertEquals(
             '[0, 0, 2, 2, 1]',
@@ -1260,24 +1334,29 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[2]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             0,
             $newProblem[2]->difficulty,
-            'Wrong difficulty',
-            0.001
+            0.001,
+            'Wrong difficulty'
         );
-        $this->assertEquals(0, $newProblem[2]->quality, 'Wrong quality', 0.001);
+        $this->assertEqualsWithDelta(
+            0,
+            $newProblem[2]->quality,
+            0.001,
+            'Wrong quality'
+        );
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
         $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
         $extractName = function ($tag) {
@@ -1302,61 +1381,61 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[0]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.895384615,
             $newProblem[0]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.538378378,
             $newProblem[0]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
 
         $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[1]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             3.446886447,
             $newProblem[1]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             0,
             $newProblem[1]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
 
         $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[2]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.684981685,
             $newProblem[2]->difficulty,
-            'Wrong difficulty',
-            0.001
+            0.001,
+            'Wrong difficulty'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             1.736164736,
             $newProblem[2]->quality,
-            'Wrong quality',
-            0.001
+            0.001,
+            'Wrong quality'
         );
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
         $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
@@ -1370,6 +1449,102 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $tags3,
             ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'lenguaje']
         );
+    }
+
+    /**
+     * Test if the problem's quality_seal sets to true after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackPostive() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertTrue($problem->quality_seal);
+    }
+
+    /**
+     * Test if the problem's quality_seal remains as false after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackNegative() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryOpenResponse',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemCategoryIntroductionToProgramming',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryIntroductionToProgramming',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertFalse($problem->quality_seal);
     }
 
     public function setUpRankForUsers(
@@ -1631,7 +1806,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[0]['problem'],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         ));
         $this->assertEquals(
             $tags,
@@ -1645,7 +1820,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[0]['problem'],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         ));
         $this->assertEquals(
             $tags,
@@ -1923,7 +2098,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[0]['problem'],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         ));
         sort($tags);
         $this->assertEquals(
@@ -1936,7 +2111,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[1]['problem'],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         ));
         sort($tags);
         $this->assertEquals(

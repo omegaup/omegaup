@@ -116,13 +116,6 @@ class UITools {
                 'CURRENT_USER_GRAVATAR_URL_51',
                 \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '51')
             );
-
-            $smarty->assign(
-                'currentUserInfo',
-                [
-                    'username' => $identity->username,
-                ]
-            );
         } else {
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
@@ -144,14 +137,8 @@ class UITools {
             $smarty->compile_check = false;
         }
 
-        $identityRequest = new \OmegaUp\Request();
-        $identityRequest['username'] = is_null(
-            $identity
-        ) ? null : $identity->username;
         /** @var string */
-        $_lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $identityRequest
-        );
+        $_lang = \OmegaUp\Controllers\Identity::getPreferredLanguage($identity);
         $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
         $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
 
@@ -181,6 +168,7 @@ class UITools {
         [
             'email' => $email,
             'identity' => $identity,
+            'user' => $user,
             'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         $smarty->assign(
@@ -203,6 +191,7 @@ class UITools {
                         $identity->username
                     ) ? $identity->username :
                     '',
+                'isMainUserIdentity' => !is_null($user),
                 'isAdmin' => $isAdmin,
                 'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
                 'navbarSection' => $navbarSection,

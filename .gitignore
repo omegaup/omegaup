@@ -63,6 +63,7 @@ bin/grader.sh
 frontend/www/runner-distrib.sh
 geckodriver.log
 yarn-error.log
+.phpunit.result.cache
 
 # Ignore Mac crap :P
 frontend/.DS_Store

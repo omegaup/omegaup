@@ -19,9 +19,7 @@ class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException 
     }
 
     public function getErrorMessage(): string {
-        $localizedText = \OmegaUp\Translations::getInstance()->get(
-            $this->message
-        );
+        $localizedText = parent::getErrorMessage();
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";

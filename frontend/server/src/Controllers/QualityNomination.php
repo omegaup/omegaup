@@ -52,8 +52,19 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
+    const CATEGORY_TAGS = [
+        'problemCategoryOpenResponse',
+        'problemCategoryKarelEducation',
+        'problemCategoryIntroductionToProgramming',
+        'problemCategoryMathematicalProblems',
+        'problemCategoryElementaryDataStructures',
+        'problemCategoryAlgorithmAndNetworkOptimization',
+        'problemCategoryCompetitiveProgramming',
+        'problemCategorySpecializedTopics',
+    ];
+
     /**
-     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, tag?: mixed, quality_seal?: bool} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -62,7 +73,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         string $nominationType,
         array $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
-        if ($nominationType !== 'demotion') {
+        if ($nominationType !== 'demotion' && $nominationType !== 'quality_tag') {
             if (
                 isset($contents['before_ac']) &&
                 boolval($contents['before_ac']) &&
@@ -94,7 +105,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             } else {
                 // All nominations types, except demotions and before AC
-                // suggestions/demotions,are only allowed for users who
+                // suggestions/demotions, are only allowed for users who
                 // have already solved the problem.
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
@@ -297,6 +308,47 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
+        } elseif ($nominationType === 'quality_tag') {
+            // Only reviewers are allowed to send this type of nominations
+            if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+
+            if (
+                !isset($contents['quality_seal']) ||
+                (
+                    $contents['quality_seal'] &&
+                    !isset($contents['tag'])
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
+
+            if (
+                isset($contents['tag']) &&
+                !in_array($contents['tag'], self::CATEGORY_TAGS)
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'contents'
+                );
+            }
+
+            if (
+                \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
+                    $identity,
+                    $problem
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'reviewerHasAlreadySentNominationForProblem'
+                );
+            }
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
@@ -352,6 +404,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
      *                before receiving an AC verdict for problem run.
      *
+     * # Quality tag
+     *
+     * A reviewer could send this type of nomination to make the user marked as
+     * a quality problem or not. The reviewer could also specify which category
+     * is the one the problem belongs to. The 'contents' field should have the
+     * following subfields:
+     *
+     * * tag: The name of the tag corresponding to the category of the problem
+     * * quality_seal: A boolean that if activated, means that the problem is a
+     *   quality problem
+     *
      * # Promotion
      *
      * A user that has already solved a problem can nominate it to be promoted
@@ -400,7 +463,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['nomination'],
             'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal']
+            ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
@@ -443,8 +506,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
             'status',
-            ['open', 'approved', 'denied'],
-            true /*is_required*/
+            ['open', 'approved', 'denied']
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['rationale'],
@@ -467,12 +529,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'qualitynominationNotFound'
             );
         }
-        if ($qualitynomination->nomination != 'demotion') {
+        if ($qualitynomination->nomination !== 'demotion') {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'onlyDemotionsSupported'
             );
         }
-        if ($r['status'] == $qualitynomination->status) {
+        if ($r['status'] === $qualitynomination->status) {
             return ['status' => 'ok'];
         }
 
@@ -488,17 +550,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $newProblemVisibility = $problem->visibility;
         switch ($r['status']) {
             case 'approved':
-                if ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
+                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                 } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
-                if ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
+                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
                     // If banning is reverted, problem will become private.
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
-                } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
                 }
@@ -508,9 +570,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $r['message'] = ($r['status'] == 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
-
-        $r['visibility'] = $newProblemVisibility;
+        $message = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
@@ -521,9 +581,21 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ]);
         $qualitynomination->status = $qualitynominationlog->to_status;
 
+        $problemParams = new \OmegaUp\ProblemParams([
+            'visibility' => $newProblemVisibility,
+            'problem_alias' => $r['problem_alias'],
+        ], /*$isRequired=*/ false);
+
         \OmegaUp\DAO\DAO::transBegin();
         try {
-            \OmegaUp\Controllers\Problem::apiUpdate($r);
+            \OmegaUp\Controllers\Problem::updateProblem(
+                $r->identity,
+                $r->user,
+                $problemParams,
+                $message,
+                $problemParams->updatePublished,
+                /*$redirect=*/ false
+            );
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
@@ -750,7 +822,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * nominator or a member of the reviewer group.
      *
      * @param \OmegaUp\Request $r
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{source: string, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -768,7 +840,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{source: string, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}
      */
     private static function getDetails(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -847,7 +919,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{autogenerated: bool, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}}, template: string}
+     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: array{source: string, name: string}[]}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: int, votes: array{time: int|null, user: array{name: null|string, username: string}, vote: int}[]}}, template: string}
      */
     public static function getDetailsForSmarty(
         \OmegaUp\Request $r

@@ -304,7 +304,7 @@ abstract class SubmissionLog {
     ): int {
         $sql = '
             INSERT INTO
-                Submission_Log (
+                `Submission_Log` (
                     `problemset_id`,
                     `submission_id`,
                     `user_id`,

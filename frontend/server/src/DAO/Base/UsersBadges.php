@@ -208,7 +208,7 @@ abstract class UsersBadges {
     ): int {
         $sql = '
             INSERT INTO
-                Users_Badges (
+                `Users_Badges` (
                     `user_id`,
                     `badge_alias`,
                     `assignation_time`

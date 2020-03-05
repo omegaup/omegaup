@@ -56,8 +56,8 @@ omegaup.OmegaUp.on('ready', function() {
         if (!(arenaInstance.submissionGap > 0)) arenaInstance.submissionGap = 0;
 
         arenaInstance.initProblemsetId(contest);
-        arenaInstance.initClock(contest.start_time, contest.finish_time);
         arenaInstance.initProblems(contest);
+        arenaInstance.initClock(contest.start_time, contest.finish_time);
         for (var idx in contest.problems) {
           var problem = contest.problems[idx];
           var problemName =
