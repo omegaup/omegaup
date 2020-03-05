@@ -264,12 +264,13 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test user cannot join the contest because he doesn't have registered
      * his basic profile information (country, state and school)
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    public function testUserNotAllowedJoinTheContest() {
+    public function testUserMissingBasicInformation() {
         // create a contest and its admin
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestAdmin,
+            'identity' => $contestIdentityAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
             'contestDirector' => $contestIdentityAdmin,
         ]));
@@ -282,14 +283,25 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Contestant will try to open the contest, it should fail
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         $contestantLogin = self::login($identity);
 
-        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $contestantLogin->auth_token,
-        ]));
+        try {
+            \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $contestantLogin->auth_token,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'contestBasicInformationNeeded',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -331,7 +343,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]));
 
-        $this->assertEquals($contest['status'], 'ok');
+        $this->assertEquals('ok', $contest['status']);
     }
 
     /**

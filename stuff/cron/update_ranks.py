@@ -42,44 +42,44 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
     logging.info('Updating accepted stats for problems...')
     cur.execute('''
         UPDATE
-            Problems p
+            `Problems` AS `p`
         SET
-            p.accepted = (
+            `p`.accepted = (
                 SELECT
-                    COUNT(DISTINCT s.identity_id)
+                    COUNT(DISTINCT `s`.`identity_id`)
                 FROM
-                    Submissions s
+                    `Submissions` AS `s`
                 INNER JOIN
-                    Runs r
+                    `Runs` AS `r`
                 ON
-                    r.run_id = s.current_run_id
+                    `r`.run_id = `s`.current_run_id
                 INNER JOIN
-                    Identities i
+                    `Identities` AS `i`
                 ON
-                    i.identity_id = s.identity_id
+                    `i`.`identity_id` = `s`.`identity_id`
                 INNER JOIN
-                    Users u
+                    `Users` AS `u`
                 ON
-                    u.user_id = i.user_id
+                    `u`.`user_id` = `i`.`user_id`
                 WHERE
-                    s.problem_id = p.problem_id AND r.verdict = 'AC'
+                    `s`.`problem_id` = `p`.`problem_id` AND `r`.verdict = 'AC'
                     AND NOT EXISTS (
                         SELECT
-                            pf.problem_id, pf.user_id
+                            `pf`.`problem_id`, `pf`.`user_id`
                         FROM
-                            Problems_Forfeited pf
+                            `Problems_Forfeited` AS `pf`
                         WHERE
-                            pf.problem_id = p.problem_id AND
-                            pf.user_id = u.user_id
+                            `pf`.`problem_id` = `p`.`problem_id` AND
+                            `pf`.`user_id` = `u`.`user_id`
                     )
                     AND NOT EXISTS (
                         SELECT
-                            a.acl_id
+                            `a`.`acl_id`
                         FROM
-                            ACLs a
+                            `ACLs` AS `a`
                         WHERE
-                            a.acl_id = p.acl_id AND
-                            a.owner_id = u.user_id
+                            `a`.`acl_id` = `p`.`acl_id` AND
+                            `a`.`owner_id` = `u`.`user_id`
                     )
             );
     ''')
@@ -92,62 +92,64 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     logging.info('Updating user rank...')
     cur.execute('''
         SELECT
-            i.username,
-            i.name,
-            i.country_id,
-            i.state_id,
-            isc.school_id,
-            up.identity_id,
-            i.user_id,
-            COUNT(p.problem_id) problems_solved_count,
-            SUM(ROUND(100 / LOG(2, p.accepted+1) , 0)) score
+            `i`.`username`,
+            `i`.`name`,
+            `i`.`country_id`,
+            `i`.`state_id`,
+            `isc`.`school_id`,
+            `up`.`identity_id`,
+            `i`.`user_id`,
+            COUNT(`p`.`problem_id`) AS `problems_solved_count`,
+            SUM(ROUND(100 / LOG(2, `p`.`accepted` + 1) , 0)) AS `score`
         FROM
         (
             SELECT DISTINCT
-                s.identity_id,
-                s.problem_id
+                `s`.`identity_id`,
+                `s`.`problem_id`
             FROM
-                Submissions s
+                `Submissions` AS `s`
             INNER JOIN
-                Runs r
+                `Runs` AS `r`
             ON
-                r.run_id = s.current_run_id
+                `r`.run_id = `s`.current_run_id
             WHERE
-                r.verdict = 'AC' AND s.type = 'normal'
+                `r`.verdict = 'AC' AND `s`.type = 'normal'
         ) AS up
         INNER JOIN
-            Problems p ON p.problem_id = up.problem_id AND p.visibility > 0
+            `Problems` AS `p`
+        ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            Identities i ON i.identity_id = up.identity_id
+            `Identities` AS `i` ON `i`.`identity_id` = up.`identity_id`
         LEFT JOIN
-            Identities_Schools isc
+            `Identities_Schools` AS `isc`
         ON
-            isc.identity_school_id = i.current_identity_school_id
+            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         INNER JOIN
-            Users u ON u.user_id = i.user_id
+            `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
         WHERE
-            u.is_private = 0
+            `u`.`is_private` = 0
             AND NOT EXISTS (
                 SELECT
-                    pf.problem_id, pf.user_id
+                    `pf`.`problem_id`, `pf`.`user_id`
                 FROM
-                    Problems_Forfeited pf
+                    `Problems_Forfeited` AS `pf`
                 WHERE
-                    pf.problem_id = p.problem_id AND pf.user_id = u.user_id
+                    `pf`.`problem_id` = `p`.`problem_id` AND
+                    `pf`.`user_id` = `u`.`user_id`
             )
             AND NOT EXISTS (
                 SELECT
-                    a.acl_id
+                    `a`.`acl_id`
                 FROM
-                    ACLs a
+                    `ACLs` AS `a`
                 WHERE
-                    a.acl_id = p.acl_id AND
-                    a.owner_id = u.user_id
+                    `a`.`acl_id` = `p`.`acl_id` AND
+                    `a`.`owner_id` = `u`.`user_id`
             )
         GROUP BY
-            identity_id
+            `identity_id`
         ORDER BY
-            score DESC;
+            `score` DESC;
     ''')
     prev_score = None
     rank = 0
@@ -161,9 +163,10 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
         prev_score = row['score']
         cur.execute('''
                     INSERT INTO
-                        User_Rank (user_id, rank, problems_solved_count, score,
-                                   username, name, country_id, state_id,
-                                   school_id)
+                        `User_Rank` (`user_id`, `rank`,
+                                     `problems_solved_count`, `score`,
+                                     `username`, `name`, `country_id`,
+                                     `state_id`, `school_id`)
                     VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
                     (row['user_id'], rank, row['problems_solved_count'],
                      row['score'], row['username'], row['name'],
@@ -191,7 +194,8 @@ def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
         # cutoffs towards higher scores.
         cur.execute('''
                     INSERT INTO
-                        User_Rank_Cutoffs (score, percentile, classname)
+                        `User_Rank_Cutoffs` (`score`, `percentile`,
+                                             `classname`)
                     VALUES(%s, %s, %s);''',
                     (scores[int(len(scores) * cutoff.percentile)],
                      cutoff.percentile, cutoff.classname))
@@ -203,37 +207,37 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     logging.info('Updating school rank...')
     cur.execute('''
         SELECT
-            s.school_id,
-            SUM(ROUND(100 / LOG(2, distinct_school_problems.accepted+1), 0))
-            AS score
+            `s`.`school_id`,
+            SUM(ROUND(100 / LOG(2, `distinct_school_problems`.accepted+1), 0))
+            AS `score`
         FROM
-            Schools s
+            `Schools` AS `s`
         INNER JOIN
             (
                 SELECT
-                    su.school_id,
-                    p.accepted,
-                    MIN(su.time)
+                    `su`.`school_id`,
+                    `p`.accepted,
+                    MIN(`su`.time)
                 FROM
-                    Submissions su
+                    `Submissions` AS `su`
                 INNER JOIN
-                    Runs r ON r.run_id = su.current_run_id
+                    `Runs` AS `r` ON `r`.run_id = `su`.current_run_id
                 INNER JOIN
-                    Problems p ON p.problem_id = su.problem_id
+                    `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
                 WHERE
-                    r.verdict = "AC"
-                    AND p.visibility >= 1
-                    AND su.school_id IS NOT NULL
+                    `r`.verdict = "AC"
+                    AND `p`.visibility >= 1
+                    AND `su`.`school_id` IS NOT NULL
                 GROUP BY
-                    su.school_id,
-                    su.problem_id
-            ) AS distinct_school_problems
+                    `su`.`school_id`,
+                    `su`.`problem_id`
+            ) AS `distinct_school_problems`
         ON
-            distinct_school_problems.school_id = s.school_id
+            `distinct_school_problems`.`school_id` = `s`.`school_id`
         GROUP BY
-            s.school_id
+            `s`.`school_id`
         ORDER BY
-            score DESC;
+            `score` DESC;
     ''')
     prev_score = None
     rank = 0
@@ -244,12 +248,12 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
         prev_score = row['score']
         cur.execute('''
                         UPDATE
-                            Schools as s
+                            `Schools` AS `s`
                         SET
-                            s.score = %s,
-                            s.rank = %s
+                            `s`.`score` = %s,
+                            `s`.`rank` = %s
                         WHERE
-                            s.school_id = %s;
+                            `s`.`school_id` = %s;
                     ''',
                     (row['score'], rank, row['school_id']))
 
