@@ -228,7 +228,7 @@ abstract class ProblemsetIdentityRequestHistory {
     ): int {
         $sql = '
             INSERT INTO
-                Problemset_Identity_Request_History (
+                `Problemset_Identity_Request_History` (
                     `identity_id`,
                     `problemset_id`,
                     `time`,

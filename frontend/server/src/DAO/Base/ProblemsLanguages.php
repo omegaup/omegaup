@@ -171,7 +171,7 @@ abstract class ProblemsLanguages {
     ): int {
         $sql = '
             INSERT INTO
-                Problems_Languages (
+                `Problems_Languages` (
                     `problem_id`,
                     `language_id`
                 ) VALUES (

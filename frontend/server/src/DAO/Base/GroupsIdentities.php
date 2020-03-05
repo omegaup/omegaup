@@ -301,7 +301,7 @@ abstract class GroupsIdentities {
     ): int {
         $sql = '
             INSERT INTO
-                Groups_Identities (
+                `Groups_Identities` (
                     `group_id`,
                     `identity_id`,
                     `share_user_information`,

@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
+        $sql = 'SELECT `g`.* FROM `Groups` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);

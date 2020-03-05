@@ -260,7 +260,7 @@ abstract class ProblemViewed {
     ): int {
         $sql = '
             INSERT INTO
-                Problem_Viewed (
+                `Problem_Viewed` (
                     `problem_id`,
                     `identity_id`,
                     `view_time`
