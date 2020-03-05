@@ -4,7 +4,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;
     private static $curatorIdentity = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
