@@ -158,11 +158,11 @@ def test_user_ranking_contest(driver):
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     '//a[@href = "#list-current-contest"]'))).click()
+                     '//a[contains(concat(" ", normalize-space(@class), " "), '
+                     '" tab-current ")]'))).click()
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR,
-                     '#current-contests a[href="/arena/%s"]' %
+                    (By.CSS_SELECTOR, 'a[href="/arena/%s/"]' %
                      contest_alias))).click()
 
         driver.wait.until(
@@ -469,25 +469,25 @@ def enter_contest(driver, contest_alias):
                        '/li[contains(@class, "active")]')))
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//a[contains(@href, "#list-past-contest")]'))).click()
+            (By.XPATH, '//a[contains(concat(" ", normalize-space(@class), " '
+             '"), " tab-past ")]'))).click()
     driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#list-past-contest')))
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '.list-past')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//a[contains(@href, "#list-current-contest")]'))).click()
+            (By.XPATH, '//a[contains(concat(" ", normalize-space(@class), " "'
+             '), " tab-current ")]'))).click()
     driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#list-current-contest')))
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '.list-current')))
 
-    contest_url = '/arena/%s' % contest_alias
+    contest_url = '/arena/%s/' % contest_alias
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR,
-                 '#current-contests a[href="%s"]' % contest_url))).click()
+                (By.XPATH,
+                 '//div[contains(concat(" ", normalize-space(@class), " "), " '
+                 'list-current ")]//a[@href="%s"]' % contest_url))).click()
     assert (contest_url in
             driver.browser.current_url), driver.browser.current_url
 
