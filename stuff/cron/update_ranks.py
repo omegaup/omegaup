@@ -276,91 +276,92 @@ def update_school_of_the_month_candidates(
             1)
 
     # First make sure there are not already selected schools of the month
-    cur.execute(
-        '''
-        SELECT
-            COUNT(*) as count
-        FROM
-            School_Of_The_Month
-        WHERE
-            time = %s AND
-            selected_by IS NOT NULL;
-        ''',
-        (first_day_of_next_month,))
+    cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `School_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL;
+                ''',
+                (first_day_of_next_month,))
 
     for row in cur:
         if row['count'] > 0:
             logging.info('Skipping because already exist selected schools.')
             return
 
-    cur.execute(
-        '''
-        DELETE FROM
-            School_Of_The_Month
-        WHERE
-            time = %s;
-        ''',
-        (first_day_of_next_month,))
+    cur.execute('''
+                DELETE FROM
+                    `School_Of_The_Month`
+                WHERE
+                    `time` = %s;
+                ''',
+                (first_day_of_next_month,))
 
     cur.execute(
         '''
         SELECT
-                s.school_id,
-                IFNULL(
-                    SUM(
-                        ROUND(
-                            100 / LOG(2, distinct_school_problems.accepted+1),
-                            0
-                        )
-                    ),
-                    0.0
-                ) AS score
-            FROM
-                Schools s
-            INNER JOIN
-                (
-                    SELECT
-                        su.school_id,
-                        p.accepted,
-                        MIN(su.time) AS first_ac_time
-                    FROM
-                        Submissions su
-                    INNER JOIN
-                        Runs r ON r.run_id = su.current_run_id
-                    INNER JOIN
-                        Problems p ON p.problem_id = su.problem_id
-                    WHERE
-                        r.verdict = "AC"
-                        AND p.visibility >= 1
-                        AND su.school_id IS NOT NULL
-                    GROUP BY
-                        su.school_id,
-                        su.problem_id
-                    HAVING
-                        first_ac_time BETWEEN %s AND %s
-                ) AS distinct_school_problems
-            ON
-                distinct_school_problems.school_id = s.school_id
-            WHERE
-                NOT EXISTS (
-                    SELECT
-                        sotm.school_id,
-                        MAX(time) latest_time
-                    FROM
-                        School_Of_The_Month as sotm
-                    WHERE
-                        sotm.school_id = s.school_id
-                        AND (sotm.selected_by IS NOT NULL OR sotm.rank = 1)
-                    GROUP BY
-                        sotm.school_id
-                    HAVING
-                        DATE_ADD(latest_time, INTERVAL 1 YEAR) >= %s
-                )
-            GROUP BY
-                s.school_id
-            ORDER BY
-                score DESC
-            LIMIT 100;
+            `s`.`school_id`,
+            IFNULL(
+                SUM(
+                    ROUND(
+                        100 / LOG(2, `distinct_school_problems`.`accepted`+1),
+                        0
+                    )
+                ),
+                0.0
+            ) AS `score`
+        FROM
+            `Schools` AS `s`
+        INNER JOIN
+            (
+                SELECT
+                    `su`.`school_id`,
+                    `p`.`accepted`,
+                    MIN(`su`.`time`) AS `first_ac_time`
+                FROM
+                    `Submissions` AS `su`
+                INNER JOIN
+                    `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
+                INNER JOIN
+                    `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+                WHERE
+                    `r`.`verdict` = "AC"
+                    AND `p`.`visibility` >= 1
+                    AND `su`.`school_id` IS NOT NULL
+                GROUP BY
+                    `su`.`school_id`,
+                    `su`.`problem_id`
+                HAVING
+                    `first_ac_time` BETWEEN %s AND %s
+            ) AS `distinct_school_problems`
+        ON
+            `distinct_school_problems`.`school_id` = `s`.`school_id`
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    `sotm`.`school_id`,
+                    MAX(`time`) AS `latest_time`
+                FROM
+                    `School_Of_The_Month` AS `sotm`
+                WHERE
+                    `sotm`.`school_id` = `s`.`school_id`
+                    AND (
+                        `sotm`.`selected_by` IS NOT NULL OR
+                        `sotm`.`rank` = 1
+                    )
+                GROUP BY
+                    `sotm`.`school_id`
+                HAVING
+                    DATE_ADD(`latest_time`, INTERVAL 1 YEAR) >= %s
+            )
+        GROUP BY
+            `s`.`school_id`
+        ORDER BY
+            `score` DESC
+        LIMIT 100;
         ''',
         (
             first_day_of_current_month,
@@ -370,19 +371,19 @@ def update_school_of_the_month_candidates(
 
     for index, row in enumerate(cur):
         cur.execute('''
-                        INSERT INTO
-                            School_Of_The_Month (
-                                school_id,
-                                time,
-                                rank,
-                                score
-                            )
-                        VALUES (
-                            %s,
-                            %s,
-                            %s,
-                            %s
-                        );
+                    INSERT INTO
+                        `School_Of_The_Month` (
+                            `school_id`,
+                            `time`,
+                            `rank`,
+                            `score`
+                        )
+                    VALUES (
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    );
                     ''',
                     (
                         row['school_id'],

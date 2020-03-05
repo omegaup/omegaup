@@ -393,18 +393,17 @@ class School extends \OmegaUp\Controllers\Controller {
             $firstDay
         );
 
-        $schoolOfTheMonthId = null;
         if (empty($schoolsOfTheMonth)) {
             return [
                 'schoolinfo' => null,
             ];
-        } else {
-            $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
-            foreach ($schoolsOfTheMonth as $school) {
-                if (isset($school->selected_by)) {
-                    $schoolOfTheMonthId = $school->school_id;
-                    break;
-                }
+        }
+
+        $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
+        foreach ($schoolsOfTheMonth as $school) {
+            if (isset($school->selected_by)) {
+                $schoolOfTheMonthId = $school->school_id;
+                break;
             }
         }
 
