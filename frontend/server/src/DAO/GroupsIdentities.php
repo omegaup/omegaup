@@ -114,7 +114,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 group_id = ?;';
 
         $groupsIdentities = [];
-        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
+        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, is_invited: bool, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

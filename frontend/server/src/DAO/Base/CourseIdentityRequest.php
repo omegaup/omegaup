@@ -9,19 +9,19 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** ProblemsetProblemOpened Data Access Object (DAO) Base.
+/** CourseIdentityRequest Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}.
+ * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
  * @access public
  * @abstract
  */
-abstract class ProblemsetProblemOpened {
+abstract class CourseIdentityRequest {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,40 +30,48 @@ abstract class ProblemsetProblemOpened {
      * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
      * llave primaria están vacías.
      *
-     * @param \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}.
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(
-        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         if (
-            empty($Problemset_Problem_Opened->problemset_id) ||
-            empty($Problemset_Problem_Opened->problem_id) ||
-            empty($Problemset_Problem_Opened->identity_id)
+            empty($Course_Identity_Request->identity_id) ||
+            empty($Course_Identity_Request->course_id)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = '
             REPLACE INTO
-                Problemset_Problem_Opened (
-                    `problemset_id`,
-                    `problem_id`,
+                Course_Identity_Request (
                     `identity_id`,
-                    `open_time`
+                    `course_id`,
+                    `request_time`,
+                    `last_update`,
+                    `accepted`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
                     ?
                 );';
         $params = [
-            $Problemset_Problem_Opened->problemset_id,
-            $Problemset_Problem_Opened->problem_id,
-            $Problemset_Problem_Opened->identity_id,
+            $Course_Identity_Request->identity_id,
+            $Course_Identity_Request->course_id,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Problemset_Problem_Opened->open_time
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
+            ),
+            (
+                !is_null($Course_Identity_Request->accepted) ?
+                intval($Course_Identity_Request->accepted) :
+                null
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -73,42 +81,46 @@ abstract class ProblemsetProblemOpened {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened a actualizar.
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El objeto de tipo CourseIdentityRequest a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         $sql = '
             UPDATE
-                `Problemset_Problem_Opened`
+                `Course_Identity_Request`
             SET
-                `open_time` = ?
+                `request_time` = ?,
+                `last_update` = ?,
+                `accepted` = ?
             WHERE
                 (
-                    `problemset_id` = ? AND
-                    `problem_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 );';
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Problemset_Problem_Opened->open_time
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
             ),
             (
-                is_null($Problemset_Problem_Opened->problemset_id) ?
+                is_null($Course_Identity_Request->accepted) ?
                 null :
-                intval($Problemset_Problem_Opened->problemset_id)
+                intval($Course_Identity_Request->accepted)
             ),
             (
-                is_null($Problemset_Problem_Opened->problem_id) ?
+                is_null($Course_Identity_Request->identity_id) ?
                 null :
-                intval($Problemset_Problem_Opened->problem_id)
+                intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->identity_id) ?
+                is_null($Course_Identity_Request->course_id) ?
                 null :
-                intval($Problemset_Problem_Opened->identity_id)
+                intval($Course_Identity_Request->course_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -116,48 +128,47 @@ abstract class ProblemsetProblemOpened {
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\CourseIdentityRequest} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\ProblemsetProblemOpened Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\CourseIdentityRequest Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        ?int $problemset_id,
-        ?int $problem_id,
-        ?int $identity_id
-    ): ?\OmegaUp\DAO\VO\ProblemsetProblemOpened {
+        ?int $identity_id,
+        ?int $course_id
+    ): ?\OmegaUp\DAO\VO\CourseIdentityRequest {
         $sql = '
             SELECT
-                `Problemset_Problem_Opened`.`problemset_id`,
-                `Problemset_Problem_Opened`.`problem_id`,
-                `Problemset_Problem_Opened`.`identity_id`,
-                `Problemset_Problem_Opened`.`open_time`
+                `Course_Identity_Request`.`identity_id`,
+                `Course_Identity_Request`.`course_id`,
+                `Course_Identity_Request`.`request_time`,
+                `Course_Identity_Request`.`last_update`,
+                `Course_Identity_Request`.`accepted`
             FROM
-                `Problemset_Problem_Opened`
+                `Course_Identity_Request`
             WHERE
                 (
-                    `problemset_id` = ? AND
-                    `problem_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 )
             LIMIT 1;';
-        $params = [$problemset_id, $problem_id, $identity_id];
+        $params = [$identity_id, $course_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\ProblemsetProblemOpened($row);
+        return new \OmegaUp\DAO\VO\CourseIdentityRequest($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -166,28 +177,26 @@ abstract class ProblemsetProblemOpened {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened El
-     * objeto de tipo \OmegaUp\DAO\VO\ProblemsetProblemOpened a eliminar
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo \OmegaUp\DAO\VO\CourseIdentityRequest a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): void {
         $sql = '
             DELETE FROM
-                `Problemset_Problem_Opened`
+                `Course_Identity_Request`
             WHERE
                 (
-                    `problemset_id` = ? AND
-                    `problem_id` = ? AND
-                    `identity_id` = ?
+                    `identity_id` = ? AND
+                    `course_id` = ?
                 );';
         $params = [
-            $Problemset_Problem_Opened->problemset_id,
-            $Problemset_Problem_Opened->problem_id,
-            $Problemset_Problem_Opened->identity_id
+            $Course_Identity_Request->identity_id,
+            $Course_Identity_Request->course_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -201,7 +210,7 @@ abstract class ProblemsetProblemOpened {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}.
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -212,8 +221,8 @@ abstract class ProblemsetProblemOpened {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\ProblemsetProblemOpened> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}.
+     * @return list<\OmegaUp\DAO\VO\CourseIdentityRequest> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequest}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -223,12 +232,13 @@ abstract class ProblemsetProblemOpened {
     ): array {
         $sql = '
             SELECT
-                `Problemset_Problem_Opened`.`problemset_id`,
-                `Problemset_Problem_Opened`.`problem_id`,
-                `Problemset_Problem_Opened`.`identity_id`,
-                `Problemset_Problem_Opened`.`open_time`
+                `Course_Identity_Request`.`identity_id`,
+                `Course_Identity_Request`.`course_id`,
+                `Course_Identity_Request`.`request_time`,
+                `Course_Identity_Request`.`last_update`,
+                `Course_Identity_Request`.`accepted`
             FROM
-                `Problemset_Problem_Opened`
+                `Course_Identity_Request`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -250,7 +260,7 @@ abstract class ProblemsetProblemOpened {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsetProblemOpened(
+            $allData[] = new \OmegaUp\DAO\VO\CourseIdentityRequest(
                 $row
             );
         }
@@ -261,27 +271,29 @@ abstract class ProblemsetProblemOpened {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+        \OmegaUp\DAO\VO\CourseIdentityRequest $Course_Identity_Request
     ): int {
         $sql = '
             INSERT INTO
-                `Problemset_Problem_Opened` (
-                    `problemset_id`,
-                    `problem_id`,
+                `Course_Identity_Request` (
                     `identity_id`,
-                    `open_time`
+                    `course_id`,
+                    `request_time`,
+                    `last_update`,
+                    `accepted`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -289,22 +301,25 @@ abstract class ProblemsetProblemOpened {
                 );';
         $params = [
             (
-                is_null($Problemset_Problem_Opened->problemset_id) ?
+                is_null($Course_Identity_Request->identity_id) ?
                 null :
-                intval($Problemset_Problem_Opened->problemset_id)
+                intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->problem_id) ?
+                is_null($Course_Identity_Request->course_id) ?
                 null :
-                intval($Problemset_Problem_Opened->problem_id)
-            ),
-            (
-                is_null($Problemset_Problem_Opened->identity_id) ?
-                null :
-                intval($Problemset_Problem_Opened->identity_id)
+                intval($Course_Identity_Request->course_id)
             ),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Problemset_Problem_Opened->open_time
+                $Course_Identity_Request->request_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Course_Identity_Request->last_update
+            ),
+            (
+                is_null($Course_Identity_Request->accepted) ?
+                null :
+                intval($Course_Identity_Request->accepted)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

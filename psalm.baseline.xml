@@ -111,7 +111,6 @@
       <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset</code>
-      <code>$problemsetProblem-&gt;version</code>
       <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$contest-&gt;problemset_id</code>

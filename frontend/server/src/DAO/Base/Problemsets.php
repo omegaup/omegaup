@@ -250,7 +250,7 @@ abstract class Problemsets {
     ): int {
         $sql = '
             INSERT INTO
-                Problemsets (
+                `Problemsets` (
                     `acl_id`,
                     `access_mode`,
                     `languages`,

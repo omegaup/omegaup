@@ -9,132 +9,109 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** Assignments Data Access Object (DAO) Base.
+/** CourseIdentityRequestHistory Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\Assignments}.
+ * {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}.
  * @access public
  * @abstract
  */
-abstract class Assignments {
+abstract class CourseIdentityRequestHistory {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\Assignments $Assignments El objeto de tipo Assignments a actualizar.
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History El objeto de tipo CourseIdentityRequestHistory a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\Assignments $Assignments
+        \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History
     ): int {
         $sql = '
             UPDATE
-                `Assignments`
+                `Course_Identity_Request_History`
             SET
+                `identity_id` = ?,
                 `course_id` = ?,
-                `problemset_id` = ?,
-                `acl_id` = ?,
-                `name` = ?,
-                `description` = ?,
-                `alias` = ?,
-                `publish_time_delay` = ?,
-                `assignment_type` = ?,
-                `start_time` = ?,
-                `finish_time` = ?,
-                `max_points` = ?,
-                `order` = ?
+                `time` = ?,
+                `accepted` = ?,
+                `admin_id` = ?
             WHERE
                 (
-                    `assignment_id` = ?
+                    `history_id` = ?
                 );';
         $params = [
             (
-                is_null($Assignments->course_id) ?
+                is_null($Course_Identity_Request_History->identity_id) ?
                 null :
-                intval($Assignments->course_id)
+                intval($Course_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Assignments->problemset_id) ?
+                is_null($Course_Identity_Request_History->course_id) ?
                 null :
-                intval($Assignments->problemset_id)
-            ),
-            (
-                is_null($Assignments->acl_id) ?
-                null :
-                intval($Assignments->acl_id)
-            ),
-            $Assignments->name,
-            $Assignments->description,
-            $Assignments->alias,
-            (
-                is_null($Assignments->publish_time_delay) ?
-                null :
-                intval($Assignments->publish_time_delay)
-            ),
-            $Assignments->assignment_type,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Assignments->start_time
+                intval($Course_Identity_Request_History->course_id)
             ),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Assignments->finish_time
+                $Course_Identity_Request_History->time
             ),
-            floatval($Assignments->max_points),
-            intval($Assignments->order),
-            intval($Assignments->assignment_id),
+            (
+                is_null($Course_Identity_Request_History->accepted) ?
+                null :
+                intval($Course_Identity_Request_History->accepted)
+            ),
+            (
+                is_null($Course_Identity_Request_History->admin_id) ?
+                null :
+                intval($Course_Identity_Request_History->admin_id)
+            ),
+            intval($Course_Identity_Request_History->history_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\Assignments} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Assignments}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\Assignments Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\Assignments} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\CourseIdentityRequestHistory Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        int $assignment_id
-    ): ?\OmegaUp\DAO\VO\Assignments {
+        int $history_id
+    ): ?\OmegaUp\DAO\VO\CourseIdentityRequestHistory {
         $sql = '
             SELECT
-                `Assignments`.`assignment_id`,
-                `Assignments`.`course_id`,
-                `Assignments`.`problemset_id`,
-                `Assignments`.`acl_id`,
-                `Assignments`.`name`,
-                `Assignments`.`description`,
-                `Assignments`.`alias`,
-                `Assignments`.`publish_time_delay`,
-                `Assignments`.`assignment_type`,
-                `Assignments`.`start_time`,
-                `Assignments`.`finish_time`,
-                `Assignments`.`max_points`,
-                `Assignments`.`order`
+                `Course_Identity_Request_History`.`history_id`,
+                `Course_Identity_Request_History`.`identity_id`,
+                `Course_Identity_Request_History`.`course_id`,
+                `Course_Identity_Request_History`.`time`,
+                `Course_Identity_Request_History`.`accepted`,
+                `Course_Identity_Request_History`.`admin_id`
             FROM
-                `Assignments`
+                `Course_Identity_Request_History`
             WHERE
                 (
-                    `assignment_id` = ?
+                    `history_id` = ?
                 )
             LIMIT 1;';
-        $params = [$assignment_id];
+        $params = [$history_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\Assignments($row);
+        return new \OmegaUp\DAO\VO\CourseIdentityRequestHistory($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\Assignments} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -143,24 +120,24 @@ abstract class Assignments {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\Assignments $Assignments El
-     * objeto de tipo \OmegaUp\DAO\VO\Assignments a eliminar
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History El
+     * objeto de tipo \OmegaUp\DAO\VO\CourseIdentityRequestHistory a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\Assignments $Assignments
+        \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History
     ): void {
         $sql = '
             DELETE FROM
-                `Assignments`
+                `Course_Identity_Request_History`
             WHERE
                 (
-                    `assignment_id` = ?
+                    `history_id` = ?
                 );';
         $params = [
-            $Assignments->assignment_id
+            $Course_Identity_Request_History->history_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -174,7 +151,7 @@ abstract class Assignments {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\Assignments}.
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -185,8 +162,8 @@ abstract class Assignments {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\Assignments> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\Assignments}.
+     * @return list<\OmegaUp\DAO\VO\CourseIdentityRequestHistory> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -196,21 +173,14 @@ abstract class Assignments {
     ): array {
         $sql = '
             SELECT
-                `Assignments`.`assignment_id`,
-                `Assignments`.`course_id`,
-                `Assignments`.`problemset_id`,
-                `Assignments`.`acl_id`,
-                `Assignments`.`name`,
-                `Assignments`.`description`,
-                `Assignments`.`alias`,
-                `Assignments`.`publish_time_delay`,
-                `Assignments`.`assignment_type`,
-                `Assignments`.`start_time`,
-                `Assignments`.`finish_time`,
-                `Assignments`.`max_points`,
-                `Assignments`.`order`
+                `Course_Identity_Request_History`.`history_id`,
+                `Course_Identity_Request_History`.`identity_id`,
+                `Course_Identity_Request_History`.`course_id`,
+                `Course_Identity_Request_History`.`time`,
+                `Course_Identity_Request_History`.`accepted`,
+                `Course_Identity_Request_History`.`admin_id`
             FROM
-                `Assignments`
+                `Course_Identity_Request_History`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -232,7 +202,7 @@ abstract class Assignments {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\Assignments(
+            $allData[] = new \OmegaUp\DAO\VO\CourseIdentityRequestHistory(
                 $row
             );
         }
@@ -243,42 +213,28 @@ abstract class Assignments {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\Assignments}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\Assignments $Assignments El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Assignments}
+     * @param \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\CourseIdentityRequestHistory}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\Assignments $Assignments
+        \OmegaUp\DAO\VO\CourseIdentityRequestHistory $Course_Identity_Request_History
     ): int {
         $sql = '
             INSERT INTO
-                `Assignments` (
+                `Course_Identity_Request_History` (
+                    `identity_id`,
                     `course_id`,
-                    `problemset_id`,
-                    `acl_id`,
-                    `name`,
-                    `description`,
-                    `alias`,
-                    `publish_time_delay`,
-                    `assignment_type`,
-                    `start_time`,
-                    `finish_time`,
-                    `max_points`,
-                    `order`
+                    `time`,
+                    `accepted`,
+                    `admin_id`
                 ) VALUES (
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -287,44 +243,35 @@ abstract class Assignments {
                 );';
         $params = [
             (
-                is_null($Assignments->course_id) ?
+                is_null($Course_Identity_Request_History->identity_id) ?
                 null :
-                intval($Assignments->course_id)
+                intval($Course_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Assignments->problemset_id) ?
+                is_null($Course_Identity_Request_History->course_id) ?
                 null :
-                intval($Assignments->problemset_id)
-            ),
-            (
-                is_null($Assignments->acl_id) ?
-                null :
-                intval($Assignments->acl_id)
-            ),
-            $Assignments->name,
-            $Assignments->description,
-            $Assignments->alias,
-            (
-                is_null($Assignments->publish_time_delay) ?
-                null :
-                intval($Assignments->publish_time_delay)
-            ),
-            $Assignments->assignment_type,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Assignments->start_time
+                intval($Course_Identity_Request_History->course_id)
             ),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $Assignments->finish_time
+                $Course_Identity_Request_History->time
             ),
-            floatval($Assignments->max_points),
-            intval($Assignments->order),
+            (
+                is_null($Course_Identity_Request_History->accepted) ?
+                null :
+                intval($Course_Identity_Request_History->accepted)
+            ),
+            (
+                is_null($Course_Identity_Request_History->admin_id) ?
+                null :
+                intval($Course_Identity_Request_History->admin_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Assignments->assignment_id = (
+        $Course_Identity_Request_History->history_id = (
             \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
         );
 

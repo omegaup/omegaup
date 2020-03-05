@@ -138,10 +138,7 @@ class InterviewCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     *
      * Only site-admins and interviewers can create interviews for now
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testOnlyInterviewersCanCreateInterviews() {
         $r = new \OmegaUp\Request();
@@ -150,11 +147,16 @@ class InterviewCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $interviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'title' => 'My fourth interview',
-            'alias' => 'my-fourth-interview',
-            'duration' => 60,
-        ]));
+        try {
+            \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'title' => 'My fourth interview',
+                'alias' => 'my-fourth-interview',
+                'duration' => 60,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 }

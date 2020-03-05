@@ -260,7 +260,7 @@ abstract class Users {
     ): int {
         $sql = '
             INSERT INTO
-                Users (
+                `Users` (
                     `facebook_user_id`,
                     `git_token`,
                     `main_email_id`,

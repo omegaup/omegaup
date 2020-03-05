@@ -202,7 +202,7 @@ abstract class Emails {
     ): int {
         $sql = '
             INSERT INTO
-                Emails (
+                `Emails` (
                     `email`,
                     `user_id`
                 ) VALUES (
