@@ -383,8 +383,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns the first school of the previous month or the one selected by
-     * the mentor, if it has already been stored. Otherwise, calculates and
-     * saves the new schools of the month, and returns the first one of them.
+     * the mentor, if it has already been stored.
      *
      * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
      */
@@ -393,32 +392,12 @@ class School extends \OmegaUp\Controllers\Controller {
         $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTimeAndSelected(
             $firstDay
         );
-        if (empty($schoolsOfTheMonth)) {
-            // Calculate and store new schools of the month
-            $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
-            if (empty($schools)) {
-                return [
-                    'schoolinfo' => null,
-                ];
-            }
 
-            try {
-                \OmegaUp\DAO\DAO::transBegin();
-                $schoolOfTheMonthId = $schools[0]['school_id'];
-                foreach ($schools as $index => $school) {
-                    \OmegaUp\DAO\SchoolOfTheMonth::create(
-                        new \OmegaUp\DAO\VO\SchoolOfTheMonth([
-                            'school_id' => $school['school_id'],
-                            'time' => $firstDay,
-                            'rank' => $index + 1,
-                        ])
-                    );
-                }
-                \OmegaUp\DAO\DAO::transEnd();
-            } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
-                throw $e;
-            }
+        $schoolOfTheMonthId = null;
+        if (empty($schoolsOfTheMonth)) {
+            return [
+                'schoolinfo' => null,
+            ];
         } else {
             $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
             foreach ($schoolsOfTheMonth as $school) {
