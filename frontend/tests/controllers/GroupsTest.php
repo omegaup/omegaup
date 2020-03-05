@@ -53,7 +53,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Group creation should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals($e->getMessage(), 'aliasInUse');
+            $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
 
@@ -81,8 +81,6 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Add user to group
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddUserToGroupNotOwned() {
         $group = GroupsFactory::createGroup();
@@ -90,11 +88,16 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $userCalling, 'identity' => $identityCalling] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identityCalling);
-        $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $group['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $group['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
@@ -123,36 +126,43 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Remove user from group test
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveUserFromGroupUserNotInGroup() {
         $groupData = GroupsFactory::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($groupData['owner']);
-        \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $groupData['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $groupData['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('User', $e->parameter);
+        }
     }
 
     /**
      * Remove user from group test
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveUserFromGroupUserNotOwner() {
         $groupData = GroupsFactory::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $groupData['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $groupData['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
@@ -275,8 +285,6 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Adding a contest to a scoreboard not being contest admin
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddContestToScoreboardNoContestAdmin() {
         $groupData = GroupsFactory::createGroup();
@@ -288,12 +296,17 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($groupData['owner']);
-        \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'group_alias' => $groupData['request']['alias'],
-            'scoreboard_alias' => $scoreboardData['request']['alias'],
-            'contest_alias' => $contestData['request']['alias']
-        ]));
+        try {
+            \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'group_alias' => $groupData['request']['alias'],
+                'scoreboard_alias' => $scoreboardData['request']['alias'],
+                'contest_alias' => $contestData['request']['alias']
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
