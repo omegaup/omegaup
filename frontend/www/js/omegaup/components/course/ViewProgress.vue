@@ -50,10 +50,11 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
-import AsyncComputed from 'vue-async-computed';
+import AsyncComputedPlugin from 'vue-async-computed';
+import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
 
-Vue.use(AsyncComputed);
+Vue.use(AsyncComputedPlugin);
 
 function escapeCsv(cell: any): string {
   if (typeof cell === 'undefined') {
@@ -174,6 +175,7 @@ export default class CourseViewProgress extends Vue {
     return `${this.course.alias}.ods`;
   }
 
+  @AsyncComputed()
   async odsDataUrl(): Promise<string> {
     let zip = new JSZip();
     zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
