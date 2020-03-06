@@ -15,12 +15,12 @@
 
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormLanguages }}</label>
-        <select name="languages" class="form-control">
+        <select name="languages" class="form-control" v-model="languages">
           <option
             v-for="(languageText, languageIndex) in validLanguages"
             v-bind:value="languageIndex"
-            v-bind:selected="languageIndex === languages"
-            >{{ languageText }}</option
+          >
+            {{ languageText }}</option
           >
         </select>
       </div>
@@ -120,23 +120,28 @@ export default class ProblemValidator extends Vue {
   @Prop() inputLimit!: number;
   @Prop() overallWallTimeLimit!: number;
   @Prop() validatorTimeLimit!: number;
-  @Prop() languages!: string;
+  @Prop() initialLanguage!: string;
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
   @Prop() validatorsTypes!: Array<string>;
 
   T = T;
   UI = UI;
-  validatorSave="";
 
-  get validator(): string{
-      return this.initialValidator;
+  get validator(): string {
+    return this.initialValidator;
   }
 
-  
-  set validator(validator : string) {
-    this.validatorSave = validator;
+  set validator(validator: string) {
+    this.initialValidator = validator;
   }
-  
+
+  get languages(): string {
+    return this.initialLanguage;
+  }
+
+  set languages(language: string) {
+    this.initialLanguage = language;
+  }
 }
 </script>

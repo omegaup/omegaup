@@ -3856,21 +3856,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    /**
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
-     */
-    public static function getProblemEditDetailsForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-        // HACK to prevent fails in validateCreateOrUpdate
-        $r['problem_alias'] = strval($r['problem']);
-
-        $problemParams = self::convertRequestToProblemParams(
-            $r,
-            /*$isRequired=*/ false
-        );
-        $validatorsTypes = [
+    public static function getCommonPayloadForSmarty(): array {
+        $validatorTypes = [
             \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
                 'problemEditFormTokenCaseless'
             ),
@@ -3892,7 +3879,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $validLanguages = [
             join(
                 ',',
-                $sortedLanguages
+                \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
             ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
             'kj,kp' => 'Karel',
             'cat' => \OmegaUp\Translations::getInstance()->get(
@@ -3902,18 +3889,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'wordsNoSubmissions'
             ),
         ];
+        return [
+          'validatorsTypes' => $validatorTypes,
+          'validLanguages' => $validLanguages,
+        ];
+    }
+
+    /**
+     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
+     */
+    public static function getProblemEditDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        // HACK to prevent fails in validateCreateOrUpdate
+        $r['problem_alias'] = strval($r['problem']);
+
+        $problemParams = self::convertRequestToProblemParams(
+            $r,
+            /*$isRequired=*/ false
+        );
         if (!isset($r['request'])) {
+            print_r($r['request']);
             return [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
                 'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
-                'LANGUAGES' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-                'payload' => [
-                    'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-                    'validLanguages' => $validLanguages,
-                    'validatorsTypes' => $validatorsTypes,
-                ],
+                'payload' =>
+                    self::getCommonPayloadForSmarty()
+                ,
             ];
         }
         // Validate commit message.
@@ -3936,16 +3941,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 } else {
                     $statusError = $response['error'];
                 }
+                print_r($r['request']);
                 return [
                     'IS_UPDATE' => true,
                     'LOAD_MATHJAX' => true,
                     'LOAD_PAGEDOWN' => true,
                     'STATUS_ERROR' => $statusError,
-                    'payload' => [
-                        'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-                        'validLanguages' => $validLanguages,
-                        'validatorsTypes' => $validatorsTypes,
-                    ],
+                    'payload' =>
+                        self::getCommonPayloadForSmarty()
+                    ,
                 ];
             }
         } elseif ($r['request'] === 'markdown') {
@@ -3985,55 +3989,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
-            'payload' => [
-                'languages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
-                'validLanguages' => $validLanguages,
-                'validatorsTypes' => $validatorsTypes,
-            ]
+            'payload' =>
+                self::getCommonPayloadForSmarty()
+            ,
         ];
     }
 
     /**
      *
      * @param \OmegaUp\Request $r The request object.
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: array{string}|string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array{extraWallTime: int, inputLimit: int, languages: string, memoryLimit: int, outputLimit: int, overallWallTimeLimit: int, timeLimit: int, validLanguages: non-empty-array<string, string>, validator: string, validatorTimeLimit: int, validatorsTypes: array{custom: null|string, literal: null|string, token-caseless: null|string, token-numeric: null|string, token: null|string}}}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array<array-key, mixed>}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        $validatorsTypes = [
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
-                'problemEditFormTokenCaseless'
-            ),
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC => \OmegaUp\Translations::getInstance()->get(
-                'problemEditFormNumericTokensWithTolerance'
-            ),
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN => \OmegaUp\Translations::getInstance()->get(
-                'problemEditFormTokenByToken'
-            ),
-            \OmegaUp\ProblemParams::VALIDATOR_LITERAL => \OmegaUp\Translations::getInstance()->get(
-                'problemEditFormLiteral'
-            ),
-            \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
-                'problemEditFormCustom'
-            ),
-        ];
-        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
-        sort($sortedLanguages);
-        $validLanguages = [
-            join(
-                ',',
-                $sortedLanguages
-            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
-            'kj,kp' => 'Karel',
-            'cat' => \OmegaUp\Translations::getInstance()->get(
-                'wordsJustOutput'
-            ),
-            '' => \OmegaUp\Translations::getInstance()->get(
-                'wordsNoSubmissions'
-            ),
-        ];
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
@@ -4066,19 +4036,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'SELECTED_TAGS' => strval($r['selected_tags']),
                         'STATUS_ERROR' => $statusError,
                         'IS_UPDATE' => false,
-                        'payload' => [
-                            'timeLimit' => 1000,
-                            'validatorTimeLimit' => 1000,
-                            'overallWallTimeLimit' => 60000,
-                            'extraWallTime' => 0,
-                            'outputLimit' => 10240,
-                            'inputLimit' => 10240,
-                            'memoryLimit' => 32768,
-                            'languages' => strval($r['languages']),
-                            'validLanguages' => $validLanguages,
-                            'validatorsTypes' => $validatorsTypes,
-                            'validator' => strval($r['validator']),
-                        ],
+                        'payload' => array_merge(
+                            [
+                                'timeLimit' => strval($r['time_limit']),
+                                'validatorTimeLimit' => strval(
+                                    $r['validator_time_limit']
+                                ),
+                                'overallWallTimeLimit' => strval(
+                                    $r['overall_wall_time_limit']
+                                ),
+                                'extraWallTime' => strval(
+                                    $r['extra_wall_time']
+                                ),
+                                'outputLimit' => strval($r['output_limit']),
+                                'inputLimit' => strval($r['input_limit']),
+                                'memoryLimit' =>  strval($r['memory_limit']),
+                                'languages' => strval($r['languages']),
+                                'validator' => strval($r['validator']),
+                            ],
+                            self::getCommonPayloadForSmarty()
+                        ),
                     ],
                     'template' => 'problem.new.tpl',
                 ];
@@ -4099,7 +4076,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
-                'payload' => [
+                'payload' => array_merge(
+                    [
                     'timeLimit' => 1000,
                     'validatorTimeLimit' => 1000,
                     'overallWallTimeLimit' => 60000,
@@ -4111,10 +4089,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         ',',
                         \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
                     ),
-                    'validLanguages' => $validLanguages,
-                    'validatorsTypes' => $validatorsTypes,
                     'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                ]
+                    ],
+                    self::getCommonPayloadForSmarty()
+                ),
             ],
             'template' => 'problem.new.tpl',
         ];

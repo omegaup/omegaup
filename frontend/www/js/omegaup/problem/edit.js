@@ -29,7 +29,7 @@ OmegaUp.on('ready', function() {
           inputLimit: this.inputLimit,
           overallWallTimeLimit: this.overallWallTimeLimit,
           validatorTimeLimit: this.validatorTimeLimit,
-          languages: this.languages,
+          initialLanguage: this.initialLanguage,
           validLanguages: this.validLanguages,
           initialValidator: this.validator,
           validatorsTypes: this.validatorsTypes,
@@ -44,9 +44,9 @@ OmegaUp.on('ready', function() {
       inputLimit: 0,
       overallWallTimeLimit: 0,
       validatorTimeLimit: 0,
-      languages: payload.languages,
+      //idioma: payload.languages,
       validLanguages: payload.validLanguages,
-      validator: payload.validator,
+      //validator: payload.validator,
       validatorsTypes: payload.validatorsTypes,
     },
     components: {
@@ -615,7 +615,7 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemValidator.languages = languages;
+    problemValidator.initialLanguage = languages;
     $('input[name=title]').val(problem.title);
     problemValidator.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,
@@ -651,6 +651,7 @@ OmegaUp.on('ready', function() {
         ']',
     ).attr('checked', 1);
     problemValidator.validator = problem.settings.validator.name;
+    problemValidator.languages = problem.statement.language;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {
@@ -698,7 +699,6 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    problemValidator.languages = chosenLanguage;
     API.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',
