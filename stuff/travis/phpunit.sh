@@ -5,7 +5,18 @@
 stage_before_install() {
 	init_submodules
 
-	sudo ln -sf python3.6 /usr/bin/python3
+	if [[ "${UBUNTU}" == "focal" ]]; then
+		# In addition to the newer PHP version, this needs MySQL 8.
+		sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
+		wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
+		sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
+		sudo apt-get update -q
+		sudo apt-get install -q -y --allow-unauthenticated -o Dpkg::Options::=--force-confnew mysql-server
+
+		sudo systemctl restart mysql
+
+		sudo mysql_upgrade
+	fi
 }
 
 stage_install() {
@@ -26,9 +37,15 @@ stage_before_script() {
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup-test`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
+	mysql -uroot -e "CREATE USER 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup-test
-	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+	if [[ "${UBUNTU}" == "focal" ]]; then
+		# MySQL 8 uses a _slightly_ different syntax.
+		mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
+	else
+		mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+	fi
 }
 
 stage_script() {
@@ -41,15 +58,17 @@ stage_script() {
 	phpunit --bootstrap frontend/tests/bootstrap.php \
 		--configuration=frontend/tests/phpunit.xml \
 		frontend/tests/badges
-	mv frontend/tests/controllers/mysql_types.log \
-		frontend/tests/controllers/mysql_types.log.2
-	cat frontend/tests/controllers/mysql_types.log.1 \
-		frontend/tests/controllers/mysql_types.log.2 > \
-		frontend/tests/controllers/mysql_types.log
-	python3 stuff/process_mysql_return_types.py \
-		frontend/tests/controllers/mysql_types.log
-	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
-	python3 stuff/policy-tool.py --database=omegaup-test validate
+	if [[ "${UBUNTU}" != "focal" ]]; then
+		mv frontend/tests/controllers/mysql_types.log \
+			frontend/tests/controllers/mysql_types.log.2
+		cat frontend/tests/controllers/mysql_types.log.1 \
+			frontend/tests/controllers/mysql_types.log.2 > \
+			frontend/tests/controllers/mysql_types.log
+		python3 stuff/process_mysql_return_types.py \
+			frontend/tests/controllers/mysql_types.log
+		python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
+		python3 stuff/policy-tool.py --database=omegaup-test validate
+	fi
 
 	# Create optional directories to simplify psalm config.
 	mkdir -p frontend/www/{phpminiadmin,preguntas}

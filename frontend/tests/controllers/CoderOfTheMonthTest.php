@@ -397,6 +397,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * @dataProvider coderOfTheMonthCategoryProvider
+     * @requires PHP < 7.4
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
