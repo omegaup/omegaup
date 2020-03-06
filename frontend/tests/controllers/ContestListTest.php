@@ -458,6 +458,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test to set recommended value in two contests.
+     * @requires PHP < 7.4
      */
     public function testRecommendedSContestsList() {
         // Create 2 contests not-recommended
