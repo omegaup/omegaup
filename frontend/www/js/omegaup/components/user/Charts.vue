@@ -142,7 +142,7 @@ export default class UserCharts extends Vue {
   get totalRuns(): number {
     let total = 0;
     for (const runs of this.data.runs) {
-      total += runs['runs'];
+      total += runs.runs;
     }
     return total;
   }
@@ -206,9 +206,8 @@ export default class UserCharts extends Vue {
         response[period].cumulative[index] = { name: verdict, data: [] };
         for (const [ind, date] of response[period].categories.entries()) {
           runsByVerdict[period][verdict] += runs[period][date][verdict];
-          response[period].delta[index]['data'][ind] =
-            runs[period][date][verdict];
-          response[period].cumulative[index]['data'][ind] =
+          response[period].delta[index].data[ind] = runs[period][date][verdict];
+          response[period].cumulative[index].data[ind] =
             runsByVerdict[period][verdict];
         }
       }
@@ -223,20 +222,20 @@ export default class UserCharts extends Vue {
       const date = new Date(run.date);
       const day = date.getDay();
       // group by days
-      stats[index]['day'] = date.toLocaleDateString(T.locale);
+      stats[index].day = date.toLocaleDateString(T.locale);
       // group by weeks
       const diffMonday = date.getDate() - day + (day == 0 ? -6 : 1);
       const diffSunday = date.getDate() + (7 - day);
       const firstDay = new Date(date.setDate(diffMonday));
       const lastDay = new Date(date.setDate(diffSunday));
-      stats[index]['week'] =
+      stats[index].week =
         firstDay.toLocaleDateString(T.locale) +
         ' - ' +
         lastDay.toLocaleDateString(T.locale);
       // group by month
-      stats[index]['month'] = run.date.substring(0, 7);
+      stats[index].month = run.date.substring(0, 7);
       // group by year
-      stats[index]['year'] = run.date.substring(0, 4);
+      stats[index].year = run.date.substring(0, 4);
     }
     const periodStats: GroupedPeriods = {};
     for (const period of periods) {
