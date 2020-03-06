@@ -4063,7 +4063,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-             
+
         return [
             'smartyProperties' => [
                 'TITLE' => '',
