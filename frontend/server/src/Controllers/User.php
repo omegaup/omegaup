@@ -3180,6 +3180,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $contests = \OmegaUp\Controllers\Contest::getContestList(
             $r->identity,
             /*$query=*/ null,
@@ -3200,7 +3207,8 @@ class User extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                        $firstDay
+                        $firstDay,
+                        $category
                     )['coderinfo'],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
                     'rankTable' => self::getRankByProblemsSolved(
@@ -3230,12 +3238,17 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @return array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}
+     * @return array{smartyProperties: array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}, template: string}
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\Request $r
     ): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $r->identity = null;
+        }
         $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
         $firstDayOfNextMonth = new \DateTime($currentDate);
@@ -3243,9 +3256,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
         $isMentor = !is_null(
-            $identity
+            $r->identity
         ) && \OmegaUp\Authorization::isMentor(
-            $identity
+            $r->identity
         );
 
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3279,11 +3292,15 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
+            'category' => $category,
         ];
 
         if (!$isMentor) {
             return [
-                'payload' => $response,
+                'smartyProperties' => [
+                    'payload' => $response,
+                ],
+                'template' => 'codersofthemonth.tpl',
             ];
         }
 
@@ -3301,7 +3318,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
         ];
         return [
-            'payload' => $response,
+            'smartyProperties' => [
+                'payload' => $response,
+            ],
+            'template' => 'codersofthemonth.tpl',
         ];
     }
 
