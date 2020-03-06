@@ -12,10 +12,7 @@
       ><input type="radio" v-model="type" value="total" />
       {{ T.profileStatisticsTotal }}</label
     >
-    <div
-      class="period-group text-center"
-      v-if="type != 'total' &amp;&amp; type != ''"
-    >
+    <div class="period-group text-center" v-if="type != 'total' && type != ''">
       <label
         ><input name="period" type="radio" v-model="period" value="day" />
         {{ T.profileStatisticsDay }}</label
@@ -33,14 +30,22 @@
         {{ T.profileStatisticsYear }}</label
       >
     </div>
-    <!-- id-lint off -->
-    <div id="verdict-chart"></div>
-    <!-- id-lint on -->
+    <highcharts
+      v-bind:options="periodStatisticOptions"
+      v-bind:updateArgs="updateArgs"
+      v-if="type !== 'total'"
+    ></highcharts>
+    <highcharts
+      v-bind:options="aggregateStatisticOptions"
+      v-bind:updateArgs="updateArgs"
+      v-else=""
+    ></highcharts>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Chart } from 'highcharts-vue';
 import * as Highcharts from 'highcharts';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
@@ -99,40 +104,39 @@ const emptyPeriodRunCount = {
   },
 };
 
-@Component
+@Component({
+  components: {
+    highcharts: Chart,
+  },
+})
 export default class UserCharts extends Vue {
   @Prop() data!: Data;
   @Prop() username!: string;
+  @Prop() periodStatisticOptions!: Chart;
+  @Prop() aggregateStatisticOptions!: Chart;
 
   T = T;
   UI = UI;
   type = 'delta';
   period = 'day';
-  chart: any = null;
+  updateArgs = [true, true, { duration: 500 }];
 
   @Watch('type')
   onTypeChanged(newValue: string): void {
-    if (newValue == 'total') {
-      this.renderAggregateStatistics();
+    if (newValue === 'total') {
+      this.onRenderAggregateStatistics();
     } else {
-      this.renderPeriodStatistics();
+      this.onRenderPeriodStatistics();
     }
   }
 
   @Watch('period')
-  onPeriodChanged(newValue: string): void {
-    this.renderPeriodStatistics();
+  onPeriodChanged(): void {
+    this.onRenderPeriodStatistics();
   }
 
   mounted(): void {
-    this.chart = Highcharts.chart('verdict-chart', {
-      title: {
-        text: this.UI.formatString(this.T.profileStatisticsVerdictsOf, {
-          user: this.username,
-        }),
-      },
-    });
-    this.renderPeriodStatistics();
+    this.onRenderPeriodStatistics();
   }
 
   get totalRuns(): number {
@@ -253,109 +257,14 @@ export default class UserCharts extends Vue {
     return this.normalizedPeriodRunCounts[this.period];
   }
 
-  renderPeriodStatistics(): void {
+  onRenderPeriodStatistics(): void {
     const runs: omegaup.RunCounts = this.normalizedRunCountsForPeriod;
     const data = this.type === 'delta' ? runs.delta : runs.cumulative;
-    this.chart.update({
-      chart: { type: 'column' },
-      xAxis: {
-        categories: runs.categories,
-        title: { text: this.T.profileStatisticsPeriod },
-        labels: {
-          rotation: -45,
-        },
-      },
-      yAxis: {
-        min: 0,
-        title: { text: this.T.profileStatisticsNumberOfSolvedProblems },
-        stackLabels: {
-          enabled: false,
-          style: {
-            fontWeight: 'bold',
-            color: 'gray',
-          },
-        },
-      },
-      legend: {
-        align: 'right',
-        x: -30,
-        verticalAlign: 'top',
-        y: 25,
-        floating: true,
-        backgroundColor: 'white',
-        borderColor: '#CCC',
-        borderWidth: 1,
-        shadow: false,
-      },
-      tooltip: {
-        headerFormat: '<b>{point.x}</b><br/>',
-        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
-      },
-      plotOptions: {
-        column: {
-          stacking: 'normal',
-          dataLabels: {
-            enabled: false,
-            color: 'white',
-          },
-        },
-      },
-      series: [],
-    });
-    // Removing old series
-    while (this.chart.series.length) this.chart.series[0].remove(false);
-    // Adding new series
-    const numSeries = data.length;
-    for (let i = 0; i < numSeries; i++) {
-      this.chart.addSeries(data[i]);
-    }
-    this.chart.redraw();
+    this.$emit('emit-update-period-statistics', this, runs.categories, data);
   }
 
-  renderAggregateStatistics(): void {
-    const runs = this.normalizedRunCounts;
-    // Removing all series, except last one, because here is where the data
-    // will be placed. Otherwise, the chart will not be shown
-    while (this.chart.series.length > 1) this.chart.series[0].remove(false);
-    this.chart.update({
-      chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie',
-      },
-      xAxis: {
-        title: { text: '' },
-      },
-      yAxis: {
-        title: { text: '' },
-      },
-      title: {
-        text: this.UI.formatString(this.T.profileStatisticsVerdictsOf, {
-          user: this.username,
-        }),
-      },
-      tooltip: { pointFormat: '{series.name}: {point.y}' },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: true,
-            color: '#000000',
-            connectorColor: '#000000',
-            format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-          },
-        },
-      },
-      series: [
-        {
-          name: this.T.profileStatisticsRuns,
-          data: runs,
-        },
-      ],
-    });
-    this.chart.redraw();
+  onRenderAggregateStatistics(): void {
+    this.$emit('emit-update-aggregate-statistics', this);
   }
 }
 </script>
