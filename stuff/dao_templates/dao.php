@@ -317,7 +317,7 @@ abstract class {{ table.class_name }} {
     ): int {
         $sql = '
             INSERT INTO
-                {{ table.name }} (
+                `{{ table.name }}` (
                     {{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(',\n                    ') }}
                 ) VALUES (
                     {{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(',\n                    ') }}

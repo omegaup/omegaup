@@ -55,8 +55,6 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Creating a clone with the original contest alias
-     *
-     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
@@ -75,21 +73,24 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'title' => \OmegaUp\Test\Utils::createRandomString(),
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => $contestData['request']['alias'],
-            'contest' => $contestData['contest'],
-            'start_time' => \OmegaUp\Time::get()
-        ]));
+        try {
+            \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $contestData['request']['alias'],
+                'contest' => $contestData['contest'],
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('titleInUse', $e->getMessage());
+        }
     }
 
     /**
      * Creating a clone of a private contest without its access
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem
@@ -112,14 +113,19 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Clone the contest
-        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
-            'auth_token' => $login['auth_token'],
-            'contest_alias' => $contestData['request']['alias'],
-            'title' => \OmegaUp\Test\Utils::createRandomString(),
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => \OmegaUp\Test\Utils::createRandomString(),
-            'contest' => $contestData['contest'],
-            'start_time' => \OmegaUp\Time::get()
-        ]));
+        try {
+            \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
+                'auth_token' => $login['auth_token'],
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'contest' => $contestData['contest'],
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 }

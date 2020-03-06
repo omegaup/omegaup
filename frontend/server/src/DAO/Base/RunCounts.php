@@ -243,7 +243,7 @@ abstract class RunCounts {
     ): int {
         $sql = '
             INSERT INTO
-                Run_Counts (
+                `Run_Counts` (
                     `date`,
                     `total`,
                     `ac_count`

@@ -212,7 +212,7 @@ abstract class PrivacyStatementConsentLog {
     ): int {
         $sql = '
             INSERT INTO
-                PrivacyStatement_Consent_Log (
+                `PrivacyStatement_Consent_Log` (
                     `identity_id`,
                     `privacystatement_id`,
                     `timestamp`

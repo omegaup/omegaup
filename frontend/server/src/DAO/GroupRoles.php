@@ -22,7 +22,7 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             FROM
                 Group_Roles gr
             INNER JOIN
-                Groups g ON g.group_id = gr.group_id
+                `Groups` AS g ON g.group_id = gr.group_id
             WHERE
                 gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
@@ -68,7 +68,7 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             INNER JOIN
                 Group_Roles gr ON gr.acl_id = p.acl_id
             INNER JOIN
-                Groups g ON g.group_id = gr.group_id
+                `Groups` AS g ON g.group_id = gr.group_id
             WHERE
                 p.problemset_id = ? AND
                 gr.role_id = ?;

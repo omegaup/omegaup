@@ -27,6 +27,7 @@ rewrite ^/arena/([a-zA-Z0-9_+-]+)/practice/?$ /arena/contest.php?contest_alias=$
 rewrite ^/badge/list/?$ /badgelist.php last;
 rewrite ^/badge/([a-zA-Z0-9_-]+)/?$ /badge.php?badge_alias=$1 last;
 rewrite ^/coderofthemonth/?$ /coderofthemonth.php last;
+rewrite ^/coderofthemonth/female/?$ /coderofthemonth.php?category=female last;
 rewrite ^/contest/?$ /contests.php last;
 rewrite ^/contest/mine/?$ /contests/mine.php last;
 rewrite ^/contest/new/?$ /contests/new.php last;

@@ -222,7 +222,7 @@ abstract class IdentitiesSchools {
     ): int {
         $sql = '
             INSERT INTO
-                Identities_Schools (
+                `Identities_Schools` (
                     `identity_id`,
                     `school_id`,
                     `graduation_date`,

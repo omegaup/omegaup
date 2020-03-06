@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Description of UpdateContest
+ * Description of ContestUpdateContest
  *
  * @author joemmanuel
  */
-class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
+class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Only update the contest title. Rest should stay the same
      */
@@ -31,30 +31,27 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertContest($contestData['request']);
     }
 
-    /**
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
-     */
     public function testUpdateContestNonDirector() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         // Update title
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'title' => \OmegaUp\Test\Utils::createRandomString(),
-        ]);
 
-        // Call API
-        \OmegaUp\Controllers\Contest::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Update from private to public. Should fail if no problems in contest
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
@@ -66,19 +63,24 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update public
         $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'admission_mode' => 'public',
-        ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'admission_mode' => 'public',
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestPublicRequiresProblem',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Update from private to public with problems added
-     *
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
         // Get a contest
@@ -148,8 +150,6 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
      /**
       * Set Recommended flag to a given contest from non admin account
-      *
-      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
       */
     public function testSetRecommendedFlagNonAdmin() {
         // Get a contest
@@ -157,20 +157,21 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update value
         $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'value' => 1,
-        ]);
 
-        // Call API
-        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'value' => 1,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Contest length can't be too long
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdateContestLengthTooLong() {
         // Get a contest
@@ -178,15 +179,18 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update length
         $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'start_time' => 0,
-            'finish_time' => 60 * 60 * 24 * 32,
-        ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'start_time' => 0,
+                'finish_time' => 60 * 60 * 24 * 32,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('contestLengthTooLong', $e->getMessage());
+        }
     }
 
     /**
@@ -233,8 +237,6 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Contest start can't be updated if already contains runs
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdateContestStartWithRuns() {
         // Get a contest
@@ -245,14 +247,20 @@ class UpdateContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update length
         $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'start_time' => $contestData['request']['start_time'] + 1,
-        ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        try {
+            $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'start_time' => $contestData['request']['start_time'] + 1,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestUpdateAlreadyHasRuns',
+                $e->getMessage()
+            );
+        }
     }
 
     /**

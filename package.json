@@ -13,6 +13,7 @@
     "@types/bootstrap-datepicker": "0.0.13",
     "@types/bootstrap.v3.datetimepicker": "^4.17.47",
     "@types/jquery": "^3.3.29",
+    "@types/jszip": "3.1.4",
     "@voerro/vue-tagsinput": "^2.0.2",
     "babel-loader": "^8.0.5",
     "babylon": "^6.18.0",
@@ -68,7 +69,8 @@
     "typescript-optional": "^2.0.1",
     "v-tooltip": "^3.0.0-alpha.7",
     "vue": "^2.5.22",
-    "vue-async-computed": "^3.5.1",
+    "vue-async-computed": "^3.8.1",
+    "vue-async-computed-decorator": "^0.0.4",
     "vue-slider-component": "^3.0.25"
   }
 }

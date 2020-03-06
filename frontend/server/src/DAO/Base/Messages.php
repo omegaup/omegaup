@@ -220,7 +220,7 @@ abstract class Messages {
     ): int {
         $sql = '
             INSERT INTO
-                Messages (
+                `Messages` (
                     `read`,
                     `sender_id`,
                     `recipient_id`,

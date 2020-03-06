@@ -4,7 +4,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;
     private static $curatorIdentity = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
@@ -83,14 +83,15 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Two courses cannot have the same alias
-     *
-     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateCourseDuplicatedName() {
         $sameAlias = \OmegaUp\Test\Utils::createRandomString();
         $sameName = \OmegaUp\Test\Utils::createRandomString();
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -115,19 +116,25 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create a new Course with different alias and name
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'name' => $sameName,
-            'alias' => $sameAlias,
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => (\OmegaUp\Time::get() + 60),
-            'finish_time' => (\OmegaUp\Time::get() + 120)
-        ]);
-
-        \OmegaUp\Controllers\Course::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $sameName,
+                'alias' => $sameAlias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120)
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('aliasInUse', $e->getMessage());
+        }
     }
 
     public function testCreateSchoolAssignment() {
@@ -270,26 +277,33 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Try to create an assignment with inverted times.
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateAssignmentWithInvertedTimes() {
-        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $admin,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             $identity,
             $adminLogin
         );
 
-        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => \OmegaUp\Test\Utils::createRandomString(),
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => (\OmegaUp\Time::get() + 120),
-            'finish_time' => (\OmegaUp\Time::get() + 60),
-            'course_alias' => $courseData['course_alias'],
-            'assignment_type' => 'homework'
-        ]));
+        try {
+            \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 120),
+                'finish_time' => (\OmegaUp\Time::get() + 60),
+                'course_alias' => $courseData['course_alias'],
+                'assignment_type' => 'homework',
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('courseInvalidStartTime', $e->getMessage());
+        }
     }
 
     public function testCreateAssignmentWithUnlimitedDuration() {
@@ -380,23 +394,29 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Public course can't be created by default
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicCourseFailForNonCurator() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => \OmegaUp\Test\Utils::createRandomString(),
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => (\OmegaUp\Time::get() + 60),
-            'finish_time' => (\OmegaUp\Time::get() + 120),
-            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-        ]);
 
-        $response = \OmegaUp\Controllers\Course::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+                'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**

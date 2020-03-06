@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "listFiles": true,
     "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["frontend/www/*"]
     }

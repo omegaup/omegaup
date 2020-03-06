@@ -80,6 +80,7 @@ class SecurityTools {
                 self::ARGON2ID_MEMORY_COST * 1024
             );
         } else {
+            /** @psalm-suppress InvalidScalarArgument This misfires in PHP 7.4 */
             $hashedString = password_hash(
                 $string,
                 PASSWORD_ARGON2ID,
@@ -117,6 +118,7 @@ class SecurityTools {
                 self::ARGON2ID_MEMORY_COST * 1024
             );
         }
+        /** @psalm-suppress InvalidScalarArgument This misfires in PHP 7.4 */
         return password_needs_rehash(
             $hashedPassword,
             PASSWORD_ARGON2ID,

@@ -212,7 +212,7 @@ abstract class Notifications {
     ): int {
         $sql = '
             INSERT INTO
-                Notifications (
+                `Notifications` (
                     `user_id`,
                     `timestamp`,
                     `read`,

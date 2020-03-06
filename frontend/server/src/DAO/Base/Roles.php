@@ -198,7 +198,7 @@ abstract class Roles {
     ): int {
         $sql = '
             INSERT INTO
-                Roles (
+                `Roles` (
                     `name`,
                     `description`
                 ) VALUES (
