@@ -112,7 +112,7 @@ import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
 @Component
-export default class ProblemValidator extends Vue {
+export default class ProblemSettings extends Vue {
   @Prop() timeLimit!: number;
   @Prop() extraWallTime!: number;
   @Prop() memoryLimit!: number;

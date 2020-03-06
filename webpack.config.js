@@ -58,7 +58,7 @@ let config = [
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
-      problem_validator: './frontend/www/js/omegaup/problem/validator.js',
+      problem_settings: './frontend/www/js/omegaup/problem/settings.js',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:

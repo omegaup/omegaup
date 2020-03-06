@@ -3,7 +3,7 @@ import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
-import problem_Validator from '../components/problem/Validator.vue';
+import problem_Settings from '../components/problem/Settings.vue';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;
@@ -17,10 +17,10 @@ OmegaUp.on('ready', function() {
   const payload = JSON.parse(
     document.getElementById('problem-payload').innerText,
   );
-  let problemValidator = new Vue({
-    el: '#problem-validator',
+  let problemSettings = new Vue({
+    el: '#problem-settings',
     render: function(createElement) {
-      return createElement('omegaup-problem-validator', {
+      return createElement('omegaup-problem-settings', {
         props: {
           timeLimit: this.timeLimit,
           extraWallTime: this.extraWallTime,
@@ -44,13 +44,11 @@ OmegaUp.on('ready', function() {
       inputLimit: 0,
       overallWallTimeLimit: 0,
       validatorTimeLimit: 0,
-      //idioma: payload.languages,
       validLanguages: payload.validLanguages,
-      //validator: payload.validator,
       validatorsTypes: payload.validatorsTypes,
     },
     components: {
-      'omegaup-problem-validator': problem_Validator,
+      'omegaup-problem-settings': problem_Settings,
     },
   });
 
@@ -615,9 +613,9 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemValidator.initialLanguage = languages;
+    problemSettings.initialLanguage = languages;
     $('input[name=title]').val(problem.title);
-    problemValidator.timeLimit = UI.parseDuration(
+    problemSettings.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,
     );
 
@@ -625,21 +623,21 @@ OmegaUp.on('ready', function() {
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      problemValidator.validatorTimeLimit = UI.parseDuration(
+      problemSettings.validatorTimeLimit = UI.parseDuration(
         problem.settings.validator.custom_validator.limits.TimeLimit,
       );
     } else {
-      problemValidator.validatorTimeLimit = 0;
+      problemSettings.validatorTimeLimit = 0;
     }
-    problemValidator.overallWallTimeLimit = UI.parseDuration(
+    problemSettings.overallWallTimeLimit = UI.parseDuration(
       problem.settings.limits.OverallWallTimeLimit,
     );
-    problemValidator.extraWallTime = UI.parseDuration(
+    problemSettings.extraWallTime = UI.parseDuration(
       problem.settings.limits.ExtraWallTime,
     );
-    problemValidator.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
-    problemValidator.outputLimit = problem.settings.limits.OutputLimit;
-    problemValidator.inputLimit = problem.input_limit;
+    problemSettings.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
+    problemSettings.outputLimit = problem.settings.limits.OutputLimit;
+    problemSettings.inputLimit = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -650,8 +648,8 @@ OmegaUp.on('ready', function() {
         (problem.email_clarifications ? '1' : '0') +
         ']',
     ).attr('checked', 1);
-    problemValidator.validator = problem.settings.validator.name;
-    problemValidator.languages = problem.statement.language;
+    problemSettings.validator = problem.settings.validator.name;
+    problemSettings.languages = problem.statement.language;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {

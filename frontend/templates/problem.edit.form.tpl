@@ -34,10 +34,10 @@
 
 			</div>
 
-			<div id="problem-validator"></div>
+			<div id="problem-settings"></div>
 			<script type="text/json" id="problem-payload">{$payload|json_encode}</script>
 			{if $IS_UPDATE eq false}
-			{js_include entrypoint="problem_validator"}
+			{js_include entrypoint="problem_settings"}
 			{/if}
 			<div class="row">
 				<div class="form-group  col-md-6" id="source-group">

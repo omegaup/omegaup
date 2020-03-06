@@ -1,15 +1,15 @@
 import Vue from 'vue';
-import problem_Validator from '../components/problem/Validator.vue';
+import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(
     document.getElementById('problem-payload').innerText,
   );
-  let problemValidator = new Vue({
-    el: '#problem-validator',
+  let problemSettings = new Vue({
+    el: '#problem-settings',
     render: function(createElement) {
-      return createElement('omegaup-problem-validator', {
+      return createElement('omegaup-problem-settings', {
         props: {
           timeLimit: this.timeLimit,
           extraWallTime: this.extraWallTime,
@@ -39,7 +39,7 @@ OmegaUp.on('ready', function() {
       validatorsTypes: payload.validatorsTypes,
     },
     components: {
-      'omegaup-problem-validator': problem_Validator,
+      'omegaup-problem-settings': problem_Settings,
     },
   });
 });
