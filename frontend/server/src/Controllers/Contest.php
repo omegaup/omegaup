@@ -31,7 +31,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
         $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue($r['active'])
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
@@ -80,22 +80,62 @@ class Contest extends \OmegaUp\Controllers\Controller {
             false /* not required */
         );
         $query = $r['query'];
-        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$page_size}";
-        if (is_null($r->identity)) {
+
+        $contests = self::getContestList(
+            $r->identity,
+            $query,
+            $page,
+            $pageSize,
+            $activeContests,
+            $recommended,
+            $public,
+            $participating
+        );
+
+        $addedContests = [];
+        foreach ($contests as $contestInfo) {
+            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+                            $contestInfo['finish_time'] - $contestInfo['start_time'] :
+                            ($contestInfo['window_length'] * 60));
+
+            $addedContests[] = $contestInfo;
+        }
+
+        return [
+            'number_of_results' => count($addedContests),
+            'results' => $addedContests,
+        ];
+    }
+
+    /**
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
+     */
+    public static function getContestList(
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?string $query,
+        int $page,
+        int $pageSize,
+        int $activeContests,
+        int $recommended,
+        bool $public = false,
+        ?int $participating = null
+    ) {
+        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        if (is_null($identity)) {
             // Get all public contests
             $callback = /**
              * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
              */
             function () use (
                 $page,
-                $page_size,
+                $pageSize,
                 $activeContests,
                 $recommended,
                 $query
             ): array {
                 return \OmegaUp\DAO\Contests::getAllPublicContests(
                     $page,
-                    $page_size,
+                    $pageSize,
                     $activeContests,
                     $recommended,
                     $query
@@ -112,34 +152,34 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($participating == \OmegaUp\DAO\Enum\ParticipatingStatus::YES) {
             $contests = \OmegaUp\DAO\Contests::getContestsParticipating(
-                $r->identity->identity_id,
+                $identity->identity_id,
                 $page,
-                $page_size,
+                $pageSize,
                 $activeContests,
                 $query
             );
         } elseif ($public) {
             $contests = \OmegaUp\DAO\Contests::getRecentPublicContests(
-                $r->identity->identity_id,
+                $identity->identity_id,
                 $page,
-                $page_size,
+                $pageSize,
                 $query
             );
-        } elseif (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
             $callback = /**
              * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
              */
             function () use (
                 $page,
-                $page_size,
+                $pageSize,
                 $activeContests,
                 $recommended,
                 $query
             ): array {
                 return \OmegaUp\DAO\Contests::getAllContests(
                     $page,
-                    $page_size,
+                    $pageSize,
                     $activeContests,
                     $recommended,
                     $query
@@ -157,44 +197,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } else {
             // Get all public+private contests
             $contests = \OmegaUp\DAO\Contests::getAllContestsForIdentity(
-                $r->identity->identity_id,
+                $identity->identity_id,
                 $page,
-                $page_size,
+                $pageSize,
                 $activeContests,
                 $recommended,
                 $query
             );
         }
-
-        // Filter returned values by these columns
-        $relevantColumns = [
-            'contest_id',
-            'problemset_id',
-            'title',
-            'description',
-            'start_time',
-            'finish_time',
-            'admission_mode',
-            'alias',
-            'window_length',
-            'recommended',
-            'last_updated',
-            'rerun_id',
-        ];
-
-        $addedContests = [];
-        foreach ($contests as $contestInfo) {
-            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
-                            $contestInfo['finish_time'] - $contestInfo['start_time'] :
-                            ($contestInfo['window_length'] * 60));
-
-            $addedContests[] = $contestInfo;
-        }
-
-        return [
-            'number_of_results' => sizeof($addedContests),
-            'results' => $addedContests,
-        ];
+        return $contests;
     }
 
     /**
@@ -563,17 +574,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // suggesting to contribute to the community by releasing the material to
         // the public. This flag ensures that this alert is shown only once per
         // session, the first time the user visits the "My contests" page.
-        $privateContestsAlert = false;
-        {
-            $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
-            $privateContestsAlert = (
-                !isset($_SESSION['private_contests_alert']) &&
-                \OmegaUp\DAO\Contests::getPrivateContestsCount($r->user) > 0
-            );
+        $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
+        $privateContestsAlert = (
+            !isset($_SESSION['private_contests_alert']) &&
+            \OmegaUp\DAO\Contests::getPrivateContestsCount($r->user) > 0
+        );
         if ($privateContestsAlert) {
             $_SESSION['private_contests_alert'] = true;
         }
-        }
+        unset($scopedSession);
 
         return [
             'smartyProperties' => [
@@ -1998,6 +2007,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $contest->problemset_id
             );
+            if (is_null($problemset)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemsetNotFound'
+                );
+            }
             $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::GetRelevantProblems(
                 $problemset
             );
@@ -2046,7 +2060,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             intval($contest->problemset_id),
             intval($problem->problem_id)
         );
-        if (is_null($problemsetProblem)) {
+        if (
+            is_null($problemsetProblem)
+            || is_null($problemsetProblem->version)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
 
@@ -2273,6 +2290,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'],
             $r->identity
         );
+        if (is_null($contest->acl_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
 
         \OmegaUp\Controllers\ACL::addUser(
             $contest->acl_id,
@@ -3312,7 +3332,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
+     * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, total_runs: int, pending_runs: array, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3324,7 +3344,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($contest, $r->identity),
+                'payload' => array_merge(
+                    [
+                        'alias' => $r['contest_alias'],
+                        'entity_type' => 'contest',
+                    ],
+                    self::getStats($contest, $r->identity)
+                ),
             ],
             'template' => 'contest.stats.tpl',
         ];

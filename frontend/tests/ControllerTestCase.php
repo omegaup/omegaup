@@ -12,7 +12,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /** @var \Logger|null */
     private static $logObj = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         $scriptFilename = __DIR__ . '/controllers/gitserver-start.sh ' .
@@ -26,7 +26,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         }
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
         $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh';
         exec($scriptFilename, $output, $returnVar);
@@ -41,7 +41,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * setUp function gets executed before each test (thanks to phpunit)
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting(
@@ -64,7 +64,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * tearDown function gets executed after each test (thanks to phpunit)
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         self::logout();
     }

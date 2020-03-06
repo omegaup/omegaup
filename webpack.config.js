@@ -33,6 +33,7 @@ let config = [
       common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.js',
       common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
+      common_stats: './frontend/www/js/omegaup/common/stats.js',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
@@ -40,7 +41,6 @@ let config = [
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:
         './frontend/www/js/omegaup/contest/scoreboardmerge.js',
-      contest_stats: './frontend/www/js/omegaup/contest/stats.js',
       course_edit: './frontend/www/js/omegaup/course/edit.js',
       course_intro: './frontend/www/js/omegaup/course/intro.js',
       course_list: './frontend/www/js/omegaup/course/list.js',
@@ -57,7 +57,6 @@ let config = [
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
-      problem_stats: './frontend/www/js/omegaup/problem/stats.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',

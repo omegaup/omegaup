@@ -97,7 +97,7 @@ abstract class UserRankCutoffs {
     ): int {
         $sql = '
             INSERT INTO
-                User_Rank_Cutoffs (
+                `User_Rank_Cutoffs` (
                     `score`,
                     `percentile`,
                     `classname`

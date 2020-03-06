@@ -2899,7 +2899,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}}, template: string}
+     * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -2916,7 +2916,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'payload' => self::getStats($problem, $r->identity),
+                'payload' => array_merge(
+                    [
+                        'alias' => $r['problem_alias'],
+                        'entity_type' => 'problem',
+                    ],
+                    self::getStats($problem, $r->identity)
+                ),
             ],
             'template' => 'problem.stats.tpl',
         ];

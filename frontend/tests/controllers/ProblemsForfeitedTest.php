@@ -70,7 +70,10 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $extraProblem['problem']->alias,
             'forfeit_problem' => true,
         ]));
-        $this->assertContains('`long long`', $response['solution']['markdown']);
+        $this->assertStringContainsString(
+            '`long long`',
+            $response['solution']['markdown']
+        );
         $this->assertTrue(
             \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
