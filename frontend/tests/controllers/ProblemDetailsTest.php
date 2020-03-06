@@ -7,9 +7,6 @@
  */
 
 class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
-    /**
-     *
-     */
     public function testViewProblemInAContestDetailsValid() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
@@ -56,9 +53,9 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Assert data
-        $this->assertEquals($response['title'], $problemDAO->title);
-        $this->assertEquals($response['alias'], $problemDAO->alias);
-        $this->assertEquals($response['points'], 100);
+        $this->assertEquals($problemDAO->title, $response['title']);
+        $this->assertEquals($problemDAO->alias, $response['alias']);
+        $this->assertEquals(100, $response['points']);
         $this->assertEquals(
             $response['problemsetter']['username'],
             $authorIdentity->username
@@ -67,10 +64,13 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $response['problemsetter']['name'],
             $authorIdentity->name
         );
-        $this->assertEquals($response['source'], $problemDAO->source);
-        $this->assertContains('# Entrada', $response['statement']['markdown']);
-        $this->assertEquals($response['order'], $problemDAO->order);
-        $this->assertEquals($response['score'], 0);
+        $this->assertEquals($problemDAO->source, $response['source']);
+        $this->assertStringContainsString(
+            '# Entrada',
+            $response['statement']['markdown']
+        );
+        $this->assertEquals($problemDAO->order, $response['order']);
+        $this->assertEquals(0, $response['score']);
 
         // Default data
         $this->assertEquals(0, $problemDAO->visits);
@@ -121,7 +121,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Assert data
-        $this->assertContains(
+        $this->assertStringContainsString(
             $expected_text,
             $response['statement']['markdown']
         );
@@ -134,11 +134,13 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->internalViewProblemStatement('markdown', '# Entrada');
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\NotFoundException
-     */
     public function testViewProblemStatementInvalidType() {
-        $this->internalViewProblemStatement('not_html_or_markdown', '');
+        try {
+            $this->internalViewProblemStatement('not_html_or_markdown', '');
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('invalidStatementType', $e->getMessage());
+        }
     }
 
     public function testProblemDetailsNotInContest() {
@@ -173,8 +175,6 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * User can't see problem details
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
@@ -185,18 +185,20 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a user for our scenario
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Call api
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
+        try {
+            \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**
      * Non-user can't see problem details
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
@@ -204,10 +206,14 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'visibility' => 0
         ]));
 
-        // Call api
-        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
+        try {
+            \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**
@@ -405,7 +411,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
-            $this->assertContains(
+            $this->assertStringContainsString(
                 '`long long`',
                 $response['solution']['markdown']
             );
@@ -447,7 +453,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
-            $this->assertContains(
+            $this->assertStringContainsString(
                 '`long long`',
                 $response['solution']['markdown']
             );

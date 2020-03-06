@@ -198,7 +198,7 @@ abstract class Languages {
     ): int {
         $sql = '
             INSERT INTO
-                Languages (
+                `Languages` (
                     `name`,
                     `country_id`
                 ) VALUES (

@@ -351,9 +351,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCoderOfTheMonthDetailsForSmarty(string $category) {
         // Test coder of the month details when user is not logged
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
-            new \OmegaUp\Request(['category' => $category]),
-            null
-        );
+            new \OmegaUp\Request(['category' => $category])
+        )['smartyProperties'];
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -371,9 +370,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'category' => $category,
-            ]),
-            $identity
-        );
+            ])
+        )['smartyProperties'];
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -390,9 +388,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'category' => $category,
-            ]),
-            $mentorIdentity
-        );
+            ])
+        )['smartyProperties'];
         $this->assertTrue($response['payload']['isMentor']);
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('options', $response['payload']);
@@ -400,6 +397,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * @dataProvider coderOfTheMonthCategoryProvider
+     * @requires PHP < 7.4
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';

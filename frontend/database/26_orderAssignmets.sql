@@ -1,1 +1,0 @@
-ALTER TABLE `Assignments` ADD `order` INT NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas' AFTER `finish_time`;

@@ -3167,28 +3167,52 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
             $r->ensureIdentity();
-            $isLogged = true;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Not logged, but there is no problem with this
-            $isLogged = false;
+            /** @var null $r->identity */
         }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
+
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
+        $contests = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            /*$query=*/ null,
+            /*$page=*/ 1,
+            /*$pageSize=*/ 20,
+            /*$activeContests=*/ \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            /*$recommended=*/ \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
+        $addedContests = [];
+        foreach ($contests as $key => $contestInfo) {
+            $addedContests[] = [
+                'alias' => $contestInfo['alias'],
+                'title' => $contestInfo['title'],
+            ];
+        }
+
         return [
             'smartyProperties' => [
                 'payload' => [
                     'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                        $firstDay
+                        $firstDay,
+                        $category
                     )['coderinfo'],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
                     'rankTable' => self::getRankByProblemsSolved(
-                        $isLogged ? $r->identity : null,
+                        $r->identity,
                         /*$filter=*/ '',
                         /*$offset=*/ 1,
                         $rowCount
@@ -3196,17 +3220,15 @@ class User extends \OmegaUp\Controllers\Controller {
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
                         $rowCount
                     ),
-                    'currentUserInfo' => $isLogged ? [
+                    'currentUserInfo' => !is_null($r->identity) ? [
                         'username' => $r->identity->username,
                     ] : [],
                     'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
                     'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
-                    // TODO: Refactor Contest::apiList
-                    'upcomingContests' => \OmegaUp\Controllers\Contest::apiList(
-                        new \OmegaUp\Request([
-                            'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-                        ])
-                    ),
+                    'upcomingContests' => [
+                        'number_of_results' => count($addedContests),
+                        'results' => $addedContests,
+                    ],
                 ],
             ],
             'template' => 'index.tpl',
@@ -3216,12 +3238,17 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @return array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}
+     * @return array{smartyProperties: array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}, template: string}
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\Request $r
     ): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $r->identity = null;
+        }
         $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
         $firstDayOfNextMonth = new \DateTime($currentDate);
@@ -3229,9 +3256,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
         $isMentor = !is_null(
-            $identity
+            $r->identity
         ) && \OmegaUp\Authorization::isMentor(
-            $identity
+            $r->identity
         );
 
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3265,11 +3292,15 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
+            'category' => $category,
         ];
 
         if (!$isMentor) {
             return [
-                'payload' => $response,
+                'smartyProperties' => [
+                    'payload' => $response,
+                ],
+                'template' => 'codersofthemonth.tpl',
             ];
         }
 
@@ -3287,7 +3318,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
         ];
         return [
-            'payload' => $response,
+            'smartyProperties' => [
+                'payload' => $response,
+            ],
+            'template' => 'codersofthemonth.tpl',
         ];
     }
 
