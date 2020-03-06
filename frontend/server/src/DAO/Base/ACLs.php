@@ -198,7 +198,7 @@ abstract class ACLs {
     ): int {
         $sql = '
             INSERT INTO
-                ACLs (
+                `ACLs` (
                     `owner_id`
                 ) VALUES (
                     ?

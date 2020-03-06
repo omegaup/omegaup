@@ -6,7 +6,7 @@
  */
 
 class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]

@@ -198,7 +198,7 @@ abstract class Permissions {
     ): int {
         $sql = '
             INSERT INTO
-                Permissions (
+                `Permissions` (
                     `name`,
                     `description`
                 ) VALUES (

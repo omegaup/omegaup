@@ -171,7 +171,7 @@ abstract class Favorites {
     ): int {
         $sql = '
             INSERT INTO
-                Favorites (
+                `Favorites` (
                     `user_id`,
                     `problem_id`
                 ) VALUES (

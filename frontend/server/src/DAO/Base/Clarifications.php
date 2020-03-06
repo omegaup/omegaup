@@ -240,7 +240,7 @@ abstract class Clarifications {
     ): int {
         $sql = '
             INSERT INTO
-                Clarifications (
+                `Clarifications` (
                     `author_id`,
                     `receiver_id`,
                     `message`,

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * CreateContestTest
+ * ContestCreateTest
  *
  * @author joemmanuel
  */
 
-class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
+class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic Create Contest scenario
      *
@@ -68,22 +68,18 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token'] = $login->auth_token;
 
             try {
-                // Call the API
                 $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+                $this->fail("Exception was expected. Parameter: {$key}");
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                // This exception is expected
-                unset($_REQUEST);
+                $this->assertEquals('parameterEmpty', $e->getMessage());
+                $this->assertEquals($key, $e->parameter);
                 continue;
             }
-
-            $this->fail('Exception was expected. Parameter: ' . $key);
         }
     }
 
     /**
      * Tests that 2 contests with same name cannot be created
-     *
-     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
@@ -102,13 +98,16 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Call the API for the 2nd time with same alias
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('titleInUse', $e->getMessage());
+        }
     }
 
     /**
      * Tests very long contests
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
@@ -125,14 +124,16 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('contestLengthTooLong', $e->getMessage());
+        }
     }
 
     /**
      * Public contest without problems is not valid.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
@@ -147,16 +148,20 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        try {
+            $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestMustBeCreatedInPrivateMode',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Public contest with problems NOW is NOT valid. You need
      * to create the contest first and then you can add problems
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -177,14 +182,19 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestMustBeCreatedInPrivateMode',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Public contest with private problems is not valid.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicContestWithPrivateProblems() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -207,8 +217,12 @@ class CreateContestTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**

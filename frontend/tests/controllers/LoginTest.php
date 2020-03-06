@@ -66,61 +66,66 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test user login with invalid credentials, username and password
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
-        $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
-            'usernameOrEmail' => $identity->username,
-            'password' => 'badpasswordD:'
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+                'usernameOrEmail' => $identity->username,
+                'password' => 'badpasswordD:'
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
+            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+        }
     }
 
     /**
      * Test user login with invalid credentials, username and password
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidUsername() {
-        // Inflate request with user data
-        $r = new \OmegaUp\Request([
-            'usernameOrEmail' => 'IDontExist',
-            'password' => 'badpasswordD:'
-        ]);
-
-        // Call the API
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
+        try {
+            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+                'usernameOrEmail' => 'IDontExist',
+                'password' => 'badpasswordD:'
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
+            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+        }
     }
 
     /**
      * Test user login with invalid credentials, email and password
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['email' => $email])
         );
 
-        // Inflate request with user data
-        $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $email,
-            'password' => 'badpasswordD:'
-        ]);
-
-        // Call the API
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
+        try {
+            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+                'usernameOrEmail' => $email,
+                'password' => 'badpasswordD:'
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
+            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+        }
     }
 
     /**
      * Test login E2E via HTTP entry point
-     *
-     *
      */
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
@@ -177,8 +182,6 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test identity login with valid credentials, username and password
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginWithOldPassword() {
         // Create an user in omegaup
@@ -191,14 +194,15 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         // Let's put back plain password
         $identity->password = $plainPassword;
 
-        // Inflate request with identity data
-        $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $identity->username,
-            'password' => $identity->password
-        ]);
-
-        // Call the API
-        $response = \OmegaUp\Controllers\User::apiLogin($r);
+        try {
+            \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+                'usernameOrEmail' => $identity->username,
+                'password' => $identity->password
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
+            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+        }
     }
 
     public function testDeleteTokenExpired() {
