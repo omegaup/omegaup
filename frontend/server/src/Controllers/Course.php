@@ -1325,6 +1325,133 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{users: array}
+     */
+    public static function apiRequests(\OmegaUp\Request $r): array {
+        // Authenticate request
+        $r->ensureMainIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+
+        $course = self::validateCourseExists($r['course_alias']);
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $resultAdmins =
+            \OmegaUp\DAO\CourseIdentityRequest::getFirstAdminForCourseRequest(
+                $course->course_id
+            );
+        $resultRequests =
+            \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourse(
+                $course->course_id
+            );
+
+        $admins = [];
+        $requestsAdmins = [];
+        foreach ($resultAdmins as $result) {
+            $adminId = $result['admin_id'];
+            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
+                $admin = [];
+                $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
+                if (!is_null($data)) {
+                    $admin = [
+                        'user_id' => $data->user_id,
+                        'username' => $data->username,
+                        'name' => $data->name,
+                    ];
+                }
+                $requestsAdmins[$result['identity_id']] = $admin;
+            }
+        }
+
+        $usersRequests = array_map(function ($request) use ($requestsAdmins) {
+            if (isset($requestsAdmins[$request['identity_id']])) {
+                $request['admin'] = $requestsAdmins[$request['identity_id']];
+            }
+            return $request;
+        }, $resultRequests);
+
+        return ['users' => $usersRequests];
+    }
+
+    /**
+     * @return array{status: string}
+     */
+    public static function apiArbitrateRequest(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['note'],
+            'note'
+        );
+
+        if (is_null($r['resolution'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $course = self::validateCourseExists($r['course_alias']);
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $targetIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $r['username']
+        );
+        if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
+
+        $request = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+            $targetIdentity->identity_id,
+            $course->course_id
+        );
+
+        if (is_null($request)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'userNotInListOfRequests'
+            );
+        }
+
+        $r->ensureBool('resolution');
+
+        $request->accepted = $r['resolution'];
+        $request->extra_note = $r['note'];
+        $request->last_update = \OmegaUp\Time::get();
+
+        \OmegaUp\DAO\CourseIdentityRequest::update($request);
+
+        // Save this action in the history
+        \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+            new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                'identity_id' => $request->identity_id,
+                'course_id' => $course->course_id,
+                'time' => $request->last_update,
+                'admin_id' => intval($r->user->user_id),
+                'accepted' => $request->accepted,
+            ])
+        );
+
+        self::$log->info(
+            'Arbitrated course for user, username='
+            . $targetIdentity->username . ', state=' . $resolution
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * List students in a course
      *
      * @return array{students: list<array{name: null|string, progress: array<string, float>, username: string}>}
