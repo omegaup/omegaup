@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
           initialLanguage: this.initialLanguage,
           validLanguages: this.validLanguages,
           initialValidator: this.validator,
-          validatorsTypes: this.validatorsTypes,
+          validatorTypes: this.validatorTypes,
         },
       });
     },
@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
       overallWallTimeLimit: 0,
       validatorTimeLimit: 0,
       validLanguages: payload.validLanguages,
-      validatorsTypes: payload.validatorsTypes,
+      validatorTypes: payload.validatorTypes,
     },
     components: {
       'omegaup-problem-settings': problem_Settings,

@@ -5,7 +5,7 @@
         <label>{{ T.problemEditFormValidatorType }}</label>
         <select name="validator" class="form-control" v-model="validator">
           <option
-            v-for="(validatorText, validatorIndex) in validatorsTypes"
+            v-for="(validatorText, validatorIndex) in validatorTypes"
             v-bind:value="validatorIndex"
           >
             {{ validatorText }}</option
@@ -123,7 +123,7 @@ export default class ProblemSettings extends Vue {
   @Prop() initialLanguage!: string;
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
-  @Prop() validatorsTypes!: Array<string>;
+  @Prop() validatorTypes!: Array<string>;
 
   T = T;
   UI = UI;

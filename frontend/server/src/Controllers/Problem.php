@@ -3879,7 +3879,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $validLanguages = [
             join(
                 ',',
-                \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                $sortedLanguages
             ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
             'kj,kp' => 'Karel',
             'cat' => \OmegaUp\Translations::getInstance()->get(
@@ -3890,7 +3890,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
         ];
         return [
-          'validatorsTypes' => $validatorTypes,
+          'validatorTypes' => $validatorTypes,
           'validLanguages' => $validLanguages,
         ];
     }
@@ -4061,6 +4061,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ];
             }
         }
+        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
+        sort($sortedLanguages);
+             
         return [
             'smartyProperties' => [
                 'TITLE' => '',
@@ -4087,7 +4090,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'memoryLimit' => 32768,
                     'languages' => join(
                         ',',
-                        \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+                        $sortedLanguages
                     ),
                     'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
                     ],
