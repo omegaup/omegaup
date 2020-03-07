@@ -1396,17 +1396,19 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
-        $date = !empty($r['date']) ? strval($r['date']) : null;
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['date'],
+            'date'
+        );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['category'],
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = $r['category'] ?? 'all';
-        $firstDay = self::getCurrentMonthFirstDay($date);
-        $response = self::getCodersOfTheMonth($firstDay, $category);
-        $response['status'] = 'ok';
-        return $response;
+        return self::getCodersOfTheMonth(
+            self::getCurrentMonthFirstDay($r['date']),
+            $r['category'] ?? 'all'
+        );
     }
 
     /**
