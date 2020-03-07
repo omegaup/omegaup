@@ -60,8 +60,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     private function getCoderOfTheMonth(
-        $revDate,
-        $interval,
+        string $revDate,
+        string $interval,
         string $category
     ) {
         $reviewDate = date_create($revDate);
@@ -397,7 +397,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * @dataProvider coderOfTheMonthCategoryProvider
-     * @requires PHP < 7.4
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
@@ -453,10 +452,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             '-11 month',
             $category
         );
-        $this->assertNotEquals(
-            $identity->username,
-            $responseCoder['coderinfo']['username']
-        );
+        $this->assertNull($responseCoder['coderinfo']);
 
         $responseCoder = $this->getCoderOfTheMonth(
             $today,
