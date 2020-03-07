@@ -90,8 +90,21 @@ class ApiCaller {
      * Handles main API workflow. All HTTP API calls start here.
      */
     public static function httpEntryPoint(): string {
-        $r = self::createRequest();
-        return self::render(self::call($r), $r);
+        try {
+            $r = self::createRequest();
+            $response = self::call($r);
+        } catch (\OmegaUp\Exceptions\ApiException $apiException) {
+            $r = null;
+            $response = $apiException->asResponseArray();
+            self::$log->error($apiException);
+            if (
+                extension_loaded('newrelic') &&
+                $apiException->getCode() == 500
+            ) {
+                newrelic_notice_error(strval($apiException));
+            }
+        }
+        return self::render($response, $r);
     }
 
     /**
