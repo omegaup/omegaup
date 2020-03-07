@@ -63,7 +63,7 @@ class ProblemArtifacts {
      * Returns a list of tree entries.
      *
      * @param string $path The path to display.
-     * @return array{mode: int, type: string, name: string}[] The list of
+     * @return list<array{mode: int, type: string, id: string, name: string}> The list of
      * direct entries in $path.
      */
     public function lsTree(string $path): array {
@@ -83,7 +83,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|array{id: string, entries?: null|array{mode: int, type: string, name: string}[]} */
+        /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string}>} */
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
@@ -91,7 +91,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|array{mode: int, type: string, name: string}[] */
+        /** @var null|list<array{mode: int, type: string, id: string, name: string}> */
         $entries = $response['entries'];
         if (!is_iterable($entries)) {
             $this->log->error(
@@ -106,13 +106,13 @@ class ProblemArtifacts {
      * Returns the list of files that are transitively reachable from $path.
      *
      * @param string $path The path to display.
-     * @return array{path: string, mode: int, type: string}[] The list of files
+     * @return list<array{path: string, mode: int, id: string, type: string}> The list of files
      * that are transitively reachable from $path.
      */
     public function lsTreeRecursive(string $path = '.'): array {
-        /** @var array{path: string, mode: int, type: string}[] */
+        /** @var list<array{path: string, mode: int, id: string, type: string}> */
         $entries = [];
-        /** @var string[] */
+        /** @var list<string> */
         $queue = [$path];
         while (!empty($queue)) {
             $path = array_shift($queue);
@@ -128,7 +128,7 @@ class ProblemArtifacts {
                     continue;
                 }
 
-                array_push($entries, $entry);
+                $entries[] = $entry;
             }
         }
         usort($entries, function (array $lhs, array $rhs): int {
@@ -142,7 +142,7 @@ class ProblemArtifacts {
     }
 
     /**
-     * @return null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}
+     * @return null|array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}
      */
     public function commit(): ?array {
         $browser = new GitServerBrowser(
@@ -157,7 +157,7 @@ class ProblemArtifacts {
             );
             return null;
         }
-        /** @var null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
+        /** @var null|array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response)) {
             $this->log->error(
@@ -169,7 +169,7 @@ class ProblemArtifacts {
     }
 
     /**
-     * @return array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}[]
+     * @return list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}>
      */
     public function log(): array {
         $browser = new GitServerBrowser(
@@ -184,7 +184,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|array{log?: null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}[], next?: string} */
+        /** @var null|array{log?: null|list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}>, next?: string} */
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('log', $response)) {
             $this->log->error(
@@ -192,7 +192,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}[] */
+        /** @var null|list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}> */
         $logEntries = $response['log'];
         if (!is_iterable($logEntries)) {
             $this->log->error(
@@ -221,7 +221,7 @@ class GitServerBrowser {
     /** @var resource */
     public $curl;
 
-    /** @var string[] */
+    /** @var list<string> */
     public $headers = [];
 
     /** @var bool */
