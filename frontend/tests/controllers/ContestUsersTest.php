@@ -98,16 +98,17 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $userLogin = self::login($identity[0]);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $userLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-        ]);
-        $shoulShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $r,
-            $contestData['contest']
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity[0],
+                $contestData['contest']
+            )
         );
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
         )['smartyProperties'];
 
         // Explicitly join contest
@@ -184,15 +185,12 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $shouldShowIntro =
+        $this->assertTrue(
             \OmegaUp\Controllers\Contest::shouldShowIntro(
-                new \OmegaUp\Request([
-                    'contest_alias' => $contestData['request']['alias'],
-                ]),
+                null,
                 $contestData['contest']
-            );
-
-        $this->assertTrue($shouldShowIntro);
+            )
+        );
     }
 
     public function testNeedsBasicInformation() {
@@ -205,21 +203,20 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
-        $r = new \OmegaUp\Request([
-            'auth_token' => $userLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-        ]);
-
         // Contest intro can be shown by the user
-        $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $r,
-            $contestData['contest']
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
         );
-        $this->assertTrue($shouldShowIntro);
 
         // Contest needs basic information for the user
         $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            $r
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
         )['smartyProperties'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);

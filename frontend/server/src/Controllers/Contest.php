@@ -474,14 +474,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'] ?? ''
         );
 
-        if ($contest->admission_mode === 'private') {
+        try {
             $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            if ($contest->admission_mode === 'private') {
+                throw $e;
+            }
+            // Request can proceed unauthenticated.
         }
 
         $isPractice = isset($r['is_practice']) && $r['is_practice'] === true;
 
         $shouldShowIntro = !$isPractice && \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $r,
+            $r->identity,
             $contest
         );
 
@@ -648,22 +653,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * contest.
      */
     public static function shouldShowIntro(
-        \OmegaUp\Request $r,
+        ?\OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Contests $contest
     ): bool {
         try {
-            $session = \OmegaUp\Controllers\Session::getCurrentSession(
-                $r
-            );
-            if (is_null($session['identity'])) {
+            if (is_null($identity)) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
             }
-            self::canAccessContest($contest, $session['identity']);
+            self::canAccessContest($contest, $identity);
         } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
-            if (!self::isInvitedToContest($contest, $session['identity'])) {
+            if (!self::isInvitedToContest($contest, $identity)) {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
@@ -672,7 +674,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // You already started the contest.
         $contestOpened = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
-            $session['identity']->identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
@@ -1963,10 +1965,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest)) {
+        if (is_null($contest) || is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
-                'problem_alias'
+                'contest_alias'
             );
         }
         // Only contest admin is allowed to remove problems in contest

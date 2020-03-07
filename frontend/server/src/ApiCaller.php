@@ -246,6 +246,7 @@ class ApiCaller {
         }
 
         $request->methodName = strtolower("{$controllerName}.{$methodName}");
+        /** @var callable-string */
         $request->method = "{$controllerFqdn}::{$apiMethodName}";
 
         return $request;
@@ -285,6 +286,7 @@ class ApiCaller {
      * terminates the request.
      *
      * @param \Exception $e the thrown exception.
+     * @return no-return
      */
     public static function handleException(\Exception $e): void {
         $apiException = null;
@@ -312,19 +314,31 @@ class ApiCaller {
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
+            die(
+                file_get_contents(
+                    sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
+                )
+            );
         }
         if ($apiException->getcode() == 404) {
             self::$log->info("{$apiException}");
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
+            die(
+                file_get_contents(
+                    sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
+                )
+            );
         }
         self::$log->error("{$apiException}");
         if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
             newrelic_notice_error(strval($apiException));
         }
         header('HTTP/1.1 500 Internal Server Error');
-        die(file_get_contents(OMEGAUP_ROOT . '/www/500.html'));
+        die(
+            file_get_contents(
+                sprintf('%s/www/500.html', strval(OMEGAUP_ROOT))
+            )
+        );
     }
 }
 

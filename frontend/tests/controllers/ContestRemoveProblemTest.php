@@ -146,7 +146,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+            $this->assertEquals('contest_alias', $e->parameter);
         }
     }
 
