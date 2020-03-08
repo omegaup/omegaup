@@ -39,7 +39,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
-    headerPayload: {},
+    headerPayload: null,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -80,8 +80,8 @@ export function GetOptionsFromLocation(arenaLocation) {
     }
   }
 
-  options.headerPayload = null;
-  if (document.getElementById('header-payload') !== null) {
+  const headerPayloadElement = document.getElementById('header-payload');
+  if (headerPayloadElement !== null) {
     options.headerPayload = JSON.parse(
       document.getElementById('header-payload').innerText,
     );
@@ -1234,7 +1234,7 @@ export class Arena {
     if (self.commonNavbar === null) {
       return;
     }
-    let clarifications = self.commonNavbar.initialClarifications;
+    const clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
       if (self.problemsetAdmin) {
@@ -1371,7 +1371,7 @@ export class Arena {
         )
         .reverse();
 
-      // Removing to the notifications list all marked as solved clarifications
+      // Removing all unanswered clarifications from the notifications list.
       self.commonNavbar.initialClarifications = self.commonNavbar.initialClarifications.filter(
         clarification =>
           localStorage.getItem(
