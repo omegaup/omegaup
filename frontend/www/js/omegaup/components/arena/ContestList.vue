@@ -116,7 +116,7 @@
             v-bind:showPractice="false"
             v-bind:showVirtual="false"
             v-bind:showPublicUpdated="false"
-            v-bind:recommended="true"
+            v-bind:recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
         <div
