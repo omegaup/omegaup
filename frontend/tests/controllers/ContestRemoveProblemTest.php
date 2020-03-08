@@ -86,8 +86,6 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Removes an inexistent problem from a private contest.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveInvalidProblemFromPrivateContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -106,22 +104,21 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['director']
         );
 
-        // Create a new request
-        $r = new \OmegaUp\Request(
-            [
+        try {
+            \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => 'this problem doesnt exists'
-            ]
-        );
-
-        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
+                'problem_alias' => 'this problem does not exist'
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('problem_alias', $e->parameter);
+        }
     }
 
     /**
      * Removes a problem from an inexistent contest.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemFromInvalidContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -140,22 +137,22 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['director']
         );
 
-        $r = new \OmegaUp\Request(
-            [
+        try {
+            \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => 'this contest doesnt exists',
-                'problem_alias' => $problemData['request']['alias']
-            ]
-        );
-
-        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
+                'contest_alias' => 'this contest does not exist',
+                'problem_alias' => $problemData['request']['alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('contest_alias', $e->parameter);
+        }
     }
 
     /**
      * Removes a problem from contest while loged in with a user that
      * is not a contest admin.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -172,15 +169,16 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
-        $r = new \OmegaUp\Request(
-            [
+        try {
+            \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['alias']
-            ]
-        );
-
-        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('cannotRemoveProblem', $e->getMessage());
+        }
     }
 
     /**
@@ -279,8 +277,6 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Removes a single problem from a public contest.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -296,16 +292,22 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->makeContestPublic($contestData);
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
-            $problemData,
-            $contestData
-        );
+        try {
+            \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+                $problemData,
+                $contestData
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestPublicRequiresProblem',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Removes all problems from a public contest.
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -332,14 +334,20 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData1,
             $contestData
         );
-
-        // Validate
         $this->assertEquals('ok', $response['status']);
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
-            $problemData2,
-            $contestData
-        );
+        try {
+            \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+                $problemData2,
+                $contestData
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestPublicRequiresProblem',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -441,8 +449,6 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Removes a problem with runs from a private contest while loged in
      * with a user that is not sysadmin.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -455,7 +461,10 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -465,17 +474,23 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
-            $problemData,
-            $contestData
-        );
+        try {
+            \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+                $problemData,
+                $contestData
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'cannotRemoveProblemWithSubmissions',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Removes a problem with runs only from admins from a private contest while
      * loged in with a user that is not sysadmin.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -503,10 +518,18 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
-            $problemData,
-            $contestData
-        );
+        try {
+            \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+                $problemData,
+                $contestData
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'cannotRemoveProblemWithSubmissions',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -547,8 +570,6 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Removes a problem with runs made outside and inside the contest from a private contest
      * while logged in as Contest Admin. Should fail.
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -575,10 +596,18 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
-            $problemData,
-            $contestData
-        );
+        try {
+            \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+                $problemData,
+                $contestData
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'cannotRemoveProblemWithSubmissions',
+                $e->getMessage()
+            );
+        }
     }
 
     /**

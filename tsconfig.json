@@ -3,12 +3,14 @@
     "outDir": "./built/",
     "sourceMap": true,
     "target": "es5",
+    "downlevelIteration": true,
     "strict": true,
     "module": "es2015",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "listFiles": true,
     "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["frontend/www/*"]
     }

@@ -238,7 +238,7 @@ abstract class Identities {
     ): int {
         $sql = '
             INSERT INTO
-                Identities (
+                `Identities` (
                     `username`,
                     `password`,
                     `name`,

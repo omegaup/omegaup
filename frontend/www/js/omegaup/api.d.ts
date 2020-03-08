@@ -206,9 +206,9 @@ declare namespace omegaup {
   }
 
   export interface CourseStudent {
-    name?: string;
+    name: string;
     username: string;
-    progress: CourseProgress[];
+    progress: CourseProgress;
   }
 
   interface DetailsGroup {
@@ -435,6 +435,28 @@ declare namespace omegaup {
     name: string;
   }
 
+  export interface Run {
+    [period: string]: number;
+  }
+
+  export interface RunInfo {
+    date: string;
+    verdict: string;
+    runs: number;
+    [period: string]: string;
+  }
+
+  export interface RunCounts {
+    categories: string[];
+    cumulative: omegaup.RunData[];
+    delta: omegaup.RunData[];
+  }
+
+  interface RunData {
+    data: number[];
+    name: string;
+  }
+
   interface RunDetails {
     admin?: boolean;
     compile_error?: string;
@@ -552,6 +574,10 @@ declare namespace omegaup {
 
   interface Verdict {
     [verdict: string]: number;
+  }
+
+  export interface VerdictByDate {
+    [date: string]: Verdict;
   }
 }
 

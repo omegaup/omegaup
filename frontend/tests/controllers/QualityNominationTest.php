@@ -488,16 +488,19 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $request
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             $problemData['problem']->title,
             $emailSender::$listEmails[0]['subject']
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             $problemData['author']->name,
             $emailSender::$listEmails[0]['body']
         );
-        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
-        $this->assertContains(
+        $this->assertStringContainsString(
+            'qwert',
+            $emailSender::$listEmails[0]['body']
+        );
+        $this->assertStringContainsString(
             'something else',
             $emailSender::$listEmails[0]['body']
         );
@@ -1305,17 +1308,17 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[0]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.971428571,
             $newProblem[0]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.2,
             $newProblem[0]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
         $this->assertEquals(
             '[0, 0, 2, 2, 1]',
@@ -1331,13 +1334,18 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[2]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             0,
             $newProblem[2]->difficulty,
-            'Wrong difficulty',
-            0.001
+            0.001,
+            'Wrong difficulty'
         );
-        $this->assertEquals(0, $newProblem[2]->quality, 'Wrong quality', 0.001);
+        $this->assertEqualsWithDelta(
+            0,
+            $newProblem[2]->quality,
+            0.001,
+            'Wrong quality'
+        );
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
@@ -1373,49 +1381,49 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[0]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.895384615,
             $newProblem[0]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.538378378,
             $newProblem[0]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
 
         $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[1]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             3.446886447,
             $newProblem[1]->difficulty,
-            'Wrong difficulty.',
-            0.001
+            0.001,
+            'Wrong difficulty.'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             0,
             $newProblem[1]->quality,
-            'Wrong quality.',
-            0.001
+            0.001,
+            'Wrong quality.'
         );
 
         $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
             $problemData[2]['request']['problem_alias']
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             2.684981685,
             $newProblem[2]->difficulty,
-            'Wrong difficulty',
-            0.001
+            0.001,
+            'Wrong difficulty'
         );
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             1.736164736,
             $newProblem[2]->quality,
-            'Wrong quality',
-            0.001
+            0.001,
+            'Wrong quality'
         );
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(

@@ -286,7 +286,7 @@ abstract class CourseIdentityRequest {
     ): int {
         $sql = '
             INSERT INTO
-                Course_Identity_Request (
+                `Course_Identity_Request` (
                     `identity_id`,
                     `course_id`,
                     `request_time`,

@@ -98,7 +98,7 @@ abstract class ProblemsetAccessLog {
     ): int {
         $sql = '
             INSERT INTO
-                Problemset_Access_Log (
+                `Problemset_Access_Log` (
                     `problemset_id`,
                     `identity_id`,
                     `ip`,
