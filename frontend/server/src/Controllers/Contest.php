@@ -92,18 +92,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $participating
         );
 
-        $addedContests = [];
-        foreach ($contests as $contestInfo) {
-            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
-                            $contestInfo['finish_time'] - $contestInfo['start_time'] :
-                            ($contestInfo['window_length'] * 60));
-
-            $addedContests[] = $contestInfo;
-        }
-
         return [
-            'number_of_results' => count($addedContests),
-            'results' => $addedContests,
+            'number_of_results' => count($contests),
+            'results' => $contests,
         ];
     }
 
@@ -150,7 +141,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             } else {
                 $contests = $callback();
             }
-        } elseif ($participating == \OmegaUp\DAO\Enum\ParticipatingStatus::YES) {
+        } elseif ($participating === \OmegaUp\DAO\Enum\ParticipatingStatus::YES) {
             $contests = \OmegaUp\DAO\Contests::getContestsParticipating(
                 $identity->identity_id,
                 $page,
@@ -205,7 +196,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $query
             );
         }
-        return $contests;
+        $addedContests = [];
+        foreach ($contests as $contestInfo) {
+            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+                $contestInfo['finish_time'] - $contestInfo['start_time'] :
+                ($contestInfo['window_length'] * 60)
+            );
+
+            $addedContests[] = $contestInfo;
+        }
+        return $addedContests;
     }
 
     /**
@@ -563,6 +563,104 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => $result,
             'template' => 'arena.contest.intro.tpl',
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: array{contests: array{current: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, future: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, participating?: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, past: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, public: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, recommended_current: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>, recommended_past: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>}, isLogged: bool, query: string}}, template: string}
+     */
+    public static function getContestListDetailsForSmarty(
+        \OmegaUp\Request $r
+    ) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['query'],
+            'query',
+            /*$minLength=*/ 0,
+            /*$maxLength=*/ 256,
+            /*$required=*/ false
+        );
+        $contests = [];
+        if (!is_null($r->identity)) {
+            $contests['participating'] = self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+                /*$public=*/ false,
+                \OmegaUp\DAO\Enum\ParticipatingStatus::YES
+            );
+        }
+        $contests['recommended_current'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED
+        );
+        $contests['current'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
+        );
+        $contests['public'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
+        );
+        $contests['future'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
+            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
+        );
+        $contests['recommended_past'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+            \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED
+        );
+        $contests['past'] = self::getContestList(
+            $r->identity,
+            $r['query'],
+            $page,
+            $pageSize,
+            \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+            \OmegaUp\DAO\Enum\RecommendedStatus::NOT_RECOMMENDED
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'query' => $r['query'],
+                    'isLogged' => !is_null($r->identity),
+                    'contests' => $contests,
+                ],
+            ],
+            'template' => 'arena.index.tpl',
         ];
     }
 
@@ -3794,6 +3892,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function isPublic(string $admissionMode): bool {
-        return $admissionMode != 'private';
+        return $admissionMode !== 'private';
     }
 }
