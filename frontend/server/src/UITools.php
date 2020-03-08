@@ -162,6 +162,7 @@ class UITools {
 
     private static function assignSmartyNavbarHeader(
         \Smarty $smarty,
+        array $payload = [],
         bool $inContest = false,
         string $navbarSection = ''
     ): void {
@@ -171,6 +172,35 @@ class UITools {
             'user' => $user,
             'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
+        $smarty->assign(
+            'payload',
+            array_merge(
+                $payload,
+                [
+                    'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
+                    'inContest' => $inContest,
+                    'isLoggedIn' => !is_null($identity),
+                    'isReviewer' => !is_null(
+                        $identity
+                    ) ? \OmegaUp\Authorization::isQualityReviewer(
+                        $identity
+                    ) : false,
+                    'gravatarURL51' => is_null($email) ? '' :
+                      self::getFormattedGravatarURL(md5($email), '51'),
+                    'currentUsername' =>
+                        !is_null(
+                            $identity
+                        ) && !is_null(
+                            $identity->username
+                        ) ? $identity->username :
+                        '',
+                    'isMainUserIdentity' => !is_null($user),
+                    'isAdmin' => $isAdmin,
+                    'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
+                    'navbarSection' => $navbarSection,
+                ]
+            )
+        );
         $smarty->assign(
             'headerPayload',
             [
@@ -214,16 +244,17 @@ class UITools {
             \OmegaUp\ApiCaller::handleException($e);
         }
 
-        \OmegaUp\UITools::assignSmartyNavbarHeader(
-            $smarty,
-            $inContest,
-            $navbarSection
-        );
-
         /** @var mixed $value */
         foreach ($smartyProperties as $key => $value) {
             $smarty->assign($key, $value);
         }
+
+        \OmegaUp\UITools::assignSmartyNavbarHeader(
+            $smarty,
+            $smartyProperties['payload'] ?? [],
+            $inContest,
+            $navbarSection
+        );
 
         $smarty->display(
             sprintf(

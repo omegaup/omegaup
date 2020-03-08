@@ -71,20 +71,26 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.disableSockets = true;
   }
   const elementPayload = document.getElementById('payload');
-  if (elementPayload != null) {
+  if (elementPayload !== null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload != null) {
+    if (payload !== null) {
+      console.log(payload);
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
+      options.headerPayload = {
+        omegaUpLockDown: payload.omegaUpLockDown,
+        inContest: payload.inContest,
+        isLoggedIn: payload.isLoggedIn,
+        isReviewer: payload.isReviewer,
+        gravatarURL51: payload.gravatarURL51,
+        currentUsername: payload.currentUsername,
+        isAdmin: payload.isAdmin,
+        isMainUserIdentity: payload.isMainUserIdentity,
+        lockDownImage: payload.lockDownImage,
+        navbarSection: payload.navbarSection,
+      };
     }
-  }
-
-  const headerPayloadElement = document.getElementById('header-payload');
-  if (headerPayloadElement !== null) {
-    options.headerPayload = JSON.parse(
-      document.getElementById('header-payload').innerText,
-    );
   }
   return options;
 }
