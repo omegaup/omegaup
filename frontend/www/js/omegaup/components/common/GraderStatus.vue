@@ -50,6 +50,16 @@ a.grader-submissions-link:hover {
 hr.dropdown-separator {
   margin: 0;
 }
+
+li,
+ul {
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
 </style>
 
 <script lang="ts">
