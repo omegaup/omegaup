@@ -1,5 +1,5 @@
 <template>
-  <div class="panel">
+  <div class="panel contest-list">
     <div class="panel-heading panel-default">
       <div class="text-right">
         <form action="/arena/" method="GET">

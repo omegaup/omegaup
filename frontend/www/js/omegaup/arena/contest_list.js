@@ -5,8 +5,10 @@ import arena_ContestList from '../components/arena/ContestList.vue';
 OmegaUp.on('ready', function() {
   Date.setLocale(omegaup.T.locale);
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  for (const timeType in payload.contests) {
-    payload[timeType] = convertContestTimes(payload.contests[timeType]);
+  for (const [timeType, contests] of Object.entries(payload.contests)) {
+    payload[timeType] = contests.forEach(contest =>
+      OmegaUp.convertTimes(contest),
+    );
   }
   const contestList = new Vue({
     el: '#arena-contest-list',
@@ -26,8 +28,4 @@ OmegaUp.on('ready', function() {
     },
     components: { 'omegaup-arena-contestlist': arena_ContestList },
   });
-
-  function convertContestTimes(contests) {
-    return contests.forEach(contest => OmegaUp.convertTimes(contest));
-  }
 });
