@@ -160,9 +160,12 @@ class UITools {
         return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     private static function assignSmartyNavbarHeader(
         \Smarty $smarty,
-        array $payload = [],
+        $payload = [],
         bool $inContest = false,
         string $navbarSection = ''
     ): void {
@@ -240,6 +243,8 @@ class UITools {
             $template = $response['template'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
+            /** @var array<string, mixed> $payload */
+            $payload = $smartyProperties['payload'] ?? [];
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
@@ -251,7 +256,7 @@ class UITools {
 
         \OmegaUp\UITools::assignSmartyNavbarHeader(
             $smarty,
-            $smartyProperties['payload'] ?? [],
+            $payload,
             $inContest,
             $navbarSection
         );

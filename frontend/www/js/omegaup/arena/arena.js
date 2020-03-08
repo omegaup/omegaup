@@ -74,7 +74,6 @@ export function GetOptionsFromLocation(arenaLocation) {
   if (elementPayload !== null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
     if (payload !== null) {
-      console.log(payload);
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
