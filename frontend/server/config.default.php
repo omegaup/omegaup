@@ -19,11 +19,11 @@ try_define('IS_TEST', false);
 try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
 try_define(
     'OMEGAUP_TEST_ROOT',
-    sprintf(strval(OMEGAUP_ROOT), '/tests/controllers/')
+    sprintf('%s/tests/controllers/', strval(OMEGAUP_ROOT))
 );
 try_define(
     'OMEGAUP_TEST_RESOURCES_ROOT',
-    sprintf(strval(OMEGAUP_ROOT), '/tests/resources/')
+    sprintf('%s/tests/resources/', strval(OMEGAUP_ROOT))
 );
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
@@ -72,24 +72,24 @@ try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define(
     'OMEGAUP_SSLCERT_URL',
-    sprintf(strval(OMEGAUP_ROOT), '/omegaup.pem')
+    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
 );
 try_define(
     'OMEGAUP_CACERT_URL',
-    sprintf(strval(OMEGAUP_ROOT), '/omegaup.pem')
+    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
 );
 try_define(
     'BIN_PATH',
-    sprintf(strval(OMEGAUP_ROOT), '/../bin')
+    sprintf('%s/../bin', strval(OMEGAUP_ROOT))
 );
 try_define(
     'IMAGES_PATH',
-    sprintf(strval(OMEGAUP_ROOT), '/www/img/')
+    sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );
 try_define('IMAGES_URL_PATH', '/img/');
 try_define(
     'TEMPLATES_PATH',
-    sprintf(strval(OMEGAUP_ROOT), '/www/templates/')
+    sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
 );
 try_define('TEMPLATES_URL_PATH', '/templates/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
