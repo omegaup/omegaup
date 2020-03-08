@@ -64,12 +64,12 @@ class CreateUserParams {
             $params['username'] ?? null,
             'username'
         );
-        $this->username = $params['username'];
+        $this->username = $params['username'] ?? '';
 
         $this->name = $params['name'] ?? null;
 
         \OmegaUp\Validators::validateEmail($params['email'] ?? null, 'email');
-        $this->email = $params['email'];
+        $this->email = $params['email'] ?? '';
 
         $this->password = $params['password'] ?? null;
 

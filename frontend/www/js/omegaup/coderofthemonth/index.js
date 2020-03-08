@@ -15,6 +15,7 @@ OmegaUp.on('ready', function() {
           isMentor: this.isMentor,
           canChooseCoder: this.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
+          category: this.category,
         },
         on: {
           'select-coder': function(coderUsername) {
@@ -22,7 +23,11 @@ OmegaUp.on('ready', function() {
               username: coderUsername,
             })
               .then(function(data) {
-                UI.success(T.coderOfTheMonthSelectedSuccessfully);
+                UI.success(
+                  category == 'all'
+                    ? T.coderOfTheMonthSelectedSuccessfully
+                    : T.coderOfTheMonthFemaleSelectedSuccessfully,
+                );
                 coderOfTheMonthList.coderIsSelected = true;
               })
               .fail(UI.apiError);
@@ -37,6 +42,7 @@ OmegaUp.on('ready', function() {
       candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
       canChooseCoder: payload.isMentor && payload.options.canChooseCoder,
       coderIsSelected: payload.isMentor && payload.options.coderIsSelected,
+      category: payload.category,
     },
     components: { 'omegaup-coder-of-the-month-list': coderofthemonth_List },
   });

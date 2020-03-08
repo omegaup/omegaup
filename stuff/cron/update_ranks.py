@@ -3,6 +3,7 @@
 '''Updates the user ranking.'''
 
 import argparse
+import datetime
 import logging
 import os
 import sys
@@ -23,6 +24,16 @@ class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     percentile: float
     classname: str
+
+
+def _default_date() -> datetime.date:
+    today = datetime.date.today()
+    return today.replace(day=1)
+
+
+def _parse_date(s: str) -> datetime.date:
+    today = datetime.datetime.strptime(s, '%Y-%m-%d').date()
+    return today.replace(day=1)
 
 
 def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
@@ -247,6 +258,141 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                     (row['score'], rank, row['school_id']))
 
 
+def update_school_of_the_month_candidates(
+        cur: MySQLdb.cursors.BaseCursor,
+        first_day_of_current_month: datetime.date) -> None:
+    '''Updates the list of candidates to school of the current month'''
+
+    logging.info('Updating the candidates to school of the month...')
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1,
+            1,
+            1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1,
+            1)
+
+    # First make sure there are not already selected schools of the month
+    cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `School_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL;
+                ''',
+                (first_day_of_next_month,))
+
+    for row in cur:
+        if row['count'] > 0:
+            logging.info('Skipping because already exist selected schools.')
+            return
+
+    cur.execute('''
+                DELETE FROM
+                    `School_Of_The_Month`
+                WHERE
+                    `time` = %s;
+                ''',
+                (first_day_of_next_month,))
+
+    cur.execute(
+        '''
+        SELECT
+            `s`.`school_id`,
+            IFNULL(
+                SUM(
+                    ROUND(
+                        100 / LOG(2, `distinct_school_problems`.`accepted`+1),
+                        0
+                    )
+                ),
+                0.0
+            ) AS `score`
+        FROM
+            `Schools` AS `s`
+        INNER JOIN
+            (
+                SELECT
+                    `su`.`school_id`,
+                    `p`.`accepted`,
+                    MIN(`su`.`time`) AS `first_ac_time`
+                FROM
+                    `Submissions` AS `su`
+                INNER JOIN
+                    `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
+                INNER JOIN
+                    `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+                WHERE
+                    `r`.`verdict` = "AC"
+                    AND `p`.`visibility` >= 1
+                    AND `su`.`school_id` IS NOT NULL
+                GROUP BY
+                    `su`.`school_id`,
+                    `su`.`problem_id`
+                HAVING
+                    `first_ac_time` BETWEEN %s AND %s
+            ) AS `distinct_school_problems`
+        ON
+            `distinct_school_problems`.`school_id` = `s`.`school_id`
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    `sotm`.`school_id`,
+                    MAX(`time`) AS `latest_time`
+                FROM
+                    `School_Of_The_Month` AS `sotm`
+                WHERE
+                    `sotm`.`school_id` = `s`.`school_id`
+                    AND (
+                        `sotm`.`selected_by` IS NOT NULL OR
+                        `sotm`.`rank` = 1
+                    )
+                GROUP BY
+                    `sotm`.`school_id`
+                HAVING
+                    DATE_ADD(`latest_time`, INTERVAL 1 YEAR) >= %s
+            )
+        GROUP BY
+            `s`.`school_id`
+        ORDER BY
+            `score` DESC
+        LIMIT 100;
+        ''',
+        (
+            first_day_of_current_month,
+            first_day_of_next_month,
+            first_day_of_next_month
+        ))
+
+    for index, row in enumerate(cur):
+        cur.execute('''
+                    INSERT INTO
+                        `School_Of_The_Month` (
+                            `school_id`,
+                            `time`,
+                            `rank`,
+                            `score`
+                        )
+                    VALUES (
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    );
+                    ''',
+                    (
+                        row['school_id'],
+                        first_day_of_next_month,
+                        index + 1,
+                        row['score']
+                    ))
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
@@ -254,6 +400,10 @@ def main() -> None:
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
+    parser.add_argument('--date',
+                        type=_parse_date,
+                        default=_default_date(),
+                        help='The date the command should take as today')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -275,6 +425,14 @@ def main() -> None:
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update school ranking')
+                raise
+
+            try:
+                update_school_of_the_month_candidates(cur, args.date)
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to school of the month')
                 raise
     finally:
         dbconn.close()

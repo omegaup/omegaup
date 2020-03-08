@@ -27,8 +27,10 @@ class PrivacyStatement {
         $language = self::getLanguage($languageId);
 
         return file_get_contents(
-            OMEGAUP_ROOT .
-            "/privacy/{$problemsetType}_{$requestsUserInformation}_consent/{$language}.md"
+            sprintf(
+                "%s/privacy/{$problemsetType}_{$requestsUserInformation}_consent/{$language}.md",
+                strval(OMEGAUP_ROOT)
+            )
         );
     }
 
@@ -43,8 +45,7 @@ class PrivacyStatement {
         $language = self::getLanguage($languageId);
 
         return file_get_contents(
-            OMEGAUP_ROOT .
-            "/privacy/{$type}/{$language}.md"
+            sprintf("%s/privacy/{$type}/{$language}.md", strval(OMEGAUP_ROOT))
         );
     }
 
