@@ -3910,15 +3910,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$isRequired=*/ false
         );
         if (!isset($r['request'])) {
-            print_r($r['request']);
             return [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
                 'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
-                'payload' =>
-                    self::getCommonPayloadForSmarty()
-                ,
+                'payload' => self::getCommonPayloadForSmarty(),
             ];
         }
         // Validate commit message.
@@ -3941,15 +3938,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 } else {
                     $statusError = $response['error'];
                 }
-                print_r($r['request']);
                 return [
                     'IS_UPDATE' => true,
                     'LOAD_MATHJAX' => true,
                     'LOAD_PAGEDOWN' => true,
                     'STATUS_ERROR' => $statusError,
-                    'payload' =>
-                        self::getCommonPayloadForSmarty()
-                    ,
+                    'payload' => self::getCommonPayloadForSmarty(),
                 ];
             }
         } elseif ($r['request'] === 'markdown') {
@@ -3989,9 +3983,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
-            'payload' =>
-                self::getCommonPayloadForSmarty()
-            ,
+            'payload' => self::getCommonPayloadForSmarty(),
         ];
     }
 
@@ -4081,18 +4073,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'IS_UPDATE' => false,
                 'payload' => array_merge(
                     [
-                    'timeLimit' => 1000,
-                    'validatorTimeLimit' => 1000,
-                    'overallWallTimeLimit' => 60000,
-                    'extraWallTime' => 0,
-                    'outputLimit' => 10240,
-                    'inputLimit' => 10240,
-                    'memoryLimit' => 32768,
-                    'languages' => join(
-                        ',',
-                        $sortedLanguages
-                    ),
-                    'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
+                        'timeLimit' => 1000,
+                        'validatorTimeLimit' => 1000,
+                        'overallWallTimeLimit' => 60000,
+                        'extraWallTime' => 0,
+                        'outputLimit' => 10240,
+                        'inputLimit' => 10240,
+                        'memoryLimit' => 32768,
+                        'languages' => join(
+                            ',',
+                            $sortedLanguages
+                        ),
+                        'validator' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
                     ],
                     self::getCommonPayloadForSmarty()
                 ),

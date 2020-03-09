@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
@@ -128,20 +128,17 @@ export default class ProblemSettings extends Vue {
   T = T;
   UI = UI;
 
-  get validator(): string {
-    return this.initialValidator;
+  validator = this.initialValidator;
+  languages = this.initialLanguage;
+  
+  @Watch('initialValidator')
+  onInitialValidatorChange(newInitial: string): void {
+    this.validator = newInitial;
   }
-
-  set validator(validator: string) {
-    this.initialValidator = validator;
-  }
-
-  get languages(): string {
-    return this.initialLanguage;
-  }
-
-  set languages(language: string) {
-    this.initialLanguage = language;
+  
+  @Watch('initialLanguage')
+  onInitialLanguagesChange(newInitial: string): void {
+    this.languages = newInitial;
   }
 }
 </script>
