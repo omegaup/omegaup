@@ -458,20 +458,23 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test to set recommended value in two contests.
-     * @requires PHP < 7.4
      */
-    public function testRecommendedSContestsList() {
+    public function testRecommendedContestsList() {
         // Create 2 contests not-recommended
         $recommendedContest[0] = \OmegaUp\Test\Factories\Contest::createContest();
         $recommendedContest[1] = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $contestantIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get list of contests
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 1000,
         ]));
 
         // Assert that two contests are not recommended
@@ -487,23 +490,27 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Turn recommended ON
         // phpcbf does not like a block just for scoping purposes and
         // messes up the alignment pretty badly.
-        if (true) {
-            ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
-            $login = self::login($identity);
-            for ($i = 0; $i < 2; $i++) {
-                \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'contest_alias' => $recommendedContest[$i]['request']['alias'],
-                    'value' => 1,
-                ]));
-            }
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($identity);
+        for ($i = 0; $i < 2; $i++) {
+            \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $recommendedContest[$i]['request']['alias'],
+                'value' => 1,
+            ]));
         }
+        unset($login);
 
         // Get list of contests
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'page_size' => 1000,
         ]));
+        unset($login);
 
         // Assert that two contests are already recommended
         for ($i = 0; $i < 2; $i++) {

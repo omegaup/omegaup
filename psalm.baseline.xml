@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.6.2@05ace258176795e87ef07b4262b5ceba3fd27de3">
+<files psalm-version="3.9.4@352bd3f5c5789db04e4010856c2f4e01ed354f4e">
   <file src="frontend/server/src/Controllers/Contest.php">
     <DocblockTypeContradiction occurrences="1">
       <code>$req-&gt;accepted === '0'</code>
@@ -64,7 +64,7 @@
       <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="13">
+    <MixedAssignment occurrences="12">
       <code>$auth_token</code>
       <code>$r['start_time']</code>
       <code>$start_time</code>
@@ -72,7 +72,6 @@
       <code>$contest_length</code>
       <code>$requestProblems</code>
       <code>$requestProblem</code>
-      <code>$language</code>
       <code>$request-&gt;extra_note</code>
       <code>$contest-&gt;admission_mode</code>
     </MixedAssignment>
@@ -163,13 +162,12 @@
       <code>$r['problem_alias']</code>
       <code>$run</code>
     </MixedArgument>
-    <MixedAssignment occurrences="7">
+    <MixedAssignment occurrences="6">
       <code>$run</code>
       <code>$run</code>
       <code>$distribSettings</code>
       <code>$lang</code>
       <code>$lang</code>
-      <code>$logEntry['tree'][$treeEntry['path']]</code>
       <code>$run</code>
       <code>$run</code>
     </MixedAssignment>
@@ -217,16 +215,6 @@
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="3">
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-      <code>$response</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>\OmegaUp\DAO\VO\Problems</code>
-      <code>\OmegaUp\DAO\VO\Problems</code>
-    </InvalidReturnType>
     <InvalidScalarArgument occurrences="3">
       <code>$i</code>
       <code>$digits</code>
@@ -258,7 +246,7 @@
       <code>$r-&gt;identity-&gt;gender</code>
       <code>$r2['auth_token']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="8">
+    <MixedPropertyFetch occurrences="7">
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
       <code>$r['user']-&gt;user_id</code>

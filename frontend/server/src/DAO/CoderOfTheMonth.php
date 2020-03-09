@@ -18,7 +18,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|list<array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfTheMonth(
         string $startTime,
@@ -345,7 +345,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     }
 
     /**
-     * @return null|array<int, array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|list<array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
      */
     public static function calculateCoderOfMonthByGivenDate(
         string $date,

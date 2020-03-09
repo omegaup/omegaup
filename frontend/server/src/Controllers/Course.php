@@ -252,7 +252,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Only curator can set public
         if (
             !is_null($r['admission_mode'])
-            && $r['admission_mode'] === self::ADMISSION_MODE_PUBLIC
+            && $r['admission_mode'] !== self::ADMISSION_MODE_PRIVATE
             && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -2413,7 +2413,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, hasToken: bool}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, hasToken: bool}
      */
     private static function authenticateAndValidateToken(
         string $courseAlias,

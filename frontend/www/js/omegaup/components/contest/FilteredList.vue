@@ -1,6 +1,9 @@
 <template>
   <div class="panel panel-primary">
-    <div class="panel">
+    <div v-if="contests.length === 0">
+      <div class="empty-category">{{ T.contestListEmpty }}</div>
+    </div>
+    <div class="panel" v-else="">
       <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
       <div class="panel-body">
         <table class="contest-list table">
@@ -57,7 +60,7 @@
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
-              <td class="no-wrap col-md-2" v-if="$parent.showPublicUpdated">
+              <td class="no-wrap col-md-2" v-if="showPublicUpdated">
                 {{ contest.last_updated.long() }}
               </td>
             </tr>
@@ -92,8 +95,8 @@ import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
 
-@Component({})
-export default class List extends Vue {
+@Component
+export default class FilteredList extends Vue {
   @Prop() contests!: omegaup.Contest[];
   @Prop() showTimes!: boolean;
   @Prop() showPractice!: boolean;
