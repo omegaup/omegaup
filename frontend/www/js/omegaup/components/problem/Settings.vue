@@ -130,12 +130,12 @@ export default class ProblemSettings extends Vue {
 
   validator = this.initialValidator;
   languages = this.initialLanguage;
-  
+
   @Watch('initialValidator')
   onInitialValidatorChange(newInitial: string): void {
     this.validator = newInitial;
   }
-  
+
   @Watch('initialLanguage')
   onInitialLanguagesChange(newInitial: string): void {
     this.languages = newInitial;
