@@ -220,7 +220,7 @@ abstract class ContestLog {
     ): int {
         $sql = '
             INSERT INTO
-                Contest_Log (
+                `Contest_Log` (
                     `contest_id`,
                     `user_id`,
                     `from_admission_mode`,

@@ -4,6 +4,7 @@ from . import connections
 
 
 class BaseCursor(object):
+    rowcount: int
     def __init__(self, connection: connections.Connection) -> None:
       self.messages: List[str] = []
 

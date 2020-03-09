@@ -141,10 +141,7 @@ class Controller {
                 $fieldName = $info;
             } else {
                 $fieldName = $source;
-                if (
-                    isset($info['transform']) &&
-                    is_callable($info['transform'])
-                ) {
+                if (isset($info['transform'])) {
                     $transform = $info['transform'];
                 }
                 if (isset($info['important']) && $info['important'] === true) {

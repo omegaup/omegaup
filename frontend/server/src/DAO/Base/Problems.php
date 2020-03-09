@@ -288,7 +288,7 @@ abstract class Problems {
     ): int {
         $sql = '
             INSERT INTO
-                Problems (
+                `Problems` (
                     `acl_id`,
                     `visibility`,
                     `title`,

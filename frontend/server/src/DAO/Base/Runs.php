@@ -244,7 +244,7 @@ abstract class Runs {
     ): int {
         $sql = '
             INSERT INTO
-                Runs (
+                `Runs` (
                     `submission_id`,
                     `version`,
                     `status`,

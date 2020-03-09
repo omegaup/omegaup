@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
+class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for creating a problem
      */
@@ -372,8 +372,8 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Verify we have the accents, lol
-        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
-        if (strpos($markdown_contents, 'ó') === false) {
+        $markdownContents = $problemArtifacts->get('statements/es.markdown');
+        if (strpos($markdownContents, 'ó') === false) {
             $this->fail('ó not found when expected.');
         }
     }
@@ -415,15 +415,21 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
 
         // Do image path checks in the markdown file
-        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
-        $this->assertContains('![Saluda](bunny.jpg)', $markdown_contents);
+        $markdownContents = $problemArtifacts->get('statements/es.markdown');
+        $this->assertStringContainsString(
+            '![Saluda](bunny.jpg)',
+            $markdownContents
+        );
         // And the direct URL.
-        $this->assertContains(
+        $this->assertStringContainsString(
             "![Saluda]($imageAbsoluteUrl)",
-            $markdown_contents
+            $markdownContents
         );
         // And the unmodified, not found image.
-        $this->assertContains('![404](notfound.jpg)', $markdown_contents);
+        $this->assertStringContainsString(
+            '![404](notfound.jpg)',
+            $markdownContents
+        );
 
         // Check that the images are there.
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([

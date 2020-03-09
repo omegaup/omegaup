@@ -616,7 +616,11 @@ class Scoreboard {
             $identityId = $contestant['identity_id'];
 
             // Add contestant results to scoreboard data
-            if (!$showAllRuns && $testOnly[$identityId] && !$noRuns[$identityId]) {
+            if (
+                !$showAllRuns &&
+                boolval($testOnly[$identityId]) &&
+                !$noRuns[$identityId]
+            ) {
                 continue;
             }
             if (!array_key_exists($identityId, $identitiesInfo)) {
@@ -732,7 +736,7 @@ class Scoreboard {
     /**
      * @param \OmegaUp\ScoreboardParams $params
      * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}> $contestRuns
-     * @param list<array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
+     * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @return list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>
      */
@@ -742,7 +746,7 @@ class Scoreboard {
         array $rawContestIdentities,
         array $problemMapping
     ): array {
-        /** @var array<int, array{identity_id: int, username: string, name: string|null, country_id: null|string, is_invited: bool}> */
+        /** @var array<int, array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> */
         $contestIdentities = [];
 
         foreach ($rawContestIdentities as $identity) {

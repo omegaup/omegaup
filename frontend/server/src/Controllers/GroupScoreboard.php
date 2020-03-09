@@ -226,10 +226,10 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         // Fill details of this scoreboard
         $response = [
             'ranking' => [],
-            /** @var array{alias: string, create_time: int, description: string, group_id: int, group_scoreboard_id: int, name: string} */
-            'scoreboard' => $scoreboard->asArray(),
             'contests' => $contests,
         ];
+        /** @var array{alias: string, create_time: int, description: string, group_id: int, group_scoreboard_id: int, name: string} */
+        $response['scoreboard'] = $scoreboard->asArray();
 
         // If we have contests, calculate merged&filtered scoreboard
         if (!empty($contests)) {
@@ -282,6 +282,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             intval($group->group_id)
         );
         foreach ($groupScoreboards as $scoreboard) {
+            /** @var array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string} */
             $scoreboards[] = $scoreboard->asArray();
         }
 

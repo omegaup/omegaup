@@ -305,7 +305,7 @@ abstract class UserRank {
     ): int {
         $sql = '
             INSERT INTO
-                User_Rank (
+                `User_Rank` (
                     `user_id`,
                     `rank`,
                     `problems_solved_count`,

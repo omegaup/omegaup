@@ -206,7 +206,7 @@ abstract class ProblemOfTheWeek {
     ): int {
         $sql = '
             INSERT INTO
-                Problem_Of_The_Week (
+                `Problem_Of_The_Week` (
                     `problem_id`,
                     `time`,
                     `difficulty`

@@ -313,10 +313,19 @@ class Utils {
         }
     }
 
-    public static function runUpdateRanks(): void {
+    public static function runUpdateRanks(
+        string $runDate = null
+    ): void {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();
+        $date = is_null(
+            $runDate
+        ) ? '' : (' --date ' . escapeshellarg(
+            strval(
+                $runDate
+            )
+        ));
         self::shellExec(
             ('python3 ' .
              escapeshellarg(strval(OMEGAUP_ROOT)) .
@@ -325,7 +334,8 @@ class Utils {
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-            ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+            ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+            $date)
         );
     }
 

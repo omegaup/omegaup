@@ -21,6 +21,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
         'share_user_information' => true,
         'privacystatement_consent_id' => true,
         'accept_teacher' => true,
+        'is_invited' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -56,6 +57,11 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
         if (isset($data['accept_teacher'])) {
             $this->accept_teacher = boolval(
                 $data['accept_teacher']
+            );
+        }
+        if (isset($data['is_invited'])) {
+            $this->is_invited = boolval(
+                $data['is_invited']
             );
         }
     }
@@ -96,4 +102,11 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
      * @var bool|null
      */
     public $accept_teacher = null;
+
+    /**
+     * Indica si la identidad ingresará al curso por invitación o le fue compartido el link del curso abierto con registro
+     *
+     * @var bool
+     */
+    public $is_invited = false;
 }

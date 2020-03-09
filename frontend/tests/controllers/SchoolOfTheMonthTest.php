@@ -126,9 +126,6 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runDate)
         );
 
-        // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateRanks();
-
         // Now solve more problems:
         // user0=>problem1, user1=>problem0 the school0 might be the first one now, but, as the problems
         // solved are counted just once, the ranking is not affected
@@ -151,9 +148,6 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $runData['response']['guid'],
             strtotime($runDate)
         );
-
-        // Setting p.accepted value
-        \OmegaUp\Test\Utils::runUpdateRanks();
     }
 
     public function testCalculateSchoolsOfMonth() {
@@ -164,14 +158,20 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ];
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
-        self::setUpSchoolsRuns($schoolsData);
-
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return;
-
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $today
+        $previousMonth = date_create($today);
+        date_add(
+            $previousMonth,
+            date_interval_create_from_date_string(
+                '-1 month'
+            )
         );
+        $runDate = date_format($previousMonth, 'Y-m-d');
+
+        self::setUpSchoolsRuns($schoolsData);
+        \OmegaUp\Test\Utils::runUpdateRanks($runDate);
+
+        \OmegaUp\Time::setTimeForTesting(strtotime($runDate));
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
@@ -194,9 +194,9 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'rank' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $today
-        );
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runDate);
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(2, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
@@ -216,9 +216,9 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'rank' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $today
-        );
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runDate);
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
@@ -242,9 +242,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'rank' => 4
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-            $today
-        );
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
         $this->assertCount(3, $schools);
         $this->assertEquals(
             $schoolsData[1]['request']['name'],
@@ -313,7 +311,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ];
 
         \OmegaUp\Time::setTimeForTesting($runDate->getTimestamp());
-        self::setUpSchoolsRuns($schoolsData, date_format($runDate, 'Y-m-d'));
+        self::setUpSchoolsRuns($schoolsData);
 
         // Mentor's login
         $login = self::login($mentorIdentity);
