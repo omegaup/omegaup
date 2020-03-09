@@ -97,7 +97,7 @@ abstract class IdentityLoginLog {
     ): int {
         $sql = '
             INSERT INTO
-                Identity_Login_Log (
+                `Identity_Login_Log` (
                     `identity_id`,
                     `ip`,
                     `time`

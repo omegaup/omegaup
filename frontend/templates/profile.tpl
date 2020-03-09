@@ -79,8 +79,6 @@
 			<div class="panel-heading">
 				<h2 class="panel-title">{#profileStatistics#}</h2>
 			</div>
-			{js_include entrypoint="user_charts"}
-			<div id="omegaup-user-charts"></div>
 		</div>
 
 	</div>

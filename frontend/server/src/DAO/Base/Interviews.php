@@ -226,7 +226,7 @@ abstract class Interviews {
     ): int {
         $sql = '
             INSERT INTO
-                Interviews (
+                `Interviews` (
                     `problemset_id`,
                     `acl_id`,
                     `alias`,

@@ -171,7 +171,7 @@ abstract class QualityNominationReviewers {
     ): int {
         $sql = '
             INSERT INTO
-                QualityNomination_Reviewers (
+                `QualityNomination_Reviewers` (
                     `qualitynomination_id`,
                     `user_id`
                 ) VALUES (

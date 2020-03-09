@@ -34,6 +34,10 @@ class User extends \OmegaUp\Controllers\Controller {
     const LANGUAGE_PT = 3;
     const LANGUAGE_PSEUDO = 4;
 
+    const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
+        'all', 'female',
+    ];
+
     /**
      * Entry point for Create a User API
      *
@@ -1241,6 +1245,13 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $identity = self::resolveTargetIdentity($r);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1252,7 +1263,8 @@ class User extends \OmegaUp\Controllers\Controller {
         return self::getUserProfile(
             $r->identity,
             $identity,
-            $r['omit_rank'] ?: false
+            $r['omit_rank'] ?: false,
+            $category
         );
     }
 
@@ -1262,7 +1274,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getUserProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $omitRank = false
+        bool $omitRank = false,
+        string $category = 'all'
     ) {
         $user = is_null(
             $identity->user_id
@@ -1308,7 +1321,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 $loggedIdentity,
                 $identity,
                 $user,
-                $omitRank
+                $omitRank,
+                $category
             );
         }
         $response['classname'] = \OmegaUp\DAO\Users::getRankingClassName(
@@ -1379,26 +1393,41 @@ class User extends \OmegaUp\Controllers\Controller {
      * date, calculate it and save it.
      *
      * @param \OmegaUp\Request $r
-     * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
-        $date = !empty($r['date']) ? strval($r['date']) : null;
-        $firstDay = self::getCurrentMonthFirstDay($date);
-        $response = self::getCodersOfTheMonth($firstDay);
-        $response['status'] = 'ok';
-        return $response;
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['date'],
+            'date'
+        );
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        return self::getCodersOfTheMonth(
+            self::getCurrentMonthFirstDay($r['date']),
+            $r['category'] ?? 'all'
+        );
     }
 
     /**
-     * @return array{coderinfo: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null}
+     * @return array{coderinfo: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}
      */
-    private static function getCodersOfTheMonth(string $firstDay) {
-        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime($firstDay);
+    private static function getCodersOfTheMonth(
+        string $firstDay,
+        string $category = 'all'
+    ): array {
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+            $firstDay,
+            $category
+        );
 
         if (empty($codersOfTheMonth)) {
             // Generate the coder
             $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-                $firstDay
+                $firstDay,
+                $category
             );
             if (is_null($users)) {
                 return [
@@ -1416,6 +1445,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'school_id' => $user['school_id'],
                         'time' => $firstDay,
                         'rank' => $index + 1,
+                        'category' => $category,
                     ]));
                 }
                 \OmegaUp\DAO\DAO::transEnd();
@@ -1469,10 +1499,21 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateOptionalDate($r['date'], 'date');
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
         if (!is_null($r['date'])) {
-            $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($r['date']);
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                $r['date'],
+                $category
+            );
         } else {
-            $coders = \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth();
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth(
+                $category
+            );
         }
         return [
             'coders' => self::processCodersList($coders),
@@ -1508,9 +1549,15 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth = new \DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
-
-        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
-            $dateToSelect
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+            $dateToSelect,
+            $category
         );
 
         if (!empty($codersOfTheMonth)) {
@@ -1520,7 +1567,8 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         // Generate the coder
         $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
 
         if (empty($users)) {
@@ -1535,6 +1583,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'school_id' => $user['school_id'],
                     'time' => $dateToSelect,
                     'rank' => $index + 1,
+                    'category' => $category,
                 ]);
                 // All users calculated as CoderOfTheMonth are going to be saved on database,
                 // the one selected by the mentor is gonna have the field 'selected_by' filled.
@@ -1625,10 +1674,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Contests which a certain user has participated in
      *
-     * @param \OmegaUp\Request $r
-     * @return array{contests: list<array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int, scoreboard_url_admin: string}>}
+     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int}, place: int|null}>}
      */
-    public static function apiContestStats(\OmegaUp\Request $r) {
+    public static function apiContestStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
@@ -1641,9 +1689,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        /** @var array<string, array{data: array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int}, place: int|null}> */
         $contests = [];
 
-        foreach ($contestsParticipated as $contest) {
+        foreach ($contestsParticipated as &$contest) {
             // Get identity ranking
             $scoreboardResponse = \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([
@@ -1681,10 +1730,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by user
      *
-     * @param \OmegaUp\Request $r
-     * @return \OmegaUp\DAO\VO\Problems array
+     * @return array{problems: list<array{title: string, alias: string, submissions: int, accepted: int}>}
      */
-    public static function apiProblemsSolved(\OmegaUp\Request $r) {
+    public static function apiProblemsSolved(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
@@ -1695,12 +1743,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        /** @var list<array{title: string, alias: string, submissions: int, accepted: int}> */
         $responseProblems = [];
         $relevantColumns = ['title', 'alias', 'submissions', 'accepted'];
         foreach ($problems as $problem) {
             if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                 continue;
             }
+            /** @var array{title: string, alias: string, submissions: int, accepted: int} */
             $responseProblems[] = $problem->asFilteredArray($relevantColumns);
         }
 
@@ -1731,11 +1781,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $filteredProblems = [];
         foreach ($problems as $problem) {
             if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                array_push(
-                    $filteredProblems,
-                    $problem->asFilteredArray(
-                        $relevant_columns
-                    )
+                /** @var array{title: string, alias: string, submissions: int, accepted: int, difficulty: float} */
+                $filteredProblems[] = $problem->asFilteredArray(
+                    $relevant_columns
                 );
             }
         }
@@ -1758,7 +1806,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        /** @var array{title: string, alias: string}[] */
+        /** @var list<array{title: string, alias: string}> */
         $problems = [];
         $relevant_columns = ['title', 'alias'];
         foreach (
@@ -1766,6 +1814,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 intval($identity->identity_id)
             ) as $problem
         ) {
+            /** @var array{title: string, alias: string} */
             $problems[] = $problem->asFilteredArray(
                 $relevant_columns
             );
@@ -2051,6 +2100,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['locale'],
+                'locale'
+            );
             $language = \OmegaUp\DAO\Languages::getByName($r['locale']);
             if (is_null($language)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2506,7 +2559,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'auth_token' => $r['auth_token'],
                         'tokens' => $tokens
                     ]));
-                    if (!empty($r2['contest_admin']) && $r2['contest_admin']) {
+                    if (!empty($r2['contest_admin'])) {
                         $response['contest_admin'][] = strval(
                             $r2['contest_alias']
                         );
@@ -2800,7 +2853,10 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return [
             'policy_markdown' => file_get_contents(
-                OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
+                sprintf(
+                    "%s/privacy/privacy_policy/{$lang}.md",
+                    strval(OMEGAUP_ROOT)
+                )
             ) ?: '',
             'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 intval($identity->identity_id),
@@ -3116,28 +3172,52 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: int|null, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: int|null, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: string, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
             $r->ensureIdentity();
-            $isLogged = true;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Not logged, but there is no problem with this
-            $isLogged = false;
+            /** @var null $r->identity */
         }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
+
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
+        $contests = \OmegaUp\Controllers\Contest::getContestList(
+            $r->identity,
+            /*$query=*/ null,
+            /*$page=*/ 1,
+            /*$pageSize=*/ 20,
+            /*$activeContests=*/ \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+            /*$recommended=*/ \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
+        $addedContests = [];
+        foreach ($contests as $key => $contestInfo) {
+            $addedContests[] = [
+                'alias' => $contestInfo['alias'],
+                'title' => $contestInfo['title'],
+            ];
+        }
+
         return [
             'smartyProperties' => [
                 'payload' => [
                     'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                        $firstDay
+                        $firstDay,
+                        $category
                     )['coderinfo'],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
                     'rankTable' => self::getRankByProblemsSolved(
-                        $isLogged ? $r->identity : null,
+                        $r->identity,
                         /*$filter=*/ '',
                         /*$offset=*/ 1,
                         $rowCount
@@ -3145,17 +3225,15 @@ class User extends \OmegaUp\Controllers\Controller {
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
                         $rowCount
                     ),
-                    'currentUserInfo' => $isLogged ? [
+                    'currentUserInfo' => !is_null($r->identity) ? [
                         'username' => $r->identity->username,
                     ] : [],
                     'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
                     'runsChartPayload' => \OmegaUp\Controllers\Run::getCounts(),
-                    // TODO: Refactor Contest::apiList
-                    'upcomingContests' => \OmegaUp\Controllers\Contest::apiList(
-                        new \OmegaUp\Request([
-                            'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-                        ])
-                    ),
+                    'upcomingContests' => [
+                        'number_of_results' => count($addedContests),
+                        'results' => $addedContests,
+                    ],
                 ],
             ],
             'template' => 'index.tpl',
@@ -3165,12 +3243,17 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @return array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}
+     * @return array{smartyProperties: array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<array{username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}, template: string}
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
-        \OmegaUp\Request $r,
-        ?\OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\Request $r
     ): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $r->identity = null;
+        }
         $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
         $firstDayOfNextMonth = new \DateTime($currentDate);
@@ -3178,17 +3261,26 @@ class User extends \OmegaUp\Controllers\Controller {
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
         $isMentor = !is_null(
-            $identity
+            $r->identity
         ) && \OmegaUp\Authorization::isMentor(
-            $identity
+            $r->identity
         );
 
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['category'],
+            'category',
+            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
+        );
+        $category = $r['category'] ?? 'all';
+
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
-            $dateToSelect
+            $dateToSelect,
+            $category
         );
         $bestCoders = [];
         if (!is_null($candidates)) {
             foreach ($candidates as $candidate) {
+                /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
                 unset($candidate['user_id']);
                 $bestCoders[] = $candidate;
             }
@@ -3196,18 +3288,25 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth($category)
             ),
             'codersOfPreviousMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
+                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                    $currentDate,
+                    $category
+                )
             ),
             'candidatesToCoderOfTheMonth' => $bestCoders,
             'isMentor' => $isMentor,
+            'category' => $category,
         ];
 
         if (!$isMentor) {
             return [
-                'payload' => $response,
+                'smartyProperties' => [
+                    'payload' => $response,
+                ],
+                'template' => 'codersofthemonth.tpl',
             ];
         }
 
@@ -3217,10 +3316,18 @@ class User extends \OmegaUp\Controllers\Controller {
                     $currentTimeStamp
                 ),
             'coderIsSelected' =>
-                !empty(\OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect)),
+                !empty(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+                        $dateToSelect,
+                        $category
+                    )
+                ),
         ];
         return [
-            'payload' => $response,
+            'smartyProperties' => [
+                'payload' => $response,
+            ],
+            'template' => 'codersofthemonth.tpl',
         ];
     }
 
