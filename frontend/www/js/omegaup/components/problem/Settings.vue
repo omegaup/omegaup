@@ -18,9 +18,9 @@
         <select name="languages" class="form-control" v-model="languages">
           <option
             v-for="(languageText, languageIndex) in validLanguages"
-            v-bind:value="languageIndex"
+            v-bind:value="languageText"
           >
-            {{ languageText }}</option
+            {{ languageIndex }}</option
           >
         </select>
       </div>
@@ -137,7 +137,7 @@ export default class ProblemSettings extends Vue {
   }
 
   @Watch('initialLanguage')
-  onInitialLanguagesChange(newInitial: string): void {
+  onInitialLanguageChange(newInitial: string): void {
     this.languages = newInitial;
   }
 }

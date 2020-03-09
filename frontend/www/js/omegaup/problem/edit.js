@@ -29,7 +29,7 @@ OmegaUp.on('ready', function() {
           inputLimit: this.inputLimit,
           overallWallTimeLimit: this.overallWallTimeLimit,
           validatorTimeLimit: this.validatorTimeLimit,
-          initialLanguage: this.initialLanguage,
+          initialLanguage: this.languages,
           validLanguages: this.validLanguages,
           initialValidator: this.validator,
           validatorTypes: this.validatorTypes,
@@ -46,6 +46,8 @@ OmegaUp.on('ready', function() {
       validatorTimeLimit: 0,
       validLanguages: payload.validLanguages,
       validatorTypes: payload.validatorTypes,
+      validator: '',
+      languages: '',
     },
     components: {
       'omegaup-problem-settings': problem_Settings,
@@ -613,7 +615,7 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
     $('#languages').val(languages);
-    problemSettings.initialLanguage = languages;
+    problemSettings.languages = languages;
     $('input[name=title]').val(problem.title);
     problemSettings.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,
@@ -649,7 +651,6 @@ OmegaUp.on('ready', function() {
         ']',
     ).attr('checked', 1);
     problemSettings.validator = problem.settings.validator.name;
-    problemSettings.languages = problem.statement.language;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {

@@ -3876,7 +3876,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        $validLanguages = [
+        /*$validLanguages = [
             join(
                 ',',
                 $sortedLanguages
@@ -3885,9 +3885,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'cat' => \OmegaUp\Translations::getInstance()->get(
                 'wordsJustOutput'
             ),
-            '' => \OmegaUp\Translations::getInstance()->get(
+            "" => \OmegaUp\Translations::getInstance()->get(
                 'wordsNoSubmissions'
             ),
+        ];*/
+        $validLanguages = [
+            'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua' => join(
+                ',',
+                $sortedLanguages
+            ),
+            'Karel' => 'kj,kp',
+            \OmegaUp\Translations::getInstance()->get(
+                'wordsJustOutput'
+            ) => 'cat',
+            \OmegaUp\Translations::getInstance()->get(
+                'wordsNoSubmissions'
+            ) => '',
         ];
         return [
           'validatorTypes' => $validatorTypes,
