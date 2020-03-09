@@ -3876,19 +3876,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
-        /*$validLanguages = [
-            join(
-                ',',
-                $sortedLanguages
-            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
-            'kj,kp' => 'Karel',
-            'cat' => \OmegaUp\Translations::getInstance()->get(
-                'wordsJustOutput'
-            ),
-            "" => \OmegaUp\Translations::getInstance()->get(
-                'wordsNoSubmissions'
-            ),
-        ];*/
         $validLanguages = [
             'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua' => join(
                 ',',
