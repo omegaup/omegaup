@@ -267,11 +267,19 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             SchoolsFactory::createSchool(),
             SchoolsFactory::createSchool(),
         ];
+        $today = date('Y-m-d', \OmegaUp\Time::get());
+
+        $previousMonth = date_create($today);
+        date_add(
+            $previousMonth,
+            date_interval_create_from_date_string(
+                '-1 month'
+            )
+        );
+        $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
-
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return;
+        \OmegaUp\Test\Utils::runUpdateRanks($runDate);
 
         // API should return school1
         $response = \OmegaUp\Controllers\School::getSchoolOfTheMonth();
