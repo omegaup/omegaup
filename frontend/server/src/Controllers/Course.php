@@ -1325,11 +1325,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{users: array}
+     * @return array{users: list<array{accepted: bool|null, admin?: array{name?: null|string, user_id?: int|null, username?: null|string}, country: null|string, country_id: null|string, course_id: int, identity_id: int, last_update: null|string, request_time: string, user_id: int|null, username: string}>}
      */
     public static function apiRequests(\OmegaUp\Request $r): array {
         // Authenticate request
-        $r->ensureMainIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
@@ -1337,6 +1337,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $course = self::validateCourseExists($r['course_alias']);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -1349,22 +1352,27 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourse(
                 $course->course_id
             );
+        if (is_null($resultRequests)) {
+            return ['users' => []];
+        }
 
         $admins = [];
         $requestsAdmins = [];
-        foreach ($resultAdmins as $result) {
-            $adminId = $result['admin_id'];
-            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
-                $admin = [];
-                $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
-                if (!is_null($data)) {
-                    $admin = [
-                        'user_id' => $data->user_id,
-                        'username' => $data->username,
-                        'name' => $data->name,
-                    ];
+        if (!is_null($resultAdmins)) {
+            foreach ($resultAdmins as $result) {
+                $adminId = $result['admin_id'];
+                if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
+                    $admin = [];
+                    $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
+                    if (!is_null($data)) {
+                        $admin = [
+                            'user_id' => $data->user_id,
+                            'username' => $data->username,
+                            'name' => $data->name,
+                        ];
+                    }
+                    $requestsAdmins[$result['identity_id']] = $admin;
                 }
-                $requestsAdmins[$result['identity_id']] = $admin;
             }
         }
 
@@ -1388,9 +1396,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['course_alias'],
             'course_alias'
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['note'],
-            'note'
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
         );
 
         if (is_null($r['resolution'])) {
@@ -1426,8 +1434,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureBool('resolution');
 
-        $request->accepted = $r['resolution'];
-        $request->extra_note = $r['note'];
+        $request->accepted = boolval($r['resolution']);
         $request->last_update = \OmegaUp\Time::get();
 
         \OmegaUp\DAO\CourseIdentityRequest::update($request);
@@ -1444,8 +1451,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         self::$log->info(
-            'Arbitrated course for user, username='
-            . $targetIdentity->username . ', state=' . $resolution
+            "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
         );
 
         return ['status' => 'ok'];

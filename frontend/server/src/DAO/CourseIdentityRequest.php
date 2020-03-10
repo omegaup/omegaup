@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
+    /**
+     * @return list<array{accepted: bool|null, admin_id: int, identity_id: int, last_update: null|string, course_id: int, request_time: string}>|null
+     */
     public static function getFirstAdminForCourseRequest(
         int $courseId
     ): ?array {
@@ -34,27 +37,28 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
             WHERE
                 r.course_id = ?;';
 
-        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string}> */
+        /** @var list<array{accepted: bool|null, admin_id: int,  identity_id: int, last_update: null|string, course_id: int, request_time: string}>|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
         );
     }
 
-    public static function getRequestsForCourse(int $courseId): array {
+    /**
+     * @return list<array{accepted: bool|null, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string, user_id: int|null, username: string}>|null
+     */
+    public static function getRequestsForCourse(int $courseId): ?array {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
                 i.username,
                 i.user_id,
-                i.username,
                 i.country_id,
                 c.name AS country,
                 r.course_id,
                 r.request_time,
                 r.last_update,
-                r.accepted,
-                r.extra_note
+                r.accepted
             FROM
                 `Course_Identity_Request` r
             INNER JOIN
@@ -70,8 +74,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
             ORDER BY
                 i.identity_id;';
 
-        $result = [];
-        /** @var array{accepted: bool|null, country: null|string, country_id: null|string, extra_note: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string, user_id: int|null, username: string, username: string} $row */
+        /** @var list<array{accepted: bool|null, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string, user_id: int|null, username: string}>|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
