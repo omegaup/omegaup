@@ -128,7 +128,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         $sql = 'SELECT
                   UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
-                  i.username,
+                  IFNULL(i.username, "") AS `username`,
                   (
                     SELECT
                       MAX(UNIX_TIMESTAMP(ill.time))
