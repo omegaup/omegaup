@@ -898,13 +898,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
+        $r->ensureBool('only_visibility', false);
         return self::updateProblem(
             $r->identity,
             $r->user,
             $problemParams,
             strval($r['message']),
             $problemParams->updatePublished,
-            boolval($r['redirect'])
+            boolval($r['redirect']),
+            boolval($r['only_visibility'])
         );
     }
 
@@ -1104,7 +1106,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\ProblemParams $params,
         string $message,
         string $updatePublished,
-        bool $redirect
+        bool $redirect,
+        bool $onlyVisibilityChanged = false
     ) {
         [
             'problem' => $problem,
@@ -1120,39 +1123,50 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Update the Problem object
-        $valueProperties = [
-            'visibility',
-            'title',
-            'inputLimit' => [
-                'alias' => 'input_limit',
-            ],
-            'emailClarifications' => [
-                'alias' => 'email_clarifications',
-            ],
-            'source',
-            'order',
-            'languages',
-        ];
-        $params->updateValueParams($problem, $valueProperties);
-        $problem->languages = $languages ?: $problem->languages;
-
         $response = [
             'rejudged' => false,
         ];
 
-        $problemSettings = self::getProblemSettingsDistrib(
-            $problem,
-            $problem->commit
-        );
-        unset($problemSettings['cases']);
-        unset($problemSettings['slow']);
-        $originalProblemSettings = self::arrayDeepCopy($problemSettings);
-        self::updateProblemSettings($problemSettings, $params);
-        $settingsUpdated = self::diffProblemSettings(
-            $originalProblemSettings,
-            $problemSettings
-        );
+        // No needed when only visibility has changed
+        $problemSettings = [];
+        $settingsUpdated = false;
+        if (!$onlyVisibilityChanged) {
+            // Update the Problem object
+            $valueProperties = [
+                'visibility',
+                'title',
+                'inputLimit' => [
+                    'alias' => 'input_limit',
+                ],
+                'emailClarifications' => [
+                    'alias' => 'email_clarifications',
+                ],
+                'source',
+                'order',
+                'languages',
+            ];
+            $params->updateValueParams($problem, $valueProperties);
+            $problem->languages = $languages ?: $problem->languages;
+
+            $problemSettings = self::getProblemSettingsDistrib(
+                $problem,
+                $problem->commit
+            );
+            unset($problemSettings['cases']);
+            unset($problemSettings['slow']);
+            $originalProblemSettings = self::arrayDeepCopy($problemSettings);
+            self::updateProblemSettings($problemSettings, $params);
+            $settingsUpdated = self::diffProblemSettings(
+                $originalProblemSettings,
+                $problemSettings
+            );
+        } else {
+            $valueProperties = [
+                'visibility',
+            ];
+            $params->updateValueParams($problem, $valueProperties);
+        }
+
         $acceptsSubmissions = $problem->languages !== '';
         $updatedStatementLanguages = [];
         $response['rejudged'] = false;
