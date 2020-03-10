@@ -122,13 +122,13 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $inputLimit;
 
     /**
      * @readonly
-     * @var bool
+     * @var bool|null
      */
     public $emailClarifications;
 
@@ -211,8 +211,8 @@ class ProblemParams {
         $this->extraWallTime = $params['extra_wall_time'] ?? 0;
         $this->memoryLimit = $params['memory_limit'] ?? null;
         $this->outputLimit = $params['output_limit'] ?? 10240;
-        $this->inputLimit = $params['input_limit'] ?? 10240;
-        $this->emailClarifications = $params['email_clarifications'] ?? false;
+        $this->inputLimit = $params['input_limit'] ?? null;
+        $this->emailClarifications = $params['email_clarifications'] ?? null;
         $this->order = $params['order'] ?? 'normal';
     }
 

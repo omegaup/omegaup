@@ -760,8 +760,8 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
         $this->assertEquals(0, $problemParams->extraWallTime);
         $this->assertEquals(10240, $problemParams->outputLimit);
-        $this->assertEquals(10240, $problemParams->inputLimit);
-        $this->assertFalse($problemParams->emailClarifications);
+        $this->assertEquals(null, $problemParams->inputLimit);
+        $this->assertEquals(null, $problemParams->emailClarifications);
 
         // New object with custom values
         $titleAlias = \OmegaUp\Test\Utils::createRandomString();

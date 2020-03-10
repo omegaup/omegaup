@@ -68,7 +68,6 @@
           omegaup.API.Problem.update({
             problem_alias: alias,
             visibility: isPublic ? 1 : 0,
-            only_visibility: true,
             message: isPublic ? 'private -> public' : 'public -> private',
           })
             .then(resolve)

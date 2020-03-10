@@ -898,15 +898,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        $r->ensureBool('only_visibility', false);
         return self::updateProblem(
             $r->identity,
             $r->user,
             $problemParams,
             strval($r['message']),
             $problemParams->updatePublished,
-            boolval($r['redirect']),
-            boolval($r['only_visibility'])
+            boolval($r['redirect'])
         );
     }
 
@@ -1106,8 +1104,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\ProblemParams $params,
         string $message,
         string $updatePublished,
-        bool $redirect,
-        bool $onlyVisibilityChanged = false
+        bool $redirect
     ) {
         [
             'problem' => $problem,
@@ -1123,50 +1120,45 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        // Update the Problem object
+        $valueProperties = [
+            'visibility' => [
+                'important' => true,
+            ],
+            'title',
+            'inputLimit' => [
+                'alias' => 'input_limit',
+            ],
+            'emailClarifications' => [
+                'alias' => 'email_clarifications',
+            ],
+            'source',
+            'order',
+            'languages',
+        ];
+        $importantChanges = $params->updateValueParams(
+            $problem,
+            $valueProperties
+        );
+        $problem->languages = $languages ?: $problem->languages;
+
         $response = [
             'rejudged' => false,
         ];
 
-        // No needed when only visibility has changed
-        $problemSettings = [];
-        $settingsUpdated = false;
-        if (!$onlyVisibilityChanged) {
-            // Update the Problem object
-            $valueProperties = [
-                'visibility',
-                'title',
-                'inputLimit' => [
-                    'alias' => 'input_limit',
-                ],
-                'emailClarifications' => [
-                    'alias' => 'email_clarifications',
-                ],
-                'source',
-                'order',
-                'languages',
-            ];
-            $params->updateValueParams($problem, $valueProperties);
-            $problem->languages = $languages ?: $problem->languages;
-
-            $problemSettings = self::getProblemSettingsDistrib(
-                $problem,
-                $problem->commit
-            );
-            unset($problemSettings['cases']);
-            unset($problemSettings['slow']);
-            $originalProblemSettings = self::arrayDeepCopy($problemSettings);
-            self::updateProblemSettings($problemSettings, $params);
-            $settingsUpdated = self::diffProblemSettings(
-                $originalProblemSettings,
-                $problemSettings
-            );
-        } else {
-            $valueProperties = [
-                'visibility',
-            ];
-            $params->updateValueParams($problem, $valueProperties);
-        }
-
+        // No needed when visibility changes
+        $problemSettings = self::getProblemSettingsDistrib(
+            $problem,
+            $problem->commit
+        );
+        unset($problemSettings['cases']);
+        unset($problemSettings['slow']);
+        $originalProblemSettings = self::arrayDeepCopy($problemSettings);
+        self::updateProblemSettings($problemSettings, $params);
+        $settingsUpdated = self::diffProblemSettings(
+            $originalProblemSettings,
+            $problemSettings
+        );
         $acceptsSubmissions = $problem->languages !== '';
         $updatedStatementLanguages = [];
         $response['rejudged'] = false;
@@ -1185,7 +1177,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
-            if ($operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS || $settingsUpdated) {
+            if (
+                (
+                    $operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS ||
+                    $settingsUpdated
+                ) &&
+                !$importantChanges
+            ) {
                 $problemDeployer = new \OmegaUp\ProblemDeployer(
                     $problem->alias,
                     $acceptsSubmissions,
