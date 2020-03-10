@@ -115,7 +115,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             ORDER BY
-                s.rank IS NULL, s.rank ASC
+                s.`rank` IS NULL, s.`rank` ASC
         ';
 
         $sqlCount = '
@@ -126,7 +126,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             SELECT
                 s.school_id,
                 s.name,
-                s.rank,
+                s.`rank`,
                 s.score,
                 s.country_id';
 
@@ -162,7 +162,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
         SELECT
-            i.username,
+            IFNULL(i.username, "") AS `username`,
             IFNULL(
                 (
                     SELECT urc.classname

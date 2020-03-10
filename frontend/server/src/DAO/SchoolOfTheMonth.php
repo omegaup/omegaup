@@ -67,7 +67,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                         School_Of_The_Month as sotm
                     WHERE
                         sotm.school_id = s.school_id
-                        AND (sotm.selected_by IS NOT NULL OR sotm.rank = 1)
+                        AND (sotm.selected_by IS NOT NULL OR sotm.`rank` = 1)
                     GROUP BY
                         sotm.school_id
                     HAVING
@@ -128,7 +128,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 s.school_id,
                 s.name,
                 sotm.score,
-                sotm.rank
+                sotm.`rank`
             FROM
                 School_Of_The_Month sotm
             INNER JOIN
@@ -137,7 +137,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.time = ? AND
                 sotm.selected_by IS NULL
             ORDER BY
-                s.rank IS NULL, s.rank ASC;';
+                s.`rank` IS NULL, s.`rank` ASC;';
 
         /** @var list<array{name: string, rank: int, school_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
@@ -159,7 +159,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $sql = '
             SELECT
                 sotm.school_id,
-                sotm.rank,
+                sotm.`rank`,
                 s.name,
                 IFNULL(s.country_id, "xx") AS country_id
             FROM
@@ -170,7 +170,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.time = ?
             ORDER BY
                 sotm.selected_by IS NULL,
-                sotm.rank ASC
+                sotm.`rank` ASC
             LIMIT 100;';
 
         /** @var list<array{country_id: string, name: string, rank: int, school_id: int}> */
@@ -218,7 +218,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             WHERE
                 sotm.selected_by IS NOT NULL
                 OR (
-                    sotm.rank = 1 AND
+                    sotm.`rank` = 1 AND
                     NOT EXISTS (
                         SELECT
                             *
