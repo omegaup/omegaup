@@ -1132,7 +1132,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'source',
             'order',
-            'languages',
+            'languages' => [
+                'transform' =>
+                /**
+                 * @param list<string>|string $value
+                 */
+                function ($value): string {
+                    return is_array($value) ? join(',', $value) : $value;
+                }
+            ],
         ];
         $params->updateValueParams($problem, $valueProperties);
         $problem->languages = $languages ?: $problem->languages;
