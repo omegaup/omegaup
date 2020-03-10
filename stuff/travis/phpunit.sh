@@ -7,15 +7,7 @@ stage_before_install() {
 
 	if [[ "${UBUNTU}" == "focal" ]]; then
 		# In addition to the newer PHP version, this needs MySQL 8.
-		sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
-		wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
-		sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
-		sudo apt-get update -q
-		sudo apt-get install -q -y --allow-unauthenticated -o Dpkg::Options::=--force-confnew mysql-server
-
-		sudo systemctl restart mysql
-
-		sudo mysql_upgrade
+		install_mysql8
 	fi
 }
 
@@ -58,16 +50,16 @@ stage_script() {
 	phpunit --bootstrap frontend/tests/bootstrap.php \
 		--configuration=frontend/tests/phpunit.xml \
 		frontend/tests/badges
-	if [[ "${UBUNTU}" != "focal" ]]; then
-		mv frontend/tests/controllers/mysql_types.log \
-			frontend/tests/controllers/mysql_types.log.2
-		cat frontend/tests/controllers/mysql_types.log.1 \
-			frontend/tests/controllers/mysql_types.log.2 > \
-			frontend/tests/controllers/mysql_types.log
-		python3 stuff/process_mysql_return_types.py \
-			frontend/tests/controllers/mysql_types.log
+	mv frontend/tests/controllers/mysql_types.log \
+		frontend/tests/controllers/mysql_types.log.2
+	cat frontend/tests/controllers/mysql_types.log.1 \
+		frontend/tests/controllers/mysql_types.log.2 > \
+		frontend/tests/controllers/mysql_types.log
+	python3 stuff/process_mysql_return_types.py \
+		frontend/tests/controllers/mysql_types.log
+	python3 stuff/policy-tool.py --database=omegaup-test validate
+	if [[ "${UBUNTU}" == "focal" ]]; then
 		python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
-		python3 stuff/policy-tool.py --database=omegaup-test validate
 	fi
 
 	# Create optional directories to simplify psalm config.
@@ -86,9 +78,13 @@ stage_script() {
 }
 
 stage_after_success() {
-	bash <(curl -s https://codecov.io/bash)
+	if [[ "${UBUNTU}" != "focal" ]]; then
+		bash <(curl -s https://codecov.io/bash)
+	fi
 }
 
 stage_after_failure() {
-	cat frontend/tests/controllers/gitserver.log
+	if [[ "${UBUNTU}" != "focal" ]]; then
+		cat frontend/tests/controllers/gitserver.log
+	fi
 }

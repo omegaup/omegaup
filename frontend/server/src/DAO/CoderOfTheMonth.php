@@ -132,7 +132,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             WHERE
                 (cm.selected_by IS NOT NULL
                 OR (
-                    cm.rank = 1 AND
+                    cm.`rank` = 1 AND
                     NOT EXISTS (
                         SELECT
                             *
@@ -195,7 +195,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             LEFT JOIN
               Emails e ON e.user_id = u.user_id
             WHERE
-              (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
+              (cm.`rank` = 1 OR cm.selected_by IS NOT NULL) AND
               cm.school_id = ? AND
               cm.category = ?
             ORDER BY
@@ -221,7 +221,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         $sql = "
           SELECT
             cm.time,
-            cm.rank,
+            cm.`rank`,
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             e.email,
@@ -239,7 +239,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.category = ?
           ORDER BY
             cm.time DESC,
-            cm.rank ASC
+            cm.`rank` ASC
           LIMIT 100
         ";
         /** @var list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}> */
@@ -266,7 +266,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
-            cm.rank = 1 AND
+            cm.`rank` = 1 AND
             cm.category = ?
           ORDER BY
             cm.time DESC
