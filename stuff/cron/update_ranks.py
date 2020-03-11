@@ -426,9 +426,9 @@ def update_coder_of_the_month_candidates(
 
     for row in cur:
         if row['count'] > 0:
-            logging.info('Skipping because already exist selected coder ' + category)
-            return   
-    
+            logging.info('Skipping because already exist selected coder '
+             + category)
+            return
     cur.execute('''
                 DELETE FROM
                     `Coder_Of_The_Month`
@@ -437,9 +437,8 @@ def update_coder_of_the_month_candidates(
                     `category` = %s;
                 ''',
                 (first_day_of_next_month, category))
-    
     if category == 'female':
-        genderClause = " AND i.gender = 'female'" 
+        genderClause = " AND i.gender = 'female' " 
     else:
         genderClause = ""
 
@@ -490,7 +489,8 @@ def update_coder_of_the_month_candidates(
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
           LEFT JOIN
-            Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            Identities_Schools isc ON isc.identity_school_id = 
+            i.current_identity_school_id
           LEFT JOIN
             (
               SELECT
@@ -506,7 +506,8 @@ def update_coder_of_the_month_candidates(
                 selected_by
             ) AS cm on i.user_id = cm.user_id
           WHERE
-            (cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
+            (cm.user_id IS NULL OR 
+            DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
             i.user_id IS NOT NULL
             {0}
           GROUP BY
