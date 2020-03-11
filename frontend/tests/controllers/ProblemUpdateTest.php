@@ -1577,4 +1577,154 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )->verdict
         );
     }
+
+    public function testUpdateProblemSettingsAndVisibility() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
+
+            // Asserts default values
+            $this->assertEquals(
+                $problemData['request']['time_limit'],
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->TimeLimit
+                )
+            );
+            $this->assertEquals(
+                $problemData['request']['extra_wall_time'],
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->ExtraWallTime
+                )
+            );
+            $this->assertEquals(
+                $problemData['request']['memory_limit'],
+                $problemSettings->Limits->MemoryLimit / 1024
+            );
+            $this->assertEquals(
+                $problemData['request']['output_limit'],
+                $problemSettings->Limits->OutputLimit
+            );
+            $this->assertEquals(
+                $problemData['request']['overall_wall_time_limit'],
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->OverallWallTimeLimit
+                )
+            );
+        }
+
+        // Call API to update time limit.
+        $newTimeLimit = 4000;
+        $newExtraWallTime = 100;
+        $newMemoryLimit = 16000;
+        $newOutputLimit = 5120;
+        $newOverallWallTimeLimit = 30000;
+        $login = self::login($problemData['author']);
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemAlias,
+            'time_limit' => $newTimeLimit,
+            'extra_wall_time' => $newExtraWallTime,
+            'memory_limit' => $newMemoryLimit,
+            'output_limit' => $newOutputLimit,
+            'overall_wall_time_limit' => $newOverallWallTimeLimit,
+            'message' => 'Updated all problem settings',
+        ]));
+
+        // Verify problem settings were set.
+        {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
+            $this->assertEquals(
+                $newTimeLimit,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->TimeLimit
+                )
+            );
+            $this->assertEquals(
+                $newExtraWallTime,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->ExtraWallTime
+                )
+            );
+            $this->assertEquals(
+                $newMemoryLimit,
+                $problemSettings->Limits->MemoryLimit / 1024
+            );
+            $this->assertEquals(
+                $newOutputLimit,
+                $problemSettings->Limits->OutputLimit
+            );
+            $this->assertEquals(
+                $newOverallWallTimeLimit,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->OverallWallTimeLimit
+                )
+            );
+        }
+
+        // Updated problem visibility only
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemAlias,
+            'visibility' => 0,
+            'message' => 'Visibility updated to private',
+        ]));
+
+        // Verify problem settings were not modified.
+        {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
+            $this->assertEquals(
+                $newTimeLimit,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->TimeLimit
+                )
+            );
+            $this->assertEquals(
+                $newExtraWallTime,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->ExtraWallTime
+                )
+            );
+            $this->assertEquals(
+                $newMemoryLimit,
+                $problemSettings->Limits->MemoryLimit / 1024
+            );
+            $this->assertEquals(
+                $newOutputLimit,
+                $problemSettings->Limits->OutputLimit
+            );
+            $this->assertEquals(
+                $newOverallWallTimeLimit,
+                \Omegaup\Controllers\Problem::parseDuration(
+                    $problemSettings->Limits->OverallWallTimeLimit
+                )
+            );
+        }
+
+        // But visibility mode has changed
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemAlias,
+            ])
+        );
+        $this->assertEquals(0, $response['visibility']);
+    }
 }
