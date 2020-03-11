@@ -422,11 +422,11 @@ def update_coder_of_the_month_candidates(
                     `selected_by` IS NOT NULL AND
                     `category` = %s;
                 ''',
-                (first_day_of_next_month,category,))
+                (first_day_of_next_month, category))
 
     for row in cur:
         if row['count'] > 0:
-            logging.info('Skipping because already exist selected coder '+category)
+            logging.info('Skipping because already exist selected coder ' + category)
             return   
     
     cur.execute('''
@@ -436,12 +436,12 @@ def update_coder_of_the_month_candidates(
                     `time` = %s AND
                     `category` = %s;
                 ''',
-                (first_day_of_next_month,category,))
+                (first_day_of_next_month, category))
     
-    if category=='female':
-        genderClause=" AND i.gender = 'female'" 
+    if category == 'female':
+        genderClause = " AND i.gender = 'female'" 
     else:
-        genderClause=""
+        genderClause = ""
 
     sql='''
          SELECT DISTINCT
