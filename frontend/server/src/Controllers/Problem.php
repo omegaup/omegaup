@@ -249,34 +249,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         \OmegaUp\Validators::validateNumberInRange(
-            $params->validatorTimeLimit,
-            'validator_time_limit',
-            0,
-            null,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->overallWallTimeLimit,
-            'overall_wall_time_limit',
-            0,
-            60000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->extraWallTime,
-            'extra_wall_time',
-            0,
-            5000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->outputLimit,
-            'output_limit',
-            0,
-            null,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
             $params->inputLimit,
             'input_limit',
             0,
@@ -1136,17 +1108,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages',
         ];
-        $importantChanges = $params->updateValueParams(
-            $problem,
-            $valueProperties
-        );
+        $params->updateValueParams($problem, $valueProperties);
         $problem->languages = $languages ?: $problem->languages;
 
         $response = [
             'rejudged' => false,
         ];
 
-        // No needed when visibility changes
         $problemSettings = self::getProblemSettingsDistrib(
             $problem,
             $problem->commit
@@ -1178,11 +1146,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
             if (
-                (
-                    $operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS ||
-                    $settingsUpdated
-                ) &&
-                !$importantChanges
+                $operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS ||
+                $settingsUpdated
             ) {
                 $problemDeployer = new \OmegaUp\ProblemDeployer(
                     $problem->alias,
@@ -3561,12 +3526,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
-        $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        if (!is_null($params->extraWallTime)) {
+            $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        }
         if (!is_null($params->memoryLimit)) {
             $problemSettings['limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
         }
-        $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
-        $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        if (!is_null($params->outputLimit)) {
+            $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
+        }
+        if (!is_null($params->memoryLimit)) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        }
         if (!is_null($params->timeLimit)) {
             $problemSettings['limits']['TimeLimit'] = "{$params->timeLimit}ms";
         }
@@ -3580,7 +3551,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'MemoryLimit' => '256MiB',
                     'OutputLimit' => '10KiB',
                     'OverallWallTimeLimit' => '5s',
-                    'TimeLimit' => '30s',
                 ];
             }
             $problemSettings['validator']['limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";

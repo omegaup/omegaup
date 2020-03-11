@@ -756,10 +756,10 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $problemParams->updatePublished
         );
-        $this->assertEquals(1000, $problemParams->validatorTimeLimit);
-        $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
-        $this->assertEquals(0, $problemParams->extraWallTime);
-        $this->assertEquals(10240, $problemParams->outputLimit);
+        $this->assertEquals(null, $problemParams->validatorTimeLimit);
+        $this->assertEquals(null, $problemParams->overallWallTimeLimit);
+        $this->assertEquals(null, $problemParams->extraWallTime);
+        $this->assertEquals(null, $problemParams->outputLimit);
         $this->assertEquals(null, $problemParams->inputLimit);
         $this->assertEquals(null, $problemParams->emailClarifications);
 

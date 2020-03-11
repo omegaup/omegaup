@@ -191,6 +191,42 @@ class ProblemParams {
                 $isRequired
             );
         }
+        if (isset($params['validator_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['validator_time_limit'],
+                'validator_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['overall_wall_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['overall_wall_time_limit'],
+                'overall_wall_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 60000,
+                $isRequired
+            );
+        }
+        if (isset($params['extra_wall_time'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['extra_wall_time'],
+                'extra_wall_time',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 5000,
+                $isRequired
+            );
+        }
+        if (isset($params['output_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['output_limit'],
+                'output_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
 
         $this->problemAlias = $params['problem_alias'];
         $this->title = $params['title'] ?? null;
@@ -206,11 +242,11 @@ class ProblemParams {
         $this->source = $params['source'] ?? null;
         $this->validator = $params['validator'] ?? null;
         $this->timeLimit = $params['time_limit'] ?? null;
-        $this->validatorTimeLimit = $params['validator_time_limit'] ?? 1000;
-        $this->overallWallTimeLimit = $params['overall_wall_time_limit'] ?? 60000;
-        $this->extraWallTime = $params['extra_wall_time'] ?? 0;
+        $this->validatorTimeLimit = $params['validator_time_limit'] ?? null;
+        $this->overallWallTimeLimit = $params['overall_wall_time_limit'] ?? null;
+        $this->extraWallTime = $params['extra_wall_time'] ?? null;
         $this->memoryLimit = $params['memory_limit'] ?? null;
-        $this->outputLimit = $params['output_limit'] ?? 10240;
+        $this->outputLimit = $params['output_limit'] ?? null;
         $this->inputLimit = $params['input_limit'] ?? null;
         $this->emailClarifications = $params['email_clarifications'] ?? null;
         $this->order = $params['order'] ?? 'normal';
