@@ -92,19 +92,19 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $validatorTimeLimit;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $overallWallTimeLimit;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $extraWallTime;
 
@@ -116,7 +116,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $outputLimit;
 
