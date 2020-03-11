@@ -396,7 +396,7 @@ def update_school_of_the_month_candidates(
 def update_coder_of_the_month_candidates(
         cur: MySQLdb.cursors.BaseCursor,
         first_day_of_current_month: datetime.date,
-        category) -> None:
+        category: str) -> None:
     '''Updates the list of candidates to coder of the current month'''
 
     logging.info('Updating the candidates to coder of the month...')
@@ -412,22 +412,19 @@ def update_coder_of_the_month_candidates(
             1)
 
     # First make sure there are not already selected coder of the month
-    cur.execute('''
+        cur.execute('''
                 SELECT
-	                COUNT(*) AS `count`
+                    COUNT(*) AS `count`
                 FROM
-	                `Coder_Of_The_Month`
+                    `Coder_Of_The_Month`
                 WHERE
                     `time` = %s AND
                     `selected_by` IS NOT NULL AND
                     `category` = %s;
-                ''',
-                (first_day_of_next_month, category))
-
+                ''', (first_day_of_next_month, category))
     for row in cur:
         if row['count'] > 0:
-            logging.info('Skipping because already exist selected coder '
-             + category)
+            logging.info('Skipping because already exist selected coder')
             return
     cur.execute('''
                 DELETE FROM
@@ -438,11 +435,11 @@ def update_coder_of_the_month_candidates(
                 ''',
                 (first_day_of_next_month, category))
     if category == 'female':
-        genderClause = " AND i.gender = 'female' " 
+        gender = " AND i.gender = 'female'"
     else:
-        genderClause = ""
+        gender = ""
 
-    sql='''
+    sql = '''
          SELECT DISTINCT
             IFNULL(i.user_id, 0) AS user_id,
             i.username,
@@ -489,7 +486,7 @@ def update_coder_of_the_month_candidates(
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
           LEFT JOIN
-            Identities_Schools isc ON isc.identity_school_id = 
+            Identities_Schools isc ON isc.identity_school_id =
             i.current_identity_school_id
           LEFT JOIN
             (
@@ -506,7 +503,7 @@ def update_coder_of_the_month_candidates(
                 selected_by
             ) AS cm on i.user_id = cm.user_id
           WHERE
-            (cm.user_id IS NULL OR 
+            (cm.user_id IS NULL OR
             DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
             i.user_id IS NOT NULL
             {0}
@@ -516,10 +513,9 @@ def update_coder_of_the_month_candidates(
             score DESC,
             ProblemsSolved DESC
           LIMIT 100;
-        '''.format(genderClause)
+        '''.format(gender)
     cur.execute(
-        sql
-        ,
+        sql,
         (
             first_day_of_current_month,
             first_day_of_next_month,
@@ -552,6 +548,7 @@ def update_coder_of_the_month_candidates(
                         row['school_id'],
                         category
                     ))
+
 
 def main() -> None:
     '''Main entrypoint.'''
