@@ -20,7 +20,7 @@
           <td>{{ request.country }}</td>
           <td>{{ request.request_time }}</td>
           <td v-if="request.last_update === null">{{ T.wordsPending }}</td>
-          <td v-else-if="request.accepted === true">
+          <td v-else-if="request.accepted">
             {{ T.wordAccepted }}
           </td>
           <td v-else="">{{ T.wordsDenied }}</td>
@@ -28,7 +28,7 @@
             {{ request.last_update }} ({{ request.admin.username }})
           </td>
           <td v-else=""></td>
-          <td v-if="request.accepted === false">
+          <td v-if="!request.accepted">
             <button
               class="close"
               style="color:red"
