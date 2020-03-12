@@ -1,5 +1,5 @@
 <template>
-  <div class="panel panel-primary" v-if="requests.length != 0">
+  <div class="panel panel-primary" v-if="requests.length !== 0">
     <div class="panel-body">
       {{ T.pendingRegistrations }}
     </div>
@@ -11,7 +11,7 @@
           <th>{{ T.requestDate }}</th>
           <th>{{ T.currentStatus }}</th>
           <th>{{ T.lastUpdate }}</th>
-          <th>{{ T.contestAdduserAddContestant }}</th>
+          <th>{{ textAddParticipant }}</th>
         </tr>
       </thead>
       <tbody>
@@ -19,18 +19,16 @@
           <td>{{ request.username }}</td>
           <td>{{ request.country }}</td>
           <td>{{ request.request_time }}</td>
-          <td v-if="request.last_update == null">{{ T.wordsPending }}</td>
-          <td v-else-if="request.accepted == 'true' || request.accepted == '1'">
+          <td v-if="request.last_update === null">{{ T.wordsPending }}</td>
+          <td v-else-if="request.accepted === true">
             {{ T.wordAccepted }}
           </td>
           <td v-else="">{{ T.wordsDenied }}</td>
-          <td v-if="request.last_update != null">
+          <td v-if="request.last_update !== null">
             {{ request.last_update }} ({{ request.admin.username }})
           </td>
           <td v-else=""></td>
-          <td
-            v-if="request.accepted != 'true' &amp;&amp; request.accepted != '1'"
-          >
+          <td v-if="request.accepted === false">
             <button
               class="close"
               style="color:red"
@@ -58,9 +56,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 
-@Component({})
+@Component
 export default class Requests extends Vue {
-  @Prop() data!: omegaup.IdentityContestRequest[];
+  @Prop() data!: omegaup.IdentityRequest[];
+  @Prop() textAddParticipant!: string;
 
   T = T;
   requests = this.data;
