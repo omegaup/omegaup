@@ -149,7 +149,7 @@
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
               href="#"
-              ><img v-bind:src="header.gravatarURL51"/>
+              ><img class="user-avatar" v-bind:src="header.gravatarURL51"/>
               <span class="username" v-bind:title="header.currentUsername">{{
                 header.currentUsername
               }}</span>
@@ -252,8 +252,8 @@
     }
 
     img {
-      width: 51px;
-      height: 51px;
+      width: 50px;
+      height: 50px;
       margin-right: 10px;
     }
   }
@@ -346,6 +346,30 @@
   .container {
     @media (max-width: 991px) {
       max-width: 100% !important;
+    }
+  }
+
+  .user-avatar {
+    @media (max-width: 827px) {
+      display: none !important;
+    }
+  }
+
+  .username {
+    @media (max-width: 991px) {
+      display: none !important;
+    }
+  }
+
+  .grader-count {
+    @media (max-width: 991px) {
+      display: none !important;
+    }
+  }
+
+  .navbar-right .caret {
+    @media (max-width: 827px) {
+      margin: 23px 4px 23px 4px;
     }
   }
 
