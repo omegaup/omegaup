@@ -1424,8 +1424,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         if (empty($codersOfTheMonth)) {
-            // Generate the coder
-            $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+            $users = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
                 $firstDay,
                 $category
             );
@@ -1433,25 +1432,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 return [
                     'coderinfo' => null,
                 ];
-            }
-
-            try {
-                \OmegaUp\DAO\DAO::transBegin();
-                // First place of list is going to be returned
-                $coderOfTheMonthUserId = $users[0]['user_id'];
-                foreach ($users as $index => $user) {
-                    \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
-                        'user_id' => $user['user_id'],
-                        'school_id' => $user['school_id'],
-                        'time' => $firstDay,
-                        'rank' => $index + 1,
-                        'category' => $category,
-                    ]));
-                }
-                \OmegaUp\DAO\DAO::transEnd();
-            } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
-                throw $e;
             }
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
@@ -1560,13 +1540,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $category
         );
 
-        if (!empty($codersOfTheMonth)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'coderOfTheMonthAlreadySelected'
-            );
-        }
-        // Generate the coder
-        $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+        $users = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
             $category
         );
@@ -1579,11 +1553,12 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
             foreach ($users as $index => $user) {
                 $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
+                    'coder_of_the_month_id' => $user['coder_of_the_month_id'],
                     'user_id' => $user['user_id'],
                     'school_id' => $user['school_id'],
-                    'time' => $dateToSelect,
-                    'rank' => $index + 1,
-                    'category' => $category,
+                    'time' => $user['time'],
+                    'rank' => $user['rank'],
+                    'category' => $user['category'],
                 ]);
                 // All users calculated as CoderOfTheMonth are going to be saved on database,
                 // the one selected by the mentor is gonna have the field 'selected_by' filled.
@@ -3273,7 +3248,11 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $category = $r['category'] ?? 'all';
 
-        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+        /*$candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
+            $dateToSelect,
+            $category
+        );*/
+        $candidates = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
             $category
         );

@@ -524,15 +524,18 @@ def update_coder_of_the_month_candidates(
         ))
 
     for index, row in enumerate(cur):
+        logging.info(str(row))
         cur.execute('''
                     INSERT INTO
                         `Coder_Of_The_Month` (
                             `user_id`,
                             `time`,
                             `rank`,
+                            `school_id`,
                             `category`
                         )
                     VALUES (
+                        %s,
                         %s,
                         %s,
                         %s,
@@ -543,6 +546,7 @@ def update_coder_of_the_month_candidates(
                         row['user_id'],
                         first_day_of_next_month,
                         index + 1,
+                        row['school_id'],
                         category
                     ))
 

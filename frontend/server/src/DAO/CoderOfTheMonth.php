@@ -15,6 +15,36 @@ namespace OmegaUp\DAO;
  */
 class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     /**
+     *
+     *
+     */
+    public static function getCandidatesToCoderOfTheMonth(
+        string $time,
+        string $category = 'all'
+    ): ?array {
+        $sql = 'SELECT
+            `c`.*,
+            `i`.`username`
+          FROM
+            `Coder_Of_The_Month` AS `c`
+          INNER JOIN
+            `Identities` AS `i` ON `i`.`user_id` = `c`.`user_id`
+          WHERE
+            `time` = ? AND
+            `category` = ?;
+        ';
+
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$time, $category]
+        );
+        if (empty($results)) {
+            return null;
+        }
+        return $results;
+    }
+
+  /**
      * Gets the users that solved the most problems during the provided
      * time period.
      *
