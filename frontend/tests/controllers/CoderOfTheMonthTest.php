@@ -781,6 +781,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $coderFemale = $this->getCoderOfTheMonth($today, '-5 month', 'female');
         $coderAll = $this->getCoderOfTheMonth($today, '-5 month', 'all');
 
