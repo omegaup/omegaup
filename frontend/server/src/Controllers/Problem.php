@@ -1094,9 +1094,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Update the Problem object
         $valueProperties = [
-            'visibility' => [
-                'important' => true,
-            ],
+            'visibility',
             'title',
             'inputLimit' => [
                 'alias' => 'input_limit',
@@ -3551,6 +3549,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'MemoryLimit' => '256MiB',
                     'OutputLimit' => '10KiB',
                     'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
                 ];
             }
             $problemSettings['validator']['limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";

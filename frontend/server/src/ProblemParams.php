@@ -247,7 +247,7 @@ class ProblemParams {
         $this->extraWallTime = $params['extra_wall_time'] ?? null;
         $this->memoryLimit = $params['memory_limit'] ?? null;
         $this->outputLimit = $params['output_limit'] ?? null;
-        $this->inputLimit = $params['input_limit'] ?? null;
+        $this->inputLimit = $params['input_limit'] ?? 10240;
         $this->emailClarifications = $params['email_clarifications'] ?? null;
         $this->order = $params['order'] ?? 'normal';
     }
