@@ -614,7 +614,7 @@ OmegaUp.on('ready', function() {
 
     $('#statement-preview .title').html(UI.escape(problem.title));
     let languages = problem.languages.sort().join();
-    $('#languages').val(languages);
+    document.getElementsById('languages').value = languages;
     problemSettings.languages = languages;
     $('input[name=title]').val(problem.title);
     problemSettings.timeLimit = UI.parseDuration(
