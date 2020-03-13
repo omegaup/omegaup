@@ -37,8 +37,6 @@ OmegaUp.on('ready', function() {
       validLanguages: payload.validLanguages,
       initialValidator: payload.validator,
       validatorTypes: payload.validatorTypes,
-      //validator: '',
-      //languages: '',
     },
     components: {
       'omegaup-problem-settings': problem_Settings,

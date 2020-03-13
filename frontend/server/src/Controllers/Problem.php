@@ -3885,17 +3885,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
         sort($sortedLanguages);
         $validLanguages = [
-            'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua' => join(
+            join(
                 ',',
                 $sortedLanguages
-            ),
-            'Karel' => 'kj,kp',
-            \OmegaUp\Translations::getInstance()->get(
+            ) => 'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
+            'kj,kp' => 'Karel',
+            'cat' => \OmegaUp\Translations::getInstance()->get(
                 'wordsJustOutput'
-            ) => 'cat',
-            \OmegaUp\Translations::getInstance()->get(
+            ),
+            '' => \OmegaUp\Translations::getInstance()->get(
                 'wordsNoSubmissions'
-            ) => '',
+            ),
         ];
         return [
           'validatorTypes' => $validatorTypes,

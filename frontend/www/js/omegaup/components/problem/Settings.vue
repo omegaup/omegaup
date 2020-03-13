@@ -18,9 +18,9 @@
         <select name="languages" class="form-control" v-model="languages">
           <option
             v-for="(languageText, languageIndex) in validLanguages"
-            v-bind:value="languageText"
+            v-bind:value="languageIndex"
           >
-            {{ languageIndex }}</option
+            {{ languageText }}</option
           >
         </select>
       </div>
