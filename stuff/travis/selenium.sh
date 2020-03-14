@@ -16,6 +16,7 @@ stage_before_install() {
 	python3 -m pip install --user pytest-xdist
 	python3 -m pip install --user flaky
 
+	install_mysql8
 	install_yarn
 }
 
@@ -45,7 +46,8 @@ stage_install() {
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
-	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+	mysql -uroot -e "CREATE USER 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
+	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
 
 	yarn install
 	yarn build-development

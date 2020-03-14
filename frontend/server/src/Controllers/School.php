@@ -325,7 +325,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{school_id: int, name: string, country_id: string, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{name: string, rank: int, school_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -351,9 +351,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     'schoolsOfCurrentMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
                         $currentDate
                     ),
-                    'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
-                        /* rowcount */ 100
-                    ),
+                    'candidatesToSchoolOfTheMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(),
                     'isMentor' => $isMentor,
                 ],
             ],
@@ -389,7 +387,7 @@ class School extends \OmegaUp\Controllers\Controller {
      */
     public static function getSchoolOfTheMonth(string $date = null): array {
         $firstDay = self::getCurrentMonthFirstDay($date);
-        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTimeAndSelected(
+        $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
             $firstDay
         );
 
