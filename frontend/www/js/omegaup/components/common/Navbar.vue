@@ -367,6 +367,7 @@
     margin-right: auto;
     padding-left: 0;
     padding-right: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
     @media (max-width: 991px) {
       width: 100% !important;
