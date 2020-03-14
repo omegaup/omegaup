@@ -301,7 +301,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function showIntro(\OmegaUp\Request $r): bool {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
             'contest_alias'
         );
