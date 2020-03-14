@@ -252,8 +252,8 @@
     }
 
     img {
-      width: 51px;
-      height: 51px;
+      width: 50px;
+      height: 50px;
       margin-right: 10px;
     }
   }
@@ -346,6 +346,18 @@
   .container {
     @media (max-width: 991px) {
       max-width: 100% !important;
+    }
+  }
+
+  .username {
+    @media (max-width: 991px) {
+      display: none !important;
+    }
+  }
+
+  .grader-count {
+    @media (max-width: 991px) {
+      display: none !important;
     }
   }
 
