@@ -48,7 +48,6 @@
       <code>$r['verdict']</code>
       <code>$r['language']</code>
       <code>$r['offset']</code>
-      <code>$r['rowcount']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
     <MixedAssignment occurrences="7">
@@ -91,11 +90,7 @@
       <code>$resultAdmins</code>
     </PossiblyNullIterator>
     <PossiblyNullOperand occurrences="2"/>
-    <PossiblyNullPropertyFetch occurrences="4">
-      <code>$contest-&gt;start_time</code>
-      <code>$contest-&gt;finish_time</code>
-      <code>$problemset-&gt;problemset_id</code>
-    </PossiblyNullPropertyFetch>
+    <PossiblyNullPropertyFetch occurrences="2"/>
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($identity)</code>
     </TypeDoesNotContainNull>
