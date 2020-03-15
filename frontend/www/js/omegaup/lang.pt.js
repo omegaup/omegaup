@@ -588,6 +588,7 @@ const translations = {
 	privacyPolicyNotice: "Ao clicar em Registrar-se voc\u00ea est\u00e1 aceitando <a href=\"http://blog.omegaup.com/privacy-policy/\"> Uso e Pol\u00edtica de Privacidade do site</a>.",
 	privacyStatementNotFound: "Declara\u00e7\u00e3o de privacidade n\u00e3o encontrada.",
 	probAliasAndContestAliasInvalid: "A combina\u00e7\u00e3o do alias do problema e do alias do concurso \u00e9 inv\u00e1lida.",
+	problemAliasExists: "J\u00e1 existe este alias de problema. Por favor, tente um diferente.",
 	problemCategoryAlgorithmAndNetworkOptimization: "Design de algoritmos e otimiza\u00e7\u00e3o de redes",
 	problemCategoryCompetitiveProgramming: "Problemas de programa\u00e7\u00e3o competitiva",
 	problemCategoryElementaryDataStructures: "Ordena\u00e7\u00e3o y estruturas de dados elementares",
