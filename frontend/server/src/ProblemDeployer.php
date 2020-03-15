@@ -415,10 +415,11 @@ class ProblemDeployer {
             );
             $output = curl_exec($curl);
             /** @var int */
-            $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $retval = ($output !== false && $retval == 200) ? 0 : 1;
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $retval = ($output !== false && $statusCode == 200) ? 0 : 1;
             $result = [
                 'retval' => $retval,
+                'statusCode' => $statusCode,
                 'output' => strval($output),
             ];
         } finally {
@@ -426,6 +427,11 @@ class ProblemDeployer {
             fclose($zipFile);
         }
 
+        if ($result['statusCode'] == 409) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'problemAliasExists'
+            );
+        }
         if ($result['retval'] != 0) {
             $errorMessage = 'problemDeployerInternalError';
             $context = null;
