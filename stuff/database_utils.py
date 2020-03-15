@@ -28,8 +28,16 @@ def quote(s):
 
 def default_config_file() -> Optional[str]:
     '''Returns the default config file path for MySQL.'''
-    for candidate_path in (os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
-                           '/etc/mysql/conf.d/mysql_password.cnf'):
+    for candidate_path in (
+            # ${OMEGAUP_ROOT}/.my.cnf
+            os.path.join(
+                os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), '..')),
+                '.my.cnf'),
+            # ~/.my.cnf
+            os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
+            '/etc/mysql/conf.d/mysql_password.cnf',
+    ):
         if os.path.isfile(candidate_path):
             return candidate_path
     return None
@@ -39,7 +47,7 @@ def authentication(*, config_file=default_config_file(), username=None,
                    password=None):
     '''Computes the authentication arguments for mysql binaries.'''
     if config_file and os.path.isfile(config_file):
-        return ['--defaults-extra-file=%s' % quote(config_file)]
+        return ['--defaults-file=%s' % quote(config_file)]
     assert username
     args = ['--user=%s' % quote(username)]
     if password:

@@ -21,10 +21,13 @@ RUN apt update -y && \
 
 RUN curl -sL https://phar.phpunit.de/phpunit-6.5.9.phar -o /usr/bin/phpunit
 RUN chmod +x /usr/bin/phpunit
-RUN mkdir -p /etc/omegaup/frontend
+
+RUN curl -sL https://getcomposer.org/download/1.10.1/composer.phar -o /usr/bin/composer
+RUN chmod +x /usr/bin/composer
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
 
+RUN mkdir -p /etc/omegaup/frontend
 RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
 RUN mkdir -p /var/log/supervisor && chown -R ubuntu /var/log/supervisor
 
