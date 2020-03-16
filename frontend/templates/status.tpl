@@ -20,4 +20,4 @@
 	</div>
 {/if}
 
-<script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}" defer></script>
