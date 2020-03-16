@@ -46,15 +46,10 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             SELECT DISTINCT
                 i.identity_id,
                 i.username,
-                i.user_id,
-                i.username,
-                i.country_id,
                 c.name AS country,
-                r.problemset_id,
                 r.request_time,
                 r.last_update,
-                r.accepted,
-                r.extra_note
+                r.accepted
             FROM
                 `Problemset_Identity_Request` r
             INNER JOIN
@@ -71,7 +66,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
-        /** @var array{accepted: bool|null, country: null|string, country_id: null|string, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string, user_id: int|null, username: string, username: string} $row */
+        /** @var array{accepted: bool|null, country: null|string, identity_id: int, last_update: null|string, request_time: string, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

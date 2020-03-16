@@ -51,7 +51,7 @@ class Constraint:
 
     def __init__(self, tokens):
         self.type = tokens['type']
-        self.columns = tokens['key_part']
+        self.columns = tokens.get('key_part')
 
     def __repr__(self):
         return 'Constraint<type={}, columns={}>'.format(
@@ -115,9 +115,10 @@ def _parse(text: Text):
           ((CaselessKeyword('FULLTEXT KEY') | CaselessKeyword('UNIQUE KEY')
             | CaselessKeyword('KEY'))('type') + identifier('index_name'))) +
          '(' + delimitedList(identifier('key_part*')) + ')') |
-        (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') +
-         (CaselessKeyword('FOREIGN KEY')('type') + '(' + delimitedList(
-             identifier('key_part*')) + ')' + reference_definition))
+        (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') + (
+            (CaselessKeyword('FOREIGN KEY')('type') + '(' + delimitedList(
+                identifier('key_part*')) + ')' + reference_definition)
+            | (CaselessKeyword('CHECK')('type') + Regex('[^,\n]+'))))
     ).setParseAction(Constraint)
 
     column_type = (Word(alphanums) + Optional('(' + Regex('[^)]+') + ')') +

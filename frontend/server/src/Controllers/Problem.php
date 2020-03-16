@@ -50,7 +50,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 1000;
+    const PAGE_SIZE = 100;
 
     /**
      * Returns a ProblemParams instance from the Request values.
@@ -248,34 +248,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'source'
             );
         }
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->validatorTimeLimit,
-            'validator_time_limit',
-            0,
-            null,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->overallWallTimeLimit,
-            'overall_wall_time_limit',
-            0,
-            60000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->extraWallTime,
-            'extra_wall_time',
-            0,
-            5000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->outputLimit,
-            'output_limit',
-            0,
-            null,
-            $isRequired
-        );
         \OmegaUp\Validators::validateNumberInRange(
             $params->inputLimit,
             'input_limit',
@@ -1171,7 +1143,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
-            if ($operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS || $settingsUpdated) {
+            if (
+                $operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS ||
+                $settingsUpdated
+            ) {
                 $problemDeployer = new \OmegaUp\ProblemDeployer(
                     $problem->alias,
                     $acceptsSubmissions,
@@ -3549,12 +3524,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
-        $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        if (!is_null($params->extraWallTime)) {
+            $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        }
         if (!is_null($params->memoryLimit)) {
             $problemSettings['limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
         }
-        $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
-        $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        if (!is_null($params->outputLimit)) {
+            $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
+        }
+        if (!is_null($params->memoryLimit)) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        }
         if (!is_null($params->timeLimit)) {
             $problemSettings['limits']['TimeLimit'] = "{$params->timeLimit}ms";
         }
