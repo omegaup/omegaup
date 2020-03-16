@@ -41,7 +41,7 @@ function smarty_compiler_js_include(
         // if the content changes.
         $generatedPath = __DIR__ . "/../www/{$filename}";
         $hash = substr(sha1(file_get_contents($generatedPath)), 0, 6);
-        $generatedPaths[] = "<script src=\"{$filename}?ver={$hash}\" type=\"text/javascript\"></script>";
+        $generatedPaths[] = "<script src=\"{$filename}?ver={$hash}\" type=\"text/javascript\" defer></script>";
     }
     return implode('', $generatedPaths);
 }

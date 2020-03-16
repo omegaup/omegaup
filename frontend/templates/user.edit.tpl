@@ -195,5 +195,5 @@
 		{/block}
 	</div>
 
-	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}"></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}" defer></script>
 {/block}
