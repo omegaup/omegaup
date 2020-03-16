@@ -2096,8 +2096,12 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $newSchoolId = $currentSchoolId;
-        if (!is_null($r['school_id']) && $r['school_id'] !== '') {
-            $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+        try {
+            \OmegaUp\Validators::validateNumber(
+                $r['school_id'],
+                'school_id'
+            );
+            $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -2105,20 +2109,30 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             $newSchoolId = $school->school_id;
-        }
-        if (is_null($newSchoolId) && !empty($r['school_name'])) {
-            $response = \OmegaUp\Controllers\School::apiCreate(
-                new \OmegaUp\Request([
-                    'name' => $r['school_name'],
-                    'country_id' => !is_null(
-                        $state
-                    ) ? $state->country_id : null,
-                    'state_id' => !is_null($state) ? $state->state_id : null,
-                    'auth_token' => $r['auth_token'],
-                ])
-            );
-            $r['school_id'] = $response['school_id'];
-            $newSchoolId = $response['school_id'];
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            // It's ok if parameter school_id was not sent or it is not a number
+            if ($e->getMessage() === 'parameterNotANumber') {
+                if (!empty($r['school_name'])) {
+                    $response = \OmegaUp\Controllers\School::apiCreate(
+                        new \OmegaUp\Request([
+                            'name' => $r['school_name'],
+                            'country_id' => !is_null(
+                                $state
+                            ) ? $state->country_id : null,
+                            'state_id' => !is_null(
+                                $state
+                            ) ? $state->state_id : null,
+                            'auth_token' => $r['auth_token'],
+                        ])
+                    );
+                    $r['school_id'] = $response['school_id'];
+                    $newSchoolId = $response['school_id'];
+                }
+            } elseif ($e->getMessage() !== 'parameterEmpty') {
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            throw $e;
         }
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
@@ -2192,7 +2206,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'scholar_degree',
             'school_id',
             'birth_date' => [
-                /** @param int $value */
                 'transform' => function (string $value): string {
                     return strval(gmdate('Y-m-d', intval($value)));
                 },
