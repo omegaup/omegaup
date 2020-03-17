@@ -1422,25 +1422,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $firstDay,
             $category
         );
-        $coderOfTheMonthUserId = null;
         if (empty($codersOfTheMonth)) {
-            $users = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
-                $firstDay,
-                $category
-            );
-            if (is_null($users)) {
-                return [
-                    'coderinfo' => null,
-                ];
-            }
-        } else {
-            $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
-            // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
-            foreach ($codersOfTheMonth as $coder) {
-                if (isset($coder->selected_by)) {
-                    $coderOfTheMonthUserId = $coder->user_id;
-                    break;
-                }
+            return [
+                'coderinfo' => null,
+            ];
+        }
+        $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
+        // If someone was explicitly selected from the list, use that as coder of the month instead of the first place.
+        foreach ($codersOfTheMonth as $coder) {
+            if (isset($coder->selected_by)) {
+                $coderOfTheMonthUserId = $coder->user_id;
+                break;
             }
         }
 
@@ -1524,21 +1516,28 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-
-        $currentDate = date('Y-m-d', $currentTimestamp);
-        $firstDayOfNextMonth = new \DateTime($currentDate);
-        $firstDayOfNextMonth->modify('first day of next month');
-        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['category'],
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
         $category = $r['category'] ?? 'all';
-        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
             $dateToSelect,
+            false,
             $category
         );
+        if (!empty($codersOfTheMonth)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'coderOfTheMonthAlreadySelected'
+            );
+        }
 
         $users = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
@@ -1565,7 +1564,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 if ($user['username'] === $r['username']) {
                     $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
                 }
-                \OmegaUp\DAO\CoderOfTheMonth::create($newCoderOfTheMonth);
+                \OmegaUp\DAO\CoderOfTheMonth::update($newCoderOfTheMonth);
             }
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {

@@ -435,11 +435,11 @@ def update_coder_of_the_month_candidates(
                 ''',
                 (first_day_of_next_month, category))
     if category == 'female':
-        gender = " AND i.gender = 'female'"
+        gender_clause = " AND i.gender = 'female'"
     else:
-        gender = ""
+        gender_clause = ""
 
-    sql = '''
+    sql = f'''
          SELECT DISTINCT
             IFNULL(i.user_id, 0) AS user_id,
             i.username,
@@ -506,14 +506,14 @@ def update_coder_of_the_month_candidates(
             (cm.user_id IS NULL OR
             DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
             i.user_id IS NOT NULL
-            {0}
+            {gender_clause}
           GROUP BY
             up.identity_id
           ORDER BY
             score DESC,
             ProblemsSolved DESC
           LIMIT 100;
-        '''.format(gender)
+        '''
     cur.execute(
         sql,
         (
