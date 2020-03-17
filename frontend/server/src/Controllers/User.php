@@ -2080,8 +2080,6 @@ class User extends \OmegaUp\Controllers\Controller {
         $currentIdentitySchool = null;
         $currentGraduationDate = null;
         $currentSchoolId = null;
-        /** @var int|null $pickedSchoolId */
-        $pickedSchoolId = $r['school_id'];
         if (!is_null($r->identity->current_identity_school_id)) {
             $currentIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $r->identity->current_identity_school_id
@@ -2102,7 +2100,8 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['school_id'],
             'school_id'
         );
-
+        /** @var int|null $pickedSchoolId */
+        $pickedSchoolId = $r['school_id'];
         if (!is_null($pickedSchoolId)) {
             $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
             if (is_null($school)) {
@@ -2129,7 +2128,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     'auth_token' => $r['auth_token'],
                 ])
             );
-            $r['school_id'] = $response['school_id'];
             $newSchoolId = $response['school_id'];
         }
 
@@ -2202,7 +2200,6 @@ class User extends \OmegaUp\Controllers\Controller {
         $userValueProperties = [
             'username',
             'scholar_degree',
-            'school_id',
             'birth_date' => [
                 'transform' => function (int $value): string {
                     return strval(gmdate('Y-m-d', $value));
@@ -2218,7 +2215,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'name',
             'country_id',
             'state_id',
-            'school_id',
             'gender',
         ];
 
