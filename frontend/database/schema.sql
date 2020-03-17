@@ -225,7 +225,7 @@ CREATE TABLE `Courses` (
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
-  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`),
+  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -263,14 +263,14 @@ CREATE TABLE `Group_Roles` (
   KEY `group_id` (`group_id`),
   KEY `role_id` (`role_id`),
   KEY `acl_id` (`acl_id`),
-  CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`),
+  CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_gr_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`),
   CONSTRAINT `fk_gra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Groups` (
+CREATE TABLE `Groups_` (
   `group_id` int NOT NULL AUTO_INCREMENT,
   `acl_id` int NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -298,7 +298,7 @@ CREATE TABLE `Groups_Identities` (
   KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_gipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`),
-  CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`)
+  CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -313,7 +313,7 @@ CREATE TABLE `Groups_Scoreboards` (
   PRIMARY KEY (`group_scoreboard_id`),
   UNIQUE KEY `groups_scoreboards_alias` (`alias`),
   KEY `group_id` (`group_id`),
-  CONSTRAINT `fk_gs_user_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`)
+  CONSTRAINT `fk_gs_user_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
