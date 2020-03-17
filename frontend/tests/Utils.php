@@ -253,7 +253,7 @@ class Utils {
 
             // Tables with special entries.
             \OmegaUp\MySQLConnection::getInstance()->Execute(
-                'DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";'
+                'DELETE FROM `Groups_` WHERE `alias` NOT LIKE "%:%";'
             );
 
             // The format of the question changed from this id
