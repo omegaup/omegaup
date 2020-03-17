@@ -787,9 +787,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now check if the third user has not participated in the coder of the
         // month female.
-        $this->assertEquals(
-            $coderAll['coderinfo']['username'],
-            $coderFemale['coderinfo']['username']
-        );
+        if (isset($coderAll['coderinfo']['username'])) {
+            $this->assertEquals(
+                $coderAll['coderinfo']['username'],
+                $coderFemale['coderinfo']['username']
+            );
+        }
     }
 }
