@@ -2100,9 +2100,8 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['school_id'],
             'school_id'
         );
-        $pickedSchoolId = $r['school_id'];
-        if (!is_null($pickedSchoolId)) {
-            $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
+        if (!is_null($r['school_id'])) {
+            $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
