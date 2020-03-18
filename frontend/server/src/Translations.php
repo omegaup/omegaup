@@ -28,7 +28,7 @@ class Translations {
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
             /*$identity=*/ null
         );
-        $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
+        $filename = sprintf("%s/templates/{$lang}.lang", strval(OMEGAUP_ROOT));
         /** @var array<int, string> $match */
         foreach (
             new \RegexIterator(

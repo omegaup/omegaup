@@ -179,6 +179,6 @@
 
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/interviews.edit.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/interviews.edit.js"}" defer></script>
 {include file='footer.tpl' inline}
 

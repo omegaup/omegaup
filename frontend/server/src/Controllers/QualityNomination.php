@@ -166,7 +166,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Tags must be strings.
-            if (isset($contents['tags'])) {
+            if (isset($contents['tags']) && is_array($contents['tags'])) {
                 /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (
@@ -522,7 +522,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'qualitynomination_id'
         );
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
-            $r['qualitynomination_id']
+            intval($r['qualitynomination_id'])
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -909,6 +909,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
+            /** @psalm-suppress RedundantCondition $response['original_contents']['statements'] can be an array but still be empty. */
             if (empty($response['original_contents']['statements'])) {
                 // Force 'statements' to be an object.
                 $response['original_contents']['statements'] = (object)[];

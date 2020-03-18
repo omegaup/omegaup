@@ -61,5 +61,5 @@
     </tbody>
   </table>
 </div>
-<script type="text/javascript" src="{version_hash src="/js/problem.mine.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/problem.mine.js"}" defer></script>
 {include file='footer.tpl' inline}

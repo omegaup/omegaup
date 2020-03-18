@@ -6,8 +6,8 @@
 {/if}
 
 <span id="form-data" data-name="groups" data-page="new"></span>
-<script src="{version_hash src="/js/alias.generate.js"}"></script>
-<script src="{version_hash src="/js/groups.js"}"></script>
+<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
+<script src="{version_hash src="/js/groups.js"}" defer></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE != 1}

@@ -301,15 +301,26 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function showIntro(\OmegaUp\Request $r): bool {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
             'contest_alias'
         );
         $contest = \OmegaUp\Controllers\Contest::validateContest(
             $r['contest_alias']
         );
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            if ($contest->admission_mode === 'private') {
+                throw $e;
+            }
+            // Request can proceed unauthenticated.
+        }
         // TODO: Arreglar esto para que Problemsets se encargue de obtener
         //       la info correcta
-        return \OmegaUp\Controllers\Contest::shouldShowIntro($r, $contest);
+        return \OmegaUp\Controllers\Contest::shouldShowIntro(
+            $r->identity,
+            $contest
+        );
     }
 }

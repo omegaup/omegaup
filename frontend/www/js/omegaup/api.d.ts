@@ -16,6 +16,10 @@ declare namespace omegaup {
     Required = 'required',
   }
 
+  export interface ArenaContests {
+    [timeType: string]: omegaup.Contest[];
+  }
+
   export interface Assignment {
     alias: string;
     assignment_type: string,
@@ -115,11 +119,6 @@ declare namespace omegaup {
     show_scoreboard_after?: boolean;
     submission_deadline?: Date;
     submissions_gap?: number;
-  }
-
-  interface ContestAdmin {
-    username: string;
-    role: string;
   }
 
   export interface ContestGroup {
@@ -266,13 +265,13 @@ declare namespace omegaup {
     country_id?: string;
   }
 
-  export interface IdentityContestRequest {
+  export interface IdentityRequest {
     username: string;
     country: string;
     request_time: Date;
     last_update: Date;
     accepted: boolean;
-    admin?: ContestAdmin;
+    admin?: UserRole;
   }
 
   interface Languages {
@@ -431,6 +430,28 @@ declare namespace omegaup {
     name: string;
   }
 
+  export interface Run {
+    [period: string]: number;
+  }
+
+  export interface RunInfo {
+    date: string;
+    verdict: string;
+    runs: number;
+    [period: string]: string;
+  }
+
+  export interface RunCounts {
+    categories: string[];
+    cumulative: omegaup.RunData[];
+    delta: omegaup.RunData[];
+  }
+
+  interface RunData {
+    data: number[];
+    name: string;
+  }
+
   interface RunDetails {
     admin?: boolean;
     compile_error?: string;
@@ -548,6 +569,10 @@ declare namespace omegaup {
 
   interface Verdict {
     [verdict: string]: number;
+  }
+
+  export interface VerdictByDate {
+    [date: string]: Verdict;
   }
 }
 

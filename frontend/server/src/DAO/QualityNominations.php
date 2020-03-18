@@ -239,6 +239,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 $nomination['contents'],
                 /*assoc=*/true
             );
+        } else {
+            unset($nomination['contents']);
         }
 
         return $nomination;

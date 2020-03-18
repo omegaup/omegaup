@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @author carlosabcs
  */
 class Badge extends \OmegaUp\Controllers\Controller {
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
     /**

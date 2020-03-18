@@ -166,5 +166,5 @@
 	</div>
 </div>
 <script type="text/javascript" src="/third_party/js/bootstrap-select.min.js"></script>
-<script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}" defer></script>
 <link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">

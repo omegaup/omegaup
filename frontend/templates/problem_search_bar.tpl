@@ -54,4 +54,4 @@
 		</div>
 	</form>
 </div>
-<script type="text/javascript" src="{version_hash src="/js/problem_search_bar.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/problem_search_bar.js"}" defer></script>

@@ -3,6 +3,6 @@
 
 {include file='contest.new.form.tpl' inline}
 
-<script type="text/javascript" src="{version_hash src="/js/contest.new.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/contest.new.js"}" defer></script>
 
 {include file='footer.tpl' inline}

@@ -16,6 +16,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     const ADMISSION_MODE_PRIVATE = 'private';
     const ADMISSION_MODE_REGISTRATION = 'registration';
 
+    // Number of rows shown in course list
+    const PAGE_SIZE = 100;
+
     /**
      * Validate assignment_alias existis into the course and
      * return Assignments object
@@ -254,7 +257,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Only curator can set public
         if (
             !is_null($r['admission_mode'])
-            && $r['admission_mode'] === self::ADMISSION_MODE_PUBLIC
+            && $r['admission_mode'] !== self::ADMISSION_MODE_PRIVATE
             && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -1211,7 +1214,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $pageSize = (isset(
+            $r['page_size']
+        ) ? intval(
+            $r['page_size']
+        ) : \OmegaUp\Controllers\Course::PAGE_SIZE);
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
@@ -2288,7 +2295,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, hasToken: bool}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, hasToken: bool}
      */
     private static function authenticateAndValidateToken(
         string $courseAlias,

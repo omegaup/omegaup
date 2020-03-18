@@ -31,13 +31,11 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contestantLogin = self::login($identity);
-        $request2 = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $contestantLogin->auth_token,
-        ]);
-
         try {
-            $response = \OmegaUp\Controllers\Contest::apiOpen($request2);
+            $response = \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $contestantLogin->auth_token,
+            ]));
             $this->AssertFalse(
                 true,
                 'User gained access to contest even though its registration needed.'
@@ -47,7 +45,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $showIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $request2,
+            $identity,
             $contestData['contest']
         );
         $this->assertEquals(
@@ -66,7 +64,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Contest::apiUpdate($request);
 
         $showIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $request2,
+            $identity,
             $contestData['contest']
         );
         $this->assertEquals(
@@ -75,17 +73,16 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $contestantLogin = self::login($identity);
-        $request2 = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $contestantLogin->auth_token,
-        ]);
 
         // Join this contest
-        $response = \OmegaUp\Controllers\Contest::apiOpen($request2);
+        $response = \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $contestantLogin->auth_token,
+        ]));
 
         // Now that i have joined the contest, i should not see the intro
         $showIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $request2,
+            $identity,
             $contestData['contest']
         );
         $this->assertEquals(
@@ -108,18 +105,12 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
         // user can now submit to contest
-        $contestantLogin = self::login($identity);
-        $request = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $contestantLogin->auth_token,
-        ]);
-
         $showIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $request,
+            $identity,
             $contestData['contest']
         );
 
-        $this->assertEquals(1, $showIntro);
+        $this->assertTrue($showIntro);
     }
 
     //pruebas (público, privado) x (usuario mortal, admin, invitado)

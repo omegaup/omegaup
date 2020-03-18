@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
+        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
         $params = [$alias];
         /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -29,7 +29,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * @return \OmegaUp\DAO\VO\Groups[]
      */
     public static function SearchByName(string $name) {
-        $sql = "SELECT `g`.* FROM `Groups` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 10;";
+        $sql = "SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
@@ -41,7 +41,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT `g`.* FROM `Groups` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
+        $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
 
         /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
@@ -71,7 +71,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
                 g.name,
                 g.group_id
             FROM
-                `Groups` AS g
+                `Groups_` AS g
             INNER JOIN
                 ACLs AS a ON a.acl_id = g.acl_id
             LEFT JOIN
