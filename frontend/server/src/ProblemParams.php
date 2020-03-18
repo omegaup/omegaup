@@ -173,7 +173,60 @@ class ProblemParams {
                 ]
             );
         }
-
+        if (isset($params['time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['time_limit']),
+                'time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['memory_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['memory_limit']),
+                'memory_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['validator_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['validator_time_limit']),
+                'validator_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['overall_wall_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['overall_wall_time_limit']),
+                'overall_wall_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 60000,
+                $isRequired
+            );
+        }
+        if (isset($params['extra_wall_time'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['extra_wall_time']),
+                'extra_wall_time',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 5000,
+                $isRequired
+            );
+        }
+        if (isset($params['output_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                intval($params['output_limit']),
+                'output_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
         $this->problemAlias = $params['problem_alias'];
         $this->title = $params['title'] ?? null;
         $this->visibility = $params['visibility'] ?? null;

@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}>|null
+     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}>
      */
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
@@ -37,7 +37,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
-        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}>|null */
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]

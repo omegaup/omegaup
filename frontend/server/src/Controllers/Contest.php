@@ -1618,6 +1618,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
+        /** @psalm-suppress MixedArgument */
         $languages = empty($r['languages']) ? null : join(',', $r['languages']);
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
@@ -1669,8 +1670,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $r->ensureInt('start_time', null, null, $isRequired);
         $r->ensureInt('finish_time', null, null, $isRequired);
-        $currentStartTime = 0;
-        $currentFinisTime = 0;
+        $currentStartTime = null;
+        $currentFinisTime = null;
         if (!is_null($contest)) {
             $currentStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $contest->start_time
@@ -1686,12 +1687,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             !is_null($r['start_time']) ?
             intval($r['start_time']) :
             $currentStartTime
-        ) ?: 0;
+        );
         $finishTime = (
             !is_null($r['finish_time']) ?
             intval($r['finish_time']) :
             $currentFinisTime
-        ) ?: 0;
+        );
 
         // Validate start & finish time
         if ($startTime > $finishTime) {
@@ -1701,7 +1702,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Calculate the actual contest length
-        $contestLength = $finishTime - $startTime;
+        $contestLength = null;
+        if (!is_null($finishTime) && !is_null($startTime)) {
+            $contestLength = $finishTime - $startTime;
+        }
 
         // Validate max contest length
         if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
@@ -1715,7 +1719,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->ensureInt(
                 'window_length',
                 0,
-                intval($contestLength / 60),
+                is_null($contestLength) ? null : intval($contestLength / 60),
                 false
             );
         }
@@ -1748,7 +1752,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
             'submissions_gap',
             1,
-            floor($contestLength / 60),
+            is_null($contestLength) ? null : floor($contestLength / 60),
             $isRequired
         );
 
@@ -2057,8 +2061,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $masterCommit,
             $currentVersion,
             $r->identity,
-            $r['points'],
-            $r['order_in_contest'] ?: 1
+            floatval($r['points']),
+            !empty($r['order_in_contest']) ? intval($r['order_in_contest']) : 1
         );
 
         // Invalidar cache
@@ -3061,14 +3065,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias' => $r['contest_alias'],
             'users' => [],
         ];
-        if (is_null($resultAdmins)) {
-            $result['users'] = array_map(function ($request) {
-                unset($request['identity_id']);
-                return $request;
-            }, $resultRequests);
-
-            return $result;
-        }
         foreach ($resultAdmins as $result) {
             $adminId = $result['admin_id'];
             if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
