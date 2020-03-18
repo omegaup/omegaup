@@ -1561,9 +1561,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 ]);
                 // All users calculated as CoderOfTheMonth are going to be saved on database,
                 // the one selected by the mentor is gonna have the field 'selected_by' filled.
-                if ($user['username'] === $r['username']) {
-                    $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
+                if ($user['username'] !== $r['username']) {
+                    continue;
                 }
+                $newCoderOfTheMonth->selected_by = $r->identity->identity_id;
                 \OmegaUp\DAO\CoderOfTheMonth::update($newCoderOfTheMonth);
             }
             \OmegaUp\DAO\DAO::transEnd();
