@@ -32,7 +32,7 @@
 {/if}
 
 {if isset($jsfile)}
-		<script type="text/javascript" src="{$jsfile}"></script>
+		<script type="text/javascript" src="{$jsfile}" defer></script>
 {/if}
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
 		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>

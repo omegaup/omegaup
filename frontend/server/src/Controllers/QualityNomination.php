@@ -522,7 +522,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'qualitynomination_id'
         );
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
-            $r['qualitynomination_id']
+            intval($r['qualitynomination_id'])
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
