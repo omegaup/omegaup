@@ -325,6 +325,7 @@ class Validators {
      * @param int|float|null $lowerBound
      * @param int|float|null $upperBound
      * @param boolean   $required
+     * @psalm-assert int $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumberInRange(
