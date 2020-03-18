@@ -2100,7 +2100,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['school_id'],
             'school_id'
         );
-        /** @var int|null $pickedSchoolId */
         $pickedSchoolId = $r['school_id'];
         if (!is_null($pickedSchoolId)) {
             $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
