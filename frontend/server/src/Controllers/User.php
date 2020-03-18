@@ -1530,7 +1530,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
             $dateToSelect,
-            false,
+            /*autoselected=*/false,
             $category
         );
         if (!empty($codersOfTheMonth)) {
@@ -1559,8 +1559,8 @@ class User extends \OmegaUp\Controllers\Controller {
                     'rank' => $user['rank'],
                     'category' => $user['category'],
                 ]);
-                // All users calculated as CoderOfTheMonth are going to be saved on database,
-                // the one selected by the mentor is gonna have the field 'selected_by' filled.
+                // Only the CoderOfTheMonth selected by the mentor is going to be
+                // updated.
                 if ($user['username'] !== $r['username']) {
                     continue;
                 }
