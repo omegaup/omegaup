@@ -3114,7 +3114,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'mode' => strval($r['mode']),
-            'page' => $r['page'],
+            'page' => intval($r['page']),
             'orderBy' => strval($r['order_by']),
             'language' => strval($r['language']),
             'tags' => $tags,

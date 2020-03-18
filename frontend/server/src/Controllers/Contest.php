@@ -42,21 +42,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
         $activeContests = isset($r['active'])
-            ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue($r['active'])
+            ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
         \OmegaUp\Validators::validateNumber($activeContests, 'active');
         $recommended = isset($r['recommended'])
             ? \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
-                $r['recommended']
+                intval($r['recommended'])
             )
             : \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
         // Same as above.
         \OmegaUp\Validators::validateNumber($recommended, 'recommended');
         $participating = isset($r['participating'])
             ? \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
-                $r['participating']
+                intval($r['participating'])
             )
             : \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
         \OmegaUp\Validators::validateOptionalInEnum(
