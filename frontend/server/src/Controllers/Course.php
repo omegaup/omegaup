@@ -231,15 +231,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             ['no', 'optional', 'required']
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
-            'admission_mode',
-            [
-                self::ADMISSION_MODE_PUBLIC,
-                self::ADMISSION_MODE_PRIVATE,
-                self::ADMISSION_MODE_REGISTRATION,
-            ]
-        );
 
         $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
@@ -254,12 +245,28 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['admission_mode'],
+            'admission_mode'
+        );
+
+        if (is_null($r['admission_mode'])) {
+            return;
+        }
+
+        if ($r['admission_mode'] !== self::ADMISSION_MODE_PUBLIC) {
+            \OmegaUp\Validators::validateInEnum(
+                $r['admission_mode'],
+                'admission_mode',
+                [
+                    self::ADMISSION_MODE_PRIVATE,
+                    self::ADMISSION_MODE_REGISTRATION,
+                ]
+            );
+            return;
+        }
         // Only curator can set public
-        if (
-            !is_null($r['admission_mode'])
-            && $r['admission_mode'] !== self::ADMISSION_MODE_PRIVATE
-            && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
-        ) {
+        if (!\OmegaUp\Authorization::canCreatePublicCourse($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
