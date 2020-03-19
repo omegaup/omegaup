@@ -77,12 +77,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
-        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}>|null $rs */
+        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
-        if (is_null($rs)) {
-            return $result;
-        }
         foreach ($rs as $identityData) {
             $result[] = new \OmegaUp\DAO\VO\Identities($identityData);
         }
