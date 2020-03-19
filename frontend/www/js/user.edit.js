@@ -18,6 +18,12 @@ omegaup.OmegaUp.on('ready', function() {
     $('#school_name').val(val.label);
   });
 
+  $('#school').on('change', function() {
+    if ($('#school').val() === '' || original_school !== $('#school').val()) {
+      $('#school_id').val('');
+    }
+  });
+
   $('#country_id').on('change', function() {
     // Clear select
     $('#state_id option').remove();
@@ -111,7 +117,7 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
 
-    omegaup.API.User.update({
+    var user = {
       username: $('#username').val(),
       name: $('#name').val(),
       birth_date: birth_date.getTime() / 1000,
@@ -120,13 +126,18 @@ omegaup.OmegaUp.on('ready', function() {
       state_id: $('#state_id').val() || undefined,
       scholar_degree: $('#scholar_degree').val(),
       graduation_date: graduation_date.getTime() / 1000,
-      school_id: $('#school_id').val(),
       school_name: $('#school').val(),
       locale: $('#locale').val(),
       preferred_language: $('#programming_language').val(),
-      is_private: $('#is_private').prop('checked') ? 1 : 0,
-      hide_problem_tags: $('#hide_problem_tags').prop('checked') ? 1 : 0,
-    })
+      is_private: $('#is_private').prop('checked'),
+      hide_problem_tags: $('#hide_problem_tags').prop('checked'),
+    };
+
+    if ($('#school_id').val() !== '') {
+      user.school_id = $('#school_id').val();
+    }
+
+    omegaup.API.User.update(user)
       .then(function(response) {
         if (locale_changed) {
           window.location.reload();
