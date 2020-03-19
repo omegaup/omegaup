@@ -139,6 +139,7 @@ class ProblemParams {
     public $order;
 
     /**
+     * @psalm-suppress RedundantConditionGivenDocblockType
      * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
@@ -175,7 +176,7 @@ class ProblemParams {
         }
         if (isset($params['time_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['time_limit']),
+                $params['time_limit'],
                 'time_limit',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ null,
@@ -184,7 +185,7 @@ class ProblemParams {
         }
         if (isset($params['memory_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['memory_limit']),
+                $params['memory_limit'],
                 'memory_limit',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ null,
@@ -193,7 +194,7 @@ class ProblemParams {
         }
         if (isset($params['validator_time_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['validator_time_limit']),
+                $params['validator_time_limit'],
                 'validator_time_limit',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ null,
@@ -202,7 +203,7 @@ class ProblemParams {
         }
         if (isset($params['overall_wall_time_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['overall_wall_time_limit']),
+                $params['overall_wall_time_limit'],
                 'overall_wall_time_limit',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ 60000,
@@ -211,7 +212,7 @@ class ProblemParams {
         }
         if (isset($params['extra_wall_time'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['extra_wall_time']),
+                $params['extra_wall_time'],
                 'extra_wall_time',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ 5000,
@@ -220,7 +221,7 @@ class ProblemParams {
         }
         if (isset($params['output_limit'])) {
             \OmegaUp\Validators::validateNumberInRange(
-                intval($params['output_limit']),
+                $params['output_limit'],
                 'output_limit',
                 /*$lowerBound=*/ 0,
                 /*$uppperBound=*/ null,
