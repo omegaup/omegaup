@@ -204,7 +204,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('problemset_id');
 
         $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
-            $r['problemset_id']
+            intval($r['problemset_id'])
         );
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -217,11 +217,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $problemset['contest_alias'],
             ]);
-            if (isset($r['auth_token'])) {
+            if (isset($r['auth_token']) && is_string($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
             }
-            if (isset($r['tokens']) && count($r['tokens']) >= 4) {
-                $request['token'] = $r['tokens'][3];
+            if (
+                isset($r['tokens']) &&
+                is_array($r['tokens']) &&
+                count($r['tokens']) >= 4
+            ) {
+                $request['token'] = strval($r['tokens'][3]);
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails($request);
             $request['contest_alias'] = $response['contest_alias'];
