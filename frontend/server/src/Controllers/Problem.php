@@ -219,11 +219,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'problem_alias'
                 );
             }
-            /** @var array{tagname: string, public: bool}[]|null */
-            $selectedTags = json_decode(
+            /** @var list<array{tagname: string, public: bool}>|null */
+            $selectedTags = !is_null($params->selectedTagsAsJSON) ? json_decode(
                 $params->selectedTagsAsJSON,
                 /*$assoc=*/true
-            );
+            ) : null;
             if (!empty($selectedTags)) {
                 foreach ($selectedTags as $tag) {
                     if (empty($tag['tagname'])) {
@@ -415,11 +415,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
 
         $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
+        if (is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -455,16 +462,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
-        if (is_null($group)) {
+        if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
             );
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -565,13 +573,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
 
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
+        if (is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -611,16 +626,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
-        if (is_null($group)) {
+        if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
             );
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -706,7 +722,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -883,6 +899,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @psalm-suppress MixedInferredReturnType Psalm cannot effectively analyze templated arrays this way
      * @psalm-suppress MismatchingDocblockReturnType Psalm cannot effectively analyze templated arrays this way
+     * @psalm-suppress MixedAssignment Psalm cannot effectively analyze templated arrays this way
      * @template T
      * @param T $array
      * @return T
@@ -1267,6 +1284,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             strval($problem->alias)
         );
+        /** @var array{cases: array<string, mixed>, interactive?: array{idl: string, language: string, main_source: string, module_name: string, templates: array<string, string>}, limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}} $distribSettings */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             /*assoc=*/true
@@ -1474,13 +1492,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * languages.
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem
-     * @param array $updatedLanguages the array of updated statement file languages.
-     *
-     * @return void
+     * @param list<string> $updatedLanguages the list of updated statement file
+     *        languages.
      */
     private static function invalidateCache(
         \OmegaUp\DAO\VO\Problems $problem,
-        array $updatedLanguages
+        $updatedLanguages
     ): void {
         self::updateLanguages($problem);
 
@@ -1501,13 +1518,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Invalidates the problem solution cache
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem
-     * @param array $updatedLanguages the array of updated loose file languages.
-     *
-     * @return void
+     * @param list<string> $updatedLanguages the list of updated loose file
+     *        languages.
      */
     private static function invalidateSolutionCache(
         \OmegaUp\DAO\VO\Problems $problem,
-        array $updatedLanguages
+        $updatedLanguages
     ): void {
         // Invalidate problem solution cache
         foreach ($updatedLanguages as $lang) {
@@ -1534,16 +1550,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function validateDetails(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $contestAlias,
-        ?string $problemAlias,
+        string $problemAlias,
         ?string $lang,
         string $statementType,
         ?int $problemsetId
     ): array {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $problemAlias,
-            'problem_alias'
-        );
-
         // Lang is optional. Default is user's preferred.
         if (!is_null($lang)) {
             if (strlen($lang) < 2) {
@@ -1985,6 +1996,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'],
             'contest_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -2036,16 +2051,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getValidProblemAndProblemset(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $contestAlias,
-        ?string $problemAlias,
+        string $problemAlias,
         ?string $lang,
         string $statementType,
         ?int $problemsetId
     ): array {
-        if (
-            is_null($identity) &&
-            !is_null($contestAlias) &&
-            !is_null($problemAlias)
-        ) {
+        if (is_null($identity) && !is_null($contestAlias)) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -2154,16 +2165,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-            if (is_null($acl->owner_id)) {
+            if (is_null($acl) || is_null($acl->owner_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
             $problemsetter = \OmegaUp\DAO\Identities::findByUserId(
                 $acl->owner_id
             );
+            if (is_null($problemsetter) || is_null($problemsetter->username)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             $response['problemsetter'] = [
-                'username' => strval($problemsetter->username),
+                'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
-                          strval($problemsetter->username) :
+                          $problemsetter->username :
                           $problemsetter->name,
                 'creation_date' => intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $response['creation_date']
@@ -2198,11 +2212,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if (!is_null($problemset) && !is_null($loggedIdentity)) {
-            $result['admin'] = \OmegaUp\Authorization::isAdmin(
+            $response['admin'] = \OmegaUp\Authorization::isAdmin(
                 $loggedIdentity,
                 $problemset
             );
-            if (!$result['admin'] || $preventProblemsetOpen !== true) {
+            if (!$response['admin'] || $preventProblemsetOpen !== true) {
                 if (is_null($problemset->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemsetNotFound'
@@ -2294,6 +2308,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
 
         // Validate request
         $response = self::validateDetails(
@@ -2452,12 +2470,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $masterLog[] = $logEntry;
         }
-
+        $commit = (
+            new \OmegaUp\ProblemArtifacts($problem->alias, 'published')
+        )->commit();
         return [
-            'published' => (new \OmegaUp\ProblemArtifacts(
-                $problem->alias,
-                'published'
-            ))->commit()['commit'],
+            'published' => !is_null($commit) ? $commit['commit'] : null,
             'log' => $masterLog,
         ];
     }
@@ -3377,12 +3394,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiBestScore(\OmegaUp\Request $r) {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
 
         // Uses same params as apiDetails, except for lang, which is optional
         $problem = self::validateDetails(
             $r->identity,
             !is_null($r['contest_alias']) ? strval($r['contest_alias']) : null,
-            !is_null($r['problem_alias']) ? strval($r['problem_alias']) : null,
+            $r['problem_alias'],
             !is_null($r['lang']) ? strval($r['lang']) : null,
             !is_null($r['statement_type']) ? strval($r['statement_type']) : '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
@@ -3606,13 +3627,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'],
             'contest_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
         [
             'problem' => $problem,
             'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset(
             $r->identity,
             !is_null($r['contest_alias']) ? strval($r['contest_alias']) : null,
-            !is_null($r['problem_alias']) ? strval($r['problem_alias']) : null,
+            $r['problem_alias'],
             $r['lang'],
             !is_null($r['statement_type']) ? strval($r['statement_type']) : '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
@@ -3675,10 +3700,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (
             isset($details['settings']['cases']) &&
             isset($details['settings']['cases']['sample']) &&
-            isset($result['settings']['cases']['sample']['in'])
+            isset($details['settings']['cases']['sample']['in'])
         ) {
             $result['sample_input'] = strval(
-                $result['settings']['cases']['sample']['in']
+                $details['settings']['cases']['sample']['in']
             );
         }
         $details['histogram'] = [

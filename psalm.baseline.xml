@@ -106,45 +106,7 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/Controllers/Problem.php">
-    <InvalidArrayOffset occurrences="1">
-      <code>$result['settings']</code>
-    </InvalidArrayOffset>
-    <MixedArgument occurrences="7">
-      <code>$r['problem_alias']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['group']</code>
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['group']</code>
-      <code>$run</code>
-      <code>$r['problem_alias']</code>
-      <code>$run</code>
-    </MixedArgument>
-    <MixedAssignment occurrences="6">
-      <code>$run</code>
-      <code>$run</code>
-      <code>$distribSettings</code>
-      <code>$lang</code>
-      <code>$lang</code>
-      <code>$run</code>
-      <code>$run</code>
-    </MixedAssignment>
-    <MixedPropertyAssignment occurrences="5">
-      <code>$run</code>
-      <code>$run</code>
-      <code>$run</code>
-      <code>$run</code>
-      <code>$run</code>
-    </MixedPropertyAssignment>
-    <PossiblyNullArgument occurrences="10"/>
-    <PossiblyNullArrayAccess occurrences="2"/>
-    <PossiblyNullPropertyFetch occurrences="3">
-      <code>$acl-&gt;owner_id</code>
-      <code>$problemsetter-&gt;username</code>
-      <code>$problemsetter-&gt;name</code>
-    </PossiblyNullPropertyFetch>
-    <PossiblyUndefinedVariable occurrences="1">
-      <code>$result</code>
-    </PossiblyUndefinedVariable>
+    <PossiblyNullArrayAccess occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Problemset.php">
     <MixedArgument occurrences="3">
