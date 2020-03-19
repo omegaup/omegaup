@@ -1618,7 +1618,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
-        /** @psalm-suppress MixedArgument */
         $languages = empty($r['languages']) ? null : join(',', $r['languages']);
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
@@ -1671,12 +1670,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('start_time', null, null, $isRequired);
         $r->ensureInt('finish_time', null, null, $isRequired);
         $currentStartTime = null;
-        $currentFinisTime = null;
+        $currentFinishTime = null;
         if (!is_null($contest)) {
             $currentStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $contest->start_time
             );
-            $currentFinisTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $currentFinishTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $contest->finish_time
             );
         }
@@ -1691,7 +1690,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $finishTime = (
             !is_null($r['finish_time']) ?
             intval($r['finish_time']) :
-            $currentFinisTime
+            $currentFinishTime
         );
 
         // Validate start & finish time
@@ -1780,9 +1779,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
-            /** @var list<\OmegaUp\RequestProblem>|null */
-            $requestProblems = json_decode($r['problems']);
-            if (is_null($requestProblems)) {
+            /** @var list<array{problem: string, points: int}>|null */
+            $requestProblems = json_decode($r['problems'], /*$assoc=*/true);
+            if (!is_array($requestProblems)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'invalidParameters',
                     'problems'
@@ -1793,7 +1792,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             foreach ($requestProblems as $requestProblem) {
                 $problem = \OmegaUp\DAO\Problems::getByAlias(
-                    $requestProblem->problem
+                    $requestProblem['problem']
                 );
                 if (is_null($problem)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1807,8 +1806,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 array_push($problems, [
                     'id' => $problem->problem_id,
-                    'alias' => $requestProblem->problem,
-                    'points' => $requestProblem->points
+                    'alias' => $requestProblem['problem'],
+                    'points' => $requestProblem['points']
                 ]);
             }
 
@@ -3329,9 +3328,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'languages' => [
                 'transform' =>
-                    /**
-                     * @param list<string>|string $value
-                     */
+                    /** @param list<string>|string $value */
                     function ($value): string {
                         if (!is_array($value)) {
                             return $value;

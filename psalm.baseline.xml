@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.9.4@352bd3f5c5789db04e4010856c2f4e01ed354f4e">
+  <file src="frontend/server/src/Controllers/Contest.php">
+    <MixedArgument occurrences="1">
+      <code>$r['languages']</code>
+    </MixedArgument>
+  </file>
   <file src="frontend/server/src/Controllers/Identity.php">
     <MixedArgument occurrences="2"/>
     <MixedArgumentTypeCoercion occurrences="1">
