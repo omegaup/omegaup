@@ -3454,7 +3454,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetIdentityNotFound'
             );
         }
-        $problemsetIdentity->end_time = $r['end_time'];
+        $problemsetIdentity->end_time = intval($r['end_time']);
         \OmegaUp\DAO\ProblemsetIdentities::update($problemsetIdentity);
 
         return [
@@ -3619,8 +3619,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             !is_null($problem) ? $problem->problem_id : null,
             $r['language'],
             !is_null($identity) ? $identity->identity_id : null,
-            $r['offset'],
-            $r['rowcount']
+            intval($r['offset']),
+            intval($r['rowcount'])
         );
 
         $result = [];
