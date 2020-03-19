@@ -1444,7 +1444,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'user_id' => $user['user_id'],
                         'school_id' => $user['school_id'],
                         'time' => $firstDay,
-                        'rank' => $index + 1,
+                        'ranking' => $index + 1,
                         'category' => $category,
                     ]));
                 }
@@ -1582,7 +1582,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'user_id' => $user['user_id'],
                     'school_id' => $user['school_id'],
                     'time' => $dateToSelect,
-                    'rank' => $index + 1,
+                    'ranking' => $index + 1,
                     'category' => $category,
                 ]);
                 // All users calculated as CoderOfTheMonth are going to be saved on database,
