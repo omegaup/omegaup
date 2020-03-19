@@ -56,28 +56,6 @@
       <code>$result</code>
     </PossiblyUndefinedVariable>
   </file>
-  <file src="frontend/server/src/Controllers/Problemset.php">
-    <MixedArgument occurrences="3">
-      <code>$r['tokens']</code>
-      <code>$run['guid']</code>
-    </MixedArgument>
-    <MixedArrayAccess occurrences="9">
-      <code>$r['tokens'][3]</code>
-      <code>$run['guid']</code>
-      <code>$run['language']</code>
-      <code>$run['guid']</code>
-      <code>$run['guid']</code>
-      <code>$run['username']</code>
-      <code>$run['alias']</code>
-      <code>$run['verdict']</code>
-      <code>$run['contest_score']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="3">
-      <code>$request['auth_token']</code>
-      <code>$request['token']</code>
-      <code>$run</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/login.php">
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>
