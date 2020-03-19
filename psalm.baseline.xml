@@ -78,12 +78,6 @@
       <code>$run</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/tests/factories/IdentityFactory.php">
-    <PossiblyNullPropertyAssignment occurrences="2">
-      <code>$unassociatedIdentity</code>
-      <code>$associatedIdentity</code>
-    </PossiblyNullPropertyAssignment>
-  </file>
   <file src="frontend/www/login.php">
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>
