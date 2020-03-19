@@ -191,7 +191,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'rank' => 1
+            'ranking' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -213,7 +213,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => '2017-01-01',
-            'rank' => 1
+            'ranking' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -239,7 +239,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'rank' => 4
+            'ranking' => 4
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();

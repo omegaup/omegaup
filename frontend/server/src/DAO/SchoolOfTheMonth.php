@@ -67,7 +67,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                         School_Of_The_Month as sotm
                     WHERE
                         sotm.school_id = s.school_id
-                        AND (sotm.selected_by IS NOT NULL OR sotm.`rank` = 1)
+                        AND (sotm.selected_by IS NOT NULL OR sotm.`ranking` = 1)
                     GROUP BY
                         sotm.school_id
                     HAVING
@@ -106,7 +106,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     /**
      * Returns the list of candidates to school of the month
      *
-     * @return list<array{name: string, rank: int, school_id: int, score: float}>
+     * @return list<array{name: string, ranking: int, school_id: int, score: float}>
      */
     public static function getCandidatesToSchoolOfTheMonth(): array {
         $date = new \DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
@@ -128,7 +128,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 s.school_id,
                 s.name,
                 sotm.score,
-                sotm.`rank`
+                sotm.`ranking`
             FROM
                 School_Of_The_Month sotm
             INNER JOIN
@@ -137,9 +137,9 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.time = ? AND
                 sotm.selected_by IS NULL
             ORDER BY
-                s.`rank` IS NULL, s.`rank` ASC;';
+                s.`ranking` IS NULL, s.`ranking` ASC;';
 
-        /** @var list<array{name: string, rank: int, school_id: int, score: float}> */
+        /** @var list<array{name: string, ranking: int, school_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [ $firstDayOfNextMonth ]
@@ -150,7 +150,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * Gets all the best schools based on the month
      * of a certain date.
      *
-     * @return list<array{country_id: string, name: string, rank: int, school_id: int}>
+     * @return list<array{country_id: string, name: string, ranking: int, school_id: int}>
      */
     public static function getMonthlyList(
         string $firstDay
@@ -159,7 +159,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $sql = '
             SELECT
                 sotm.school_id,
-                sotm.`rank`,
+                sotm.`ranking`,
                 s.name,
                 IFNULL(s.country_id, "xx") AS country_id
             FROM
@@ -170,10 +170,10 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.time = ?
             ORDER BY
                 sotm.selected_by IS NULL,
-                sotm.`rank` ASC
+                sotm.`ranking` ASC
             LIMIT 100;';
 
-        /** @var list<array{country_id: string, name: string, rank: int, school_id: int}> */
+        /** @var list<array{country_id: string, name: string, ranking: int, school_id: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [ $date ]
@@ -218,7 +218,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             WHERE
                 sotm.selected_by IS NOT NULL
                 OR (
-                    sotm.`rank` = 1 AND
+                    sotm.`ranking` = 1 AND
                     NOT EXISTS (
                         SELECT
                             *
@@ -281,7 +281,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 time = ?;';
 
         $schools = [];
-        /** @var array{rank: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
+        /** @var array{ranking: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
