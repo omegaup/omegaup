@@ -20,8 +20,7 @@
 {include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true inline}
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}"></script>
-
-<script type="text/javascript" src="{version_hash src="/js/interviews.results.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/js/interviews.results.js"}" defer></script>
 {include file='footer.tpl' inline}
 

@@ -11,17 +11,26 @@ import argparse
 import configparser
 import getpass
 import os
+from typing import Optional
 
 import MySQLdb
 import MySQLdb.connections
 
 
+def default_config_file_path() -> Optional[str]:
+    '''Try to autodetect the config file path.'''
+    for candidate_path in (os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
+                           '/etc/mysql/conf.d/mysql_password.cnf'):
+        if os.path.isfile(candidate_path):
+            return candidate_path
+    return None
+
+
 def configure_parser(parser: argparse.ArgumentParser) -> None:
     '''Add DB-related arguments to `parser`'''
     db_args = parser.add_argument_group('DB Access')
-    db_args.add_argument('--mysql-config-file',
-                         default=os.path.join(os.getenv('HOME') or '.',
-                                              '.my.cnf'),
+    db_args.add_argument('--mysql-config-file', type=str,
+                         default=default_config_file_path(),
                          help='.my.cnf file that stores credentials')
     db_args.add_argument('--host', type=str, help='MySQL host',
                          default='localhost')

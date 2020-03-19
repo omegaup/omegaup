@@ -15,95 +15,33 @@ namespace OmegaUp\DAO;
  */
 class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     /**
-     * Gets the users that solved the most problems during the provided
+     * Gets the users that are candidates to coder of the month
      * time period.
+     * category.
      *
-     * @return null|list<array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
+     * @return null|list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, rank: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
-    public static function calculateCoderOfTheMonth(
-        string $startTime,
-        string $endTime,
+    public static function getCandidatesToCoderOfTheMonth(
+        string $time,
         string $category = 'all'
     ): ?array {
-        $genderClause = ($category == 'female') ? " AND i.gender = 'female'" : '';
-        $sql = "
-          SELECT DISTINCT
-            IFNULL(i.user_id, 0) AS user_id,
-            i.username,
-            IFNULL(i.country_id, 'xx') AS country_id,
-            isc.school_id,
-            COUNT(ps.problem_id) ProblemsSolved,
-            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
-            IFNULL(
-                (
-                    SELECT urc.classname FROM
-                        User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT
-                        1
-                ),
-                'user-rank-unranked'
-            ) AS classname
+        $sql = 'SELECT
+            `c`.*,
+            `i`.`username`
           FROM
-            (
-              SELECT DISTINCT
-                s.identity_id, s.problem_id
-              FROM
-                Submissions s
-              INNER JOIN
-                Runs r
-              ON
-                r.run_id = s.current_run_id
-              WHERE
-                r.verdict = 'AC' AND s.type= 'normal' AND
-                s.time >= ? AND s.time <= ?
-            ) AS up
+            `Coder_Of_The_Month` AS `c`
           INNER JOIN
-            Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
-          INNER JOIN
-            Identities i ON i.identity_id = up.identity_id
-          LEFT JOIN
-            Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
-          LEFT JOIN
-            (
-              SELECT
-                user_id,
-                MAX(time) latest_time,
-                selected_by
-              FROM
-                Coder_Of_The_Month
-              WHERE
-                category = ?
-              GROUP BY
-                user_id,
-                selected_by
-            ) AS cm on i.user_id = cm.user_id
+            `Identities` AS `i` ON `i`.`user_id` = `c`.`user_id`
           WHERE
-            (cm.user_id IS NULL OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?) AND
-            i.user_id IS NOT NULL
-            {$genderClause}
-          GROUP BY
-            up.identity_id
-          ORDER BY
-            score DESC,
-            ProblemsSolved DESC
-          LIMIT 100
-        ";
+            `time` = ? AND
+            `category` = ?;
+        ';
 
-        $val = [$startTime, $endTime, $category, $endTime];
-
-        /** @var list<array{ProblemsSolved: int, classname: string, country_id: string, school_id: int|null, score: float, user_id: int, username: string}> */
-        $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
+        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, rank: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$time, $category]
+        );
         if (empty($results)) {
             return null;
         }
@@ -132,7 +70,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             WHERE
                 (cm.selected_by IS NOT NULL
                 OR (
-                    cm.rank = 1 AND
+                    cm.`rank` = 1 AND
                     NOT EXISTS (
                         SELECT
                             *
@@ -195,7 +133,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             LEFT JOIN
               Emails e ON e.user_id = u.user_id
             WHERE
-              (cm.rank = 1 OR cm.selected_by IS NOT NULL) AND
+              (cm.`rank` = 1 OR cm.selected_by IS NOT NULL) AND
               cm.school_id = ? AND
               cm.category = ?
             ORDER BY
@@ -221,7 +159,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         $sql = "
           SELECT
             cm.time,
-            cm.rank,
+            cm.`rank`,
             i.username,
             IFNULL(i.country_id, 'xx') AS country_id,
             e.email,
@@ -239,7 +177,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.category = ?
           ORDER BY
             cm.time DESC,
-            cm.rank ASC
+            cm.`rank` ASC
           LIMIT 100
         ";
         /** @var list<array{country_id: string, email: null|string, rank: int, time: string, user_id: int, username: string}> */
@@ -266,7 +204,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           INNER JOIN
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
-            cm.rank = 1 AND
+            cm.`rank` = 1 AND
             cm.category = ?
           ORDER BY
             cm.time DESC
@@ -302,7 +240,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                     category = ?
                 AND
                     `selected_by` {$clause};";
-        /** @var list<array{coder_of_the_month_id: int, description: null|string, interview_url: null|string, rank: int, school_id: int|null, selected_by: int|null, time: string, user_id: int}> */
+        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, rank: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time,$category]
@@ -342,24 +280,5 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             $coders[] = new \OmegaUp\DAO\VO\CoderOfTheMonth($row);
         }
         return $coders;
-    }
-
-    /**
-     * @return null|list<array{user_id: int, username: string, country_id: string, school_id: int|null, ProblemsSolved: int, score: float, classname: string}>
-     */
-    public static function calculateCoderOfMonthByGivenDate(
-        string $date,
-        string $category = 'all'
-    ): ?array {
-        $date = new \DateTimeImmutable($date);
-        $firstDayOfLastMonth = $date->modify('first day of last month');
-        $startTime = $firstDayOfLastMonth->format('Y-m-d');
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth(
-            $startTime,
-            $endTime,
-            $category
-        );
     }
 }

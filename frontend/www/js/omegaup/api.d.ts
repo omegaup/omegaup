@@ -131,11 +131,6 @@ declare namespace omegaup {
     submissions_gap?: number;
   }
 
-  interface ContestAdmin {
-    username: string;
-    role: string;
-  }
-
   export interface ContestGroup {
     alias: string;
     name: string;
@@ -280,13 +275,13 @@ declare namespace omegaup {
     country_id?: string;
   }
 
-  export interface IdentityContestRequest {
+  export interface IdentityRequest {
     username: string;
     country: string;
     request_time: Date;
     last_update: Date;
     accepted: boolean;
-    admin?: ContestAdmin;
+    admin?: UserRole;
   }
 
   interface Languages {

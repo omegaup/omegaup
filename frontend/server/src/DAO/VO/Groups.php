@@ -10,7 +10,7 @@
 namespace OmegaUp\DAO\VO;
 
 /**
- * Value Object class for table `Groups`.
+ * Value Object class for table `Groups_`.
  *
  * @access public
  */
