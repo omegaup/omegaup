@@ -84,11 +84,6 @@
       <code>$associatedIdentity</code>
     </PossiblyNullPropertyAssignment>
   </file>
-  <file src="frontend/www/badge.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['badge_alias']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/www/login.php">
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>

@@ -130,4 +130,26 @@ class Badge extends \OmegaUp\Controllers\Controller {
             'owners_count' => $ownersCount,
         ];
     }
+
+    /**
+     * @return array{smartyProperties: array{badge_alias: string}, template: string}
+     */
+    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateValidAlias(
+            $r['badge_alias'],
+            'badge_alias'
+        );
+
+        \OmegaUp\Validators::validateBadgeExists(
+            $r['badge_alias'],
+            \OmegaUp\Controllers\Badge::getAllBadges()
+        );
+        return [
+            'smartyProperties' => [
+                'badge_alias' => $r['badge_alias'],
+            ],
+            'template' => 'badge.details.tpl',
+        ];
+    }
 }
