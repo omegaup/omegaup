@@ -254,7 +254,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 selected_by {$clause};";
 
         $schools = [];
-        /** @var array{rank: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
+        /** @var array{ranking: int, school_id: int, school_of_the_month_id: int, score: float, selected_by: int|null, time: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
