@@ -4,6 +4,6 @@
 {js_include entrypoint="common_index" async}
 <div id="common-index"></div>
 
-<script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>
+<script type="text/javascript" src="{version_hash src="/js/index.js"}" defer></script>
 
 {include file='footer.tpl' inline}

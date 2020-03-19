@@ -52,6 +52,6 @@
 		</div><!-- row -->
 	</div><!-- panel panel-default -->
 
-<script src="{version_hash src="/js/interviews.arena.intro.js"}"></script>
+<script src="{version_hash src="/js/interviews.arena.intro.js"}" defer></script>
 {include file='footer.tpl' inline}
 

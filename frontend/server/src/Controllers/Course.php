@@ -14,6 +14,8 @@ class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
     const ADMISSION_MODE_PUBLIC = 'public';
     const ADMISSION_MODE_PRIVATE = 'private';
+    // Number of rows shown in course list
+    const PAGE_SIZE = 100;
 
     /**
      * Validate assignment_alias existis into the course and
@@ -1209,7 +1211,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $pageSize = (isset(
+            $r['page_size']
+        ) ? intval(
+            $r['page_size']
+        ) : \OmegaUp\Controllers\Course::PAGE_SIZE);
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
