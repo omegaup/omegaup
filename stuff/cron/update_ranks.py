@@ -393,6 +393,164 @@ def update_school_of_the_month_candidates(
                     ))
 
 
+def update_coder_of_the_month_candidates(
+        cur: MySQLdb.cursors.BaseCursor,
+        first_day_of_current_month: datetime.date,
+        category: str) -> None:
+    '''Updates the list of candidates to coder of the current month'''
+
+    logging.info('Updating the candidates to coder of the month...')
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1,
+            1,
+            1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1,
+            1)
+
+    # First make sure there are not already selected coder of the month
+        cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Coder_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL AND
+                    `category` = %s;
+                ''', (first_day_of_next_month, category))
+    for row in cur:
+        if row['count'] > 0:
+            logging.info('Skipping because already exist selected coder')
+            return
+    cur.execute('''
+                DELETE FROM
+                    `Coder_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `category` = %s;
+                ''',
+                (first_day_of_next_month, category))
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
+    sql = f'''
+         SELECT DISTINCT
+            IFNULL(i.user_id, 0) AS user_id,
+            i.username,
+            IFNULL(i.country_id, 'xx') AS country_id,
+            isc.school_id,
+            COUNT(ps.problem_id) ProblemsSolved,
+            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
+            IFNULL(
+                (
+                    SELECT urc.classname FROM
+                        User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT
+                        1
+                ),
+                'user-rank-unranked'
+            ) AS classname
+          FROM
+            (
+              SELECT DISTINCT
+                s.identity_id, s.problem_id
+              FROM
+                Submissions s
+              INNER JOIN
+                Runs r
+              ON
+                r.run_id = s.current_run_id
+              WHERE
+                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.time >= %s AND s.time <= %s
+            ) AS up
+          INNER JOIN
+            Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
+          INNER JOIN
+            Identities i ON i.identity_id = up.identity_id
+          LEFT JOIN
+            Identities_Schools isc ON isc.identity_school_id =
+            i.current_identity_school_id
+          LEFT JOIN
+            (
+              SELECT
+                user_id,
+                MAX(time) latest_time,
+                selected_by
+              FROM
+                Coder_Of_The_Month
+              WHERE
+                category = %s
+              GROUP BY
+                user_id,
+                selected_by
+            ) AS cm on i.user_id = cm.user_id
+          WHERE
+            (cm.user_id IS NULL OR
+            DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
+            i.user_id IS NOT NULL
+            {gender_clause}
+          GROUP BY
+            up.identity_id
+          ORDER BY
+            score DESC,
+            ProblemsSolved DESC
+          LIMIT 100;
+        '''
+    cur.execute(
+        sql,
+        (
+            first_day_of_current_month,
+            first_day_of_next_month,
+            category,
+            first_day_of_next_month,
+        ))
+
+    for index, row in enumerate(cur):
+        logging.info(str(row))
+        cur.execute('''
+                    INSERT INTO
+                        `Coder_Of_The_Month` (
+                            `user_id`,
+                            `time`,
+                            `rank`,
+                            `school_id`,
+                            `category`
+                        )
+                    VALUES (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    );
+                    ''',
+                    (
+                        row['user_id'],
+                        first_day_of_next_month,
+                        index + 1,
+                        row['school_id'],
+                        category
+                    ))
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
@@ -433,6 +591,20 @@ def main() -> None:
             except:  # noqa: bare-except
                 logging.exception(
                     'Failed to update candidates to school of the month')
+                raise
+            try:
+                update_coder_of_the_month_candidates(cur, args.date, 'all')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month')
+                raise
+            try:
+                update_coder_of_the_month_candidates(cur, args.date, 'female')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month female')
                 raise
     finally:
         dbconn.close()
