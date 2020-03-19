@@ -530,7 +530,7 @@ def update_coder_of_the_month_candidates(
                         `Coder_Of_The_Month` (
                             `user_id`,
                             `time`,
-                            `rank`,
+                            `ranking`,
                             `school_id`,
                             `category`
                         )
