@@ -1618,7 +1618,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
-        $languages = empty($r['languages']) ? null : join(',', $r['languages']);
+        $languages = (
+            empty($r['languages']) || !is_array($r['languages']) ?
+            null :
+            join(',', $r['languages'])
+        );
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
