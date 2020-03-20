@@ -8,7 +8,7 @@
 class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
@@ -31,7 +31,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $school = SchoolsFactory::createSchool()['school'];
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
-        $response = \OmegaUp\Controllers\Course::apiCreate(
+        \OmegaUp\Controllers\Course::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -62,7 +62,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @param list<\OmegaUp\DAO\VO\Courses>  $coursesList
+     * @param list<\OmegaUp\DAO\VO\Courses> $courses
      */
     private function assertCourseIsPresentInArray($courses, string $alias) {
         foreach ($courses as $course) {
@@ -85,9 +85,11 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertCourseIsPresentInArray(
+        $this->assertArrayContainsWithPredicate(
             $coursesList['student'],
-            $course->alias
+            function ($studentCourse) use ($course): bool {
+                return $studentCourse['alias'] === $course->alias;
+            }
         );
     }
 

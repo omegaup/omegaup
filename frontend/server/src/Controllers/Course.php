@@ -15,8 +15,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     const ADMISSION_MODE_PUBLIC = 'public';
     const ADMISSION_MODE_REGISTRATION = 'registration';
     const ADMISSION_MODE_PRIVATE = 'private';
-    // Number of rows shown in course list
-    const PAGE_SIZE = 100;
 
     /**
      * Validate assignment_alias existis into the course and
@@ -230,15 +228,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             ['no', 'optional', 'required']
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
-            'admission_mode',
-            [
-                self::ADMISSION_MODE_PUBLIC,
-                self::ADMISSION_MODE_REGISTRATION,
-                self::ADMISSION_MODE_PRIVATE,
-            ]
-        );
 
         $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
@@ -256,11 +245,20 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Only curator can set public
         if (
             !is_null($r['admission_mode'])
-            && $r['admission_mode'] !== self::ADMISSION_MODE_PRIVATE
+            && $r['admission_mode'] === self::ADMISSION_MODE_PUBLIC
             && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['admission_mode'],
+            'admission_mode',
+            [
+                self::ADMISSION_MODE_PUBLIC,
+                self::ADMISSION_MODE_REGISTRATION,
+                self::ADMISSION_MODE_PRIVATE,
+            ]
+        );
     }
 
     /**
@@ -1213,11 +1211,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset(
-            $r['page_size']
-        ) ? intval(
-            $r['page_size']
-        ) : \OmegaUp\Controllers\Course::PAGE_SIZE);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // TODO(pablo): Cache
         // Courses the user is an admin for.
@@ -2013,7 +2007,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $hasSharedUserInformation = true;
         $hasAcceptedTeacher = true;
-        $registrtionResponse = [];
+        $registrationResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
                 'share_user_information' => $hasSharedUserInformation,
@@ -2029,22 +2023,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        } elseif ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+        }
+        if ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
             $registration = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
                 $r->identity->identity_id,
                 $course->course_id
             );
 
-            $registrtionResponse['userRegistrationRequested'] = !is_null(
+            $registrationResponse['userRegistrationRequested'] = !is_null(
                 $registration
             );
             if (is_null($registration)) {
-                $registrtionResponse['userRegistrationAnswered'] = false;
+                $registrationResponse['userRegistrationAnswered'] = false;
             } else {
-                $registrtionResponse['userRegistrationAnswered'] = !is_null(
+                $registrationResponse['userRegistrationAnswered'] = !is_null(
                     $registration->accepted
                 );
-                $registrtionResponse['userRegistrationAccepted'] = $registration->accepted;
+                $registrationResponse['userRegistrationAccepted'] = $registration->accepted;
             }
         }
 
@@ -2113,7 +2108,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             $smartyProperties = [
                 'coursePayload' => array_merge(
-                    $registrtionResponse,
+                    $registrationResponse,
                     [
                         'name' => $courseDetails['name'],
                         'description' => $courseDetails['description'],
@@ -2185,7 +2180,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $course = self::validateCourseExists($r['course_alias']);
 
         if ($course->admission_mode !== self::ADMISSION_MODE_REGISTRATION) {
-            throw new \OmegaUp\Exceptions\UnauthorizedException(
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'courseDoesNotAdmitRegistration'
             );
         }
