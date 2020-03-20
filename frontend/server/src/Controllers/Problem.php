@@ -913,7 +913,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_array($value)) {
                 $copy[$key] = self::arrayDeepCopy($value);
             } else {
-                /** @var string $value */
+                /** @var int|float|string $value */
                 $copy[$key] = $value;
             }
         }
