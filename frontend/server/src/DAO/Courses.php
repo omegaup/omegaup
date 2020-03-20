@@ -95,7 +95,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 INNER JOIN (
                     SELECT g.group_id
                     FROM Groups_Identities gi
-                    INNER JOIN Groups g ON g.group_id = gi.group_id
+                    INNER JOIN `Groups_` AS g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
@@ -134,7 +134,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     pr.alias as assignment_alias,
                     pr.assignment_score
                 FROM
-                    Groups g
+                    `Groups_` AS g
                 INNER JOIN Groups_Identities gi
                     ON g.group_id = ? AND g.group_id = gi.group_id
                 INNER JOIN Identities i

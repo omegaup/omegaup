@@ -325,7 +325,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{school_id: int, name: string, country_id: string, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{name: string, rank: int, school_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, rank: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -351,9 +351,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     'schoolsOfCurrentMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
                         $currentDate
                     ),
-                    'candidatesToSchoolOfTheMonth' => self::getTopSchoolsOfTheMonth(
-                        /* rowcount */ 100
-                    ),
+                    'candidatesToSchoolOfTheMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(),
                     'isMentor' => $isMentor,
                 ],
             ],
@@ -383,8 +381,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns the first school of the previous month or the one selected by
-     * the mentor, if it has already been stored. Otherwise, calculates and
-     * saves the new schools of the month, and returns the first one of them.
+     * the mentor, if it has already been stored.
      *
      * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
      */
@@ -393,41 +390,18 @@ class School extends \OmegaUp\Controllers\Controller {
         $schoolsOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByTime(
             $firstDay
         );
-        if (empty($schoolsOfTheMonth)) {
-            // Calculate and store new schools of the month
-            $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-                $firstDay
-            );
-            if (empty($schools)) {
-                return [
-                    'schoolinfo' => null,
-                ];
-            }
 
-            try {
-                \OmegaUp\DAO\DAO::transBegin();
-                $schoolOfTheMonthId = $schools[0]['school_id'];
-                foreach ($schools as $index => $school) {
-                    \OmegaUp\DAO\SchoolOfTheMonth::create(
-                        new \OmegaUp\DAO\VO\SchoolOfTheMonth([
-                            'school_id' => $school['school_id'],
-                            'time' => $firstDay,
-                            'rank' => $index + 1,
-                        ])
-                    );
-                }
-                \OmegaUp\DAO\DAO::transEnd();
-            } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
-                throw $e;
-            }
-        } else {
-            $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
-            foreach ($schoolsOfTheMonth as $school) {
-                if (isset($school->selected_by)) {
-                    $schoolOfTheMonthId = $school->school_id;
-                    break;
-                }
+        if (empty($schoolsOfTheMonth)) {
+            return [
+                'schoolinfo' => null,
+            ];
+        }
+
+        $schoolOfTheMonthId = $schoolsOfTheMonth[0]->school_id;
+        foreach ($schoolsOfTheMonth as $school) {
+            if (isset($school->selected_by)) {
+                $schoolOfTheMonthId = $school->school_id;
+                break;
             }
         }
 

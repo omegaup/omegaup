@@ -1,6 +1,6 @@
 {include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#courseDetails#}" inline}
 
-<script src="{version_hash src="/js/course.js"}"></script>
+<script src="{version_hash src="/js/course.js"}" defer></script>
 
 <script type="text/html" id="assignments-list">
 <h3 data-bind="text: header"></h3>

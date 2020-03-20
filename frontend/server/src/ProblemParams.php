@@ -92,19 +92,19 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $validatorTimeLimit;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $overallWallTimeLimit;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $extraWallTime;
 
@@ -116,19 +116,19 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $outputLimit;
 
     /**
      * @readonly
-     * @var int
+     * @var int|null
      */
     public $inputLimit;
 
     /**
      * @readonly
-     * @var bool
+     * @var bool|null
      */
     public $emailClarifications;
 
@@ -139,6 +139,7 @@ class ProblemParams {
     public $order;
 
     /**
+     * @psalm-suppress RedundantConditionGivenDocblockType
      * @param array{email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
@@ -191,7 +192,42 @@ class ProblemParams {
                 $isRequired
             );
         }
-
+        if (isset($params['validator_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['validator_time_limit'],
+                'validator_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
+        if (isset($params['overall_wall_time_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['overall_wall_time_limit'],
+                'overall_wall_time_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 60000,
+                $isRequired
+            );
+        }
+        if (isset($params['extra_wall_time'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['extra_wall_time'],
+                'extra_wall_time',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ 5000,
+                $isRequired
+            );
+        }
+        if (isset($params['output_limit'])) {
+            \OmegaUp\Validators::validateNumberInRange(
+                $params['output_limit'],
+                'output_limit',
+                /*$lowerBound=*/ 0,
+                /*$uppperBound=*/ null,
+                $isRequired
+            );
+        }
         $this->problemAlias = $params['problem_alias'];
         $this->title = $params['title'] ?? null;
         $this->visibility = $params['visibility'] ?? null;
@@ -206,13 +242,13 @@ class ProblemParams {
         $this->source = $params['source'] ?? null;
         $this->validator = $params['validator'] ?? null;
         $this->timeLimit = $params['time_limit'] ?? null;
-        $this->validatorTimeLimit = $params['validator_time_limit'] ?? 1000;
-        $this->overallWallTimeLimit = $params['overall_wall_time_limit'] ?? 60000;
-        $this->extraWallTime = $params['extra_wall_time'] ?? 0;
+        $this->validatorTimeLimit = $params['validator_time_limit'] ?? null;
+        $this->overallWallTimeLimit = $params['overall_wall_time_limit'] ?? null;
+        $this->extraWallTime = $params['extra_wall_time'] ?? null;
         $this->memoryLimit = $params['memory_limit'] ?? null;
-        $this->outputLimit = $params['output_limit'] ?? 10240;
+        $this->outputLimit = $params['output_limit'] ?? null;
         $this->inputLimit = $params['input_limit'] ?? 10240;
-        $this->emailClarifications = $params['email_clarifications'] ?? false;
+        $this->emailClarifications = $params['email_clarifications'] ?? null;
         $this->order = $params['order'] ?? 'normal';
     }
 
@@ -238,10 +274,7 @@ class ProblemParams {
                 $objectFieldName = $info;
             } else {
                 $thisFieldName = $source;
-                if (
-                    isset($info['transform']) &&
-                    is_callable($info['transform'])
-                ) {
+                if (isset($info['transform'])) {
                     $transform = $info['transform'];
                 }
                 if (isset($info['important']) && $info['important'] === true) {

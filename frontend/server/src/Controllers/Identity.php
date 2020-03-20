@@ -762,7 +762,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             // break up string into pieces (languages and q factors)
-            /** @var array{0: string, 1: string, 2: string} $langParse */
             if (
                 preg_match_all(
                     '/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
@@ -772,12 +771,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 !empty($langParse[1])
             ) {
                 // create a list like "en" => 0.8
-                $langs = array_combine($langParse[1], $langParse[2]);
+                /** @var array{0: list<string>, 1: list<string>, 2: list<string>} $langParse */
+                [$_, $lang, $q] = $langParse;
+                $langs = array_combine($lang, $q);
 
                 // set default to 1 for any without q factor
                 foreach ($langs as $lang => $val) {
                     if ($val === '') {
                         $langs[$lang] = 1.0;
+                    } else {
+                        $langs[$lang] = floatval($val);
                     }
                 }
 

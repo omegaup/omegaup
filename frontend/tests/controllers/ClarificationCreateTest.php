@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Description of CreateClarificationTest
+ * Description of ClarificationCreateTest
  *
  * @author joemmanuel
  */
 
-class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
+class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      *
@@ -97,10 +97,8 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-    * Creates a clarification with message too long
-    *
-    * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-    */
+     * Creates a clarification with message too long
+     */
     public function testCreateClarificationMessageTooLong() {
         [
             'problemData' => $problemData,
@@ -108,12 +106,17 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             'contestant' => $contestant,
         ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
 
-        $clarificationData = ClarificationsFactory::createClarification(
-            $problemData,
-            $contestData,
-            $contestant,
-            'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
-        );
+        try {
+            ClarificationsFactory::createClarification(
+                $problemData,
+                $contestData,
+                $contestant,
+                'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterStringTooLong', $e->getMessage());
+        }
     }
 
     /**

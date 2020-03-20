@@ -252,7 +252,7 @@ abstract class Submissions {
     ): int {
         $sql = '
             INSERT INTO
-                Submissions (
+                `Submissions` (
                     `current_run_id`,
                     `identity_id`,
                     `problem_id`,

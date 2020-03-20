@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @author carlosabcs
  */
 class Badge extends \OmegaUp\Controllers\Controller {
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
     /**
@@ -127,6 +128,28 @@ class Badge extends \OmegaUp\Controllers\Controller {
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
             'owners_count' => $ownersCount,
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{badge_alias: string}, template: string}
+     */
+    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateValidAlias(
+            $r['badge_alias'],
+            'badge_alias'
+        );
+
+        \OmegaUp\Validators::validateBadgeExists(
+            $r['badge_alias'],
+            \OmegaUp\Controllers\Badge::getAllBadges()
+        );
+        return [
+            'smartyProperties' => [
+                'badge_alias' => $r['badge_alias'],
+            ],
+            'template' => 'badge.details.tpl',
         ];
     }
 }

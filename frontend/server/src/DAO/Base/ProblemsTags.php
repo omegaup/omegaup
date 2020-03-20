@@ -263,7 +263,7 @@ abstract class ProblemsTags {
     ): int {
         $sql = '
             INSERT INTO
-                Problems_Tags (
+                `Problems_Tags` (
                     `problem_id`,
                     `tag_id`,
                     `public`,

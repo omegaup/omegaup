@@ -1,5 +1,5 @@
 <?php
-require_once OMEGAUP_ROOT . '/server/try_define.php';
+require_once dirname(__DIR__) . '/server/try_define.php';
 
 # ###################################
 # GLOBAL CONFIG
@@ -17,8 +17,14 @@ try_define('OMEGAUP_MAINTENANCE', null);
 # ####################################
 try_define('IS_TEST', false);
 try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
-try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
-try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
+try_define(
+    'OMEGAUP_TEST_ROOT',
+    sprintf('%s/tests/controllers/', strval(OMEGAUP_ROOT))
+);
+try_define(
+    'OMEGAUP_TEST_RESOURCES_ROOT',
+    sprintf('%s/tests/resources/', strval(OMEGAUP_ROOT))
+);
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
 # ####################################
@@ -64,12 +70,27 @@ try_define(
 );
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
-try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
-try_define('IMAGES_PATH', OMEGAUP_ROOT . '/www/img/');
+try_define(
+    'OMEGAUP_SSLCERT_URL',
+    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
+);
+try_define(
+    'OMEGAUP_CACERT_URL',
+    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
+);
+try_define(
+    'BIN_PATH',
+    sprintf('%s/../bin', strval(OMEGAUP_ROOT))
+);
+try_define(
+    'IMAGES_PATH',
+    sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
+);
 try_define('IMAGES_URL_PATH', '/img/');
-try_define('TEMPLATES_PATH', OMEGAUP_ROOT . '/www/templates/');
+try_define(
+    'TEMPLATES_PATH',
+    sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
+);
 try_define('TEMPLATES_URL_PATH', '/templates/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_FAKE', false);

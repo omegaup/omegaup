@@ -304,7 +304,7 @@ abstract class Contests {
     ): int {
         $sql = '
             INSERT INTO
-                Contests (
+                `Contests` (
                     `problemset_id`,
                     `acl_id`,
                     `title`,

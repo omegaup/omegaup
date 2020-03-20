@@ -50,7 +50,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 1000;
+    const PAGE_SIZE = 100;
 
     /**
      * Returns a ProblemParams instance from the Request values.
@@ -248,34 +248,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'source'
             );
         }
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->validatorTimeLimit,
-            'validator_time_limit',
-            0,
-            null,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->overallWallTimeLimit,
-            'overall_wall_time_limit',
-            0,
-            60000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->extraWallTime,
-            'extra_wall_time',
-            0,
-            5000,
-            $isRequired
-        );
-        \OmegaUp\Validators::validateNumberInRange(
-            $params->outputLimit,
-            'output_limit',
-            0,
-            null,
-            $isRequired
-        );
         \OmegaUp\Validators::validateNumberInRange(
             $params->inputLimit,
             'input_limit',
@@ -1171,7 +1143,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
-            if ($operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS || $settingsUpdated) {
+            if (
+                $operation !== \OmegaUp\ProblemDeployer::UPDATE_SETTINGS ||
+                $settingsUpdated
+            ) {
                 $problemDeployer = new \OmegaUp\ProblemDeployer(
                     $problem->alias,
                     $acceptsSubmissions,
@@ -1828,7 +1803,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Gets the distributable problem settings for the problem, using the cache
      * if needed.
      *
-     * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}
+     * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}, slow: bool}
      */
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -1837,7 +1812,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            /** @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}} */
+            /** @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}, slow: bool} */
             function () use ($problem): array {
                 return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
                     'alias' => strval($problem->alias),
@@ -1853,10 +1828,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @param array{alias: string, commit: string} $params
      *
-     * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}
+     * @return array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}, slow: bool}
      */
     public static function getProblemSettingsDistribImpl(array $params): array {
-        /** @var array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}} */
+        /** @var array{cases: array<string, mixed>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}, slow: bool} */
         return json_decode(
             (new \OmegaUp\ProblemArtifacts(
                 $params['alias'],
@@ -2056,7 +2031,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      *
-     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
+     * @return array{exists: bool, lang: string, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      */
     private static function getValidProblemAndProblemset(
         ?\OmegaUp\DAO\VO\Identities $identity,
@@ -3139,7 +3114,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'mode' => strval($r['mode']),
-            'page' => $r['page'],
+            'page' => intval($r['page']),
             'orderBy' => strval($r['order_by']),
             'language' => strval($r['language']),
             'tags' => $tags,
@@ -3549,12 +3524,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
-        $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        if (!is_null($params->extraWallTime)) {
+            $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+        }
         if (!is_null($params->memoryLimit)) {
             $problemSettings['limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
         }
-        $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
-        $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        if (!is_null($params->outputLimit)) {
+            $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
+        }
+        if (!is_null($params->memoryLimit)) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+        }
         if (!is_null($params->timeLimit)) {
             $problemSettings['limits']['TimeLimit'] = "{$params->timeLimit}ms";
         }

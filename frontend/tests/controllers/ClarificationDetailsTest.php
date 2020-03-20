@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Description of DetailsClarificationTest
+ * Description of ClarificationDetailsTest
  *
  * @author joemmanuel
  */
 
-class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
+class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Validates a clarification given the clarification ID
      *
@@ -121,8 +121,6 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Checks that private clarifications cant be viewed by someone else
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testClarificationsCreatedPrivateAsDefault() {
         // Get a problem
@@ -138,10 +136,16 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant who will submit the clarification
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create our contestant who will try to view the clarification
-        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant2,
+            'identity' => $identity2,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
@@ -152,15 +156,19 @@ class DetailsClarificationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Prepare the request object
-        $r = new \OmegaUp\Request();
-        $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
         $login = self::login($identity2);
-        $r['auth_token'] = $login->auth_token;
 
-        // Call API, will fail
-        \OmegaUp\Controllers\Clarification::apiDetails($r);
+        try {
+            \OmegaUp\Controllers\Clarification::apiDetails(new \OmegaUp\Request([
+                'clarification_id' => $clarificationData['response']['clarification_id'],
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     public function testPublicClarificationsCanBeViewed() {

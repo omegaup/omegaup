@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of ProblemList
+ * Description of ProblemListTest
  *
  * @author joemmanuel
  */
-class ProblemList extends \OmegaUp\Test\ControllerTestCase {
+class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Gets the list of problems
      */
@@ -1085,6 +1085,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
         $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'rowcount' => 1000,
         ]);
         // Call apiList to define the number of problems and pages
         $apiListResponse = \OmegaUp\Controllers\Problem::apiList($request);
@@ -1113,7 +1114,7 @@ class ProblemList extends \OmegaUp\Test\ControllerTestCase {
                 $problems[] = $problem['alias'];
             }
         }
-        // Asserting the number of non-repeated problems isthe same than the total
+        // Asserting the number of non-repeated problems is the same than the total
         $this->assertEquals(
             count(
                 array_unique(

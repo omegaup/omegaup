@@ -177,7 +177,7 @@ abstract class UserRoles {
     ): int {
         $sql = '
             INSERT INTO
-                User_Roles (
+                `User_Roles` (
                     `user_id`,
                     `role_id`,
                     `acl_id`

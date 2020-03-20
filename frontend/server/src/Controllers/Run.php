@@ -73,6 +73,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         'NO-AC',
     ];
 
+    public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
+
     /**
      *
      * Validates Create Run request
@@ -1314,7 +1316,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready']
+            self::STATUS
         );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],
