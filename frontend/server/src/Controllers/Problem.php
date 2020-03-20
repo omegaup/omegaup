@@ -462,7 +462,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
+        \OmegaUp\Validators::validateValidAlias($r['group'], 'group');
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
         if (is_null($group) || is_null($group->group_id)) {
@@ -626,7 +626,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
+        \OmegaUp\Validators::validateValidAlias($r['group'], 'group');
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
         if (is_null($group) || is_null($group->group_id)) {
@@ -899,14 +899,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @psalm-suppress MixedInferredReturnType Psalm cannot effectively analyze templated arrays this way
      * @psalm-suppress MismatchingDocblockReturnType Psalm cannot effectively analyze templated arrays this way
-     * @psalm-suppress MixedAssignment Psalm cannot effectively analyze templated arrays this way
      * @template T
      * @param T $array
      * @return T
      */
     private static function arrayDeepCopy($array): array {
         $copy = [];
-        /** @var string $key */
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 $copy[$key] = self::arrayDeepCopy($value);
@@ -1996,7 +1994,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'],
             'contest_alias'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
+        \OmegaUp\Validators::validateValidAlias(
             $r['problem_alias'],
             'problem_alias'
         );
@@ -2176,9 +2174,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
-                'name' => is_null($problemsetter->name) ?
-                          $problemsetter->username :
-                          $problemsetter->name,
+                'name' => $problemsetter->name ?? $problemsetter->username,
                 'creation_date' => intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $response['creation_date']
                 )),
@@ -2308,7 +2304,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
+        \OmegaUp\Validators::validateValidAlias(
             $r['problem_alias'],
             'problem_alias'
         );
@@ -2560,17 +2556,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         try {
             // Begin transaction
             \OmegaUp\DAO\DAO::transBegin();
-            $commit = ((new \OmegaUp\ProblemArtifacts(
+            $commit = (new \OmegaUp\ProblemArtifacts(
                 $problem->alias,
                 'published'
-            ))->commit())['commit'];
+            ))->commit();
             if (is_null($commit)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemVersionNotFound'
                 );
             }
             $problemDeployer->updatePublished(
-                $commit,
+                $commit['commit'],
                 $problem->commit,
                 $r->identity
             );
@@ -3394,7 +3390,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiBestScore(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
+        \OmegaUp\Validators::validateValidAlias(
             $r['problem_alias'],
             'problem_alias'
         );
@@ -3627,7 +3623,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias'],
             'contest_alias'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
+        \OmegaUp\Validators::validateValidAlias(
             $r['problem_alias'],
             'problem_alias'
         );
