@@ -89,8 +89,11 @@ class MySQLConnection {
             );
         }
         $this->_connection->autocommit(false);
-        $this->_connection->set_charset('utf8');
-        $this->_connection->query('SET NAMES "utf8";', MYSQLI_STORE_RESULT);
+        $this->_connection->set_charset('utf8mb4');
+        $this->_connection->query(
+            'SET NAMES "utf8mb4" COLLATE "utf8mb4_unicode_ci";',
+            MYSQLI_STORE_RESULT
+        );
     }
 
     /**
