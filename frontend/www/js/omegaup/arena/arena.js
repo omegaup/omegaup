@@ -39,7 +39,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
-    headerPayload: null,
+    payload: {},
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -77,18 +77,7 @@ export function GetOptionsFromLocation(arenaLocation) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
-      options.headerPayload = {
-        omegaUpLockDown: payload.omegaUpLockDown,
-        inContest: payload.inContest,
-        isLoggedIn: payload.isLoggedIn,
-        isReviewer: payload.isReviewer,
-        gravatarURL51: payload.gravatarURL51,
-        currentUsername: payload.currentUsername,
-        isAdmin: payload.isAdmin,
-        isMainUserIdentity: payload.isMainUserIdentity,
-        lockDownImage: payload.lockDownImage,
-        navbarSection: payload.navbarSection,
-      };
+      options.payload = payload;
     }
   }
   return options;
@@ -278,7 +267,16 @@ export class Arena {
         render: function(createElement) {
           return createElement('omegaup-common-navbar', {
             props: {
-              header: this.header,
+              omegaUpLockDown: this.omegaUpLockDown,
+              inContest: this.inContest,
+              isLoggedIn: this.isLoggedIn,
+              isReviewer: this.isReviewer,
+              gravatarURL51: this.gravatarURL51,
+              currentUsername: this.currentUsername,
+              isAdmin: this.isAdmin,
+              isMainUserIdentity: this.isMainUserIdentity,
+              lockDownImage: this.lockDownImage,
+              navbarSection: this.navbarSection,
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
@@ -287,7 +285,16 @@ export class Arena {
           });
         },
         data: {
-          header: self.options.headerPayload,
+          omegaUpLockDown: self.options.payload.omegaUpLockDown,
+          inContest: self.options.payload.inContest,
+          isLoggedIn: self.options.payload.isLoggedIn,
+          isReviewer: self.options.payload.isReviewer,
+          gravatarURL51: self.options.payload.gravatarURL51,
+          currentUsername: self.options.payload.currentUsername,
+          isAdmin: self.options.payload.isAdmin,
+          isMainUserIdentity: self.options.payload.isMainUserIdentity,
+          lockDownImage: self.options.payload.lockDownImage,
+          navbarSection: self.options.payload.navbarSection,
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
@@ -298,9 +305,9 @@ export class Arena {
         },
       });
 
-      if (self.options.headerPayload.isAdmin) {
+      if (self.options.payload.isAdmin) {
         API.Notification.myList({})
-          .then(function(data) {
+          .then(data => {
             self.commonNavbar.notifications = data.notifications;
           })
           .fail(UI.apiError);

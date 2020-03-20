@@ -2,7 +2,7 @@ import { Arena } from '../arena/arena.js';
 import { API, UI, OmegaUp } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const headerPayload = JSON.parse(
+  const payload = JSON.parse(
     document.getElementById('header-payload').innerText,
   );
   let params = /\/course\/([^\/]+)\/assignment\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
     courseAlias: params[1],
     assignmentAlias: params[2],
     scoreboardToken: params[3],
-    headerPayload: headerPayload,
+    payload: payload,
   };
   let arena = new Arena(options);
   let getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes

@@ -294,19 +294,6 @@ declare namespace omegaup {
     memory: number;
   }
 
-  export interface NavbarPayload {
-    omegaUpLockDown: boolean;
-    inContest: boolean;
-    isLoggedIn: boolean;
-    isReviewer: boolean;
-    gravatarURL51: string;
-    currentUsername: string;
-    isAdmin: boolean;
-    isMainUserIdentity: boolean;
-    lockDownImage: string;
-    navbarSection: string;
-  }
-
   export interface NominationVote {
     time: number;
     vote: number;

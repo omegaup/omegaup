@@ -4,7 +4,7 @@ import omegaup from '../api.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  const headerPayload = JSON.parse(
+  const payload = JSON.parse(
     document.getElementById('header-payload').innerText,
   );
   let commonNavbar = new Vue({
@@ -12,7 +12,16 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
-          header: this.header,
+          omegaUpLockDown: this.omegaUpLockDown,
+          inContest: this.inContest,
+          isLoggedIn: this.isLoggedIn,
+          isReviewer: this.isReviewer,
+          gravatarURL51: this.gravatarURL51,
+          currentUsername: this.currentUsername,
+          isAdmin: this.isAdmin,
+          isMainUserIdentity: this.isMainUserIdentity,
+          lockDownImage: this.lockDownImage,
+          navbarSection: this.navbarSection,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
@@ -21,7 +30,16 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      header: headerPayload,
+      omegaUpLockDown: payload.omegaUpLockDown,
+      inContest: payload.inContest,
+      isLoggedIn: payload.isLoggedIn,
+      isReviewer: payload.isReviewer,
+      gravatarURL51: payload.gravatarURL51,
+      currentUsername: payload.currentUsername,
+      isAdmin: payload.isAdmin,
+      isMainUserIdentity: payload.isMainUserIdentity,
+      lockDownImage: payload.lockDownImage,
+      navbarSection: payload.navbarSection,
       graderInfo: null,
       graderQueueLength: -1,
       errorMessage: null,
@@ -32,7 +50,7 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  if (headerPayload.isAdmin) {
+  if (payload.isAdmin) {
     API.Notification.myList({})
       .then(function(data) {
         commonNavbar.notifications = data.notifications;

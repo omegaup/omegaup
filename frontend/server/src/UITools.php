@@ -185,9 +185,9 @@ class UITools {
                     'isLoggedIn' => !is_null($identity),
                     'isReviewer' => !is_null(
                         $identity
-                    ) ? \OmegaUp\Authorization::isQualityReviewer(
+                    ) && \OmegaUp\Authorization::isQualityReviewer(
                         $identity
-                    ) : false,
+                    ),
                     'gravatarURL51' => is_null($email) ? '' :
                       self::getFormattedGravatarURL(md5($email), '51'),
                     'currentUsername' =>
@@ -243,8 +243,7 @@ class UITools {
             $template = $response['template'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
-            /** @var array<string, mixed> $payload */
-            $payload = $smartyProperties['payload'] ?? [];
+            $payload = $smartyProperties;
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
@@ -256,7 +255,7 @@ class UITools {
 
         \OmegaUp\UITools::assignSmartyNavbarHeader(
             $smarty,
-            $payload,
+            $payload['payload'] ?? [],
             $inContest,
             $navbarSection
         );
