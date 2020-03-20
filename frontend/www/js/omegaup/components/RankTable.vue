@@ -70,7 +70,7 @@
       </thead>
       <tbody>
         <tr v-for="rank in ranking">
-          <td>{{ rank.ranking }}</td>
+          <td>{{ rank.rank }}</td>
           <td>
             <omegaup-countryflag
               v-bind:country="rank.country"

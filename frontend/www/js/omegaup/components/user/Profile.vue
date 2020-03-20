@@ -18,7 +18,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h2 class="panel-title">
-            {{ profile.rankinfo.ranking &gt; 0 ? `#${profile.rankinfo.ranking} - `:
+            {{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank} - `:
           '' }}
             <omegaup-user-username
               v-bind:classname="profile.classname"
