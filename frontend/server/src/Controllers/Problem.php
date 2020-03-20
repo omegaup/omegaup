@@ -905,10 +905,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function arrayDeepCopy($array): array {
         $copy = [];
+        /**
+         * @var string $key
+         * @var mixed $value
+         */
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 $copy[$key] = self::arrayDeepCopy($value);
             } else {
+                /** @var string $value */
                 $copy[$key] = $value;
             }
         }
