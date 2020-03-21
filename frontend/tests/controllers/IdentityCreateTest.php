@@ -40,7 +40,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create the identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -89,7 +89,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -126,7 +126,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -162,7 +162,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -220,7 +220,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $creatorIdentity,
         ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -231,7 +231,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => IdentityFactory::getCsvData(
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                 'identities.csv',
                 $group['group']->alias
             ),
@@ -248,7 +248,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api again, names should have changed
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => IdentityFactory::getCsvData(
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                 'identities_updated.csv',
                 $group['group']->alias
             ),
@@ -278,7 +278,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $creatorIdentity,
         ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -290,7 +290,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             // Call api using identity creator group member
             $response = \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => IdentityFactory::getCsvData(
+                'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'duplicated_identities.csv',
                     $group['group']->alias
                 ),
@@ -309,7 +309,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -321,7 +321,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             // Call api using identity creator group team member
             $response = \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => IdentityFactory::getCsvData(
+                'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'identities_wrong_country_id.csv',
                     $group['group']->alias
                 ),
@@ -339,7 +339,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testLoginIdentity() {
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
