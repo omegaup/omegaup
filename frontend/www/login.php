@@ -79,7 +79,11 @@ function shouldRedirect(string $url): bool {
 }
 
 if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
-    if (!empty($_GET['redirect']) && shouldRedirect($_GET['redirect'])) {
+    if (
+        !empty($_GET['redirect']) &&
+        is_string($_GET['redirect']) &&
+        shouldRedirect($_GET['redirect'])
+    ) {
         die(header("Location: {$_GET['redirect']}"));
     }
     die(header('Location: /profile/'));
