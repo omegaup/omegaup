@@ -330,7 +330,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_type' => 'homework',
                 'start_time' => (\OmegaUp\Time::get() + 120),
             ]));
-            $this->assertFail('Should have thrown exception');
+            $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterEmpty', $e->getMessage());
         }
