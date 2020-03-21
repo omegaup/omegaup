@@ -1098,7 +1098,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         for ($i = 1; $i <= $pages; $i++) {
             $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
                 $request
-            )['smartyProperties'];
+            )['smartyProperties']['payload'];
             $nextPage = end($response['pager_items']);
             $nextPageURL = $nextPage['url'];
             $nextPageURLQuery = parse_url($nextPageURL);
