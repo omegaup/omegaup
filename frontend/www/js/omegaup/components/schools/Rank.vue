@@ -17,7 +17,7 @@
     </div>
     <div class="panel-body" v-if="showControls">
       <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
+        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
         <span class="delimiter" v-show="showNextPage">|</span>
@@ -25,7 +25,7 @@
       <a
         class="next"
         v-show="showNextPage"
-        v-bind:href="`/rank/schools?page=${page + 1}`"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
     </div>
@@ -60,7 +60,7 @@
     </div>
     <div class="panel-footer" v-else-if="showControls">
       <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
+        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
         <span class="delimiter" v-show="showNextPage">|</span>
@@ -68,7 +68,7 @@
       <a
         class="next"
         v-show="showNextPage"
-        v-bind:href="`/rank/schools?page=${page + 1}`"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
     </div>
