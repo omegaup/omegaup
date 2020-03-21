@@ -651,6 +651,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
+    /**
+     * @return list<array{alias: string, contest_score: float|null, guid: string, language: string, username: string, verdict: string}>
+     */
     final public static function getByProblemset(int $problemsetId): array {
         $sql = '
             SELECT
