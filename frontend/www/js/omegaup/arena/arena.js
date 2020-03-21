@@ -1086,7 +1086,7 @@ export class Arena {
     }
 
     series.sort(function(a, b) {
-      return a.rank - b.rank;
+      return a.ranking - b.ranking;
     });
 
     navigatorData.push([
