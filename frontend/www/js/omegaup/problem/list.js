@@ -15,6 +15,7 @@ OmegaUp.on('ready', function() {
               problems: this.problems,
               loggedIn: this.loggedIn,
               currentTags: this.currentTags,
+              pagerItems: this.pagerItems,
               wizardTags: tagData,
             },
             on: {
@@ -28,6 +29,7 @@ OmegaUp.on('ready', function() {
           problems: payload.problems,
           loggedIn: payload.logged_in,
           currentTags: payload.current_tags,
+          pagerItems: payload.pager_items,
           wizardTags: {},
         },
         components: {

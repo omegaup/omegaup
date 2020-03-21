@@ -3192,7 +3192,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $tags
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
-     * @return array{results: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[], total: int}
+     * @return array{results: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>, total: int}
      */
     private static function getList(
         int $page,
@@ -3752,7 +3752,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[]}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{current_tags: list<string>, logged_in: bool, pager_items: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3762,6 +3762,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
         }
 
         // Defaults for offset and rowcount
@@ -3829,9 +3830,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'MODE' => $mode,
                 'ORDER_BY' => $orderBy,
                 'LANGUAGE' => $language,
-                'problems' => $response['results'],
-                'current_tags' => $tags,
-                'pager_items' => $pagerItems,
+                'payload' => [
+                    'problems' => $response['results'],
+                    'logged_in' => !is_null($r->identity),
+                    'current_tags' => $tags,
+                    'pager_items' => $pagerItems,
+                ],
             ],
             'template' => 'problems.tpl',
         ];

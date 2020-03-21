@@ -102,6 +102,9 @@
         </tbody>
       </table>
     </div>
+    <omegaup-common-paginator
+      v-bind:pagerItems="pagerItems"
+    ></omegaup-common-paginator>
   </div>
 </template>
 
@@ -134,17 +137,20 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
+import common_Paginator from '../common/Paginator.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 
 @Component({
   components: {
     'omegaup-problem-finder': problem_FinderWizard,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class ProblemList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];
+  @Prop() pagerItems!: omegaup.Paginator[];
   @Prop() wizardTags!: omegaup.Tag[];
 
   T = T;

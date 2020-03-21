@@ -329,6 +329,12 @@ declare namespace omegaup {
     badge?: string;
   }
 
+  export interface Paginator {
+    label: string;
+    url: string;
+    class: string;
+  }
+
   export interface Profile extends User {
     email: string;
     country_id: string;
