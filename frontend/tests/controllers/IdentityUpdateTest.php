@@ -14,7 +14,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -82,7 +82,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -180,7 +180,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $user, 'identity' => $creator] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creator,
             null,
             null,
@@ -228,7 +228,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -278,7 +278,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $user, 'identity' => $creator] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creator,
             null,
             null,
@@ -326,7 +326,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -381,7 +381,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -436,7 +436,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,

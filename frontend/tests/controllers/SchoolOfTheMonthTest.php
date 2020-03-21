@@ -41,10 +41,22 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // school1: user2=>problem0, user2=>problem1, user2=>problem2, user2=>problem3, user2=>problem4
         // school2: user3=>problem0
         // The rank should be: school1, school0, school2
-        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
-        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
-        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
-        SchoolsFactory::addUserToSchool($schoolsData[2], $identities[3]);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[1],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[2],
+            $identities[3]
+        );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problems[0],
@@ -152,9 +164,9 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCalculateSchoolsOfMonth() {
         $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
         ];
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
@@ -191,7 +203,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'rank' => 1
+            'ranking' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -213,7 +225,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => '2017-01-01',
-            'rank' => 1
+            'ranking' => 1
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -239,7 +251,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'rank' => 4
+            'ranking' => 4
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
@@ -263,9 +275,9 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::cleanUpDB();
 
         $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
         ];
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
@@ -313,9 +325,9 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
         ];
 
         \OmegaUp\Time::setTimeForTesting($runDate->getTimestamp());

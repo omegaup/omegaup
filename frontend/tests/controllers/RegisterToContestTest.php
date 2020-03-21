@@ -300,7 +300,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserAllowedJoinTheContest() {
         // Create a school
-        $school = SchoolsFactory::createSchool();
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
 
         // create a contest and its admin
         ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
