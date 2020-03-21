@@ -913,7 +913,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_array($value)) {
                 $copy[$key] = self::arrayDeepCopy($value);
             } else {
-                /** @var int|float|string $value */
+                /** @psalm-suppress MixedAssignment Psalm cannot effectively allow assigning mixed this way */
                 $copy[$key] = $value;
             }
         }
