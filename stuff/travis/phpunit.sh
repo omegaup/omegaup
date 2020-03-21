@@ -66,15 +66,7 @@ stage_script() {
 	mkdir -p frontend/www/{phpminiadmin,preguntas}
 	touch 'frontend/server/config.php'
 	touch 'frontend/tests/test_config.php'
-	./vendor/bin/psalm --update-baseline --show-info=false
-
-	if [[ "$(/usr/bin/git status --porcelain psalm.baseline.xml)" != "" ]]; then
-		/usr/bin/git diff -- psalm.baseline.xml
-		>&2 echo "Some psalm errors have been fixed! Please run:"
-		>&2 echo ""
-		>&2 echo "    ./vendor/bin/psalm --show-info=false --update-baseline"
-		exit 1
-	fi
+	./vendor/bin/psalm
 }
 
 stage_after_success() {
