@@ -146,7 +146,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add a custom school
         $login = self::login($identity);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $school->school_id,
@@ -267,7 +267,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         self::updateIdentity($identity3, $gender);
 
         // Add a custom school for identities 1 and 2
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
 
         $login = self::login($identity1);
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -763,7 +763,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add a custom school
         $login = self::login($identity);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $school->school_id,

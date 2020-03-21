@@ -20,24 +20,24 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/BadgesTestCase.php');
     require_once(OMEGAUP_ROOT . '/tests/Utils.php');
     // Load Factories
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Clarification.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/Contest.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/Course.php');
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Groups.php');
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Identity.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/Problem.php');
-    require_once(OMEGAUP_ROOT . '/tests/Factories/Run.php');
-    require_once(OMEGAUP_ROOT . '/tests/Factories/User.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/ClarificationsFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/IdentityFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
     require_once(
-        OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php'
+        OMEGAUP_ROOT . '/tests/Factories/QualityNomination.php'
     );
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Run.php');
+    require_once(OMEGAUP_ROOT . '/tests/Factories/Schools.php');
+    require_once(OMEGAUP_ROOT . '/tests/Factories/User.php');
     \OmegaUp\Test\Utils::cleanupLogs();
     \OmegaUp\Test\Utils::cleanupFilesAndDB();
     // Clean APC cache
     \OmegaUp\Cache::clearCacheForTesting();
-    QualityNominationFactory::initQualityReviewers();
-    QualityNominationFactory::initTags();
+    \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+    \OmegaUp\Test\Factories\QualityNomination::initTags();
 
     \OmegaUp\Grader::setInstanceForTesting(new \OmegaUp\Test\NoOpGrader());
 }
