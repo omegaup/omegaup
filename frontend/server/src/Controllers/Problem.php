@@ -3561,7 +3561,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{isSysadmin: bool, privateProblemsAlert: bool}, template: string}
+     * @return array{smartyProperties: array{payload: array{isSysadmin: bool, privateProblemsAlert: bool}}, template: string}
      */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3579,10 +3579,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin(
-                    $r->identity
-                ),
-                'privateProblemsAlert' => $privateProblemsAlert,
+                'payload' => [
+                    'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin(
+                        $r->identity
+                    ),
+                    'privateProblemsAlert' => $privateProblemsAlert,
+                ],
             ],
             'template' => 'problem.mine.tpl',
         ];

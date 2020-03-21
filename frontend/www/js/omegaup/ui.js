@@ -214,7 +214,7 @@ let UI = {
       success = false;
       error = data.error;
     };
-    $('input[type=checkbox]').each(function() {
+    $('input[type=checkbox]', 'table').each(function() {
       if (this.checked) {
         operation(this.id, resolve, reject);
       }

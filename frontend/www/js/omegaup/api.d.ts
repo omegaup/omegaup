@@ -16,6 +16,10 @@ declare namespace omegaup {
     Required = 'required',
   }
 
+  export interface StatementProblems {
+    name: string;
+  }
+
   export interface ArenaContests {
     [timeType: string]: omegaup.Contest[];
   }
