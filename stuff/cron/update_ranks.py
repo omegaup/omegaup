@@ -163,7 +163,7 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
         prev_score = row['score']
         cur.execute('''
                     INSERT INTO
-                        `User_Rank` (`user_id`, `rank`,
+                        `User_Rank` (`user_id`, `ranking`,
                                      `problems_solved_count`, `score`,
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
@@ -251,7 +251,7 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `Schools` AS `s`
                         SET
                             `s`.`score` = %s,
-                            `s`.`rank` = %s
+                            `s`.`ranking` = %s
                         WHERE
                             `s`.`school_id` = %s;
                     ''',
@@ -350,7 +350,7 @@ def update_school_of_the_month_candidates(
                     `sotm`.`school_id` = `s`.`school_id`
                     AND (
                         `sotm`.`selected_by` IS NOT NULL OR
-                        `sotm`.`rank` = 1
+                        `sotm`.`ranking` = 1
                     )
                 GROUP BY
                     `sotm`.`school_id`
@@ -375,7 +375,7 @@ def update_school_of_the_month_candidates(
                         `School_Of_The_Month` (
                             `school_id`,
                             `time`,
-                            `rank`,
+                            `ranking`,
                             `score`
                         )
                     VALUES (
@@ -530,7 +530,7 @@ def update_coder_of_the_month_candidates(
                         `Coder_Of_The_Month` (
                             `user_id`,
                             `time`,
-                            `rank`,
+                            `ranking`,
                             `school_id`,
                             `category`
                         )

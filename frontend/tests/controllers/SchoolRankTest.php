@@ -394,8 +394,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($school0->score, $school0->score);
-        $this->assertEquals($school0->rank, $school2->rank);
-        $this->assertGreaterThan($school1->rank, $school0->rank);
+        $this->assertEquals($school0->ranking, $school2->ranking);
+        $this->assertGreaterThan($school1->ranking, $school0->ranking);
         $this->assertGreaterThan($school0->score, $school1->score);
 
         // Test apiRank
@@ -405,8 +405,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertGreaterThanOrEqual(3, count($response['rank']));
         $this->assertGreaterThanOrEqual(
-            $response['rank'][0]['rank'],
-            $response['rank'][1]['rank']
+            $response['rank'][0]['ranking'],
+            $response['rank'][1]['ranking']
         ); /** is sorted */
     }
 }

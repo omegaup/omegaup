@@ -17,7 +17,7 @@ namespace OmegaUp\DAO\VO;
 class UserRank extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
-        'rank' => true,
+        'ranking' => true,
         'problems_solved_count' => true,
         'score' => true,
         'username' => true,
@@ -42,9 +42,9 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
                 $data['user_id']
             );
         }
-        if (isset($data['rank'])) {
-            $this->rank = intval(
-                $data['rank']
+        if (isset($data['ranking'])) {
+            $this->ranking = intval(
+                $data['ranking']
             );
         }
         if (isset($data['problems_solved_count'])) {
@@ -97,7 +97,7 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $rank = null;
+    public $ranking = null;
 
     /**
      * [Campo no documentado]
