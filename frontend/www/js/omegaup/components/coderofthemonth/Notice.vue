@@ -1,6 +1,13 @@
 <template>
   <div class="alert alert-warning" name="notice" v-if="show">
-    {{ UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
+    {{
+      UI.formatString(
+        category === 'all'
+          ? T.coderOfTheMonthNotice
+          : T.coderOfTheMonthFemaleNotice,
+        { username: coderUsername },
+      )
+    }}
   </div>
 </template>
 
@@ -13,6 +20,7 @@ import UI from '../../ui.js';
 export default class CoderOfTheMonthNotice extends Vue {
   @Prop() coderUsername!: string;
   @Prop() currentUsername!: string;
+  @Prop() category!: string;
 
   T = T;
   UI = UI;

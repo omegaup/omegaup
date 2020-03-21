@@ -4,6 +4,13 @@
       v-if="coderOfTheMonth && currentUserInfo"
       v-bind:coderUsername="currentUserInfo.username"
       v-bind:currentUsername="coderOfTheMonth.username"
+      v-bind:category="'all'"
+    ></omegaup-coder-of-the-month-notice>
+    <omegaup-coder-of-the-month-notice
+      v-if="coderOfTheMonth && currentUserInfo"
+      v-bind:coderUsername="currentUserInfo.username"
+      v-bind:currentUsername="coderOfTheMonthFemale.username"
+      v-bind:category="'female'"
     ></omegaup-coder-of-the-month-notice>
     <div class="container-fluid">
       <div class="row">
@@ -91,6 +98,7 @@ import schools_Rank from '../schools/Rank.vue';
 })
 export default class Index extends Vue {
   @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
+  @Prop() coderOfTheMonthFemale!: omegaup.CoderOfTheMonth;
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;

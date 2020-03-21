@@ -3258,10 +3258,16 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                        $firstDay,
-                        $category
-                    )['coderinfo'],
+                    'coderOfTheMonthData' => [
+                        'all' => self::getCodersOfTheMonth(
+                            $firstDay,
+                            'all'
+                        )['coderinfo'],
+                        'female' => self::getCodersOfTheMonth(
+                            $firstDay,
+                            'female'
+                        )['coderinfo']
+                    ],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
                     'rankTable' => self::getRankByProblemsSolved(
                         $r->identity,

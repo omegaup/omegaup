@@ -29,6 +29,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-common-index', {
         props: {
           coderOfTheMonth: this.coderOfTheMonth,
+          coderOfTheMonthFemale: this.coderOfTheMonthFemale,
           currentUserInfo: this.currentUserInfo,
           rankTable: this.rankTable,
           schoolsRank: this.schoolsRank,
@@ -40,7 +41,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      coderOfTheMonth: coderOfTheMonthData,
+      coderOfTheMonth: coderOfTheMonthData.all,
+      coderOfTheMonthFemale: coderOfTheMonthData.female,
       currentUserInfo: payload.currentUserInfo,
       rankTable: {
         page: 1,
