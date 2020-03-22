@@ -3752,7 +3752,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{current_tags: list<string>, logged_in: bool, pager_items: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3832,9 +3832,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'LANGUAGE' => $language,
                 'payload' => [
                     'problems' => $response['results'],
-                    'logged_in' => !is_null($r->identity),
-                    'current_tags' => $tags,
-                    'pager_items' => $pagerItems,
+                    'loggedIn' => !is_null($r->identity),
+                    'currentTags' => $tags,
+                    'pagerItems' => $pagerItems,
                 ],
             ],
             'template' => 'problems.tpl',

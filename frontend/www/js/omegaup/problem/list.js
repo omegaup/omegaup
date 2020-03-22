@@ -27,9 +27,9 @@ OmegaUp.on('ready', function() {
         },
         data: {
           problems: payload.problems,
-          loggedIn: payload.logged_in,
-          currentTags: payload.current_tags,
-          pagerItems: payload.pager_items,
+          loggedIn: payload.loggedIn,
+          currentTags: payload.currentTags,
+          pagerItems: payload.pagerItems,
           wizardTags: {},
         },
         components: {
