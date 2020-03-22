@@ -690,12 +690,15 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         );
     }
 
+    /**
+     * @return list<\OmegaUp\DAO\VO\Runs>
+     */
     final public static function getByProblem(
         int $problemId
-    ): array {
+    ) {
         $sql = '
             SELECT
-                *
+                r.*
             FROM
                 Submissions s
             INNER JOIN
@@ -706,10 +709,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problem_id = ?;
         ';
         $params = [$problemId];
+        /** @var list<array{contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
-            array_push($runs, new \OmegaUp\DAO\VO\Runs($row));
+            $runs[] = new \OmegaUp\DAO\VO\Runs($row);
         }
         return $runs;
     }

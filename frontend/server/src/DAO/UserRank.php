@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
     /**
      * @param null|string|int $value
-     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getFilteredRank(
         int $page,
@@ -27,7 +27,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $sql = '
               SELECT
                 `ur`.`user_id`,
-                `ur`.`rank`,
+                `ur`.`ranking`,
                 `ur`.`problems_solved_count` as `problems_solved`,
                 `ur`.`score`,
                 `ur`.`username`,
@@ -85,7 +85,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}> */
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sql}{$sqlFrom}{$sqlLimit}",
             $params

@@ -73,8 +73,10 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get two problems with another author, add $author to their
         // group admin list
         $problemAdminData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
-        $group = GroupsFactory::createGroup($problemAdminData[1]['author']);
-        GroupsFactory::addUserToGroup($group, $identity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $problemAdminData[1]['author']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($group, $identity);
         \OmegaUp\Test\Factories\Problem::addGroupAdmin(
             $problemAdminData[1],
             $group['group']

@@ -330,7 +330,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_type' => 'homework',
                 'start_time' => (\OmegaUp\Time::get() + 120),
             ]));
-            $this->assertFail('Should have thrown exception');
+            $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterEmpty', $e->getMessage());
         }
@@ -424,7 +424,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreatePublicCourse() {
         $login = self::login(self::$curatorIdentity);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -617,7 +617,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateCourseAdmissionMode() {
         $adminLogin = self::login(self::$curatorIdentity);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         $alias = \OmegaUp\Test\Utils::createRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,

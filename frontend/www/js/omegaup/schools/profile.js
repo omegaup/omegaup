@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
       country: payload.country,
       monthlySolvedProblemsCount: [],
       name: payload.school_name,
-      rank: payload.rank,
+      rank: payload.ranking,
       stateName: payload.state_name,
       users: [],
     },

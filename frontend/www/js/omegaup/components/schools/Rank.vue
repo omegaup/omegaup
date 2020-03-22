@@ -17,7 +17,7 @@
     </div>
     <div class="panel-body" v-if="showControls">
       <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
+        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
         <span class="delimiter" v-show="showNextPage">|</span>
@@ -25,7 +25,7 @@
       <a
         class="next"
         v-show="showNextPage"
-        v-bind:href="`/rank/schools?page=${page + 1}`"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
     </div>
@@ -40,7 +40,7 @@
       <tbody>
         <tr v-for="(school, index) in rank">
           <td v-if="showHeader">{{ index + 1 }}</td>
-          <td v-else="">{{ school.rank ? school.rank : '' }}</td>
+          <td v-else="">{{ school.ranking ? school.ranking : '' }}</td>
           <td class="cell-school-name" colspan="2" v-bind:title="school.name">
             <omegaup-countryflag
               v-bind:country="school.country_id"
@@ -60,7 +60,7 @@
     </div>
     <div class="panel-footer" v-else-if="showControls">
       <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools?page=${page - 1}`">
+        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
           {{ T.wordsPrevPage }}</a
         >
         <span class="delimiter" v-show="showNextPage">|</span>
@@ -68,7 +68,7 @@
       <a
         class="next"
         v-show="showNextPage"
-        v-bind:href="`/rank/schools?page=${page + 1}`"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
         >{{ T.wordsNextPage }}</a
       >
     </div>
@@ -91,8 +91,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
 import CountryFlag from '../CountryFlag.vue';
 
