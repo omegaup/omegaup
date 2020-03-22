@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 
 @Component
 export default class Paginator extends Vue {
