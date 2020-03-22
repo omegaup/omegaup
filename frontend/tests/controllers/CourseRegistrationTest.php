@@ -28,7 +28,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
     private static function createCourseWithRegistrationMode() {
         $adminLogin = self::login(self::$curator);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         \OmegaUp\Controllers\Course::apiCreate(
@@ -59,18 +59,6 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             'course' => $course,
             'adminLogin' => $adminLogin,
         ];
-    }
-
-    /**
-     * @param list<\OmegaUp\DAO\VO\Courses> $courses
-     */
-    private function assertCourseIsPresentInArray($courses, string $alias) {
-        foreach ($courses as $course) {
-            if ($course['alias'] === $alias) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public function testCourseIsPresentInStudentList() {
