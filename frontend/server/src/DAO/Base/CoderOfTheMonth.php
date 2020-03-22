@@ -36,7 +36,7 @@ abstract class CoderOfTheMonth {
                 `description` = ?,
                 `time` = ?,
                 `interview_url` = ?,
-                `rank` = ?,
+                `ranking` = ?,
                 `selected_by` = ?,
                 `school_id` = ?,
                 `category` = ?,
@@ -56,9 +56,9 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->rank) ?
+                is_null($Coder_Of_The_Month->ranking) ?
                 null :
-                intval($Coder_Of_The_Month->rank)
+                intval($Coder_Of_The_Month->ranking)
             ),
             (
                 is_null($Coder_Of_The_Month->selected_by) ?
@@ -99,7 +99,7 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`description`,
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
-                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`ranking`,
                 `Coder_Of_The_Month`.`selected_by`,
                 `Coder_Of_The_Month`.`school_id`,
                 `Coder_Of_The_Month`.`category`,
@@ -191,7 +191,7 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`description`,
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
-                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`ranking`,
                 `Coder_Of_The_Month`.`selected_by`,
                 `Coder_Of_The_Month`.`school_id`,
                 `Coder_Of_The_Month`.`category`,
@@ -251,7 +251,7 @@ abstract class CoderOfTheMonth {
                     `description`,
                     `time`,
                     `interview_url`,
-                    `rank`,
+                    `ranking`,
                     `selected_by`,
                     `school_id`,
                     `category`,
@@ -279,9 +279,9 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->rank) ?
+                is_null($Coder_Of_The_Month->ranking) ?
                 null :
-                intval($Coder_Of_The_Month->rank)
+                intval($Coder_Of_The_Month->ranking)
             ),
             (
                 is_null($Coder_Of_The_Month->selected_by) ?

@@ -1,12 +1,8 @@
 <?php
 
-/**
- * Description of ClarificationsFactory
- *
- * @author joemmanuel
- */
+namespace OmegaUp\Test\Factories;
 
-class ClarificationsFactory {
+class Clarification {
     /**
      * Creates a clarification in a problem inside a contest
      *

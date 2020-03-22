@@ -52,12 +52,17 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestAdminData = [];
 
         // Create a group with two arbitrary users.
-        $helperGroup = GroupsFactory::createGroup($directorIdentity);
+        $helperGroup = \OmegaUp\Test\Factories\Groups::createGroup(
+            $directorIdentity
+        );
         $users = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
             ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
-            GroupsFactory::addUserToGroup($helperGroup, $identities[$i]);
+            \OmegaUp\Test\Factories\Groups::addUserToGroup(
+                $helperGroup,
+                $identities[$i]
+            );
         }
 
         // Get two contests with another director, add $director to their
@@ -75,10 +80,15 @@ class UserContestsTest extends \OmegaUp\Test\ControllerTestCase {
         // Get two contests with another director, add $director to their
         // group admin list
         $contestAdminData[1] = \OmegaUp\Test\Factories\Contest::createContest();
-        $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
-        GroupsFactory::addUserToGroup($group, $directorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $contestAdminData[1]['director']
+        );
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $group,
+            $directorIdentity
+        );
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup($group, $identity);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($group, $identity);
         \OmegaUp\Test\Factories\Contest::addGroupAdmin(
             $contestAdminData[1],
             $group['group']

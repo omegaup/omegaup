@@ -32,6 +32,6 @@ fi
 	--configuration frontend/tests/phpunit.xml \
 	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/badges
 
-./vendor/bin/psalm --update-baseline --show-info=false
+./vendor/bin/psalm
 
 /usr/bin/python3 -m pytest $OMEGAUP_ROOT/frontend/tests/ui/ -s

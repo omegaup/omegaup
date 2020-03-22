@@ -29,7 +29,7 @@ class UpdateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create clarification
         $this->detourBroadcasterCalls($this->exactly(2));
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $identity
@@ -37,7 +37,7 @@ class UpdateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update answer
         $newAnswer = 'new answer';
-        $response = ClarificationsFactory::answer(
+        $response = \OmegaUp\Test\Factories\Clarification::answer(
             $clarificationData,
             $contestData,
             $newAnswer
