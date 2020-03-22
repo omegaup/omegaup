@@ -74,7 +74,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>, total: int}
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>, count: int}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -292,13 +292,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         /** @var int */
-        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) $sql",
             $args
         );
 
         // Reset the offset to 0 if out of bounds.
-        if ($offset < 0 || $offset > $total) {
+        if ($offset < 0 || $offset > $count) {
             $offset = 0;
         }
 
@@ -350,7 +350,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
         return [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ];
     }
 
@@ -831,14 +831,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     public static function getAllWithCount(
         int $page,
         int $pageSize
     ) {
         /** @var int */
-        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             'SELECT COUNT(*) FROM `Problems`'
         );
 
@@ -851,14 +851,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         return [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ];
     }
 
     /**
      * Returns all problems that an identity can manage.
      *
-     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsAdminedByIdentity(
         int $identityId,
@@ -907,7 +907,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ];
 
         /** @var int */
-        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) {$sql}",
             $params
         );
@@ -928,14 +928,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         return [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ];
     }
 
     /**
      * Returns all problems owned by a user.
      *
-     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsOwnedByUser(
         int $userId,
@@ -966,7 +966,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ];
 
         /** @var int */
-        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) {$sql}",
             $params
         );
@@ -987,7 +987,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         return [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ];
     }
 

@@ -3262,7 +3262,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ] = \OmegaUp\DAO\Problems::byIdentityType(
             $identityType,
             $language,
@@ -3280,7 +3280,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange
         );
         return [
-            'total' => $total,
+            'total' => $count,
             'results' => $problems,
         ];
     }
@@ -3307,7 +3307,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             [
                 'problems' => $problems,
-                'total' => $total,
+                'count' => $count,
             ] = \OmegaUp\DAO\Problems::getAllWithCount(
                 $page,
                 $pageSize
@@ -3315,7 +3315,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             [
                 'problems' => $problems,
-                'total' => $total,
+                'count' => $count,
             ] = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
@@ -3338,7 +3338,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $pagerItems = \OmegaUp\Pager::paginate(
-            $total,
+            $count,
             $page ?: 1,
             '/problem/list/',
             5,
@@ -3379,7 +3379,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         [
             'problems' => $problems,
-            'total' => $total,
+            'count' => $count,
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
@@ -3401,7 +3401,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $pagerItems = \OmegaUp\Pager::paginate(
-            $total,
+            $count,
             $page ?: 1,
             '/problem/list/',
             5,
