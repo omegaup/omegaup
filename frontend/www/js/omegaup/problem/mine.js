@@ -20,8 +20,9 @@ OmegaUp.on('ready', function() {
             statement = ev.selected;
             showProblems(statement);
           },
-          'change-visibility': function(visibility) {
+          'change-visibility': function(ev, selectedProblems, visibility) {
             omegaup.UI.bulkOperation(
+              selectedProblems,
               function(alias, resolve, reject) {
                 omegaup.API.Problem.update({
                   problem_alias: alias,

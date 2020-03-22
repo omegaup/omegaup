@@ -204,7 +204,7 @@ let UI = {
       });
   },
 
-  bulkOperation: function(operation, onOperationFinished, options) {
+  bulkOperation: function(items, operation, onOperationFinished, options) {
     var isStopExecuted = false;
     var success = true;
     var error = null;
@@ -214,11 +214,9 @@ let UI = {
       success = false;
       error = data.error;
     };
-    $('input[type=checkbox]', 'table').each(function() {
-      if (this.checked) {
-        operation(this.id, resolve, reject);
-      }
-    });
+    for (const item of items) {
+      operation(item, resolve, reject);
+    }
 
     // Wait for all
     $(document).ajaxStop(function() {

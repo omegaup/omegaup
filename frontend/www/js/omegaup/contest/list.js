@@ -41,8 +41,8 @@ OmegaUp.on('ready', function() {
             this.showAdmin = showAdmin;
             fillContestsTable();
           },
-          'bulk-update': admissionMode =>
-            this.changeAdmissionMode(admissionMode),
+          'bulk-update': (ev, selectedContests, admissionMode) =>
+            this.changeAdmissionMode(ev, selectedContests, admissionMode),
           'download-csv-users': contestAlias =>
             this.downloadCsvUsers(contestAlias),
         },
@@ -56,15 +56,19 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      changeAdmissionMode: function(admissionMode) {
-        UI.bulkOperation(function(alias, resolve, reject) {
-          API.Contest.update({
-            contest_alias: alias,
-            admission_mode: admissionMode,
-          })
-            .then(resolve)
-            .fail(reject);
-        }, fillContestsTable);
+      changeAdmissionMode: function(ev, selectedContests, admissionMode) {
+        UI.bulkOperation(
+          selectedContests,
+          function(alias, resolve, reject) {
+            API.Contest.update({
+              contest_alias: alias,
+              admission_mode: admissionMode,
+            })
+              .then(resolve)
+              .fail(reject);
+          },
+          fillContestsTable,
+        );
       },
       downloadCsvUsers: function(contestAlias) {
         API.Contest.contestants({

@@ -31,10 +31,14 @@
           </button>
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a v-on:click="onChangeVisibility(1)">{{ T.makePublic }}</a>
+              <a v-on:click="onChangeVisibility(selectedProblems, 1)">{{
+                T.makePublic
+              }}</a>
             </li>
             <li>
-              <a v-on:click="onChangeVisibility(0)">{{ T.makePrivate }}</a>
+              <a v-on:click="onChangeVisibility(selectedProblems, 0)">{{
+                T.makePrivate
+              }}</a>
             </li>
           </ul>
         </div>
