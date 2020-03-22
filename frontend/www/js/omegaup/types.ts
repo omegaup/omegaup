@@ -1,4 +1,4 @@
-import omegaup from './api.js';
+import { omegaup } from './omegaup';
 import { Optional } from 'typescript-optional';
 
 export interface LinkableResource {
@@ -134,7 +134,7 @@ export class SchoolUser implements LinkableResource {
     username: string,
     created_problems: number,
     solved_problems: number,
-    organized_contests: number
+    organized_contests: number,
   ) {
     this.classname = classname;
     this.username = username;
@@ -152,14 +152,15 @@ export class SchoolUser implements LinkableResource {
   }
 
   getDisplayValue(): number {
-    switch(this.displayField) {
+    switch (this.displayField) {
       case 'solved_problems':
         return this.solved_problems;
       case 'organized_contests':
         return this.organized_contests;
       case 'created_problems':
         return this.created_problems;
-      default: return 0;
+      default:
+        return 0;
     }
   }
 
