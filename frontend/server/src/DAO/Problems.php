@@ -74,7 +74,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>, total: int}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -90,8 +90,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        ?array $difficultyRange,
-        int &$total
+        ?array $difficultyRange
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -349,7 +348,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             );
             $problems[] = $problem;
         }
-        return $problems;
+        return [
+            'problems' => $problems,
+            'total' => $total,
+        ];
     }
 
     final public static function getByAlias(
@@ -829,37 +831,39 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
      */
-    public static function getAllWithTotal(
+    public static function getAllWithCount(
         int $page,
-        int $pageSize,
-        int &$total
+        int $pageSize
     ) {
-        /** @var int $total */
+        /** @var int */
         $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            'SELECT COUNT(*) FROM `Problems`',
-            []
+            'SELECT COUNT(*) FROM `Problems`'
         );
 
-        return \OmegaUp\DAO\Problems::getAll(
+        $problems = \OmegaUp\DAO\Problems::getAll(
             $page,
             $pageSize,
             'problem_id',
             'DESC'
         );
+
+        return [
+            'problems' => $problems,
+            'total' => $total,
+        ];
     }
 
     /**
      * Returns all problems that an identity can manage.
      *
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
      */
     final public static function getAllProblemsAdminedByIdentity(
         int $identityId,
         int $page,
-        int $pageSize,
-        int &$total
+        int $pageSize
     ): array {
         $offset = ($page - 1) * $pageSize;
         $select = '
@@ -902,7 +906,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
-        /** @var int $total */
+        /** @var int */
         $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) {$sql}",
             $params
@@ -921,19 +925,22 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         foreach ($rs as $row) {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
-        return $problems;
+
+        return [
+            'problems' => $problems,
+            'total' => $total,
+        ];
     }
 
     /**
      * Returns all problems owned by a user.
      *
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, total: int}
      */
     final public static function getAllProblemsOwnedByUser(
         int $userId,
         int $page,
-        int $pageSize,
-        int &$total
+        int $pageSize
     ) {
         $offset = ($page - 1) * $pageSize;
         $select = '
@@ -958,7 +965,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
-        /** @var int $total */
+        /** @var int */
         $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) {$sql}",
             $params
@@ -977,7 +984,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         foreach ($rs as $row) {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
-        return $problems;
+
+        return [
+            'problems' => $problems,
+            'total' => $total,
+        ];
     }
 
     /**

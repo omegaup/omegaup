@@ -3260,8 +3260,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $rowcount = PROBLEMS_PER_PAGE;
         }
 
-        $total = 0;
-        $problems = \OmegaUp\DAO\Problems::byIdentityType(
+        [
+            'problems' => $problems,
+            'total' => $total,
+        ] = \OmegaUp\DAO\Problems::byIdentityType(
             $identityType,
             $language,
             $orderBy,
@@ -3275,8 +3277,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $requireAllTags,
             $programmingLanguages,
-            $difficultyRange,
-            $total
+            $difficultyRange
         );
         return [
             'total' => $total,
@@ -3288,7 +3289,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pager_items: array{class: string, label: string, url: string}[], problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3303,19 +3304,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['page_size']
         ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
 
-        $total = 0;
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $problems = \OmegaUp\DAO\Problems::getAllWithTotal(
+            [
+                'problems' => $problems,
+                'total' => $total,
+            ] = \OmegaUp\DAO\Problems::getAllWithCount(
                 $page,
-                $pageSize,
-                $total
+                $pageSize
             );
         } else {
-            $problems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
+            [
+                'problems' => $problems,
+                'total' => $total,
+            ] = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
-                $pageSize,
-                $total
+                $pageSize
             );
         }
 
@@ -3343,14 +3347,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'problems' => $addedProblems,
-            'pager_items' => $pagerItems,
+            'pagerItems' => $pagerItems,
         ];
     }
 
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{problems: list<array{tags: array<array-key, array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: array<array-key, array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3373,12 +3377,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $page = isset($r['page']) ? intval($r['page']) : 1;
 
-        $total = 0;
-        $problems = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
+        [
+            'problems' => $problems,
+            'total' => $total,
+        ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
-            $rowcount,
-            $total
+            $rowcount
         );
 
         $addedProblems = [];
@@ -3405,7 +3410,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'problems' => $addedProblems,
-            'pager_items' => $pagerItems,
+            'pagerItems' => $pagerItems,
         ];
     }
 
