@@ -159,7 +159,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns rank of best schools in last month
      *
      * @param \OmegaUp\Request $r
-     * @return array{coders: array{time: string, username: string, classname: string}[]}
+     * @return array{coders: list<array{time: string, username: string, classname: string}>}
      */
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -186,7 +186,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the number of solved problems on the last X
      * months (including the current one)
      * @param \OmegaUp\Request $r
-     * @return array{distinct_problems_solved: array{year: int, month: int, count: int}[], status: string}
+     * @return array{distinct_problems_solved: list<array{year: int, month: int, count: int}>, status: string}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -211,7 +211,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * with the number of created problems, solved problems and organized contests.
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, users: array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]}
+     * @return array{status: string, users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
