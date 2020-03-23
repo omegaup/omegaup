@@ -125,7 +125,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{finish_time?: int|null, problems?: array<int, array{alias: string, order: int}>, ranking?: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time?: int, time?: int, title?: string}
+     * @return array{finish_time?: int|null, problems?: list<array{alias: string, order: int}>, ranking?: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time?: int, time?: int, title?: string}
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [
@@ -204,7 +204,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('problemset_id');
 
         $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
-            $r['problemset_id']
+            intval($r['problemset_id'])
         );
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -217,11 +217,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $problemset['contest_alias'],
             ]);
-            if (isset($r['auth_token'])) {
+            if (isset($r['auth_token']) && is_string($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
             }
-            if (isset($r['tokens']) && count($r['tokens']) >= 4) {
-                $request['token'] = $r['tokens'][3];
+            if (
+                isset($r['tokens']) &&
+                is_array($r['tokens']) &&
+                count($r['tokens']) >= 4
+            ) {
+                $request['token'] = strval($r['tokens'][3]);
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails($request);
             $request['contest_alias'] = $response['contest_alias'];

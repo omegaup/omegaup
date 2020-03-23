@@ -157,8 +157,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 import DateTimePicker from '../DateTimePicker.vue';
 
 @Component({

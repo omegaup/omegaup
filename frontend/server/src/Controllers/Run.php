@@ -73,6 +73,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         'NO-AC',
     ];
 
+    public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
+
     /**
      *
      * Validates Create Run request
@@ -766,7 +768,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -848,7 +850,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -882,7 +884,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      */
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
@@ -904,7 +906,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!is_string($detailsJson)) {
             return $response;
         }
-        /** @var array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float} */
+        /** @var array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float} */
         $details = json_decode($detailsJson, true);
         if (
             isset($details['compile_error']) &&
@@ -1295,7 +1297,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1314,7 +1316,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready']
+            self::STATUS
         );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],

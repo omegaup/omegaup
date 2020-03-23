@@ -163,9 +163,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
-import omegaup from '../../api.js';
 
 @Component({})
 export default class List extends Vue {

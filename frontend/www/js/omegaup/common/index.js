@@ -9,7 +9,7 @@ OmegaUp.on('ready', function() {
   const ranking = [];
   for (const user of payload.rankTable.rank) {
     ranking.add({
-      rank: user.rank,
+      rank: user.ranking,
       country: user.country_id,
       username: user.username,
       classname: user.classname,

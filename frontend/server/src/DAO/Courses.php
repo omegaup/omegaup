@@ -95,14 +95,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 INNER JOIN (
                     SELECT g.group_id
                     FROM Groups_Identities gi
-                    INNER JOIN `Groups` AS g ON g.group_id = gi.group_id
+                    INNER JOIN `Groups_` AS g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
                 UNION(
                     SELECT cc.*
                     FROM Courses cc
-                    WHERE cc.admission_mode = ?
+                    WHERE cc.admission_mode <> ?
                 );
                ';
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: null|string, group_id: int, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: string}> */
@@ -110,7 +110,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $sql,
             [
                 $identityId,
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+                \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             ]
         );
         $courses = [];
@@ -134,7 +134,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     pr.alias as assignment_alias,
                     pr.assignment_score
                 FROM
-                    `Groups` AS g
+                    `Groups_` AS g
                 INNER JOIN Groups_Identities gi
                     ON g.group_id = ? AND g.group_id = gi.group_id
                 INNER JOIN Identities i

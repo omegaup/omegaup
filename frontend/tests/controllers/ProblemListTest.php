@@ -180,7 +180,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $login[] = self::login($identities[$i]);
         }
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[0],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -189,7 +189,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[1],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -198,7 +198,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[2],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -207,7 +207,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[3],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -216,7 +216,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[4],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -572,19 +572,23 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $authorLogin = self::login($identity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $identity,
             null,
             null,
             null,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup(
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $group,
             $addedIdentityAdmin,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup($group, $identity, $authorLogin);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $group,
+            $identity,
+            $authorLogin
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
             'auth_token' => $authorLogin->auth_token,
@@ -621,7 +625,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = $problemDataPrivate['request']['problem_alias'];
 
         $authorLogin = self::login($authorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $authorIdentity,
             null,
             null,
@@ -629,12 +633,16 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $authorLogin
         );
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup(
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $group,
             $identity,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup($group, $authorIdentity, $authorLogin);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $group,
+            $authorIdentity,
+            $authorLogin
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
             'auth_token' => $authorLogin->auth_token,
@@ -673,8 +681,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'author' => $authorIdentity
         ]));
 
-        $group = GroupsFactory::createGroup($authorIdentity);
-        GroupsFactory::addUserToGroup($group, $helperIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup($authorIdentity);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($group, $helperIdentity);
 
         $login = self::login($authorIdentity);
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
@@ -1085,6 +1093,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
         $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
+            'rowcount' => 1000,
         ]);
         // Call apiList to define the number of problems and pages
         $apiListResponse = \OmegaUp\Controllers\Problem::apiList($request);
@@ -1113,7 +1122,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 $problems[] = $problem['alias'];
             }
         }
-        // Asserting the number of non-repeated problems isthe same than the total
+        // Asserting the number of non-repeated problems is the same than the total
         $this->assertEquals(
             count(
                 array_unique(

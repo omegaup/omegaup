@@ -9,6 +9,7 @@ import os
 import shlex
 import subprocess
 import tempfile
+from typing import Optional
 
 
 _MYSQL_BINARY = '/usr/bin/mysql'
@@ -25,9 +26,13 @@ def quote(s):
     return pipes.quote(s)
 
 
-def default_config_file():
+def default_config_file() -> Optional[str]:
     '''Returns the default config file path for MySQL.'''
-    return os.path.join(os.getenv('HOME') or '.', '.my.cnf')
+    for candidate_path in (os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
+                           '/etc/mysql/conf.d/mysql_password.cnf'):
+        if os.path.isfile(candidate_path):
+            return candidate_path
+    return None
 
 
 def authentication(*, config_file=default_config_file(), username=None,

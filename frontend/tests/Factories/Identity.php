@@ -1,14 +1,8 @@
 <?php
 
-/**
- * IdentityFactory
- *
- * This class is a helper for identity actions
- *
- * @author juan.pablo
- */
+namespace OmegaUp\Test\Factories;
 
-class IdentityFactory {
+class Identity {
     public static function getCsvData(
         string $file,
         string $group_alias,
@@ -56,7 +50,7 @@ class IdentityFactory {
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'identities' => IdentityFactory::getCsvData(
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                 'identities.csv',
                 strval($group->alias),
                 $password
@@ -74,9 +68,15 @@ class IdentityFactory {
         $unassociatedIdentity = \OmegaUp\DAO\Identities::FindByUsername(
             $unassociatedIdentity['username']
         );
+        if (is_null($unassociatedIdentity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $associatedIdentity = \OmegaUp\DAO\Identities::FindByUsername(
             $associatedIdentity['username']
         );
+        if (is_null($associatedIdentity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
 
         $unassociatedIdentity->password = $password;
         $associatedIdentity->password = $password;

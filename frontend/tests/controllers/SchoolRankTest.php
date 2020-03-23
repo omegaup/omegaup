@@ -7,7 +7,7 @@
 
 class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testApiMonthlySolvedProblemsCount() {
-        $schoolData = SchoolsFactory::createSchool();
+        $schoolData = \OmegaUp\Test\Factories\Schools::createSchool();
 
         $users = [];
         $identities = [];
@@ -15,9 +15,18 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        SchoolsFactory::addUserToSchool($schoolData, $identities[0]);
-        SchoolsFactory::addUserToSchool($schoolData, $identities[1]);
-        SchoolsFactory::addUserToSchool($schoolData, $identities[2]);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[2]
+        );
 
         $problems = [];
         for ($i = 0; $i < 3; $i++) {
@@ -213,7 +222,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
          * user2 solves 2 problems, organizes 0 contest and creates 1 problems
          * user3 solves 1 problem, organizes 1 contests and creates 0 problem
          */
-        $schoolData = SchoolsFactory::createSchool();
+        $schoolData = \OmegaUp\Test\Factories\Schools::createSchool();
         $users = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
@@ -224,9 +233,18 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $identities[] = $contestData['director'];
 
-        SchoolsFactory::addUserToSchool($schoolData, $identities[0]);
-        SchoolsFactory::addUserToSchool($schoolData, $identities[1]);
-        SchoolsFactory::addUserToSchool($schoolData, $identities[2]);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolData,
+            $identities[2]
+        );
 
         // User 1
         $login = self::login($identities[0]);
@@ -308,9 +326,9 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         // => School1 must have a better (lower) rank than School0 and School2
 
         $schoolsData = [
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool(),
-            SchoolsFactory::createSchool()
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool(),
+            \OmegaUp\Test\Factories\Schools::createSchool()
         ];
 
         $users = [];
@@ -324,10 +342,22 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
 
-        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[0]);
-        SchoolsFactory::addUserToSchool($schoolsData[0], $identities[1]);
-        SchoolsFactory::addUserToSchool($schoolsData[1], $identities[2]);
-        SchoolsFactory::addUserToSchool($schoolsData[2], $identities[3]);
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[0],
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[0],
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[1],
+            $identities[2]
+        );
+        \OmegaUp\Test\Factories\Schools::addUserToSchool(
+            $schoolsData[2],
+            $identities[3]
+        );
 
         // School 0
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -394,8 +424,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($school0->score, $school0->score);
-        $this->assertEquals($school0->rank, $school2->rank);
-        $this->assertGreaterThan($school1->rank, $school0->rank);
+        $this->assertEquals($school0->ranking, $school2->ranking);
+        $this->assertGreaterThan($school1->ranking, $school0->ranking);
         $this->assertGreaterThan($school0->score, $school1->score);
 
         // Test apiRank
@@ -405,8 +435,8 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertGreaterThanOrEqual(3, count($response['rank']));
         $this->assertGreaterThanOrEqual(
-            $response['rank'][0]['rank'],
-            $response['rank'][1]['rank']
+            $response['rank'][0]['ranking'],
+            $response['rank'][1]['ranking']
         ); /** is sorted */
     }
 }
