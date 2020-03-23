@@ -243,7 +243,8 @@ class UITools {
             $template = $response['template'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
-            $payload = $smartyProperties;
+            /** @var array<string, mixed> */
+            $payload = $smartyProperties['payload'] ?? [];
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
@@ -255,7 +256,7 @@ class UITools {
 
         \OmegaUp\UITools::assignSmartyNavbarHeader(
             $smarty,
-            $payload['payload'] ?? [],
+            $payload,
             $inContest,
             $navbarSection
         );
