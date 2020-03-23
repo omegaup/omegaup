@@ -123,7 +123,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($identity->current_identity_school_id);
 
         // Now update user, adding a new school without graduation_date
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $school->school_id,
@@ -157,7 +157,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($identitySchool->end_time);
 
         // Now assign a new School to User
-        $newSchool = SchoolsFactory::createSchool()['school'];
+        $newSchool = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $newSchool->school_id,

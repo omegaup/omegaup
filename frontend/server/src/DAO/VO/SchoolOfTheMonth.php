@@ -19,7 +19,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'school_of_the_month_id' => true,
         'school_id' => true,
         'time' => true,
-        'rank' => true,
+        'ranking' => true,
         'selected_by' => true,
         'score' => true,
     ];
@@ -49,9 +49,9 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\VO\VO {
                 $data['time']
             );
         }
-        if (isset($data['rank'])) {
-            $this->rank = intval(
-                $data['rank']
+        if (isset($data['ranking'])) {
+            $this->ranking = intval(
+                $data['ranking']
             );
         }
         if (isset($data['selected_by'])) {
@@ -94,7 +94,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $rank = null;
+    public $ranking = null;
 
     /**
      * Identidad que seleccionó a la escuela.

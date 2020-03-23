@@ -32,7 +32,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$name];
 
         $result = [];
-        /** @var array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float, state_id: null|string} $row */
+        /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -47,7 +47,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
      * @param int $schoolId
      * @param int $monthsNumber
-     * @return array{year: int, month: int, count: int}[]
+     * @return list<array{year: int, month: int, count: int}>
      */
     public static function getMonthlySolvedProblemsCount(
         int $schoolId,
@@ -103,7 +103,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
      * Gets the schools ordered by rank and score
      *
-     * @return array{rank: list<array{country_id: string|null, name: string, rank: int|null, school_id: int, score: float}>, totalRows: int}
+     * @return array{rank: list<array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}>, totalRows: int}
      */
     public static function getRank(
         int $page,
@@ -115,7 +115,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             ORDER BY
-                s.`rank` IS NULL, s.`rank` ASC
+                s.`ranking` IS NULL, s.`ranking` ASC
         ';
 
         $sqlCount = '
@@ -126,7 +126,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             SELECT
                 s.school_id,
                 s.name,
-                s.`rank`,
+                s.`ranking`,
                 s.score,
                 s.country_id';
 
@@ -138,7 +138,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             []
         ) ?? 0;
 
-        /** @var list<array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float}> */
+        /** @var list<array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlFrom . $sqlLimit,
             [$offset, $rowsPerPage]

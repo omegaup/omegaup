@@ -66,11 +66,10 @@ class Session extends \OmegaUp\Controllers\Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      *
-     * @return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
-            'status' => 'ok',
             'session' => self::getCurrentSession($r),
             'time' => \OmegaUp\Time::get(),
         ];
@@ -338,7 +337,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -377,7 +376,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     public static function LoginViaGoogle(
         string $email,
@@ -556,13 +555,13 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     private static function ThirdPartyLogin(
         string $provider,
         string $email,
         ?string $name = null
-    ): array {
+    ) {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
@@ -588,6 +587,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
+                /** @var array<string, string> */
                 return $e->asResponseArray();
             }
             $identity = \OmegaUp\DAO\Identities::findByUsername($username);

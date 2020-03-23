@@ -231,7 +231,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add user's school
         $login = self::login($identity);
-        $school = SchoolsFactory::createSchool();
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $school['school']->school_id,

@@ -1618,7 +1618,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'user_id' => $user['user_id'],
                     'school_id' => $user['school_id'],
                     'time' => $user['time'],
-                    'rank' => $user['rank'],
+                    'ranking' => $user['ranking'],
                     'category' => $user['category'],
                 ]);
                 // Only the CoderOfTheMonth selected by the mentor is going to be
@@ -1661,7 +1661,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{user_verified: bool, interview_url: string, name_or_username: null|string, opened_interview: mixed, finished: bool}
+     * @return array{user_verified: bool, interview_url: string, name_or_username: null|string, opened_interview: bool, finished: bool}
      */
     public static function apiInterviewStats(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -2268,7 +2268,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * If no username provided: Gets the top N users who have solved more problems
      * If username provided: Gets rank for username provided
      *
-     * @return array{rank: int|list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total?: int, name?: string, problems_solved?: int}
+     * @return array{rank: int|list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total?: int, name?: string, problems_solved?: int}
      */
     public static function apiRankByProblemsSolved(\OmegaUp\Request $r): array {
         $r->ensureInt('offset', null, null, false);
@@ -2341,7 +2341,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'rank' => intval($userRank->rank),
+            'rank' => intval($userRank->ranking),
             'name' => strval($identity->name),
             'problems_solved' => $userRank->problems_solved_count,
         ];
@@ -2351,7 +2351,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Get rank by problems solved logic. It has its own func so it can be
      * accesed internally without authentication.
      *
-     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
+     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
      */
     public static function getRankByProblemsSolved(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2368,7 +2368,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
             $rankCacheName,
             /**
-             * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}
+             * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
              */
             function () use (
                 $loggedIdentity,
@@ -2383,7 +2383,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 return \OmegaUp\DAO\UserRank::getFilteredRank(
                     $offset,
                     $rowCount,
-                    'rank',
+                    'ranking',
                     'ASC',
                     $selectedFilter['filteredBy'],
                     $selectedFilter['value']
@@ -2508,7 +2508,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * This API does not need authentication to be used. This allows to track
      * contest updates with an access token.
      *
-     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset: array<empty, empty>}
+     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
@@ -2522,7 +2522,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'admin' => false,
             'problem_admin' => [],
             'contest_admin' => [],
-            'problemset' => [],
+            'problemset_admin' => [],
         ];
 
         $session = \OmegaUp\Controllers\Session::getCurrentSession(
@@ -3219,7 +3219,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, rank: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {

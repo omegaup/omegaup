@@ -257,7 +257,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{exists: bool, group?: array<string, mixed>, scoreboards?: list<array{alias: string, create_time: string, description: null|string, group_id: int, group_scoreboard_id: int, name: string}>}
+     * @return array{exists: bool, group?: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards?: list<array{alias: string, create_time: string, description: null|string, name: string}>}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -278,12 +278,23 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'exists' => true,
-            'group' => $group->asArray(),
             'scoreboards' => [],
         ];
+        /** @var array{create_time: int, alias: null|string, name: null|string, description: null|string} */
+        $response['group'] = $group->asFilteredArray([
+            'create_time',
+            'alias',
+            'name',
+            'description',
+        ]);
         foreach ($scoreboards as $scoreboard) {
-            /** @var array{alias: string, create_time: string, description: null|string, group_id: int, group_scoreboard_id: int, name: string} */
-            $response['scoreboards'][] = $scoreboard->asArray();
+            /** @var array{alias: string, create_time: string, description: null|string, name: string} */
+            $response['scoreboards'][] = $scoreboard->asFilteredArray([
+                'alias',
+                'create_time',
+                'description',
+                'name',
+            ]);
         }
         return $response;
     }

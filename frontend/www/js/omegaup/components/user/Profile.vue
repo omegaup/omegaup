@@ -118,9 +118,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import { Chart } from 'highcharts-vue';
-import omegaup from '../../api.js';
 import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';

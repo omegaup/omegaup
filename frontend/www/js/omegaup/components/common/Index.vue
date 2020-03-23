@@ -28,7 +28,7 @@
                 v-bind:length="schoolsRank.length"
                 v-bind:showHeader="schoolsRank.showHeader"
                 v-bind:totalRows="schoolsRank.totalRows"
-                v-bind:rank="schoolsRank.rank"
+                v-bind:rank="schoolsRank.ranking"
               ></omegaup-schools-rank>
             </div>
           </div>
@@ -65,8 +65,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 import common_Welcome from './Welcome.vue';
 import common_SocialMedia from './SocialMedia.vue';
 import common_RecomendedMaterial from './RecomendedMaterial.vue';

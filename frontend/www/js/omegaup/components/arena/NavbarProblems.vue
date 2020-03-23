@@ -58,8 +58,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 
 @Component
 export default class ArenaNavbarProblems extends Vue {
