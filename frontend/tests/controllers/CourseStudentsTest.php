@@ -102,14 +102,14 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create identities for a group
         $password = \OmegaUp\Test\Utils::createRandomString();
-        [$_, $associatedIdentity] = IdentityFactory::createIdentitiesFromAGroup(
+        [$_, $associatedIdentity] = \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
             $associatedGroup,
             $creatorLogin,
             $password
         );
 
         // Create an unassociated group, it does not have access to the course
-        $unassociatedGroup = GroupsFactory::createGroup(
+        $unassociatedGroup = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -117,7 +117,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $creatorLogin
         )['group'];
 
-        [$unassociatedIdentity, $_] = IdentityFactory::createIdentitiesFromAGroup(
+        [$unassociatedIdentity, $_] = \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
             $unassociatedGroup,
             $creatorLogin,
             $password

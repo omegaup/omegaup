@@ -55,7 +55,7 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $identity
@@ -98,7 +98,7 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $identity
@@ -149,7 +149,7 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $identity
@@ -192,7 +192,7 @@ class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $identity
