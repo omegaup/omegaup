@@ -1661,7 +1661,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{user_verified: bool, interview_url: string, name_or_username: null|string, opened_interview: mixed, finished: bool}
+     * @return array{user_verified: bool, interview_url: string, name_or_username: null|string, opened_interview: bool, finished: bool}
      */
     public static function apiInterviewStats(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -2508,7 +2508,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * This API does not need authentication to be used. This allows to track
      * contest updates with an access token.
      *
-     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset: array<empty, empty>}
+     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
@@ -2522,7 +2522,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'admin' => false,
             'problem_admin' => [],
             'contest_admin' => [],
-            'problemset' => [],
+            'problemset_admin' => [],
         ];
 
         $session = \OmegaUp\Controllers\Session::getCurrentSession(

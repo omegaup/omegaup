@@ -17,6 +17,10 @@ stage_before_install() {
 	install_yarn
 }
 
+stage_install() {
+	composer install
+}
+
 stage_before_script() {
 	setup_phpenv
 }
