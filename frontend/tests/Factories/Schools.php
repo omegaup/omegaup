@@ -1,13 +1,8 @@
 <?php
 
-/**
- * SchoolsFactory
- *
- * This class is a helper for creating schools as needed in other places
- *
- * @author joemmanuel
- */
-class SchoolsFactory {
+namespace OmegaUp\Test\Factories;
+
+class Schools {
     /**
      * Create a random school
      * @param  string $name

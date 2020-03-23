@@ -3,7 +3,9 @@
 class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $login = self::login(QualityNominationFactory::$reviewers[0]);
+        $login = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
 
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -71,7 +73,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request(
             [
             'auth_token' => $reviewerLogin->auth_token,
@@ -207,7 +211,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
@@ -399,7 +405,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -476,7 +484,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -532,7 +542,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
         // Login as a reviewer and deny ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'denied',
@@ -582,7 +594,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -661,7 +675,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'approved',
@@ -894,7 +910,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Login as an arbitrary reviewer.
-        $login = self::login(QualityNominationFactory::$reviewers[0]);
+        $login = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $response = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -912,7 +930,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
-            QualityNominationFactory::$reviewers,
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers,
             function ($reviewer) use (&$nomination) {
                 return $reviewer->username == $nomination['votes'][0]['user']['username'];
             }
@@ -1107,7 +1125,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create dismissal nomination.
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identity,
             $problemData['request']['problem_alias'],
             null,
@@ -1116,7 +1134,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
@@ -1294,7 +1314,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $beforeACUser['identity']
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $beforeACUser['identity'],
             $problemData[0]['request']['problem_alias'],
             4, /* difficulty */
@@ -1458,7 +1478,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testReviewersFeedbackPostive() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1469,7 +1491,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[1]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1480,7 +1504,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[2]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1506,7 +1532,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testReviewersFeedbackNegative() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1517,7 +1545,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[1]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[1]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1528,7 +1558,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[2]);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[2]
+        );
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -1565,7 +1597,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         if ($withSuggestions) {
             \OmegaUp\Test\Utils::deleteAllSuggestions();
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[0],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
@@ -1574,7 +1606,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[1],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
@@ -1583,7 +1615,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[2],
                 $problems[0]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1592,7 +1624,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[3],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
@@ -1601,7 +1633,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[4],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
@@ -1610,7 +1642,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[1],
                 $problems[1]['request']['problem_alias'],
                 3, /* difficulty */
@@ -1619,7 +1651,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[2],
                 $problems[1]['request']['problem_alias'],
                 null, /* difficulty */
@@ -1628,7 +1660,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[3],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1637,7 +1669,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[4],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1646,7 +1678,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[2],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1655,7 +1687,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[3],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1664,7 +1696,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[4],
                 $problems[2]['request']['problem_alias'],
                 1, /* difficulty */
@@ -1673,7 +1705,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[3],
                 $problems[3]['request']['problem_alias'],
                 4, /* difficulty */
@@ -1682,7 +1714,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[4],
                 $problems[3]['request']['problem_alias'],
                 3, /* difficulty */
@@ -1691,7 +1723,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 false
             );
 
-            QualityNominationFactory::createSuggestion(
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                 $users[4],
                 $problems[4]['request']['problem_alias'],
                 3, /* difficulty */
@@ -1762,7 +1794,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
             for ($userIdx = 0; $userIdx < 10; $userIdx++) {
-                QualityNominationFactory::createSuggestion(
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$userIdx],
                     $problemData[$problemIdx]['request']['problem_alias'],
                     $difficultyRatings[$problemIdx][$userIdx],
@@ -1845,7 +1877,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[0],
             $problemData[0]['request']['problem_alias'],
             null,
@@ -1853,7 +1885,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicDynamicProgramming', 'problemTopicMath'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[1],
             $problemData[0]['request']['problem_alias'],
             3,
@@ -1861,7 +1893,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicMath', 'problemTopicDynamicProgramming'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[2],
             $problemData[0]['request']['problem_alias'],
             4,
@@ -1869,7 +1901,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicMatrices', 'problemTopicMath'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[3],
             $problemData[0]['request']['problem_alias'],
             null,
@@ -1877,7 +1909,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicMath'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[4],
             $problemData[0]['request']['problem_alias'],
             3,
@@ -1885,7 +1917,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[5],
             $problemData[0]['request']['problem_alias'],
             3,
@@ -1893,7 +1925,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             [],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[6],
             $problemData[0]['request']['problem_alias'],
             null,
@@ -1901,7 +1933,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             [],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[7],
             $problemData[0]['request']['problem_alias'],
             4,
@@ -1909,7 +1941,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[8],
             $problemData[0]['request']['problem_alias'],
             4,
@@ -1917,7 +1949,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicDynamicProgramming'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[9],
             $problemData[0]['request']['problem_alias'],
             4,
@@ -1926,7 +1958,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[0],
             $problemData[1]['request']['problem_alias'],
             4,
@@ -1934,7 +1966,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicSorting', 'problemTopicGeometry'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[1],
             $problemData[1]['request']['problem_alias'],
             1,
@@ -1942,7 +1974,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicSorting', 'problemTopicGeometry'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[2],
             $problemData[1]['request']['problem_alias'],
             4,
@@ -1950,7 +1982,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicMatrices', 'problemTopicSorting'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[3],
             $problemData[1]['request']['problem_alias'],
             3,
@@ -1958,7 +1990,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicSorting'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[4],
             $problemData[1]['request']['problem_alias'],
             3,
@@ -1966,7 +1998,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicSorting', 'problemTopicMath', 'problemTopicGeometry'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[5],
             $problemData[1]['request']['problem_alias'],
             3,
@@ -1974,7 +2006,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             [],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[6],
             $problemData[1]['request']['problem_alias'],
             null,
@@ -1982,7 +2014,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             [],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[7],
             $problemData[1]['request']['problem_alias'],
             3,
@@ -1990,7 +2022,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicSorting', 'problemTopicDynamicProgramming'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[8],
             $problemData[1]['request']['problem_alias'],
             4,
@@ -1998,7 +2030,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['problemTopicDynamicProgramming'],
             false
         );
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[9],
             $problemData[1]['request']['problem_alias'],
             4,

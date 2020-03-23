@@ -34,7 +34,7 @@ class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
         $this->detourBroadcasterCalls($this->exactly(9));
         for ($i = 0; $i < 4; $i++) {
             $clarificationData1[$i] =
-                ClarificationsFactory::createClarification(
+                \OmegaUp\Test\Factories\Clarification::createClarification(
                     $problemData,
                     $contestData,
                     $identity1
@@ -42,8 +42,14 @@ class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Answer clarification 0 and 2
-        ClarificationsFactory::answer($clarificationData1[0], $contestData);
-        ClarificationsFactory::answer($clarificationData1[2], $contestData);
+        \OmegaUp\Test\Factories\Clarification::answer(
+            $clarificationData1[0],
+            $contestData
+        );
+        \OmegaUp\Test\Factories\Clarification::answer(
+            $clarificationData1[2],
+            $contestData
+        );
 
         // Create another contestant
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
@@ -52,7 +58,7 @@ class ListClarificationsContest extends \OmegaUp\Test\ControllerTestCase {
         $clarificationData2 = [];
         for ($i = 0; $i < 3; $i++) {
             $clarificationData2[$i] =
-                ClarificationsFactory::createClarification(
+                \OmegaUp\Test\Factories\Clarification::createClarification(
                     $problemData,
                     $contestData,
                     $identity2

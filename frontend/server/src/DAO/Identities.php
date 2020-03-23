@@ -55,7 +55,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function findByUsernameOrName(string $usernameOrName): array {
+    /**
+     * @return list<\OmegaUp\DAO\VO\Identities>
+     */
+    public static function findByUsernameOrName(string $usernameOrName) {
         $sql = "
             SELECT
                 i.*
@@ -74,10 +77,11 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
+        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $identityData) {
-            array_push($result, new \OmegaUp\DAO\VO\Identities($identityData));
+            $result[] = new \OmegaUp\DAO\VO\Identities($identityData);
         }
         return $result;
     }

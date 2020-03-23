@@ -180,8 +180,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
 import Autocomplete from '../Autocomplete.vue';
 

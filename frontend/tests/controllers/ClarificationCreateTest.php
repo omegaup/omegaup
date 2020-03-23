@@ -55,7 +55,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'contestant' => $contestant,
         ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/true);
 
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestant
@@ -107,7 +107,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
 
         try {
-            ClarificationsFactory::createClarification(
+            \OmegaUp\Test\Factories\Clarification::createClarification(
                 $problemData,
                 $contestData,
                 $contestant,
@@ -145,7 +145,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $messageToEveryone = ClarificationsFactory::createClarification(
+        $messageToEveryone = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -153,7 +153,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['director']->username
         );
 
-        $messageToSpecificUser = ClarificationsFactory::createClarification(
+        $messageToSpecificUser = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -161,7 +161,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestant->username
         );
 
-        $messageToSpecificUserWithPublicAnswer = ClarificationsFactory::createClarification(
+        $messageToSpecificUserWithPublicAnswer = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -192,7 +192,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Now, director answers one message, and it turns public
-        $response = ClarificationsFactory::answer(
+        $response = \OmegaUp\Test\Factories\Clarification::answer(
             $messageToSpecificUserWithPublicAnswer,
             $contestData,
             'answer to everyone',

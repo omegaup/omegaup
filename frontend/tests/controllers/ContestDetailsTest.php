@@ -243,14 +243,18 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         // Add user to our private contest
         {
             $login = self::login($contestData['director']);
-            $groupData = GroupsFactory::createGroup(
+            $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
                 /*$owner=*/null,
                 /*$name=*/null,
                 /*$description=*/null,
                 /*$alias=*/null,
                 $login
             );
-            GroupsFactory::addUserToGroup($groupData, $identity, $login);
+            \OmegaUp\Test\Factories\Groups::addUserToGroup(
+                $groupData,
+                $identity,
+                $login
+            );
             \OmegaUp\Controllers\Contest::apiAddGroup(
                 new \OmegaUp\Request([
                     'contest_alias' => strval($contestData['request']['alias']),

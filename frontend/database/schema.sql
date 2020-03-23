@@ -94,7 +94,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `description` tinytext,
   `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Fecha no es UNIQUE por si hay más de 1 coder de mes.',
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
-  `rank` int NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
+  `ranking` int NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes',
   `selected_by` int DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder.',
   `school_id` int DEFAULT NULL,
   `category` enum('all','female') NOT NULL DEFAULT 'all',
@@ -105,7 +105,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
-  KEY `rank_time_category` (`category`,`rank`,`time`),
+  KEY `rank_time_category` (`category`,`ranking`,`time`),
   CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
@@ -225,7 +225,7 @@ CREATE TABLE `Courses` (
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
-  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`),
+  CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -263,14 +263,14 @@ CREATE TABLE `Group_Roles` (
   KEY `group_id` (`group_id`),
   KEY `role_id` (`role_id`),
   KEY `acl_id` (`acl_id`),
-  CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`),
+  CONSTRAINT `fk_gr_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_gr_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`),
   CONSTRAINT `fk_gra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Groups` (
+CREATE TABLE `Groups_` (
   `group_id` int NOT NULL AUTO_INCREMENT,
   `acl_id` int NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -298,7 +298,7 @@ CREATE TABLE `Groups_Identities` (
   KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_gipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`),
-  CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`)
+  CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -313,7 +313,7 @@ CREATE TABLE `Groups_Scoreboards` (
   PRIMARY KEY (`group_scoreboard_id`),
   UNIQUE KEY `groups_scoreboards_alias` (`alias`),
   KEY `group_id` (`group_id`),
-  CONSTRAINT `fk_gs_user_id` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`group_id`)
+  CONSTRAINT `fk_gs_user_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -819,11 +819,11 @@ CREATE TABLE `School_Of_The_Month` (
   `school_of_the_month_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL,
   `time` date NOT NULL DEFAULT '2000-01-01',
-  `rank` int NOT NULL COMMENT 'El lugar que tuvo la escuela en el mes.',
+  `ranking` int NOT NULL COMMENT 'El lugar que tuvo la escuela en el mes.',
   `selected_by` int DEFAULT NULL COMMENT 'Identidad que seleccionó a la escuela.',
   `score` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_of_the_month_id`),
-  UNIQUE KEY `rank_time` (`rank`,`time`),
+  UNIQUE KEY `rank_time` (`ranking`,`time`),
   KEY `school_of_the_month_id` (`school_of_the_month_id`),
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
@@ -838,7 +838,7 @@ CREATE TABLE `Schools` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
-  `rank` int DEFAULT NULL,
+  `ranking` int DEFAULT NULL,
   `score` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_id`),
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
@@ -918,7 +918,7 @@ CREATE TABLE `Tags` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
-  `rank` int NOT NULL,
+  `ranking` int NOT NULL,
   `problems_solved_count` int NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
   `username` varchar(50) NOT NULL,
@@ -928,7 +928,7 @@ CREATE TABLE `User_Rank` (
   `school_id` int DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  KEY `rank` (`rank`),
+  KEY `rank` (`ranking`),
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),

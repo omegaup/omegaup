@@ -124,8 +124,8 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
-        $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $identity);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -156,8 +156,8 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
-        $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $identity);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -204,9 +204,9 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a group
-        $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $identity);
-        GroupsFactory::addUserToGroup($groupData, $identity2);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($groupData, $identity);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($groupData, $identity2);
 
         // Prepare request
         $login = self::login($contestData['director']);
