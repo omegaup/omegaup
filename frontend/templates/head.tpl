@@ -45,16 +45,8 @@
 		<link rel="stylesheet" href="/third_party/bootstrap-3.4.1/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/bootstrap-3.4.1/js/bootstrap.min.js"}" defer></script>
-		<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
-		<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
-		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}" defer></script>
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
 		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.min.js"}" defer></script>
-		<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
-		<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
-		<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}" defer></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.es.js"}" defer></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.pt-BR.js"}" defer></script>
 
 {if isset($inArena) && $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
