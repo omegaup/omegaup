@@ -155,6 +155,16 @@ export namespace omegaup {
     verdict: string;
   }
 
+  export interface Clarification {
+    clarification_id: number;
+    problem_alias: string;
+    author: string;
+    message: string;
+    answer?: string;
+    public: number;
+    receiver?: string;
+  }
+
   export interface CoderOfTheMonth extends Profile {
     date?: string;
     ProblemsSolved?: number;
@@ -373,19 +383,6 @@ export namespace omegaup {
     time: number;
     wall_time: number;
     memory: number;
-  }
-
-  export interface NavbarPayload {
-    omegaUpLockDown: boolean;
-    inContest: boolean;
-    isLoggedIn: boolean;
-    isReviewer: boolean;
-    gravatarURL51: string;
-    currentUsername: string;
-    isAdmin: boolean;
-    isMainUserIdentity: boolean;
-    lockDownImage: string;
-    navbarSection: string;
   }
 
   export interface NominationVote {

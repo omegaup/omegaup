@@ -1086,6 +1086,7 @@ const translations: { [key: string]: string; } = {
   wordsClarifications: "Clarificaciones",
   wordsCloneContest: "Clonar concurso",
   wordsCloneCourse: "Clonar curso",
+  wordsClose: "Cerrar",
   wordsCompilerOutput: "Salida del compilador",
   wordsConfirm: "Confirmar",
   wordsConsole: "Consola",

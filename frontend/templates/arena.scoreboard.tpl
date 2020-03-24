@@ -1,4 +1,5 @@
 {include file='head.tpl' inArena=true inline}
+<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 {if $titleClassName == 'course-title'}
         {js_include entrypoint="course_scoreboard"}
 {/if}
