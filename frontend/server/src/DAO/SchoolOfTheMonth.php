@@ -24,6 +24,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $finishDate,
         int $limit
     ): array {
+        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
+        return [];
         $sql = '
             SELECT
                 s.school_id,
@@ -98,7 +100,6 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        print_r('Desde ' . $startTime . ', hasta: ' . $endTime . '\n');
         return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
 
