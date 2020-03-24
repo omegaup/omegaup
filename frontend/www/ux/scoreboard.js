@@ -1,4 +1,7 @@
 omegaup.OmegaUp.on('ready', function() {
+  const payload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
   var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
     window.location.pathname,
   );
@@ -7,6 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
     disableClarifications: true,
     contestAlias: params[1],
     scoreboardToken: params[2],
+    payload: payload,
   };
   var arenaInstance = new arena.Arena(options);
   var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
