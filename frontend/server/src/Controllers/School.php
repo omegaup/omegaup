@@ -325,7 +325,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{name: string, ranking: int, school_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, ranking: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, ranking: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -479,7 +479,7 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
             $dateToSelect
         );
 
@@ -489,17 +489,21 @@ class School extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            foreach ($schools as $index => $school) {
-                $newSchoolOfTheMonth = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
-                    'school_id' => $school['school_id'],
-                    'time' => $dateToSelect,
-                    'ranking' => $index + 1,
-                ]);
-
+            foreach ($schools as $school) {
                 if ($school['school_id'] === $selectedSchool->school_id) {
-                    $newSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                    $selectedSchoolOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByPK(
+                        $selectedSchool->school_id
+                    );
+                    if (is_null($selectedSchoolOfTheMonth)) {
+                        throw new \OmegaUp\Exceptions\NotFoundException(
+                            'schoolNotFound'
+                        );
+                    }
+                    $selectedSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                    \OmegaUp\DAO\SchoolOfTheMonth::update(
+                        $selectedSchoolOfTheMonth
+                    );
                 }
-                \OmegaUp\DAO\SchoolOfTheMonth::create($newSchoolOfTheMonth);
             }
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {

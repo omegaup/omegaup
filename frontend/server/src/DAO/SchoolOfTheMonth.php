@@ -24,8 +24,6 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         string $finishDate,
         int $limit
     ): array {
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return [];
         $sql = '
             SELECT
                 s.school_id,
@@ -100,24 +98,29 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
+        print_r('Desde ' . $startTime . ', hasta: ' . $endTime . '\n');
         return self::calculateSchoolsOfMonth($startTime, $endTime, $rowcount);
     }
 
     /**
      * Returns the list of candidates to school of the month
      *
-     * @return list<array{name: string, ranking: int, school_id: int, score: float}>
+     * @return list<array{country_id: string, name: string, ranking: int, school_id: int, score: float}>
      */
-    public static function getCandidatesToSchoolOfTheMonth(): array {
-        $date = new \DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
-        $firstDayOfNextMonth = $date->modify(
-            'first day of next month'
-        )->format(
-            'Y-m-d'
-        );
-
+    public static function getCandidatesToSchoolOfTheMonth(
+        string $firstDayOfMonth = null
+    ): array {
+        if (is_null($firstDayOfMonth)) {
+            $currentDate = date('Y-m-d', \OmegaUp\Time::get());
+            $date = new \DateTimeImmutable($currentDate);
+            $firstDayOfMonth = $date->modify(
+                'first day of next month'
+            )->format(
+                'Y-m-d'
+            );
+        }
         $alreadySelectedSchools = self::getByTimeAndSelected(
-            $firstDayOfNextMonth
+            $firstDayOfMonth
         );
         if (!empty($alreadySelectedSchools)) {
             return [];
@@ -127,6 +130,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             SELECT
                 s.school_id,
                 s.name,
+                IFNULL(s.country_id, "xx") AS country_id,
                 sotm.score,
                 sotm.`ranking`
             FROM
@@ -139,10 +143,10 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             ORDER BY
                 s.`ranking` IS NULL, s.`ranking` ASC;';
 
-        /** @var list<array{name: string, ranking: int, school_id: int, score: float}> */
+        /** @var list<array{country_id: string, name: string, ranking: int, school_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
-            [ $firstDayOfNextMonth ]
+            [ $firstDayOfMonth ]
         );
     }
 
