@@ -3778,7 +3778,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[]}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3788,6 +3788,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
         }
 
         // Defaults for offset and rowcount
@@ -3855,9 +3856,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'MODE' => $mode,
                 'ORDER_BY' => $orderBy,
                 'LANGUAGE' => $language,
-                'problems' => $response['results'],
-                'current_tags' => $tags,
-                'pager_items' => $pagerItems,
+                'payload' => [
+                    'problems' => $response['results'],
+                    'loggedIn' => !is_null($r->identity),
+                    'currentTags' => $tags,
+                    'pagerItems' => $pagerItems,
+                ],
             ],
             'template' => 'problems.tpl',
         ];
