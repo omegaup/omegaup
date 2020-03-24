@@ -26,12 +26,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testCreateCourseWithRegistrationMode() {
+    private static function createCourseWithRegistrationMode() {
         $adminLogin = self::login(self::$curator);
-        $school = SchoolsFactory::createSchool()['school'];
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
-        $response = \OmegaUp\Controllers\Course::apiCreate(
+        \OmegaUp\Controllers\Course::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -57,6 +57,97 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get updated course
         $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+
+        return [
+            'course' => $course,
+            'adminLogin' => $adminLogin,
+        ];
+    }
+
+    public function testCreateCourseWithRegistrationMode() {
+        $course = self::createCourseWithRegistrationMode()['course'];
         $this->assertEquals($course->admission_mode, 'registration');
+    }
+
+    public function testCourseIsPresentInStudentList() {
+        $course = self::createCourseWithRegistrationMode()['course'];
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        $studentLogin = self::login($student);
+
+        // Course should appear in public course list for students
+        $coursesList = \OmegaUp\Controllers\Course::apiListCourses(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+            ])
+        );
+
+        $this->assertArrayContainsWithPredicate(
+            $coursesList['student'],
+            function ($studentCourse) use ($course): bool {
+                return $studentCourse['alias'] === $course->alias;
+            }
+        );
+    }
+
+    public function testRequestIsShownInIntroDetails() {
+        [
+            'course' => $course,
+            'adminLogin' => $adminLogin,
+        ] = self::createCourseWithRegistrationMode();
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        $studentLogin = self::login($student);
+
+        $response = \OmegaUp\Controllers\Course::apiIntroDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+
+        // In courses with registration we should be able to see all the user
+        // registration keys, except userRegistrationAccepted, because user
+        // has not been accepted yet
+        $this->assertArrayHasKey('userRegistrationRequested', $response);
+        $this->assertArrayHasKey('userRegistrationAnswered', $response);
+        $this->assertArrayNotHasKey('userRegistrationAccepted', $response);
+
+        // In a public or private course, user registration keys do not exist
+        $response = \OmegaUp\Controllers\Course::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120)
+            ])
+        );
+
+        $this->assertArrayNotHasKey('userRegistrationRequested', $response);
+        $this->assertArrayNotHasKey('userRegistrationAnswered', $response);
+        $this->assertArrayNotHasKey('userRegistrationAccepted', $response);
+    }
+
+    /**
+     * Uers only can register into a course with registration mode
+     */
+    public function testRegisterForCourse() {
+        $course = self::createCourseWithRegistrationMode()['course'];
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        $studentLogin = self::login($student);
+
+        $response = \OmegaUp\Controllers\Course::apiRegisterForCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+
+        $registration = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+            $student->identity_id,
+            $course->course_id
+        );
+
+        $this->assertNotEmpty($registration);
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
-class GroupsFactory {
+namespace OmegaUp\Test\Factories;
+
+class Groups {
     /**
      * Create group
      *

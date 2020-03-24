@@ -34,7 +34,7 @@ abstract class SchoolOfTheMonth {
             SET
                 `school_id` = ?,
                 `time` = ?,
-                `rank` = ?,
+                `ranking` = ?,
                 `selected_by` = ?,
                 `score` = ?
             WHERE
@@ -49,9 +49,9 @@ abstract class SchoolOfTheMonth {
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->rank) ?
+                is_null($School_Of_The_Month->ranking) ?
                 null :
-                intval($School_Of_The_Month->rank)
+                intval($School_Of_The_Month->ranking)
             ),
             (
                 is_null($School_Of_The_Month->selected_by) ?
@@ -83,7 +83,7 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month`.`school_of_the_month_id`,
                 `School_Of_The_Month`.`school_id`,
                 `School_Of_The_Month`.`time`,
-                `School_Of_The_Month`.`rank`,
+                `School_Of_The_Month`.`ranking`,
                 `School_Of_The_Month`.`selected_by`,
                 `School_Of_The_Month`.`score`
             FROM
@@ -170,7 +170,7 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month`.`school_of_the_month_id`,
                 `School_Of_The_Month`.`school_id`,
                 `School_Of_The_Month`.`time`,
-                `School_Of_The_Month`.`rank`,
+                `School_Of_The_Month`.`ranking`,
                 `School_Of_The_Month`.`selected_by`,
                 `School_Of_The_Month`.`score`
             FROM
@@ -225,7 +225,7 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month` (
                     `school_id`,
                     `time`,
-                    `rank`,
+                    `ranking`,
                     `selected_by`,
                     `score`
                 ) VALUES (
@@ -243,9 +243,9 @@ abstract class SchoolOfTheMonth {
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->rank) ?
+                is_null($School_Of_The_Month->ranking) ?
                 null :
-                intval($School_Of_The_Month->rank)
+                intval($School_Of_The_Month->ranking)
             ),
             (
                 is_null($School_Of_The_Month->selected_by) ?

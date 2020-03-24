@@ -12,9 +12,12 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
+    /**
+     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}>
+     */
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
-    ): ?array {
+    ) {
         $sql = '
             SELECT
                 r.*,
@@ -41,7 +44,10 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
         );
     }
 
-    public static function getRequestsForProblemset(int $problemsetId): array {
+    /**
+     * @return list<array{accepted: bool|null, country: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}>
+     */
+    public static function getRequestsForProblemset(int $problemsetId) {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
@@ -73,7 +79,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 [$problemsetId]
             ) as $row
         ) {
-            $row['accepted'] = $row['accepted'] == '1';
+            $row['accepted'] = boolval($row['accepted']);
             $result[] = $row;
         }
         return $result;

@@ -171,7 +171,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserRankFiltered() {
         // Create a school
-        $school = SchoolsFactory::createSchool();
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
         // Create a user with no country, state and school
         [
             'identity' => $identityWithNoCountry,
