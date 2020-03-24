@@ -74,7 +74,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>, count: int}
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
      */
     final public static function byIdentityType(
         string $identityType,

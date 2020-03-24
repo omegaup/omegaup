@@ -279,6 +279,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "Para unirte al curso debes completar tu informaci\u00f3n b\u00e1sica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>",
   courseDetails: "Detalles del curso",
   courseDetailsScoreboard: "Scoreboard",
+  courseDoesNotAdmitRegistration: "El curso no admite registro de usuarios",
   courseDoesNotHaveUnlimitedDuration: "No se puede establecer duraci\u00f3n ilimitada a una tarea de un curso que no es de duraci\u00f3n ilimitada.",
   courseEdit: "Editar curso",
   courseEditAddAdminsTooltip: "Agrega administradores utilizando su nombre de usuario de omegaUp",
