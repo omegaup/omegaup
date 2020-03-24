@@ -1374,22 +1374,18 @@ export class Arena {
     }
 
     if (self.commonNavbar !== null) {
-      // Removing to the notifications list all unsolved clarifications
       self.commonNavbar.initialClarifications = data.clarifications
         .filter(clarification =>
+          // Removing all unsolved clarifications.
           self.problemsetAdmin
             ? clarification.answer === null
-            : clarification.answer !== null,
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
         )
         .reverse();
-
-      // Removing all unanswered clarifications from the notifications list.
-      self.commonNavbar.initialClarifications = self.commonNavbar.initialClarifications.filter(
-        clarification =>
-          localStorage.getItem(
-            `clarification-${clarification.clarification_id}`,
-          ) === null,
-      );
     }
     if (
       self.answeredClarifications > previouslyAnswered &&
