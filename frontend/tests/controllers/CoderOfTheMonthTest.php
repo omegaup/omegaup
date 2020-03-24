@@ -488,7 +488,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'category' => $category,
         ]));
-        print_r($response);
         $coders = [];
         foreach ($response['coders'] as $index => $coder) {
             $coders[$index] = $coder['username'];
