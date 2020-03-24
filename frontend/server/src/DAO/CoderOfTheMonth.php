@@ -93,6 +93,52 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     }
 
     /**
+     * Get all first coders of the month
+     * @return list<array{time: string, username: string, country_id: string, email: string|null}>
+     */
+    final public static function getCodersOfTheMonthOficial(string $category = 'all'): array {
+        $date = date('Y-m-01', \OmegaUp\Time::get());
+        $sql = "
+          SELECT
+              cm.time,
+              i.username,
+              IFNULL(i.country_id, 'xx') AS country_id,
+              e.email
+          FROM
+              Coder_Of_The_Month cm
+          INNER JOIN
+              Users u ON u.user_id = cm.user_id
+          INNER JOIN
+              Identities i ON i.identity_id = u.main_identity_id
+          LEFT JOIN
+              Emails e ON e.user_id = u.user_id
+          WHERE
+              (cm.selected_by IS NOT NULL
+              OR (
+                  cm.`ranking` = 1 AND
+                  NOT EXISTS (
+                      SELECT
+                          *
+                      FROM
+                          Coder_Of_The_Month
+                      WHERE
+                          time = cm.time AND selected_by IS NOT NULL
+                  )
+              ))
+              AND cm.category = ?
+              AND cm.time <= ?
+          ORDER BY
+              cm.time DESC;
+      ";
+
+      /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$category,$date]
+        );
+    }
+
+    /**
      * Gets all coders of the month from a certain school
      *
      * @return list<array{time: string, username: string, classname: string}>
@@ -101,6 +147,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         int $schoolId,
         string $category = 'all'
     ): array {
+        $date = date('Y-m-01', \OmegaUp\Time::get());
         $sql = "
             SELECT
               cm.time,
@@ -135,7 +182,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             WHERE
               (cm.`ranking` = 1 OR cm.selected_by IS NOT NULL) AND
               cm.school_id = ? AND
-              cm.category = ?
+              cm.category = ? AND
+              cm.time <= ?
             ORDER BY
               cm.time DESC;
         ";
@@ -143,7 +191,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         /** @var list<array{classname: string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$schoolId, $category]
+            [$schoolId, $category, $date]
         );
     }
 

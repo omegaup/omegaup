@@ -3335,7 +3335,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth($category)
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthOficial(
+                    $category
+                )
             ),
             'codersOfPreviousMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(

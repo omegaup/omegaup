@@ -308,7 +308,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity2, $runCreationDate, 1 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
-        $this->getCoderOfTheMonth($today, '-3 month', $category);
+        $this->getCoderOfTheMonth($today, '-2 month', $category);
 
         // Identity 3 will be the coder of the month of two months ago
         $runCreationDate = date_create($runCreationDate);
@@ -319,9 +319,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
-        $this->createRuns($identity3, $today, 1 /*numRuns*/);
+        $this->createRuns($identity3, $runCreationDate, 1 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
-        $this->getCoderOfTheMonth($today, '-2 month', $category);
+        $this->getCoderOfTheMonth($today, '-1 month', $category);
 
         // First run api with invalid school_id
         try {
@@ -338,7 +338,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'school_id' => $school->school_id,
             'category' => $category,
         ]));
-
         // Get all usernames and verify that only identity1 username
         // and identity2 username are part of results
         $resultCoders = [];
@@ -489,7 +488,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'category' => $category,
         ]));
-
+        print_r($response);
         $coders = [];
         foreach ($response['coders'] as $index => $coder) {
             $coders[$index] = $coder['username'];
@@ -504,7 +503,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     'category' => $category,
                 ])
             );
-
             if ($index == 0) {
                 // Mentor can see the current coder of the month email
                 $this->assertArrayHasKey('email', $profile);
