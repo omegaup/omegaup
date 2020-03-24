@@ -134,8 +134,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 
 @Component
 export default class Clarifications extends Vue {
