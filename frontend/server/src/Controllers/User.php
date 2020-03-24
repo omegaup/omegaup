@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @author joemmanuel
+ * @psalm-type UserListItem=array{label: string, value: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1865,7 +1865,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
-     * @return list<array{label: string, value: string}>
+     * @return list<UserListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $param = '';
