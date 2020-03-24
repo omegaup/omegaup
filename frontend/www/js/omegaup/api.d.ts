@@ -1393,10 +1393,12 @@ namespace api {
   };
   type ProblemAdminListRequest = any;
   type ProblemAdminListResponse = {
+    pagerItems: { class: string; label: string; url: string }[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   type ProblemMyListRequest = any;
   type ProblemMyListResponse = {
+    pagerItems: { class: string; label: string; url: string }[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   type ProblemBestScoreRequest = any;
