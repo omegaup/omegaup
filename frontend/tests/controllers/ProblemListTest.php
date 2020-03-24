@@ -1106,8 +1106,8 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         for ($i = 1; $i <= $pages; $i++) {
             $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
                 $request
-            )['smartyProperties'];
-            $nextPage = end($response['pager_items']);
+            )['smartyProperties']['payload'];
+            $nextPage = end($response['pagerItems']);
             $nextPageURL = $nextPage['url'];
             $nextPageURLQuery = parse_url($nextPageURL);
             // Getting all the parameters gotten by the url, even if some of them is empty
