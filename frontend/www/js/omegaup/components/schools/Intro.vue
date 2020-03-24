@@ -4,7 +4,7 @@
       <h1>{{ T.schoolsLearnProgBySolvProblems }}</h1>
       <p>
         <a class="btn btn-primary" href="/course/" role="button">{{
-          T.schoolsStartUsingSchools
+          T.schoolsStartUsingCourses
         }}</a>
       </p>
     </div>
