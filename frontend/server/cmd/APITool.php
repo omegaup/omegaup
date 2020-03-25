@@ -282,7 +282,7 @@ class APIGenerator {
             echo "  // Type aliases\n";
             ksort($this->typeAliases);
             foreach ($this->typeAliases as $typeName => $typeExpansion) {
-                echo "  type {$typeName} = {$typeExpansion};\n";
+                echo "  interface {$typeName} {$typeExpansion};\n";
             }
             echo "\n";
         }

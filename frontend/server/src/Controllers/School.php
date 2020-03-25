@@ -97,7 +97,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Api to create new school
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, school_id: int}
+     * @return array{school_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -121,8 +121,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
-            'school_id' => self::createSchool($r['name'], $state)
+            'school_id' => self::createSchool($r['name'], $state),
         ];
     }
 
@@ -186,7 +185,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the number of solved problems on the last X
      * months (including the current one)
      * @param \OmegaUp\Request $r
-     * @return array{distinct_problems_solved: list<array{year: int, month: int, count: int}>, status: string}
+     * @return array{distinct_problems_solved: list<array{year: int, month: int, count: int}>}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -202,7 +201,6 @@ class School extends \OmegaUp\Controllers\Controller {
                 intval($r['school_id']),
                 intval($r['months_count'])
             ),
-            'status' => 'ok'
         ];
     }
 
@@ -211,7 +209,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * with the number of created problems, solved problems and organized contests.
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
+     * @return array{users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -222,7 +220,6 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
             'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
                 intval($school->school_id)
             ),
