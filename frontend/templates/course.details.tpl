@@ -67,8 +67,8 @@
                                                      assignment: homework,
                                                      assignmentType: 'homework' } } "></span>
                 <span data-bind="template: { name: 'assignments-list',
-                                             data: { header: '{#wordsTest#}',
-                                                     newLabel: '{#wordsNewTest#}',
+                                             data: { header: '{#wordsExams#}',
+                                                     newLabel: '{#wordsNewExam#}',
                                                      course: $data,
                                                      assignment: test,
                                                      assignmentType: 'test' } } "></span>
