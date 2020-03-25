@@ -6,8 +6,8 @@ $('#forgot-password-form').on('submit', function(ev) {
     .then(function(data) {
       omegaup.UI.success(data.message);
     })
-    .fail(omegaup.UI.apiError)
-    .always(function() {
+    .catch(omegaup.UI.apiError)
+    .finally(function() {
       $('#submit').prop('disabled', false);
     });
   return false;
@@ -26,8 +26,8 @@ $('#reset-password-form').on('submit', function(ev) {
     .then(function(data) {
       omegaup.UI.success(data.message);
     })
-    .fail(omegaup.UI.apiError)
-    .always(function() {
+    .catch(omegaup.UI.apiError)
+    .finally(function() {
       $('#submit').prop('disabled', false);
     });
 });

@@ -22,7 +22,7 @@ OmegaUp.on('ready', function() {
                 reason: ev.selectedReason,
                 original: ev.original,
               }),
-            }).fail(UI.apiError);
+            }).catch(UI.apiError);
           },
         },
       });

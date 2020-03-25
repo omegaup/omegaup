@@ -169,25 +169,25 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       viewProfile.contests = data;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.problemsSolved({ username: profile.username })
     .then(function(data) {
       viewProfile.solvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.listUnsolvedProblems({ username: profile.username })
     .then(function(data) {
       viewProfile.unsolvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.problemsCreated({ username: profile.username })
     .then(function(data) {
       viewProfile.createdProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myList({})
@@ -196,7 +196,7 @@ OmegaUp.on('ready', function() {
           data['badges'].map(badge => badge.badge_alias),
         );
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   API.Badge.userList({ target_username: profile.username })
@@ -205,11 +205,11 @@ OmegaUp.on('ready', function() {
         data['badges'].map(badge => badge.badge_alias),
       );
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.stats({ username: profile.username })
     .then(function(data) {
       viewProfile.charts = data;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

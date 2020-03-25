@@ -36,7 +36,7 @@ OmegaUp.on('ready', function() {
         token: arena.options.scoreboardToken,
       })
         .then(arena.rankingChange.bind(arena))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
       if (new Date() < course.finish_time && !arena.socket) {
         setInterval(function() {
           API.Problemset.scoreboard({
@@ -44,7 +44,7 @@ OmegaUp.on('ready', function() {
             token: arena.options.scoreboardToken,
           })
             .then(arena.rankingChange.bind(arena))
-            .fail(UI.ignoreError);
+            .catch(UI.ignoreError);
         }, getRankingByTokenRefresh);
       }
 
@@ -52,5 +52,5 @@ OmegaUp.on('ready', function() {
       $('#root').fadeIn('slow');
       $('#loading').fadeOut('slow');
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

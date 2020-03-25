@@ -750,7 +750,7 @@ export namespace omegaup {
             this._notify('ready');
           }
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     }
 
     _notify(eventName: string): void {

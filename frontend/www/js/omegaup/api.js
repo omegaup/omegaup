@@ -2,65 +2,71 @@ import UI from './ui.js';
 import * as types from './types.ts';
 import { OmegaUp } from './omegaup.js';
 
-function _call(url, transform, defaultParams) {
-  return function(params) {
-    var dfd = $.Deferred();
-    if (defaultParams) {
-      params = $.extend({}, defaultParams, params);
-    }
-    $.ajax({
-      url: url,
-      method: params ? 'POST' : 'GET',
-      data: params,
-      dataType: 'json',
-    })
-      .done(function(data) {
-        if (transform) {
-          data = transform(data);
-        }
-        dfd.resolve(data);
-      })
-      .fail(function(jqXHR) {
-        if (jqXHR.status == 499 || jqXHR.readyState != 4) {
-          // If we cancel the connection, let's just swallow the error since
-          // the user is not going to see it.
-          return;
-        }
-        var errorData;
-        try {
-          if (jqXHR.responseText) {
-            errorData = JSON.parse(jqXHR.responseText);
-          } else {
-            errorData = { status: 'error', error: null };
+function _call(url, transform) {
+  return params =>
+    new Promise((accept, reject) => {
+      let responseOk = true;
+      fetch(
+        url,
+        params
+          ? {
+              method: 'POST',
+              body: Object.keys(params)
+                .filter(key => typeof params[key] !== 'undefined')
+                .map(
+                  key =>
+                    `${encodeURIComponent(key)}=${encodeURIComponent(
+                      params[key],
+                    )}`,
+                )
+                .join('&'),
+              headers: {
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=UTF-8',
+              },
+            }
+          : undefined,
+      )
+        .then(response => {
+          if (response.status == 499) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
+            return;
           }
-        } catch (err) {
-          errorData = { status: 'error', error: err };
-        }
-        omegaup.OmegaUp.addError(errorData);
-        dfd.reject(errorData);
-      });
-    return dfd.promise();
-  };
+          responseOk = response.ok;
+          return response.json();
+        })
+        .then(data => {
+          if (!responseOk) {
+            OmegaUp.addError(data);
+            reject(data);
+            return;
+          }
+          if (transform) {
+            accept(transform(data));
+          } else {
+            accept(data);
+          }
+        })
+        .catch(err => {
+          const errorData = { status: 'error', error: err };
+          OmegaUp.addError(errorData);
+          reject(errorData);
+        });
+    });
 }
 
 function _convertRuntimes(data) {
   if (data.runs) {
     for (var i = 0; i < data.runs.length; i++) {
-      data.runs[i].time = omegaup.OmegaUp.remoteTime(data.runs[i].time * 1000);
+      data.runs[i].time = OmegaUp.remoteTime(data.runs[i].time * 1000);
     }
   }
   return data;
 }
 
-// This alias is needed because, without it, webpack cries when
-// trying to export, e.g. Course.adminDetails, with the original
-// name OmegaUp.convertTimes.
-function _convertTimes(item) {
-  return omegaup.OmegaUp.convertTimes(item);
-}
-
 function _normalizeContestFields(contest) {
-  omegaup.OmegaUp.convertTimes(contest);
+  OmegaUp.convertTimes(contest);
   contest.submissions_gap = parseInt(contest.submissions_gap);
   contest.show_penalty = contest.penalty != 0 || contest.penalty_type != 'none';
   return contest;
@@ -111,7 +117,7 @@ export default {
   Contest: {
     activityReport: _call('/api/contest/activityReport/', function(result) {
       for (let ev of result.events) {
-        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+        ev.time = OmegaUp.remoteTime(ev.time * 1000);
       }
       return result;
     }),
@@ -131,7 +137,7 @@ export default {
       // able to get the unmodified times.
       contest.start_time = new Date(contest.start_time * 1000);
       contest.finish_time = new Date(contest.finish_time * 1000);
-      contest.submission_deadline = omegaup.OmegaUp.remoteTime(
+      contest.submission_deadline = OmegaUp.remoteTime(
         contest.submission_deadline * 1000,
       );
       contest.show_penalty =
@@ -142,7 +148,7 @@ export default {
     adminList: _call('/api/contest/adminlist/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -154,9 +160,7 @@ export default {
     clarifications: _call('/api/contest/clarifications/', function(data) {
       for (var idx in data.clarifications) {
         var clarification = data.clarifications[idx];
-        clarification.time = omegaup.OmegaUp.remoteTime(
-          clarification.time * 1000,
-        );
+        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
       }
       return data;
     }),
@@ -174,7 +178,7 @@ export default {
     list: _call('/api/contest/list/', function(result) {
       for (var idx in result.results) {
         var contest = result.results[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -182,7 +186,7 @@ export default {
     myList: _call('/api/contest/mylist/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -227,12 +231,10 @@ export default {
     users: _call('/api/contest/users/', function(result) {
       for (const user of result.users) {
         if (user.access_time !== null) {
-          user.access_time = omegaup.OmegaUp.remoteTime(
-            user.access_time * 1000,
-          );
+          user.access_time = OmegaUp.remoteTime(user.access_time * 1000);
         }
         if (user.end_time !== null) {
-          user.end_time = omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+          user.end_time = OmegaUp.remoteTime(user.end_time * 1000);
         }
       }
       return result;
@@ -242,7 +244,7 @@ export default {
   Course: {
     activityReport: _call('/api/course/activityReport/', function(result) {
       for (let ev of result.events) {
-        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+        ev.time = OmegaUp.remoteTime(ev.time * 1000);
       }
       return result;
     }),
@@ -314,7 +316,7 @@ export default {
     apiGetProblemUsers: _call('/api/course/getProblemUsers'),
 
     listAssignments: _call('/api/course/listAssignments/', function(result) {
-      // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
+      // We cannot use OmegaUp.remoteTime() because admins need to
       // be able to get the unmodified times.
       result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
@@ -368,7 +370,7 @@ export default {
     studentProgress: _call('/api/course/studentProgress/', function(result) {
       for (var problem of result.problems) {
         for (var run of problem.runs) {
-          run.time = omegaup.OmegaUp.remoteTime(run.time * 1000);
+          run.time = OmegaUp.remoteTime(run.time * 1000);
         }
       }
       return result;
@@ -500,9 +502,7 @@ export default {
     clarifications: _call('/api/problem/clarifications/', function(data) {
       for (var idx in data.clarifications) {
         var clarification = data.clarifications[idx];
-        clarification.time = omegaup.OmegaUp.remoteTime(
-          clarification.time * 1000,
-        );
+        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
       }
       return data;
     }),

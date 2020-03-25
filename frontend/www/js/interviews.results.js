@@ -27,7 +27,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.page-header h1 small').html(omegaup.T.interviewNotStarted);
       }
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   omegaup.API.Run.list({
     username: candidateUsername,
@@ -36,5 +36,5 @@ omegaup.OmegaUp.on('ready', function() {
     .then(function(runs) {
       console.log(runs);
     })
-    .fail(omegaup.UI.ignoreError);
+    .catch(omegaup.UI.ignoreError);
 });

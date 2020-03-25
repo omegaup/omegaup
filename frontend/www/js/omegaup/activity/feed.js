@@ -15,13 +15,13 @@ OmegaUp.on('ready', function() {
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   } else if (problemsetType == 'course') {
     API.Course.activityReport({ course_alias: problemsetAlias })
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 
   function createComponent(problemsetType, problemsetAlias, report) {

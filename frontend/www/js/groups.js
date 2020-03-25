@@ -16,7 +16,7 @@ $(function() {
             '/group/' + $('.new-group-form #alias').val() + '/edit/#members',
           );
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
 
       return false;
     });
@@ -49,7 +49,7 @@ $(function() {
           $('div.post.footer').show();
           refreshGroupScoreboards();
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
 
       return false; // Prevent refresh
     });
@@ -92,7 +92,7 @@ $(function() {
             );
           }
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     }
 
     refreshGroupScoreboards();

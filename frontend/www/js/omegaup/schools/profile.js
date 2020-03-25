@@ -39,7 +39,7 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       schoolProfile.codersOfTheMonth = data.coders;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.School.users({
     school_id: payload.school_id,
@@ -47,7 +47,7 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       schoolProfile.users = data.users;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,
@@ -56,5 +56,5 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

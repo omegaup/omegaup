@@ -23,7 +23,7 @@ OmegaUp.on('ready', function() {
                 problem_alias: nominationPayload.problem_alias,
                 nomination: 'quality_tag',
                 contents: JSON.stringify(contents),
-              }).fail(UI.apiError);
+              }).catch(UI.apiError);
             },
           },
         });

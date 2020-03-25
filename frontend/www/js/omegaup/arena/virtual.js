@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
                     window.location =
                       '/contest/' + virtualContestAlias + '/edit/';
                   })
-                  .fail(UI.apiError);
+                  .catch(UI.apiError);
               },
             },
           });
@@ -40,5 +40,5 @@ OmegaUp.on('ready', function() {
         components: { 'omegaup-arena-virtual': arena_virtual },
       });
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

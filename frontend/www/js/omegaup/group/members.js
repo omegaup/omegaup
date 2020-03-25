@@ -30,7 +30,7 @@ OmegaUp.on('ready', function() {
                 UI.success(T.groupEditMemberAdded);
                 groupMembersInstance.reset();
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'edit-identity': function(groupMembersInstance, identity) {
             groupMembersInstance.showEditForm = true;
@@ -59,7 +59,7 @@ OmegaUp.on('ready', function() {
                 groupMembersInstance.showEditForm = false;
                 refreshMemberList();
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'change-password-identity': function(groupMembersInstance, username) {
             groupMembersInstance.showEditForm = false;
@@ -93,7 +93,7 @@ OmegaUp.on('ready', function() {
                 groupMembersInstance.showChangePasswordForm = false;
                 groupMembersInstance.reset();
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           remove: function(username) {
             API.Group.removeUser({
@@ -104,7 +104,7 @@ OmegaUp.on('ready', function() {
                 refreshMemberList();
                 UI.success(T.groupEditMemberRemoved);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           cancel: function(groupMembersInstance) {
             refreshMemberList();
@@ -141,7 +141,7 @@ OmegaUp.on('ready', function() {
           }
         }
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   refreshMemberList();
