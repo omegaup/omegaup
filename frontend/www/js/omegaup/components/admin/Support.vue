@@ -127,8 +127,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
 
 @Component({})

@@ -122,6 +122,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
+
         try {
             \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -131,7 +132,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'start_time' => (\OmegaUp\Time::get() + 60),
                 'finish_time' => (\OmegaUp\Time::get() + 120)
             ]));
-            $this->fail('Should have failed');
+            $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
@@ -139,7 +140,10 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCreateSchoolAssignment() {
         // Create a test course
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         $courseAlias = \OmegaUp\Test\Utils::createRandomString();
 
@@ -279,10 +283,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Try to create an assignment with inverted times.
      */
     public function testCreateAssignmentWithInvertedTimes() {
-        [
-            'user' => $admin,
-            'identity' => $identity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             $identity,
@@ -298,9 +299,9 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'start_time' => (\OmegaUp\Time::get() + 120),
                 'finish_time' => (\OmegaUp\Time::get() + 60),
                 'course_alias' => $courseData['course_alias'],
-                'assignment_type' => 'homework',
+                'assignment_type' => 'homework'
             ]));
-            $this->fail('Should have failed');
+            $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('courseInvalidStartTime', $e->getMessage());
         }
@@ -413,7 +414,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'finish_time' => (\OmegaUp\Time::get() + 120),
                 'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
             ]));
-            $this->fail('Should have failed');
+            $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -613,7 +614,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Updating admission_mode for Courses, testing all the diferent modes to
-     * join a course: Public, Private
+     * join a course: Public, Private and Registration
      */
     public function testUpdateCourseAdmissionMode() {
         $adminLogin = self::login(self::$curatorIdentity);
@@ -652,6 +653,80 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $course->admission_mode,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        // Should update to registration the admission mode
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $alias,
+            'name' => $course->name,
+            'description' => $course->description,
+            'alias' => $course->alias,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+        $this->assertEquals(
+            $course->admission_mode,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION
+        );
+    }
+
+    /**
+     * Course can't be updated to Public by non-curator user
+     */
+    public function testUpdatePublicCourseFailForNonCurator() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\Course::apiCreate(
+            new \OmegaUp\Request(
+                [
+                    'auth_token' => $login->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $alias,
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'start_time' => (\OmegaUp\Time::get() + 60),
+                    'finish_time' => (\OmegaUp\Time::get() + 120),
+                    'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+                ]
+            )
+        );
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+
+        // Should not update to public the admission mode
+        try {
+            \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course_alias' => $alias,
+                'name' => $course->name,
+                'description' => $course->description,
+                'alias' => $course->alias,
+                'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+            ]));
+            $this->fail(
+                'Should have thrown exception, because user is not curator'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        // But user should be update to 'with registration' mode because there
+        // is no restrictions.
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $alias,
+            'name' => $course->name,
+            'description' => $course->description,
+            'alias' => $course->alias,
+            'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+        $this->assertEquals(
+            $course->admission_mode,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION
         );
     }
 }

@@ -74,7 +74,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}[]
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -90,8 +90,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        ?array $difficultyRange,
-        int &$total
+        ?array $difficultyRange
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -293,13 +292,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         /** @var int */
-        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             "SELECT COUNT(*) $sql",
             $args
         );
 
         // Reset the offset to 0 if out of bounds.
-        if ($offset < 0 || $offset > $total) {
+        if ($offset < 0 || $offset > $count) {
             $offset = 0;
         }
 
@@ -311,8 +310,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }
         $sql .= ' LIMIT ?, ? ';
-        $args[] = intval($offset);
-        $args[] = intval($rowcount);
+        $args[] = $offset;
+        $args[] = $rowcount;
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -347,9 +346,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $problemObject,
                 true
             );
-            array_push($problems, $problem);
+            $problems[] = $problem;
         }
-        return $problems;
+        return [
+            'problems' => $problems,
+            'count' => $count,
+        ];
     }
 
     final public static function getByAlias(
@@ -829,19 +831,45 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
+     */
+    public static function getAllWithCount(
+        int $page,
+        int $pageSize
+    ) {
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT COUNT(*) FROM `Problems`'
+        );
+
+        $problems = \OmegaUp\DAO\Problems::getAll(
+            $page,
+            $pageSize,
+            'problem_id',
+            'DESC'
+        );
+
+        return [
+            'problems' => $problems,
+            'count' => $count,
+        ];
+    }
+
+    /**
      * Returns all problems that an identity can manage.
      *
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsAdminedByIdentity(
         int $identityId,
-        int $page = 1,
-        int $pageSize = 1000
+        int $page,
+        int $pageSize
     ): array {
         $offset = ($page - 1) * $pageSize;
-        $sql = '
+        $select = '
             SELECT
-                p.*
+                p.*';
+        $sql = '
             FROM
                 Problems AS p
             INNER JOIN
@@ -860,13 +888,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 (ai.identity_id = ? OR
                 (ur.role_id = ? AND uri.identity_id = ?) OR
                 (gr.role_id = ? AND gi.identity_id = ?)) AND
-                p.visibility > ?
+                p.visibility > ?';
+        $limits = '
             GROUP BY
                 p.problem_id
             ORDER BY
                 p.problem_id DESC
             LIMIT
                 ?, ?';
+
         $params = [
             $identityId,
             \OmegaUp\Authorization::ADMIN_ROLE,
@@ -874,60 +904,91 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
-            intval($offset),
-            intval($pageSize),
         ];
 
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "SELECT COUNT(*) {$sql}",
+            $params
+        );
+
+        $params[] = $offset;
+        $params[] = $pageSize;
+
         /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql} {$limits};",
+            $params
+        );
 
         $problems = [];
         foreach ($rs as $row) {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
-        return $problems;
+
+        return [
+            'problems' => $problems,
+            'count' => $count,
+        ];
     }
 
     /**
      * Returns all problems owned by a user.
      *
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return array{problems: list<\OmegaUp\DAO\VO\Problems>, count: int}
      */
     final public static function getAllProblemsOwnedByUser(
         int $userId,
-        int $page = 1,
-        int $pageSize = 1000
+        int $page,
+        int $pageSize
     ) {
         $offset = ($page - 1) * $pageSize;
-        $sql = '
+        $select = '
             SELECT
-                p.*
+                p.*';
+        $sql = '
             FROM
                 Problems AS p
             INNER JOIN
                 ACLs AS a ON a.acl_id = p.acl_id
             WHERE
                 a.owner_id = ? AND
-                p.visibility > ?
+                p.visibility > ?';
+        $limits = '
             ORDER BY
                 p.problem_id DESC
             LIMIT
                 ?, ?';
+
         $params = [
             $userId,
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
-            intval($offset),
-            intval($pageSize),
         ];
 
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "SELECT COUNT(*) {$sql}",
+            $params
+        );
+
+        $params[] = $offset;
+        $params[] = $pageSize;
+
         /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: string, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$select} {$sql} {$limits};",
+            $params
+        );
 
         $problems = [];
         foreach ($rs as $row) {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
-        return $problems;
+
+        return [
+            'problems' => $problems,
+            'count' => $count,
+        ];
     }
 
     /**

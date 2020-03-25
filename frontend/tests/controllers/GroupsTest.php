@@ -213,8 +213,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'group_alias' => $groupData['group']->alias,
         ]));
         $this->assertEquals(
-            $groupData['group']->group_id,
-            $response['group']['group_id']
+            $groupData['group']->alias,
+            $response['group']['alias']
         );
 
         $response = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
