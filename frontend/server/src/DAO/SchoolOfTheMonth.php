@@ -151,7 +151,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         /** @var list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
-            [ $firstDayOfNextMonth, $rowcount ]
+            [ $firstDayOfMonth, $rowcount ]
         );
     }
 

@@ -239,9 +239,6 @@ class School extends \OmegaUp\Controllers\Controller {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
-        return \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
-            $rowcount
-        );
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
@@ -465,6 +462,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
+            100,
             $dateToSelect
         );
 
