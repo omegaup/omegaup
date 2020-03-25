@@ -228,7 +228,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the top X schools of the month
-     * @return list<array{name: string, ranking: int, school_id: int, score: float}>
+     * @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>
      */
     public static function getTopSchoolsOfTheMonth(
         int $rowcount
@@ -239,7 +239,7 @@ class School extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
-            /** @return list<array{name: string, ranking: int, school_id: int, score: float}> */
+            /** @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
             function () use (
                 $rowcount
             ): array {
