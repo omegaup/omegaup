@@ -1897,15 +1897,6 @@ namespace api {
   type SchoolSchoolCodersOfTheMonthResponse = {
     coders: { time: string; username: string; classname: string }[];
   };
-  type SchoolSchoolsOfTheMonthRequest = any;
-  type SchoolSchoolsOfTheMonthResponse = {
-    rank: {
-      school_id: numeric;
-      name: string;
-      country_id: string;
-      score: numeric;
-    }[];
-  };
   type SchoolSelectSchoolOfTheMonthRequest = any;
   type SchoolSelectSchoolOfTheMonthResponse = { status: string };
   type SchoolUsersRequest = any;
@@ -1926,7 +1917,6 @@ namespace api {
     >;
     rank: () => Promise<SchoolRankResponse>;
     schoolCodersOfTheMonth: () => Promise<SchoolSchoolCodersOfTheMonthResponse>;
-    schoolsOfTheMonth: () => Promise<SchoolSchoolsOfTheMonthResponse>;
     selectSchoolOfTheMonth: () => Promise<SchoolSelectSchoolOfTheMonthResponse>;
     users: () => Promise<SchoolUsersResponse>;
   }
