@@ -1,7 +1,7 @@
 import { OmegaUp, T } from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
-import Notifications from './notifications.js';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
@@ -9,6 +9,7 @@ import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
+import common_Navbar from '../components/common/Navbar.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -38,6 +39,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    payload: {},
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -69,12 +71,13 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.disableSockets = true;
   }
   const elementPayload = document.getElementById('payload');
-  if (elementPayload != null) {
+  if (elementPayload !== null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload != null) {
+    if (payload !== null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
+      options.payload = payload;
     }
   }
   return options;
@@ -256,11 +259,83 @@ export class Arena {
     // The Markdown-to-HTML converter.
     self.markdownConverter = UI.markdownConverter();
 
-    // Currently opened notifications.
-    self.notifications = new Notifications();
-    OmegaUp.on('ready', function() {
-      self.notifications.attach($('#notifications'));
-    });
+    // Currently opened clarification notifications.
+    self.commonNavbar = null;
+    if (document.getElementById('common-navbar')) {
+      self.commonNavbar = new Vue({
+        el: '#common-navbar',
+        render: function(createElement) {
+          return createElement('omegaup-common-navbar', {
+            props: {
+              omegaUpLockDown: this.omegaUpLockDown,
+              inContest: this.inContest,
+              isLoggedIn: this.isLoggedIn,
+              isReviewer: this.isReviewer,
+              gravatarURL51: this.gravatarURL51,
+              currentUsername: this.currentUsername,
+              isAdmin: this.isAdmin,
+              isMainUserIdentity: this.isMainUserIdentity,
+              lockDownImage: this.lockDownImage,
+              navbarSection: this.navbarSection,
+              graderInfo: this.graderInfo,
+              graderQueueLength: this.graderQueueLength,
+              errorMessage: this.errorMessage,
+              initialClarifications: this.initialClarifications,
+            },
+          });
+        },
+        data: {
+          omegaUpLockDown: self.options.payload.omegaUpLockDown,
+          inContest: self.options.payload.inContest,
+          isLoggedIn: self.options.payload.isLoggedIn,
+          isReviewer: self.options.payload.isReviewer,
+          gravatarURL51: self.options.payload.gravatarURL51,
+          currentUsername: self.options.payload.currentUsername,
+          isAdmin: self.options.payload.isAdmin,
+          isMainUserIdentity: self.options.payload.isMainUserIdentity,
+          lockDownImage: self.options.payload.lockDownImage,
+          navbarSection: self.options.payload.navbarSection,
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+        },
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+      });
+
+      if (self.options.payload.isAdmin) {
+        API.Notification.myList({})
+          .then(data => {
+            self.commonNavbar.notifications = data.notifications;
+          })
+          .fail(UI.apiError);
+
+        function updateGraderStatus() {
+          API.Grader.status()
+            .then(stats => {
+              self.commonNavbar.graderInfo = stats.grader;
+              if (stats.status !== 'ok') {
+                self.commonNavbar.errorMessage = T.generalError;
+                return;
+              }
+              if (stats.grader.queue) {
+                self.commonNavbar.graderQueueLength =
+                  stats.grader.queue.run_queue_length +
+                  stats.grader.queue.running.length;
+              }
+              self.commonNavbar.errorMessage = null;
+            })
+            .fail(stats => {
+              self.commonNavbar.errorMessage = stats.error;
+            });
+        }
+
+        updateGraderStatus();
+        setInterval(updateGraderStatus, 30000);
+      }
+    }
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -1168,20 +1243,20 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
+    if (self.commonNavbar === null) {
+      return;
+    }
+    const clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
-
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
+      if (self.problemsetAdmin) {
+        self.commonNavbar.initialClarifications = clarifications.filter(
+          notification =>
+            notification.clarification_id !== clarification.clarification_id,
+        );
+      } else {
+        clarifications.push(clarification);
+      }
     } else {
       r = $('.clarifications tbody.clarification-list tr.template')
         .clone()
@@ -1189,6 +1264,9 @@ export class Arena {
         .addClass('inserted');
 
       if (self.problemsetAdmin) {
+        if (clarifications !== null) {
+          clarifications.push(clarification);
+        }
         (function(id, answerNode) {
           let responseFormNode = $(
             '#create-response-form',
@@ -1230,11 +1308,6 @@ export class Arena {
               .then(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
-                if (self.problemsetAdmin) {
-                  self.notifications.resolve({
-                    id: 'clarification-' + clarification.clarification_id,
-                  });
-                }
               })
               .fail(function() {
                 $('pre', answerNode).html(responseText);
@@ -1257,20 +1330,6 @@ export class Arena {
     $('.answer pre', r).html(UI.escape(clarification.answer));
     if (clarification.answer) {
       self.answeredClarifications++;
-    }
-
-    if (self.problemsetAdmin != !!clarification.answer) {
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
     }
 
     if (!self.clarifications[clarification.clarification_id]) {
@@ -1314,6 +1373,20 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
+    if (self.commonNavbar !== null) {
+      self.commonNavbar.initialClarifications = data.clarifications
+        .filter(clarification =>
+          // Removing all unsolved clarifications.
+          self.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
+        )
+        .reverse();
+    }
     if (
       self.answeredClarifications > previouslyAnswered &&
       self.activeTab != 'clarifications'

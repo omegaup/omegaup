@@ -110,7 +110,7 @@ let UI = {
       return;
     }
     UI.success(
-      omegaup.T.contestEditContestEdited +
+      T.contestEditContestEdited +
         ' <a href="/arena/' +
         contestAlias +
         '">' +
@@ -434,7 +434,7 @@ let UI = {
           highlight: true,
         },
         {
-          source: UI.typeaheadWrapper(omegaup.API.School.list),
+          source: UI.typeaheadWrapper(API.School.list),
           async: true,
           limit: 10,
           display: 'label',

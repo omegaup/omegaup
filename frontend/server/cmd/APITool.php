@@ -5,32 +5,36 @@ require_once(__DIR__ . '/../libs/third_party/log4php/src/main/php/Logger.php');
 require_once(__DIR__ . '/../autoload.php');
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-/**
- * @return list<string>
- */
-function listDir(string $path) {
-    $dh = opendir($path);
-    if (!is_resource($dh)) {
-        die("Failed to open {$path}");
+class Method {
+    /** @var string */
+    public $apiTypePrefix = '';
+
+    /** @var string */
+    public $returnType = '';
+}
+
+class Controller {
+    /**
+     * @var string
+     * @readonly
+     */
+    public $classBasename = '';
+
+    /** @var array<string, Method> */
+    public $methods = [];
+
+    public function __construct(string $classBasename) {
+        $this->classBasename = $classBasename;
     }
-    $paths = [];
-    while (($path = readdir($dh)) !== false) {
-        if ($path == '.' || $path == '..') {
-            continue;
-        }
-        $paths[] = $path;
-    }
-    closedir($dh);
-    asort($paths);
-    /** @var list<string> */
-    return $paths;
 }
 
 /**
+ * @param array<string, string> $typeAliases
  * @param list<string> $propertyPath
  */
 function convertTypeToTypeScript(
     \Psalm\Type\Union $unionType,
+    $typeAliases,
     string $methodName,
     $propertyPath
 ): string {
@@ -42,7 +46,7 @@ function convertTypeToTypeScript(
                 $propertyTypes = [];
                 foreach ($type->properties as $propertyName => $propertyType) {
                     if (is_numeric($propertyName)) {
-                        throw new Exception(
+                        throw new \Exception(
                             "Property {$path}.{$propertyName} is non-string: {$propertyType}"
                         );
                     }
@@ -62,6 +66,7 @@ function convertTypeToTypeScript(
                         "{$propertyName}: " .
                         convertTypeToTypeScript(
                             $propertyType,
+                            $typeAliases,
                             $methodName,
                             $childPropertyPath
                         ) .
@@ -73,6 +78,7 @@ function convertTypeToTypeScript(
                 $typeNames[] = (
                     convertTypeToTypeScript(
                         $type->type_param,
+                        $typeAliases,
                         $methodName,
                         $propertyPath
                     ) .
@@ -80,12 +86,12 @@ function convertTypeToTypeScript(
                 );
             } elseif ($type instanceof \Psalm\Type\Atomic\TArray) {
                 if (count($type->type_params) != 2) {
-                    throw new Exception(
+                    throw new \Exception(
                         "Array type {$path} does not have two type params: {$type}"
                     );
                 }
                 if (!$type->type_params[0]->isSingle()) {
-                    throw new Exception(
+                    throw new \Exception(
                         "Array type {$path} has complex key: {$type}"
                     );
                 }
@@ -94,6 +100,7 @@ function convertTypeToTypeScript(
                         '{ [key: string]: ' .
                         convertTypeToTypeScript(
                             $type->type_params[1],
+                            $typeAliases,
                             $methodName,
                             $propertyPath
                         ) .
@@ -106,6 +113,7 @@ function convertTypeToTypeScript(
                         '{ [key: int]: ' .
                         convertTypeToTypeScript(
                             $type->type_params[1],
+                            $typeAliases,
                             $methodName,
                             $propertyPath
                         ) .
@@ -113,11 +121,11 @@ function convertTypeToTypeScript(
                     );
                     continue;
                 }
-                throw new Exception(
+                throw new \Exception(
                     "Array type {$path} does not have a int|string key: {$type}"
                 );
             } else {
-                throw new Exception("Unsupported type {$path}: {$type}");
+                throw new \Exception("Unsupported type {$path}: {$type}");
             }
         } elseif ($typeName == 'int' || $typeName == 'float') {
             $typeNames[] = 'numeric';
@@ -136,9 +144,13 @@ function convertTypeToTypeScript(
                 // associative array instead of a flat array.
                 continue;
             }
+            if (isset($typeAliases[$type->value])) {
+                $typeNames[] = "api.{$type->value}";
+                continue;
+            }
             $voPrefix = 'OmegaUp\\DAO\\VO\\';
             if (strpos($type->value, $voPrefix) !== 0) {
-                throw new Exception(
+                throw new \Exception(
                     "Unsupported object type {$path}: {$type->value}"
                 );
             }
@@ -149,13 +161,16 @@ function convertTypeToTypeScript(
                 )
             );
         } else {
-            throw new Exception("Unsupported type {$path}: {$type}");
+            throw new \Exception("Unsupported type {$path}: {$type}");
         }
     }
     return join('|', $typeNames);
 }
 
-function getReturnType(\ReflectionMethod $method): string {
+/**
+ * @param array<string, string> $typeAliases
+ */
+function getReturnType(\ReflectionMethod $method, $typeAliases): string {
     $returnType = $method->getReturnType();
     if (
         !is_null($returnType) &&
@@ -178,6 +193,7 @@ function getReturnType(\ReflectionMethod $method): string {
         ) {
             return convertTypeToTypeScript(
                 \Psalm\Type::parseString(substr($returnTypeString, 0, $i + 1)),
+                $typeAliases,
                 $method->getDeclaringClass()->getName() . '::' . $method->getName(),
                 []
             );
@@ -186,66 +202,145 @@ function getReturnType(\ReflectionMethod $method): string {
     throw new Exception("Invalid @return annotation: {$returnTypeString}");
 }
 
-function processControllerFile(string $controllerClassBasename): void {
-    /** @var class-string */
-    $controllerClassName = sprintf(
-        '\\OmegaUp\\Controllers\\%s',
-        $controllerClassBasename
-    );
-    $controllerClass = new \ReflectionClass($controllerClassName);
+class APIGenerator {
+    /** @var array<string, Controller> */
+    private $controllers = [];
 
-    $methodMapping = [];
-    foreach (
-        $controllerClass->getMethods(
-            ReflectionMethod::IS_STATIC
-        ) as $method
-    ) {
-        if (strpos($method->name, 'api') !== 0) {
-            continue;
-        }
-        $apiMethodName = strtolower(
-            $method->name[3]
-        ) . substr(
-            $method->name,
-            4
+    /** @var array<string, string> */
+    private $typeAliases = [];
+
+    public function addController(string $controllerClassBasename): void {
+        /** @var class-string */
+        $controllerClassName = sprintf(
+            '\\OmegaUp\\Controllers\\%s',
+            $controllerClassBasename
         );
-        $apiTypePrefix = $controllerClassBasename . substr($method->name, 3);
-        $returnType = getReturnType($method);
+        $reflectionClass = new \ReflectionClass($controllerClassName);
 
-        echo "  type {$apiTypePrefix}Request = any;\n";
-        if ($returnType == 'void') {
-            $methodMapping[$apiMethodName] = 'void';
-            continue;
+        $docComment = \Psalm\DocComment::parse(
+            $reflectionClass->getDocComment()
+        );
+        if (isset($docComment['specials']['psalm-type'])) {
+            foreach ($docComment['specials']['psalm-type'] as $typeAlias) {
+                [
+                    $typeName,
+                    $typeExpansion,
+                ] = explode('=', $typeAlias);
+                $typeExpansion = convertTypeToTypeScript(
+                    \Psalm\Type::parseString($typeExpansion),
+                    $this->typeAliases,
+                    $controllerClassName,
+                    []
+                );
+                if (
+                    isset($this->typeAliases[$typeName]) &&
+                    $this->typeAliases[$typeName] != $typeExpansion
+                ) {
+                    throw new \Exception(
+                        "Mismatched definition of `@psalm-type {$typeAlias}`. Previous definition was {$typeExpansion}."
+                    );
+                }
+                $this->typeAliases[$typeName] = $typeExpansion;
+            }
         }
-        $methodMapping[$apiMethodName] = "{$apiTypePrefix}Response";
-        echo "  type {$apiTypePrefix}Response = $returnType;\n";
+
+        $controller = new Controller($controllerClassBasename);
+        $this->controllers[$controllerClassBasename] = $controller;
+
+        foreach (
+            $reflectionClass->getMethods(
+                ReflectionMethod::IS_STATIC
+            ) as $reflectionMethod
+        ) {
+            if (strpos($reflectionMethod->name, 'api') !== 0) {
+                continue;
+            }
+            $apiMethodName = strtolower(
+                $reflectionMethod->name[3]
+            ) . substr(
+                $reflectionMethod->name,
+                4
+            );
+            $method = new Method();
+            $method->apiTypePrefix = $controllerClassBasename . substr(
+                $reflectionMethod->name,
+                3
+            );
+            $method->returnType = getReturnType(
+                $reflectionMethod,
+                $this->typeAliases
+            );
+            $controller->methods[$apiMethodName] = $method;
+        }
     }
 
-    echo "  export interface ${controllerClassBasename} {\n";
-    ksort($methodMapping);
-    foreach ($methodMapping as $apiMethodName => $returnType) {
-        echo "    {$apiMethodName}: () => Promise<{$returnType}>;\n";
+    public function generate(): void {
+        echo "// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.\n";
+        echo "namespace api {\n";
+
+        if (!empty($this->typeAliases)) {
+            echo "  // Type aliases\n";
+            ksort($this->typeAliases);
+            foreach ($this->typeAliases as $typeName => $typeExpansion) {
+                echo "  interface {$typeName} {$typeExpansion};\n";
+            }
+            echo "\n";
+        }
+
+        ksort($this->controllers);
+        foreach ($this->controllers as $_ => $controller) {
+            echo "  // {$controller->classBasename}\n";
+            ksort($controller->methods);
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo "  type {$method->apiTypePrefix}Request = any;\n";
+                if ($method->returnType != 'void') {
+                    echo "  type {$method->apiTypePrefix}Response = {$method->returnType};\n";
+                }
+            }
+            echo "  export interface {$controller->classBasename} {\n";
+            foreach ($controller->methods as $apiMethodName => $method) {
+                if ($method->returnType == 'void') {
+                    echo "    {$apiMethodName}: () => Promise<void>;\n";
+                } else {
+                    echo "    {$apiMethodName}: () => Promise<{$method->apiTypePrefix}Response>;\n";
+                }
+            }
+            echo "  }\n\n";
+        }
+        echo "}\n\n";
+
+        echo "const API = {\n";
+        foreach ($this->controllers as $controller) {
+            echo "  {$controller->classBasename}: api.{$controller->classBasename},\n";
+        }
+        echo "};\n\n";
+
+        echo "export { API as default };\n";
     }
-    echo "  }\n\n";
 }
 
-echo "// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.\n";
-echo "namespace api {\n";
-$controllerClassBasenames = [];
+/**
+ * @return Generator<int, string>
+ */
+function listDir(string $path): Generator {
+    $dh = opendir($path);
+    if (!is_resource($dh)) {
+        die("Failed to open {$path}");
+    }
+    while (($path = readdir($dh)) !== false) {
+        if ($path == '.' || $path == '..') {
+            continue;
+        }
+        yield $path;
+    }
+    closedir($dh);
+}
+
+$apiGenerator = new APIGenerator();
 $controllerFiles = listDir(
     sprintf('%s/server/src/Controllers', strval(OMEGAUP_ROOT))
 );
 foreach ($controllerFiles as $controllerFile) {
-    $controllerClassBasename = basename($controllerFile, '.php');
-    $controllerClassBasenames[] = $controllerClassBasename;
-    processControllerFile($controllerClassBasename);
+    $apiGenerator->addController(basename($controllerFile, '.php'));
 }
-echo "}\n\n";
-
-echo "const API = {\n";
-foreach ($controllerClassBasenames as $controllerClassBasename) {
-    echo "  {$controllerClassBasename}: api.{$controllerClassBasename},\n";
-}
-echo "};\n\n";
-
-echo "export { API as default };\n";
+$apiGenerator->generate();

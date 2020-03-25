@@ -57,7 +57,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of badges owned by a certain user
      *
-     * @return array{badges: list<array{assignation_time: string, badge_alias: string}>, status: string}
+     * @return array{badges: list<array{assignation_time: string, badge_alias: string}>}
      */
     public static function apiUserList(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidUsername(
@@ -69,7 +69,6 @@ class Badge extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return [
-            'status' => 'ok',
             'badges' => \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user),
         ];
     }
@@ -78,7 +77,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @return array{assignation_time: int|null, status: string}
+     * @return array{assignation_time: int|null}
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -91,7 +90,6 @@ class Badge extends \OmegaUp\Controllers\Controller {
             self::getAllBadges()
         );
         return [
-            'status' => 'ok',
             'assignation_time' => is_null($r->user) ?
                 null :
                 \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
@@ -105,7 +103,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @return array{first_assignation: int|null, total_users: int, owners_count: int, status: string}
+     * @return array{first_assignation: int|null, total_users: int, owners_count: int}
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
@@ -124,7 +122,6 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $r['badge_alias']
         );
         return [
-            'status' => 'ok',
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
             'owners_count' => $ownersCount,

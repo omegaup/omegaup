@@ -3260,8 +3260,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $rowcount = PROBLEMS_PER_PAGE;
         }
 
-        $total = 0;
-        $problems = \OmegaUp\DAO\Problems::byIdentityType(
+        [
+            'problems' => $problems,
+            'count' => $count,
+        ] = \OmegaUp\DAO\Problems::byIdentityType(
             $identityType,
             $language,
             $orderBy,
@@ -3275,11 +3277,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $requireAllTags,
             $programmingLanguages,
-            $difficultyRange,
-            $total
+            $difficultyRange
         );
         return [
-            'total' => $total,
+            'total' => $count,
             'results' => $problems,
         ];
     }
@@ -3288,7 +3289,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3304,14 +3305,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
 
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $problems = \OmegaUp\DAO\Problems::getAll(
+            [
+                'problems' => $problems,
+                'count' => $count,
+            ] = \OmegaUp\DAO\Problems::getAllWithCount(
                 $page,
-                $pageSize,
-                'problem_id',
-                'DESC'
+                $pageSize
             );
         } else {
-            $problems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
+            [
+                'problems' => $problems,
+                'count' => $count,
+            ] = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
                 $pageSize
@@ -3332,15 +3337,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $addedProblems[] = $problemArray;
         }
 
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $count,
+            $page ?: 1,
+            '/problem/list/',
+            5,
+            []
+        );
+
         return [
             'problems' => $addedProblems,
+            'pagerItems' => $pagerItems,
         ];
     }
 
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3363,7 +3377,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $page = isset($r['page']) ? intval($r['page']) : 1;
 
-        $problems = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
+        [
+            'problems' => $problems,
+            'count' => $count,
+        ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
             $rowcount
@@ -3383,8 +3400,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $addedProblems[] = $problemArray;
         }
 
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $count,
+            $page ?: 1,
+            '/problem/list/',
+            5,
+            []
+        );
+
         return [
             'problems' => $addedProblems,
+            'pagerItems' => $pagerItems,
         ];
     }
 
@@ -3778,7 +3804,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, current_tags: string[]|string, pager_items: array{class: string, label: string, url: string}[], problems: array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: array{source: string, name: string}[], title: string, visibility: int, quality_seal: bool}[]}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3788,6 +3814,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
         }
 
         // Defaults for offset and rowcount
@@ -3855,9 +3882,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'MODE' => $mode,
                 'ORDER_BY' => $orderBy,
                 'LANGUAGE' => $language,
-                'problems' => $response['results'],
-                'current_tags' => $tags,
-                'pager_items' => $pagerItems,
+                'payload' => [
+                    'problems' => $response['results'],
+                    'loggedIn' => !is_null($r->identity),
+                    'currentTags' => $tags,
+                    'pagerItems' => $pagerItems,
+                ],
             ],
             'template' => 'problems.tpl',
         ];
