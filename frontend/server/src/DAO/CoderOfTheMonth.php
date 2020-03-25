@@ -215,15 +215,20 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           LIMIT 2
         ';
 
-        /** @var array{username: string}|null */
+        /** @var list<array{username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$category]
         );
-        if (empty($rs) || sizeof($rs) < 2) {
+        if (empty($rs)) {
             return false;
         }
-        return $username == $rs[1]['username'];
+
+        if (count($rs) == 2) {
+            return $username == $rs[1]['username'];
+        } else {
+            return false;
+        }
     }
 
     /**
