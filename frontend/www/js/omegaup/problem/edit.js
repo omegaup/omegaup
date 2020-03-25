@@ -67,12 +67,12 @@ OmegaUp.on('ready', function() {
 
             refreshProblemTags();
           })
-          .fail(UI.apiError);
+          .catch(UI.apiError);
 
         return false; // Prevent refresh
       });
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   $('#tag-name')
     .typeahead(
@@ -102,7 +102,7 @@ OmegaUp.on('ready', function() {
         $('div.post.footer').show();
         refreshProblemAdmins();
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     return false; // Prevent refresh
   });
@@ -126,7 +126,7 @@ OmegaUp.on('ready', function() {
 
         refreshProblemAdmins();
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     return false; // Prevent refresh
   });
@@ -143,7 +143,7 @@ OmegaUp.on('ready', function() {
       .then(function(response) {
         window.location = '/problem/mine/';
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
     return false;
   });
 
@@ -164,7 +164,7 @@ OmegaUp.on('ready', function() {
             .then(function(response) {
               resolve(response);
             })
-            .fail(T.editFieldRequired);
+            .catch(T.editFieldRequired);
         }),
       );
     }
@@ -226,7 +226,7 @@ OmegaUp.on('ready', function() {
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .fail(UI.apiError);
+                            .catch(UI.apiError);
                         };
                       })(admin.username),
                     ),
@@ -267,7 +267,7 @@ OmegaUp.on('ready', function() {
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .fail(UI.apiError);
+                            .catch(UI.apiError);
                         };
                       })(group_admin.alias),
                     ),
@@ -277,7 +277,7 @@ OmegaUp.on('ready', function() {
 
         $('#problem-admins .site-admin').hide();
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   const problemVersions = new Vue({
@@ -301,7 +301,7 @@ OmegaUp.on('ready', function() {
                 problemVersions.publishedRevision = selectedRevision;
                 UI.success(T.problemVersionUpdated);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'runs-diff': function(versions, selectedCommit) {
             API.Problem.runsDiff({
@@ -315,7 +315,7 @@ OmegaUp.on('ready', function() {
                   response.diff,
                 );
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -338,7 +338,7 @@ OmegaUp.on('ready', function() {
         }
       }
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   const solutionEdit = new Vue({
     el: '#solution-edit',
@@ -377,7 +377,7 @@ OmegaUp.on('ready', function() {
                 solutionEdit.solutions[language] = response.solution.markdown;
                 solutionEdit.updateAndRefresh(response.solution.markdown);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'edit-solution': function(solutions, commitMessage, currentLanguage) {
             let promises = [];
@@ -393,7 +393,7 @@ OmegaUp.on('ready', function() {
                     lang: lang,
                   })
                     .then(resolve)
-                    .fail(UI.apiError);
+                    .catch(UI.apiError);
                 }),
               );
             }
@@ -444,7 +444,7 @@ OmegaUp.on('ready', function() {
             self.solutions[lang] = response.solution.markdown;
             self.updateAndRefresh(response.solution.markdown);
           })
-          .fail(UI.apiError);
+          .catch(UI.apiError);
       },
     },
     components: {
@@ -468,7 +468,7 @@ OmegaUp.on('ready', function() {
 
         refreshProblemTags();
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     return false; // Prevent refresh
   });
@@ -519,7 +519,7 @@ OmegaUp.on('ready', function() {
                           );
                           $(tr).remove();
                         })
-                        .fail(UI.apiError);
+                        .catch(UI.apiError);
                     };
                   })(tag.name),
                 ),
@@ -527,7 +527,7 @@ OmegaUp.on('ready', function() {
           );
         }
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   var imageMapping = {};
@@ -557,7 +557,7 @@ OmegaUp.on('ready', function() {
       statement_type: 'markdown',
     })
       .then(problemCallback)
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   function problemCallback(problem) {
@@ -665,7 +665,7 @@ OmegaUp.on('ready', function() {
       lang: chosenLanguage,
     })
       .then(problemCallback)
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   });
 
   $('#wmd-input-statement').on('blur', function(e) {

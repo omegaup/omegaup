@@ -581,7 +581,7 @@ export namespace omegaup {
     country_id: string;
     score?: number;
     name: string;
-    rank?: number;
+    ranking?: number;
   }
 
   export interface SchoolRankTable {
@@ -750,7 +750,7 @@ export namespace omegaup {
             this._notify('ready');
           }
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     }
 
     _notify(eventName: string): void {

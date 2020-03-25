@@ -4,7 +4,7 @@
       <h1>{{ T.schoolsLearnProgBySolvProblems }}</h1>
       <p>
         <a class="btn btn-primary" href="/course/" role="button">{{
-          T.schoolsStartUsingSchools
+          T.schoolsStartUsingCourses
         }}</a>
       </p>
     </div>
@@ -64,7 +64,7 @@ body {
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 
 @Component({})
 export default class Intro extends Vue {

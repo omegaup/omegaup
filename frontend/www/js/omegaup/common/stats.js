@@ -190,11 +190,11 @@ OmegaUp.on('ready', function() {
     if (entityType === 'contest') {
       API.Contest.stats({ contest_alias: payload.alias })
         .then(s => Vue.set(statsChart, 'stats', s))
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     } else {
       API.Problem.stats({ problem_alias: payload.alias })
         .then(s => Vue.set(statsChart, 'stats', s))
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     }
   }
 

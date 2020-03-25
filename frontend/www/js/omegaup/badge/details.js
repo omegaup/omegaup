@@ -34,13 +34,13 @@ OmegaUp.on('ready', function() {
       badgeDetails.badge['total_users'] = data['total_users'];
       badgeDetails.badge['owners_count'] = data['owners_count'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myBadgeAssignationTime({ badge_alias: payload.badge })
       .then(function(data) {
         badgeDetails.badge['assignation_time'] = data['assignation_time'];
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 });

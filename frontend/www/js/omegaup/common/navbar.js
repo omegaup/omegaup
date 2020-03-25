@@ -1,6 +1,5 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
-import omegaup from '../api.js';
+import { API, UI, OmegaUp, T } from '../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -51,11 +50,11 @@ OmegaUp.on('ready', function() {
   });
 
   if (payload.isAdmin) {
-    API.Notification.myList({})
-      .then(function(data) {
+    API.Notification.myList()
+      .then(data => {
         commonNavbar.notifications = data.notifications;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     function updateGraderStatus() {
       API.Grader.status()
@@ -72,7 +71,7 @@ OmegaUp.on('ready', function() {
           }
           commonNavbar.errorMessage = null;
         })
-        .fail(stats => {
+        .catch(stats => {
           commonNavbar.errorMessage = stats.error;
         });
     }
