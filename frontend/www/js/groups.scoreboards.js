@@ -19,7 +19,7 @@ $(function() {
           );
         }
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
 
     $('#scoreboard-add-contest-form').on('submit', function() {
       omegaup.API.GroupScoreboard.addContest({
@@ -33,7 +33,7 @@ $(function() {
           omegaup.UI.success(omegaup.T.groupEditScoreboardsContestsAdded);
           refreshScoreboardContests();
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
 
       return false;
     });
@@ -88,7 +88,7 @@ $(function() {
                             var tr = e.target.parentElement.parentElement;
                             $(tr).remove();
                           })
-                          .fail(omegaup.UI.apiError);
+                          .catch(omegaup.UI.apiError);
                       };
                     })(contest.alias),
                   ),
@@ -96,7 +96,7 @@ $(function() {
             );
           }
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     }
   } else if (formPage === 'details') {
     omegaup.API.GroupScoreboard.details({
@@ -187,6 +187,6 @@ $(function() {
         $('#root').fadeIn('slow');
         $('#loading').fadeOut('slow');
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 });

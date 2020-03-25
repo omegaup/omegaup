@@ -38,7 +38,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#pass').val($('#reg_pass').val());
         $('#login_form').trigger('submit');
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
     return false; // Prevent form submission
   }
 
@@ -53,7 +53,7 @@ function signInCallback(googleUser) {
     .then(function(data) {
       window.location.reload();
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 }
 
 function signInFailure(error) {

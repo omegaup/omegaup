@@ -23,7 +23,7 @@ OmegaUp.on('ready', function() {
                 .then(function() {
                   omegaup.UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                 username: payload.username,
@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
                 .then(function() {
                   omegaup.UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(omegaup.UI.apiError);
             }
           },
           'on-change-group': function(selectedGroup) {
@@ -44,7 +44,7 @@ OmegaUp.on('ready', function() {
                 .then(function() {
                   omegaup.UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                 username: payload.username,
@@ -53,7 +53,7 @@ OmegaUp.on('ready', function() {
                 .then(function() {
                   omegaup.UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(omegaup.UI.apiError);
             }
           },
         },

@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
                 UI.success(T.schoolOfTheMonthSelectedSuccessfully);
                 SchoolOfTheMonth.schoolIsSelected = true;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

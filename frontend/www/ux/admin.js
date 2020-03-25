@@ -106,7 +106,7 @@ omegaup.OmegaUp.on('ready', function() {
               );
             }
           })
-          .fail(omegaup.UI.ignoreError);
+          .catch(omegaup.UI.ignoreError);
 
         arenaInstance.setupPolls();
         adminInstance.refreshRuns();
@@ -123,7 +123,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#loading').fadeOut('slow');
         $('#root').fadeIn('slow');
       })
-      .fail(function() {
+      .catch(function() {
         if (!omegaup.OmegaUp.loggedIn) {
           window.location = '/login/?redirect=' + escape(window.location);
         } else {
@@ -172,7 +172,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('#submit input').prop('disabled', false);
         arenaInstance.hideOverlay();
       })
-      .fail(function(run) {
+      .catch(function(run) {
         alert(run.error);
         $('#submit input').prop('disabled', false);
       });
@@ -194,7 +194,7 @@ omegaup.OmegaUp.on('ready', function() {
         .then(function() {
           adminInstance.refreshRuns();
         })
-        .fail(omegaup.UI.ignoreError);
+        .catch(omegaup.UI.ignoreError);
     }
     return false;
   });

@@ -38,7 +38,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 viewStudent.problems = data.problems;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
