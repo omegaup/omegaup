@@ -18,13 +18,11 @@ OmegaUp.on('ready', function() {
                 notification => notification.notification_id,
               ),
             })
-              .then(function() {
-                return API.Notification.myList({});
-              })
-              .then(function(data) {
+              .then(() => API.Notification.myList())
+              .then(data => {
                 notificationsList.notifications = data.notifications;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -37,9 +35,9 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  API.Notification.myList({})
-    .then(function(data) {
+  API.Notification.myList()
+    .then(data => {
       notificationsList.notifications = data.notifications;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

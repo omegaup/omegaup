@@ -30,7 +30,7 @@ OmegaUp.on('ready', function() {
                 );
                 coderOfTheMonthList.coderIsSelected = true;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

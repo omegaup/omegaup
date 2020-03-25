@@ -21,24 +21,30 @@ OmegaUp.on('ready', function() {
             showProblems(statement);
           },
           'change-visibility': function(ev, selectedProblems, visibility) {
-            omegaup.UI.bulkOperation(
-              selectedProblems,
-              function(alias, resolve, reject) {
-                omegaup.API.Problem.update({
-                  problem_alias: alias,
+            const promises = [];
+            for (const problemAlias of selectedProblems) {
+              promises.push(
+                API.Problem.update({
+                  problem_alias: problemAlias,
                   visibility: visibility,
                   message:
                     visibility === 1
                       ? 'private -> public'
                       : 'public -> private',
-                })
-                  .then(resolve)
-                  .fail(reject);
-              },
-              function() {
+                }),
+              );
+            }
+
+            Promise.all(promises)
+              .then(() => {
+                UI.success(T.updateItemsSuccess);
+              })
+              .catch(error => {
+                UI.error(UI.formatString(T.bulkOperationError, error));
+              })
+              .finally(() => {
                 showProblems(statement);
-              },
-            );
+              });
           },
         },
       });
@@ -57,16 +63,13 @@ OmegaUp.on('ready', function() {
     .then(function(result) {
       problemsMine.problems = result.problems;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   function showProblems(statement) {
-    const deferred = statement
-      ? omegaup.API.Problem.adminList()
-      : omegaup.API.Problem.myList();
-    deferred
+    (statement ? API.Problem.adminList() : API.Problem.myList())
       .then(function(result) {
         problemsMine.problems = result.problems;
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 });

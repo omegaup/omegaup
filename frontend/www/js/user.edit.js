@@ -93,7 +93,7 @@ omegaup.OmegaUp.on('ready', function() {
       original_school = data.school;
       original_school_id = data.school_id;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   $('form#user_profile_form').on('submit', function(ev) {
     ev.preventDefault();
@@ -145,7 +145,7 @@ omegaup.OmegaUp.on('ready', function() {
           omegaup.UI.success(omegaup.T.userEditSuccess);
         }
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   });
 
   $('form#change-password-form').on('submit', function(ev) {
@@ -164,6 +164,6 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function() {
         omegaup.UI.success(omegaup.T.passwordResetResetSuccess);
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   });
 });

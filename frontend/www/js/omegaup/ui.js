@@ -204,40 +204,6 @@ let UI = {
       });
   },
 
-  bulkOperation: function(items, operation, onOperationFinished, options) {
-    var isStopExecuted = false;
-    var success = true;
-    var error = null;
-
-    var resolve = function(data) {};
-    var reject = function(data) {
-      success = false;
-      error = data.error;
-    };
-    let promises = [];
-    for (const item of items) {
-      promises.push(
-        new Promise(function() {
-          operation(item, resolve, reject);
-        }),
-      );
-    }
-
-    Promise.all(promises)
-      .then(function() {
-        onOperationFinished();
-        UI.success(T.updateItemsSuccess);
-      })
-      .catch(function() {
-        UI.error(
-          UI.formatString(
-            (options && options.errorTemplate) || T.bulkOperationError,
-            error,
-          ),
-        );
-      });
-  },
-
   prettyPrintJSON: function(json) {
     return UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
   },
@@ -286,8 +252,8 @@ let UI = {
       pendingRequest = true;
       f({ query: query })
         .then(data => asyncResults(data.results || data))
-        .fail(UI.ignoreError)
-        .always(() => {
+        .catch(UI.ignoreError)
+        .finally(() => {
           pendingRequest = false;
 
           // If there is a pending request, send it out now.

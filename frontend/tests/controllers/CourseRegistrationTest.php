@@ -55,10 +55,18 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
         ]));
 
+        // Get updated course
+        $course = \OmegaUp\DAO\Courses::getByAlias($alias);
+
         return [
             'course' => $course,
             'adminLogin' => $adminLogin,
         ];
+    }
+
+    public function testCreateCourseWithRegistrationMode() {
+        $course = self::createCourseWithRegistrationMode()['course'];
+        $this->assertEquals($course->admission_mode, 'registration');
     }
 
     public function testCourseIsPresentInStudentList() {

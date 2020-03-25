@@ -19,7 +19,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 UI.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'download-identities': function(identities) {
             const csv = CSV.serialize({

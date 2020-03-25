@@ -18,6 +18,7 @@ let config = [
     entry: {
       omegaup: [
         '@babel/polyfill',
+        'unfetch/polyfill',
         './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js',
       ],
@@ -72,7 +73,8 @@ let config = [
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
-      school_of_the_month: './frontend/www/js/omegaup/schools/schoolofthemonth.js',
+      school_of_the_month:
+        './frontend/www/js/omegaup/schools/schoolofthemonth.js',
       school_profile: './frontend/www/js/omegaup/schools/profile.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
@@ -201,11 +203,7 @@ let config = [
         // inline scss styles on vue components
         {
           test: /\.scss$/,
-          use: [
-            'vue-style-loader',
-            'css-loader',
-            'sass-loader'
-          ]
+          use: ['vue-style-loader', 'css-loader', 'sass-loader'],
         },
       ],
     },
