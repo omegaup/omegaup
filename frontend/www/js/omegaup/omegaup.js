@@ -1,11 +1,5 @@
-import {
-  API,
-  Experiments,
-  EventListenerList,
-  OmegaUp,
-  T,
-  UI,
-} from './omegaup.ts';
+import { Experiments, EventListenerList, OmegaUp, T, UI } from './omegaup.ts';
+import API from './api.js';
 export { API, EventListenerList, Experiments, OmegaUp, T, UI };
 
 OmegaUp.on('ready', function() {

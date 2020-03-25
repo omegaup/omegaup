@@ -1,4 +1,5 @@
 import API from '../api.js';
+import * as api from '../api_transitional';
 import UI from '../ui.js';
 
 export default class ArenaAdmin {
@@ -47,7 +48,7 @@ export default class ArenaAdmin {
         'disabled',
         'disabled',
       );
-      API.Clarification.create({
+      api.Clarification.create({
         contest_alias: self.arena.options.contestAlias,
         problem_alias: $(
           'select[name="problem"]',
