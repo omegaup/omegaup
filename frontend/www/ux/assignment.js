@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
     assignment: arenaInstance.options.assignmentAlias,
   })
     .then(arenaInstance.problemsetLoaded.bind(arenaInstance))
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   window.addEventListener(
     'hashchange',

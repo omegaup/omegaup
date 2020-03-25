@@ -110,7 +110,7 @@ let UI = {
       return;
     }
     UI.success(
-      omegaup.T.contestEditContestEdited +
+      T.contestEditContestEdited +
         ' <a href="/arena/' +
         contestAlias +
         '">' +
@@ -204,47 +204,6 @@ let UI = {
       });
   },
 
-  bulkOperation: function(operation, onOperationFinished, options) {
-    var isStopExecuted = false;
-    var success = true;
-    var error = null;
-
-    var resolve = function(data) {};
-    var reject = function(data) {
-      success = false;
-      error = data.error;
-    };
-    $('input[type=checkbox]').each(function() {
-      if (this.checked) {
-        operation(this.id, resolve, reject);
-      }
-    });
-
-    // Wait for all
-    $(document).ajaxStop(function() {
-      if (!isStopExecuted) {
-        // Make sure we execute this block once. onOperationFinish might
-        // have
-        // async calls that would fire ajaxStop event
-        isStopExecuted = true;
-        $(document).off('ajaxStop');
-
-        onOperationFinished();
-
-        if (success === false) {
-          UI.error(
-            UI.formatString(
-              (options && options.errorTemplate) || T.bulkOperationError,
-              error,
-            ),
-          );
-        } else {
-          UI.success(T.updateItemsSuccess);
-        }
-      }
-    });
-  },
-
   prettyPrintJSON: function(json) {
     return UI.syntaxHighlight(JSON.stringify(json, undefined, 4) || '');
   },
@@ -293,8 +252,8 @@ let UI = {
       pendingRequest = true;
       f({ query: query })
         .then(data => asyncResults(data.results || data))
-        .fail(UI.ignoreError)
-        .always(() => {
+        .catch(UI.ignoreError)
+        .finally(() => {
           pendingRequest = false;
 
           // If there is a pending request, send it out now.
@@ -434,7 +393,7 @@ let UI = {
           highlight: true,
         },
         {
-          source: UI.typeaheadWrapper(omegaup.API.School.list),
+          source: UI.typeaheadWrapper(API.School.list),
           async: true,
           limit: 10,
           display: 'label',

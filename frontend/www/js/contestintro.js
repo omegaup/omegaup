@@ -40,7 +40,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(result) {
         window.location.reload();
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   });
 
   $('input[name=share-user-information]').on('click', function(ev) {
@@ -55,7 +55,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(result) {
         $('#registration_pending').removeClass('hidden');
       })
-      .fail(function(result) {
+      .catch(function(result) {
         omegaup.UI.error(result.error);
         $('#request-access-form').show();
         $('#start-contest-submit').prop('disabled', false);
@@ -136,6 +136,27 @@ omegaup.OmegaUp.on('ready', function() {
       contestObject = contest;
       setInterval(showCountdown.bind(), 1000);
     }
+  }
+
+  function promiseFinally(contest) {
+    $('#intro-page').removeClass('hidden');
+    if (contest.admission_mode != 'registration') {
+      readyToStart(contest);
+      return;
+    }
+    if (!contest.user_registration_requested) {
+      $('#must_register').removeClass('hidden');
+      return;
+    }
+    if (!contest.user_registration_answered) {
+      $('#registration_pending').removeClass('hidden');
+      return;
+    }
+    if (!contest.user_registration_accepted) {
+      $('#registration_denied').removeClass('hidden');
+      return;
+    }
+    readyToStart(contest);
   }
 
   omegaup.API.Contest.publicDetails({ contest_alias: contestAlias })
@@ -221,34 +242,14 @@ omegaup.OmegaUp.on('ready', function() {
       } else {
         $('.contest #points-decay-factor').hide();
       }
-      return contest;
+      promiseFinally(contest);
     })
-    .fail(function(contest) {
+    .catch(function(contest) {
       $('#contest-details').hide();
       $('#contest-details')
         .parent()
         .removeClass('col-md-6')
         .addClass('col-md-2');
-      return contest;
-    })
-    .always(function(contest) {
-      $('#intro-page').removeClass('hidden');
-      if (contest.admission_mode != 'registration') {
-        readyToStart(contest);
-        return;
-      }
-      if (!contest.user_registration_requested) {
-        $('#must_register').removeClass('hidden');
-        return;
-      }
-      if (!contest.user_registration_answered) {
-        $('#registration_pending').removeClass('hidden');
-        return;
-      }
-      if (!contest.user_registration_accepted) {
-        $('#registration_denied').removeClass('hidden');
-        return;
-      }
-      readyToStart(contest);
+      promiseFinally(contest);
     });
 });

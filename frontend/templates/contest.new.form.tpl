@@ -165,6 +165,13 @@
 		</form>
 	</div>
 </div>
+
+<!-- Bootstrap datetimepicker plugin from http://www.malot.fr/bootstrap-datetimepicker/demo.php -->
+<link rel="stylesheet" href="/third_party/css/bootstrap-datetimepicker.css">
+<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datetimepicker.min.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.es.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/locales/bootstrap-datetimepicker.pt-BR.js"}" defer></script>
+
 <script type="text/javascript" src="/third_party/js/bootstrap-select.min.js"></script>
 <script type="text/javascript" src="{version_hash src="/js/contest.new.form.js"}" defer></script>
 <link rel="stylesheet" href="/third_party/css/bootstrap-select.min.css">

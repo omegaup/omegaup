@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
                     ? null
                     : new Date(data.last_login * 1000);
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
           'verify-user': function(email) {
             omegaup.API.User.verifyEmail({ usernameOrEmail: email })
@@ -35,7 +35,7 @@ OmegaUp.on('ready', function() {
                 adminSupport.verified = true;
                 omegaup.UI.success(T.userVerified);
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
           'generate-token': function(email) {
             omegaup.API.Reset.generateToken({
@@ -47,7 +47,7 @@ OmegaUp.on('ready', function() {
                 );
                 adminSupport.link = data.link;
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
           'copy-token': function() {
             omegaup.UI.success(T.passwordResetLinkCopiedToClipboard);

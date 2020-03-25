@@ -47,7 +47,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
      * @param int $schoolId
      * @param int $monthsNumber
-     * @return array{year: int, month: int, count: int}[]
+     * @return list<array{year: int, month: int, count: int}>
      */
     public static function getMonthlySolvedProblemsCount(
         int $schoolId,

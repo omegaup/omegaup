@@ -15,6 +15,7 @@ OmegaUp.on('ready', function() {
               problems: this.problems,
               loggedIn: this.loggedIn,
               currentTags: this.currentTags,
+              pagerItems: this.pagerItems,
               wizardTags: tagData,
             },
             on: {
@@ -26,8 +27,9 @@ OmegaUp.on('ready', function() {
         },
         data: {
           problems: payload.problems,
-          loggedIn: payload.logged_in,
-          currentTags: payload.current_tags,
+          loggedIn: payload.loggedIn,
+          currentTags: payload.currentTags,
+          pagerItems: payload.pagerItems,
           wizardTags: {},
         },
         components: {
@@ -35,5 +37,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

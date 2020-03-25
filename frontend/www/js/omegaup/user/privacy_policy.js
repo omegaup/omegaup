@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
                 UI.info(T.wordsPrivacyPolicyAccepted);
                 privacyPolicy.saved = true;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

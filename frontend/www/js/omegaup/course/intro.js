@@ -34,7 +34,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 window.location.replace('/course/' + coursePayload.alias);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

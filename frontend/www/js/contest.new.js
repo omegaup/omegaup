@@ -37,7 +37,7 @@ omegaup.OmegaUp.on('ready', function() {
           '/contest/' + $('.new_contest_form #alias').val() + '/edit/#problems',
         );
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
     return false;
   });
 
