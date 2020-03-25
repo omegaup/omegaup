@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
 
 export default {
