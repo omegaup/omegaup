@@ -28,7 +28,7 @@
                 v-bind:length="schoolsRank.length"
                 v-bind:showHeader="schoolsRank.showHeader"
                 v-bind:totalRows="schoolsRank.totalRows"
-                v-bind:rank="schoolsRank.ranking"
+                v-bind:rank="schoolsRank.rank"
               ></omegaup-schools-rank>
             </div>
           </div>

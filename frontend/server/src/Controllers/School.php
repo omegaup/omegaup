@@ -228,7 +228,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the top X schools of the month
-     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
+     * @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>
      */
     public static function getTopSchoolsOfTheMonth(
         int $rowcount
@@ -236,37 +236,19 @@ class School extends \OmegaUp\Controllers\Controller {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
-
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
-            /** @return list<array{school_id: int, name: string, country_id: string, score: float}> */
+            /** @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
             function () use (
-                $date,
                 $rowcount
             ): array {
-                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-                    $date,
+                return \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
                     $rowcount
                 );
             },
             60 * 60 * 12 // 12 hours
         );
-    }
-
-    /**
-     * Gets the top schools that are showed on the index page.
-     * @return array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>}
-     */
-    public static function apiSchoolsOfTheMonth(\OmegaUp\Request $r) {
-        $r->ensureInt('rowcount', null, null, false);
-        $rowcount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        return [
-            'rank' => self::getTopSchoolsOfTheMonth(
-                $rowcount
-            ),
-        ];
     }
 
     /**
@@ -477,6 +459,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
+            100,
             $dateToSelect
         );
 
