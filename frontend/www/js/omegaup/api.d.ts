@@ -903,14 +903,12 @@ namespace api {
   type CourseRequestsResponse = {
     users: {
       accepted?: boolean;
-      admin: { name?: string; user_id?: numeric; username?: string };
+      admin_name?: string;
+      admin_username?: string;
       country?: string;
       country_id?: string;
-      course_id: numeric;
-      identity_id: numeric;
       last_update?: string;
       request_time: string;
-      user_id?: numeric;
       username: string;
     }[];
   };

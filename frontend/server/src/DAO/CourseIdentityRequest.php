@@ -13,58 +13,62 @@ namespace OmegaUp\DAO;
  */
 class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin_id: int, identity_id: int, last_update: null|string, course_id: int, request_time: string}>|null
+     * @return list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}>
      */
-    public static function getFirstAdminForCourseRequest(
-        int $courseId
-    ): ?array {
-        $sql = '
-            SELECT
-                r.*,
-                (SELECT
-                    h.admin_id
-                FROM
-                    `Course_Identity_Request_History` h
-                WHERE
-                    r.identity_id = h.identity_id
-                    AND r.course_id = h.course_id
-                ORDER BY
-                    h.history_id
-                LIMIT
-                    1) AS admin_id
-            FROM
-                `Course_Identity_Request` r
-            WHERE
-                r.course_id = ?;';
-
-        /** @var list<array{accepted: bool|null, admin_id: int,  identity_id: int, last_update: null|string, course_id: int, request_time: string}>|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$courseId]
-        );
-    }
-
-    /**
-     * @return list<array{accepted: bool|null, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string, user_id: int|null, username: string}>|null
-     */
-    public static function getRequestsForCourse(int $courseId): ?array {
+    public static function getRequestsForCourseWithFirstAdmin(int $courseId) {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
                 i.username,
-                i.user_id,
                 i.country_id,
                 c.name AS country,
-                r.course_id,
                 r.request_time,
                 r.last_update,
-                r.accepted
+                r.accepted,
+                arh.username AS admin_username,
+                arh.name AS admin_name
             FROM
                 `Course_Identity_Request` r
             INNER JOIN
                 `Identities` i
             ON
                 i.identity_id = r.identity_id
+            LEFT JOIN
+                (
+                    SELECT
+                        rh.history_id,
+                        rh.course_id,
+                        rh.identity_id,
+                        i.user_id,
+                        i.username,
+                        i.name
+                    FROM
+                        `Course_Identity_Request_History` rh
+                    INNER JOIN
+                        (
+                            SELECT
+                                MIN(history_id) AS `history_id`
+                            FROM
+                                `Course_Identity_Request_History`
+                            WHERE
+                                course_id = ?
+                            GROUP BY
+                                `identity_id`, `course_id`
+                        ) h
+                    ON
+                        rh.history_id = h.history_id
+                    INNER JOIN
+                        `Users` u
+                    ON
+                        u.user_id = rh.admin_id
+                    INNER JOIN
+                         `Identities` i
+                     ON
+                        u.main_identity_id = i.identity_id
+                ) arh
+            ON
+                arh.identity_id = r.identity_id
+                AND arh.course_id = r.course_id
             LEFT JOIN
                 `Countries` c
             ON
@@ -74,10 +78,10 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
             ORDER BY
                 i.identity_id;';
 
-        /** @var list<array{accepted: bool|null, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, course_id: int, request_time: string, user_id: int|null, username: string}>|null */
+        /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$courseId]
+            [$courseId, $courseId]
         );
     }
 }

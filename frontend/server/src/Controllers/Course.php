@@ -1325,7 +1325,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{users: list<array{accepted: bool|null, admin?: array{name?: null|string, user_id?: int|null, username?: null|string}, country: null|string, country_id: null|string, course_id: int, identity_id: int, last_update: null|string, request_time: string, user_id: int|null, username: string}>}
+     * @return array{users: list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, last_update: null|string, request_time: string, username: string}>}
      */
     public static function apiRequests(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1344,45 +1344,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $resultAdmins =
-            \OmegaUp\DAO\CourseIdentityRequest::getFirstAdminForCourseRequest(
+        $resultRequestsForCourseWithFirstAdmin =
+            \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 $course->course_id
             );
-        $resultRequests =
-            \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourse(
-                $course->course_id
-            );
-        if (is_null($resultRequests)) {
-            return ['users' => []];
-        }
-
-        $admins = [];
-        $requestsAdmins = [];
-        if (!is_null($resultAdmins)) {
-            foreach ($resultAdmins as $result) {
-                $adminId = $result['admin_id'];
-                if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
-                    $admin = [];
-                    $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
-                    if (!is_null($data)) {
-                        $admin = [
-                            'user_id' => $data->user_id,
-                            'username' => $data->username,
-                            'name' => $data->name,
-                        ];
-                    }
-                    $requestsAdmins[$result['identity_id']] = $admin;
-                }
-            }
-        }
-
-        $usersRequests = array_map(function ($request) use ($requestsAdmins) {
-            if (isset($requestsAdmins[$request['identity_id']])) {
-                $request['admin'] = $requestsAdmins[$request['identity_id']];
-            }
+        $usersRequests = array_map(function ($request) {
+            unset($request['identity_id']);
             return $request;
-        }, $resultRequests);
+        }, $resultRequestsForCourseWithFirstAdmin);
 
+        error_log(print_r($usersRequests, true));
         return ['users' => $usersRequests];
     }
 
