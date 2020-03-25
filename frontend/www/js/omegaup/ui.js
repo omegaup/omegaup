@@ -214,33 +214,28 @@ let UI = {
       success = false;
       error = data.error;
     };
+    let promises = [];
     for (const item of items) {
-      operation(item, resolve, reject);
+      promises.push(
+        new Promise(function() {
+          operation(item, resolve, reject);
+        }),
+      );
     }
 
-    // Wait for all
-    $(document).ajaxStop(function() {
-      if (!isStopExecuted) {
-        // Make sure we execute this block once. onOperationFinish might
-        // have
-        // async calls that would fire ajaxStop event
-        isStopExecuted = true;
-        $(document).off('ajaxStop');
-
+    Promise.all(promises)
+      .then(function() {
         onOperationFinished();
-
-        if (success === false) {
-          UI.error(
-            UI.formatString(
-              (options && options.errorTemplate) || T.bulkOperationError,
-              error,
-            ),
-          );
-        } else {
-          UI.success(T.updateItemsSuccess);
-        }
-      }
-    });
+        UI.success(T.updateItemsSuccess);
+      })
+      .catch(function() {
+        UI.error(
+          UI.formatString(
+            (options && options.errorTemplate) || T.bulkOperationError,
+            error,
+          ),
+        );
+      });
   },
 
   prettyPrintJSON: function(json) {
