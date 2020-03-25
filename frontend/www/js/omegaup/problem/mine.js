@@ -3,7 +3,7 @@ import problem_Mine from '../components/problem/Mine.vue';
 import { OmegaUp, T, API } from '../omegaup.js';
 import UI from '../ui.js';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', () => {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let statement = false;
   const problemsMine = new Vue({
@@ -16,14 +16,13 @@ OmegaUp.on('ready', function() {
           isSysadmin: this.isSysadmin,
         },
         on: {
-          'change-show-all-problems': function(ev) {
+          'change-show-all-problems': ev => {
             statement = ev.selected;
             showProblems(statement);
           },
-          'change-visibility': function(ev, selectedProblems, visibility) {
-            const promises = [];
-            for (const problemAlias of selectedProblems) {
-              promises.push(
+          'change-visibility': (ev, selectedProblems, visibility) => {
+            Promise.all(
+              selectedProblems.map(problemAlias =>
                 API.Problem.update({
                   problem_alias: problemAlias,
                   visibility: visibility,
@@ -32,10 +31,8 @@ OmegaUp.on('ready', function() {
                       ? 'private -> public'
                       : 'public -> private',
                 }),
-              );
-            }
-
-            Promise.all(promises)
+              ),
+            )
               .then(() => {
                 UI.success(T.updateItemsSuccess);
               })
@@ -60,14 +57,14 @@ OmegaUp.on('ready', function() {
   });
 
   omegaup.API.Problem.myList()
-    .then(function(result) {
+    .then(result => {
       problemsMine.problems = result.problems;
     })
     .catch(omegaup.UI.apiError);
 
   function showProblems(statement) {
     (statement ? API.Problem.adminList() : API.Problem.myList())
-      .then(function(result) {
+      .then(result => {
         problemsMine.problems = result.problems;
       })
       .catch(omegaup.UI.apiError);

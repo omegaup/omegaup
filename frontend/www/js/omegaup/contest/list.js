@@ -3,10 +3,10 @@ import { API, OmegaUp, UI, T } from '../omegaup.js';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', () => {
   function fillContestsTable() {
     (contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList())
-      .then(function(result) {
+      .then(result => {
         contestList.contests = result.contests;
       })
       .catch(UI.apiError);
@@ -53,18 +53,15 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      changeAdmissionMode: function(ev, selectedContests, admissionMode) {
-        const promises = [];
-        for (const contestAlias of selectedContests) {
-          promises.push(
+      changeAdmissionMode: (ev, selectedContests, admissionMode) => {
+        Promise.all(
+          selectedContests.map(contestAlias =>
             API.Contest.update({
               contest_alias: contestAlias,
               admission_mode: admissionMode,
             }),
-          );
-        }
-
-        Promise.all(promises)
+          ),
+        )
           .then(() => {
             UI.success(T.updateItemsSuccess);
           })
@@ -75,7 +72,7 @@ OmegaUp.on('ready', function() {
             fillContestsTable();
           });
       },
-      downloadCsvUsers: function(contestAlias) {
+      downloadCsvUsers: contestAlias => {
         API.Contest.contestants({
           contest_alias: contestAlias,
         })
