@@ -1,6 +1,5 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
-import omegaup from '../api.js';
+import { API, UI, OmegaUp, T } from '../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

@@ -53,9 +53,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
-import omegaup from '../../api.js';
 import DateTime from '../DateTimePicker.vue';
 
 @Component({
