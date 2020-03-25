@@ -106,20 +106,23 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
     /**
      * Returns the list of candidates to school of the month
      *
-     * @return list<array{name: string, ranking: int, school_id: int, score: float}>
+     * @return list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>
      */
     public static function getCandidatesToSchoolOfTheMonth(
-        int $rowcount = 100
+        int $rowcount = 100,
+        string $firstDayOfMonth = null
     ): array {
-        $date = new \DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
-        $firstDayOfNextMonth = $date->modify(
-            'first day of next month'
-        )->format(
-            'Y-m-d'
-        );
-
+        if (is_null($firstDayOfMonth)) {
+            $currentDate = date('Y-m-d', \OmegaUp\Time::get());
+            $date = new \DateTimeImmutable($currentDate);
+            $firstDayOfMonth = $date->modify(
+                'first day of next month'
+            )->format(
+                'Y-m-d'
+            );
+        }
         $alreadySelectedSchools = self::getByTimeAndSelected(
-            $firstDayOfNextMonth
+            $firstDayOfMonth
         );
         if (!empty($alreadySelectedSchools)) {
             return [];
@@ -129,6 +132,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             SELECT
                 s.school_id,
                 s.name,
+                IFNULL(s.country_id, "xx") AS country_id,
+                sotm.school_of_the_month_id,
                 sotm.score,
                 sotm.`ranking`
             FROM
@@ -143,7 +148,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             LIMIT
                 ?;';
 
-        /** @var list<array{name: string, ranking: int, school_id: int, score: float}> */
+        /** @var list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [ $firstDayOfNextMonth, $rowcount ]
