@@ -198,6 +198,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         string $username,
         string $category = 'all'
     ): bool {
+        $date = date('Y-m-01', \OmegaUp\Time::get());
         $sql = '
           SELECT
             i.username
@@ -209,26 +210,22 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             Identities i ON u.main_identity_id = i.identity_id
           WHERE
             cm.`ranking` = 1 AND
-            cm.category = ?
+            cm.category = ? AND
+            cm.time <= ?
           ORDER BY
             cm.time DESC
-          LIMIT 2
+          LIMIT 1
         ';
 
-        /** @var list<array{username: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var array{username: string}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$category]
+            [$category, $date]
         );
         if (empty($rs)) {
             return false;
         }
-
-        if (count($rs) == 2) {
-            return $username == $rs[1]['username'];
-        } else {
-            return false;
-        }
+        return $username == $rs['username'];
     }
 
     /**
