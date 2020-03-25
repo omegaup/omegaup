@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 omegaup.UI.success(T.qualityNominationResolutionSuccess);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

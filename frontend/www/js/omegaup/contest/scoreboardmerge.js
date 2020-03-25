@@ -51,7 +51,7 @@ OmegaUp.on('ready', function() {
                 scoreboardMerge.showPenalty = showPenalty;
                 scoreboardMerge.scoreboard = scoreboard;
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
         },
       });
@@ -61,7 +61,7 @@ OmegaUp.on('ready', function() {
         .then(function(contests) {
           scoreboardMerge.contests = contests.results;
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     },
     data: {
       contests: [],

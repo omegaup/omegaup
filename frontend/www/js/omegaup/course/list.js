@@ -116,5 +116,5 @@ OmegaUp.on('ready', function() {
       }
       courseList.courses = allCourses;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

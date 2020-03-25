@@ -16,19 +16,19 @@ OmegaUp.on('ready', function() {
         props: { T: T, update: false, course: this.course },
         on: {
           submit: function(ev) {
-            var schoolIdDeferred = $.Deferred();
-            if (ev.school_id) {
-              schoolIdDeferred.resolve(ev.school_id);
-            } else if (ev.school_name) {
-              API.School.create({ name: ev.school_name })
-                .then(function(data) {
-                  schoolIdDeferred.resolve(data.school_id);
-                })
-                .fail(UI.apiError);
-            } else {
-              schoolIdDeferred.resolve(null);
-            }
-            schoolIdDeferred
+            new Promise((accept, reject) => {
+              if (ev.school_id) {
+                accept(ev.school_id);
+              } else if (ev.school_name) {
+                API.School.create({ name: ev.school_name })
+                  .then(data => {
+                    accept(data.school_id);
+                  })
+                  .catch(UI.apiError);
+              } else {
+                accept(null);
+              }
+            })
               .then(function(school_id) {
                 const params = {
                   alias: ev.alias,
@@ -48,14 +48,14 @@ OmegaUp.on('ready', function() {
                 }
 
                 API.Course.create(params)
-                  .then(function() {
+                  .then(() => {
                     window.location.replace(
                       '/course/' + ev.alias + '/edit/#assignments',
                     );
                   })
-                  .fail(UI.apiError);
+                  .catch(UI.apiError);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           cancel: function() {
             window.location = '/course/';

@@ -50,11 +50,11 @@ OmegaUp.on('ready', function() {
   });
 
   if (payload.isAdmin) {
-    API.Notification.myList({})
-      .then(function(data) {
+    API.Notification.myList()
+      .then(data => {
         commonNavbar.notifications = data.notifications;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     function updateGraderStatus() {
       API.Grader.status()
@@ -71,7 +71,7 @@ OmegaUp.on('ready', function() {
           }
           commonNavbar.errorMessage = null;
         })
-        .fail(stats => {
+        .catch(stats => {
           commonNavbar.errorMessage = stats.error;
         });
     }

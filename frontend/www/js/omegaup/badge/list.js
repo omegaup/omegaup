@@ -31,12 +31,12 @@ OmegaUp.on('ready', function() {
           data['badges'].map(badge => badge.badge_alias),
         );
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   API.Badge.list({})
     .then(function(data) {
       badgeList.allBadges = new Set(data);
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });
