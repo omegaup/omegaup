@@ -4028,33 +4028,24 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Given a contest_alias and user_id, returns the role of the user within
      * the context of a contest.
      *
-     * @return array{status?: string, admin: bool}
+     * @return array{admin: bool}
      */
     public static function apiRole(\OmegaUp\Request $r): array {
-        try {
-            if ($r['contest_alias'] == 'all-events') {
-                $r->ensureIdentity();
-                if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-                    return [
-                        'status' => 'ok',
-                        'admin' => true
-                    ];
-                }
+        if ($r['contest_alias'] == 'all-events') {
+            $r->ensureIdentity();
+            if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+                return [
+                    'status' => 'ok',
+                    'admin' => true
+                ];
             }
-
-            $response = self::validateDetails($r);
-
-            return [
-                'admin' => $response['contest_admin']
-            ];
-        } catch (\Exception $e) {
-            self::$log->error('Error getting role:', $e);
-
-            return [
-                'status' => 'error',
-                'admin' => false,
-            ];
         }
+
+        $response = self::validateDetails($r);
+
+        return [
+            'admin' => $response['contest_admin']
+        ];
     }
 
     /**
