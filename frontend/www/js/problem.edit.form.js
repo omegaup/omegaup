@@ -21,7 +21,7 @@ omegaup.OmegaUp.on('ready', function() {
         );
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   function onTabClicked() {
     var tagname = $(this).data('key');

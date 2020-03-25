@@ -17,7 +17,7 @@ OmegaUp.on('ready', function() {
               .then(function(response) {
                 UI.success(omegaup.T.userEditSuccessfulEmailUpdate);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

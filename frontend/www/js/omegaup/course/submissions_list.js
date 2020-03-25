@@ -7,11 +7,11 @@ let course_alias = /\/course\/([^\/]+)\/list\/?/.exec(
 )[1];
 
 OmegaUp.on('ready', function() {
-  $.when(
+  Promise.all([
     API.Course.listSolvedProblems({ course_alias: course_alias }),
     API.Course.listUnsolvedProblems({ course_alias: course_alias }),
-  )
-    .then((solvedProblems, unsolvedProblems) => {
+  ])
+    .then(([solvedProblems, unsolvedProblems]) => {
       let submissionsList = new Vue({
         el: '#course-submissions-list',
         render: function(createElement) {
@@ -27,5 +27,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

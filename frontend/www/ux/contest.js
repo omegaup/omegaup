@@ -38,7 +38,7 @@ omegaup.OmegaUp.on('ready', function() {
         .then(function(data) {
           onlyProblemUpdateRuns(data.runs, 'score', 100);
         })
-        .fail(omegaup.UI.apiError);
+        .catch(omegaup.UI.apiError);
     }
 
     if (problem.user.admin) {
@@ -124,7 +124,7 @@ omegaup.OmegaUp.on('ready', function() {
       contest_alias: arenaInstance.options.contestAlias,
     })
       .then(arenaInstance.problemsetLoaded.bind(arenaInstance))
-      .fail(omegaup.UI.ignoreError);
+      .catch(omegaup.UI.ignoreError);
 
     $('.clarifpager .clarifpagerprev').on('click', function() {
       if (arenaInstance.clarificationsOffset > 0) {
@@ -162,10 +162,10 @@ omegaup.OmegaUp.on('ready', function() {
         arenaInstance.hideOverlay();
         arenaInstance.refreshClarifications();
       })
-      .fail(function(run) {
+      .catch(function(run) {
         alert(run.error);
       })
-      .always(function() {
+      .finally(function() {
         $('#clarification input').prop('disabled', false);
       });
 
