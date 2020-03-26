@@ -73,7 +73,7 @@ export default class ActivitySubmissionsList extends Vue {
   @Prop() unsolvedProblems!: CourseProblems;
 
   T = T;
-  static readonly NUM_COLUMNS = 3;
+  readonly NUM_COLUMNS = 3;
 
   get groupedSolvedProblems(): GroupedCourseProblems {
     return this.groupElements(this.solvedProblems);
@@ -87,14 +87,8 @@ export default class ActivitySubmissionsList extends Vue {
     let groups: GroupedCourseProblems = {};
     for (let user in elements) {
       groups[user] = [];
-      for (
-        let i = 0;
-        i < elements[user].length;
-        i += ActivitySubmissionsList.NUM_COLUMNS
-      ) {
-        groups[user].push(
-          elements[user].slice(i, i + ActivitySubmissionsList.NUM_COLUMNS),
-        );
+      for (let i = 0; i < elements[user].length; i += this.NUM_COLUMNS) {
+        groups[user].push(elements[user].slice(i, i + this.NUM_COLUMNS));
       }
     }
     return groups;
