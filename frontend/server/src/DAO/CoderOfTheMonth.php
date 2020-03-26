@@ -19,15 +19,17 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * time period.
      * category.
      *
-     * @return null|list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return null|list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
     public static function getCandidatesToCoderOfTheMonth(
         string $time,
         string $category = 'all'
     ): ?array {
-        $sql = 'SELECT
+        $sql = "SELECT
             `c`.*,
-            `i`.`username`
+            `i`.`username`,
+            IFNULL(`i`.country_id, 'xx') AS country_id,
+            IFNULL((SELECT `urc`.classname FROM `User_Rank_Cutoffs` AS `urc` WHERE `urc`.`score` <= (SELECT `ur`.score FROM `User_Rank` AS `ur` WHERE `ur`.`user_id` = `c`.`user_id`) ORDER BY `urc`.`percentile` ASC LIMIT 1),'user-rank-unranked') AS classname
           FROM
             `Coder_Of_The_Month` AS `c`
           INNER JOIN
@@ -35,9 +37,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
           WHERE
             `time` = ? AND
             `category` = ?;
-        ';
+        ";
 
-        /** @var list<array{category: string, coder_of_the_month_id: int, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
+        /** @var list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time, $category]
