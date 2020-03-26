@@ -585,7 +585,7 @@ export namespace omegaup {
     country_id: string;
     score?: number;
     name: string;
-    rank?: number;
+    ranking?: number;
   }
 
   export interface SchoolRankTable {

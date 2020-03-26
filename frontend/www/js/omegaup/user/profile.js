@@ -25,7 +25,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'update-period-statistics': (e, categories, data) => {
-            e.periodStatisticOptions.chart.categories = categories;
+            e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
           'update-aggregate-statistics': e =>
