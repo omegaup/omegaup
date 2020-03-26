@@ -36,7 +36,8 @@ abstract class Schools {
                 `state_id` = ?,
                 `name` = ?,
                 `ranking` = ?,
-                `score` = ?
+                `score` = ?,
+                `monthly_solved_problems` = ?
             WHERE
                 (
                     `school_id` = ?
@@ -51,6 +52,7 @@ abstract class Schools {
                 intval($Schools->ranking)
             ),
             floatval($Schools->score),
+            $Schools->monthly_solved_problems,
             intval($Schools->school_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -77,7 +79,8 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`ranking`,
-                `Schools`.`score`
+                `Schools`.`score`,
+                `Schools`.`monthly_solved_problems`
             FROM
                 `Schools`
             WHERE
@@ -164,7 +167,8 @@ abstract class Schools {
                 `Schools`.`state_id`,
                 `Schools`.`name`,
                 `Schools`.`ranking`,
-                `Schools`.`score`
+                `Schools`.`score`,
+                `Schools`.`monthly_solved_problems`
             FROM
                 `Schools`
         ';
@@ -219,8 +223,10 @@ abstract class Schools {
                     `state_id`,
                     `name`,
                     `ranking`,
-                    `score`
+                    `score`,
+                    `monthly_solved_problems`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -237,6 +243,7 @@ abstract class Schools {
                 intval($Schools->ranking)
             ),
             floatval($Schools->score),
+            $Schools->monthly_solved_problems,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
