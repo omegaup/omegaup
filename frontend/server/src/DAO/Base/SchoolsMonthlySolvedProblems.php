@@ -9,95 +9,96 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** Schools Data Access Object (DAO) Base.
+/** SchoolsMonthlySolvedProblems Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\Schools}.
+ * {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}.
  * @access public
  * @abstract
  */
-abstract class Schools {
+abstract class SchoolsMonthlySolvedProblems {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\Schools $Schools El objeto de tipo Schools a actualizar.
+     * @param \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems El objeto de tipo SchoolsMonthlySolvedProblems a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\Schools $Schools
+        \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems
     ): int {
         $sql = '
             UPDATE
-                `Schools`
+                `Schools_Monthly_Solved_Problems`
             SET
-                `country_id` = ?,
-                `state_id` = ?,
-                `name` = ?,
-                `ranking` = ?,
-                `score` = ?
+                `school_id` = ?,
+                `year` = ?,
+                `month` = ?,
+                `count` = ?
             WHERE
                 (
-                    `school_id` = ?
+                    `school_monthly_solved_problems_id` = ?
                 );';
         $params = [
-            $Schools->country_id,
-            $Schools->state_id,
-            $Schools->name,
             (
-                is_null($Schools->ranking) ?
+                is_null($Schools_Monthly_Solved_Problems->school_id) ?
                 null :
-                intval($Schools->ranking)
+                intval($Schools_Monthly_Solved_Problems->school_id)
             ),
-            floatval($Schools->score),
-            intval($Schools->school_id),
+            $Schools_Monthly_Solved_Problems->year,
+            $Schools_Monthly_Solved_Problems->month,
+            (
+                is_null($Schools_Monthly_Solved_Problems->count) ?
+                null :
+                intval($Schools_Monthly_Solved_Problems->count)
+            ),
+            intval($Schools_Monthly_Solved_Problems->school_monthly_solved_problems_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\Schools} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Schools}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\Schools Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\Schools} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        int $school_id
-    ): ?\OmegaUp\DAO\VO\Schools {
+        int $school_monthly_solved_problems_id
+    ): ?\OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems {
         $sql = '
             SELECT
-                `Schools`.`school_id`,
-                `Schools`.`country_id`,
-                `Schools`.`state_id`,
-                `Schools`.`name`,
-                `Schools`.`ranking`,
-                `Schools`.`score`
+                `Schools_Monthly_Solved_Problems`.`school_monthly_solved_problems_id`,
+                `Schools_Monthly_Solved_Problems`.`school_id`,
+                `Schools_Monthly_Solved_Problems`.`year`,
+                `Schools_Monthly_Solved_Problems`.`month`,
+                `Schools_Monthly_Solved_Problems`.`count`
             FROM
-                `Schools`
+                `Schools_Monthly_Solved_Problems`
             WHERE
                 (
-                    `school_id` = ?
+                    `school_monthly_solved_problems_id` = ?
                 )
             LIMIT 1;';
-        $params = [$school_id];
+        $params = [$school_monthly_solved_problems_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\Schools($row);
+        return new \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\Schools} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -106,24 +107,24 @@ abstract class Schools {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\Schools $Schools El
-     * objeto de tipo \OmegaUp\DAO\VO\Schools a eliminar
+     * @param \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems El
+     * objeto de tipo \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\Schools $Schools
+        \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems
     ): void {
         $sql = '
             DELETE FROM
-                `Schools`
+                `Schools_Monthly_Solved_Problems`
             WHERE
                 (
-                    `school_id` = ?
+                    `school_monthly_solved_problems_id` = ?
                 );';
         $params = [
-            $Schools->school_id
+            $Schools_Monthly_Solved_Problems->school_monthly_solved_problems_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -137,7 +138,7 @@ abstract class Schools {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\Schools}.
+     * {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -148,8 +149,8 @@ abstract class Schools {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\Schools> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\Schools}.
+     * @return list<\OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -159,14 +160,13 @@ abstract class Schools {
     ): array {
         $sql = '
             SELECT
-                `Schools`.`school_id`,
-                `Schools`.`country_id`,
-                `Schools`.`state_id`,
-                `Schools`.`name`,
-                `Schools`.`ranking`,
-                `Schools`.`score`
+                `Schools_Monthly_Solved_Problems`.`school_monthly_solved_problems_id`,
+                `Schools_Monthly_Solved_Problems`.`school_id`,
+                `Schools_Monthly_Solved_Problems`.`year`,
+                `Schools_Monthly_Solved_Problems`.`month`,
+                `Schools_Monthly_Solved_Problems`.`count`
             FROM
-                `Schools`
+                `Schools_Monthly_Solved_Problems`
         ';
         if (!is_null($orden)) {
             $sql .= (
@@ -188,7 +188,7 @@ abstract class Schools {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\Schools(
+            $allData[] = new \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems(
                 $row
             );
         }
@@ -199,51 +199,52 @@ abstract class Schools {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\Schools}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\Schools $Schools El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Schools}
+     * @param \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\Schools $Schools
+        \OmegaUp\DAO\VO\SchoolsMonthlySolvedProblems $Schools_Monthly_Solved_Problems
     ): int {
         $sql = '
             INSERT INTO
-                `Schools` (
-                    `country_id`,
-                    `state_id`,
-                    `name`,
-                    `ranking`,
-                    `score`
+                `Schools_Monthly_Solved_Problems` (
+                    `school_id`,
+                    `year`,
+                    `month`,
+                    `count`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
                     ?
                 );';
         $params = [
-            $Schools->country_id,
-            $Schools->state_id,
-            $Schools->name,
             (
-                is_null($Schools->ranking) ?
+                is_null($Schools_Monthly_Solved_Problems->school_id) ?
                 null :
-                intval($Schools->ranking)
+                intval($Schools_Monthly_Solved_Problems->school_id)
             ),
-            floatval($Schools->score),
+            $Schools_Monthly_Solved_Problems->year,
+            $Schools_Monthly_Solved_Problems->month,
+            (
+                is_null($Schools_Monthly_Solved_Problems->count) ?
+                null :
+                intval($Schools_Monthly_Solved_Problems->count)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Schools->school_id = (
+        $Schools_Monthly_Solved_Problems->school_monthly_solved_problems_id = (
             \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
         );
 

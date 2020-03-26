@@ -10,18 +10,17 @@
 namespace OmegaUp\DAO\VO;
 
 /**
- * Value Object class for table `Schools`.
+ * Value Object class for table `Schools_Monthly_Solved_Problems`.
  *
  * @access public
  */
-class Schools extends \OmegaUp\DAO\VO\VO {
+class SchoolsMonthlySolvedProblems extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
+        'school_monthly_solved_problems_id' => true,
         'school_id' => true,
-        'country_id' => true,
-        'state_id' => true,
-        'name' => true,
-        'ranking' => true,
-        'score' => true,
+        'year' => true,
+        'month' => true,
+        'count' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -34,34 +33,29 @@ class Schools extends \OmegaUp\DAO\VO\VO {
                 'Unknown columns: ' . join(', ', array_keys($unknownColumns))
             );
         }
+        if (isset($data['school_monthly_solved_problems_id'])) {
+            $this->school_monthly_solved_problems_id = intval(
+                $data['school_monthly_solved_problems_id']
+            );
+        }
         if (isset($data['school_id'])) {
             $this->school_id = intval(
                 $data['school_id']
             );
         }
-        if (isset($data['country_id'])) {
-            $this->country_id = strval(
-                $data['country_id']
+        if (isset($data['year'])) {
+            $this->year = strval(
+                $data['year']
             );
         }
-        if (isset($data['state_id'])) {
-            $this->state_id = strval(
-                $data['state_id']
+        if (isset($data['month'])) {
+            $this->month = strval(
+                $data['month']
             );
         }
-        if (isset($data['name'])) {
-            $this->name = strval(
-                $data['name']
-            );
-        }
-        if (isset($data['ranking'])) {
-            $this->ranking = intval(
-                $data['ranking']
-            );
-        }
-        if (isset($data['score'])) {
-            $this->score = floatval(
-                $data['score']
+        if (isset($data['count'])) {
+            $this->count = intval(
+                $data['count']
             );
         }
     }
@@ -73,40 +67,33 @@ class Schools extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $school_id = 0;
+    public $school_monthly_solved_problems_id = 0;
+
+    /**
+     * Identificador de escuela
+     *
+     * @var int|null
+     */
+    public $school_id = null;
 
     /**
      * [Campo no documentado]
      *
      * @var string|null
      */
-    public $country_id = null;
+    public $year = null;
 
     /**
      * [Campo no documentado]
      *
      * @var string|null
      */
-    public $state_id = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var string|null
-     */
-    public $name = null;
+    public $month = null;
 
     /**
      * [Campo no documentado]
      *
      * @var int|null
      */
-    public $ranking = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var float
-     */
-    public $score = 0.00;
+    public $count = null;
 }

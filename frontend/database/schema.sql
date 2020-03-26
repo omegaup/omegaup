@@ -840,7 +840,6 @@ CREATE TABLE `Schools` (
   `name` varchar(128) NOT NULL,
   `ranking` int DEFAULT NULL,
   `score` double NOT NULL DEFAULT '0',
-  `monthly_solved_problems` json DEFAULT NULL,
   PRIMARY KEY (`school_id`),
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
@@ -848,6 +847,20 @@ CREATE TABLE `Schools` (
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Schools_Monthly_Solved_Problems` (
+  `school_monthly_solved_problems_id` int NOT NULL AUTO_INCREMENT,
+  `school_id` int NOT NULL COMMENT 'Identificador de escuela',
+  `year` smallint NOT NULL,
+  `month` smallint NOT NULL,
+  `count` int NOT NULL,
+  PRIMARY KEY (`school_monthly_solved_problems_id`),
+  UNIQUE KEY `school_month_year` (`school_id`,`month`,`year`),
+  KEY `school_id` (`school_id`),
+  CONSTRAINT `fk_smsps_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cantidad de problemas que resolvieron los usuarios de una escuela en un mes y año determinados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
