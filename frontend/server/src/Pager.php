@@ -40,7 +40,7 @@ class Pager {
      * @param array<string, string[]|string> $params Additional key => value
      * parameters to append to the item's URL.
      *
-     * @return list<array{label: string, url: string, class: string}> The
+     * @return list<array{class: string, label: string, page: int, url: string}> The
      * information for each item of the pager.
      */
     public static function paginate(
@@ -60,13 +60,13 @@ class Pager {
             $query = '&' . self::buildQueryString($params);
         }
 
-        /** @var list<array{label: string, url: string, class: string}> */
+        /** @var list<array{class: string, label: string, page: int, url: string}> */
         $items = [];
-        $prev = ['label' => '«', 'url' => '', 'class' => ''];
+        $prev = ['label' => '«', 'url' => '', 'class' => '', 'page' => 0];
         if ($current > 1) {
-            $prev['url'] = $url . '?page=' . ($current - 1) . $query;
+            $prev['page'] = ($current - 1);
+            $prev['url'] = "{$url}?page={$prev['page']}{$query}";
         } else {
-            $prev['url'] = '';
             $prev['class'] = 'disabled';
         }
         $items[] = $prev;
@@ -76,11 +76,13 @@ class Pager {
                 'label' => '1',
                 'url'   => "{$url}?page=1{$query}",
                 'class' => '',
+                'page' => 1,
             ];
             $items[] = [
                 'label' => '...',
                 'url'   => '',
                 'class' => 'disabled',
+                'page' => 0,
             ];
         }
 
@@ -97,6 +99,7 @@ class Pager {
                 'label' => strval($i),
                 'url'   => "{$url}?page={$i}{$query}",
                 'class' => ($i == $current) ? 'active' : '',
+                'page' => $i,
             ];
         }
 
@@ -105,19 +108,21 @@ class Pager {
                 'label' => '...',
                 'url'   => '',
                 'class' => 'disabled',
+                'page' => 0,
             ];
             $items[] = [
                 'label' => strval($pages),
                 'url'   => "{$url}?page={$pages}{$query}",
                 'class' => '',
+                'page' => $pages,
             ];
         }
 
-        $next = ['label' => '»', 'url' => '', 'class' => ''];
+        $next = ['label' => '»', 'url' => '', 'class' => '', 'page' => 0];
         if ($current < $pages) {
-            $next['url'] = $url . '?page=' . ($current + 1) . $query;
+            $next['page'] = ($current + 1);
+            $next['url'] = "{$url}?page={$next['page']}{$query}";
         } else {
-            $next['url'] = '';
             $next['class'] = 'disabled';
         }
         $items[] = $next;

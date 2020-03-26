@@ -418,9 +418,10 @@ export namespace omegaup {
   }
 
   export interface Paginator {
-    label: string;
-    url: string;
     class: string;
+    label: string;
+    page: number;
+    url: string;
   }
 
   export interface Profile extends User {

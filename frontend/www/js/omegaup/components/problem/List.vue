@@ -104,6 +104,8 @@
     </div>
     <omegaup-common-paginator
       v-bind:pagerItems="pagerItems"
+      v-bind:requireCallback="false"
+      v-bind:callback="voidFunction"
     ></omegaup-common-paginator>
   </div>
 </template>
@@ -194,5 +196,7 @@ export default class ProblemList extends Vue {
   wizardSearch(queryParameters: omegaup.QueryParameters): void {
     this.$emit('wizard-search', queryParameters);
   }
+
+  voidFunction(): void {}
 }
 </script>

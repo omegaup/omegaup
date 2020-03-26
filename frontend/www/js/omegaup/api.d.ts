@@ -1224,7 +1224,7 @@ namespace api {
   type ProblemAddTagResponse = { name: string };
   type ProblemAdminListRequest = any;
   type ProblemAdminListResponse = {
-    pagerItems: { class: string; label: string; url: string }[];
+    pagerItems: { class: string; label: string; page: numeric; url: string }[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   type ProblemAdminsRequest = any;
@@ -1333,7 +1333,7 @@ namespace api {
   };
   type ProblemMyListRequest = any;
   type ProblemMyListResponse = {
-    pagerItems: { class: string; label: string; url: string }[];
+    pagerItems: { class: string; label: string; page: numeric; url: string }[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   type ProblemRejudgeRequest = any;

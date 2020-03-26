@@ -112,16 +112,27 @@
         </tbody>
       </table>
     </div>
+    <omegaup-common-paginator
+      v-bind:pagerItems="pagerItems"
+      v-bind:requireCallback="true"
+      v-bind:callback="goToPage"
+    ></omegaup-common-paginator>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import common_Paginator from '../common/Paginator.vue';
 import { omegaup, T } from '../../omegaup.js';
 
-@Component
+@Component({
+  components: {
+    'omegaup-common-paginator': common_Paginator,
+  },
+})
 export default class ProblemMine extends Vue {
   @Prop() problems!: omegaup.Problem[];
+  @Prop() pagerItems!: omegaup.Paginator[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
 
@@ -150,6 +161,11 @@ export default class ProblemMine extends Vue {
   onChangeVisibility(visibiliy: number): number {
     this.selectedProblems = [];
     return visibiliy;
+  }
+
+  @Emit('go-to-page')
+  goToPage(page: number): number {
+    return page;
   }
 }
 </script>
