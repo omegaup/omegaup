@@ -19,7 +19,8 @@ OmegaUp.on('ready', function() {
         badge_alias: payload.badge,
         assignation_time: null,
         first_assignation: null,
-        owners_percentage: null,
+        total_users: null,
+        owners_count: null,
       },
     },
     components: {
@@ -30,15 +31,16 @@ OmegaUp.on('ready', function() {
   API.Badge.badgeDetails({ badge_alias: payload.badge })
     .then(function(data) {
       badgeDetails.badge['first_assignation'] = data['first_assignation'];
-      badgeDetails.badge['owners_percentage'] = data['owners_percentage'];
+      badgeDetails.badge['total_users'] = data['total_users'];
+      badgeDetails.badge['owners_count'] = data['owners_count'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myBadgeAssignationTime({ badge_alias: payload.badge })
       .then(function(data) {
         badgeDetails.badge['assignation_time'] = data['assignation_time'];
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 });

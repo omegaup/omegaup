@@ -132,10 +132,8 @@ abstract class Tags {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Tags[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Tags> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Tags}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Tags>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -196,7 +194,7 @@ abstract class Tags {
     ): int {
         $sql = '
             INSERT INTO
-                Tags (
+                `Tags` (
                     `name`
                 ) VALUES (
                     ?

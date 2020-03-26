@@ -13,17 +13,18 @@ omegaup.OmegaUp.on('ready', function() {
         $('#problem-form .tag-list').append(
           $('<a></a>')
             .attr('href', '#tags')
+            .data('key', e.name)
             .addClass('tag')
             .addClass('pull-left')
-            .text(e.name)
+            .text(omegaup.T.hasOwnProperty(e.name) ? omegaup.T[e.name] : e.name)
             .on('click', onTabClicked),
         );
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   function onTabClicked() {
-    var tagname = $(this).text();
+    var tagname = $(this).data('key');
     var public = $('#tag-public').val() == 'true';
     $(this).remove();
     refreshProblemTags(tagname, public);
@@ -31,13 +32,17 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function refreshProblemTags(tagname, public) {
+    var tagLocalizedName = omegaup.T.hasOwnProperty(tagname)
+      ? omegaup.T[tagname]
+      : tagname;
     $('#problem-tags').append(
       $('<tr></tr>')
         .append(
           $('<td class="tag-name"></td>').append(
             $('<a></a>')
+              .data('key', tagname)
               .attr('href', '/problem/?tag[]=' + encodeURIComponent(tagname))
-              .text(tagname),
+              .text(tagLocalizedName),
           ),
         )
         .append(
@@ -53,9 +58,10 @@ omegaup.OmegaUp.on('ready', function() {
               $('#problem-form .tag-list').append(
                 $('<a></a>')
                   .attr('href', '#tags')
+                  .data('key', tagname)
                   .addClass('tag')
                   .addClass('pull-left')
-                  .text(tagname)
+                  .text(tagLocalizedName)
                   .on('click', onTabClicked),
               );
               $(tr).remove();
@@ -90,7 +96,7 @@ omegaup.OmegaUp.on('ready', function() {
       selectedTags.push({
         tagname: $(this)
           .find('td.tag-name a')
-          .text(),
+          .data('key'),
         public:
           $(this)
             .find('td.is-public')

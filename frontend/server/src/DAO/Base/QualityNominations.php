@@ -157,10 +157,8 @@ abstract class QualityNominations {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\QualityNominations[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\QualityNominations> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\QualityNominations}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\QualityNominations>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -226,7 +224,7 @@ abstract class QualityNominations {
     ): int {
         $sql = '
             INSERT INTO
-                QualityNominations (
+                `QualityNominations` (
                     `user_id`,
                     `problem_id`,
                     `nomination`,

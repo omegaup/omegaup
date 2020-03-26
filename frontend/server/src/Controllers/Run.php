@@ -8,23 +8,72 @@
  * @author joemmanuel
  */
 class Run extends \OmegaUp\Controllers\Controller {
+    // All languages that runs can have.
     public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',
-        'c' => 'C',
-        'cpp' => 'C++',
-        'cpp11' => 'C++ 11',
-        'java' => 'Java',
-        'py' => 'Python',
-        'rb' => 'Ruby',
-        'pl' => 'Perl',
-        'cs' => 'C#',
-        'pas' => 'Pascal',
+        'c11-gcc' => 'C11 (gcc 7.4)',
+        'c11-clang' => 'C11 (clang 6.0)',
+        'cpp11-gcc' => 'C++11 (g++ 7.4)',
+        'cpp11-clang' => 'C++11 (clang++ 6.0)',
+        'cpp17-gcc' => 'C++17 (g++ 7.4)',
+        'cpp17-clang' => 'C++17 (clang++ 6.0)',
+        'java' => 'Java (openjdk 11.0)',
+        'py2' => 'Python 2.7',
+        'py3' => 'Python 3.6',
+        'rb' => 'Ruby (2.5)',
+        'cs' => 'C# (dotnet 2.2)',
+        'pas' => 'Pascal (fpc 3.0)',
         'cat' => 'Output Only',
-        'hs' => 'Haskell',
-        'lua' => 'Lua',
+        'hs' => 'Haskell (ghc 8.0)',
+        'lua' => 'Lua (5.2)',
     ];
+
+    // These languages are aliases. They can be shown to the user, but should
+    // not appear as selectable mostly anywhere.
+    public const LANGUAGE_ALIASES = [
+        'c' => 'C11 (gcc 7.4)',
+        'cpp' => 'C++03 (gcc 7.4)',
+        'cpp11' => 'C++11 (gcc 7.4)',
+        'py' => 'Python 2.7',
+    ];
+
+    public const DEFAULT_LANGUAGES = [
+        'c11-gcc',
+        'c11-clang',
+        'cpp11-gcc',
+        'cpp11-clang',
+        'cpp17-gcc',
+        'cpp17-clang',
+        'cs',
+        'hs',
+        'java',
+        'lua',
+        'pas',
+        'py2',
+        'py3',
+        'rb',
+    ];
+
+    /** @var int */
     public static $defaultSubmissionGap = 60; /*seconds*/
+
+    public const VERDICTS = [
+        'AC',
+        'PA',
+        'WA',
+        'TLE',
+        'OLE',
+        'MLE',
+        'RTE',
+        'RFE',
+        'CE',
+        'JE',
+        'VE',
+        'NO-AC',
+    ];
+
+    public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
 
     /**
      *
@@ -34,43 +83,49 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotAllowedToSubmitException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      */
-    private static function validateCreateRequest(\OmegaUp\Request $r): bool {
+    private static function validateCreateRequest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $allowedLanguages = array_keys(self::SUPPORTED_LANGUAGES);
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
             'problem_alias'
         );
 
         // Check that problem exists
-        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem) || is_null($problem->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
 
-        if ($r['problem']->deprecated) {
+        if ($problem->deprecated) {
             throw new \OmegaUp\Exceptions\PreconditionFailedException(
                 'problemDeprecated'
             );
         }
         // check that problem is not publicly or privately banned.
-        if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
+        if (
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $allowedLanguages = array_intersect(
-            $allowedLanguages,
-            explode(',', $r['problem']->languages)
+            array_keys(self::SUPPORTED_LANGUAGES),
+            explode(',', $problem->languages)
         );
         \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             $allowedLanguages
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source');
 
         // Can't set both problemset_id and contest_alias at the same time.
         if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
@@ -80,12 +135,17 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problemset_id = null;
+        /** @var null|int */
+        $problemsetId = null;
+        /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews */
+        $problemsetContainer = null;
+        /** @var null|\OmegaUp\DAO\VO\Contests */
+        $contest = null;
         if (!empty($r['problemset_id'])) {
             // Got a problemset id directly.
-            $problemset_id = intval($r['problemset_id']);
-            $r['container'] = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
-                $problemset_id
+            $problemsetId = intval($r['problemset_id']);
+            $problemsetContainer = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
+                $problemsetId
             );
         } elseif (!empty($r['contest_alias'])) {
             // Got a contest alias, need to fetch the problemset id.
@@ -94,44 +154,44 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $r['contest_alias'],
                 'contest_alias'
             );
-            $r['contest'] = \OmegaUp\DAO\Contests::getByAlias(
+            $contest = \OmegaUp\DAO\Contests::getByAlias(
                 $r['contest_alias']
             );
-            if (is_null($r['contest'])) {
+            if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterNotFound',
                     'contest_alias'
                 );
             }
 
-            $problemset_id = $r['contest']->problemset_id;
-            $r['container'] = $r['contest'];
+            $problemsetId = intval($contest->problemset_id);
+            $problemsetContainer = $contest;
 
             // Update list of valid languages.
-            if (!is_null($r['contest']->languages)) {
+            if (!is_null($contest->languages)) {
                 $allowedLanguages = array_intersect(
                     $allowedLanguages,
-                    explode(',', $r['contest']->languages)
+                    explode(',', $contest->languages)
                 );
             }
         } else {
             // Check for practice or public problem, there is no contest info
             // in this scenario.
             if (
-                \OmegaUp\DAO\Problems::isVisible($r['problem']) ||
+                \OmegaUp\DAO\Problems::isVisible($problem) ||
                 \OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
-                    $r['problem']
+                    $problem
                 ) ||
                 \OmegaUp\Time::get() > \OmegaUp\DAO\Problems::getPracticeDeadline(
-                    $r['problem']->problem_id
+                    $problem->problem_id
                 )
             ) {
                 if (
                     !\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
                         null,
                         null,
-                        intval($r['problem']->problem_id),
+                        intval($problem->problem_id),
                         intval($r->identity->identity_id)
                     )
                         && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
@@ -141,16 +201,27 @@ class Run extends \OmegaUp\Controllers\Controller {
                         );
                 }
 
-                return true;
+                return [
+                    'isPractice' => true,
+                    'problem' => $problem,
+                    'contest' => null,
+                    'problemsetContainer' => null,
+                    'problemset' => null,
+                ];
             } else {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
                     'problemIsNotPublic'
                 );
             }
         }
+        if (is_null($problemsetContainer)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
 
-        $r['problemset'] = \OmegaUp\DAO\Problemsets::getByPK($problemset_id);
-        if (is_null($r['problemset'])) {
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($problemsetId);
+        if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'problemset_id'
@@ -158,10 +229,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate the language.
-        if (!is_null($r['problemset']->languages)) {
+        if (!is_null($problemset->languages)) {
             $allowedLanguages = array_intersect(
                 $allowedLanguages,
-                explode(',', $r['problemset']->languages)
+                explode(',', $problemset->languages)
             );
         }
         \OmegaUp\Validators::validateInEnum(
@@ -173,8 +244,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Validate that the combination problemset_id problem_id is valid
         if (
             !\OmegaUp\DAO\ProblemsetProblems::getByPK(
-                $problemset_id,
-                $r['problem']->problem_id
+                $problemsetId,
+                $problem->problem_id
             )
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -185,13 +256,13 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $problemsetIdentity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $r->identity->identity_id,
-            $problemset_id
+            $problemsetId
         );
 
         // No one should submit after the deadline. Not even admins.
         if (
             \OmegaUp\DAO\Problemsets::isLateSubmission(
-                $r['container'],
+                $problemsetContainer,
                 $problemsetIdentity
             )
         ) {
@@ -201,13 +272,13 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Contest admins can skip following checks
-        if (!\OmegaUp\Authorization::isAdmin($r->identity, $r['problemset'])) {
+        if (!\OmegaUp\Authorization::isAdmin($r->identity, $problemset)) {
             // Before submit something, user had to open the problem/problemset.
             if (
                 is_null($problemsetIdentity) &&
                 !\OmegaUp\Authorization::canSubmitToProblemset(
                     $r->identity,
-                    $r['problemset']
+                    $problemset
                 )
             ) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
@@ -218,7 +289,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             // Validate that the run is timely inside contest
             if (
                 !\OmegaUp\DAO\Problemsets::isSubmissionWindowOpen(
-                    $r['container']
+                    $problemsetContainer
                 )
             ) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
@@ -229,9 +300,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             // Validate if the user is allowed to submit given the submissions_gap
             if (
                 !\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
-                    intval($problemset_id),
-                    $r['contest'],
-                    intval($r['problem']->problem_id),
+                    intval($problemsetId),
+                    $contest,
+                    intval($problem->problem_id),
                     intval($r->identity->identity_id)
                 )
             ) {
@@ -241,48 +312,64 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        return false;
+        return [
+            'isPractice' => false,
+            'problem' => $problem,
+            'contest' => $contest,
+            'problemset' => $problemset,
+            'problemsetContainer' => $problemsetContainer,
+        ];
     }
 
     /**
      * Create a new run
      *
-     * @param \OmegaUp\Request $r
-     * @return array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
+     *
+     * @return array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
         // Validate request
-        $practice = self::validateCreateRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source');
+        [
+            'isPractice' => $isPractice,
+            'problem' => $problem,
+            'contest' => $contest,
+            'problemsetContainer' => $problemsetContainer,
+            'problemset' => $problemset,
+        ] = self::validateCreateRequest($r);
 
         self::$log->info('New run being submitted!!');
         $response = [];
 
-        if ($practice) {
+        /** @var null|int */
+        $problemsetId = null;
+        if ($isPractice) {
             if (OMEGAUP_LOCKDOWN) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'lockdown'
                 );
             }
             $submitDelay = 0;
-            $problemsetId = null;
             $type = 'normal';
         } else {
+            $problemsetId = !is_null(
+                $problemset
+            ) ? intval(
+                $problemset->problemset_id
+            ) : null;
             //check the kind of penalty_type for this contest
             $start = null;
-            $problemsetId = intval($r['problemset']->problemset_id);
-            if (isset($r['contest'])) {
-                $penalty_type = $r['contest']->penalty_type;
-
-                switch ($penalty_type) {
+            if (!is_null($contest) && !is_null($problemsetId)) {
+                switch ($contest->penalty_type) {
                     case 'contest_start':
                         // submit_delay is calculated from the start
                         // of the contest
-                        $start = $r['contest']->start_time;
+                        $start = $contest->start_time;
                         break;
 
                     case 'problem_open':
@@ -290,14 +377,13 @@ class Run extends \OmegaUp\Controllers\Controller {
                         // time the user opened the problem
                         $opened = \OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
                             $problemsetId,
-                            $r['problem']->problem_id,
+                            intval($problem->problem_id),
                             $r->identity->identity_id
                         );
 
                         if (is_null($opened)) {
-                            //holy moly, he is submitting a run
-                            //and he hasnt even opened the problem
-                            //what should be done here?
+                            // welp, the user is submitting a run before even
+                            // opening the problem!
                             throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
                                 'runEvenOpened'
                             );
@@ -308,7 +394,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
                     case 'none':
                     case 'runtime':
-                        //we dont care
+                        // we don't care about problemset start.
                         $start = null;
                         break;
 
@@ -321,37 +407,49 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
 
             if (!is_null($start)) {
-                //asuming submit_delay is in minutes
+                // assuming submit_delay is in minutes.
                 $submitDelay = intval((\OmegaUp\Time::get() - $start) / 60);
             } else {
                 $submitDelay = 0;
             }
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
-
-            $type = (\OmegaUp\Authorization::isAdmin(
-                $r->identity,
-                $r['problemset']
-            ) &&
-                !is_null($r['contest']) &&
+            $type = (
+                !is_null($problemset) &&
+                !is_null($contest) &&
+                \OmegaUp\Authorization::isAdmin(
+                    $r->identity,
+                    $problemset
+                ) &&
                 !\OmegaUp\DAO\Contests::isVirtual(
-                    $r['contest']
-                )) ? 'test' : 'normal';
+                    $contest
+                )
+            ) ? 'test' : 'normal';
         }
 
         // Populate new run+submission object
         $submission = new \OmegaUp\DAO\VO\Submissions([
             'identity_id' => $r->identity->identity_id,
-            'problem_id' => $r['problem']->problem_id,
+            'problem_id' => $problem->problem_id,
             'problemset_id' => $problemsetId,
-            'guid' => md5(uniqid(rand(), true)),
+            'guid' => md5(uniqid(strval(rand()), true)),
             'language' => $r['language'],
             'time' => \OmegaUp\Time::get(),
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
+
+        if (!is_null($r->identity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $r->identity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $submission->school_id = $identitySchool->school_id;
+            }
+        }
+
         $run = new \OmegaUp\DAO\VO\Runs([
-            'version' => $r['problem']->current_version,
+            'version' => $problem->current_version,
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
@@ -399,13 +497,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
             'problemset_id' => $submission->problemset_id,
-            'ip' => ip2long($_SERVER['REMOTE_ADDR'])
+            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR']))
         ]));
 
-        $r['problem']->submissions++;
-        \OmegaUp\DAO\Problems::update($r['problem']);
+        $problem->submissions++;
+        \OmegaUp\DAO\Problems::update($problem);
 
-        if ($practice) {
+        if ($isPractice) {
             $response['submission_deadline'] = 0;
         } else {
             // Add remaining time to the response
@@ -421,16 +519,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             ) {
                 $response['submission_deadline'] =
                     intval($problemsetIdentity->end_time);
-            } elseif (isset($r['container']->finish_time)) {
+            } elseif (isset($problemsetContainer->finish_time)) {
                 $response['submission_deadline'] =
-                    intval($r['container']->finish_time);
+                    intval($problemsetContainer->finish_time);
             } else {
                 $response['submission_deadline'] = 0;
             }
         }
-
-        /** @var null|\OmegaUp\DAO\VO\Contests */
-        $contest = isset($r['contest']) ? $r['contest'] : null;
 
         // Happy ending
         $response['nextSubmissionTimestamp'] =
@@ -439,7 +534,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
         $response['guid'] = $submission->guid;
-        $response['status'] = 'ok';
 
         // Expire rank cache
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -450,47 +544,55 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Validate request of details
      *
-     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{submission: \OmegaUp\DAO\VO\Submissions, run: \OmegaUp\DAO\VO\Runs}
      */
-    private static function validateDetailsRequest(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
-        );
-
+    private static function validateDetailsRequest(string $runAlias): array {
         // If user is not judge, must be the run's owner.
-        $r['submission'] = \OmegaUp\DAO\Submissions::getByGuid($r['run_alias']);
-        if (is_null($r['submission'])) {
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
+        if (is_null($submission) || is_null($submission->current_run_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        $r['run'] = \OmegaUp\DAO\Runs::getByPK(
-            $r['submission']->current_run_id
+        $run = \OmegaUp\DAO\Runs::getByPK(
+            $submission->current_run_id
         );
-        if (is_null($r['run'])) {
+        if (is_null($run)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
+
+        return [
+            'run' => $run,
+            'submission' => $submission,
+        ];
     }
 
     /**
      * Get basic details of a run
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
+     *
+     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: int}
      */
-    public static function apiStatus(\OmegaUp\Request $r) {
+    public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        self::validateDetailsRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['run_alias'],
+            'run_alias'
+        );
+        [
+            'run' => $run,
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($r['run_alias']);
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
                 $r->identity,
-                $r['submission']
+                $submission
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -500,14 +602,14 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Fill response
         $filtered = (
-            $r['submission']->asFilteredArray([
+            $submission->asFilteredArray([
                 'guid', 'language', 'time', 'submit_delay',
             ]) +
-            $r['run']->asFilteredArray([
+            $run->asFilteredArray([
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
-        $filtered['time'] = $filtered['time'];
+        $filtered['time'] = intval($filtered['time']);
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
         $filtered['penalty'] = intval($filtered['penalty']);
@@ -521,7 +623,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 2
             );
         }
-        if ($r['submission']->identity_id == $r->identity->identity_id) {
+        if ($submission->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
         }
         return $filtered;
@@ -530,18 +632,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Re-sends a problem to Grader.
      *
-     * @param \OmegaUp\Request $r
+     * @return array{status: string}
      */
-    public static function apiRejudge(\OmegaUp\Request $r) {
+    public static function apiRejudge(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        self::validateDetailsRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['run_alias'],
+            'run_alias'
+        );
+        [
+            'run' => $run,
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($r['run_alias']);
 
         if (
             !\OmegaUp\Authorization::canEditSubmission(
                 $r->identity,
-                $r['submission']
+                $submission
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -554,8 +663,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Reset fields.
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            $r['run']->status = 'new';
-            \OmegaUp\DAO\Runs::update($r['run']);
+            $run->status = 'new';
+            \OmegaUp\DAO\Runs::update($run);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -564,7 +673,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
-                [$r['run']],
+                [$run],
                 $r['debug'] || false
             );
         } catch (\Exception $e) {
@@ -574,7 +683,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $response = [];
         $response['status'] = 'ok';
 
-        self::invalidateCacheOnRejudge($r['run']);
+        self::invalidateCacheOnRejudge($run);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -585,18 +694,24 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Disqualify a submission
      *
-     * @param \OmegaUp\Request $r
+     * @return array{status: string}
      */
-    public static function apiDisqualify(\OmegaUp\Request $r) {
+    public static function apiDisqualify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        self::validateDetailsRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['run_alias'],
+            'run_alias'
+        );
+        [
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($r['run_alias']);
 
         if (
             !\OmegaUp\Authorization::canEditSubmission(
                 $r->identity,
-                $r['submission']
+                $submission
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -604,7 +719,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Submissions::disqualify($r['submission']->guid);
+        \OmegaUp\DAO\Submissions::disqualify(strval($submission->guid));
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -615,28 +730,26 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Invalidates relevant caches on run rejudge
-     *
-     * @param \OmegaUp\DAO\VO\Runs $run
      */
     public static function invalidateCacheOnRejudge(\OmegaUp\DAO\VO\Runs $run): void {
         try {
             // Expire details of the run
             \OmegaUp\Cache::deleteFromCache(
                 \OmegaUp\Cache::RUN_ADMIN_DETAILS,
-                $run->run_id
+                strval($run->run_id)
             );
 
             $submission = \OmegaUp\DAO\Submissions::getByPK(
-                $run->submission_id
+                intval($run->submission_id)
             );
-            if (is_null($submission)) {
+            if (is_null($submission) || is_null($submission->problem_id)) {
                 return;
             }
 
             // Now we need to invalidate problem stats
             $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
 
-            if (!is_null($problem)) {
+            if (!is_null($problem) && !is_null($problem->alias)) {
                 // Invalidar cache stats
                 \OmegaUp\Cache::deleteFromCache(
                     \OmegaUp\Cache::PROBLEM_STATS,
@@ -655,27 +768,32 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        self::validateDetailsRequest($r);
-
-        $r['problem'] = \OmegaUp\DAO\Problems::getByPK(
-            $r['submission']->problem_id
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['run_alias'],
+            'run_alias'
         );
-        if (is_null($r['problem'])) {
+        [
+            'run' => $run,
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($r['run_alias']);
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            intval($submission->problem_id)
+        );
+        if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
                 $r->identity,
-                $r['submission']
+                $submission
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -684,41 +802,45 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the source
-        /** @val array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string} */
         $response = [
-            'status' => 'ok',
             'admin' => \OmegaUp\Authorization::isProblemAdmin(
                 $r->identity,
-                $r['problem']
+                $problem
             ),
-            'guid' => $r['submission']->guid,
-            'language' => $r['submission']->language,
+            'guid' => strval($submission->guid),
+            'language' => strval($submission->language),
         ];
-        $showDetails = $response['admin'] ||
-            \OmegaUp\DAO\Problems::isProblemSolved(
-                $r['problem'],
-                intval(
-                    $r->identity->identity_id
-                )
-            );
 
         // Get the details, compile error, logs, etc.
-        self::populateRunDetails(
-            $r['submission'],
-            $r['run'],
-            $showDetails,
-            $response
+        $details = self::getOptionalRunDetails(
+            $submission,
+            $run,
+            /*$showDetails=*/(
+                $response['admin'] ||
+                \OmegaUp\DAO\Problems::isProblemSolved(
+                    $problem,
+                    intval(
+                        $r->identity->identity_id
+                    )
+                )
+            )
         );
+        $response['source'] = $details['source'];
+        if (isset($details['compile_error'])) {
+            $response['compile_error'] = $details['compile_error'];
+        }
+        if (isset($details['details'])) {
+            $response['details'] = $details['details'];
+        }
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
-            $gzippedLogs = self::getGraderResource($r['run'], 'logs.txt.gz');
+            $gzippedLogs = self::getGraderResource($run, 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
-                $response['logs'] = gzdecode($gzippedLogs);
+                $response['logs'] = strval(gzdecode($gzippedLogs));
             }
 
-            $response['judged_by'] = $r['run']->judged_by;
+            $response['judged_by'] = strval($run->judged_by);
         }
 
-        /** @val array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string} $response */
         return $response;
     }
 
@@ -726,19 +848,27 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Given the run alias, returns the source code and any compile errors if any
      * Used in the arena, any contestant can view its own codes and compile errors
      *
-     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      */
-    public static function apiSource(\OmegaUp\Request $r) {
+    public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        self::validateDetailsRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['run_alias'],
+            'run_alias'
+        );
+        [
+            'run' => $run,
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($r['run_alias']);
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
                 $r->identity,
-                $r['submission']
+                $submission
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -746,49 +876,56 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $response = [
-            'status' => 'ok',
-        ];
-        self::populateRunDetails($r['submission'], $r['run'], false, $response);
-        return $response;
+        return self::getOptionalRunDetails(
+            $submission,
+            $run,
+            false
+        );
     }
 
-    private static function populateRunDetails(
+    /**
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     */
+    private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
-        bool $showDetails,
-        &$response
-    ) {
+        bool $showDetails
+    ): array {
+        $response = [];
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
             $response['source'] = \OmegaUp\Controllers\Submission::getSource(
-                $submission->guid
+                strval($submission->guid)
             );
         }
         if (!$showDetails && $run->verdict != 'CE') {
-            return;
+            return $response;
         }
         $detailsJson = self::getGraderResource($run, 'details.json');
         if (!is_string($detailsJson)) {
-            return;
+            return $response;
         }
+        /** @var array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float} */
         $details = json_decode($detailsJson, true);
-        if (isset($details['compile_error'])) {
+        if (
+            isset($details['compile_error']) &&
+            is_string($details['compile_error'])
+        ) {
             $response['compile_error'] = $details['compile_error'];
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;
         }
+        return $response;
     }
 
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
-     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    public static function apiDownload(\OmegaUp\Request $r) {
+    public static function apiDownload(\OmegaUp\Request $r): void {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -811,13 +948,20 @@ class Run extends \OmegaUp\Controllers\Controller {
         exit;
     }
 
+    /**
+     * @return bool|null|string
+     */
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $passthru
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
-        if (is_null($submission)) {
+        if (
+            is_null($submission) ||
+            is_null($submission->current_run_id) ||
+            is_null($submission->problem_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
@@ -850,7 +994,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getGraderResource(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename
-    ) {
+    ): ?string {
         $result = \OmegaUp\Grader::getInstance()->getGraderResource(
             $run,
             $filename,
@@ -865,6 +1009,9 @@ class Run extends \OmegaUp\Controllers\Controller {
         return $result;
     }
 
+    /**
+     * @return bool|null|string
+     */
     private static function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename
@@ -901,49 +1048,122 @@ class Run extends \OmegaUp\Controllers\Controller {
             return null;
         }
 
-        $descriptorspec = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
+        if (strpos($resourcePath, '/') !== 0) {
+            $resourcePath = "/{$resourcePath}";
+        }
+        $accessKeyId = strval(AWS_CLI_ACCESS_KEY_ID);
+        $secretAccessKey = strval(AWS_CLI_SECRET_ACCESS_KEY);
+        $regionName = 'us-east-1';
+        $bucketName = 'omegaup-runs';
+        $serviceName = 's3';
+        $signingAlgorithm = 'AWS4-HMAC-SHA256';
+
+        $now = \OmegaUp\Time::get();
+        $datestamp = gmstrftime('%Y%m%d', $now);
+        $timestamp = gmstrftime('%Y%m%dT%H%M%SZ', $now);
+        $emptySHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+        $headers = [
+            'Host' => "{$bucketName}.{$serviceName}.amazonaws.com",
+            'X-Amz-Content-Sha256' => $emptySHA256,
+            'X-Amz-Date' => $timestamp,
         ];
-        $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/{$resourcePath} -",
-            $descriptorspec,
-            $pipes,
-            '/tmp',
+        $signedHeaders = join(
+            ';',
+            array_map(
+                function (string $key): string {
+                    return strtolower($key);
+                },
+                array_keys($headers)
+            )
+        );
+        $canonicalRequest = join(
+            "\n",
             [
-                'AWS_ACCESS_KEY_ID' => AWS_CLI_ACCESS_KEY_ID,
-                'AWS_SECRET_ACCESS_KEY' => AWS_CLI_SECRET_ACCESS_KEY,
+                'GET',
+                $resourcePath,
+                '',
+                join(
+                    '',
+                    array_map(
+                        function (string $key) use ($headers): string {
+                            return strtolower($key) . ":{$headers[$key]}\n";
+                        },
+                        array_keys($headers)
+                    )
+                ),
+                $signedHeaders,
+                $emptySHA256,
             ]
         );
 
-        if (!is_resource($proc)) {
-            $errors = error_get_last();
-            if (is_null($errors)) {
-                self::$log->error("Getting {$resourcePath} failed");
-            } else {
-                self::$log->error(
-                    "Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}"
-                );
-            }
-            return null;
-        }
+        $scope = "{$datestamp}/{$regionName}/{$serviceName}/aws4_request";
+        $stringToSign = join(
+            "\n",
+            [
+                $signingAlgorithm,
+                $timestamp,
+                $scope,
+                hash('sha256', $canonicalRequest),
+            ]
+        );
 
-        fclose($pipes[0]);
-        $err = trim(stream_get_contents($pipes[2]));
-        fclose($pipes[2]);
+        $dateSignature = hash_hmac(
+            'sha256',
+            $datestamp,
+            "AWS4{$secretAccessKey}",
+            true
+        );
+        $regionSignature = hash_hmac(
+            'sha256',
+            $regionName,
+            $dateSignature,
+            true
+        );
+        $serviceSignature = hash_hmac(
+            'sha256',
+            $serviceName,
+            $regionSignature,
+            true
+        );
+        $signingKey = hash_hmac(
+            'sha256',
+            'aws4_request',
+            $serviceSignature,
+            true
+        );
+        $signature = hash_hmac(
+            'sha256',
+            $stringToSign,
+            $signingKey,
+            false
+        );
+        $headers['Authorization'] = "{$signingAlgorithm} Credential={$accessKeyId}/{$scope}, SignedHeaders={$signedHeaders}, Signature={$signature}";
+
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl,
+            [
+                CURLOPT_URL => "https://{$headers['Host']}{$resourcePath}",
+                CURLOPT_HTTPHEADER => array_map(
+                    function (string $key) use ($headers): string {
+                        return "{$key}: {$headers[$key]}";
+                    },
+                    array_keys($headers)
+                ),
+                CURLOPT_RETURNTRANSFER => intval(!$passthru),
+            ]
+        );
+
+        $output = curl_exec($curl);
         if ($passthru) {
-            fpassthru($pipes[1]);
             $result = '';
         } else {
-            $result = stream_get_contents($pipes[1]);
+            $result = strval($output);
         }
-        fclose($pipes[1]);
-
-        $retval = proc_close($proc);
-
-        if ($retval != 0) {
-            self::$log->error("Getting {$resourcePath} failed: $retval $err");
+        /** @var int */
+        $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($output === false || $retval != 200) {
+            self::$log->error("Getting {$resourcePath} failed: {$output}");
             return null;
         }
         return $result;
@@ -952,10 +1172,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Get total of last 6 months
      *
-     * @param \OmegaUp\Request $r
-     * @return type
+     * @return array{total: array<string, int>, ac: array<string, int>}
      */
-    public static function apiCounts(\OmegaUp\Request $r): array {
+    public static function apiCounts(\OmegaUp\Request $r) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::RUN_COUNTS,
             '',
@@ -971,8 +1190,12 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
 
                 foreach ($runCounts as $runCount) {
-                    $totals['total'][$runCount->date] = $runCount->total;
-                    $totals['ac'][$runCount->date] = $runCount->ac_count;
+                    $totals['total'][strval(
+                        $runCount->date
+                    )] = $runCount->total;
+                    $totals['ac'][strval(
+                        $runCount->date
+                    )] = $runCount->ac_count;
                 }
 
                 return $totals;
@@ -982,20 +1205,46 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get total of runs have been submitted last 3 months.
+     *
+     * @return array{date: list<string>, total: list<int>}
+     */
+    public static function getCounts() {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::RUN_TOTAL_COUNTS,
+            '',
+            function () {
+                $result = [];
+                $result['date'] = [];
+                $result['total'] = [];
+                $runCounts = \OmegaUp\DAO\RunCounts::getAll(
+                    1,
+                    90,
+                    'date',
+                    'DESC'
+                );
+
+                foreach ($runCounts as $runCount) {
+                    $result['date'][] = strval($runCount->date);
+                    $result['total'][] = intval($runCount->total);
+                }
+
+                return $result;
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
+    }
+
+    /**
      * Validator for List API
      *
-     * @param \OmegaUp\Request $r
+     * @return array{problem: null|\OmegaUp\DAO\VO\Problems, identity: null|\OmegaUp\DAO\VO\Identities}
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateList(\OmegaUp\Request $r) {
-        // Defaults for offset and rowcount
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
+    private static function validateList(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -1003,83 +1252,101 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum(
-            $r['status'],
-            'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready'],
-            false
-        );
-        \OmegaUp\Validators::validateInEnum(
-            $r['verdict'],
-            'verdict',
-            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
-            false
-        );
-
         // Check filter by problem, is optional
+        /** @var null|\OmegaUp\DAO\VO\Problems */
+        $problem = null;
         if (!is_null($r['problem_alias'])) {
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['problem_alias'],
                 'problem'
             );
 
-            $r['problem'] = \OmegaUp\DAO\Problems::getByAlias(
+            $problem = \OmegaUp\DAO\Problems::getByAlias(
                 $r['problem_alias']
             );
-            if (is_null($r['problem'])) {
+            if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
             }
         }
 
-        \OmegaUp\Validators::validateInEnum(
-            $r['language'],
-            'language',
-            array_keys(self::SUPPORTED_LANGUAGES),
-            false
-        );
-
         // Get user if we have something in username
+        /** @var null|\OmegaUp\DAO\VO\Identities */
+        $identity = null;
         if (!is_null($r['username'])) {
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['username'],
+                'username'
+            );
             try {
-                $r['identity'] = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
                     $r['username']
                 );
             } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
-                $r['username'] = null;
-                $r['identity'] = null;
             }
         }
+
+        return [
+            'problem' => $problem,
+            'identity' => $identity,
+        ];
     }
 
     /**
      * Gets a list of latest runs overall
      *
-     * @param \OmegaUp\Request $r
-     * @return string
+     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
      */
-    public static function apiList(\OmegaUp\Request $r) {
+    public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
         $r->ensureIdentity();
-        self::validateList($r);
+
+        // Defaults for offset and rowcount
+        $r->ensureInt('offset', null, null, false);
+        if (!isset($r['offset'])) {
+            $r['offset'] = 0;
+        }
+        $r->ensureInt('rowcount', null, null, false);
+        if (!isset($r['rowcount'])) {
+            $r['rowcount'] = 100;
+        }
+
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['status'],
+            'status',
+            self::STATUS
+        );
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['verdict'],
+            'verdict',
+            \OmegaUp\Controllers\Run::VERDICTS
+        );
+
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['language'],
+            'language',
+            array_keys(self::SUPPORTED_LANGUAGES)
+        );
+
+        [
+            'problem' => $problem,
+            'identity' => $identity,
+        ] = self::validateList($r);
 
         $runs = \OmegaUp\DAO\Runs::getAllRuns(
             null,
             $r['status'],
             $r['verdict'],
-            !is_null($r['problem']) ? $r['problem']->problem_id : null,
+            !is_null($problem) ? $problem->problem_id : null,
             $r['language'],
-            !is_null($r['identity']) ? $r['identity']->identity_id : null,
-            $r['offset'],
-            $r['rowcount']
+            !is_null($identity) ? $identity->identity_id : null,
+            intval($r['offset']),
+            intval($r['rowcount'])
         );
 
         $result = [];
-
         foreach ($runs as $run) {
             $run['time'] = intval($run['time']);
             $run['score'] = round(floatval($run['score']), 4);
@@ -1091,13 +1358,11 @@ class Run extends \OmegaUp\Controllers\Controller {
                     2
                 );
             }
-            array_push($result, $run);
+            $result[] = $run;
         }
 
-        $response = [];
-        $response['runs'] = $result;
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'runs' => $result,
+        ];
     }
 }

@@ -212,10 +212,8 @@ abstract class ProblemsetProblemOpened {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\ProblemsetProblemOpened[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\ProblemsetProblemOpened> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\ProblemsetProblemOpened>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -278,7 +276,7 @@ abstract class ProblemsetProblemOpened {
     ): int {
         $sql = '
             INSERT INTO
-                Problemset_Problem_Opened (
+                `Problemset_Problem_Opened` (
                     `problemset_id`,
                     `problem_id`,
                     `identity_id`,

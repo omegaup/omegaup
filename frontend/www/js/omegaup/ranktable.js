@@ -20,7 +20,7 @@ OmegaUp.on('ready', function() {
           problemsSolvedUser = user.problems_solved;
         }
         ranking.add({
-          rank: user.rank,
+          rank: user.ranking,
           country: user.country_id,
           username: user.username,
           classname: user.classname,
@@ -61,5 +61,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

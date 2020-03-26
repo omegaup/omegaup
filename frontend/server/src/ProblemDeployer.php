@@ -10,7 +10,7 @@ class ProblemDeployer {
     const UPDATE_CASES = 1;
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
-
+    const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
     /** @var \Logger */
     private $log;
 
@@ -26,7 +26,7 @@ class ProblemDeployer {
     /** @var null|string */
     public $publishedCommit = null;
 
-    /** @var string[] */
+    /** @var list<string> */
     private $updatedLanguages = [];
 
     /** @var bool */
@@ -279,14 +279,16 @@ class ProblemDeployer {
     /**
      * Returns the list of languages of updated statement or solution files.
      *
-     * @param string The filetype
-     * @return array The list of updated languages
+     * @return list<string>
      */
     public function getUpdatedLanguages() {
         return $this->updatedLanguages;
     }
 
-    private function executeRaw(array $args, string $cwd): array {
+    /**
+     * @return array{output: null|string, retval: int}
+     */
+    private function executeRaw(array $args, string $cwd) {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
@@ -329,7 +331,7 @@ class ProblemDeployer {
         }
         return [
             'retval' => $retval,
-            'output' => $output,
+            'output' => $output ?: null,
         ];
     }
 
@@ -363,6 +365,18 @@ class ProblemDeployer {
         $zipFile = fopen($zipPath, 'r');
         /** @var int */
         $zipFileSize = fstat($zipFile)['size'];
+        if ($zipFileSize > self::ZIP_MAX_SIZE) {
+            $exception = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerExceededZipSizeLimit'
+            );
+            $exception->addCustomMessageToArray('size', strval(
+                $zipFileSize / 1024 / 1024
+            ));
+            $exception->addCustomMessageToArray('max_size', strval(
+                self::ZIP_MAX_SIZE / 1024 / 1024
+            ));
+            throw $exception;
+        }
         try {
             $queryParams = [
                 'message' => $commitMessage,
@@ -401,10 +415,11 @@ class ProblemDeployer {
             );
             $output = curl_exec($curl);
             /** @var int */
-            $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $retval = ($output !== false && $retval == 200) ? 0 : 1;
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $retval = ($output !== false && $statusCode == 200) ? 0 : 1;
             $result = [
                 'retval' => $retval,
+                'statusCode' => $statusCode,
                 'output' => strval($output),
             ];
         } finally {
@@ -412,6 +427,11 @@ class ProblemDeployer {
             fclose($zipFile);
         }
 
+        if ($result['statusCode'] == 409) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'problemAliasExists'
+            );
+        }
         if ($result['retval'] != 0) {
             $errorMessage = 'problemDeployerInternalError';
             $context = null;

@@ -1,5 +1,5 @@
 import common_Footer from '../components/common/Footer.vue';
-import { OmegaUp, T} from '../omegaup.js';
+import { OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

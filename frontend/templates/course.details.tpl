@@ -1,6 +1,6 @@
-{include file='head.tpl' navbarSection='schools' htmlTitle="{#courseDetails#}"}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#courseDetails#}" inline}
 
-<script src="{version_hash src="/js/course.js"}"></script>
+<script src="{version_hash src="/js/course.js"}" defer></script>
 
 <script type="text/html" id="assignments-list">
 <h3 data-bind="text: header"></h3>
@@ -67,8 +67,8 @@
                                                      assignment: homework,
                                                      assignmentType: 'homework' } } "></span>
                 <span data-bind="template: { name: 'assignments-list',
-                                             data: { header: '{#wordsTest#}',
-                                                     newLabel: '{#wordsNewTest#}',
+                                             data: { header: '{#wordsExams#}',
+                                                     newLabel: '{#wordsNewExam#}',
                                                      course: $data,
                                                      assignment: test,
                                                      assignmentType: 'test' } } "></span>
@@ -79,4 +79,4 @@
 </script>
 
 <div id="course-info" data-bind="template: 'course-info-template'"></div>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

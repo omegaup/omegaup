@@ -1,7 +1,7 @@
-{include file='head.tpl' htmlTitle="{#interviewList#}"}
+{include file='head.tpl' htmlTitle="{#interviewList#}" inline}
 
 <span id="form-data" data-name="interviews" data-page="new"></span>
-<script src="{version_hash src="/js/alias.generate.js"}"></script>
+<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -54,6 +54,6 @@
 	</table>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/interviews.list.js"}"></script>
-{include file='footer.tpl'}
+<script type="text/javascript" src="{version_hash src="/js/interviews.list.js"}" defer></script>
+{include file='footer.tpl' inline}
 

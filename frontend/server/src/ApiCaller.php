@@ -20,19 +20,42 @@ class ApiCaller {
      */
     public static function call(\OmegaUp\Request $request): array {
         try {
+            if (self::isCSRFAttempt()) {
+                throw new \OmegaUp\Exceptions\CSRFException();
+            }
             $response = $request->execute();
+            if (
+                self::isAssociativeArray($response) &&
+                !isset($response['status'])
+            ) {
+                $response['status'] = 'ok';
+            }
+            \OmegaUp\Metrics::getInstance()->apiStatus(
+                strval($request->methodName),
+                200
+            );
+            return $response;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error($e);
-            $response = $e->asResponseArray();
+            $apiException = $e;
         } catch (\Exception $e) {
-            self::$log->error($e);
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
                 $e
             );
-            $response = $apiException->asResponseArray();
         }
 
-        return $response;
+        self::$log->error($apiException);
+        \OmegaUp\Metrics::getInstance()->apiStatus(
+            strval($request->methodName),
+            intval($apiException->getCode())
+        );
+        if (
+            extension_loaded('newrelic') &&
+            $apiException->getCode() == 500
+        ) {
+            newrelic_notice_error(strval($apiException));
+        }
+        /** @var array<string, mixed> */
+        return $apiException->asResponseArray();
     }
 
     /**
@@ -45,46 +68,33 @@ class ApiCaller {
             // This API request was explicitly created.
             return false;
         }
-        $referrer_host = parse_url(
+        $referrerHost = parse_url(
             strval($_SERVER['HTTP_REFERER']),
             PHP_URL_HOST
         );
-        if (is_null($referrer_host)) {
+        if (is_null($referrerHost)) {
             // Malformed referrer. Fail closed and prefer to not allow this.
             return true;
         }
         // Instead of attempting to exactly match the whole URL, just ensure
         // the host is the same. Otherwise this would break tests and local
         // development environments.
-        $allowed_hosts = [
+        $allowedHosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
         ];
-        return !in_array($referrer_host, $allowed_hosts, true);
+        return !in_array($referrerHost, $allowedHosts, true);
     }
 
     /**
      * Handles main API workflow. All HTTP API calls start here.
      */
     public static function httpEntryPoint(): string {
-        $r = null;
-        /** @var null|\OmegaUp\Exceptions\ApiException */
-        $apiException = null;
         try {
-            if (self::isCSRFAttempt()) {
-                throw new \OmegaUp\Exceptions\CSRFException();
-            }
             $r = self::createRequest();
-            $response = $r->execute();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $apiException = $e;
-        } catch (\Exception $e) {
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
-                $e
-            );
-        }
-
-        if (!is_null($apiException)) {
+            $response = self::call($r);
+        } catch (\OmegaUp\Exceptions\ApiException $apiException) {
+            $r = null;
             $response = $apiException->asResponseArray();
             self::$log->error($apiException);
             if (
@@ -94,7 +104,6 @@ class ApiCaller {
                 newrelic_notice_error(strval($apiException));
             }
         }
-
         return self::render($response, $r);
     }
 
@@ -109,7 +118,7 @@ class ApiCaller {
         $i = 0;
         /** @var mixed $_ */
         foreach ($array as $key => $_) {
-            if ($key != $i++) {
+            if ($key !== $i++) {
                 return true;
             }
         }
@@ -201,11 +210,11 @@ class ApiCaller {
         $controllerName = str_replace(chr(0), '', $controllerName);
         $methodName = str_replace(chr(0), '', $args[3]);
 
-        $controllerName = "\\OmegaUp\\Controllers\\{$controllerName}";
+        $controllerFqdn = "\\OmegaUp\\Controllers\\{$controllerName}";
 
-        if (!class_exists($controllerName)) {
+        if (!class_exists($controllerFqdn)) {
             self::$log->error(
-                "Controller name was not found: {$controllerName}"
+                "Controller name was not found: {$controllerFqdn}"
             );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -214,12 +223,12 @@ class ApiCaller {
         $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
-        $methodName = "api{$methodName}";
+        $apiMethodName = "api{$methodName}";
 
         // Check the method
-        if (!method_exists($controllerName, $methodName)) {
+        if (!method_exists($controllerFqdn, $apiMethodName)) {
             self::$log->error(
-                "Method name was not found: {$controllerName}::{$methodName}"
+                "Method name was not found: {$controllerFqdn}::{$apiMethodName}"
             );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -236,7 +245,9 @@ class ApiCaller {
             $request[$args[$i]] = urldecode($args[$i + 1]);
         }
 
-        $request->method = "{$controllerName}::{$methodName}";
+        $request->methodName = strtolower("{$controllerName}.{$methodName}");
+        /** @var callable-string */
+        $request->method = "{$controllerFqdn}::{$apiMethodName}";
 
         return $request;
     }
@@ -275,6 +286,7 @@ class ApiCaller {
      * terminates the request.
      *
      * @param \Exception $e the thrown exception.
+     * @return no-return
      */
     public static function handleException(\Exception $e): void {
         $apiException = null;
@@ -302,19 +314,31 @@ class ApiCaller {
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
+            die(
+                file_get_contents(
+                    sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
+                )
+            );
         }
         if ($apiException->getcode() == 404) {
             self::$log->info("{$apiException}");
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
+            die(
+                file_get_contents(
+                    sprintf('%s/www/404.html', strval(OMEGAUP_ROOT))
+                )
+            );
         }
         self::$log->error("{$apiException}");
         if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
             newrelic_notice_error(strval($apiException));
         }
         header('HTTP/1.1 500 Internal Server Error');
-        die(file_get_contents(OMEGAUP_ROOT . '/www/500.html'));
+        die(
+            file_get_contents(
+                sprintf('%s/www/500.html', strval(OMEGAUP_ROOT))
+            )
+        );
     }
 }
 

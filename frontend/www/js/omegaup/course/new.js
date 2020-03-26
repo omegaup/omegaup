@@ -16,42 +16,48 @@ OmegaUp.on('ready', function() {
         props: { T: T, update: false, course: this.course },
         on: {
           submit: function(ev) {
-            var schoolIdDeferred = $.Deferred();
-            if (ev.school_id) {
-              schoolIdDeferred.resolve(ev.school_id);
-            } else if (ev.school_name) {
-              API.School.create({ name: ev.school_name })
-                .then(function(data) {
-                  schoolIdDeferred.resolve(data.school_id);
-                })
-                .fail(UI.apiError);
-            } else {
-              schoolIdDeferred.resolve(null);
-            }
-            schoolIdDeferred
+            new Promise((accept, reject) => {
+              if (ev.school_id) {
+                accept(ev.school_id);
+              } else if (ev.school_name) {
+                API.School.create({ name: ev.school_name })
+                  .then(data => {
+                    accept(data.school_id);
+                  })
+                  .catch(UI.apiError);
+              } else {
+                accept(null);
+              }
+            })
               .then(function(school_id) {
-                API.Course.create({
+                const params = {
                   alias: ev.alias,
                   name: ev.name,
                   description: ev.description,
                   start_time: ev.startTime.getTime() / 1000,
-                  finish_time:
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000,
                   show_scoreboard: ev.showScoreboard,
                   needs_basic_information: ev.basic_information_required,
                   requests_user_information: ev.requests_user_information,
                   school_id: school_id,
-                })
-                  .then(function(data) {
+                };
+
+                if (ev.unlimitedDuration) {
+                  params.unlimited_duration = true;
+                } else {
+                  params.finish_time = ev.finishTime.getTime() / 1000;
+                }
+
+                API.Course.create(params)
+                  .then(() => {
                     window.location.replace(
                       '/course/' + ev.alias + '/edit/#assignments',
                     );
                   })
-                  .fail(UI.apiError);
+                  .catch(UI.apiError);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
-          cancel: function(ev) {
+          cancel: function() {
             window.location = '/course/';
           },
         },

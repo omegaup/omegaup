@@ -24,8 +24,8 @@ class Identities extends \OmegaUp\DAO\VO\VO {
         'language_id' => true,
         'country_id' => true,
         'state_id' => true,
-        'school_id' => true,
         'gender' => true,
+        'current_identity_school_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -78,14 +78,14 @@ class Identities extends \OmegaUp\DAO\VO\VO {
                 $data['state_id']
             );
         }
-        if (isset($data['school_id'])) {
-            $this->school_id = intval(
-                $data['school_id']
-            );
-        }
         if (isset($data['gender'])) {
             $this->gender = strval(
                 $data['gender']
+            );
+        }
+        if (isset($data['current_identity_school_id'])) {
+            $this->current_identity_school_id = intval(
+                $data['current_identity_school_id']
             );
         }
     }
@@ -149,16 +149,16 @@ class Identities extends \OmegaUp\DAO\VO\VO {
     public $state_id = null;
 
     /**
-     * [Campo no documentado]
-     *
-     * @var int|null
-     */
-    public $school_id = null;
-
-    /**
      * Género de la identidad
      *
      * @var string|null
      */
     public $gender = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $current_identity_school_id = null;
 }

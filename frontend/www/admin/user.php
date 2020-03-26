@@ -7,7 +7,8 @@ require_once('../../server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 \OmegaUp\UITools::redirectIfNoAdmin();
 
-$user = \OmegaUp\DAO\Users::FindByUsername(strval($_REQUEST['username']));
+$username = strval($_REQUEST['username']);
+$user = \OmegaUp\DAO\Users::FindByUsername($username);
 if (is_null($user) || is_null($user->user_id)) {
     header('HTTP/1.1 404 Not found');
     die();
@@ -45,7 +46,7 @@ $payload = [
         return ['name' => $role->name];
     }, $roles),
     'systemRoles' => $systemRoles,
-    'username' => $user->username,
+    'username' => $username,
     'verified' => $user->verified != 0,
 ];
 

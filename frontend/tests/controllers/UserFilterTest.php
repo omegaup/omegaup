@@ -3,168 +3,183 @@
 /**
  * Tests the /api/user/validateFilter/ API.
  */
-class UserFilterTest extends OmegaupTestCase {
-    /**
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-     */
+class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
     public function testInvalidFilter() {
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => 'invalid',
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => 'invalid',
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
-     */
     public function testUnauthorizedAccess() {
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/all-events',
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => '/all-events',
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
-     */
     public function testInsufficientPrivileges() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/all-events',
-            'auth_token' => $login->auth_token,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => '/all-events',
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     public function testAllEventsWithAdmin() {
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['admin'], true);
+        $this->assertEquals(true, $response['admin']);
     }
 
     public function testMyEvents() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user->username,
+            'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['status'], 'ok');
-        $this->assertEquals($response['user'], $user->username);
-        $this->assertEquals($response['admin'], false);
+        $this->assertEquals($identity->username, $response['user']);
+        $this->assertEquals(false, $response['admin']);
         $this->assertEmpty($response['problem_admin']);
         $this->assertEmpty($response['contest_admin']);
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
-     */
     public function testOtherUsersEvents() {
-        ['user' => $user1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $user1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity1);
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user2->username,
-            'auth_token' => $login->auth_token,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/user/{$identity2->username}",
+                'auth_token' => $login->auth_token,
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     public function testOtherUsersEventsWithAdmin() {
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/user/' . $user->username,
+            'filter' => "/user/{$identity->username}",
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['admin'], true);
+        $this->assertEquals(true, $response['admin']);
     }
 
     public function testPublicProblemsetAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'filter' => '/problemset/' . $contest->problemset_id,
+            'filter' => "/problemset/{$contest->problemset_id}",
         ]));
     }
 
     public function testPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'filter' => '/problemset/' . $contest->problemset_id,
+            'filter' => "/problemset/{$contest->problemset_id}",
         ]));
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
-     */
     public function testAnonymousPublicProblemsetAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
 
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $contest->problemset_id,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/problemset/{$contest->problemset_id}",
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('loginRequired', $e->getMessage());
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
-     */
     public function testAnonymousPublicContestAccess() {
-        $contest = ContestsFactory::createContest()['contest'];
+        $contest = \OmegaUp\Test\Factories\Contest::createContest()['contest'];
 
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $contest->problemset_id,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/problemset/{$contest->problemset_id}",
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('loginRequired', $e->getMessage());
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
-     */
     public function testAnonymousProblemsetAccess() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
 
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $contest->problemset_id,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/problemset/{$contest->problemset_id}",
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('loginRequired', $e->getMessage());
+        }
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
-     */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
 
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $contest->problemset_id,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/problemset/{$contest->problemset_id}",
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('loginRequired', $e->getMessage());
+        }
     }
 
     public function testAnonymousProblemsetWithToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -179,9 +194,9 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -196,9 +211,9 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousProblemsetWithAdminToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -214,9 +229,9 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         )['contest'];
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
@@ -232,19 +247,19 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testPublicProblemAccess() {
-        $problem = ProblemsFactory::createProblem()['problem'];
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problem/' . $problem->alias,
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals($response['user'], $user->username);
+        $this->assertEquals($identity->username, $response['user']);
     }
 
     public function testAnonymousPublicProblemAccess() {
-        $problem = ProblemsFactory::createProblem()['problem'];
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problem/' . $problem->alias,
@@ -252,16 +267,18 @@ class UserFilterTest extends OmegaupTestCase {
         $this->assertNull($response['user']);
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
-     */
     public function testAnonymousProblemAccess() {
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]))['problem'];
 
-        \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problem/' . $problem->alias,
-        ]));
+        try {
+            \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
+                'filter' => "/problem/{$problem->alias}",
+            ]));
+            $this->fail('should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 }

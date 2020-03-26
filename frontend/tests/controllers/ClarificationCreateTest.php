@@ -1,51 +1,61 @@
 <?php
 
 /**
- * Description of CreateClarificationTest
+ * Description of ClarificationCreateTest
  *
  * @author joemmanuel
  */
 
-class CreateClarificationTest extends OmegaupTestCase {
+class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
+     *
+     * @return array{problemData: array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}, contestData: array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}, contestant: \OmegaUp\DAO\VO\Identities}
      */
     private function setupContest(
-        &$problemData,
-        &$contestData,
-        &$contestant,
-        $isGraderExpectedToBeCalled = true
+        bool $isGraderExpectedToBeCalled
     ) {
          // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        ['user' => $userContestant, 'identity' => $contestant] = UserFactory::createUser();
+        [
+            'user' => $userContestant,
+            'identity' => $contestant,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call the API avoiding the broadcaster logic
         if ($isGraderExpectedToBeCalled) {
             $this->detourBroadcasterCalls();
         }
+
+        return [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ];
     }
 
     /**
      * Creates a valid clarification
      */
     public function testCreateValidClarification() {
-        $problemData = null;
-        $contestData = null;
-        $contestant = null;
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/true);
 
-        // Setup contest is required to submit a clarification
-        $this->setupContest($problemData, $contestData, $contestant);
-
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestant
@@ -87,29 +97,26 @@ class CreateClarificationTest extends OmegaupTestCase {
     }
 
     /**
-    * Creates a clarification with message too long
-    *
-    * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-    */
+     * Creates a clarification with message too long
+     */
     public function testCreateClarificationMessageTooLong() {
-        $problemData = null;
-        $contestData = null;
-        $contestant = null;
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
 
-        // Setup contest is required to submit a clarification
-        $this->setupContest(
-            $problemData,
-            $contestData,
-            $contestant,
-            false /*isGraderExpectedToBeCalled*/
-        );
-
-        $clarificationData = ClarificationsFactory::createClarification(
-            $problemData,
-            $contestData,
-            $contestant,
-            'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
-        );
+        try {
+            \OmegaUp\Test\Factories\Clarification::createClarification(
+                $problemData,
+                $contestData,
+                $contestant,
+                'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterStringTooLong', $e->getMessage());
+        }
     }
 
     /**
@@ -117,30 +124,28 @@ class CreateClarificationTest extends OmegaupTestCase {
      * other one to a specific user
      */
     public function testCreateClarificationsSentByAdmin() {
-        $problemData = null;
-        $contestData = null;
-        $contestant = null;
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
 
-        // Setup contest is required to submit a clarification
-        $this->setupContest(
-            $problemData,
-            $contestData,
-            $contestant,
-            false /*isGraderExpectedToBeCalled*/
-        );
         // Create 5 users
         $n = 5;
         $users = [];
         $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add it to the contest
-            ContestsFactory::addUser($contestData, $identities[$i]);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
 
-        $messageToEveryone = ClarificationsFactory::createClarification(
+        $messageToEveryone = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -148,7 +153,7 @@ class CreateClarificationTest extends OmegaupTestCase {
             $contestData['director']->username
         );
 
-        $messageToSpecificUser = ClarificationsFactory::createClarification(
+        $messageToSpecificUser = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -156,7 +161,7 @@ class CreateClarificationTest extends OmegaupTestCase {
             $contestant->username
         );
 
-        $messageToSpecificUserWithPublicAnswer = ClarificationsFactory::createClarification(
+        $messageToSpecificUserWithPublicAnswer = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -187,7 +192,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         }
 
         // Now, director answers one message, and it turns public
-        $response = ClarificationsFactory::answer(
+        $response = \OmegaUp\Test\Factories\Clarification::answer(
             $messageToSpecificUserWithPublicAnswer,
             $contestData,
             'answer to everyone',

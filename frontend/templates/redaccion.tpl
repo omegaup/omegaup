@@ -1,7 +1,7 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleRedaccion#}"}
-<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
+{include file='head.tpl' htmlTitle="{#omegaupTitleRedaccion#}" inline}
+<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}" defer></script>
 <link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
 
 <div class="post">
@@ -17,8 +17,8 @@
 	<div id="wmd-button-bar"></div><button id="reset-statement">Restaurar</button>
 	<textarea class="wmd-input" id="wmd-input"></textarea>
 </div>
-<script type="text/javascript" src="{version_hash src="/js/redaccion.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/redaccion.js"}" defer></script>
 <div style='clear: both;'></div>
 </div>
 </div>
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

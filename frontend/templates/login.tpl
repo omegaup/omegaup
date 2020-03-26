@@ -1,4 +1,4 @@
-{include file='head.tpl' recaptchaFile='https://www.google.com/recaptcha/api.js' htmlTitle="{#omegaupTitleLogin#}"}
+{include file='head.tpl' recaptchaFile='https://www.google.com/recaptcha/api.js' htmlTitle="{#omegaupTitleLogin#}" inline}
 
 <div id="login-page">
 	<script type="text/json" id="payload">{$payload|json_encode}</script>
@@ -113,8 +113,8 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/login.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/login.js"}" defer></script>
 {if $GOOGLECLIENTID != ""}
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 {/if}
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

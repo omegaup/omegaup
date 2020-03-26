@@ -41,9 +41,7 @@ abstract class ApiException extends \Exception {
     }
 
     /**
-     * @return array
-     *
-     * @psalm-return array<string, mixed>
+     * @return array<string, mixed>
      */
     final public function asArray(): array {
         $previous = $this->getPrevious();
@@ -86,7 +84,10 @@ abstract class ApiException extends \Exception {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
         }
-        return $localizedText;
+        return \OmegaUp\ApiUtils::formatString(
+            $localizedText,
+            $this->_customMessage
+        );
     }
 }
 

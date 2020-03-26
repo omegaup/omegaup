@@ -2,8 +2,7 @@
   <div class="common-footer">
     <div class="footer-navigation">
       <div class="footer-brand">
-        <img class="footer-logo"
-             src="/media/logo-main-white.svg">
+        <img class="footer-logo" src="/media/logo-main-white.svg" />
         <div class="slogan">
           {{ T.frontPageFooter }}
         </div>
@@ -35,7 +34,9 @@
         <h4 class="section-title">{{ T.frontPageFooterOrganization }}</h4>
         <ul>
           <li>
-            <a href="https://omegaup.org/#about">{{ T.frontPageFooterAboutUs }}</a>
+            <a href="https://omegaup.org/#about">{{
+              T.frontPageFooterAboutUs
+            }}</a>
           </li>
           <li>
             <a href="https://omegaup.org/#team">{{ T.frontPageFooterTeam }}</a>
@@ -46,8 +47,10 @@
         <h4 class="section-title">{{ T.frontPageDevelopers }}</h4>
         <ul>
           <li>
-            <a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar">{{
-            T.frontPageFooterHelpUs }}</a>
+            <a
+              href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+              >{{ T.frontPageFooterHelpUs }}</a
+            >
           </li>
           <li>
             <a href="https://github.com/omegaup/omegaup">GitHub</a>
@@ -70,12 +73,14 @@
     <div class="copy">
       <div class="copy-content">
         <div class="">
-          Copyright © 2019 omegaUp, Inc. All rights reserved.​
+          Copyright © 2020 omegaUp, Inc. All rights reserved.​
         </div>
         <div class="menu">
           <ul>
             <li>
-              <a href="">{{ T.frontPageFooterPrivacyPolicy }}</a>
+              <a href="https://blog.omegaup.com/privacy-policy/">{{
+                T.frontPageFooterPrivacyPolicy
+              }}</a>
             </li>
           </ul>
         </div>
@@ -83,17 +88,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-
-@Component
-export default class Footer extends Vue {
-  T = T;
-}
-
-</script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
@@ -208,3 +202,13 @@ export default class Footer extends Vue {
   }
 }
 </style>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { T } from '../../omegaup';
+
+@Component
+export default class Footer extends Vue {
+  T = T;
+}
+</script>

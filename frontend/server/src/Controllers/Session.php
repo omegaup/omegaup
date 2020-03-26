@@ -2,6 +2,24 @@
 
  namespace OmegaUp\Controllers;
 
+class ScopedFacebook {
+    /** @var \OmegaUp\ScopedSession */
+    public $scopedSession;
+    /** @var \Facebook\Facebook */
+    public $facebook;
+
+    public function __construct() {
+        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
+
+        $this->scopedSession = new \OmegaUp\ScopedSession();
+        $this->facebook = new \Facebook\Facebook([
+            'app_id' => OMEGAUP_FB_APPID,
+            'app_secret' => OMEGAUP_FB_SECRET,
+            'default_graph_version' => 'v2.5',
+        ]);
+    }
+}
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -14,8 +32,6 @@ class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
-    /** @var null|\Facebook\Facebook */
-    private static $_facebook;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
     /** @var bool */
@@ -28,26 +44,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         return self::$_sessionManager;
     }
 
-    /**
-     * @return \Facebook\Facebook
-     */
-    private static function getFacebookInstance() {
-        if (is_null(self::$_facebook)) {
-            require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-
-            self::$_facebook = new \Facebook\Facebook([
-                'app_id' => OMEGAUP_FB_APPID,
-                'app_secret' => OMEGAUP_FB_SECRET,
-                'default_graph_version' => 'v2.5',
-            ]);
-        }
-        return self::$_facebook;
-    }
-
     public static function getFacebookLoginUrl(): string {
-        $facebook = self::getFacebookInstance();
-
-        $helper = $facebook->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
     }
 
@@ -67,24 +66,24 @@ class Session extends \OmegaUp\Controllers\Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      *
-     * @return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
-            'status' => 'ok',
             'session' => self::getCurrentSession($r),
             'time' => \OmegaUp\Time::get(),
         ];
     }
 
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
-        $SessionM = self::getSessionManagerInstance();
-        $SessionM->sessionStart();
+        $sessionManager = self::getSessionManagerInstance();
         $authToken = null;
         if (!is_null($r['auth_token'])) {
             $authToken = strval($r['auth_token']);
         } else {
-            $authToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
+            $authToken = $sessionManager->getCookie(
+                OMEGAUP_AUTH_TOKEN_COOKIE_NAME
+            );
         }
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;
@@ -127,10 +126,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
         ) {
-            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
+                /** @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
                 function () use ($r) {
                     return self::getCurrentSessionImpl($r);
                 },
@@ -251,7 +250,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
-            'identity_id' => $identity->identity_id,
+            'identity_id' => intval($identity->identity_id),
             'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
         ]));
 
@@ -259,7 +258,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         //erase expired tokens
         try {
-            \OmegaUp\DAO\AuthTokens::expireAuthTokens($identity->identity_id);
+            \OmegaUp\DAO\AuthTokens::expireAuthTokens(
+                intval($identity->identity_id)
+            );
         } catch (\Exception $e) {
             // Best effort
             self::$log->error(
@@ -336,7 +337,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -375,7 +376,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     public static function LoginViaGoogle(
         string $email,
@@ -392,9 +393,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $facebook = self::getFacebookInstance();
-
-        $helper = $facebook->getRedirectLoginHelper();
+        $scopedFacebook = new ScopedFacebook();
+        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         try {
             $accessToken = $helper->getAccessToken();
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
@@ -415,7 +415,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            $fbResponse = $facebook->get('/me?fields=name,email', $accessToken);
+            $fbResponse = $scopedFacebook->facebook->get(
+                '/me?fields=name,email',
+                $accessToken
+            );
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
@@ -482,27 +485,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
-            try {
-                \OmegaUp\DAO\DAO::transBegin();
-                $identity->password = \OmegaUp\SecurityTools::hashString(
-                    $r['password']
-                );
-                \OmegaUp\DAO\Identities::update($identity);
-                if (!is_null($identity->user_id)) {
-                    $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-                    if (is_null($user)) {
-                        throw new \OmegaUp\Exceptions\NotFoundException(
-                            'userNotExist'
-                        );
-                    }
-                    $user->password = $identity->password;
-                    \OmegaUp\DAO\Users::update($user);
-                }
-                \OmegaUp\DAO\DAO::transEnd();
-            } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
-                throw $e;
-            }
+            $identity->password = \OmegaUp\SecurityTools::hashString(
+                $r['password']
+            );
+            \OmegaUp\DAO\Identities::update($identity);
         }
 
         self::$log->info(
@@ -569,13 +555,13 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     private static function ThirdPartyLogin(
         string $provider,
         string $email,
         ?string $name = null
-    ): array {
+    ) {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
@@ -587,32 +573,24 @@ class Session extends \OmegaUp\Controllers\Controller {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
 
-            // I have a problem with this:
             $username = self::getUniqueUsernameFromEmail($email);
-            // Even if the user gave us their email, we should not
-            // just go ahead and assume its ok to share with the world
-            // maybe we could do:
-            // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
-            \OmegaUp\Controllers\User::$permissionKey = uniqid();
-
-            $r = new \OmegaUp\Request([
-                'name' => (!is_null($name) ? $name : $username),
-                'username' => $username,
-                'email' => $email,
-                'password' => null,
-                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
-                'ignore_password' => true
-            ]);
 
             try {
-                $res = \OmegaUp\Controllers\User::apiCreate($r);
+                \OmegaUp\Controllers\User::createUser(
+                    new \OmegaUp\CreateUserParams([
+                        'name' => (!is_null($name) ? $name : $username),
+                        'username' => $username,
+                        'email' => $email,
+                    ]),
+                    /*ignorePassword=*/true,
+                    /*forceVerification=*/true
+                );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
+                /** @var array<string, string> */
                 return $e->asResponseArray();
             }
-            $identity = \OmegaUp\DAO\Identities::findByUsername(
-                $res['username']
-            );
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }

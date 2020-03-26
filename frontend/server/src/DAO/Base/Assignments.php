@@ -185,10 +185,8 @@ abstract class Assignments {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Assignments[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Assignments> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Assignments}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Assignments>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -260,7 +258,7 @@ abstract class Assignments {
     ): int {
         $sql = '
             INSERT INTO
-                Assignments (
+                `Assignments` (
                     `course_id`,
                     `problemset_id`,
                     `acl_id`,

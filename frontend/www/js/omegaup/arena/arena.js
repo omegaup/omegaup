@@ -1,10 +1,15 @@
 import { OmegaUp, T } from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
-import Notifications from './notifications.js';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
+import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
+import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
+import common_Navbar from '../components/common/Navbar.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
 
@@ -34,6 +39,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    payload: {},
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -65,11 +71,13 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.disableSockets = true;
   }
   const elementPayload = document.getElementById('payload');
-  if (elementPayload != null) {
+  if (elementPayload !== null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload != null) {
+    if (payload !== null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
+      options.preferredLanguage = payload.preferred_language || null;
+      options.payload = payload;
     }
   }
   return options;
@@ -83,7 +91,10 @@ class EventsSocket {
     self.arena = arena;
     self.socket = null;
     self.socketKeepalive = null;
-    self.deferred = $.Deferred();
+    self.promise = new Promise((accept, reject) => {
+      self.promiseAccept = accept;
+      self.promiseReject = reject;
+    });
     self.retries = 10;
   }
 
@@ -102,7 +113,7 @@ class EventsSocket {
     self.socket.onopen = self.onopen.bind(self);
     self.socket.onclose = self.onclose.bind(self);
 
-    return self.deferred;
+    return self.promise;
   }
 
   onmessage(message) {
@@ -153,7 +164,7 @@ class EventsSocket {
     }
 
     self.arena.elements.socketStatus.html('✗').css('color', '#800');
-    self.deferred.reject(e);
+    self.promiseReject(e);
   }
 }
 class EphemeralGrader {
@@ -251,11 +262,83 @@ export class Arena {
     // The Markdown-to-HTML converter.
     self.markdownConverter = UI.markdownConverter();
 
-    // Currently opened notifications.
-    self.notifications = new Notifications();
-    OmegaUp.on('ready', function() {
-      self.notifications.attach($('#notifications'));
-    });
+    // Currently opened clarification notifications.
+    self.commonNavbar = null;
+    if (document.getElementById('common-navbar')) {
+      self.commonNavbar = new Vue({
+        el: '#common-navbar',
+        render: function(createElement) {
+          return createElement('omegaup-common-navbar', {
+            props: {
+              omegaUpLockDown: this.omegaUpLockDown,
+              inContest: this.inContest,
+              isLoggedIn: this.isLoggedIn,
+              isReviewer: this.isReviewer,
+              gravatarURL51: this.gravatarURL51,
+              currentUsername: this.currentUsername,
+              isAdmin: this.isAdmin,
+              isMainUserIdentity: this.isMainUserIdentity,
+              lockDownImage: this.lockDownImage,
+              navbarSection: this.navbarSection,
+              graderInfo: this.graderInfo,
+              graderQueueLength: this.graderQueueLength,
+              errorMessage: this.errorMessage,
+              initialClarifications: this.initialClarifications,
+            },
+          });
+        },
+        data: {
+          omegaUpLockDown: self.options.payload.omegaUpLockDown,
+          inContest: self.options.payload.inContest,
+          isLoggedIn: self.options.payload.isLoggedIn,
+          isReviewer: self.options.payload.isReviewer,
+          gravatarURL51: self.options.payload.gravatarURL51,
+          currentUsername: self.options.payload.currentUsername,
+          isAdmin: self.options.payload.isAdmin,
+          isMainUserIdentity: self.options.payload.isMainUserIdentity,
+          lockDownImage: self.options.payload.lockDownImage,
+          navbarSection: self.options.payload.navbarSection,
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+        },
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+      });
+
+      if (self.options.payload.isAdmin) {
+        API.Notification.myList({})
+          .then(data => {
+            self.commonNavbar.notifications = data.notifications;
+          })
+          .catch(UI.apiError);
+
+        function updateGraderStatus() {
+          API.Grader.status()
+            .then(stats => {
+              self.commonNavbar.graderInfo = stats.grader;
+              if (stats.status !== 'ok') {
+                self.commonNavbar.errorMessage = T.generalError;
+                return;
+              }
+              if (stats.grader.queue) {
+                self.commonNavbar.graderQueueLength =
+                  stats.grader.queue.run_queue_length +
+                  stats.grader.queue.running.length;
+              }
+              self.commonNavbar.errorMessage = null;
+            })
+            .catch(stats => {
+              self.commonNavbar.errorMessage = stats.error;
+            });
+        }
+
+        updateGraderStatus();
+        setInterval(updateGraderStatus, 30000);
+      }
+    }
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -271,19 +354,69 @@ export class Arena {
     self.submissionGap = 0;
 
     // Setup preferred language
-    self.preferredLanguage = null;
+    self.preferredLanguage = options.preferredLanguage || null;
 
     // UI elements
     self.elements = {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
-      miniRanking: $('#mini-ranking'),
-      problemList: $('#problem-list'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
       submitForm: $('#submit'),
     };
+
+    if (document.getElementById('arena-navbar-problems') !== null) {
+      self.elements.navBar = new Vue({
+        el: '#arena-navbar-problems',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-problems', {
+            props: {
+              problems: this.problems,
+              activeProblem: this.activeProblem,
+            },
+            on: {
+              'navigate-to-problem': function(problemAlias) {
+                window.location.hash = `#problems/${problemAlias}`;
+              },
+            },
+          });
+        },
+        data: {
+          problems: [],
+          activeProblem: null,
+        },
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+      });
+    }
+
+    const navbar = document.getElementById('arena-navbar-payload');
+    let navbarPayload = false;
+    if (navbar !== null) {
+      navbarPayload = JSON.parse(navbar.innerText);
+    }
+
+    if (document.getElementById('arena-navbar-miniranking') !== null) {
+      self.elements.miniRanking = new Vue({
+        el: '#arena-navbar-miniranking',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-miniranking', {
+            props: {
+              showRanking: this.showRanking,
+              users: this.users,
+            },
+          });
+        },
+        data: {
+          showRanking: navbarPayload,
+          users: [],
+        },
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+      });
+    }
+
     if (self.elements.ranking.length) {
       self.elements.rankingTable = new Vue({
         el: self.elements.ranking[0],
@@ -362,6 +495,10 @@ export class Arena {
 
     // Number of digits after the decimal point to show.
     self.digitsAfterDecimalPoint = 2;
+
+    self.qualityNominationForm = null;
+
+    self.elements.assignmentsNav = null;
   }
 
   installLibinteractiveHooks() {
@@ -422,15 +559,12 @@ export class Arena {
 
     function connect(uris, index) {
       self.socket = new EventsSocket(uris[index], self);
-      self.socket.connect().fail(function(e) {
+      self.socket.connect().catch(function(e) {
         console.log(e);
         // Try the next uri.
         index++;
         if (index < uris.length) {
-          connect(
-            uris,
-            index,
-          );
+          connect(uris, index);
         } else {
           // Out of options. Falling back to polls.
           self.socket = null;
@@ -442,11 +576,7 @@ export class Arena {
     }
 
     self.elements.socketStatus.html('↻').css('color', '#888');
-    connect(
-      uris,
-      0,
-      10,
-    );
+    connect(uris, 0, 10);
   }
 
   setupPolls() {
@@ -513,7 +643,7 @@ export class Arena {
             } else {
               API.Problemset.details({ problemset_id: x })
                 .then(problemsetLoaded.bind(self))
-                .fail(UI.ignoreError);
+                .catch(UI.ignoreError);
             }
           };
         })(self.options.problemsetId, problemset.start_time);
@@ -560,19 +690,18 @@ export class Arena {
     self.initProblems(problemset);
 
     let problemSelect = $('select', self.elements.clarification);
-    let problemTemplate = $('#problem-list .template');
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
       let problemName = problem.letter + '. ' + UI.escape(problem.title);
 
-      let prob = problemTemplate
-        .clone()
-        .removeClass('template')
-        .addClass('problem_' + problem.alias);
-      $('.name', prob)
-        .attr('href', '#problems/' + problem.alias)
-        .html(problemName);
-      self.elements.problemList.append(prob);
+      if (self.elements.navBar) {
+        self.elements.navBar.problems.push({
+          alias: problem.alias,
+          text: problemName,
+          bestScore: 0,
+          maxScore: 0,
+        });
+      }
 
       $('<option>')
         .val(problem.alias)
@@ -589,6 +718,36 @@ export class Arena {
 
     self.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
+
+    if (
+      typeof problemset.courseAssignments !== 'undefined' &&
+      document.getElementById('arena-navbar-assignments') !== null &&
+      self.elements.assignmentsNav === null
+    ) {
+      self.elements.assignmentsNav = new Vue({
+        el: '#arena-navbar-assignments',
+        render: function(createElement) {
+          return createElement('omegaup-arena-navbar-assignments', {
+            props: {
+              assignments: this.assignments,
+              currentAssignmentAlias: this.currentAssignmentAlias,
+            },
+            on: {
+              'navigate-to-assignment': function(assignmentAlias) {
+                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+              },
+            },
+          });
+        },
+        data: {
+          assignments: problemset.courseAssignments,
+          currentAssignmentAlias: problemset.alias,
+        },
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
+      });
+    }
   }
 
   initProblems(problemset) {
@@ -665,7 +824,7 @@ export class Arena {
     setTimeout(function() {
       API.Run.status({ run_alias: guid })
         .then(self.updateRun.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }, 5000);
   }
 
@@ -707,7 +866,7 @@ export class Arena {
             self.virtualRankingChange(response);
           else self.rankingChange(response);
         })
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     } else if (
       self.options.problemsetAdmin ||
       self.options.contestAlias != null ||
@@ -716,7 +875,7 @@ export class Arena {
     ) {
       API.Problemset.scoreboard(scoreboardParams)
         .then(self.rankingChange.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }
   }
 
@@ -821,7 +980,7 @@ export class Arena {
         response.events = response.events.concat(originalContestEvents);
         self.onRankingEvents(response);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
 
     self.virtualContestRefreshInterval = setTimeout(function() {
       self.onVirtualRankingChange(virtualContestData);
@@ -844,7 +1003,7 @@ export class Arena {
           self.originalContestScoreboardEvent = response.events;
           self.onVirtualRankingChange(data);
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     } else {
       self.onVirtualRankingChange(data);
     }
@@ -864,13 +1023,15 @@ export class Arena {
     if (rankingEvent) {
       API.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }
   }
 
   onRankingChanged(data) {
     let self = this;
-    $('tbody.inserted', self.elements.miniRanking).remove();
+    if (typeof self.elements.miniRanking !== 'undefined') {
+      self.elements.miniRanking.users = [];
+    }
 
     if (self.removeRecentEventClassTimeout) {
       clearTimeout(self.removeRecentEventClassTimeout);
@@ -901,41 +1062,36 @@ export class Arena {
         let problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
-        if (self.problems[alias] && rank.username == OmegaUp.username) {
+        if (
+          self.problems[alias] &&
+          rank.username == OmegaUp.username &&
+          self.problems[alias].languages !== ''
+        ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          $('#problems .problem_' + alias + ' .solved').html(
-            '(' +
-              problem.points.toFixed(self.digitsAfterDecimalPoint) +
-              ' / ' +
-              currentPoints.toFixed(self.digitsAfterDecimalPoint) +
-              ')',
-          );
+          if (self.elements.navBar) {
+            const currentProblem = self.elements.navBar.problems.find(
+              problem => problem.alias === alias,
+            );
+            currentProblem.bestScore = problem.points;
+            currentProblem.maxScore = currentPoints;
+          }
           self.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
       // update miniranking
       if (i < 10) {
-        let r = $('tbody.user-list-template', self.elements.miniRanking)
-          .clone()
-          .removeClass('user-list-template')
-          .addClass('inserted');
-
-        $('.position', r).html(rank.place);
-        $('.user', r).html(
-          '<span title="' +
-            UI.rankingUsername(rank) +
-            '">' +
-            UI.rankingUsername(rank) +
-            UI.getFlag(rank['country']) +
-            '</span>',
-        );
-        $('.points', r).html(
-          rank.total.points.toFixed(self.digitsAfterDecimalPoint),
-        );
-        $('.penalty', r).html(rank.total.penalty.toFixed(0));
-
-        self.elements.miniRanking.append(r);
+        if (typeof self.elements.miniRanking !== 'undefined') {
+          const username = UI.rankingUsername(rank);
+          self.elements.miniRanking.users.push({
+            position: rank.place,
+            username: username,
+            country: rank['country'],
+            classname: rank['classname'],
+            points: rank.total.points,
+            penalty: rank.total.penalty,
+          });
+        }
       }
     }
 
@@ -993,7 +1149,9 @@ export class Arena {
     for (let i in dataInSeries) {
       if (dataInSeries.hasOwnProperty(i)) {
         dataInSeries[i].push([
-          Math.min(this.finishTime.getTime(), Date.now()),
+          this.finishTime
+            ? Math.min(this.finishTime.getTime(), Date.now())
+            : Date.now(),
           dataInSeries[i][dataInSeries[i].length - 1][1],
         ]);
         series.push({
@@ -1006,11 +1164,13 @@ export class Arena {
     }
 
     series.sort(function(a, b) {
-      return a.rank - b.rank;
+      return a.ranking - b.ranking;
     });
 
     navigatorData.push([
-      Math.min(this.finishTime.getTime(), Date.now()),
+      this.finishTime
+        ? Math.min(this.finishTime.getTime(), Date.now())
+        : Date.now(),
       navigatorData[navigatorData.length - 1][1],
     ]);
     this.createChart(series, navigatorData);
@@ -1078,7 +1238,7 @@ export class Arena {
       rowcount: self.clarificationsRowcount,
     })
       .then(self.clarificationsChange.bind(self))
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   updateClarification(clarification) {
@@ -1086,20 +1246,20 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
+    if (self.commonNavbar === null) {
+      return;
+    }
+    const clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
-
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
+      if (self.problemsetAdmin) {
+        self.commonNavbar.initialClarifications = clarifications.filter(
+          notification =>
+            notification.clarification_id !== clarification.clarification_id,
+        );
+      } else {
+        clarifications.push(clarification);
+      }
     } else {
       r = $('.clarifications tbody.clarification-list tr.template')
         .clone()
@@ -1107,6 +1267,9 @@ export class Arena {
         .addClass('inserted');
 
       if (self.problemsetAdmin) {
+        if (clarifications !== null) {
+          clarifications.push(clarification);
+        }
         (function(id, answerNode) {
           let responseFormNode = $(
             '#create-response-form',
@@ -1148,13 +1311,8 @@ export class Arena {
               .then(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
-                if (self.problemsetAdmin) {
-                  self.notifications.resolve({
-                    id: 'clarification-' + clarification.clarification_id,
-                  });
-                }
               })
-              .fail(function() {
+              .catch(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               });
@@ -1175,20 +1333,6 @@ export class Arena {
     $('.answer pre', r).html(UI.escape(clarification.answer));
     if (clarification.answer) {
       self.answeredClarifications++;
-    }
-
-    if (self.problemsetAdmin != !!clarification.answer) {
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
     }
 
     if (!self.clarifications[clarification.clarification_id]) {
@@ -1232,6 +1376,20 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
+    if (self.commonNavbar !== null) {
+      self.commonNavbar.initialClarifications = data.clarifications
+        .filter(clarification =>
+          // Removing all unsolved clarifications.
+          self.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
+        )
+        .reverse();
+    }
     if (
       self.answeredClarifications > previouslyAnswered &&
       self.activeTab != 'clarifications'
@@ -1242,19 +1400,29 @@ export class Arena {
 
   updateAllowedLanguages(lang_array) {
     const allowedLanguages = [
-      { language: 'cpp11', name: 'C++11' },
-      { language: 'cpp', name: 'C++' },
-      { language: 'c', name: 'C' },
-      { language: 'cs', name: 'C#' },
-      { language: 'hs', name: 'Haskell' },
-      { language: 'java', name: 'Java' },
-      { language: 'pas', name: 'Pascal' },
-      { language: 'py', name: 'Python' },
-      { language: 'rb', name: 'Ruby' },
-      { language: 'lua', name: 'Lua' },
+      { language: '', name: '' },
       { language: 'kp', name: 'Karel (Pascal)' },
       { language: 'kj', name: 'Karel (Java)' },
-      { language: 'cat', name: T.wordsJustOutput },
+      { language: 'c', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
+      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
+      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
+      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
+      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
+      { language: 'java', name: 'Java (openjdk 11.0)' },
+      { language: 'py', name: 'Python 2.7' },
+      { language: 'py2', name: 'Python 2.7' },
+      { language: 'py3', name: 'Python 3.6' },
+      { language: 'rb', name: 'Ruby (2.5)' },
+      { language: 'pl', name: 'Perl (5.26)' },
+      { language: 'cs', name: 'C# (dotnet 2.2)' },
+      { language: 'pas', name: 'Pascal (fpc 3.0)' },
+      { language: 'cat', name: 'Output Only' },
+      { language: 'hs', name: 'Haskell (ghc 8.0)' },
+      { language: 'lua', name: 'Lua (5.2)' },
     ];
 
     let self = this;
@@ -1272,6 +1440,7 @@ export class Arena {
 
     const languageArray =
       typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
+    languageArray.push('');
 
     allowedLanguages
       .filter(item => {
@@ -1409,11 +1578,10 @@ export class Arena {
     if (problem && self.problems[problem[1]]) {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
-
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.problem_' + problem.alias, self.elements.problemList).addClass(
-        'active',
-      );
+      // Set as active the selected problem
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = self.currentProblem.alias;
+      }
 
       function update(problem) {
         // TODO: Make #problem a component
@@ -1490,20 +1658,121 @@ export class Arena {
           self.myRuns.filter_problem(problem.alias);
         }
 
+        function showQualityNominationPopup() {
+          let qualityPayload = self.currentProblem.quality_payload;
+          if (typeof qualityPayload === 'undefined') {
+            // Quality Nomination only works for Courses
+            return;
+          }
+          if (self.qualityNominationForm !== null) {
+            self.qualityNominationForm.nominated = qualityPayload.nominated;
+            self.qualityNominationForm.nominatedBeforeAC =
+              qualityPayload.nominatedBeforeAC;
+            self.qualityNominationForm.solved = qualityPayload.solved;
+            self.qualityNominationForm.tried = qualityPayload.tried;
+            self.qualityNominationForm.dismissed = qualityPayload.dismissed;
+            self.qualityNominationForm.dismissedBeforeAC =
+              qualityPayload.dismissedBeforeAC;
+            self.qualityNominationForm.canNominateProblem =
+              qualityPayload.canNominateProblem;
+            self.qualityNominationForm.problemAlias =
+              qualityPayload.problemAlias;
+            return;
+          }
+          self.qualityNominationForm = new Vue({
+            el: '#qualitynomination-popup',
+            mounted: function() {
+              UI.reportEvent('quality-nomination', 'shown');
+            },
+            render: function(createElement) {
+              return createElement('qualitynomination-popup', {
+                props: {
+                  nominated: this.nominated,
+                  nominatedBeforeAC: this.nominatedBeforeAC,
+                  solved: this.solved,
+                  tried: this.tried,
+                  dismissed: this.dismissed,
+                  dismissedBeforeAC: this.dismissedBeforeAC,
+                  canNominateProblem: this.canNominateProblem,
+                  problemAlias: this.problemAlias,
+                },
+                on: {
+                  submit: function(ev) {
+                    const contents = {
+                      before_ac: !ev.solved && ev.tried,
+                      difficulty:
+                        ev.difficulty !== ''
+                          ? Number.parseInt(ev.difficulty, 10)
+                          : 0,
+                      tags: ev.tags.length > 0 ? ev.tags : [],
+                      quality:
+                        ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
+                    };
+                    API.QualityNomination.create({
+                      problem_alias: qualityPayload.problem_alias,
+                      nomination: 'suggestion',
+                      contents: JSON.stringify(contents),
+                    })
+                      .then(() => {
+                        UI.reportEvent('quality-nomination', 'submit');
+                      })
+                      .catch(UI.apiError);
+                  },
+                  dismiss: function(ev) {
+                    const contents = {
+                      before_ac: !ev.solved && ev.tried,
+                    };
+                    API.QualityNomination.create({
+                      problem_alias: qualityPayload.problem_alias,
+                      nomination: 'dismissal',
+                      contents: JSON.stringify(contents),
+                    })
+                      .then(function(data) {
+                        UI.info(T.qualityNominationRateProblemDesc);
+                        UI.reportEvent('quality-nomination', 'dismiss');
+                      })
+                      .catch(UI.apiError);
+                  },
+                },
+              });
+            },
+            data: {
+              nominated: qualityPayload.nominated,
+              nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
+              solved: qualityPayload.solved,
+              tried: qualityPayload.tried,
+              dismissed: qualityPayload.dismissed,
+              dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
+              canNominateProblem: qualityPayload.can_nominate_problem,
+              problemAlias: qualityPayload.problem_alias,
+            },
+            components: {
+              'qualitynomination-popup': qualitynomination_Popup,
+            },
+          });
+        }
+
         if (self.options.isPractice || self.options.isOnlyProblem) {
           API.Problem.runs({ problem_alias: problem.alias })
             .then(function(data) {
               updateRuns(data.runs);
             })
-            .fail(UI.apiError);
+            .catch(UI.apiError);
         } else {
           updateRuns(problem.runs);
+          showQualityNominationPopup();
         }
 
         self.initSubmissionCountdown();
       }
 
       if (problemChanged) {
+        // Ping Analytics with updated problem id
+        let page = window.location.pathname + window.location.hash;
+        if (typeof ga == 'function') {
+          ga('set', 'page', page);
+          ga('send', 'pageview');
+        }
         if (problem.statement) {
           update(problem);
         } else {
@@ -1526,7 +1795,7 @@ export class Arena {
               self.preferredLanguage = problem_ext.preferred_language;
               update(problem);
             })
-            .fail(UI.apiError);
+            .catch(UI.apiError);
         }
       }
 
@@ -1552,8 +1821,9 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      $('.active', self.elements.problemList).removeClass('active');
-      $('.summary', self.elements.problemList).addClass('active');
+      if (self.elements.navBar) {
+        self.elements.navBar.activeProblem = null;
+      }
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
@@ -1640,7 +1910,7 @@ export class Arena {
         .then(function(data) {
           self.displayRunDetails(showRunMatch[1], data);
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     }
   }
 
@@ -1742,8 +2012,12 @@ export class Arena {
     let self = this;
     let lang = $(e.target).val();
     let ext = $('.submit-filename-extension', self.elements.submitForm);
-    if (lang == 'cpp11') {
+    if (lang.startsWith('cpp')) {
       ext.text('.cpp');
+    } else if (lang.startsWith('c-')) {
+      ext.text('.c');
+    } else if (lang.startsWith('py')) {
+      ext.text('.py');
     } else if (lang && lang != 'cat') {
       ext.text('.' + lang);
     } else {
@@ -1863,6 +2137,7 @@ export class Arena {
       }),
     )
       .then(function(run) {
+        UI.reportEvent('submission', 'submit');
         if (self.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem('run:' + run.guid, code);
         }
@@ -1888,9 +2163,10 @@ export class Arena {
         self.clearInputFile();
         self.initSubmissionCountdown();
       })
-      .fail(function(run) {
+      .catch(function(run) {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
+        UI.reportEvent('submission', 'submit-fail', run.errorname);
       });
   }
 
@@ -1903,16 +2179,26 @@ export class Arena {
     }
     self.summaryView.title(UI.contestTitle(contest));
     self.summaryView.description(contest.description);
-    let duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    let duration = null;
+    if (contest.finish_time) {
+      duration = contest.finish_time.getTime() - contest.start_time.getTime();
+    }
     self.summaryView.windowLength(
-      UI.formatDelta(contest.window_length * 60000 || duration),
+      duration
+        ? UI.formatDelta(contest.window_length * 60000 || duration)
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.contestOrganizer(contest.director);
     self.summaryView.startTime(
       Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
     );
     self.summaryView.finishTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.finish_time.getTime()),
+      contest.finish_time
+        ? Highcharts.dateFormat(
+            '%Y-%m-%d %H:%M:%S',
+            contest.finish_time.getTime(),
+          )
+        : T.wordsUnlimitedDuration,
     );
     self.summaryView.scoreboardCutoff(
       Highcharts.dateFormat(
@@ -2040,15 +2326,13 @@ export class Arena {
         },
       );
     }
-    $('.problem_' + alias + ' .solved').text(
-      '(' +
-        self.myRuns
-          .getMaxScore(alias, previousScore)
-          .toFixed(self.digitsAfterDecimalPoint) +
-        ' / ' +
-        parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
-        ')',
-    );
+    if (self.elements.navBar) {
+      const currentProblem = self.elements.navBar.problems.find(
+        problem => problem.alias === alias,
+      );
+      currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
+      currentProblem.maxScore = maxScore || '0';
+    }
   }
 }
 class RunView {
@@ -2291,6 +2575,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2310,6 +2595,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       let prefix = '';
@@ -2330,6 +2616,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return self.penalty();
@@ -2377,7 +2664,7 @@ class ObservableRun {
       return '#CF6';
     } else if (self.verdict() == 'CE') {
       return '#F90';
-    } else if (self.verdict() == 'JE') {
+    } else if (self.verdict() == 'JE' || self.verdict() == 'VE') {
       return '#F00';
     } else {
       return '';
@@ -2390,6 +2677,7 @@ class ObservableRun {
       self.contest_score() != null &&
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return parseFloat(self.contest_score() || '0').toFixed(2);
@@ -2403,6 +2691,7 @@ class ObservableRun {
     if (
       self.status() == 'ready' &&
       self.verdict() != 'JE' &&
+      self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
       return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';
@@ -2423,7 +2712,7 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   disqualify() {
@@ -2433,7 +2722,7 @@ class ObservableRun {
         self.type('disqualifed');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   debug_rejudge() {
@@ -2443,6 +2732,6 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 }

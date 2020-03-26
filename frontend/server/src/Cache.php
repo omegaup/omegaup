@@ -212,12 +212,14 @@ class Cache {
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
+    const RUN_TOTAL_COUNTS = 'run-total-counts';
     const USER_PROFILE = 'profile-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_LIST_SYSTEM_ADMIN = 'contest-list-sys-admin';
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
+    const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
 
     /** @var \Logger */
     private $log;
@@ -315,12 +317,15 @@ class Cache {
      * cache.  Otherwise, executes $setFunc() to generate the associated
      * value, stores it, and returns it.
      *
+     * @template T
+     *
      * @param string $prefix
      * @param string $id
-     * @param callable():mixed $setFunc
+     * @param callable():T $setFunc
      * @param int $timeout (seconds)
      * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
-     * @return mixed the value returned from the cache or $setFunc().
+     *
+     * @return T the value returned from the cache or $setFunc().
      */
     public static function getFromCacheOrSet(
         string $prefix,
@@ -330,10 +335,10 @@ class Cache {
         ?bool &$cacheUsed = null
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
-        /** @var null|mixed */
+        /** @var null|T */
         $returnValue = $cache->get();
 
-        // If there wasn't a value in the cache for the key ($prefix, $id)
+        // If there was a value in the cache for the key ($prefix, $id)
         if (!is_null($returnValue)) {
             if (!is_null($cacheUsed)) {
                 $cacheUsed = true;
@@ -341,15 +346,62 @@ class Cache {
             return $returnValue;
         }
 
-        // Get the value from the function provided
-        /** @var mixed */
-        $returnValue = call_user_func($setFunc);
-        $cache->set($returnValue, $timeout);
+        // Get a lock to prevent multiple requests from trying to create the
+        // same cache entry. The name of the lockfile is derived from the
+        // prefix, not the full key, since it is still preferred to rate-limit
+        // all possible cache interactions with the same prefix, since they
+        // typically deal with pagination. That way multiple independent caches
+        // can still make progress.
+        //
+        // This is preferred over apcu_entry() because that function grabs a
+        // *global* lock that blocks evey single APCu function call!
+        $lockFile = '/tmp/omegaup-cache-' . sha1($prefix) . '.lock';
 
-        if (!is_null($cacheUsed)) {
-            $cacheUsed = false;
+        $f = fopen($lockFile, 'w');
+        try {
+            flock($f, LOCK_EX);
+
+            // Maybe by the time we acquired the lock it had already been
+            // populated by another request.
+            /** @var null|T */
+            $returnValue = $cache->get();
+            if (!is_null($returnValue)) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = true;
+                }
+                return $returnValue;
+            }
+
+            // Get the value from the function provided
+            $cache->log->info('Calling $setFunc');
+            /** @var T */
+            $returnValue = call_user_func($setFunc);
+            $cache->set($returnValue, $timeout);
+            $cache->log->info('Committed value');
+
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = false;
+            }
+            return $returnValue;
+        } finally {
+            flock($f, LOCK_UN);
+            fclose($f);
+            // By the time the code reaches this point, it might be the case
+            // that another request managed to reach the critical section and
+            // also opened the file. In that case, it could be the case that
+            // multiple requests will attempt to unlink the lock file, so it's
+            // totally okay for them to fail.
+            //
+            // Additionally, since this is performed after the call to set(),
+            // even if we somehow managed to unlink the file between the time
+            // another request checked if the cache was set and it tried to
+            // open the lockfile (thus opening a completely unrelated file that
+            // is not synchronized with the current one at all), that other
+            // request will finish acquiring the lockfile and then see that the
+            // cache value had already been set, causing no additional
+            // evaluations of $setFunc.
+            @unlink($lockFile);
         }
-        return $returnValue;
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of ProblemList
+ * Description of ProblemListTest
  *
  * @author joemmanuel
  */
-class ProblemList extends OmegaupTestCase {
+class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Gets the list of problems
      */
@@ -12,17 +12,17 @@ class ProblemList extends OmegaupTestCase {
         // Get 3 problems
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
         }
 
         // Get 1 problem private, should not appear
-        $privateProblemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -83,11 +83,11 @@ class ProblemList extends OmegaupTestCase {
         // Get 3 problems
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
             for ($j = 0; $j <= $i; $j++) {
-                ProblemsFactory::addTag(
+                \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
                     "tag-$j",
                     1 /* public */
@@ -96,18 +96,18 @@ class ProblemList extends OmegaupTestCase {
         }
 
         // Get 1 problem private, should not appear
-        $privateProblemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
         for ($j = 0; $j < $n; $j++) {
-            ProblemsFactory::addTag(
+            \OmegaUp\Test\Factories\Problem::addTag(
                 $privateProblemData,
                 "tag-$j",
                 1 /* public */
             );
         }
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Test one tag at a time
@@ -116,7 +116,6 @@ class ProblemList extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => "tag-$j",
             ]));
-            $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tag $j.
             $this->assertCount($n - $j, $response['results']);
@@ -126,12 +125,12 @@ class ProblemList extends OmegaupTestCase {
         $tags = [];
         for ($j = 0; $j < $n; $j++) {
             $tags[] = "tag-$j";
+            $plainTags = implode(',', $tags);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => $tags,
+                'tag' => $plainTags,
             ]));
-            $this->assertEquals($response['status'], 'ok');
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tags 0 through $j.
             $this->assertCount($n - $j, $response['results']);
@@ -150,14 +149,14 @@ class ProblemList extends OmegaupTestCase {
         // - Even problems could be solved using Karel, odd ones don't
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
-        $karel_problem = 'kj,kp,cpp,c'; // Karel problems should allow kj AND kp extensions
+        $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
         for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
-                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp11-gcc,c11-gcc',
             ]));
             for ($j = 0; $j <= $i; $j++) {
-                ProblemsFactory::addTag(
+                \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
                     "test-tag-$j",
                     1 /* public */
@@ -170,18 +169,18 @@ class ProblemList extends OmegaupTestCase {
         $users = [];
         $identities = [];
         for ($i = 0; $i < 5; $i++) {
-            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             for ($j = 0; $j <= $i; $j++) {
-                $runData = RunsFactory::createRunToProblem(
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData[$j],
                     $identities[$i]
                 );
-                RunsFactory::gradeRun($runData);
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
             }
             $login[] = self::login($identities[$i]);
         }
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[0],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -190,7 +189,7 @@ class ProblemList extends OmegaupTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[1],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -199,7 +198,7 @@ class ProblemList extends OmegaupTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[2],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -208,7 +207,7 @@ class ProblemList extends OmegaupTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[3],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -217,7 +216,7 @@ class ProblemList extends OmegaupTestCase {
             false
         );
 
-        QualityNominationFactory::createSuggestion(
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
             $identities[4],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
@@ -226,7 +225,19 @@ class ProblemList extends OmegaupTestCase {
             false
         );
 
-        Utils::RunAggregateFeedback();
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        // Filter 0:
+        // - Containing test-tag-0
+        // - Only Karel problems
+        // - No Difficulty Range - It must show all problems with the selected
+        //                         tag and languages
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+            'auth_token' => $login[0]->auth_token,
+            'tag' => 'test-tag-0',
+            'programming_languages' => 'kp,kj',
+        ]));
+        $this->assertCount(3, $response['results']);
 
         // Filter 1:
         // - Containing tag-0
@@ -236,8 +247,8 @@ class ProblemList extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
             'tag' => 'test-tag-0',
-            'programming_languages' => ['kp', 'kj'],
-            'difficulty_range' => [0,2],
+            'programming_languages' => 'kp,kj',
+            'difficulty_range' => '0,3',
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
@@ -256,9 +267,9 @@ class ProblemList extends OmegaupTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['test-tag-0', 'test-tag-3'],
+            'tag' => 'test-tag-0,test-tag-3',
             'require_all_tags' => false,
-            'difficulty_range' => [0,4],
+            'difficulty_range' => '0,4',
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
@@ -276,7 +287,7 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login[0]->auth_token,
             'tag' => ['test-tag-2', 'test-tag-3'],
             'require_all_tags' => false,
-            'difficulty_range' => [1,4],
+            'difficulty_range' => '1,4',
             'order_by' => 'quality',
         ]));
         $this->assertCount(0, $response['results']);
@@ -289,49 +300,49 @@ class ProblemList extends OmegaupTestCase {
         [
             'user' => $admin,
             'identity' => $identityAdmin
-        ] = UserFactory::createAdminUser(
-            new UserParams(
+        ] = \OmegaUp\Test\Factories\User::createAdminUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'admin']
             )
         );
-        ['user' => $userA, 'identity' => $identityA] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $userA, 'identity' => $identityA] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'user_a']
             )
         );
-        ['user' => $userB, 'identity' => $identityB] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $userB, 'identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'user_b']
             )
         );
-        ['user' => $otherUser, 'identity' => $otherIdentity] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'other']
             )
         );
 
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityAdmin
         ]));
-        $private_problem = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $private_problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityAdmin
         ]));
-        $problem_a = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problem_a = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityA
         ]));
-        $private_problem_a = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $private_problem_a = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityA
         ]));
-        $problem_b = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problem_b = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identityB
         ]));
-        $private_problem_b = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $private_problem_b = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identityB
         ]));
 
@@ -339,9 +350,21 @@ class ProblemList extends OmegaupTestCase {
                          $problem_a, $private_problem_a, $problem_b, $private_problem_b];
         // Tag each problem with 3 tags, 2 public and 1 private.
         foreach ($all_problems as $problem) {
-            ProblemsFactory::addTag($problem, 'a', 1 /* public */);
-            ProblemsFactory::addTag($problem, 'b', 1 /* public */);
-            ProblemsFactory::addTag($problem, 'c', 0 /* public */);
+            \OmegaUp\Test\Factories\Problem::addTag(
+                $problem,
+                'a',
+                1 /* public */
+            );
+            \OmegaUp\Test\Factories\Problem::addTag(
+                $problem,
+                'b',
+                1 /* public */
+            );
+            \OmegaUp\Test\Factories\Problem::addTag(
+                $problem,
+                'c',
+                0 /* public */
+            );
         }
 
         $all_users = [$identityAdmin, $identityA, $identityB, $otherIdentity];
@@ -368,21 +391,18 @@ class ProblemList extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => 'a',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_a_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => ['a', 'b']
+                'tag' => 'a,b',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ab_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => ['a', 'c']
+                'tag' => 'a,c',
             ]));
-            $this->assertEquals($response['status'], 'ok');
             $this->assertCount($tag_ac_results[$i], $response['results']);
         }
     }
@@ -393,12 +413,12 @@ class ProblemList extends OmegaupTestCase {
         // Get 3 problems
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
         }
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -417,19 +437,19 @@ class ProblemList extends OmegaupTestCase {
      *
      */
     public function testPrivateProblemsShowToAuthor() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
-        ['user' => $anotherAuthor, 'identity' => $anotherIdentity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $anotherAuthor, 'identity' => $anotherIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPublic = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identity
         ]));
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
-        $anotherProblemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $anotherProblemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $anotherIdentity
         ]));
 
@@ -450,18 +470,18 @@ class ProblemList extends OmegaupTestCase {
      *
      */
     public function testAllPrivateProblemsShowToAdmin() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPublic = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $identity
         ]));
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
 
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -479,14 +499,14 @@ class ProblemList extends OmegaupTestCase {
      * An added admin should see those problems as well
      */
     public function testAllPrivateProblemsShowToAddedAdmin() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
 
-        ['user' => $addedAdmin, 'identity' => $addedIdentityAdmin] = UserFactory::createUser();
+        ['user' => $addedAdmin, 'identity' => $addedIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         $adminLogin = self::login($addedIdentityAdmin);
         $r = new \OmegaUp\Request([
@@ -505,10 +525,8 @@ class ProblemList extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
-            'usernameOrEmail' => $addedAdmin->username,
+            'usernameOrEmail' => $addedIdentityAdmin->username,
         ]));
-
-        $this->assertEquals('ok', $response['status']);
 
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
@@ -523,15 +541,15 @@ class ProblemList extends OmegaupTestCase {
      * An added admin group should see those problems as well
      */
     public function testAllPrivateProblemsShowToAddedAdminGroup() {
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $identity
         ]));
         $alias = $problemDataPrivate['request']['problem_alias'];
 
-        ['user' => $addedAdmin, 'identity' => $addedIdentityAdmin] = UserFactory::createUser();
+        ['user' => $addedAdmin, 'identity' => $addedIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($addedIdentityAdmin);
         $r = new \OmegaUp\Request([
@@ -554,27 +572,29 @@ class ProblemList extends OmegaupTestCase {
         );
 
         $authorLogin = self::login($identity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $identity,
             null,
             null,
             null,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup(
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $group,
             $addedIdentityAdmin,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup($group, $identity, $authorLogin);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $group,
+            $identity,
+            $authorLogin
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
             'auth_token' => $authorLogin->auth_token,
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
-
-        $this->assertEquals('ok', $response['status']);
 
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
@@ -596,37 +616,39 @@ class ProblemList extends OmegaupTestCase {
      * Authors with admin groups should only see each problem once.
      */
     public function testAuthorOnlySeesProblemsOnce() {
-        ['user' => $author, 'identity' => $authorIdentity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             'author' => $authorIdentity
         ]));
         $alias = $problemDataPrivate['request']['problem_alias'];
 
         $authorLogin = self::login($authorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $authorIdentity,
             null,
             null,
             null,
             $authorLogin
         );
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup(
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
             $group,
             $identity,
             $authorLogin
         );
-        GroupsFactory::addUserToGroup($group, $authorIdentity, $authorLogin);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $group,
+            $authorIdentity,
+            $authorLogin
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
             'auth_token' => $authorLogin->auth_token,
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
-
-        $this->assertEquals('ok', $response['status']);
 
         // It should be visible just once.
         $r = new \OmegaUp\Request([
@@ -651,16 +673,16 @@ class ProblemList extends OmegaupTestCase {
      * An author that belongs to an admin group should not see repeated problems.
      */
     public function testPublicProblemsPlusAddedAdminGroup() {
-        ['user' => $author, 'identity' => $authorIdentity] = UserFactory::createUser();
-        ['user' => $helper, 'identity' => $helperIdentity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $helper, 'identity' => $helperIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
             'author' => $authorIdentity
         ]));
 
-        $group = GroupsFactory::createGroup($authorIdentity);
-        GroupsFactory::addUserToGroup($group, $helperIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup($authorIdentity);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($group, $helperIdentity);
 
         $login = self::login($authorIdentity);
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
@@ -668,8 +690,6 @@ class ProblemList extends OmegaupTestCase {
             'problem_alias' => $problemDataPrivate['request']['problem_alias'],
             'group' => $group['group']->alias,
         ]));
-
-        $this->assertEquals('ok', $response['status']);
 
         // This should be visible exactly once.
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -687,11 +707,11 @@ class ProblemList extends OmegaupTestCase {
      */
     public function testMyList() {
         // Get 3 problems
-        ['user' => $author, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $author, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $n = 3;
         for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
                 'author' => $identity
             ]));
         }
@@ -711,20 +731,23 @@ class ProblemList extends OmegaupTestCase {
      * Logged-in users will have their best scores for all problems
      */
     public function testListContainsScores() {
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $problemData = ProblemsFactory::createProblem();
-        $problemDataNoRun = ProblemsFactory::createProblem();
-        $problemDataDecimal = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemDataNoRun = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemDataDecimal = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $runDataDecimal = RunsFactory::createRunToProblem(
+        $runDataDecimal = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataDecimal,
             $identity
         );
-        RunsFactory::gradeRun($runDataDecimal, '.123456', 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataDecimal, '.123456', 'PA');
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -753,7 +776,7 @@ class ProblemList extends OmegaupTestCase {
      * Test that non-logged in users dont have score set
      */
     public function testListScoresForNonLoggedIn() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $response = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request()
@@ -773,14 +796,14 @@ class ProblemList extends OmegaupTestCase {
      * Test List API with query param
      */
     public function testListWithAliasQuery() {
-        $problemDataPublic = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
         ]));
-        $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
 
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         // Expect public problem only
@@ -803,7 +826,7 @@ class ProblemList extends OmegaupTestCase {
 
         // Expect 1 problem, admin can see private problem
         {
-            ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+            ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
             $adminLogin = self::login($identityAdmin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -836,14 +859,14 @@ class ProblemList extends OmegaupTestCase {
      */
     public function testProblemListPager() {
         // Create a user and some problems with submissions for the tests.
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 6; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
-                'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
             ]));
             $runs = $i / 2;
             for ($r = 0; $r < $runs; $r++) {
-                $runData = RunsFactory::createRunToProblem(
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
                     $problemData[$i],
                     $identity
                 );
@@ -853,7 +876,11 @@ class ProblemList extends OmegaupTestCase {
                     $verdict = ($points == 100) ? 'AC' : 'PA';
                 }
 
-                RunsFactory::gradeRun($runData, $points / 100, $verdict);
+                \OmegaUp\Test\Factories\Run::gradeRun(
+                    $runData,
+                    $points / 100,
+                    $verdict
+                );
             }
         }
 
@@ -953,55 +980,61 @@ class ProblemList extends OmegaupTestCase {
      * Test getting the list of Problems unsolved by some user.
      */
     public function testListUnsolvedProblemsByUser() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         /* Five different problems, each variable has its expected final verdict as suffix */
-        $problemDataAC = ProblemsFactory::createProblem();
-        $problemDataAC2 = ProblemsFactory::createProblem();
-        $problemDataWA = ProblemsFactory::createProblem();
-        $problemDataPE = ProblemsFactory::createProblem();
+        $problemDataAC = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemDataAC2 = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemDataWA = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemDataPE = \OmegaUp\Test\Factories\Problem::createProblem();
 
         /*----------------- Different runs for each problem -----------------*/
         // problemDataWA will have only one run with a WA verdict
-        $runDataWA = RunsFactory::createRunToProblem($problemDataWA, $identity);
-        RunsFactory::gradeRun($runDataWA, '0.0', 'WA');
+        $runDataWA = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemDataWA,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataWA, '0.0', 'WA');
 
         // problemDataAC will have two AC runs
-        $runDataAC1 = RunsFactory::createRunToProblem(
+        $runDataAC1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC1);
-        $runDataAC1_2 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC1);
+        $runDataAC1_2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC1_2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC1_2);
 
         // problemDataAC2 will have three runs, one AC, one PE and one TLE
-        $runDataAC2_1 = RunsFactory::createRunToProblem(
+        $runDataAC2_1 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_1, '0.05', 'PE');
-        $runDataAC2_2 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_1, '0.05', 'PE');
+        $runDataAC2_2 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_2, '0.04', 'TLE');
-        $runDataAC2_3 = RunsFactory::createRunToProblem(
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_2, '0.04', 'TLE');
+        $runDataAC2_3 = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataAC2,
             $identity
         );
-        RunsFactory::gradeRun($runDataAC2_3);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataAC2_3);
 
         // problemDataPE will have two runs, one with a PE verdict and  the other with a TLE verdict.
-        $runDataPE = RunsFactory::createRunToProblem($problemDataPE, $identity);
-        RunsFactory::gradeRun($runDataPE, '0.10', 'PE');
-        $runDataTLE = RunsFactory::createRunToProblem(
+        $runDataPE = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPE,
             $identity
         );
-        RunsFactory::gradeRun($runDataTLE, '0.10', 'TLE');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPE, '0.10', 'PE');
+        $runDataTLE = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemDataPE,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataTLE, '0.10', 'TLE');
 
         // Pass the user user_id (necessary for the search) and the username necessary for the UN-authentication.
         $response = \OmegaUp\Controllers\User::apiListUnsolvedProblems(new \OmegaUp\Request([
@@ -1048,5 +1081,57 @@ class ProblemList extends OmegaupTestCase {
                     );
             }
         }
+    }
+
+    /**
+     * Test problem list from url, getting all the parameters
+     */
+    public function testProblemListPagerFromUrl() {
+        // Create a user and some problems with submissions for the tests.
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $request = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'rowcount' => 1000,
+        ]);
+        // Call apiList to define the number of problems and pages
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList($request);
+        $total = $apiListResponse['total'];
+        $pages = intval(($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+
+        // Fetching every page to get all the problems, starting on page 1
+        $request['page'] = 1;
+        $problems = [];
+        for ($i = 1; $i <= $pages; $i++) {
+            $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+                $request
+            )['smartyProperties']['payload'];
+            $nextPage = end($response['pagerItems']);
+            $nextPageURL = $nextPage['url'];
+            $nextPageURLQuery = parse_url($nextPageURL);
+            // Getting all the parameters gotten by the url, even if some of them is empty
+            if (isset($nextPageURLQuery['query'])) {
+                parse_str($nextPageURLQuery['query'], $params);
+                foreach ($params as $param => $value) {
+                    $request[$param] = $value;
+                }
+            }
+
+            foreach ($response['problems'] as $problem) {
+                $problems[] = $problem['alias'];
+            }
+        }
+        // Asserting the number of non-repeated problems is the same than the total
+        $this->assertEquals(
+            count(
+                array_unique(
+                    $problems
+                )
+            ),
+            count(
+                $apiListResponse['results']
+            )
+        );
     }
 }

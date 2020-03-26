@@ -29,9 +29,6 @@ legend {
 	margin: 0 0.2em 0 0.2em;
 }
 
-.template,
-.user-list-template { display: none; }
-
 #root,
 #problem,
 #ranking,
@@ -133,70 +130,6 @@ body#only-problem #problems .main {
 
 .tab {
 	padding: 1em;
-}
-
-#problem-list > div {
-	width: 19em;
-	margin-bottom: 0.5em;
-	background: #ddd;
-	border: solid 1px #ccc;
-	border-width: 1px 0 1px 1px;
-	position: relative;
-}
-
-#problem-list > div a {
-	color: #5588DD;
-	display: block;
-	padding: 0.5em;
-	width: 100%;
-	max-width: 212px;
-}
-
-#problem-list > div.active {
-	background: white;
-}
-
-#problem-list > div.summary {
-	margin-bottom: 1em;
-}
-
-#problem-list > div .solved {
-	position: absolute;
-	top: 0.5em;
-	right: 1em;
-}
-
-#problems #mini-ranking {
-	width: 18em;
-	margin-top: 2em;
-}
-
-#problems #mini-ranking td {
-	border: 1px solid #000;
-	padding: 0.2em;
-}
-
-#problems #mini-ranking th {
-	padding: 0.2em;
-}
-
-#problems #mini-ranking .position,
-#problems #mini-ranking .points,
-#problems #mini-ranking .penalty {
-	text-align: center;
-}
-
-#problems #mini-ranking .user,
-#problems #mini-ranking .user span {
-	width: 10em;
-	max-width: 10em;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-#problems #mini-ranking .user span {
-	display: block;
 }
 
 #problem, #summary {
@@ -457,14 +390,6 @@ table.clarifications {
 	margin: 0 auto;
 }
 
-#problems #mini-ranking td.points {
-	border-right-style: dotted;
-}
-
-#problems #mini-ranking td.penalty {
-	border-left-width: 0;
-}
-
 .clarifications tbody td {
 	border: 1px solid #000;
 	padding: 0.4em;
@@ -619,82 +544,6 @@ td.forcebreaks-arena {
 
 .contest-list tr:nth-child(4n+2) td, .contest-list tr:nth-child(4n+4) td {
    border: none;
-}
-
-/* Notificaciones */
-.notification-button {
-  padding-top: 6px !important;
-  padding-bottom: 20px !important;
-  padding-right: 12px !important;
-  padding-left: 12px !important;
-  font-size: 22px;
-}
-
-.notification-counter {
-  position: absolute;
-  font-size: 16px;
-  padding: 2px 4px;
-  bottom: 4px;
-  right: 0px;
-}
-
-.notification-drawer::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-color: #F5F5F5;
-}
-
-.notification-drawer::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background-color: #F5F5F5;
-}
-
-.notification-drawer::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #7F7F7F;
-}
-
-.notification-drawer {
-  width: 320px;
-  max-width: 320px;
-  max-height: 380px;
-  overflow-y: scroll;
-}
-
-.notification-drawer li {
-  padding: 3px 20px;
-  border-top: 1px solid #F1F1F1;
-}
-
-.notification-drawer li a {
-  color: #333;
-  text-decoration: none;
-}
-
-.notification-drawer li a pre {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.notification-drawer li:hover,
-.notification-drawer li:focus,
-.notification-drawer li:active {
-  cursor: pointer;
-  background-color: #678DD7;
-  text-decoration: none;
-}
-
-.notification-drawer li:hover > a,
-.notification-drawer li:focus > a,
-.notification-drawer li:active > a {
-  color: #FFF;
-}
-
-.notification-drawer li a > h4,
-.notification-drawer li a > p {
-  word-wrap: break-word;
 }
 
 .dropdown-menu li.empty {

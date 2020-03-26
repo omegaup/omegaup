@@ -1,15 +1,16 @@
 <template>
-  <omegaup-arena-codemirror ref="cm-wrapper"
-        v-bind:options="editorOptions"
-        v-bind:value="value"
-        v-on:change="onChange"
-        v-on:input="onInput"></omegaup-arena-codemirror>
+  <omegaup-arena-codemirror
+    ref="cm-wrapper"
+    v-bind:options="editorOptions"
+    v-bind:value="value"
+    v-on:change="onChange"
+    v-on:input="onInput"
+  ></omegaup-arena-codemirror>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
 import { codemirror } from 'vue-codemirror-lite';
 
@@ -17,9 +18,15 @@ const languageModeMap: {
   [language: string]: string;
 } = {
   c: 'text/x-csrc',
+  'c11-gcc': 'text/x-csrc',
+  'c11-clang': 'text/x-csrc',
   cpp: 'text/x-c++src',
+  'cpp17-gcc': 'text/x-c++src',
+  'cpp17-clang': 'text/x-c++src',
   java: 'text/x-java',
   py: 'text/x-python',
+  py2: 'text/x-python',
+  py3: 'text/x-python',
   rb: 'text/x-ruby',
   pl: 'text/x-perl',
   cs: 'text/x-csharp',
@@ -27,6 +34,8 @@ const languageModeMap: {
   cat: 'text/plain',
   hs: 'text/x-haskell',
   cpp11: 'text/x-c++src',
+  'cpp11-gcc': 'text/x-c++src',
+  'cpp11-clang': 'text/x-c++src',
   lua: 'text/x-lua',
 };
 
@@ -63,7 +72,7 @@ export default class ArenaCodeView extends Vue {
   @Prop() value!: string;
 
   T = T;
-  mode = languageModeMap[this.language] || languageModeMap['cpp11'];
+  mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
 
   get editorOptions(): EditorOptions {
     return {
@@ -87,5 +96,4 @@ export default class ArenaCodeView extends Vue {
     this.mode = languageModeMap[newLanguage];
   }
 }
-
 </script>

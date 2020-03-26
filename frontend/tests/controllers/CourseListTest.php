@@ -5,17 +5,20 @@
  * @author pablo
  */
 
-class CourseListTest extends OmegaupTestCase {
-    public function setUp() {
+class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
         parent::setUp();
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
             ['homework' => 3, 'test' => 2]
         );
         $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
-        ['user' => $this->other_user, 'identity' => $this->other_identity] = UserFactory::createUser();
+        ['user' => $this->other_user, 'identity' => $this->other_identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        CoursesFactory::addStudentToCourse($courseData, $this->other_user);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $this->other_identity
+        );
     }
 
     protected $admin_user;
@@ -32,7 +35,6 @@ class CourseListTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
 
@@ -52,11 +54,12 @@ class CourseListTest extends OmegaupTestCase {
             'auth_token' => $otherUserLogin->auth_token,
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
-
-        $this->assertEquals(1, count($response['student']));
+        $studentCourses = array_filter($response['student'], function ($course) {
+            return $course['admission_mode'] !== \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC;
+        });
+        $this->assertEquals(1, count($studentCourses));
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],

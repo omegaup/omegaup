@@ -114,10 +114,8 @@ abstract class GroupRoles {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\GroupRoles[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\GroupRoles> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\GroupRoles}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\GroupRoles>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -179,7 +177,7 @@ abstract class GroupRoles {
     ): int {
         $sql = '
             INSERT INTO
-                Group_Roles (
+                `Group_Roles` (
                     `group_id`,
                     `role_id`,
                     `acl_id`

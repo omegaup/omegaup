@@ -1,84 +1,119 @@
 <template>
   <div class="omegaup-course-details panel">
     <div>
-      <h1><span><a class="course-header">{{ username }}</a></span></h1>
+      <h1>
+        <span
+          ><a class="course-header">{{ username }}</a></span
+        >
+      </h1>
     </div>
     <div class="panel-body">
-      <form class="form-horizontal"
-            role="form"
-            v-on:submit.prevent="onEditMember">
+      <form
+        class="form-horizontal"
+        role="form"
+        v-on:submit.prevent="onEditMember"
+      >
         <div class="row">
           <div class="form-group">
-            <label class="col-md-4 col-sm-4 control-label"
-                 for="username">{{ T.username }}</label>
+            <label class="col-md-4 col-sm-4 control-label" for="username">{{
+              T.username
+            }}</label>
             <div class="col-md-7 col-sm-7">
               <div class="input-group">
-                <span class="input-group-addon">{{ groupName }}:</span> <input class="form-control"
-                     name="username"
-                     size="30"
-                     type="text"
-                     v-model="identityName">
+                <span class="input-group-addon">{{ groupName }}:</span>
+                <input
+                  class="form-control"
+                  name="username"
+                  size="30"
+                  type="text"
+                  v-model="identityName"
+                />
               </div>
             </div>
           </div>
           <div class="form-group">
-            <label class="col-md-4 col-sm-4 control-label"
-                 for="name">{{ T.profile }}</label>
+            <label class="col-md-4 col-sm-4 control-label" for="name">{{
+              T.profile
+            }}</label>
             <div class="col-md-7 col-sm-7">
-              <input class="form-control"
-                   name="name"
-                   size="30"
-                   type="text"
-                   v-model="identity.name">
+              <input
+                class="form-control"
+                name="name"
+                size="30"
+                type="text"
+                v-model="identity.name"
+              />
             </div>
           </div>
           <div class="form-group">
-            <label class="col-md-4 col-sm-4 control-label"
-                 for="countryId">{{ T.userEditCountry }}</label>
+            <label class="col-md-4 col-sm-4 control-label" for="countryId">{{
+              T.userEditCountry
+            }}</label>
             <div class="col-md-7 col-sm-7">
-              <select class="form-control"
-                   name="countryId"
-                   v-model="selectedCountry">
-                <option v-bind:value="country.country_id"
-                        v-for="country in countries">
+              <select
+                class="form-control"
+                name="countryId"
+                v-model="selectedCountry"
+              >
+                <option
+                  v-bind:value="country.country_id"
+                  v-for="country in countries"
+                >
                   {{ country.name }}
                 </option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="col-md-4 col-sm-4 control-label"
-                 for="stateId">{{ T.profileState }}</label>
+            <label class="col-md-4 col-sm-4 control-label" for="stateId">{{
+              T.profileState
+            }}</label>
             <div class="col-md-7 col-sm-7">
-              <select class="form-control"
-                   name="stateId"
-                   v-model="selectedState">
-                <option v-bind:value="code.split('-')[1]"
-                        v-for="[code, state] in Object.entries(countryStates)">
+              <select
+                class="form-control"
+                name="stateId"
+                v-model="selectedState"
+              >
+                <option
+                  v-bind:value="code.split('-')[1]"
+                  v-for="[code, state] in Object.entries(countryStates)"
+                >
                   {{ state.name }}
                 </option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="col-md-4 col-sm-4 control-label"
-                 for="school">{{ T.profileSchool }}</label>
+            <label class="col-md-4 col-sm-4 control-label" for="school">{{
+              T.profileSchool
+            }}</label>
             <div class="col-md-7 col-sm-7">
-              <input class="form-control"
-                   name="school"
-                   size="20"
-                   type="text"
-                   v-model="identity.school">
-            </div><input name="schoolId"
-                 type="hidden"
-                 v-bind:value="identity.school_id">
+              <input
+                class="form-control"
+                name="school"
+                size="20"
+                type="text"
+                v-model="identity.school"
+              />
+            </div>
+            <input
+              name="schoolId"
+              type="hidden"
+              v-bind:value="identity.school_id"
+            />
           </div>
         </div>
         <div class="form-group pull-right">
-          <button class="btn btn-primary"
-               type="submit">{{ T.wordsSaveChanges }}</button> <button class="btn btn-secundary"
-               type="reset"
-               v-on:click="$emit('emit-cancel')">{{ T.wordsCancel }}</button>
+          <button class="btn btn-primary" type="submit">
+            {{ T.wordsSaveChanges }}
+          </button>
+          <button
+            class="btn btn-secundary"
+            type="reset"
+            v-on:click="$emit('emit-cancel')"
+          >
+            {{ T.wordsCancel }}
+          </button>
         </div>
       </form>
     </div>
@@ -87,8 +122,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 
 @Component
@@ -142,5 +176,4 @@ export default class IdentityEdit extends Vue {
     );
   }
 }
-
 </script>

@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#passwordResetResetTitle#}"}
+{include file='head.tpl' htmlTitle="{#passwordResetResetTitle#}" inline}
 <div id="password-reset" class="container">
 	<h1>{#passwordResetResetTitle#}</h1>
 	<div class="row">
@@ -21,5 +21,5 @@
 		</div>
 	</div>
 </div>
-<script type='text/javascript' src="{version_hash src="/js/reset.js"}" ></script>
-{include file='footer.tpl'}
+<script type='text/javascript' src="{version_hash src="/js/reset.js"}" defer></script>
+{include file='footer.tpl' inline}

@@ -1,3 +1,3 @@
-{include file='head.tpl' navbarSection='rank' htmlTitle="{#omegaupTitleRank#}"}
-{include file='rank.table.tpl' rankTablePayload=$rankTablePayload}
-{include file='footer.tpl'}
+{include file='head.tpl' navbarSection='rank' headerPayload=$headerPayload htmlTitle="{#omegaupTitleRank#}" inline}
+{include file='rank.table.tpl' rankTablePayload=$rankTablePayload inline}
+{include file='footer.tpl' inline}

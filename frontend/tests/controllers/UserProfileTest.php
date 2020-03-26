@@ -5,13 +5,13 @@
  *
  * @author Alberto
  */
-class UserProfileTest extends OmegaupTestCase {
+class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     /*
      * Test for the function which returns the general user info
      */
     public function testUserData() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser1']
             )
         );
@@ -22,21 +22,24 @@ class UserProfileTest extends OmegaupTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayNotHasKey('password', $response['userinfo']);
-        $this->assertEquals($user->username, $response['userinfo']['username']);
+        $this->assertArrayNotHasKey('password', $response);
+        $this->assertEquals(
+            $identity->username,
+            $response['username']
+        );
     }
 
     /*
      * Test for the function which returns the general user info
      */
     public function testUserDataAnotherUser() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser2']
             )
         );
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser(
-            new UserParams(
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser3']
             )
         );
@@ -48,11 +51,11 @@ class UserProfileTest extends OmegaupTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayNotHasKey('password', $response['userinfo']);
-        $this->assertArrayNotHasKey('email', $response['userinfo']);
+        $this->assertArrayNotHasKey('password', $response);
+        $this->assertArrayNotHasKey('email', $response);
         $this->assertEquals(
             $identity2->username,
-            $response['userinfo']['username']
+            $response['username']
         );
     }
 
@@ -60,11 +63,11 @@ class UserProfileTest extends OmegaupTestCase {
      * Test apiProfile with is_private enabled
      */
     public function testUserPrivateDataAnotherUser() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Mark user2's profile as private (5th argument)
-        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser(
-            new UserParams(
-                ['is_private' => true]
+        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['isPrivate' => true]
             )
         );
 
@@ -76,21 +79,21 @@ class UserProfileTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
-        foreach ($response['userinfo'] as $k => $v) {
+        foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;
             }
             $this->assertNull($v);
         }
-        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+        foreach ($response['rankinfo'] as $k => $v) {
             if ($k == 'status') {
                 continue;
             }
             $this->assertNull($v);
         }
         $this->assertEquals(
-            $user2->username,
-            $response['userinfo']['username']
+            $identity2->username,
+            $response['username']
         );
     }
 
@@ -98,8 +101,8 @@ class UserProfileTest extends OmegaupTestCase {
      * Test admin can see emails for all non-private profiles
      */
     public function testAdminCanSeeEmails() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $r = new \OmegaUp\Request([
@@ -108,33 +111,33 @@ class UserProfileTest extends OmegaupTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
     }
 
     /*
      * Test admin can see all details for private profiles
      */
     public function testAdminCanSeePrivateProfile() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(['is_private' => true])
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['isPrivate' => true])
         );
-        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username
+            'username' => $identity->username
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
         $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
-        foreach ($response['userinfo'] as $k => $v) {
+        foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 $this->assertNotNull($v);
             }
         }
-        foreach ($response['userinfo']['rankinfo'] as $k => $v) {
+        foreach ($response['rankinfo'] as $k => $v) {
             $this->assertNotNull($v);
         }
     }
@@ -143,51 +146,71 @@ class UserProfileTest extends OmegaupTestCase {
      * User can see his own email
      */
     public function testUserCanSeeSelfEmail() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'username' => $user->username
+            'username' => $identity->username
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $this->assertArrayHasKey('email', $response['userinfo']);
+        $this->assertArrayHasKey('email', $response);
     }
 
     /*
      * Test the contest which a certain user has participated
      */
     public function testUserContests() {
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest();
-        $contests[1] = ContestsFactory::createContest();
+        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest();
+        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest();
 
-        ContestsFactory::addUser($contests[0], $identity);
-        ContestsFactory::addUser($contests[1], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contests[0]);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contests[0]
+        );
 
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contests[0],
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Get ContestStats
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
-                    'auth_token' => $login->auth_token,
-                ]
+                'auth_token' => $login->auth_token,
+            ]
         ));
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
         $this->assertEquals(1, count($response['contests']));
+        $alias = $contests[0]['contest']->alias;
+        $this->assertEquals(
+            $alias,
+            $response['contests'][$alias]['data']['alias']
+        );
+        $this->assertArrayHasKey(
+            'title',
+            $response['contests'][$alias]['data']
+        );
+        $this->assertArrayNotHasKey(
+            'contest_id',
+            $response['contests'][$alias]['data']
+        );
+        $this->assertArrayNotHasKey(
+            'scoreboard_url_admin',
+            $response['contests'][$alias]['data']
+        );
     }
 
     /*
@@ -195,37 +218,40 @@ class UserProfileTest extends OmegaupTestCase {
      * API can be accessed by a user who cannot see the contest (contest is private)
      */
     public function testUserContestsPrivateContestOutsider() {
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest(
-            new ContestParams(
-                ['admission_mode' => 'private']
+        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             )
         );
-        $contests[1] = ContestsFactory::createContest();
+        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest();
 
-        ContestsFactory::addUser($contests[0], $identity);
-        ContestsFactory::addUser($contests[1], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
 
-        $problemData = ProblemsFactory::createProblem();
-        ContestsFactory::addProblemToContest($problemData, $contests[0]);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contests[0]
+        );
 
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contests[0],
             $identity
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        ['user' => $externalUser, 'identity' => $externalIdentity] = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($externalIdentity);
         // Get ContestStats
         $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
                     'auth_token' => $login->auth_token,
-                    'username' => $contestant->username
+                    'username' => $identity->username
                 ]
         ));
 
@@ -237,29 +263,47 @@ class UserProfileTest extends OmegaupTestCase {
      * Test the problems solved by user
      */
     public function testProblemsSolved() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $contest = ContestsFactory::createContest();
+        $contest = \OmegaUp\Test\Factories\Contest::createContest();
 
-        $problemOne = ProblemsFactory::createProblem();
-        $problemTwo = ProblemsFactory::createProblem();
+        $problemOne = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemTwo = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ContestsFactory::addProblemToContest($problemOne, $contest);
-        ContestsFactory::addProblemToContest($problemTwo, $contest);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemOne,
+            $contest
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemTwo,
+            $contest
+        );
 
-        ContestsFactory::addUser($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         //Submission gap between runs must be 60 seconds
         $runs = [];
-        $runs[0] = RunsFactory::createRun($problemOne, $contest, $identity);
+        $runs[0] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemOne,
+            $contest,
+            $identity
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runs[1] = RunsFactory::createRun($problemTwo, $contest, $identity);
+        $runs[1] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemTwo,
+            $contest,
+            $identity
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runs[2] = RunsFactory::createRun($problemOne, $contest, $identity);
+        $runs[2] = \OmegaUp\Test\Factories\Run::createRun(
+            $problemOne,
+            $contest,
+            $identity
+        );
 
-        RunsFactory::gradeRun($runs[0]);
-        RunsFactory::gradeRun($runs[1]);
-        RunsFactory::gradeRun($runs[2]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[0]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[1]);
+        \OmegaUp\Test\Factories\Run::gradeRun($runs[2]);
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -271,11 +315,68 @@ class UserProfileTest extends OmegaupTestCase {
         $this->assertEquals(2, count($response['problems']));
     }
 
+    /*
+     * Test the problems solved by user
+     */
+    public function testProblemsCreated() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $problems = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identity,
+                $login
+            );
+        }
+
+        // As all problems are public, this function should retrieve 10 records
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(count($problems), count($response['problems']));
+
+        // Now make one of those problems private, results must change
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problems[0]['problem']->alias,
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            'message' => 'public -> private',
+        ]));
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $expectedProblemCount = count($problems) - 1;
+        $this->assertEquals(
+            $expectedProblemCount,
+            count(
+                $response['problems']
+            )
+        );
+
+        // Now, as another user, request the problems created by initial user
+        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($otherIdentity);
+
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]));
+        $this->assertEquals(
+            $expectedProblemCount,
+            count(
+                $response['problems']
+            )
+        );
+    }
+
     /**
      * Test update main email api
      */
     public function testUpdateMainEmail() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -293,21 +394,33 @@ class UserProfileTest extends OmegaupTestCase {
      * Test update main email api
      */
     public function testStats() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $problem = ProblemsFactory::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($identity);
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run, 0.0, 'CE');
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0.0, 'CE');
         }
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run, 0.5, 'PA');
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 0.5, 'PA');
         }
         {
-            $run = RunsFactory::createRunToProblem($problem, $user, $login);
-            RunsFactory::gradeRun($run);
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
         }
 
         $response = \OmegaUp\Controllers\User::apiStats(new \OmegaUp\Request([

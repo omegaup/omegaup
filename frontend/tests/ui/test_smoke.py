@@ -39,6 +39,25 @@ def test_login(driver):
 
 @util.no_javascript_errors()
 @util.annotate
+def test_js_errors(driver):
+    '''Tests assert{,_no}_js_errors().'''
+
+    # console.log() is not considered an error.
+    with util.assert_no_js_errors(driver):
+        driver.browser.execute_script('console.log("foo");')
+
+    with util.assert_js_errors(driver, expected_messages=('bar', )):
+        driver.browser.execute_script('console.error("bar");')
+
+    with util.assert_no_js_errors(driver):
+        # Within an asset_js_error() context manager, messages should not be
+        # bubbled up.
+        with util.assert_js_errors(driver, expected_messages=('baz', )):
+            driver.browser.execute_script('console.error("baz");')
+
+
+@util.no_javascript_errors()
+@util.annotate
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
@@ -104,13 +123,16 @@ def prepare_run(driver, problem_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-problems'))).click()
+            (By.XPATH,
+             '//div[@id="root"]//li[contains(concat(" ", '
+             'normalize-space(@class), " "), " nav-problems ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-problems"]'
-                  '//a[@href = "/problem/"]')))).click()
+                 ('//div[@id="root"]//li[contains(concat(" ", '
+                  'normalize-space(@class), " "), " nav-problems ")]//a[@href '
+                  '= "/problem/"]')))).click()
 
     search_box_element = driver.wait.until(
         EC.visibility_of_element_located(
@@ -132,12 +154,15 @@ def create_problem(driver, problem_alias):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
+                (By.XPATH,
+                 '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-problems ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-problems ")]'
                       '//a[@href = "/problem/new/"]')))).click()
 
         driver.wait.until(

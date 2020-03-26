@@ -154,10 +154,8 @@ abstract class Messages {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Messages[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Messages> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Messages}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Messages>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -222,7 +220,7 @@ abstract class Messages {
     ): int {
         $sql = '
             INSERT INTO
-                Messages (
+                `Messages` (
                     `read`,
                     `sender_id`,
                     `recipient_id`,

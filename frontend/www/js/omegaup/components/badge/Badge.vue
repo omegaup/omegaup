@@ -1,10 +1,11 @@
 <template>
-  <figure class="badge-container"
-          v-tooltip="description">
-    <a class="badge-icon"
-            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:class=
-            "{'badge-gray': !this.badge.unlocked}"
-         v-bind:src="this.iconUrl"></a>
+  <figure class="badge-container" v-tooltip="description">
+    <a class="badge-icon" v-bind:href="`/badge/${this.badge.badge_alias}/`"
+      ><img
+        v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
+        v-bind:src="this.iconUrl"
+    /></a>
+
     <figcaption class="badge-name">
       {{ this.name }}
     </figcaption>
@@ -37,8 +38,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
@@ -64,5 +64,4 @@ export default class Badge extends Vue {
     return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 }
-
 </script>

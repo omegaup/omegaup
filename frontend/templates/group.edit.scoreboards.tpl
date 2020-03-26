@@ -1,4 +1,4 @@
-<script src="{version_hash src="/js/alias.generate.js"}"></script>
+<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
 
 <div class="panel panel-primary">
 	<div class="panel-body">

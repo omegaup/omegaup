@@ -12,7 +12,12 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
-    final public static function getByIdentity($identityId) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\IdentityLoginLog>
+     */
+    final public static function getByIdentity(
+        int $identityId
+    ): array {
         $sql = 'SELECT
                     *
                 FROM
@@ -20,6 +25,7 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
                 WHERE
                     identity_id = ?;';
 
+        /** @var list<array{identity_id: int, ip: int, time: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
@@ -27,11 +33,8 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
 
         $identityLoginLogs = [];
         foreach ($rs as $row) {
-            array_push(
-                $identityLoginLogs,
-                new \OmegaUp\DAO\VO\IdentityLoginLog(
-                    $row
-                )
+            $identityLoginLogs[] = new \OmegaUp\DAO\VO\IdentityLoginLog(
+                $row
             );
         }
         return $identityLoginLogs;

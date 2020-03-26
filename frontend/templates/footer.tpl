@@ -3,10 +3,10 @@
 	</div>
 
 	<div id="common-footer"></div>
-	<script type="text/javascript" src="{version_hash src="/js/dist/common_footer.js"}"></script>
+	{js_include entrypoint="common_footer"}
 </div>
 
-{include file='common.analytics.tpl'}
+{include file='common.analytics.tpl' inline}
 <!-- #root -->
 </body>
 </html>

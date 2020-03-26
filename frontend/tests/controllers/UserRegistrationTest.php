@@ -5,7 +5,7 @@
  *
  * @author alanboy@omegaup.com
  */
-class UserRegistrationTest extends OmegaupTestCase {
+class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      *  Scenario:
      *      user A creates a new native account :
@@ -53,13 +53,13 @@ class UserRegistrationTest extends OmegaupTestCase {
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $username = 'X' . \OmegaUp\Time::get();
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged via google, facebook, linkedin does not have password
-        $this->assertNull($user->password);
+        $this->assertNull($identity->password);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -70,13 +70,15 @@ class UserRegistrationTest extends OmegaupTestCase {
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\User::apiCreate($r);
-
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
-
-        // Users logged in native mode must have password
-        $this->assertNotNull($user->password);
+        try {
+            // Try to create new user
+            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            $this->fail(
+                'User should have not been able to be created because the email already exists in the data base'
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('mailInUse', $e->getMessage());
+        }
     }
 
     /**
@@ -89,29 +91,30 @@ class UserRegistrationTest extends OmegaupTestCase {
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($email);
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
-        $this->assertEquals($user->username, $username);
+        $this->assertEquals($identity->username, $username);
         $this->assertEquals($email, $email_user->email);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z' . $username,
-            'password' => Utils::CreateRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomString(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\User::apiCreate($r);
-
-        $user = \OmegaUp\DAO\Users::FindByUsername('Z' . $username);
-        $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-
-        // Asserts that user has different username but the same email
-        $this->assertNotEquals($user->username, $username);
-        $this->assertEquals($email, $email_user->email);
+        try {
+            // Call API
+            $response = \OmegaUp\Controllers\User::apiCreate($r);
+            $this->fail(
+                'User should have not been able to be created because the email already exists in the data base'
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('mailInUse', $e->getMessage());
+        }
     }
 }

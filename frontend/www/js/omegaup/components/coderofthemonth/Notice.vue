@@ -1,14 +1,12 @@
 <template>
-  <div class="alert alert-warning"
-       name="notice"
-       v-if="show">
-    {{ UI.formatString(T.coderOfTheMonthNotice, {username: coderUsername}) }}
+  <div class="alert alert-warning" name="notice" v-if="show">
+    {{ UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
 
 @Component
@@ -27,5 +25,4 @@ export default class CoderOfTheMonthNotice extends Vue {
     );
   }
 }
-
 </script>

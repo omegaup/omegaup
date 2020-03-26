@@ -5,14 +5,11 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   function fillContestsTable() {
-    const deferred = contestList.showAdmin
-      ? API.Contest.adminList()
-      : API.Contest.myList();
-    deferred
+    (contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList())
       .then(function(result) {
         contestList.contests = result.contests;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   const payloadElement = document.getElementById('payload');
@@ -57,14 +54,28 @@ OmegaUp.on('ready', function() {
     },
     methods: {
       changeAdmissionMode: function(admissionMode) {
-        UI.bulkOperation(function(alias, resolve, reject) {
-          API.Contest.update({
-            contest_alias: alias,
-            admission_mode: admissionMode,
+        var promises = [];
+        $('input[type=checkbox]').each(function() {
+          if (this.checked) {
+            promises.push(
+              API.Contest.update({
+                contest_alias: this.id,
+                admission_mode: admissionMode,
+              }),
+            );
+          }
+        });
+
+        Promise.all(promises)
+          .then(() => {
+            UI.success(T.updateItemsSuccess);
           })
-            .then(resolve)
-            .fail(reject);
-        }, fillContestsTable);
+          .catch(error => {
+            UI.error(UI.formatString(T.bulkOperationError, error));
+          })
+          .finally(() => {
+            fillContestsTable();
+          });
       },
       downloadCsvUsers: function(contestAlias) {
         API.Contest.contestants({
@@ -109,7 +120,7 @@ OmegaUp.on('ready', function() {
 
             link.click(); // This will download the data
           })
-          .fail(omegaup.UI.apiError);
+          .catch(omegaup.UI.apiError);
       },
     },
   });

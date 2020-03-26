@@ -39,7 +39,7 @@ abstract class Courses {
                 `acl_id` = ?,
                 `start_time` = ?,
                 `finish_time` = ?,
-                `public` = ?,
+                `admission_mode` = ?,
                 `school_id` = ?,
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
@@ -68,7 +68,7 @@ abstract class Courses {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->finish_time
             ),
-            intval($Courses->public),
+            $Courses->admission_mode,
             (
                 is_null($Courses->school_id) ?
                 null :
@@ -106,7 +106,7 @@ abstract class Courses {
                 `Courses`.`acl_id`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
-                `Courses`.`public`,
+                `Courses`.`admission_mode`,
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
@@ -181,10 +181,8 @@ abstract class Courses {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Courses[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Courses> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Courses}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Courses>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -202,7 +200,7 @@ abstract class Courses {
                 `Courses`.`acl_id`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
-                `Courses`.`public`,
+                `Courses`.`admission_mode`,
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
@@ -256,7 +254,7 @@ abstract class Courses {
     ): int {
         $sql = '
             INSERT INTO
-                Courses (
+                `Courses` (
                     `name`,
                     `description`,
                     `alias`,
@@ -264,7 +262,7 @@ abstract class Courses {
                     `acl_id`,
                     `start_time`,
                     `finish_time`,
-                    `public`,
+                    `admission_mode`,
                     `school_id`,
                     `needs_basic_information`,
                     `requests_user_information`,
@@ -303,7 +301,7 @@ abstract class Courses {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->finish_time
             ),
-            intval($Courses->public),
+            $Courses->admission_mode,
             (
                 is_null($Courses->school_id) ?
                 null :

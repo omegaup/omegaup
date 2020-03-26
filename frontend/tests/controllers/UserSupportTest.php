@@ -5,13 +5,13 @@
  *
  * @author juan.pablo
  */
-class UserSupportTest extends OmegaupTestCase {
+class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
-        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         // Asserting that user belongs to the support group
         $this->assertTrue(
@@ -33,11 +33,11 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(new UserParams([
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'email' => $email,
             'verify' => false
         ]));
@@ -65,7 +65,6 @@ class UserSupportTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals(1, $response['verified']);
-        $this->assertEquals('ok', $response['status']);
     }
 
     /**
@@ -73,12 +72,12 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['email' => $email]
             )
         );
@@ -111,15 +110,13 @@ class UserSupportTest extends OmegaupTestCase {
 
         // Finally, users can update their password with the generated token
         $reset_token = explode('reset_token=', $response['link'])[1];
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
         $response = \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request([
             'email' => $email,
             'reset_token' => $reset_token,
             'password' => $password,
             'password_confirmation' => $password
         ]));
-
-        $this->assertContains('ok', $response['status']);
     }
 
     /**
@@ -127,12 +124,12 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
-            new UserParams(
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
                 ['email' => $email]
             )
         );

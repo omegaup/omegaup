@@ -3,12 +3,12 @@
 /**
  * @author alanboy
  */
-class AssignmentUpdateTest extends OmegaupTestCase {
+class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentUpdate() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -46,14 +46,81 @@ class AssignmentUpdateTest extends OmegaupTestCase {
     }
 
     /**
+     * Test if it's possible to set finish time as null on assignment update
+     */
+    public function testAssignmentUpdateUnlimitedDuration() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $login
+        );
+        $assignmentAlias = $courseData['assignment_alias'];
+        $courseAlias = $courseData['course_alias'];
+
+        $updatedStartTime = $courseData['request']['start_time'] + 10;
+
+        try {
+            // Try to set unlimited duration to assignment
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment' => $assignmentAlias,
+                'course' => $courseAlias,
+                'start_time' => $updatedStartTime,
+                'unlimited_duration' => true,
+                'name' => 'some new name',
+                'description' => 'some meaningful description'
+            ]));
+            $this->fail('Should have thrown exception.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'courseDoesNotHaveUnlimitedDuration',
+                $e->getMessage()
+            );
+        }
+
+        // Now update the course in order to be of unlimited duration
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'unlimited_duration' => true
+        ]));
+
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $updatedStartTime,
+            'unlimited_duration' => true,
+            'name' => 'some new name',
+            'description' => 'some meaningful description'
+        ]));
+
+        // Read the assignment again
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias
+        ]));
+
+        $this->assertEquals($updatedStartTime, $response['start_time']);
+        $this->assertNull($response['finish_time']);
+    }
+
+    /**
      * When updating an assignment you need to supply both assignment
      * alias and course alias
      */
     public function testMissingDataOnAssignmentUpdate() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -62,6 +129,18 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
+                'name' => 'some new name'
+            ]));
+            $this->fail(
+                'Updating assignment should have failed due to missing parameter'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'course' => $courseData['course_alias'],
                 'name' => 'some new name'
             ]));
@@ -77,10 +156,10 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Can't update the start time to be after the finish time.
      */
     public function testAssignmentUpdateWithInvertedTimes() {
-        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $identity,
             $login
         );
@@ -106,21 +185,21 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Students should not be able to update the assignment.
      */
     public function testAssignmentUpdateByStudent() {
-        ['user' => $admin, 'identity' => $adminIdentity] = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($adminIdentity);
-        $courseData = CoursesFactory::createCourseWithOneAssignment(
+        ['user' => $admin, 'identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login($adminIdentity);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             $adminIdentity,
             $adminLogin
         );
 
-        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
         ]));
 
-        $login = OmegaupTestCase::login($identity);
+        $login = \OmegaUp\Test\ControllerTestCase::login($identity);
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -138,7 +217,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
 
     public function testAssignmentsOutOfDate() {
         // Create 1 course with 1 assignment
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
@@ -162,7 +241,144 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'Assignment should not have been updated because the date falls outside of valid range'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
+            $this->assertEquals('parameterDateTooLarge', $e->getMessage());
+
+            $responseArray =  $e->asResponseArray();
+            $this->assertEquals(
+                'parameterDateTooLarge',
+                $responseArray['errorname']
+            );
+            $this->assertEquals(
+                $courseData['course']->finish_time,
+                $responseArray['payload']['upper_bound']
+            );
         }
+    }
+
+    public function testAssignmentUpdateWithRuns() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            /*$admin=*/ null,
+            /*$adminLogin=*/ null,
+            /*$accessMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            /*$requestsUserInformation=*/ 'no',
+            /*$showScoreboard=*/ 'false',
+            /*$startTimeDelay=*/ 0,
+            /*$courseDuration=*/ 180
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Login
+        $login = self::login($courseData['admin']);
+
+        // Add the problem to the assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
+        );
+
+        // Create our participant
+        ['user' => $user, 'identity' => $participant] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add student to course
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Trying to create a run out of the time
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 140);
+
+        try {
+            // Create a run for assignment
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problemData,
+                $courseData,
+                $participant
+            );
+            $this->fail('Should have thrown exception.');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals(
+                'runNotInsideContest',
+                $e->getMessage()
+            );
+        }
+
+        // Updating finish time to let participants create runs
+        $updatedStartTime = $courseData['request']['start_time'];
+        $updatedFinishTime = $courseData['request']['start_time'] + 160;
+
+        // Login
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'start_time' => $updatedStartTime,
+            'finish_time' => $updatedFinishTime,
+        ]));
+
+        // Create a successful run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+
+        // Set the unlimited duration time of the course as true
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAlias,
+            'name' => $courseData['request']['course']->name,
+            'description' => $courseData['request']['course']->description,
+            'alias' => $courseData['request']['course']->alias,
+            'show_scoreboard' => false,
+            'unlimited_duration' => true
+        ]));
+        $newCourse = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNull($newCourse->finish_time);
+
+        // Set the unlimited duration time of the assignment as true
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'unlimited_duration' => true,
+        ]));
+
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAlias,
+            $courseData['request']['course']->course_id
+        );
+        $this->assertNull($assignment->finish_time);
+
+        // Going forward in the time to test whether participant can create runs
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 280);
+
+        // Create a run for assignment
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
     }
 }

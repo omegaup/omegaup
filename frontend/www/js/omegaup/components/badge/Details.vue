@@ -2,9 +2,11 @@
   <div class="panel badge-details-panel">
     <h1 class="text-center">{{ name }}</h1>
     <figure class="badge-info-grid">
-      <img class="badge-icon"
-              v-bind:class="{'badge-gray': !this.badge.assignation_time}"
-              v-bind:src="iconUrl">
+      <img
+        class="badge-icon"
+        v-bind:class="{ 'badge-gray': !this.badge.assignation_time }"
+        v-bind:src="iconUrl"
+      />
       <figcaption class="badge-description">
         {{ description }}
       </figcaption>
@@ -12,11 +14,11 @@
     <div class="badge-details-grid">
       <div class="badge-detail">
         <div class="badge-detail-data">
-          {{ ownersPercentage }}
+          {{ ownersNumber }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">👥</span> {{ this.T['badgeOwnersPercentageMessage']
-          }}
+          <span class="badge-detail-text-icon">👥</span>
+          {{ this.T['badgeOwnersMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -24,16 +26,15 @@
           {{ firstAssignationDate }}
         </div>
         <div class="badge-detail-text">
-          <span class="badge-detail-text-icon">📅</span> {{ this.T['badgeFirstAssignationMessage']
-          }}
+          <span class="badge-detail-text-icon">📅</span>
+          {{ this.T['badgeFirstAssignationMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
         <div class="badge-detail-data">
           {{ assignationDate }}
         </div>
-        <div class="badge-detail-text"
-             v-html="ownedMessage"></div>
+        <div class="badge-detail-text" v-html="ownedMessage"></div>
       </div>
     </div>
   </div>
@@ -47,7 +48,7 @@
 .badge-details-grid {
   display: grid;
   justify-content: center;
-  justify-items:center;
+  justify-items: center;
   align-items: center;
   text-align: center;
   row-gap: 40px;
@@ -89,9 +90,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
-import omegaup from '../../api.js';
 
 @Component
 export default class BadgeDetails extends Vue {
@@ -130,11 +130,8 @@ export default class BadgeDetails extends Vue {
       : '';
   }
 
-  get ownersPercentage(): string {
-    return this.badge.owners_percentage
-      ? `${this.badge.owners_percentage.toFixed(2)}%`
-      : '';
+  get ownersNumber(): string {
+    return `${this.badge.owners_count}/${this.badge.total_users}`;
   }
 }
-
 </script>

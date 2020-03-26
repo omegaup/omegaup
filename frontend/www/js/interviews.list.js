@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
         omegaup.UI.success(omegaup.T.interviewCreatedSuccess);
         fillInterviewsTable();
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   });
 
   function fillInterviewsTable() {
@@ -38,7 +38,7 @@ omegaup.OmegaUp.on('ready', function() {
           .empty()
           .html(html);
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 
   fillInterviewsTable();

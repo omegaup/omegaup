@@ -15,10 +15,22 @@ OmegaUp.on('ready', function() {
           contests: this.contests,
           solvedProblems: this.solvedProblems,
           unsolvedProblems: this.unsolvedProblems,
+          createdProblems: this.createdProblems,
           visitorBadges: this.visitorBadges,
           profileBadges: this.profileBadges,
           rank: this.rank,
           charts: this.charts,
+          periodStatisticOptions: this.periodStatisticOptions,
+          aggregateStatisticOptions: this.aggregateStatisticOptions,
+        },
+        on: {
+          'update-period-statistics': (e, categories, data) => {
+            e.periodStatisticOptions.chart.categories = categories;
+            e.periodStatisticOptions.series = data;
+          },
+          'update-aggregate-statistics': e =>
+            (e.aggregateStatisticOptions.series[0].data =
+              e.normalizedRunCounts),
         },
       });
     },
@@ -28,8 +40,107 @@ OmegaUp.on('ready', function() {
       profileBadges: new Set(),
       solvedProblems: [],
       unsolvedProblems: [],
+      createdProblems: [],
       visitorBadges: new Set(),
       charts: null,
+      periodStatisticOptions: {
+        title: {
+          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+            user: profile.username,
+          }),
+        },
+        chart: { type: 'column' },
+        xAxis: {
+          categories: [],
+          title: { text: T.profileStatisticsPeriod },
+          labels: {
+            rotation: -45,
+          },
+        },
+        yAxis: {
+          min: 0,
+          title: { text: T.profileStatisticsNumberOfSolvedProblems },
+          stackLabels: {
+            enabled: false,
+            style: {
+              fontWeight: 'bold',
+              color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray',
+            },
+          },
+        },
+        legend: {
+          align: 'right',
+          x: -30,
+          verticalAlign: 'top',
+          y: 25,
+          floating: true,
+          backgroundColor:
+            (Highcharts.theme && Highcharts.theme.background2) || 'white',
+          borderColor: '#CCC',
+          borderWidth: 1,
+          shadow: false,
+        },
+        tooltip: {
+          headerFormat: '<b>{point.x}</b><br/>',
+          pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
+        },
+        plotOptions: {
+          column: {
+            stacking: 'normal',
+            dataLabels: {
+              enabled: false,
+              color:
+                (Highcharts.theme && Highcharts.theme.dataLabelsColor) ||
+                'white',
+            },
+          },
+        },
+        series: [],
+      },
+      aggregateStatisticOptions: {
+        title: {
+          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+            user: profile.username,
+          }),
+        },
+        chart: {
+          plotBackgroundColor: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          type: 'pie',
+        },
+        xAxis: {
+          title: { text: '' },
+        },
+        yAxis: {
+          title: { text: '' },
+        },
+        title: {
+          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+            user: profile.username,
+          }),
+        },
+        tooltip: { pointFormat: '{series.name}: {point.y}' },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              color: '#000000',
+              connectorColor: '#000000',
+              format:
+                '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
+            },
+          },
+        },
+        series: [
+          {
+            name: T.profileStatisticsRuns,
+            data: [],
+          },
+        ],
+      },
     },
     computed: {
       rank: function() {
@@ -56,31 +167,27 @@ OmegaUp.on('ready', function() {
 
   API.User.contestStats({ username: profile.username })
     .then(function(data) {
-      let contests = [];
-      for (var contest_alias in data['contests']) {
-        var now = new Date();
-        var currentTimestamp =
-          data['contests'][contest_alias]['finish_time'] * 1000;
-        var end = OmegaUp.remoteTime(currentTimestamp);
-        if (data['contests'][contest_alias]['place'] != null && now > end) {
-          contests.push(data['contests'][contest_alias]);
-        }
-      }
-      viewProfile.contests = contests;
+      viewProfile.contests = data;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.problemsSolved({ username: profile.username })
     .then(function(data) {
       viewProfile.solvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.listUnsolvedProblems({ username: profile.username })
     .then(function(data) {
       viewProfile.unsolvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
+
+  API.User.problemsCreated({ username: profile.username })
+    .then(function(data) {
+      viewProfile.createdProblems = data['problems'];
+    })
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myList({})
@@ -89,7 +196,7 @@ OmegaUp.on('ready', function() {
           data['badges'].map(badge => badge.badge_alias),
         );
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   API.Badge.userList({ target_username: profile.username })
@@ -98,11 +205,11 @@ OmegaUp.on('ready', function() {
         data['badges'].map(badge => badge.badge_alias),
       );
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.stats({ username: profile.username })
     .then(function(data) {
       viewProfile.charts = data;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

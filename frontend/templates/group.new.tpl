@@ -1,13 +1,13 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleGroupsNew#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroupsNew#}" inline}
 
 {if !isset($IS_UPDATE)}
 	{assign "IS_UPDATE" 0}
 {/if}
 
 <span id="form-data" data-name="groups" data-page="new"></span>
-<script src="{version_hash src="/js/alias.generate.js"}"></script>
-<script src="{version_hash src="/js/groups.js"}"></script>
+<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
+<script src="{version_hash src="/js/groups.js"}" defer></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE != 1}
@@ -51,4 +51,4 @@
 	</div>
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

@@ -11,11 +11,18 @@
       </div>
       <form v-on:submit.prevent="$emit('submit', this)">
         <div class="top-margin text-center">
-          <label><input name="agreed"
-                 type="checkbox"
-                 v-bind:disabled="saved"
-                 v-model="agreed"> {{ T.wordsAgree }}</label> <button class="btn btn-primary"
-               v-bind:disabled="!agreed || saved">{{ T.wordsSaveChanges }}</button>
+          <label
+            ><input
+              name="agreed"
+              type="checkbox"
+              v-bind:disabled="saved"
+              v-model="agreed"
+            />
+            {{ T.wordsAgree }}</label
+          >
+          <button class="btn btn-primary" v-bind:disabled="!agreed || saved">
+            {{ T.wordsSaveChanges }}
+          </button>
         </div>
       </form>
     </div>
@@ -24,7 +31,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 import UI from '../../ui.js';
 
 @Component
@@ -41,5 +48,4 @@ export default class UserPrivacyPolicy extends Vue {
     return this.markdownConverter.makeHtml(this.policyMarkdown);
   }
 }
-
 </script>

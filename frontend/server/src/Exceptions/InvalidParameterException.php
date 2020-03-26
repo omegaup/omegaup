@@ -3,8 +3,11 @@
 namespace OmegaUp\Exceptions;
 
 class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
-    /** @var null|string */
-    private $parameter;
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $parameter;
 
     /** @var array<string, string> */
     private $additionalParameters;

@@ -37,6 +37,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'quality' => true,
         'quality_histogram' => true,
         'difficulty_histogram' => true,
+        'quality_seal' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -162,6 +163,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
                 $data['difficulty_histogram']
             );
         }
+        if (isset($data['quality_seal'])) {
+            $this->quality_seal = boolval(
+                $data['quality_seal']
+            );
+        }
     }
 
     /**
@@ -220,7 +226,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      *
      * @var string
      */
-    public $languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
+    public $languages = 'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua';
 
     /**
      * [Campo no documentado]
@@ -312,4 +318,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $difficulty_histogram = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $quality_seal = false;
 }

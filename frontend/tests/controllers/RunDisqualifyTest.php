@@ -5,28 +5,31 @@
  *
  * @author SpaceWhite
  */
-class RunDisqualifyTest extends OmegaupTestCase {
+class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDisqualifyByAdmin() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a new run
-        $runData = RunsFactory::createRun(
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
 
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $login = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
@@ -42,32 +45,35 @@ class RunDisqualifyTest extends OmegaupTestCase {
 
     public function testDisqualifyScoreboard() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestants
-        ['user' => $contestant1, 'identity' => $identity1] = UserFactory::createUser();
-        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
+        ['user' => $contestant1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create new runs
-        $runData1 = RunsFactory::createRun(
+        $runData1 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity1
         );
-        $runData2 = RunsFactory::createRun(
+        $runData2 = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity2
         );
 
-        RunsFactory::gradeRun($runData1);
-        RunsFactory::gradeRun($runData2);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData1);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData2);
 
         // Disqualify run by contestant1
         $login = self::login($contestData['director']);
@@ -86,7 +92,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
 
         // Contestant 2 should not be changed
         $this->assertEquals(
-            $contestant2->username,
+            $identity2->username,
             $response['ranking'][0]['username']
         );
         $this->assertEquals(
@@ -96,7 +102,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
         // Contestant 1 should be changed
         $this->assertEquals(
-            $contestant1->username,
+            $identity1->username,
             $response['ranking'][1]['username']
         );
         $this->assertEquals(

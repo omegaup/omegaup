@@ -12,27 +12,35 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
-    public static function GetSubmissionsForProblemset($problemset_id) {
+    /**
+     * @return list<array{alias: string, classname: string, ip: int, time: int, username: string}>
+     */
+    public static function GetSubmissionsForProblemset(int $problemsetId): array {
         $sql = 'SELECT
                     i.username,
                     p.alias,
                     sl.ip,
                     UNIX_TIMESTAMP(sl.time) AS `time`,
-                    (SELECT `urc`.classname FROM
-                        `User_Rank_Cutoffs` urc
-                    WHERE
-                        `urc`.score <= (
-                                SELECT
-                                    `ur`.`score`
-                                FROM
-                                    `User_Rank` `ur`
-                                WHERE
-                                    `ur`.user_id = `i`.`user_id`
-                            )
-                    ORDER BY
-                        `urc`.percentile ASC
-                    LIMIT
-                        1) `classname`
+                    IFNULL(
+                        (
+                            SELECT `urc`.classname FROM
+                                `User_Rank_Cutoffs` urc
+                            WHERE
+                                `urc`.score <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.user_id = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`
                 FROM
                     Submission_Log sl
                 INNER JOIN
@@ -51,12 +59,16 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     sl.problemset_id = ?
                 ORDER BY
                     `time`;';
-        $val = [$problemset_id];
+        $val = [$problemsetId];
 
+        /** @var list<array{alias: string, classname: string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
-    final public static function GetSubmissionsForCourse($course_id) {
+    /**
+     * @return list<array{alias: string, ip: int, time: int, username: string}>
+     */
+    final public static function GetSubmissionsForCourse(int $courseId): array {
         $sql = 'SELECT
                     i.username,
                     p.alias,
@@ -84,9 +96,10 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
+        /** @var list<array{alias: string, ip: int, time: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$course_id]
+            [$courseId]
         );
     }
 }

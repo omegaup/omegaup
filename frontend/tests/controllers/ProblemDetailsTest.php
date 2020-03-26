@@ -6,28 +6,28 @@
  * @author joemmanuel
  */
 
-class ProblemDetailsTest extends OmegaupTestCase {
-    /**
-     *
-     */
+class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testViewProblemInAContestDetailsValid() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user to be the author
-        ['user' => $authorUser, 'identity' => $authorIdentity] = UserFactory::createUser();
+        ['user' => $authorUser, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1,
             'author' => $authorIdentity
         ]));
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Explicitly join contest
         $login = self::login($identity);
@@ -49,25 +49,28 @@ class ProblemDetailsTest extends OmegaupTestCase {
             $contestData['request']['alias']
         );
         $contestantDAO = \OmegaUp\DAO\Users::FindByUsername(
-            $contestant->username
+            $identity->username
         );
 
         // Assert data
-        $this->assertEquals($response['title'], $problemDAO->title);
-        $this->assertEquals($response['alias'], $problemDAO->alias);
-        $this->assertEquals($response['points'], 100);
+        $this->assertEquals($problemDAO->title, $response['title']);
+        $this->assertEquals($problemDAO->alias, $response['alias']);
+        $this->assertEquals(100, $response['points']);
         $this->assertEquals(
             $response['problemsetter']['username'],
-            $authorUser->username
+            $authorIdentity->username
         );
         $this->assertEquals(
             $response['problemsetter']['name'],
             $authorIdentity->name
         );
-        $this->assertEquals($response['source'], $problemDAO->source);
-        $this->assertContains('# Entrada', $response['statement']['markdown']);
-        $this->assertEquals($response['order'], $problemDAO->order);
-        $this->assertEquals($response['score'], 0);
+        $this->assertEquals($problemDAO->source, $response['source']);
+        $this->assertStringContainsString(
+            '# Entrada',
+            $response['statement']['markdown']
+        );
+        $this->assertEquals($problemDAO->order, $response['order']);
+        $this->assertEquals(0, $response['score']);
 
         // Default data
         $this->assertEquals(0, $problemDAO->visits);
@@ -95,16 +98,19 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function internalViewProblemStatement($type, $expected_text) {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call api
         $login = self::login($identity);
@@ -115,7 +121,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         // Assert data
-        $this->assertContains(
+        $this->assertStringContainsString(
             $expected_text,
             $response['statement']['markdown']
         );
@@ -128,21 +134,23 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->internalViewProblemStatement('markdown', '# Entrada');
     }
 
-    /**
-     * @expectedException \OmegaUp\Exceptions\NotFoundException
-     */
     public function testViewProblemStatementInvalidType() {
-        $this->internalViewProblemStatement('not_html_or_markdown', '');
+        try {
+            $this->internalViewProblemStatement('not_html_or_markdown', '');
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('invalidStatementType', $e->getMessage());
+        }
     }
 
     public function testProblemDetailsNotInContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 1
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call api
         $login = self::login($identity);
@@ -167,41 +175,45 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
     /**
      * User can't see problem details
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Call api
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
+        try {
+            \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**
      * Non-user can't see problem details
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 0
         ]));
 
-        // Call api
-        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
+        try {
+            \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**
@@ -209,16 +221,22 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testScoreInDetailsOutsideContest() {
         // Create problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
-        RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        $runDataPA = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -235,25 +253,28 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testScoreInDetailsInsideContest() {
         // Create problem and contest
-        $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem(
+        $runDataOutsideContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        $runDataInsideContest = RunsFactory::createRun(
+        $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataOutsideContest);
-        RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataOutsideContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
         $login = self::login($identity);
@@ -271,28 +292,31 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testViewProblemHasCorrectRuns() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $runDataOutOfContest = RunsFactory::createRunToProblem(
+        $runDataOutOfContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
         );
-        $runDataInContest = RunsFactory::createRun(
+        $runDataInContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataOutOfContest);
-        RunsFactory::gradeRun($runDataInContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataOutOfContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInContest);
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -316,20 +340,23 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testShowSolvers() {
         // Create problem and contest
-        $problemData = ProblemsFactory::createProblem();
-        $contestData = ContestsFactory::createContest();
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create an accepted run.
-        $runDataInsideContest = RunsFactory::createRun(
+        $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
             $contestData,
             $identity
         );
-        RunsFactory::gradeRun($runDataInsideContest);
+        \OmegaUp\Test\Factories\Run::gradeRun($runDataInsideContest);
 
         // Call API
         $login = self::login($identity);
@@ -350,7 +377,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
             ]));
             $this->assertCount(1, $response['solvers']);
             $this->assertEquals(
-                $contestant->username,
+                $identity->username,
                 $response['solvers'][0]['username']
             );
         }
@@ -360,7 +387,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
      * Solutions that don't exist don't cause an exception.
      */
     public function testShowSolutionInexistent() {
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
         ]));
         $login = self::login($problemData['author']);
@@ -377,14 +404,14 @@ class ProblemDetailsTest extends OmegaupTestCase {
      * Solutions can be viewed by a problem admin.
      */
     public function testShowSolutionByAdmin() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
         {
             $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
-            $this->assertContains(
+            $this->assertStringContainsString(
                 '`long long`',
                 $response['solution']['markdown']
             );
@@ -395,9 +422,9 @@ class ProblemDetailsTest extends OmegaupTestCase {
      * Solutions can be viewed by a user that has solved the problem.
      */
     public function testShowSolutionBySolver() {
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         try {
             $login = self::login($identity);
@@ -414,8 +441,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
             );
         }
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         {
             $login = self::login($identity);
@@ -423,7 +453,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
-            $this->assertContains(
+            $this->assertStringContainsString(
                 '`long long`',
                 $response['solution']['markdown']
             );
@@ -431,15 +461,18 @@ class ProblemDetailsTest extends OmegaupTestCase {
     }
 
     public function testAuthorizationController() {
-        $problemData = ProblemsFactory::createProblem();
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $runData = RunsFactory::createRunToProblem($problemData, $identity);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([
             'token' => OMEGAUP_GITSERVER_SECRET_TOKEN,
-            'username' => $contestant->username,
+            'username' => $identity->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertTrue($result['has_solved']);

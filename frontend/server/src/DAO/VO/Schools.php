@@ -20,6 +20,8 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         'country_id' => true,
         'state_id' => true,
         'name' => true,
+        'ranking' => true,
+        'score' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -50,6 +52,16 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         if (isset($data['name'])) {
             $this->name = strval(
                 $data['name']
+            );
+        }
+        if (isset($data['ranking'])) {
+            $this->ranking = intval(
+                $data['ranking']
+            );
+        }
+        if (isset($data['score'])) {
+            $this->score = floatval(
+                $data['score']
             );
         }
     }
@@ -83,4 +95,18 @@ class Schools extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $name = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $ranking = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var float
+     */
+    public $score = 0.00;
 }

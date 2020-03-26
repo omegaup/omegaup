@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class IdentityContestsTest extends OmegaupTestCase {
+class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function createRunWithIdentity(
         array $contestData,
         array $problemData,
@@ -17,16 +17,16 @@ class IdentityContestsTest extends OmegaupTestCase {
         $contestant->password = $password;
 
         // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contestData,
             $problemData,
             $contestant
         );
 
-        $detourGrader = new ScopedGraderDetour();
+        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Create valid run
         $contestantLogin = self::login($contestant);
@@ -34,7 +34,7 @@ class IdentityContestsTest extends OmegaupTestCase {
             'auth_token' => $contestantLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
+            'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
@@ -46,15 +46,17 @@ class IdentityContestsTest extends OmegaupTestCase {
      */
     public function testIdentityJoinsContest() {
         // Get a public contest
-        $contestData = ContestsFactory::createContest(new ContestParams());
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get some problems into the contest
-        [$problemData] = ContestsFactory::insertProblemsInContest($contestData);
+        [$problemData] = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
 
         // Identity creator group member will upload csv file
-        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -63,12 +65,12 @@ class IdentityContestsTest extends OmegaupTestCase {
         );
 
         // Set default password for all created identities
-        $password = Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomString();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => IdentityFactory::getCsvData(
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                 'identities.csv',
                 $group['group']->alias,
                 $password
@@ -93,8 +95,7 @@ class IdentityContestsTest extends OmegaupTestCase {
             $identityPublicContest['username'],
             $password
         );
-
-        $this->assertEquals('ok', $runResponse['status']);
+        $this->assertArrayHasKey('guid', $runResponse);
 
         // Updating admission_mode for the contest
         $directorLogin = self::login($contestData['director']);
@@ -117,8 +118,7 @@ class IdentityContestsTest extends OmegaupTestCase {
             $invitedIdentityPrivateContest['username'],
             $password
         );
-
-        $this->assertEquals('ok', $runResponse['status']);
+        $this->assertArrayHasKey('guid', $runResponse);
 
         try {
             // Our contestant tries to open a private contest

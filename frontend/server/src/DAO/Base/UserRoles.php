@@ -114,10 +114,8 @@ abstract class UserRoles {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\UserRoles[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\UserRoles> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\UserRoles}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\UserRoles>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -179,7 +177,7 @@ abstract class UserRoles {
     ): int {
         $sql = '
             INSERT INTO
-                User_Roles (
+                `User_Roles` (
                     `user_id`,
                     `role_id`,
                     `acl_id`

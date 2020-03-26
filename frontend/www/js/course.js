@@ -1,11 +1,11 @@
 omegaup.OmegaUp.on('ready', function() {
   var courseAlias = /\/course\/([^\/]+)/.exec(window.location.pathname)[1];
 
-  var details = omegaup.API.Course.details({ alias: courseAlias });
-  var progress = omegaup.API.Course.myProgress({ alias: courseAlias });
-
-  $.when(details, progress)
-    .then(function(course, score) {
+  Promise.all([
+    omegaup.API.Course.details({ alias: courseAlias }),
+    omegaup.API.Course.myProgress({ alias: courseAlias }),
+  ])
+    .then(function([course, score]) {
       // Assignment lists by type.
       var assignments = {};
       for (var i = 0; i < course.assignments.length; ++i) {
@@ -40,11 +40,11 @@ omegaup.OmegaUp.on('ready', function() {
           course.assignments[i].alias +
           '/admin/#runs';
         course.assignments[i].startTime = omegaup.UI.formatDateTime(
-          new Date(1000 * course.assignments[i].start_time),
+          course.assignments[i].start_time,
         );
-        course.assignments[i].finishTime = omegaup.UI.formatDateTime(
-          new Date(1000 * course.assignments[i].finish_time),
-        );
+        course.assignments[i].finishTime = course.assignments[i].finish_time
+          ? omegaup.UI.formatDateTime(course.assignments[i].finish_time)
+          : omegaup.T.wordsUnlimitedDuration;
 
         var iScore = score.assignments[course.assignments[i].alias];
         var percent = (iScore.score / iScore.max_score) * 100;
@@ -66,5 +66,5 @@ omegaup.OmegaUp.on('ready', function() {
 
       ko.applyBindings(course, $('#course-info')[0]);
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

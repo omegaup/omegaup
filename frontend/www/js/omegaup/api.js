@@ -1,64 +1,72 @@
 import UI from './ui.js';
+import * as types from './types.ts';
+import { OmegaUp } from './omegaup.js';
 
-function _call(url, transform, defaultParams) {
-  return function(params) {
-    var dfd = $.Deferred();
-    if (defaultParams) {
-      params = $.extend({}, defaultParams, params);
-    }
-    $.ajax({
-      url: url,
-      method: params ? 'POST' : 'GET',
-      data: params,
-      dataType: 'json',
-    })
-      .done(function(data) {
-        if (transform) {
-          data = transform(data);
-        }
-        dfd.resolve(data);
-      })
-      .fail(function(jqXHR) {
-        if (jqXHR.status == 499 || jqXHR.readyState != 4) {
-          // If we cancel the connection, let's just swallow the error since
-          // the user is not going to see it.
-          return;
-        }
-        var errorData;
-        try {
-          if (jqXHR.responseText) {
-            errorData = JSON.parse(jqXHR.responseText);
-          } else {
-            errorData = { status: 'error', error: null };
+function _call(url, transform) {
+  return params =>
+    new Promise((accept, reject) => {
+      let responseOk = true;
+      fetch(
+        url,
+        params
+          ? {
+              method: 'POST',
+              body: Object.keys(params)
+                .filter(key => typeof params[key] !== 'undefined')
+                .map(
+                  key =>
+                    `${encodeURIComponent(key)}=${encodeURIComponent(
+                      params[key],
+                    )}`,
+                )
+                .join('&'),
+              headers: {
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=UTF-8',
+              },
+            }
+          : undefined,
+      )
+        .then(response => {
+          if (response.status == 499) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
+            return;
           }
-        } catch (err) {
-          errorData = { status: 'error', error: err };
-        }
-        omegaup.OmegaUp.addError(errorData);
-        dfd.reject(errorData);
-      });
-    return dfd.promise();
-  };
+          responseOk = response.ok;
+          return response.json();
+        })
+        .then(data => {
+          if (!responseOk) {
+            OmegaUp.addError(data);
+            reject(data);
+            return;
+          }
+          if (transform) {
+            accept(transform(data));
+          } else {
+            accept(data);
+          }
+        })
+        .catch(err => {
+          const errorData = { status: 'error', error: err };
+          OmegaUp.addError(errorData);
+          reject(errorData);
+        });
+    });
 }
 
 function _convertRuntimes(data) {
   if (data.runs) {
     for (var i = 0; i < data.runs.length; i++) {
-      data.runs[i].time = omegaup.OmegaUp.remoteTime(data.runs[i].time * 1000);
+      data.runs[i].time = OmegaUp.remoteTime(data.runs[i].time * 1000);
     }
   }
   return data;
 }
 
-// This alias is needed because, without it, webpack cries when
-// trying to export, e.g. Course.adminDetails, with the original
-// name OmegaUp.convertTimes.
-function _convertTimes(item) {
-  return omegaup.OmegaUp.convertTimes(item);
-}
-
 function _normalizeContestFields(contest) {
-  omegaup.OmegaUp.convertTimes(contest);
+  OmegaUp.convertTimes(contest);
   contest.submissions_gap = parseInt(contest.submissions_gap);
   contest.show_penalty = contest.penalty != 0 || contest.penalty_type != 'none';
   return contest;
@@ -109,12 +117,14 @@ export default {
   Contest: {
     activityReport: _call('/api/contest/activityReport/', function(result) {
       for (let ev of result.events) {
-        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+        ev.time = OmegaUp.remoteTime(ev.time * 1000);
       }
       return result;
     }),
 
     addAdmin: _call('/api/contest/addAdmin/'),
+
+    addGroup: _call('/api/contest/addGroup/'),
 
     addGroupAdmin: _call('/api/contest/addGroupAdmin/'),
 
@@ -127,7 +137,7 @@ export default {
       // able to get the unmodified times.
       contest.start_time = new Date(contest.start_time * 1000);
       contest.finish_time = new Date(contest.finish_time * 1000);
-      contest.submission_deadline = omegaup.OmegaUp.remoteTime(
+      contest.submission_deadline = OmegaUp.remoteTime(
         contest.submission_deadline * 1000,
       );
       contest.show_penalty =
@@ -138,7 +148,7 @@ export default {
     adminList: _call('/api/contest/adminlist/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -150,9 +160,7 @@ export default {
     clarifications: _call('/api/contest/clarifications/', function(data) {
       for (var idx in data.clarifications) {
         var clarification = data.clarifications[idx];
-        clarification.time = omegaup.OmegaUp.remoteTime(
-          clarification.time * 1000,
-        );
+        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
       }
       return data;
     }),
@@ -170,7 +178,7 @@ export default {
     list: _call('/api/contest/list/', function(result) {
       for (var idx in result.results) {
         var contest = result.results[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -178,7 +186,7 @@ export default {
     myList: _call('/api/contest/mylist/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
-        omegaup.OmegaUp.convertTimes(contest);
+        OmegaUp.convertTimes(contest);
       }
       return result;
     }),
@@ -196,7 +204,9 @@ export default {
 
     removeAdmin: _call('/api/contest/removeAdmin/'),
 
-    removeGroupAdminFromContest: _call('/api/contest/removeGroupAdmin/'),
+    removeGroup: _call('/api/contest/removeGroup/'),
+
+    removeGroupAdmin: _call('/api/contest/removeGroupAdmin/'),
 
     removeProblem: _call('/api/contest/removeProblem/'),
 
@@ -221,12 +231,10 @@ export default {
     users: _call('/api/contest/users/', function(result) {
       for (const user of result.users) {
         if (user.access_time !== null) {
-          user.access_time = omegaup.OmegaUp.remoteTime(
-            user.access_time * 1000,
-          );
+          user.access_time = OmegaUp.remoteTime(user.access_time * 1000);
         }
         if (user.end_time !== null) {
-          user.end_time = omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+          user.end_time = OmegaUp.remoteTime(user.end_time * 1000);
         }
       }
       return result;
@@ -236,7 +244,7 @@ export default {
   Course: {
     activityReport: _call('/api/course/activityReport/', function(result) {
       for (let ev of result.events) {
-        ev.time = omegaup.OmegaUp.remoteTime(ev.time * 1000);
+        ev.time = OmegaUp.remoteTime(ev.time * 1000);
       }
       return result;
     }),
@@ -250,11 +258,15 @@ export default {
     addStudent: _call('/api/course/addStudent/'),
 
     adminDetails: _call('/api/course/adminDetails/', function(result) {
+      if (result.finish_time) {
+        result.finish_time = new Date(result.finish_time * 1000);
+      }
       result.start_time = new Date(result.start_time * 1000);
-      result.finish_time = new Date(result.finish_time * 1000);
       result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
       });
       return result;
     }),
@@ -267,13 +279,31 @@ export default {
 
     create: _call('/api/course/create/'),
 
-    details: _call('/api/course/details/', _convertTimes),
+    details: _call('/api/course/details/', function(data) {
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      data.start_time = new Date(data.start_time * 1000);
+      data.assignments.forEach(assignment => {
+        assignment.start_time = new Date(assignment.start_time * 1000);
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
+      return data;
+    }),
 
     myProgress: _call('/api/course/myProgress/'),
 
     createAssignment: _call('/api/course/createAssignment/'),
 
-    getAssignment: _call('/api/course/assignmentDetails', _convertTimes),
+    getAssignment: _call('/api/course/assignmentDetails', function(data) {
+      data.start_time = new Date(data.start_time * 1000);
+      if (data.finish_time) {
+        data.finish_time = new Date(data.finish_time * 1000);
+      }
+      return data;
+    }),
 
     /**
      * Returns the list of users signed up for the course that have
@@ -286,23 +316,36 @@ export default {
     apiGetProblemUsers: _call('/api/course/getProblemUsers'),
 
     listAssignments: _call('/api/course/listAssignments/', function(result) {
-      // We cannot use omegaup.OmegaUp.remoteTime() because admins need to
+      // We cannot use OmegaUp.remoteTime() because admins need to
       // be able to get the unmodified times.
-      for (var i = 0; i < result.assignments.length; ++i) {
-        var assignment = result.assignments[i];
+      result.assignments.forEach(assignment => {
         assignment.start_time = new Date(assignment.start_time * 1000);
-        assignment.finish_time = new Date(assignment.finish_time * 1000);
-      }
+        if (assignment.finish_time) {
+          assignment.finish_time = new Date(assignment.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
     listCourses: _call('/api/course/listCourses/', function(result) {
-      for (var i = 0; i < result.admin.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.admin[i]);
-      }
-      for (var i = 0; i < result.student.length; ++i) {
-        omegaup.OmegaUp.convertTimes(result.student[i]);
-      }
+      result.admin.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.student.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
+      result.public.forEach(res => {
+        res.start_time = new Date(res.start_time * 1000);
+        if (res.finish_time) {
+          res.finish_time = new Date(res.finish_time * 1000);
+        }
+      });
       return result;
     }),
 
@@ -327,7 +370,7 @@ export default {
     studentProgress: _call('/api/course/studentProgress/', function(result) {
       for (var problem of result.problems) {
         for (var run of problem.runs) {
-          run.time = omegaup.OmegaUp.remoteTime(run.time * 1000);
+          run.time = OmegaUp.remoteTime(run.time * 1000);
         }
       }
       return result;
@@ -459,9 +502,7 @@ export default {
     clarifications: _call('/api/problem/clarifications/', function(data) {
       for (var idx in data.clarifications) {
         var clarification = data.clarifications[idx];
-        clarification.time = omegaup.OmegaUp.remoteTime(
-          clarification.time * 1000,
-        );
+        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
       }
       return data;
     }),
@@ -520,20 +561,18 @@ export default {
 
     details: _call('/api/qualityNomination/details/'),
 
-    list: _call('/api/qualityNomination/list/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    list: _call('/api/qualityNomination/list/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
-    myList: _call('/api/qualityNomination/mylist/', function(result) {
-      for (var idx in result.nominations) {
-        var nomination = result.nominations[idx];
-        omegaup.OmegaUp.convertTimes(nomination);
-      }
-      return result;
+    myList: _call('/api/qualityNomination/mylist/', function(data) {
+      data.nominations.forEach(nomination => {
+        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
+      });
+      return data;
     }),
 
     resolve: _call('/api/qualityNomination/resolve/'),
@@ -571,7 +610,37 @@ export default {
 
     list: _call('/api/school/list/'),
 
+    monthlySolvedProblemsCount: _call('/api/school/monthlysolvedproblemscount'),
+
     rank: _call('/api/school/rank/'),
+
+    schoolsOfTheMonth: _call('/api/school/schoolsofthemonth'),
+
+    schoolCodersOfTheMonth: _call(
+      '/api/school/schoolcodersofthemonth',
+      function(data) {
+        data.coders = data.coders.map(
+          coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
+        );
+        return data;
+      },
+    ),
+
+    selectSchoolOfTheMonth: _call('/api/school/selectschoolofthemonth/'),
+
+    users: _call('/api/school/users/', function(data) {
+      data.users = data.users.map(
+        user =>
+          new types.SchoolUser(
+            user.classname,
+            user.username,
+            user.created_problems,
+            user.solved_problems,
+            user.organized_contests,
+          ),
+      );
+      return data;
+    }),
   },
 
   Session: {
@@ -586,6 +655,17 @@ export default {
      * @param {string} storeToken - The auth code.
      */
     googleLogin: _call('/api/session/googlelogin/'),
+  },
+
+  Submission: {
+    latestSubmissions: _call('/api/submission/latestsubmissions/', function(
+      data,
+    ) {
+      data.submissions.forEach(submission => {
+        submission.time = new Date(submission.time * 1000);
+      });
+      return data;
+    }),
   },
 
   Time: {
@@ -613,7 +693,19 @@ export default {
 
     changePassword: _call('/api/user/changepassword/'),
 
-    contestStats: _call('/api/user/conteststats/'),
+    contestStats: _call('/api/user/conteststats/', function(data) {
+      let contests = [];
+      for (let contestAlias in data.contests) {
+        const now = new Date();
+        const currentTimestamp =
+          data.contests[contestAlias].data.finish_time * 1000;
+        const end = OmegaUp.remoteTime(currentTimestamp);
+        if (data.contests[contestAlias].place !== null && now > end) {
+          contests.push(new types.ContestResult(data.contests[contestAlias]));
+        }
+      }
+      return contests;
+    }),
 
     coderOfTheMonthList: _call('/api/user/coderofthemonthlist'),
 
@@ -635,17 +727,44 @@ export default {
 
     listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
-    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
+    listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/', function(
+      data,
+    ) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
 
-    problemsSolved: _call('/api/user/problemssolved/'),
+    problemsSolved: _call('/api/user/problemssolved/', function(data) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
+
+    problemsCreated: _call('/api/user/problemscreated', function(data) {
+      if (data.hasOwnProperty('problems')) {
+        data.problems = data.problems.map(
+          problem => new types.Problem(problem),
+        );
+      }
+      return data;
+    }),
 
     profile: _call('/api/user/profile/', function(data) {
-      data.userinfo.birth_date = omegaup.OmegaUp.remoteTime(
-        data.userinfo.birth_date * 1000,
-      );
-      data.userinfo.graduation_date = omegaup.OmegaUp.remoteTime(
-        data.userinfo.graduation_date * 1000,
-      );
+      if (data.birth_date !== null) {
+        data.birth_date = omegaup.OmegaUp.remoteTime(data.birth_date * 1000);
+      }
+      if (data.graduation_date !== null) {
+        data.graduation_date = omegaup.OmegaUp.remoteTime(
+          data.graduation_date * 1000,
+        );
+      }
       return data;
     }),
 

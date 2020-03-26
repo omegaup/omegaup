@@ -39,7 +39,7 @@ OmegaUp.on('ready', function() {
                   }),
                 );
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
           'get-tokens': function() {
             API.ProblemForfeited.getCounts({})
@@ -50,7 +50,7 @@ OmegaUp.on('ready', function() {
                   UI.warning(T.solutionNoTokens);
                 }
               })
-              .fail(omegaup.UI.apiError);
+              .catch(omegaup.UI.apiError);
           },
           'get-solution': function() {
             if (payload['solution_status'] === 'unlocked') {
@@ -64,7 +64,7 @@ OmegaUp.on('ready', function() {
                     data.solution.images,
                   );
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(omegaup.UI.apiError);
             }
           },
         },

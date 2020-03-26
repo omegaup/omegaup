@@ -2,6 +2,34 @@
 
 namespace OmegaUp;
 
+// An RAII wrapper to manage the lifetime of a session.
+class ScopedSession {
+    /**
+     * @const
+     * @var bool
+     */
+    private $_sessionStarted = false;
+
+    public function __construct() {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            // In case of nested sessions, we just let the
+            // outermost one manage the whole session.
+            return;
+        }
+        session_start();
+        $this->_sessionStarted = true;
+    }
+
+    public function __destruct() {
+        if (!$this->_sessionStarted) {
+            // This instance did not start a session, so it
+            // should not close it either.
+            return;
+        }
+        session_write_close();
+    }
+}
+
 class SessionManager {
     public function setCookie(
         string $name,
@@ -33,7 +61,7 @@ class SessionManager {
                 /*secure=*/!empty($_SERVER['HTTPS']),
                 /*httponly=*/true
             );
-        } else {
+        } elseif (PHP_VERSION_ID < 70400) {
             /**
              * @psalm-suppress TooManyArguments this is needed to support
              *                                  Same-Site cookies.
@@ -48,6 +76,19 @@ class SessionManager {
                 /*httponly=*/true,
                 /*samesite=*/'Lax'
             );
+        } else {
+            setcookie(
+                $name,
+                $value,
+                [
+                    'expires' => $expire,
+                    'path' => $path,
+                    'domain' => $domain,
+                    'secure' => !empty($_SERVER['HTTPS']),
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]
+            );
         }
     }
 
@@ -59,10 +100,7 @@ class SessionManager {
         return strval($_COOKIE[$name]);
     }
 
-    public function sessionStart(): void {
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            return;
-        }
-        @session_start();
+    public function sessionStart(): ScopedSession {
+        return new ScopedSession();
     }
 }

@@ -6,13 +6,17 @@ import argparse
 import json
 import logging
 import os
-
+import sys
 from typing import Set
 
 import MySQLdb
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 
 BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
@@ -99,9 +103,6 @@ def main() -> None:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             process_badges(cur)  # type: ignore
         dbconn.commit()
-    except:  # noqa: bare-except
-        logging.exception(
-            'Failed to assign all badges and create notifications.')
     finally:
         dbconn.close()
         logging.info('Finished')

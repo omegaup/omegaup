@@ -1,13 +1,15 @@
 <template>
   <li class="dropdown-item notification">
-    <hr class="notification-separator">
+    <hr class="notification-separator" />
     <div class="notification-header">
       <div class="notification-date">
         {{ date }}
-      </div><button class="close"
-           v-on:click="$emit('remove', notification)">❌</button>
-    </div><img class="notification-img"
-        v-bind:src="iconUrl">
+      </div>
+      <button class="close" v-on:click="$emit('remove', notification)">
+        ❌
+      </button>
+    </div>
+    <img class="notification-img" v-bind:src="iconUrl" />
     <div class="notification-text">
       {{ text }}
     </div>
@@ -56,9 +58,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
-import omegaup from '../../api.js';
 
 @Component
 export default class Notification extends Vue {
@@ -91,5 +92,4 @@ export default class Notification extends Vue {
     return this.UI.formatDate(this.notification.timestamp);
   }
 }
-
 </script>

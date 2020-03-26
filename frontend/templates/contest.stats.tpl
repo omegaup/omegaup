@@ -1,7 +1,8 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleContestStats#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' htmlTitle="{#omegaupTitleContestStats#}" inline}
 
-<div id="contest-stats"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/contest_stats.js"}"></script>
+<div id="common-stats"></div>
+<script type="text/json" id="payload">{$payload|json_encode}</script>
+{js_include entrypoint="common_stats"}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

@@ -40,7 +40,8 @@ abstract class Submissions {
                 `language` = ?,
                 `time` = ?,
                 `submit_delay` = ?,
-                `type` = ?
+                `type` = ?,
+                `school_id` = ?
             WHERE
                 (
                     `submission_id` = ?
@@ -73,6 +74,11 @@ abstract class Submissions {
             ),
             intval($Submissions->submit_delay),
             $Submissions->type,
+            (
+                is_null($Submissions->school_id) ?
+                null :
+                intval($Submissions->school_id)
+            ),
             intval($Submissions->submission_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -103,7 +109,8 @@ abstract class Submissions {
                 `Submissions`.`language`,
                 `Submissions`.`time`,
                 `Submissions`.`submit_delay`,
-                `Submissions`.`type`
+                `Submissions`.`type`,
+                `Submissions`.`school_id`
             FROM
                 `Submissions`
             WHERE
@@ -174,10 +181,8 @@ abstract class Submissions {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Submissions[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Submissions> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Submissions}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Submissions>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -196,7 +201,8 @@ abstract class Submissions {
                 `Submissions`.`language`,
                 `Submissions`.`time`,
                 `Submissions`.`submit_delay`,
-                `Submissions`.`type`
+                `Submissions`.`type`,
+                `Submissions`.`school_id`
             FROM
                 `Submissions`
         ';
@@ -246,7 +252,7 @@ abstract class Submissions {
     ): int {
         $sql = '
             INSERT INTO
-                Submissions (
+                `Submissions` (
                     `current_run_id`,
                     `identity_id`,
                     `problem_id`,
@@ -255,8 +261,10 @@ abstract class Submissions {
                     `language`,
                     `time`,
                     `submit_delay`,
-                    `type`
+                    `type`,
+                    `school_id`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -295,6 +303,11 @@ abstract class Submissions {
             ),
             intval($Submissions->submit_delay),
             $Submissions->type,
+            (
+                is_null($Submissions->school_id) ?
+                null :
+                intval($Submissions->school_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

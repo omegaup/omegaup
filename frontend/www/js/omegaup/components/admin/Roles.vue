@@ -8,9 +8,14 @@
       <table class="table">
         <tbody>
           <tr v-for="role in roles">
-            <td><input type="checkbox"
-                   v-model="role.value"
-                   v-on:change.prevent="onChangeRole($event, role)"></td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="role.value"
+                v-on:change.prevent="onChangeRole($event, role)"
+              />
+            </td>
+
             <td>{{ role.name }}</td>
           </tr>
         </tbody>
@@ -19,9 +24,14 @@
       <table class="table">
         <tbody>
           <tr v-for="group in groups">
-            <td><input type="checkbox"
-                   v-model="group.value"
-                   v-on:change.prevent="onChangeGroup($event, group)"></td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="group.value"
+                v-on:change.prevent="onChangeGroup($event, group)"
+              />
+            </td>
+
             <td>{{ group.name }}</td>
           </tr>
         </tbody>
@@ -32,8 +42,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 
 @Component({})
 export default class AdminRoles extends Vue {
@@ -66,5 +75,4 @@ export default class AdminRoles extends Vue {
     };
   }
 }
-
 </script>

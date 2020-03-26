@@ -250,10 +250,8 @@ abstract class {{ table.class_name }} {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\{{ table.class_name }}[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\{{ table.class_name }}> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\{{ table.class_name }}>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -319,7 +317,7 @@ abstract class {{ table.class_name }} {
     ): int {
         $sql = '
             INSERT INTO
-                {{ table.name }} (
+                `{{ table.name }}` (
                     {{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(',\n                    ') }}
                 ) VALUES (
                     {{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(',\n                    ') }}

@@ -1,29 +1,32 @@
 omegaup.OmegaUp.on('ready', function() {
-  var arena = new omegaup.arena.Arena(
-    omegaup.arena.GetOptionsFromLocation(window.location),
+  var arenaInstance = new arena.Arena(
+    arena.GetOptionsFromLocation(window.location),
   );
-  var admin = new omegaup.arena.ArenaAdmin(arena);
+  var adminInstance = new arena.ArenaAdmin(arenaInstance);
 
-  window.addEventListener('hashchange', arena.onHashChanged.bind(arena));
+  window.addEventListener(
+    'hashchange',
+    arenaInstance.onHashChanged.bind(arenaInstance),
+  );
 
   Highcharts.setOptions({ global: { useUTC: false } });
 
-  if (arena.options.contestAlias === 'admin') {
+  if (arenaInstance.options.contestAlias === 'admin') {
     $('#runs').show();
-    admin.refreshRuns();
+    adminInstance.refreshRuns();
     setInterval(function() {
       runsOffset = 0; // Return pagination to start on refresh
-      admin.refreshRuns();
+      adminInstance.refreshRuns();
     }, 5 * 60 * 1000);
 
     // Trigger the event (useful on page load).
-    arena.onHashChanged();
+    arenaInstance.onHashChanged();
 
     $('#loading').fadeOut('slow');
     $('#root').fadeIn('slow');
   } else {
     omegaup.API.Contest.adminDetails({
-      contest_alias: arena.options.contestAlias,
+      contest_alias: arenaInstance.options.contestAlias,
     })
       .then(function(contest) {
         if (!contest.admin) {
@@ -34,7 +37,7 @@ omegaup.OmegaUp.on('ready', function() {
           }
           return;
         } else if (
-          arena.options.isPractice &&
+          arenaInstance.options.isPractice &&
           contest.finish_time &&
           Date.now() < contest.finish_time.getTime()
         ) {
@@ -47,29 +50,27 @@ omegaup.OmegaUp.on('ready', function() {
         $('#title .contest-title').html(
           omegaup.UI.escape(omegaup.UI.contestTitle(contest)),
         );
-        arena.updateSummary(contest);
+        arenaInstance.updateSummary(contest);
 
-        arena.submissionGap = parseInt(contest.submission_gap);
-        if (!(arena.submissionGap > 0)) arena.submissionGap = 0;
+        arenaInstance.submissionGap = parseInt(contest.submission_gap);
+        if (!(arenaInstance.submissionGap > 0)) arenaInstance.submissionGap = 0;
 
-        arena.initProblemsetId(contest);
-        arena.initClock(contest.start_time, contest.finish_time);
-        arena.initProblems(contest);
+        arenaInstance.initProblemsetId(contest);
+        arenaInstance.initProblems(contest);
+        arenaInstance.initClock(contest.start_time, contest.finish_time);
         for (var idx in contest.problems) {
           var problem = contest.problems[idx];
           var problemName =
             problem.letter + '. ' + omegaup.UI.escape(problem.title);
 
-          arena.problems[problem.alias] = problem;
-
-          var prob = $('#problem-list .template')
-            .clone()
-            .removeClass('template')
-            .addClass('problem_' + problem.alias);
-          $('.name', prob)
-            .attr('href', '#problems/' + problem.alias)
-            .html(problemName);
-          $('#problem-list').append(prob);
+          arenaInstance.problems[problem.alias] = problem;
+          arenaInstance.elements.navBar.problems.push({
+            alias: problem.alias,
+            text: problemName,
+            bestScore: 0,
+            maxScore: 0,
+            active: false,
+          });
 
           $('#clarification select[name=problem]').append(
             '<option value="' +
@@ -87,7 +88,9 @@ omegaup.OmegaUp.on('ready', function() {
           );
         }
 
-        omegaup.API.Contest.users({ contest_alias: arena.options.contestAlias })
+        omegaup.API.Contest.users({
+          contest_alias: arenaInstance.options.contestAlias,
+        })
           .then(function(data) {
             for (var ind in data.users) {
               var user = data.users[ind];
@@ -103,24 +106,24 @@ omegaup.OmegaUp.on('ready', function() {
               );
             }
           })
-          .fail(omegaup.UI.ignoreError);
+          .catch(omegaup.UI.ignoreError);
 
-        arena.setupPolls();
-        admin.refreshRuns();
-        if (!arena.socket) {
+        arenaInstance.setupPolls();
+        adminInstance.refreshRuns();
+        if (!arenaInstance.socket) {
           setInterval(function() {
             runsOffset = 0; // Return pagination to start on refresh
-            admin.refreshRuns();
+            adminInstance.refreshRuns();
           }, 5 * 60 * 1000);
         }
 
         // Trigger the event (useful on page load).
-        arena.onHashChanged();
+        arenaInstance.onHashChanged();
 
         $('#loading').fadeOut('slow');
         $('#root').fadeIn('slow');
       })
-      .fail(function() {
+      .catch(function() {
         if (!omegaup.OmegaUp.loggedIn) {
           window.location = '/login/?redirect=' + escape(window.location);
         } else {
@@ -131,8 +134,12 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#submit select[name="language"]').on('change', function(e) {
     var lang = $('#submit select[name="language"]').val();
-    if (lang == 'cpp11') {
+    if (lang.startsWith('cpp')) {
       $('#submit-filename-extension').text('.cpp');
+    } else if (lang.startsWith('c-')) {
+      $('#submit-filename-extension').text('.c');
+    } else if (lang.startsWith('py')) {
+      $('#submit-filename-extension').text('.py');
     } else if (lang && lang != 'cat') {
       $('#submit-filename-extension').text('.' + lang);
     } else {
@@ -145,27 +152,27 @@ omegaup.OmegaUp.on('ready', function() {
 
     $('#submit input').attr('disabled', 'disabled');
     omegaup.API.Run.create({
-      contest_alias: arena.options.contestAlias,
-      problem_alias: arena.currentProblem.alias,
+      contest_alias: arenaInstance.options.contestAlias,
+      problem_alias: arenaInstance.currentProblem.alias,
       language: $('#submit select[name="language"]').val(),
       source: $('#submit textarea[name="code"]').val(),
     })
       .then(function(run) {
         run.status = 'new';
-        run.alias = arena.currentProblem.alias;
+        run.alias = arenaInstance.currentProblem.alias;
         run.contest_score = null;
         run.time = new Date();
         run.penalty = 0;
         run.runtime = 0;
         run.memory = 0;
         run.language = $('#submit select[name="language"]').val();
-        arena.trackRun(run);
-        arena.updateRunFallback(run.guid, run);
+        arenaInstance.trackRun(run);
+        arenaInstance.updateRunFallback(run.guid, run);
 
         $('#submit input').prop('disabled', false);
-        arena.hideOverlay();
+        arenaInstance.hideOverlay();
       })
-      .fail(function(run) {
+      .catch(function(run) {
         alert(run.error);
         $('#submit input').prop('disabled', false);
       });
@@ -176,24 +183,30 @@ omegaup.OmegaUp.on('ready', function() {
   $('#rejudge-problem').on('click', function() {
     if (
       confirm(
-        'Deseas rejuecear el problema ' + arena.currentProblem.alias + '?',
+        'Deseas rejuecear el problema ' +
+          arenaInstance.currentProblem.alias +
+          '?',
       )
     ) {
-      omegaup.API.Problem.rejudge({ problem_alias: arena.currentProblem.alias })
+      omegaup.API.Problem.rejudge({
+        problem_alias: arenaInstance.currentProblem.alias,
+      })
         .then(function() {
-          admin.refreshRuns();
+          adminInstance.refreshRuns();
         })
-        .fail(omegaup.UI.ignoreError);
+        .catch(omegaup.UI.ignoreError);
     }
     return false;
   });
 
   $('#update-problem').on('submit', function() {
     $('#update-problem input[name="problem_alias"]').val(
-      arena.currentProblem.alias,
+      arenaInstance.currentProblem.alias,
     );
     return confirm(
-      'Deseas actualizar el problema ' + arena.currentProblem.alias + '?',
+      'Deseas actualizar el problema ' +
+        arenaInstance.currentProblem.alias +
+        '?',
     );
   });
 });

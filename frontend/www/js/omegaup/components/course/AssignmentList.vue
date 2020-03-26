@@ -3,71 +3,107 @@
     <div class="panel-heading">
       <h3>{{ T.wordsAssignments }}</h3>
     </div>
-    <div class="panel-body"
-         v-if="assignments.length == 0">
+    <div class="panel-body" v-if="assignments.length == 0">
       <div class="empty-category">
         {{ T.courseAssignmentEmpty }}
       </div>
     </div>
-    <div class="panel-body"
-         v-else="">
+    <div class="panel-body" v-else="">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="4"
-                v-text="T.wordsHomeworks"></th>
+            <th colspan="4" v-text="T.wordsHomeworks"></th>
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortHomeworks }">
-          <tr v-bind:key="assignment.alias"
-              v-for="assignment in homeworks">
+          <tr v-bind:key="assignment.alias" v-for="assignment in homeworks">
             <td>
-              <a v-bind:title="T.courseAssignmentReorder"><span aria-hidden="true"
-                    class="glyphicon glyphicon-move handle"></span></a>
+              <a v-bind:title="T.courseAssignmentReorder"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-move handle"
+                ></span
+              ></a>
             </td>
             <td>
-              <a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+              <a v-bind:href="assignmentUrl(assignment)">{{
+                assignment.name
+              }}</a>
             </td>
             <td class="button-column">
-              <a v-bind:title="T.courseAssignmentEdit"
-                  v-on:click="$emit('edit', assignment)"><span aria-hidden="true"
-                    class="glyphicon glyphicon-edit"></span></a>
+              <a
+                v-bind:title="T.courseAssignmentEdit"
+                v-on:click="$emit('edit', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-edit"
+                ></span
+              ></a>
             </td>
             <td class="button-column">
-              <a v-bind:title="T.courseAssignmentDelete"
-                  v-on:click="$emit('delete', assignment)"><span aria-hidden="true"
-                    class="glyphicon glyphicon-remove"></span></a>
+              <a
+                v-bind:title="T.courseAddProblemsAdd"
+                v-on:click="$emit('add-problems', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-th-list"
+                ></span
+              ></a>
+            </td>
+            <td class="button-column">
+              <a
+                v-bind:title="T.courseAssignmentDelete"
+                v-on:click="$emit('delete', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-remove"
+                ></span
+              ></a>
             </td>
           </tr>
         </tbody>
       </table>
-      <hr>
+      <hr />
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="4"
-                v-text="T.wordsTests"></th>
+            <th colspan="4" v-text="T.wordsExams"></th>
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortTests }">
-          <tr v-bind:key="assignment.alias"
-              v-for="assignment in tests">
+          <tr v-bind:key="assignment.alias" v-for="assignment in tests">
             <td>
-              <a v-bind:title="T.courseAssignmentReorder"><span aria-hidden="true"
-                    class="glyphicon glyphicon-move handle"></span></a>
+              <a v-bind:title="T.courseAssignmentReorder"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-move handle"
+                ></span
+              ></a>
             </td>
             <td>
-              <a v-bind:href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+              <a v-bind:href="assignmentUrl(assignment)">{{
+                assignment.name
+              }}</a>
             </td>
             <td class="button-column">
-              <a v-bind:title="T.courseAssignmentEdit"
-                  v-on:click="$emit('edit', assignment)"><span aria-hidden="true"
-                    class="glyphicon glyphicon-edit"></span></a>
+              <a
+                v-bind:title="T.courseAssignmentEdit"
+                v-on:click="$emit('edit', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-edit"
+                ></span
+              ></a>
             </td>
             <td class="button-column">
-              <a v-bind:title="T.courseAssignmentDelete"
-                  v-on:click="$emit('delete', assignment)"><span aria-hidden="true"
-                    class="glyphicon glyphicon-remove"></span></a>
+              <a
+                v-bind:title="T.courseAssignmentDelete"
+                v-on:click="$emit('delete', assignment)"
+                ><span
+                  aria-hidden="true"
+                  class="glyphicon glyphicon-remove"
+                ></span
+              ></a>
             </td>
           </tr>
         </tbody>
@@ -78,9 +114,13 @@
         <div class="row">
           <div class="form-group col-md-12">
             <div class="pull-right">
-              <button class="btn btn-primary"
-                   type="submit"
-                   v-on:click.prevent="$emit('new')">{{ T.courseAssignmentNew }}</button>
+              <button
+                class="btn btn-primary"
+                type="submit"
+                v-on:click.prevent="$emit('new')"
+              >
+                {{ T.courseAssignmentNew }}
+              </button>
             </div>
           </div>
         </div>
@@ -91,8 +131,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 
 @Component
 export default class CourseAssignmentList extends Vue {
@@ -135,5 +174,4 @@ export default class CourseAssignmentList extends Vue {
     this.$emit('sort-tests', this.courseAlias, this.tests);
   }
 }
-
 </script>

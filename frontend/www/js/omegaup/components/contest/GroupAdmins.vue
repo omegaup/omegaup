@@ -1,34 +1,43 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="form"
-            v-on:submit.prevent="onSubmit">
+      <form class="form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsGroupAdmin}}</label> <omegaup-autocomplete v-bind:init=
-          "el =&gt; UI.groupTypeahead(el)"
-               v-model="groupName"></omegaup-autocomplete>
-        </div><button class="btn btn-primary"
-              type="submit">{{T.contestAddgroupAddGroup}}</button>
+          <label>{{ T.wordsGroupAdmin }}</label>
+          <omegaup-autocomplete
+            v-bind:init="el =&gt; UI.groupTypeahead(el)"
+            v-model="groupName"
+          ></omegaup-autocomplete>
+        </div>
+        <button class="btn btn-primary" type="submit">
+          {{ T.contestAddgroupAddGroup }}
+        </button>
       </form>
     </div>
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>{{T.contestEditRegisteredGroupAdminName}}</th>
-          <th>{{T.contestEditRegisteredAdminRole}}</th>
-          <th>{{T.contestEditRegisteredAdminDelete}}</th>
+          <th>{{ T.contestEditRegisteredGroupAdminName }}</th>
+          <th>{{ T.contestEditRegisteredAdminRole }}</th>
+          <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="group in groupAdmins">
           <td>
-            <a v-bind:href="`/group/${group.alias}/edit/`">{{group.name}}</a>
+            <a v-bind:href="`/group/${group.alias}/edit/`">{{ group.name }}</a>
           </td>
-          <td>{{group.role}}</td>
-          <td><button class="close"
-                  type="button"
-                  v-if="group.name != 'admin'"
-                  v-on:click="onRemove(group)">×</button></td>
+          <td>{{ group.role }}</td>
+          <td>
+            <button
+              class="close"
+              type="button"
+              v-if="group.name != 'admin'"
+              v-on:click="onRemove(group)"
+            >
+              ×
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -37,9 +46,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
-import omegaup from '../../api.js';
 import Autocomplete from '../Autocomplete.vue';
 
 @Component({
@@ -65,5 +73,4 @@ export default class GroupAdmin extends Vue {
     this.$emit('emit-remove-group-admin', this);
   }
 }
-
 </script>

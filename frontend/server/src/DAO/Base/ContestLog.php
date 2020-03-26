@@ -154,10 +154,8 @@ abstract class ContestLog {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\ContestLog[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\ContestLog> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\ContestLog}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\ContestLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -222,7 +220,7 @@ abstract class ContestLog {
     ): int {
         $sql = '
             INSERT INTO
-                Contest_Log (
+                `Contest_Log` (
                     `contest_id`,
                     `user_id`,
                     `from_admission_mode`,

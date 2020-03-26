@@ -4,52 +4,64 @@
     <div class="omegaup-histogram">
       <div class="omegaup-histogram-1">
         <p class="omegaup-histogram-score">{{ score.toFixed(1) }}</p>
-        <p class="omegaup-histogram-votes">👥 {{ totalVotes + ' ' + T.wordsTotalVotes }}</p>
+        <p class="omegaup-histogram-votes">
+          👥 {{ totalVotes + ' ' + T.wordsTotalVotes }}
+        </p>
       </div>
       <div class="omegaup-histogram-2">
         <div class="omegaup-histogram-item">
           <div class="omegaup-histogram-bar-name">
             {{ tags[0] }}
           </div>
-          <div class="omegaup-histogram-bar omegaup-histogram-bar-1"
-               v-bind:style="`width:${barsWidth[0]}%`">
-            {{`${customHistogram[0]}`}}
+          <div
+            class="omegaup-histogram-bar omegaup-histogram-bar-1"
+            v-bind:style="`width:${barsWidth[0]}%`"
+          >
+            {{ `${customHistogram[0]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
           <div class="omegaup-histogram-bar-name">
             {{ tags[1] }}
           </div>
-          <div class="omegaup-histogram-bar omegaup-histogram-bar-2"
-               v-bind:style="`width:${barsWidth[1]}%`">
-            {{`${customHistogram[1]}` }}
+          <div
+            class="omegaup-histogram-bar omegaup-histogram-bar-2"
+            v-bind:style="`width:${barsWidth[1]}%`"
+          >
+            {{ `${customHistogram[1]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
           <div class="omegaup-histogram-bar-name">
             {{ tags[2] }}
           </div>
-          <div class="omegaup-histogram-bar omegaup-histogram-bar-3"
-               v-bind:style="`width:${barsWidth[2]}%`">
-            {{`${customHistogram[2]}` }}
+          <div
+            class="omegaup-histogram-bar omegaup-histogram-bar-3"
+            v-bind:style="`width:${barsWidth[2]}%`"
+          >
+            {{ `${customHistogram[2]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
           <div class="omegaup-histogram-bar-name">
             {{ tags[3] }}
           </div>
-          <div class="omegaup-histogram-bar omegaup-histogram-bar-4"
-               v-bind:style="`width:${barsWidth[3]}%`">
-            {{`${customHistogram[3]}` }}
+          <div
+            class="omegaup-histogram-bar omegaup-histogram-bar-4"
+            v-bind:style="`width:${barsWidth[3]}%`"
+          >
+            {{ `${customHistogram[3]}` }}
           </div>
         </div>
         <div class="omegaup-histogram-item">
           <div class="omegaup-histogram-bar-name">
             {{ tags[4] }}
           </div>
-          <div class="omegaup-histogram-bar omegaup-histogram-bar-5"
-               v-bind:style="`width:${barsWidth[4]}%`">
-            {{`${customHistogram[4]}` }}
+          <div
+            class="omegaup-histogram-bar omegaup-histogram-bar-5"
+            v-bind:style="`width:${barsWidth[4]}%`"
+          >
+            {{ `${customHistogram[4]}` }}
           </div>
         </div>
       </div>
@@ -126,33 +138,33 @@
   font-weight: bold;
   background-size: 200% 100%;
   background-position: right bottom;
-  animation: leftToRight .5s ease .65s forwards;
+  animation: leftToRight 0.5s ease 0.65s forwards;
 }
 
 .omegaup-histogram-bar-1 {
-  background-image: linear-gradient(to right, #4FA2EB 50%, transparent 50%);
+  background-image: linear-gradient(to right, #4fa2eb 50%, transparent 50%);
 }
 
 .omegaup-histogram-bar-2 {
-  background-image: linear-gradient(to right, #C2DDEB 50%, transparent 50%);
+  background-image: linear-gradient(to right, #c2ddeb 50%, transparent 50%);
 }
 
 .omegaup-histogram-bar-3 {
-  background-image: linear-gradient(to right, #DDDCDB 50%, transparent 50%);
+  background-image: linear-gradient(to right, #dddcdb 50%, transparent 50%);
 }
 
 .omegaup-histogram-bar-4 {
-  background-image: linear-gradient(to right, #FACCB4 50%, transparent 50%);
+  background-image: linear-gradient(to right, #faccb4 50%, transparent 50%);
 }
 
 .omegaup-histogram-bar-5 {
-  background-image: linear-gradient(to right, #DF3E4B 50%, transparent 50%);
+  background-image: linear-gradient(to right, #df3e4b 50%, transparent 50%);
 }
 </style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import { T } from '../../omegaup';
 
 @Component
 export default class ProblemHistogram extends Vue {
@@ -200,5 +212,4 @@ export default class ProblemHistogram extends Vue {
     return this.histogram.map(value => (value / maxValue) * 100);
   }
 }
-
 </script>

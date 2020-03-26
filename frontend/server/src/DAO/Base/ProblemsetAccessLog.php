@@ -34,10 +34,8 @@ abstract class ProblemsetAccessLog {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\ProblemsetAccessLog[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\ProblemsetAccessLog> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsetAccessLog}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\ProblemsetAccessLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -100,7 +98,7 @@ abstract class ProblemsetAccessLog {
     ): int {
         $sql = '
             INSERT INTO
-                Problemset_Access_Log (
+                `Problemset_Access_Log` (
                     `problemset_id`,
                     `identity_id`,
                     `ip`,

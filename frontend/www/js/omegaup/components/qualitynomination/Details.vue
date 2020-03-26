@@ -18,8 +18,10 @@
             <strong>{{ T.wordsNominator }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.nominator.name }} (<a v-bind:href="userUrl(this.nominator.username)">{{
-            this.nominator.username }}</a>)
+            {{ this.nominator.name }} (<a
+              v-bind:href="userUrl(this.nominator.username)"
+              >{{ this.nominator.username }}</a
+            >)
           </div>
         </div>
         <div class="row">
@@ -27,8 +29,10 @@
             <strong>{{ T.wordsProblem }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.problem.title }} (<a v-bind:href="problemUrl(this.problem.alias)">{{
-            this.problem.alias }}</a>)
+            {{ this.problem.title }} (<a
+              v-bind:href="problemUrl(this.problem.alias)"
+              >{{ this.problem.alias }}</a
+            >)
           </div>
         </div>
         <div class="row">
@@ -36,8 +40,10 @@
             <strong>{{ T.wordsAuthor }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.author.name }} (<a v-bind:href="userUrl(this.author.username)">{{
-            this.author.username }}</a>)
+            {{ this.author.name }} (<a
+              v-bind:href="userUrl(this.author.username)"
+              >{{ this.author.username }}</a
+            >)
           </div>
         </div>
         <div class="row">
@@ -50,32 +56,49 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.banProblemFormQuestion }}</strong> <span aria-hidden="true"
-                 class="glyphicon glyphicon-info-sign"
-                 data-placement="top"
-                 data-toggle="tooltip"
-                 v-bind:title="T.banProblemFormComments"></span>
+            <strong>{{ T.banProblemFormQuestion }}</strong>
+            <span
+              aria-hidden="true"
+              class="glyphicon glyphicon-info-sign"
+              data-placement="top"
+              data-toggle="tooltip"
+              v-bind:title="T.banProblemFormComments"
+            ></span>
           </div>
-          <div class="col-sm-8"
-               v-bind:class="{'has-error' : !rationale, 'has-success' : rationale}">
-            <textarea class="form-control"
-                 name="rationale"
-                 type="text"
-                 v-model="rationale"></textarea>
+          <div
+            class="col-sm-8"
+            v-bind:class="{ 'has-error': !rationale, 'has-success': rationale }"
+          >
+            <textarea
+              class="form-control"
+              name="rationale"
+              type="text"
+              v-model="rationale"
+            ></textarea>
           </div>
         </div>
-        <div class="row"
-             v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true">
+        <div
+          class="row"
+          v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true"
+        >
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>
           </div>
           <div class="col-sm-8">
-            <button class="btn btn-danger"
-                 v-bind:disabled="!rationale"
-                 v-on:click="markResolution(true)">{{ T.wordsBanProblem }}</button> <button class=
-                 "btn btn-success"
-                 v-bind:disabled="!rationale"
-                 v-on:click="markResolution(false)">{{ T.wordsKeepProblem }}</button>
+            <button
+              class="btn btn-danger"
+              v-bind:disabled="!rationale"
+              v-on:click="markResolution(true)"
+            >
+              {{ T.wordsBanProblem }}
+            </button>
+            <button
+              class="btn btn-success"
+              v-bind:disabled="!rationale"
+              v-on:click="markResolution(false)"
+            >
+              {{ T.wordsKeepProblem }}
+            </button>
           </div>
         </div>
       </div>
@@ -85,8 +108,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup, T } from '../../omegaup';
 
 interface QualityNominationContents {
   original: string;
@@ -121,7 +143,6 @@ export default class QualityNominationDetails extends Vue {
     this.$emit('mark-resolution', this, banProblem);
   }
 }
-
 </script>
 
 <style>

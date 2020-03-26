@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
+    /**
+     * @return list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>
+     */
     public static function GetMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
         $sql = '
             SELECT
@@ -23,21 +26,26 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 s.state_id,
                 sc.name as school,
                 sc.school_id as school_id,
-                (SELECT `urc`.classname FROM
-                    `User_Rank_Cutoffs` urc
-                WHERE
-                    `urc`.score <= (
-                            SELECT
-                                `ur`.`score`
-                            FROM
-                                `User_Rank` `ur`
-                            WHERE
-                                `ur`.user_id = `i`.`user_id`
-                        )
-                ORDER BY
-                    `urc`.percentile ASC
-                LIMIT
-                    1) `classname`
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
             FROM
                 Groups_Identities gi
             INNER JOIN
@@ -47,32 +55,34 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             LEFT JOIN
                 Countries c ON c.country_id = s.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = i.school_id
+                Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = isc.school_id
             LEFT JOIN
                 Users u ON u.user_id = i.user_id
             WHERE
                 gi.group_id = ?;';
 
+        /** @var list<array{classname: string, country: null|string, country_id: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$group->group_id]
         );
         $identities = [];
         foreach ($rs as $row) {
-            $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
             if (strpos($row['username'], ':') === false) {
-                array_push($identities, [
+                $identities[] = [
                     'username' => $row['username'],
                     'classname' => $row['classname'],
-                ]);
-                continue;
+                ];
+            } else {
+                $identities[] = $row;
             }
-            array_push($identities, $row);
         }
         return $identities;
     }
 
-    public static function GetMemberCountById($group_id) {
+    public static function GetMemberCountById(int $groupId): int {
         $sql = '
             SELECT
                 COUNT(*) AS count
@@ -80,11 +90,21 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 Groups_Identities gi
             WHERE
                 gi.group_id = ?;';
-        $params = [$group_id];
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        /** @var null|int */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$groupId]
+        );
+        if (empty($result)) {
+            return 0;
+        }
+        return intval($result);
     }
 
-    final public static function getByGroupId($groupId) {
+    /**
+     * @return list<\OmegaUp\DAO\VO\GroupsIdentities>
+     */
+    final public static function getByGroupId(int $groupId): array {
         $sql = '
             SELECT
                 *
@@ -94,23 +114,24 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 group_id = ?;';
 
         $groupsIdentities = [];
+        /** @var array{accept_teacher: bool|null, group_id: int, identity_id: int, is_invited: bool, privacystatement_consent_id: int|null, share_user_information: bool|null} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 [$groupId]
             ) as $row
         ) {
-            array_push(
-                $groupsIdentities,
-                new \OmegaUp\DAO\VO\GroupsIdentities(
-                    $row
-                )
+            $groupsIdentities[] = new \OmegaUp\DAO\VO\GroupsIdentities(
+                $row
             );
         }
         return $groupsIdentities;
     }
 
-    final public static function getUsernamesByGroupId($group_id) {
+    /**
+     * @return list<string>
+     */
+    final public static function getUsernamesByGroupId(int $groupId): array {
         $sql = '
             SELECT
                 i.username
@@ -124,13 +145,14 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 gi.group_id = ?;';
 
         $identities = [];
+        /** @var array{username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [$group_id]
+                [$groupId]
             ) as $row
         ) {
-            array_push($identities, $row['username']);
+            $identities[] = $row['username'];
         }
         return $identities;
     }

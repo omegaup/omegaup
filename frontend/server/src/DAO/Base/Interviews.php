@@ -159,10 +159,8 @@ abstract class Interviews {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return \OmegaUp\DAO\VO\Interviews[] Un arreglo que contiene objetos del tipo
+     * @return list<\OmegaUp\DAO\VO\Interviews> Un arreglo que contiene objetos del tipo
      * {@link \OmegaUp\DAO\VO\Interviews}.
-     *
-     * @psalm-return array<int, \OmegaUp\DAO\VO\Interviews>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -228,7 +226,7 @@ abstract class Interviews {
     ): int {
         $sql = '
             INSERT INTO
-                Interviews (
+                `Interviews` (
                     `problemset_id`,
                     `acl_id`,
                     `alias`,
