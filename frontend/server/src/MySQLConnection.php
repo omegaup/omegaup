@@ -211,6 +211,9 @@ class MySQLConnection {
             case MYSQLI_TYPE_BLOB:
                 return FieldType::TYPE_STRING;
 
+            case MYSQLI_TYPE_JSON:
+                return FieldType::TYPE_STRING;
+
             default:
                 throw new \Exception("Unknown field type: {$fieldType}");
         }
