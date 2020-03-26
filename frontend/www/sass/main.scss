@@ -2,5 +2,8 @@
 @import 'base/_variables.scss';
 @import 'base/_common.scss';
 
+@import 'base/sizes.scss';
+@import 'base/colors';
+
 // COMPONENTS - Re-usable site elements
 @import 'components/_buttons.scss';
