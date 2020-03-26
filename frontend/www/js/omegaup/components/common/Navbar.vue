@@ -115,10 +115,10 @@
             </ul>
           </li>
           <li
-            class="nav-schools"
-            v-bind:class="{ active: navbarSection === 'schools' }"
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navSchools }}</a>
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li>
             <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>

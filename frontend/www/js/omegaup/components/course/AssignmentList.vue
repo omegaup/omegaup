@@ -67,7 +67,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="4" v-text="T.wordsTests"></th>
+            <th colspan="4" v-text="T.wordsExams"></th>
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortTests }">
