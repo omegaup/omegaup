@@ -785,7 +785,6 @@ export class Arena {
 
     let now = Date.now();
     let clock = '';
-    console.log('hi');
     if (now < self.startTime.getTime()) {
       clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
