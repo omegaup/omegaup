@@ -197,6 +197,14 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
         );
+        $this->assertGreaterThan(
+            $schools[1]['score'],
+            $schools[0]['score']
+        );
+        $this->assertGreaterThan(
+            $schools[2]['score'],
+            $schools[1]['score']
+        );
 
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
         // again by the DAO as it has already been selected current year.
@@ -331,6 +339,25 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $results[0]['name']
         );
 
+        // School of the month (of the next month) should not be retrieved because
+        // it is a calculation for the future.
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
+        $this->assertCount(1, $results);
+        $this->assertEquals(
+            $results[0]['school_id'],
+            $schoolsData[1]['school']->school_id
+        );
+
+        $nextMonth = date_create($nextMonthDate);
+        date_add(
+            $nextMonth,
+            date_interval_create_from_date_string(
+                '+1 month'
+            )
+        );
+        $nextMonthDate = date_format($nextMonth, 'Y-m-d');
+        \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
+
         // Finally verify that both best schools of each month are retrieved
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         $this->assertCount(2, $results);
@@ -396,6 +423,16 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'school_id' => $schoolsData[2]['school']->school_id
         ]));
         $this->assertEquals('ok', $result['status']);
+
+        $nextMonth = $lastDayOfMonth;
+        date_add(
+            $nextMonth,
+            date_interval_create_from_date_string(
+                '+1 month'
+            )
+        );
+        $nextMonthDate = date_format($nextMonth, 'Y-m-d');
+        \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
 
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
         $this->assertCount(3, $results);
