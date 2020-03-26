@@ -5,7 +5,7 @@ import UI from '../ui.js';
 
 OmegaUp.on('ready', () => {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  let statement = false;
+  let showAllProblems = false;
   const problemsMine = new Vue({
     el: '#problem-mine',
     render: function(createElement) {
@@ -17,8 +17,8 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'change-show-all-problems': ev => {
-            statement = ev.selected;
-            showProblems(statement);
+            showAllProblems = ev.selected;
+            showProblems(showAllProblems);
           },
           'change-visibility': (ev, selectedProblems, visibility) => {
             Promise.all(
@@ -40,7 +40,7 @@ OmegaUp.on('ready', () => {
                 UI.error(UI.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
-                showProblems(statement);
+                showProblems(showAllProblems);
               });
           },
         },
@@ -62,8 +62,8 @@ OmegaUp.on('ready', () => {
     })
     .catch(omegaup.UI.apiError);
 
-  function showProblems(statement) {
-    (statement ? API.Problem.adminList() : API.Problem.myList())
+  function showProblems(showAllProblems) {
+    (showAllProblems ? API.Problem.adminList() : API.Problem.myList())
       .then(result => {
         problemsMine.problems = result.problems;
       })
