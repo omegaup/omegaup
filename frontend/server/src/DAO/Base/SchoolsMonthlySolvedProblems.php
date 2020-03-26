@@ -53,7 +53,9 @@ abstract class SchoolsMonthlySolvedProblems {
                 null :
                 intval($Schools_Monthly_Solved_Problems->count)
             ),
-            intval($Schools_Monthly_Solved_Problems->school_monthly_solved_problems_id),
+            intval(
+                $Schools_Monthly_Solved_Problems->school_monthly_solved_problems_id
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
