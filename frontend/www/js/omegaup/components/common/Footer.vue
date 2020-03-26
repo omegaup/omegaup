@@ -218,8 +218,8 @@ import { T } from '../../omegaup';
 
 @Component
 export default class Footer extends Vue {
-  @Prop() isLoggedIn!: number;
-  @Prop() omegaUpLockDown!: number;
+  @Prop() isLoggedIn!: boolean;
+  @Prop() omegaUpLockDown!: boolean;
 
   T = T;
 }
