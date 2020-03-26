@@ -509,6 +509,10 @@ export namespace omegaup {
     markdown: string;
   }
 
+  export interface StatementProblems {
+    name: string;
+  }
+
   export interface Report {
     classname: string;
     event: {
