@@ -1,18 +1,14 @@
 <template>
   <div>
     <omegaup-coder-of-the-month-notice
-      v-if="coderOfTheMonth && currentUserInfo"
-      v-bind:coderUsername="currentUserInfo.username"
-      v-bind:currentUsername="coderOfTheMonth.username"
-      v-bind:visible="true"
-    ></omegaup-coder-of-the-month-notice>
-    <omegaup-coder-of-the-month-notice
-      v-if="coderOfTheMonth && currentUserInfo"
-      v-bind:coderUsername="currentUserInfo.username"
-      v-bind:currentUsername="coderOfTheMonthFemale.username"
-      v-bind:visible="
-        coderOfTheMonthFemale.username !== coderOfTheMonth.username
+      v-if="
+        currentUserInfo &&
+          ((coderOfTheMonth &&
+            coderOfTheMonth.username == currentUserInfo.username) ||
+            (coderOfTheMonthFemale &&
+              coderOfTheMonthFemale.username == currentUserInfo.username))
       "
+      v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
     <div class="container-fluid">
       <div class="row">
@@ -108,9 +104,5 @@ export default class Index extends Vue {
   @Prop() chartOptions!: Chart;
 
   T = T;
-
-  get coder(): boolean {
-    return false;
-  }
 }
 </script>

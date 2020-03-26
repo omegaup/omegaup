@@ -1,5 +1,5 @@
 <template>
-  <div class="alert alert-warning" name="notice" v-if="show">
+  <div class="alert alert-warning" name="notice">
     {{ UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
   </div>
 </template>
@@ -12,19 +12,8 @@ import UI from '../../ui.js';
 @Component
 export default class CoderOfTheMonthNotice extends Vue {
   @Prop() coderUsername!: string;
-  @Prop() currentUsername!: string;
-  @Prop() visible!: boolean;
 
   T = T;
   UI = UI;
-
-  get show(): boolean {
-    return (
-      this.currentUsername !== null &&
-      this.coderUsername !== null &&
-      this.coderUsername === this.currentUsername &&
-      this.visible
-    );
-  }
 }
 </script>
