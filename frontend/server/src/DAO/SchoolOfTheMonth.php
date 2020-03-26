@@ -144,7 +144,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
                 sotm.time = ? AND
                 sotm.selected_by IS NULL
             ORDER BY
-                s.`ranking` IS NULL, s.`ranking` ASC
+                sotm.`ranking` ASC
             LIMIT
                 ?;';
 
@@ -214,6 +214,8 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
      * @return list<array{school_id: int, name: string, country_id: string, time: string}>
      */
     public static function getSchoolsOfTheMonth(): array {
+        $currentTimestamp = \OmegaUp\Time::get();
+        $currentDate = date('Y-m-01', $currentTimestamp);
         $sql = '
             SELECT
                 sotm.school_id,
@@ -225,23 +227,31 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
             INNER JOIN
                 Schools s ON s.school_id = sotm.school_id
             WHERE
-                sotm.selected_by IS NOT NULL
-                OR (
-                    sotm.`ranking` = 1 AND
-                    NOT EXISTS (
-                        SELECT
-                            *
-                        FROM
-                            School_Of_The_Month
-                        WHERE
-                            time = sotm.time AND selected_by IS NOT NULL
+                sotm.time <= ? AND
+                (
+                    sotm.selected_by IS NOT NULL
+                    OR (
+                        sotm.`ranking` = 1 AND
+                        NOT EXISTS (
+                            SELECT
+                                *
+                            FROM
+                                School_Of_The_Month
+                            WHERE
+                                time = sotm.time AND selected_by IS NOT NULL
+                        )
                     )
                 )
             ORDER BY
                 sotm.time DESC;';
 
         /** @var list<array{country_id: string, name: string, school_id: int, time: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, []);
+        return \OmegaUp\MySQLConnection::getInstance()->getAll(
+            $sql,
+            [
+                $currentDate,
+            ]
+        );
     }
 
     /**
