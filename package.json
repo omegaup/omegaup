@@ -28,7 +28,7 @@
     "jasmine": "^3.1.0",
     "jquery": "^3.4",
     "jsdom": "^15.2.1",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.1",
     "remove-source-webpack-plugin": "^0.1.1",
     "sass-loader": "^8.0.0",
     "sortablejs": "^1.7.0",

@@ -55,6 +55,15 @@
           <li>
             <a href="https://github.com/omegaup/omegaup">GitHub</a>
           </li>
+          <li>
+            <a
+              href="https://github.com/omegaup/omegaup/issues/new"
+              target="_blank"
+              rel="nofollow"
+              v-if="!omegaUpLockDown && isLoggedIn"
+              >{{ T.reportAnIssue }}</a
+            >
+          </li>
         </ul>
       </div>
       <div class="footer-list-section">
@@ -73,7 +82,7 @@
     <div class="copy">
       <div class="copy-content">
         <div class="">
-          Copyright © 2020 omegaUp, Inc. All rights reserved.​
+          {{ T.wordsCopyright }}
         </div>
         <div class="menu">
           <ul>
@@ -204,11 +213,14 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup';
 
 @Component
 export default class Footer extends Vue {
+  @Prop() isLoggedIn!: number;
+  @Prop() omegaUpLockDown!: number;
+
   T = T;
 }
 </script>

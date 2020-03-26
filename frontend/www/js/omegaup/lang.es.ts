@@ -1097,6 +1097,7 @@ const translations: { [key: string]: string; } = {
   wordsContestant: "Concursante",
   wordsContests: "Concursos",
   wordsContestsResults: "Resultados",
+  wordsCopyright: "Copyright \u00a9 2020 omegaUp, Inc. Todos los derechos reservados.",
   wordsCountry: "Pa\u00eds",
   wordsCountryRegion: "Pa\u00eds / Regi\u00f3n",
   wordsDangerZone: "\u00c1rea Peligrosa",

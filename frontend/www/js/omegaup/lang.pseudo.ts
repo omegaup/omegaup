@@ -1097,6 +1097,7 @@ const translations: { [key: string]: string; } = {
   wordsContestant: "(C0n7357an7)",
   wordsContests: "(C0n73575)",
   wordsContestsResults: "(R35u175)",
+  wordsCopyright: "(C0pyrigh7 \u00a9 2020 0m3gaUp, Inc. A11 righ75 r353rv3d.)",
   wordsCountry: "(C0un7ry)",
   wordsCountryRegion: "(C0un7ry / R3gi0n)",
   wordsDangerZone: "(Dang3r Z0n3)",
