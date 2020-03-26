@@ -615,7 +615,7 @@ export class Arena {
     self.finishTime = finish;
     // Once the clock is ready, we can now connect to the socket.
     self.connectSocket();
-    if (self.options.isPractice) {
+    if (self.options.isPractice || !self.finishTime) {
       self.elements.clock.html('&infin;');
       return;
     }
@@ -785,7 +785,6 @@ export class Arena {
 
     let now = Date.now();
     let clock = '';
-
     if (now < self.startTime.getTime()) {
       clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
