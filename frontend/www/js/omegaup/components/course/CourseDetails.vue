@@ -19,9 +19,11 @@
         </div>
         <div class="panel-body table-responsive">
           <div v-if="course.is_admin">
-            <span
-              >{{ T.courseStudentCountLabel }} {{ course.student_count }}</span
-            >
+            <span>{{
+              UI.formatString(T.courseStudentCountLabel, {
+                student_count: course.student_count,
+              })
+            }}</span>
             <div class="pull-right">
               <a
                 class="btn btn-primary"
@@ -211,7 +213,7 @@ export default class CourseDetails extends Vue {
   }
 
   getFormattedTime(timestamp: number): string {
-    return this.UI.formatDateTime(this.OmegaUp.remoteTime(timestamp * 1000));
+    return UI.formatDateTime(OmegaUp.remoteTime(timestamp * 1000));
   }
 }
 </script>

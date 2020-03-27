@@ -329,7 +329,7 @@ const translations: { [key: string]: string; } = {
   courseNotFound: "Course not found",
   courseStudentAdded: "Student added successfully.",
   courseStudentAlreadyPresent: "The student had already added to the course.",
-  courseStudentCountLabel: "Students:",
+  courseStudentCountLabel: "Students: %(student_count)",
   courseStudentNotInCourse: "The student was not in the course.",
   courseStudentRemoved: "Student removed successfully.",
   courseStudentsEmpty: "No students",

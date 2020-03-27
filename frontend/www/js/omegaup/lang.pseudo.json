@@ -328,7 +328,7 @@
 	"courseNotFound": "(C0ur53 n07 f0und)",
 	"courseStudentAdded": "(S7ud3n7 add3d 5ucc355fu11y.)",
 	"courseStudentAlreadyPresent": "(Th3 57ud3n7 had a1r3ady add3d 70 7h3 c0ur53.)",
-	"courseStudentCountLabel": "(S7ud3n75:)",
+	"courseStudentCountLabel": "(S7ud3n75: %(student_count))",
 	"courseStudentNotInCourse": "(Th3 57ud3n7 wa5 n07 in 7h3 c0ur53.)",
 	"courseStudentRemoved": "(S7ud3n7 r3m0v3d 5ucc355fu11y.)",
 	"courseStudentsEmpty": "(N0 57ud3n75)",
