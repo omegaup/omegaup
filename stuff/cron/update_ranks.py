@@ -201,6 +201,52 @@ def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                      cutoff.percentile, cutoff.classname))
 
 
+def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the solved problems count by each school the last 6 months'''
+
+    logging.info('Updating schools solved problems...')
+
+    months = 6  # in case this parameter requires adjustments
+    cur.execute('''
+        SELECT
+            `sc`.`school_id`,
+            IFNULL(YEAR(`su`.`time`), 0) AS `year`,
+            IFNULL(MONTH(`su`.`time`), 0) AS `month`,
+            COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
+        FROM
+            `Submissions` AS `su`
+        INNER JOIN
+            `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
+        INNER JOIN
+            `Runs` `r` ON `r`.`run_id` = `su`.`current_run_id`
+        INNER JOIN
+            `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+        WHERE
+            `su`.`time` >= CURDATE() - INTERVAL %s MONTH
+            AND `r`.`verdict` = "AC" AND `p`.`visibility` >= 1
+            AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    `Submissions` AS `sub`
+                INNER JOIN
+                    `Runs` AS `ru` ON `ru`.`run_id` = `sub`.`current_run_id`
+                WHERE
+                    `sub`.`problem_id` = `su`.`problem_id`
+                    AND `sub`.`identity_id` = `su`.`identity_id`
+                    AND `ru`.`verdict` = "AC"
+                    AND `sub`.`time` < `su`.`time`
+            )
+        GROUP BY
+            `sc`.`school_id`,
+            IFNULL(YEAR(`su`.`time`), 0),
+            IFNULL(MONTH(`su`.`time`), 0)
+        ORDER BY
+            `year` ASC,
+            `month` ASC;
+    ''', (months,))
+
+
 def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     '''Updates the school rank'''
 
@@ -579,6 +625,13 @@ def main() -> None:
                 dbconn.commit()
             except:  # noqa: bare-except
                 logging.exception('Failed to update user ranking')
+                raise
+
+            try:
+                update_schools_solved_problems(cur)
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception('Failed to update schools solved problems')
                 raise
 
             try:
