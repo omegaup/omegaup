@@ -195,7 +195,5 @@ export default class ProblemList extends Vue {
   wizardSearch(queryParameters: omegaup.QueryParameters): void {
     this.$emit('wizard-search', queryParameters);
   }
-
-  voidFunction(): void {}
 }
 </script>
