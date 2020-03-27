@@ -34,7 +34,7 @@ class Pager {
      *
      * @param int $rows The total number of rows to show.
      * @param int $current  The page we want to show, the 'c' in the figure.
-     * @param string $url   The base URL that each item will point to.
+     * @param null|string $url   The base URL that each item will point to.
      * @param int $adjacent Number of items before and after the current page,
      * the 'a' in the figure.
      * @param array<string, string[]|string> $params Additional key => value
@@ -46,7 +46,7 @@ class Pager {
     public static function paginate(
         int $rows,
         int $current,
-        string $url,
+        ?string $url,
         int $adjacent,
         array $params
     ): array {

@@ -365,7 +365,7 @@ export default {
 
     addTag: api.Problem.addTag,
 
-    adminList: api.Problem.adminlist,
+    adminList: api.Problem.adminList,
 
     admins: api.Problem.admins,
 
@@ -383,7 +383,7 @@ export default {
 
     list: api.Problem.list,
 
-    myList: api.Problem.mylist,
+    myList: api.Problem.myList,
 
     rejudge: api.Problem.rejudge,
 

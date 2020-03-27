@@ -25,18 +25,20 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, T } from '../../omegaup';
+import { types } from '../../api_types';
 
 @Component
 export default class Paginator extends Vue {
-  @Prop() pagerItems!: omegaup.Paginator[];
-  @Prop() requireCallback!: boolean;
-  @Prop() callback!: Function;
+  @Prop() pagerItems!: types.PageItem[];
+  @Prop({ required: false }) callback!: Function;
 
   T = T;
   page = 1;
+  requireCallback = false;
 
   mounted() {
-    if (this.requireCallback) {
+    if (typeof this.callback === 'function') {
+      this.requireCallback = true;
       this.callback(this.page);
     }
   }

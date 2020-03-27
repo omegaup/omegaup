@@ -418,13 +418,6 @@ export namespace omegaup {
     badge?: string;
   }
 
-  export interface Paginator {
-    class: string;
-    label: string;
-    page: number;
-    url: string;
-  }
-
   export interface Profile extends User {
     email: string;
     country_id: string;

@@ -4,6 +4,8 @@
 
 /**
  * ProblemsController
+ *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3289,7 +3291,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pagerItems: list<array{class: string, label: string, page: int, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3340,7 +3342,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
             $page ?: 1,
-            '',
+            /*$page=*/ null,
             5,
             []
         );
@@ -3354,7 +3356,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{pagerItems: list<array{class: string, label: string, page: int, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3403,7 +3405,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
             $page ?: 1,
-            '',
+            /*$page=*/ null,
             5,
             []
         );
@@ -3812,7 +3814,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<array{class: string, label: string, page: int, url: string}>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
