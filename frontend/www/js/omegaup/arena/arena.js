@@ -1,5 +1,6 @@
-import { OmegaUp, T } from '../omegaup.js';
+import { OmegaUp, T } from '../omegaup';
 import API from '../api.js';
+import * as api from '../api_transitional';
 import ArenaAdmin from './admin_arena.js';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
@@ -316,7 +317,7 @@ export class Arena {
           .catch(UI.apiError);
 
         function updateGraderStatus() {
-          API.Grader.status()
+          api.Grader.status()
             .then(stats => {
               self.commonNavbar.graderInfo = stats.grader;
               if (stats.status !== 'ok') {
@@ -641,7 +642,7 @@ export class Arena {
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
-              API.Problemset.details({ problemset_id: x })
+              api.Problemset.details({ problemset_id: x })
                 .then(problemsetLoaded.bind(self))
                 .catch(UI.ignoreError);
             }
@@ -858,7 +859,7 @@ export class Arena {
     }
 
     if (self.options.contestAlias != null) {
-      API.Problemset.scoreboard(scoreboardParams)
+      api.Problemset.scoreboard(scoreboardParams)
         .then(function(response) {
           // Differentiate ranking change between virtual and normal contest
           if (self.options.originalContestAlias != null)
@@ -872,7 +873,7 @@ export class Arena {
       self.problemsetAdmin ||
       (self.options.courseAlias && self.options.assignmentAlias)
     ) {
-      API.Problemset.scoreboard(scoreboardParams)
+      api.Problemset.scoreboard(scoreboardParams)
         .then(self.rankingChange.bind(self))
         .catch(UI.ignoreError);
     }
@@ -965,7 +966,7 @@ export class Arena {
       scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
-    API.Problemset.scoreboardEvents(scoreboardEventsParams)
+    api.Problemset.scoreboardEvents(scoreboardEventsParams)
       .then(function(response) {
         // Change username to username-virtual
         for (let evt of response.events) {
@@ -995,7 +996,7 @@ export class Arena {
       clearTimeout(self.virtualContestRefreshInterval);
 
     if (self.originalContestScoreboardEvent == null) {
-      API.Problemset.scoreboardEvents({
+      api.Problemset.scoreboardEvents({
         problemset_id: self.options.originalProblemsetId,
       })
         .then(function(response) {
@@ -1020,7 +1021,7 @@ export class Arena {
     }
 
     if (rankingEvent) {
-      API.Problemset.scoreboardEvents(scoreboardEventsParams)
+      api.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(self.onRankingEvents.bind(self))
         .catch(UI.ignoreError);
     }
@@ -1302,7 +1303,7 @@ export class Arena {
                 this,
               ).html();
             }
-            API.Clarification.update({
+            api.Clarification.update({
               clarification_id: id,
               answer: responseText,
               public: $('#create-response-is-public', this)[0].checked ? 1 : 0,

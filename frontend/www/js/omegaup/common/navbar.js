@@ -1,5 +1,7 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import { API, UI, OmegaUp, T } from '../omegaup';
+import * as api from '../api_transitional';
+import API from '../api.js';
+import { UI, OmegaUp, T } from '../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -57,7 +59,7 @@ OmegaUp.on('ready', function() {
       .catch(UI.apiError);
 
     function updateGraderStatus() {
-      API.Grader.status()
+      api.Grader.status()
         .then(stats => {
           commonNavbar.graderInfo = stats.grader;
           if (stats.status !== 'ok') {

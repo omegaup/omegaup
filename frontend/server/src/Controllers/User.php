@@ -6,6 +6,7 @@ namespace OmegaUp\Controllers;
  *  UserController
  *
  * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1767,7 +1768,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by user
      *
-     * @return array{problems: list<array{title: string, alias: string, submissions: int, accepted: int}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiProblemsSolved(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1780,14 +1781,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        /** @var list<array{title: string, alias: string, submissions: int, accepted: int}> */
+        /** @var list<Problem> */
         $responseProblems = [];
-        $relevantColumns = ['title', 'alias', 'submissions', 'accepted'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
         foreach ($problems as $problem) {
             if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                 continue;
             }
-            /** @var array{title: string, alias: string, submissions: int, accepted: int} */
+            /** @var Problem */
             $responseProblems[] = $problem->asFilteredArray($relevantColumns);
         }
 
@@ -1799,7 +1800,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems unsolved by user
      *
-     * @return array{problems: list<array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1813,14 +1814,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
-        /** @var list<array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}> */
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        /** @var list<Problem> */
         $filteredProblems = [];
         foreach ($problems as $problem) {
             if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                /** @var array{title: string, alias: string, submissions: int, accepted: int, difficulty: float} */
+                /** @var Problem */
                 $filteredProblems[] = $problem->asFilteredArray(
-                    $relevant_columns
+                    $relevantColumns
                 );
             }
         }
@@ -1833,7 +1834,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems created by user
      *
-     * @return array{problems: list<array{title: string, alias: string}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiProblemsCreated(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1843,22 +1844,24 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        /** @var list<array{title: string, alias: string}> */
-        $problems = [];
-        $relevant_columns = ['title', 'alias'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        /** @var list<Problem> */
+        $filteredProblems = [];
         foreach (
             \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
                 intval($identity->identity_id)
             ) as $problem
         ) {
-            /** @var array{title: string, alias: string} */
-            $problems[] = $problem->asFilteredArray(
-                $relevant_columns
-            );
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+                /** @var Problem */
+                $filteredProblems[] = $problem->asFilteredArray(
+                    $relevantColumns
+                );
+            }
         }
 
         return [
-            'problems' => $problems,
+            'problems' => $filteredProblems,
         ];
     }
 

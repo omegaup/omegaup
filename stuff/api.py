@@ -10,7 +10,6 @@ from typing import (Any, Callable, Dict, Mapping, Optional, Sequence, Text,
 from hook_tools import linters
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_API_D_TS_PATH = 'frontend/www/js/omegaup/api.d.ts'
 
 
 def _which(program: str) -> str:
@@ -22,12 +21,13 @@ def _which(program: str) -> str:
     raise Exception('`%s` not found' % program)
 
 
-def _generate_typescript() -> str:
+def _generate_typescript(filename: str) -> str:
     '''Generates the TypeScript version of the i18n file.'''
 
     command = [
         _which('php'),
         os.path.join(_ROOT, 'frontend/server/cmd/APITool.php'),
+        f'--file={filename}',
     ]
     result = subprocess.check_output(
         command, universal_newlines=True, cwd=_ROOT)
@@ -37,7 +37,7 @@ def _generate_typescript() -> str:
         '--trailing-comma=all',
         '--no-config',
         '--stdin-filepath',
-        'api.d.ts',
+        filename,
     ]
     # pylint: disable=unexpected-keyword-arg
     result = subprocess.check_output(
@@ -58,12 +58,15 @@ def _generate_new_contents(contents_callback: Callable[[str], bytes]
                            ) -> Tuple[Dict[str, bytes], Dict[str, bytes]]:
     new_contents: Dict[str, bytes] = {}
     original_contents: Dict[str, bytes] = {}
-    _generate_content_entry(
-        new_contents,
-        original_contents,
-        path=_API_D_TS_PATH,
-        new_content=_generate_typescript(),
-        contents_callback=contents_callback)
+    for path in ('frontend/www/js/omegaup/api.d.ts',
+                 'frontend/www/js/omegaup/api_types.ts',
+                 'frontend/www/js/omegaup/api_transitional.ts'):
+        _generate_content_entry(
+            new_contents,
+            original_contents,
+            path=path,
+            new_content=_generate_typescript(os.path.basename(path)),
+            contents_callback=contents_callback)
 
     return new_contents, original_contents
 
