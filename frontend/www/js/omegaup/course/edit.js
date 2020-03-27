@@ -2,7 +2,7 @@ import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Administrators from '../components/course/Administrators.vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AssignmentList from '../components/course/AssignmentList.vue';
-import course_Details from '../components/course/Details.vue';
+import course_Form from '../components/course/Form.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Clone from '../components/course/Clone.vue';
 import { API, UI, OmegaUp, T } from '../omegaup.js';
@@ -396,7 +396,7 @@ OmegaUp.on('ready', function() {
       course: {},
     },
     components: {
-      'omegaup-course-details': course_Details,
+      'omegaup-course-details': course_Form,
     },
   });
 
