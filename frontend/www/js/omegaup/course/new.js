@@ -1,4 +1,4 @@
-import course_Details from '../components/course/Details.vue';
+import course_Form from '../components/course/Form.vue';
 import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
@@ -70,7 +70,7 @@ OmegaUp.on('ready', function() {
       },
     },
     components: {
-      'omegaup-course-details': course_Details,
+      'omegaup-course-details': course_Form,
     },
   });
 });

@@ -45,7 +45,7 @@
                   {{ T.wordsHomework }}
                 </option>
                 <option value="test">
-                  {{ T.wordsExam }}
+                  {{ T.wordsExams }}
                 </option>
               </select></label
             >
