@@ -1124,6 +1124,7 @@ const translations: { [key: string]: string; } = {
   wordsEndTime: "Fin",
   wordsEndTimeContest: "Tiempo de finalizaci\u00f3n",
   wordsEnglish: "Ingl\u00e9s",
+  wordsExam: "Examen",
   wordsExams: "Ex\u00e1menes",
   wordsExcellent: "Excelente",
   wordsExperiments: "Experimentos",
