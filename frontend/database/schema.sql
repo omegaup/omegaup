@@ -850,16 +850,15 @@ CREATE TABLE `Schools` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Schools_Monthly_Count` (
-  `school_monthly_count_id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `Schools_Problems_Solved_Per_Month` (
+  `school_pspm_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL COMMENT 'Identificador de escuela',
-  `year` smallint NOT NULL,
-  `month` smallint NOT NULL,
-  `count` int NOT NULL,
-  PRIMARY KEY (`school_monthly_count_id`),
-  UNIQUE KEY `school_month_year` (`school_id`,`month`,`year`),
+  `time` date NOT NULL,
+  `problems_solved` int NOT NULL,
+  PRIMARY KEY (`school_pspm_id`),
+  UNIQUE KEY `school_time` (`school_id`,`time`),
   KEY `school_id` (`school_id`),
-  CONSTRAINT `fk_smsps_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
+  CONSTRAINT `fk_spspms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cantidad de problemas que resolvieron los usuarios de una escuela en un mes y año determinados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
