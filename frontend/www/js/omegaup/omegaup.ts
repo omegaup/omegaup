@@ -3,10 +3,11 @@ import * as lang_es from './lang.es';
 import * as lang_pt from './lang.pt';
 import * as lang_pseudo from './lang.pseudo';
 
-import API from './api.js';
 import UI from './ui.js';
+import * as api from './api_transitional';
+import * as errors from './errors';
 
-export { API, UI };
+export { UI };
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -698,37 +699,12 @@ export namespace omegaup {
     _initialized: boolean = false;
     _remoteDeltaTime?: number = undefined;
     _deltaTimeForTesting: number = 0;
-    _errors: Array<any> = [];
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
         () => {
           this.experiments = Experiments.loadGlobal();
         },
-        () => {
-          const reportAnIssue = <HTMLAnchorElement>(
-            document.getElementById('report-an-issue')
-          );
-          if (
-            !reportAnIssue ||
-            !window.navigator ||
-            !window.navigator.userAgent ||
-            !T.reportAnIssueTemplate
-          ) {
-            return;
-          }
-          reportAnIssue.addEventListener('click', (event: Event): void => {
-            // Not using UI.formatString() to avoid creating a circular
-            // dependency.
-            let issueBody = T.reportAnIssueTemplate
-              .replace('%(userAgent)', window.navigator.userAgent)
-              .replace('%(referer)', window.location.href)
-              .replace('%(serializedErrors)', JSON.stringify(this._errors))
-              .replace(/\\n/g, '\n');
-            reportAnIssue.href =
-              'https://github.com/omegaup/omegaup/issues/new?body=' +
-              encodeURIComponent(issueBody);
-          });
-        },
+        () => errors.registerReportAnIssue(T.reportAnIssueTemplate),
       ]),
     };
 
@@ -748,7 +724,7 @@ export namespace omegaup {
       }
       this._initialized = true;
       const t0 = this._realTime();
-      API.Session.currentSession()
+      api.Session.currentSession()
         .then((data: { [name: string]: any }) => {
           if (data.session.valid) {
             this.loggedIn = true;
@@ -823,7 +799,7 @@ export namespace omegaup {
     }
 
     addError(error: any): void {
-      this._errors.push(error);
+      errors.addError(error);
     }
   }
 }

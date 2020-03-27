@@ -1,5 +1,6 @@
 {include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true inline}
 <script type="text/json" id="payload">{$payload|json_encode}</script>
+  {if !empty($payload['languages'])}
   <ul class="tabs">
     <li><a href="#problems" class="active">{#wordsProblem#}</a></li>
     {if $payload['user']['logged_in']}
@@ -10,6 +11,7 @@
       <li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
     {/if}
   </ul>
+  {/if}
   <div id="problems" class="tab">
     <div id="problem" class="main">
       <h1 class="title">
