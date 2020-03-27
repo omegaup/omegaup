@@ -184,11 +184,12 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp, omegaup, T } from '../../omegaup';
 import UI from '../../ui.js';
+import { types } from '../../api_types';
 
 @Component
 export default class CourseDetails extends Vue {
   @Prop() course!: omegaup.Course;
-  @Prop() progress!: omegaup.AssignmentProgress[];
+  @Prop() progress!: types.AssignmentProgress[];
 
   T = T;
   UI = UI;
@@ -206,7 +207,7 @@ export default class CourseDetails extends Vue {
     );
   }
 
-  getAssignmentProgress(progress: omegaup.Progress): string {
+  getAssignmentProgress(progress: types.Progress): string {
     const percent = (progress.score / progress.max_score) * 100;
     const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
     return progress.max_score === 0 ? percentText : `${percentText}%`;

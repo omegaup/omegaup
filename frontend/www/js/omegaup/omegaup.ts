@@ -138,10 +138,6 @@ export namespace omegaup {
     version: string;
   }
 
-  export interface AssignmentProgress {
-    [assignmentAlias: string]: Progress;
-  }
-
   export interface Badge {
     badge_alias: string;
     assignation_time?: Date;
@@ -462,11 +458,6 @@ export namespace omegaup {
     version?: string;
     visibility?: number;
     visits?: number;
-  }
-
-  export interface Progress{
-    max_score: number;
-    score: number;
   }
 
   export interface QueryParameters {
