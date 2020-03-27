@@ -29,7 +29,18 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             `c`.*,
             `i`.`username`,
             IFNULL(`i`.country_id, 'xx') AS country_id,
-            IFNULL((SELECT `urc`.classname FROM `User_Rank_Cutoffs` AS `urc` WHERE `urc`.`score` <= (SELECT `ur`.score FROM `User_Rank` AS `ur` WHERE `ur`.`user_id` = `c`.`user_id`) ORDER BY `urc`.`percentile` ASC LIMIT 1),'user-rank-unranked') AS classname
+            IFNULL((SELECT 
+                    `urc`.classname 
+                  FROM 
+                    `User_Rank_Cutoffs` AS `urc` 
+                  WHERE
+                      `urc`.`score` <= (SELECT 
+                                          `ur`.score 
+                                        FROM 
+                                          `User_Rank` AS `ur` 
+                                          WHERE 
+                                          `ur`.`user_id` = `c`.`user_id`) 
+                  ORDER BY `urc`.`percentile` ASC LIMIT 1),'user-rank-unranked') AS classname
           FROM
             `Coder_Of_The_Month` AS `c`
           INNER JOIN
