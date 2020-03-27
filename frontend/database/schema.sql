@@ -850,13 +850,13 @@ CREATE TABLE `Schools` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Schools_Monthly_Solved_Problems` (
-  `school_monthly_solved_problems_id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `Schools_Monthly_Count` (
+  `school_monthly_count_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL COMMENT 'Identificador de escuela',
   `year` smallint NOT NULL,
   `month` smallint NOT NULL,
   `count` int NOT NULL,
-  PRIMARY KEY (`school_monthly_solved_problems_id`),
+  PRIMARY KEY (`school_monthly_count_id`),
   UNIQUE KEY `school_month_year` (`school_id`,`month`,`year`),
   KEY `school_id` (`school_id`),
   CONSTRAINT `fk_smsps_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
