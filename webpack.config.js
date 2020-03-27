@@ -32,6 +32,7 @@ let config = [
       badge_details: './frontend/www/js/omegaup/badge/details.js',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
+      common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.js',
       common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',

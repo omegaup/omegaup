@@ -1,5 +1,5 @@
 import common_Index from '../components/common/Index.vue';
-import { API, UI, OmegaUp, T } from '../omegaup';
+import { UI, OmegaUp, T } from '../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -28,6 +28,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-common-index', {
         props: {
           coderOfTheMonth: this.coderOfTheMonth,
+          coderOfTheMonthFemale: this.coderOfTheMonthFemale,
           currentUserInfo: this.currentUserInfo,
           rankTable: this.rankTable,
           schoolsRank: this.schoolsRank,
@@ -39,7 +40,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      coderOfTheMonth: coderOfTheMonthData,
+      coderOfTheMonth: coderOfTheMonthData.all,
+      coderOfTheMonthFemale: coderOfTheMonthData.female,
       currentUserInfo: payload.currentUserInfo,
       rankTable: {
         page: 1,
