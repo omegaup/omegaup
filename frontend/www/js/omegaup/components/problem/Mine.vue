@@ -114,7 +114,7 @@
     </div>
     <omegaup-common-paginator
       v-bind:pagerItems="pagerItems"
-      v-bind:callback="page => $emit('go-to-page', page)"
+      v-on:page-changed="page => $emit('go-to-page', page)"
     ></omegaup-common-paginator>
   </div>
 </template>

@@ -7,7 +7,7 @@
             <a
               v-bind:href="page.url"
               v-bind:class="{ disabled: page.class !== 'active' }"
-              v-on:click="emitCallback(page.page)"
+              v-on:click.prevent="$emit('page-changed', page.page)"
               >{{ page.label }}</a
             >
           </li>
@@ -25,15 +25,7 @@ import { types } from '../../api_types';
 @Component
 export default class Paginator extends Vue {
   @Prop() pagerItems!: types.PageItem[];
-  @Prop({ required: false }) callback!: Function;
 
   T = T;
-
-  emitCallback(page: number): void {
-    if (!this.callback) {
-      return;
-    }
-    this.callback(page);
-  }
 }
 </script>
