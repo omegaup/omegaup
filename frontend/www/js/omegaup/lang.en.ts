@@ -1238,6 +1238,7 @@ const translations: { [key: string]: string; } = {
   wordsRanking: "Ranking",
   wordsRatio: "Ratio",
   wordsReadAgain: "Read again",
+  wordsReading: "Reading",
   wordsRegistration: "Registration/open",
   wordsRejudge: "Rejudge",
   wordsReportProblem: "Report problem.",
