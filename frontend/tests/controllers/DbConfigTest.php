@@ -2,13 +2,12 @@
 
 class DbConfigTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeSync() {
-        /** @var string|null */
+        /** @var \OmegaUp\Timestamp|null */
         $dbTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             'SELECT NOW();'
         );
-        $phpTime = date('Y-m-d H:i:s', \OmegaUp\Time::get());
 
-        $this->assertEquals($phpTime, $dbTime);
+        $this->assertEquals(\OmegaUp\Time::get(), $dbTime->time);
     }
 
     public function testPhpUtc() {

@@ -100,7 +100,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 AND
                     identity_id = ?;';
 
-        /** @var list<array{identity_id: int, ip: int, problemset_id: int, time: string}> */
+        /** @var list<array{identity_id: int, ip: int, problemset_id: int, time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId, $identityId]

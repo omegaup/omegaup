@@ -600,7 +600,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 status = ?;
         ';
 
-        /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: string, user_id: int}> */
+        /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$userId, $problemId, $nomination, $contents, $status]

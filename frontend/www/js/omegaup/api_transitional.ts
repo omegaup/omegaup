@@ -179,17 +179,60 @@ export const Contest = {
     messages.ContestDetailsRequest,
     messages.ContestDetailsResponse
   >('/api/contest/details/'),
-  list: apiCall<messages.ContestListRequest, messages.ContestListResponse>(
-    '/api/contest/list/',
-  ),
+  list: apiCall<
+    messages.ContestListRequest,
+    messages._ContestListServerResponse,
+    messages.ContestListResponse
+  >('/api/contest/list/', x => {
+    x.results = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.original_finish_time = ((x: number) => new Date(x * 1000))(
+          x.original_finish_time,
+        );
+        return x;
+      });
+    })(x.results);
+    return x;
+  }),
   listParticipating: apiCall<
     messages.ContestListParticipatingRequest,
+    messages._ContestListParticipatingServerResponse,
     messages.ContestListParticipatingResponse
-  >('/api/contest/listParticipating/'),
+  >('/api/contest/listParticipating/', x => {
+    x.contests = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.original_finish_time = ((x: number) => new Date(x * 1000))(
+          x.original_finish_time,
+        );
+        return x;
+      });
+    })(x.contests);
+    return x;
+  }),
   myList: apiCall<
     messages.ContestMyListRequest,
+    messages._ContestMyListServerResponse,
     messages.ContestMyListResponse
-  >('/api/contest/myList/'),
+  >('/api/contest/myList/', x => {
+    x.contests = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.original_finish_time = ((x: number) => new Date(x * 1000))(
+          x.original_finish_time,
+        );
+        return x;
+      });
+    })(x.contests);
+    return x;
+  }),
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
@@ -231,8 +274,22 @@ export const Contest = {
   >('/api/contest/report/'),
   requests: apiCall<
     messages.ContestRequestsRequest,
+    messages._ContestRequestsServerResponse,
     messages.ContestRequestsResponse
-  >('/api/contest/requests/'),
+  >('/api/contest/requests/', x => {
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.last_update)
+          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
+        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
+        return x;
+      });
+    })(x.users);
+    return x;
+  }),
   role: apiCall<messages.ContestRoleRequest, messages.ContestRoleResponse>(
     '/api/contest/role/',
   ),
@@ -491,8 +548,21 @@ export const Interview = {
   >('/api/interview/create/'),
   details: apiCall<
     messages.InterviewDetailsRequest,
+    messages._InterviewDetailsServerResponse,
     messages.InterviewDetailsResponse
-  >('/api/interview/details/'),
+  >('/api/interview/details/', x => {
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.access_time)
+          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+        return x;
+      });
+    })(x.users);
+    return x;
+  }),
   list: apiCall<messages.InterviewListRequest, messages.InterviewListResponse>(
     '/api/interview/list/',
   ),
@@ -622,8 +692,21 @@ export const ProblemForfeited = {
 export const Problemset = {
   details: apiCall<
     messages.ProblemsetDetailsRequest,
+    messages._ProblemsetDetailsServerResponse,
     messages.ProblemsetDetailsResponse
-  >('/api/problemset/details/'),
+  >('/api/problemset/details/', x => {
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.access_time)
+          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+        return x;
+      });
+    })(x.users);
+    return x;
+  }),
   scoreboard: apiCall<
     messages.ProblemsetScoreboardRequest,
     messages.ProblemsetScoreboardResponse

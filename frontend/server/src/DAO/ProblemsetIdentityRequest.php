@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}>
+     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}>
      */
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
@@ -37,7 +37,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
-        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}> */
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -45,7 +45,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
     }
 
     /**
-     * @return list<array{accepted: bool|null, country: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}>
+     * @return list<array{accepted: bool|null, country: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>
      */
     public static function getRequestsForProblemset(int $problemsetId) {
         $sql = '
@@ -72,7 +72,7 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
-        /** @var array{accepted: bool|null, country: null|string, identity_id: int, last_update: null|string, request_time: string, username: string} $row */
+        /** @var array{accepted: bool|null, country: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
