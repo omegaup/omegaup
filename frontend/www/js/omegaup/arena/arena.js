@@ -13,8 +13,40 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import common_Navbar from '../components/common/Navbar.vue';
 import UI from '../ui.js';
 import Vue from 'vue';
+import * as ko from 'knockout';
+import * as secureBindingsProvider from 'knockout-secure-binding';
 
 export { ArenaAdmin };
+
+// TODO(#3456): Remove this once Knockout is gone.
+OmegaUp.on('ready', function() {
+  // ko.secureBindingsProvider.nodeHasBindings() has a bug in which if
+  // there happens to be a comment with no content (like `<!---->`), it
+  // tries to call .trim() on undefined, and crashes.
+  secureBindingsProvider.prototype.nodeHasBindings = function(node) {
+    if (node.nodeType === node.ELEMENT_NODE) {
+      return (
+        node.getAttribute(this.attribute) ||
+        (ko.components && ko.components.getComponentNameForNode(node))
+      );
+    }
+    if (node.nodeType === node.COMMENT_NODE) {
+      if (this.noVirtualElements) {
+        return false;
+      }
+      // Ensures that `value` is not undefined.
+      let value = '' + node.nodeValue || node.text;
+      if (!value) {
+        return false;
+      }
+      // See also: knockout/src/virtualElements.js
+      return value.trim().indexOf('ko ') === 0;
+    }
+  };
+  ko.bindingProvider.instance = new secureBindingsProvider({
+    attribute: 'data-bind',
+  });
+});
 
 let ScoreboardColors = [
   '#FB3F51',
