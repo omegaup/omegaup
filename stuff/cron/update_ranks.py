@@ -570,7 +570,6 @@ def update_coder_of_the_month_candidates(
         ))
 
     for index, row in enumerate(cur):
-        logging.info(str(row))
         cur.execute('''
                     INSERT INTO
                         `Coder_Of_The_Month` (
@@ -600,6 +599,74 @@ def update_coder_of_the_month_candidates(
                     ))
 
 
+def update_users_stats(
+        cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
+        date: datetime.date) -> None:
+    '''Updates all the information and ranks related to users'''
+    logging.info('Updating users stats...')
+    try:
+        try:
+            scores = update_user_rank(cur)
+            update_user_rank_cutoffs(cur, scores)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update user ranking')
+            raise
+
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'all')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month')
+            raise
+
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'female')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month female')
+            raise
+        logging.info('Users stats updated')
+    except:  # noqa: bare-except
+        logging.exception('Failed to update all users stats')
+
+
+def update_schools_stats(
+        cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
+        date: datetime.date) -> None:
+    '''Updates all the information and ranks related to schools'''
+    logging.info('Updating schools stats...')
+    try:
+        try:
+            update_schools_solved_problems(cur)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update schools solved problems')
+            raise
+
+        try:
+            update_school_rank(cur)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update school ranking')
+            raise
+
+        try:
+            update_school_of_the_month_candidates(cur, date)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to school of the month')
+            raise
+        logging.info('Schools stats updated')
+    except:  # noqa: bare-except
+        logging.exception('Failed to update all schools stats')
+
+
 def main() -> None:
     '''Main entrypoint.'''
 
@@ -619,49 +686,8 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            try:
-                scores = update_user_rank(cur)
-                update_user_rank_cutoffs(cur, scores)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception('Failed to update user ranking')
-                raise
-
-            try:
-                update_schools_solved_problems(cur)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception('Failed to update schools solved problems')
-                raise
-
-            try:
-                update_school_rank(cur)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception('Failed to update school ranking')
-                raise
-
-            try:
-                update_school_of_the_month_candidates(cur, args.date)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to school of the month')
-                raise
-            try:
-                update_coder_of_the_month_candidates(cur, args.date, 'all')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month')
-                raise
-            try:
-                update_coder_of_the_month_candidates(cur, args.date, 'female')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month female')
-                raise
+            update_users_stats(cur, dbconn, args.date)
+            update_schools_stats(cur, dbconn, args.date)
     finally:
         dbconn.close()
         logging.info('Done')
