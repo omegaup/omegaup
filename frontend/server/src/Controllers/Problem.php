@@ -52,7 +52,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = PROBLEMS_PER_PAGE;
+    const PAGE_SIZE = 100;
 
     /**
      * Returns a ProblemParams instance from the Request values.

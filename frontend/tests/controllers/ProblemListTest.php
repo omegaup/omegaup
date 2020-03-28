@@ -1107,7 +1107,13 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
                 $request
             )['smartyProperties']['payload'];
+            foreach ($response['problems'] as $problem) {
+                $problems[] = $problem['alias'];
+            }
             $nextPage = end($response['pagerItems']);
+            if ($nextPage['page'] === 0) {
+                continue;
+            }
             $nextPageURL = $nextPage['url'];
             $nextPageURLQuery = parse_url($nextPageURL);
             // Getting all the parameters gotten by the url, even if some of them is empty
@@ -1116,10 +1122,6 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 foreach ($params as $param => $value) {
                     $request[$param] = $value;
                 }
-            }
-
-            foreach ($response['problems'] as $problem) {
-                $problems[] = $problem['alias'];
             }
         }
         // Asserting the number of non-repeated problems is the same than the total
