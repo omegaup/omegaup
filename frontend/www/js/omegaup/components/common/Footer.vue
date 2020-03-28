@@ -58,6 +58,9 @@
           <li>
             <a
               href="https://github.com/omegaup/omegaup/issues/new"
+              v-on:click="
+                $event.target.href = reportAnIssueURL(T.reportAnIssueTemplate)
+              "
               target="_blank"
               rel="nofollow"
               v-if="!omegaUpLockDown && isLoggedIn"
@@ -215,6 +218,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup';
+import { reportAnIssueURL } from '../../errors';
 
 @Component
 export default class Footer extends Vue {
@@ -222,5 +226,6 @@ export default class Footer extends Vue {
   @Prop() omegaUpLockDown!: boolean;
 
   T = T;
+  reportAnIssueURL = reportAnIssueURL;
 }
 </script>
