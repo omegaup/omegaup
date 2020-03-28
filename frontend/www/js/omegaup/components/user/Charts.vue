@@ -49,7 +49,7 @@ import { Chart } from 'highcharts-vue';
 import * as Highcharts from 'highcharts';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 
 interface Data {
   runs: omegaup.RunInfo[];

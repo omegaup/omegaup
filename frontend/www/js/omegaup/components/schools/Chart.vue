@@ -6,7 +6,7 @@
 
 <script>
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 
 export default {
   props: {

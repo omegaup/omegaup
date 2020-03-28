@@ -1,7 +1,7 @@
 import course_List from '../components/course/List.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 

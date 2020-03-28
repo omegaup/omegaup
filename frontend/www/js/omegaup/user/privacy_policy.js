@@ -3,7 +3,7 @@ import user_Privacy_Policy from '../components/user/PrivacyPolicy.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

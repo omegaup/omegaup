@@ -184,7 +184,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp, omegaup } from '../../omegaup';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 import { types } from '../../api_types';
 
 @Component

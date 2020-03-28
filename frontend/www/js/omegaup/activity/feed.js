@@ -2,7 +2,7 @@ import Vue from 'vue';
 import activity_Feed from '../components/activity/Feed.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   let match = /\/([^\/]+)\/([^\/]+)\/activity\/?.*/.exec(

@@ -12,7 +12,7 @@ import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import common_Navbar from '../components/common/Navbar.vue';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import Vue from 'vue';
 import * as ko from 'knockout';
 import * as secureBindingsProvider from 'knockout-secure-binding';

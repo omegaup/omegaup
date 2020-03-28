@@ -41,7 +41,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 import Autocomplete from '../Autocomplete.vue';
 
 @Component({

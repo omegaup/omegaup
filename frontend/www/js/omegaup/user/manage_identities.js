@@ -2,7 +2,7 @@ import user_ManageIdentities from '../components/user/ManageIdentities.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 
 OmegaUp.on('ready', function() {

@@ -1,7 +1,7 @@
 import schools_Rank from '../components/schools/Rank.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
