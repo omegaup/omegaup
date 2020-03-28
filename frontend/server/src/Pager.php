@@ -32,7 +32,8 @@ class Pager {
      *                                           |
      *                                      current page
      *
-     * @param int $rows The total number of rows to show.
+     * @param int $rows The number of rows to show per page.
+     * @param int $pageSize The total number of rows available.
      * @param int $current  The page we want to show, the 'c' in the figure.
      * @param int $adjacent Number of items before and after the current page,
      * the 'a' in the figure.
@@ -44,11 +45,12 @@ class Pager {
      */
     public static function paginate(
         int $rows,
+        int $pageSize,
         int $current,
         int $adjacent,
         array $params
     ): array {
-        $pages = intval(($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+        $pages = intval(($rows + $pageSize - 1) / $pageSize);
         if ($current < 1 || $current > $pages) {
             $current = 1;
         }
@@ -108,7 +110,8 @@ class Pager {
      * The function gets all the items of paginator function and it adds the
      * base url to each one.
      *
-     * @param int $rows     The total number of rows to show.
+     * @param int $rows     The number of rows to show per page.
+     * @param int $pageSize The total number of rows available.
      * @param int $current  The page we want to show, the 'c' in the figure.
      * @param string $url   The base URL that each item will point to.
      * @param int $adjacent Number of items before and after the current page,
@@ -121,12 +124,19 @@ class Pager {
      */
     public static function paginateWithUrl(
         int $rows,
+        int $pageSize,
         int $current,
         string $url,
         int $adjacent,
         array $params
     ) {
-        $pagerItems = self::paginate($rows, $current, $adjacent, $params);
+        $pagerItems = self::paginate(
+            $rows,
+            $pageSize,
+            $current,
+            $adjacent,
+            $params
+        );
         $query = '';
         if (!empty($params)) {
             $query = '&' . self::buildQueryString($params);
