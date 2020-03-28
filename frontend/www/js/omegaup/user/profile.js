@@ -213,5 +213,5 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       viewProfile.charts = data;
     })
-    .catch(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });

@@ -234,7 +234,7 @@ export default class ProblemFinderWizard extends Vue {
     this.possibleTags.forEach(tagObject => {
       tagObjects.push({
         key: tagObject.name,
-        value: this.T.hasOwnProperty(tagObject.name)
+        value: T.hasOwnProperty(tagObject.name)
           ? T[tagObject.name]
           : tagObject.name,
       });

@@ -118,7 +118,7 @@ OmegaUp.on('ready', () => {
 
             link.click(); // This will download the data
           })
-          .catch(omegaup.UI.apiError);
+          .catch(UI.apiError);
       },
     },
   });

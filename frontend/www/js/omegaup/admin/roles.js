@@ -24,18 +24,18 @@ OmegaUp.on('ready', function() {
                 role: selectedRole.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                 username: payload.username,
                 role: selectedRole.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
           'on-change-group': function(selectedGroup) {
@@ -45,18 +45,18 @@ OmegaUp.on('ready', function() {
                 group: selectedGroup.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                 username: payload.username,
                 group: selectedGroup.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
         },

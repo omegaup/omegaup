@@ -20,7 +20,7 @@ OmegaUp.on('ready', function() {
               .then(function(response) {
                 window.location = '/profile/';
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -37,5 +37,5 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       basicEdit.username = data.username;
     })
-    .catch(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });

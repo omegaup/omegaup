@@ -45,7 +45,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component({})
+@Component
 export default class AdminRoles extends Vue {
   @Prop() initialRoles!: omegaup.Role[];
   @Prop() initialGroups!: omegaup.Group[];

@@ -146,7 +146,7 @@ export default class CourseViewProgress extends Vue {
 
   get progressTable(): string[][] {
     let table: string[][] = [];
-    let header = [this.T.profileUsername, this.T.wordsName];
+    let header = [T.profileUsername, T.wordsName];
     for (let assignment of this.assignments) {
       header.push(assignment.name);
     }

@@ -143,8 +143,8 @@ export default class ProblemMine extends Vue {
 
   get statementShowAllProblems(): string {
     return this.isSysadmin
-      ? this.T.problemListShowAdminProblemsAndDeleted
-      : this.T.problemListShowAdminProblems;
+      ? T.problemListShowAdminProblemsAndDeleted
+      : T.problemListShowAdminProblems;
   }
 
   @Emit('change-show-all-problems')

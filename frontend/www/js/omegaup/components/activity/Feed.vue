@@ -197,8 +197,8 @@ export default class ActivityFeed extends Vue {
 
   get wordsReportSummary(): string {
     return this.type == 'contest'
-      ? this.T.wordsActivityReportSummaryContest
-      : this.T.wordsActivityReportSummaryCourse;
+      ? T.wordsActivityReportSummaryContest
+      : T.wordsActivityReportSummaryCourse;
   }
 
   get classByUser(): { [key: string]: string } {

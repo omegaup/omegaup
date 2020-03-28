@@ -78,7 +78,7 @@ OmegaUp.on('ready', () => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
-      .catch(omegaup.UI.apiError);
+      .catch(UI.apiError);
   }
 
   showProblems(showAllProblems, /*pageNumber=*/ 1);

@@ -103,7 +103,7 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import UI from '../../ui.js';
 
-@Component({})
+@Component
 export default class ScoreboardMerge extends Vue {
   @Prop() availableContests!: omegaup.Contest[];
   @Prop() scoreboard!: omegaup.Scoreboard[];

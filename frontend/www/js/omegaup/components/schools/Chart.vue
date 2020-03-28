@@ -13,32 +13,23 @@ export default {
     data: Array,
     school: String,
   },
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-    };
-  },
   mounted: function() {
     this.chart = Highcharts.chart('monthly-solved-problems-chart', {
       title: {
-        text: this.UI.formatString(
-          this.T.profileSchoolMonthlySolvedProblemsCount,
-          {
-            school: this.school,
-          },
-        ),
+        text: UI.formatString(T.profileSchoolMonthlySolvedProblemsCount, {
+          school: this.school,
+        }),
       },
       chart: { type: 'line' },
       yAxis: {
         min: 0,
         title: {
-          text: this.T.profileSolvedProblems,
+          text: T.profileSolvedProblems,
         },
       },
       xAxis: {
         title: {
-          text: this.T.wordsMonths,
+          text: T.wordsMonths,
         },
         labels: {
           rotation: -45,

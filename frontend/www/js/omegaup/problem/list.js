@@ -39,5 +39,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .catch(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });
