@@ -7,7 +7,7 @@
             <a
               v-if="!!callback"
               v-bind:class="{ disabled: page.class !== 'active' }"
-              v-on:click="callback(page.page)"
+              v-on:click="emitCallback(page.page)"
               >{{ page.label }}</a
             >
             <a
@@ -34,12 +34,9 @@ export default class Paginator extends Vue {
   @Prop({ required: false }) callback!: Function;
 
   T = T;
-  page = 1;
 
-  created() {
-    if (!!this.callback) {
-      this.callback(this.page);
-    }
+  emitCallback(page: number): void {
+    this.callback(page);
   }
 }
 </script>

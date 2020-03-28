@@ -78,4 +78,6 @@ OmegaUp.on('ready', () => {
       })
       .catch(omegaup.UI.apiError);
   }
+
+  showProblems(showAllProblems, /*pageNumber=*/ 1);
 });

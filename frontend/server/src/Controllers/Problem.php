@@ -5,7 +5,7 @@
 /**
  * ProblemsController
  *
- * @psalm-type PageItem=array{class: string, label: string, page?: int, url?: string}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -52,7 +52,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 100;
+    const PAGE_SIZE = PROBLEMS_PER_PAGE;
 
     /**
      * Returns a ProblemParams instance from the Request values.
@@ -3342,7 +3342,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
             $page ?: 1,
-            /*$page=*/ null,
             5,
             []
         );
@@ -3405,7 +3404,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
             $page ?: 1,
-            /*$page=*/ null,
             5,
             []
         );
@@ -3878,7 +3876,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'tag' => $tags
         ];
 
-        $pagerItems = \OmegaUp\Pager::paginate(
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
             $response['total'],
             $page ?: 1,
             '/problem/list/',
