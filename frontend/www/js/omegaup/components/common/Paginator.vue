@@ -5,15 +5,9 @@
         <ul class="pagination">
           <li v-for="page in pagerItems" v-bind:class="page.class">
             <a
-              v-if="!!callback"
-              v-bind:class="{ disabled: page.class !== 'active' }"
-              v-on:click="emitCallback(page.page)"
-              >{{ page.label }}</a
-            >
-            <a
-              v-else=""
               v-bind:href="page.url"
               v-bind:class="{ disabled: page.class !== 'active' }"
+              v-on:click="emitCallback(page.page)"
               >{{ page.label }}</a
             >
           </li>
@@ -36,6 +30,9 @@ export default class Paginator extends Vue {
   T = T;
 
   emitCallback(page: number): void {
+    if (!this.callback) {
+      return;
+    }
     this.callback(page);
   }
 }
