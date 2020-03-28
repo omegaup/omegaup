@@ -207,11 +207,22 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
     logging.info('Updating schools solved problems...')
 
     months = 6  # in case this parameter requires adjustments
+    cur.execute('DELETE FROM `Schools_Problems_Solved_Per_Month`')
     cur.execute('''
+        INSERT INTO
+            `Schools_Problems_Solved_Per_Month` (
+                `school_id`,
+                `time`,
+                `problems_solved`
+            )
         SELECT
             `sc`.`school_id`,
-            IFNULL(YEAR(`su`.`time`), 0) AS `year`,
-            IFNULL(MONTH(`su`.`time`), 0) AS `month`,
+            STR_TO_DATE(
+                CONCAT (
+                    YEAR(`su`.`time`), '-', MONTH(`su`.`time`), '-01'
+                ),
+                "%%Y-%%m-%%d"
+            ) AS `time`,
             COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
         FROM
             `Submissions` AS `su`
@@ -239,11 +250,9 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
             )
         GROUP BY
             `sc`.`school_id`,
-            IFNULL(YEAR(`su`.`time`), 0),
-            IFNULL(MONTH(`su`.`time`), 0)
+            `time`
         ORDER BY
-            `year` ASC,
-            `month` ASC;
+            `time` ASC;
     ''', (months,))
 
 
