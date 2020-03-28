@@ -17,7 +17,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`alias` = ? LIMIT 1;';
         $params = [$alias];
-        /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -43,7 +43,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` = ? LIMIT 1;';
 
-        /** @var array{acl_id: int, alias: string, create_time: string, description: null|string, group_id: int, name: string}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
