@@ -1,4 +1,6 @@
-import { OmegaUp, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
 import UI from '../ui.js';
 import problem_Solution from '../components/problem/Solution.vue';
 import Vue from 'vue';

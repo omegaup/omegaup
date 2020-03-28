@@ -182,7 +182,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { OmegaUp, omegaup, T } from '../../omegaup';
+import { OmegaUp, omegaup } from '../../omegaup';
+import T from '../../lang';
 import UI from '../../ui.js';
 import { types } from '../../api_types';
 

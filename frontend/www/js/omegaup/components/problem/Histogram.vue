@@ -164,7 +164,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup';
+import T from '../../lang';
 
 @Component
 export default class ProblemHistogram extends Vue {
@@ -177,25 +177,23 @@ export default class ProblemHistogram extends Vue {
   get tags(): string[] {
     return this.type === 'quality'
       ? [
-          this.T.qualityFormQualityVeryGood,
-          this.T.qualityFormQualityGood,
-          this.T.qualityFormQualityFair,
-          this.T.qualityFormQualityBad,
-          this.T.qualityFormQualityVeryBad,
+          T.qualityFormQualityVeryGood,
+          T.qualityFormQualityGood,
+          T.qualityFormQualityFair,
+          T.qualityFormQualityBad,
+          T.qualityFormQualityVeryBad,
         ]
       : [
-          this.T.qualityFormDifficultyVeryEasy,
-          this.T.qualityFormDifficultyEasy,
-          this.T.qualityFormDifficultyMedium,
-          this.T.qualityFormDifficultyHard,
-          this.T.qualityFormDifficultyVeryHard,
+          T.qualityFormDifficultyVeryEasy,
+          T.qualityFormDifficultyEasy,
+          T.qualityFormDifficultyMedium,
+          T.qualityFormDifficultyHard,
+          T.qualityFormDifficultyVeryHard,
         ];
   }
 
   get title(): string {
-    return this.type === 'quality'
-      ? this.T.wordsQuality
-      : this.T.wordsDifficulty;
+    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
   }
 
   get customHistogram(): number[] {

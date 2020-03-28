@@ -1,5 +1,6 @@
-import { Experiments, EventListenerList, OmegaUp, T, UI } from './omegaup.ts';
+import { Experiments, EventListenerList, OmegaUp, UI } from './omegaup.ts';
 import API from './api.js';
+import T from './lang';
 export { API, EventListenerList, Experiments, OmegaUp, T, UI };
 
 if (

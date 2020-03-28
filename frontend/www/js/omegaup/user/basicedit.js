@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import user_BasicEdit from '../components/user/BasicEdit.vue';
-import { OmegaUp, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
 
 OmegaUp.on('ready', function() {
   let basicEdit = new Vue({

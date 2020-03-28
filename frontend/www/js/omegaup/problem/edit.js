@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {

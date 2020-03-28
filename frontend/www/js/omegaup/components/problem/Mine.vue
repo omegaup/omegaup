@@ -122,7 +122,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import common_Paginator from '../common/Paginator.vue';
-import { omegaup, T } from '../../omegaup.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import { types } from '../../api_types';
 
 @Component({

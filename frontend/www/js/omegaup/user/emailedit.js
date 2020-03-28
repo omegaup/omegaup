@@ -1,6 +1,7 @@
 import user_EmailEdit from '../components/user/EmailEdit.vue';
 import Vue from 'vue';
-import { OmegaUp, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

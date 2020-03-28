@@ -1,6 +1,9 @@
 import common_Stats from '../components/common/Stats.vue';
 import Vue from 'vue';
-import { API, OmegaUp, T, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
   Highcharts.setOptions({ global: { useUTC: false } });
