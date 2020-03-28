@@ -40,7 +40,7 @@ class Pager {
      * @param array<string, string[]|string> $params Additional key => value
      * parameters to append to the item's URL.
      *
-     * @return list<array{class: string, label: string, page: int, url: string}> The
+     * @return list<array{class: string, label: string, page?: int, url?: string}> The
      * information for each item of the pager.
      */
     public static function paginate(
@@ -60,30 +60,50 @@ class Pager {
             $query = '&' . self::buildQueryString($params);
         }
 
-        /** @var list<array{class: string, label: string, page: int, url: string}> */
+        /** @var list<array{class: string, label: string, page?: int, url?: string}> */
         $items = [];
-        $prev = ['label' => '«', 'url' => '', 'class' => '', 'page' => 0];
+        $prev = ['label' => '«', 'class' => ''];
+        if (is_null($url)) {
+            $prev['page'] = 0;
+        } else {
+            $prev['url'] = '';
+        }
         if ($current > 1) {
-            $prev['page'] = ($current - 1);
-            $prev['url'] = "{$url}?page={$prev['page']}{$query}";
+            $prevPage = ($current - 1);
+            if (is_null($url)) {
+                $prev['page'] = $prevPage;
+            } else {
+                $prev['url'] = "{$url}?page={$prevPage}{$query}";
+            }
         } else {
             $prev['class'] = 'disabled';
         }
         $items[] = $prev;
 
         if ($current > $adjacent + 1) {
-            $items[] = [
-                'label' => '1',
-                'url'   => "{$url}?page=1{$query}",
-                'class' => '',
-                'page' => 1,
-            ];
-            $items[] = [
-                'label' => '...',
-                'url'   => '',
-                'class' => 'disabled',
-                'page' => 0,
-            ];
+            if (is_null($url)) {
+                $items[] = [
+                    'label' => '1',
+                    'class' => '',
+                    'page' => 1,
+                ];
+                $items[] = [
+                    'label' => '...',
+                    'class' => 'disabled',
+                    'page' => 0,
+                ];
+            } else {
+                $items[] = [
+                    'label' => '1',
+                    'url'   => "{$url}?page=1{$query}",
+                    'class' => '',
+                ];
+                $items[] = [
+                    'label' => '...',
+                    'url'   => '',
+                    'class' => 'disabled',
+                ];
+            }
         }
 
         for (
@@ -95,33 +115,60 @@ class Pager {
                 $current + $adjacent
             ); $i++
         ) {
-            $items[] = [
-                'label' => strval($i),
-                'url'   => "{$url}?page={$i}{$query}",
-                'class' => ($i == $current) ? 'active' : '',
-                'page' => $i,
-            ];
+            if (is_null($url)) {
+                $items[] = [
+                    'label' => strval($i),
+                    'class' => ($i == $current) ? 'active' : '',
+                    'page' => $i,
+                ];
+            } else {
+                $items[] = [
+                    'label' => strval($i),
+                    'url'   => "{$url}?page={$i}{$query}",
+                    'class' => ($i == $current) ? 'active' : '',
+                ];
+            }
         }
 
         if ($current + $adjacent < $pages) {
-            $items[] = [
-                'label' => '...',
-                'url'   => '',
-                'class' => 'disabled',
-                'page' => 0,
-            ];
-            $items[] = [
-                'label' => strval($pages),
-                'url'   => "{$url}?page={$pages}{$query}",
-                'class' => '',
-                'page' => $pages,
-            ];
+            if (is_null($url)) {
+                $items[] = [
+                    'label' => '...',
+                    'class' => 'disabled',
+                    'page' => 0,
+                ];
+                $items[] = [
+                    'label' => strval($pages),
+                    'class' => '',
+                    'page' => $pages,
+                ];
+            } else {
+                $items[] = [
+                    'label' => '...',
+                    'url'   => '',
+                    'class' => 'disabled',
+                ];
+                $items[] = [
+                    'label' => strval($pages),
+                    'url'   => "{$url}?page={$pages}{$query}",
+                    'class' => '',
+                ];
+            }
         }
 
-        $next = ['label' => '»', 'url' => '', 'class' => '', 'page' => 0];
+        $next = ['label' => '»', 'class' => ''];
+        if (is_null($url)) {
+            $next['page'] = 0;
+        } else {
+            $next['url'] = '';
+        }
         if ($current < $pages) {
-            $next['page'] = ($current + 1);
-            $next['url'] = "{$url}?page={$next['page']}{$query}";
+            $nextPage = ($current + 1);
+            if (is_null($url)) {
+                $next['page'] = $nextPage;
+            } else {
+                $next['url'] = "{$url}?page={$nextPage}{$query}";
+            }
         } else {
             $next['class'] = 'disabled';
         }

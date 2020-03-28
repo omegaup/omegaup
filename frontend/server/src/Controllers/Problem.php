@@ -5,7 +5,7 @@
 /**
  * ProblemsController
  *
- * @psalm-type PageItem=array{class: string, label: string, page: int, url: string}
+ * @psalm-type PageItem=array{class: string, label: string, page?: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS

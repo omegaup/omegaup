@@ -36,6 +36,10 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
+  export interface AssignmentProgress {
+    [key: string]: types.Progress;
+  }
+
   export interface PageItem {
     class: string;
     label: string;
@@ -49,6 +53,11 @@ export namespace types {
     submissions: number;
     accepted: number;
     difficulty: number;
+  }
+
+  export interface Progress {
+    score: number;
+    max_score: number;
   }
 
   export interface UserListItem {
@@ -864,7 +873,7 @@ export namespace messages {
   };
   export type CourseMyProgressRequest = { [key: string]: any };
   export type CourseMyProgressResponse = {
-    assignments: { [key: string]: { score: number; max_score: number } };
+    assignments: types.AssignmentProgress;
   };
   export type CourseRegisterForCourseRequest = { [key: string]: any };
   export type CourseRegisterForCourseResponse = { status: string };
