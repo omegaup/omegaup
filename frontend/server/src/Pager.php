@@ -53,11 +53,6 @@ class Pager {
             $current = 1;
         }
 
-        $query = '';
-        if (!empty($params)) {
-            $query = '&' . self::buildQueryString($params);
-        }
-
         /** @var list<array{class: string, label: string, page: int}> */
         $items = [];
         $prev = ['label' => '«', 'class' => '', 'page' => 0];
