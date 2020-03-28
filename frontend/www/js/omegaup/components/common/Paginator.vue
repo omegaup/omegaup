@@ -7,6 +7,7 @@
             <a
               v-bind:href="page.url"
               v-bind:class="{ disabled: page.class !== 'active' }"
+              v-on:click.prevent="$emit('page-changed', page.page)"
               >{{ page.label }}</a
             >
           </li>
@@ -19,10 +20,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, T } from '../../omegaup';
+import { types } from '../../api_types';
 
 @Component
 export default class Paginator extends Vue {
-  @Prop() pagerItems!: omegaup.Paginator[];
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
 }

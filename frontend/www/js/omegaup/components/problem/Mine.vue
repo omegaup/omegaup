@@ -112,16 +112,27 @@
         </tbody>
       </table>
     </div>
+    <omegaup-common-paginator
+      v-bind:pagerItems="pagerItems"
+      v-on:page-changed="page => $emit('go-to-page', page)"
+    ></omegaup-common-paginator>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import common_Paginator from '../common/Paginator.vue';
 import { omegaup, T } from '../../omegaup.js';
+import { types } from '../../api_types';
 
-@Component
+@Component({
+  components: {
+    'omegaup-common-paginator': common_Paginator,
+  },
+})
 export default class ProblemMine extends Vue {
   @Prop() problems!: omegaup.Problem[];
+  @Prop() pagerItems!: types.PageItem[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
 

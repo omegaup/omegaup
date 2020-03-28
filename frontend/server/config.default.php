@@ -157,11 +157,6 @@ try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 try_define('SMARTY_CACHE_DIR', '/var/tmp');
 
 # #########################
-# PAGER CONSTANTS
-# #########################
-try_define('PROBLEMS_PER_PAGE', 100);
-
-# #########################
 # CONTEST CONSTANTS
 # #########################
 try_define('MAX_PROBLEMS_IN_CONTEST', 30);

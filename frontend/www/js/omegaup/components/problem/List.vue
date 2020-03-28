@@ -135,6 +135,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, T } from '../../omegaup';
+import { types } from '../../api_types';
 import UI from '../../ui.js';
 import common_Paginator from '../common/Paginator.vue';
 import problem_FinderWizard from './FinderWizard.vue';
@@ -149,7 +150,7 @@ export default class ProblemList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];
-  @Prop() pagerItems!: omegaup.Paginator[];
+  @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
 
   T = T;

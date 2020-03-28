@@ -14,6 +14,7 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           privateProblemsAlert: this.privateProblemsAlert,
           isSysadmin: this.isSysadmin,
+          pagerItems: this.pagerItems,
         },
         on: {
           'change-show-all-problems': ev => {
@@ -43,6 +44,11 @@ OmegaUp.on('ready', () => {
                 showProblems(showAllProblems);
               });
           },
+          'go-to-page': pageNumber => {
+            if (pageNumber > 0) {
+              showProblems(showAllProblems, pageNumber);
+            }
+          },
         },
       });
     },
@@ -50,23 +56,28 @@ OmegaUp.on('ready', () => {
       problems: null,
       privateProblemsAlert: payload.privateProblemsAlert,
       isSysadmin: payload.isSysadmin,
+      pagerItems: [],
     },
     components: {
       'omegaup-problem-mine': problem_Mine,
     },
   });
 
-  omegaup.API.Problem.myList()
-    .then(result => {
-      problemsMine.problems = result.problems;
-    })
-    .catch(omegaup.UI.apiError);
-
-  function showProblems(showAllProblems) {
-    (showAllProblems ? API.Problem.adminList() : API.Problem.myList())
+  function showProblems(showAllProblems, pageNumber) {
+    (showAllProblems
+      ? API.Problem.adminList({
+          page: pageNumber,
+        })
+      : API.Problem.myList({
+          page: pageNumber,
+        })
+    )
       .then(result => {
+        problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
       .catch(omegaup.UI.apiError);
   }
+
+  showProblems(showAllProblems, /*pageNumber=*/ 1);
 });
