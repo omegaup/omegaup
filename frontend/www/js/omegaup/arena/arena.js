@@ -1848,7 +1848,7 @@ export class Arena {
         }
         if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
           self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
-          UI.warning(omegaup.T.firstSumbissionWithIdentity);
+          UI.warning(T.firstSumbissionWithIdentity);
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1894,14 +1894,11 @@ export class Arena {
       '#problem .problem-creation-date',
     );
     if (problem.problemsetter && creationDate) {
-      creationDate.innerText = omegaup.UI.formatString(
-        omegaup.T.wordsUploadedOn,
-        {
-          date: omegaup.UI.formatDate(
-            new Date(problem.problemsetter.creation_date * 1000),
-          ),
-        },
-      );
+      creationDate.innerText = UI.formatString(T.wordsUploadedOn, {
+        date: UI.formatDate(
+          new Date(problem.problemsetter.creation_date * 1000),
+        ),
+      });
     }
 
     UI.renderSampleToClipboardButton();

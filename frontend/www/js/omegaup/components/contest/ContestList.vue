@@ -176,7 +176,7 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import UI from '../../ui.js';
 
-@Component({})
+@Component
 export default class List extends Vue {
   @Prop() contests!: omegaup.Contest[];
   @Prop() isAdmin!: boolean;

@@ -73,13 +73,12 @@ export default class UserBasicEdit extends Vue {
   @Prop() username!: string;
 
   T = T;
-  UI = UI;
   newPassword1 = '';
   newPassword2 = '';
 
   formSubmit(): void {
     if (this.newPassword1 != this.newPassword2) {
-      this.UI.error(this.T.userPasswordMustBeSame);
+      UI.error(T.userPasswordMustBeSame);
       return;
     }
     this.$emit('update', this.username, this.newPassword1);

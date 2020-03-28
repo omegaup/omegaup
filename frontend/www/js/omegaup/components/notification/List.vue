@@ -16,11 +16,11 @@
     >
     <ul class="dropdown-menu notification-dropdown">
       <li class="text-center" v-if="notifications.length === 0">
-        {{ this.T.notificationsNoNewNotifications }}
+        {{ T.notificationsNoNewNotifications }}
       </li>
       <li v-else="">
         <a role="button" v-on:click="$emit('read', notifications)"
-          >{{ this.T.notificationsMarkAllAsRead }} ✔️</a
+          >{{ T.notificationsMarkAllAsRead }} ✔️</a
         >
       </li>
       <transition-group name="list"

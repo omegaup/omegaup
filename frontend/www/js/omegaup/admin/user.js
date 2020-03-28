@@ -29,18 +29,18 @@ OmegaUp.on('ready', function() {
                 experiment: experiment.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
           'change-role': function(role) {
@@ -50,18 +50,18 @@ OmegaUp.on('ready', function() {
                 role: role.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                 username: payload.username,
                 role: role.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
           'verify-user': function() {
@@ -69,7 +69,7 @@ OmegaUp.on('ready', function() {
               .then(function() {
                 adminUser.verified = true;
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

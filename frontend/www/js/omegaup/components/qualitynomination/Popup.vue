@@ -229,7 +229,6 @@ label.tag-select:hover {
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import UI from '../../ui.js';
 
 interface ProblemTag {
   text: string;
@@ -294,7 +293,6 @@ export default class QualityNominationPopup extends Vue {
   @Prop() problemAlias!: boolean;
 
   T = T;
-  UI = UI;
   currentView = 'content';
   difficulty = '';
   quality = '';
@@ -323,12 +321,12 @@ export default class QualityNominationPopup extends Vue {
         (x: string): ProblemTag => {
           return {
             value: x,
-            text: this.T[x],
+            text: T[x],
           };
         },
       )
       .sort((a: ProblemTag, b: ProblemTag): number => {
-        return a.text.localeCompare(b.text, this.T.lang);
+        return a.text.localeCompare(b.text, T.lang);
       });
   }
 

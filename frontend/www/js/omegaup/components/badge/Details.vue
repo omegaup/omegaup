@@ -18,7 +18,7 @@
         </div>
         <div class="badge-detail-text">
           <span class="badge-detail-text-icon">👥</span>
-          {{ this.T['badgeOwnersMessage'] }}
+          {{ T['badgeOwnersMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -27,7 +27,7 @@
         </div>
         <div class="badge-detail-text">
           <span class="badge-detail-text-icon">📅</span>
-          {{ this.T['badgeFirstAssignationMessage'] }}
+          {{ T['badgeFirstAssignationMessage'] }}
         </div>
       </div>
       <div class="badge-detail">
@@ -99,14 +99,13 @@ export default class BadgeDetails extends Vue {
   @Prop() badge!: omegaup.Badge;
 
   T = T;
-  UI = UI;
 
   get name(): string {
-    return this.T[`badge_${this.badge.badge_alias}_name`];
+    return T[`badge_${this.badge.badge_alias}_name`];
   }
 
   get description(): string {
-    return this.T[`badge_${this.badge.badge_alias}_description`];
+    return T[`badge_${this.badge.badge_alias}_description`];
   }
 
   get iconUrl(): string {
@@ -115,19 +114,19 @@ export default class BadgeDetails extends Vue {
 
   get ownedMessage(): string {
     return !!this.badge.assignation_time
-      ? `<span class="badge-detail-text-icon">😁</span> ${this.T['badgeAssignationTimeMessage']}`
-      : `<span class="badge-detail-text-icon">😞</span> ${this.T['badgeNotAssignedMessage']}`;
+      ? `<span class="badge-detail-text-icon">😁</span> ${T['badgeAssignationTimeMessage']}`
+      : `<span class="badge-detail-text-icon">😞</span> ${T['badgeNotAssignedMessage']}`;
   }
 
   get firstAssignationDate(): string {
     return this.badge.first_assignation
-      ? this.UI.formatDate(this.badge.first_assignation)
+      ? UI.formatDate(this.badge.first_assignation)
       : '';
   }
 
   get assignationDate(): string {
     return !!this.badge.assignation_time
-      ? this.UI.formatDate(this.badge.assignation_time)
+      ? UI.formatDate(this.badge.assignation_time)
       : '';
   }
 

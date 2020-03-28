@@ -68,7 +68,7 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import UI from '../../ui.js';
 
-@Component({})
+@Component
 export default class GraderStatus extends Vue {
   @Prop() status!: string;
   @Prop() error!: string;

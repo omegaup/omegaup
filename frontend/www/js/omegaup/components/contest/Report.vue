@@ -93,7 +93,7 @@ interface Total {
   points: number;
 }
 
-@Component({})
+@Component
 export default class Report extends Vue {
   @Prop() contestReport!: ContestReport;
   @Prop() contestAlias!: string;

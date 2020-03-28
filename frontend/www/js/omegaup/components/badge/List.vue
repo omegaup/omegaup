@@ -7,7 +7,7 @@
           class="badges-link"
           href="/badge/list/"
           v-if="this.showAllBadgesLink"
-          >{{ this.T.wordsBadgesSeeAll }}</a
+          >{{ T.wordsBadgesSeeAll }}</a
         >
       </h2>
     </div>
@@ -82,7 +82,7 @@ export default class BadgeList extends Vue {
   }
 
   getBadgeName(alias: string): string {
-    return this.T[`badge_${alias}_name`];
+    return T[`badge_${alias}_name`];
   }
 }
 </script>

@@ -34,7 +34,7 @@ OmegaUp.on('ready', function() {
         on: {
           'mark-resolution': function(viewDetails, banProblem) {
             if (!viewDetails.rationale) {
-              omegaup.UI.error(T.editFieldRequired);
+              UI.error(T.editFieldRequired);
               return;
             }
             let newStatus = banProblem ? 'approved' : 'denied';
@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
               rationale: viewDetails.rationale,
             })
               .then(function(data) {
-                omegaup.UI.success(T.qualityNominationResolutionSuccess);
+                UI.success(T.qualityNominationResolutionSuccess);
               })
               .catch(UI.apiError);
           },

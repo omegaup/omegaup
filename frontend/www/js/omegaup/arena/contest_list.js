@@ -6,7 +6,7 @@ import Vue from 'vue';
 import arena_ContestList from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', function() {
-  Date.setLocale(omegaup.T.locale);
+  Date.setLocale(T.locale);
   const payload = JSON.parse(document.getElementById('payload').innerText);
   for (const [timeType, contests] of Object.entries(payload.contests)) {
     payload[timeType] = contests.forEach(contest =>
