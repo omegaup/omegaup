@@ -1,5 +1,6 @@
 import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { UI, OmegaUp, T } from '../omegaup.js';
+import * as api from '../api_transitional';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -15,7 +16,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'get-scoreboard': function(contestAliases) {
-            omegaup.API.Contest.scoreboardMerge({
+            api.Contest.scoreboardMerge({
               contest_aliases: contestAliases.map(encodeURIComponent).join(','),
             })
               .then(function(ranks) {
@@ -57,7 +58,7 @@ OmegaUp.on('ready', function() {
       });
     },
     mounted: function() {
-      API.Contest.list()
+      api.Contest.list()
         .then(function(contests) {
           scoreboardMerge.contests = contests.results;
         })

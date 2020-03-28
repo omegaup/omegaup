@@ -108,7 +108,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
-     * @return list<array{access_time: null|string, country_id: null|string, email: null|string, end_time: null|string, identity_id: int, is_invited: bool, user_id: int|null, username: string}>
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string}>
      */
     final public static function getIdentitiesByProblemset(int $problemsetId): array {
         $sql = '
@@ -134,7 +134,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             WHERE
                 pi.problemset_id = ?;';
 
-        /** @var list<array{access_time: null|string, country_id: null|string, email: null|string, end_time: null|string, identity_id: int, is_invited: bool, user_id: int|null, username: string}> */
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
