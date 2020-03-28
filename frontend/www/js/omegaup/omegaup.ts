@@ -689,7 +689,6 @@ export namespace omegaup {
         () => {
           this.experiments = Experiments.loadGlobal();
         },
-        () => errors.registerReportAnIssue(T.reportAnIssueTemplate),
       ]),
     };
 
