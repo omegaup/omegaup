@@ -40,6 +40,15 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface Badge {
+    assignation_time: Date;
+    badge_alias: string;
+    unlocked: boolean;
+    first_assignation?: Date;
+    total_users: number;
+    owners_count: number;
+  }
+
   export interface Problem {
     title: string;
     alias: string;
@@ -88,11 +97,7 @@ export namespace messages {
 
   // Badge
   export type BadgeBadgeDetailsRequest = { [key: string]: any };
-  export type BadgeBadgeDetailsResponse = {
-    first_assignation?: number;
-    total_users: number;
-    owners_count: number;
-  };
+  export type BadgeBadgeDetailsResponse = types.Badge;
   export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
   export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any };
@@ -100,13 +105,9 @@ export namespace messages {
     assignation_time?: number;
   };
   export type BadgeMyListRequest = { [key: string]: any };
-  export type BadgeMyListResponse = {
-    badges: { assignation_time: string; badge_alias: string }[];
-  };
+  export type BadgeMyListResponse = { badges: types.Badge[] };
   export type BadgeUserListRequest = { [key: string]: any };
-  export type BadgeUserListResponse = {
-    badges: { assignation_time: string; badge_alias: string }[];
-  };
+  export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
@@ -287,6 +288,7 @@ export namespace messages {
     window_length?: number;
   };
   export type ContestListRequest = { [key: string]: any };
+  export type _ContestListServerResponse = any;
   export type ContestListResponse = {
     number_of_results: number;
     results: {
@@ -296,7 +298,7 @@ export namespace messages {
       description: string;
       finish_time: number;
       last_updated: number;
-      original_finish_time: string;
+      original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
       rerun_id: number;
@@ -306,6 +308,7 @@ export namespace messages {
     }[];
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
+  export type _ContestListParticipatingServerResponse = any;
   export type ContestListParticipatingResponse = {
     contests: {
       acl_id: number;
@@ -317,7 +320,7 @@ export namespace messages {
       finish_time: number;
       languages?: string;
       last_updated: number;
-      original_finish_time: string;
+      original_finish_time: Date;
       partial_score: number;
       penalty: number;
       penalty_calc_policy: string;
@@ -338,6 +341,7 @@ export namespace messages {
     }[];
   };
   export type ContestMyListRequest = { [key: string]: any };
+  export type _ContestMyListServerResponse = any;
   export type ContestMyListResponse = {
     contests: {
       acl_id: number;
@@ -349,7 +353,7 @@ export namespace messages {
       finish_time: number;
       languages?: string;
       last_updated: number;
-      original_finish_time: string;
+      original_finish_time: Date;
       partial_score: number;
       penalty: number;
       penalty_calc_policy: string;
@@ -469,13 +473,14 @@ export namespace messages {
     title: string;
   };
   export type ContestRequestsRequest = { [key: string]: any };
+  export type _ContestRequestsServerResponse = any;
   export type ContestRequestsResponse = {
     users: {
       accepted?: boolean;
       admin: { username?: string };
       country?: string;
-      last_update?: string;
-      request_time: string;
+      last_update?: Date;
+      request_time: Date;
       username: string;
     }[];
     contest_alias: string;
@@ -1086,6 +1091,7 @@ export namespace messages {
   export type InterviewCreateRequest = { [key: string]: any };
   export type InterviewCreateResponse = { status: string };
   export type InterviewDetailsRequest = { [key: string]: any };
+  export type _InterviewDetailsServerResponse = any;
   export type InterviewDetailsResponse = {
     description?: string;
     contest_alias?: string;
@@ -1093,7 +1099,7 @@ export namespace messages {
     users: {
       user_id?: number;
       username: string;
-      access_time?: string;
+      access_time?: Date;
       email?: string;
       opened_interview: boolean;
       country?: string;
@@ -1340,6 +1346,7 @@ export namespace messages {
 
   // Problemset
   export type ProblemsetDetailsRequest = { [key: string]: any };
+  export type _ProblemsetDetailsServerResponse = any;
   export type ProblemsetDetailsResponse = {
     admin: boolean;
     admission_mode: string;
@@ -1387,7 +1394,7 @@ export namespace messages {
     submissions_gap: number;
     title: string;
     users: {
-      access_time?: string;
+      access_time?: Date;
       country?: string;
       email?: string;
       opened_interview: boolean;

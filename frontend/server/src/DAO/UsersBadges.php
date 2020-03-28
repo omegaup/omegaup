@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
     /**
-     * @return list<array{assignation_time: string, badge_alias: string}>
+     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}>
      */
     public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
@@ -27,7 +27,7 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
                 ORDER BY
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
-        /** @var list<array{assignation_time: string, badge_alias: string}> */
+        /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 
@@ -58,16 +58,16 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
         return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
-    public static function getBadgeFirstAssignationTime(string $badge): ?int {
+    public static function getBadgeFirstAssignationTime(string $badge): ?\OmegaUp\Timestamp {
         $sql = 'SELECT
-                    UNIX_TIMESTAMP(MIN(ub.assignation_time))
+                    MIN(ub.assignation_time)
                 FROM
                     Users_Badges ub
                 WHERE
                     ub.badge_alias = ?
                 LIMIT 1;';
         $args = [$badge];
-        /** @var int|null */
+        /** @var \OmegaUp\Timestamp|null */
         return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 }
