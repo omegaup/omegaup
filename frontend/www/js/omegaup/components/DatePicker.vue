@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { T } from '../omegaup.js';
+import T from '../lang';
 import UI from '../ui.js';
 import '../../../third_party/js/bootstrap-datepicker.js';
 

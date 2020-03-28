@@ -1,5 +1,8 @@
 import group_Members from '../components/group/Members.vue';
-import { OmegaUp, UI, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import UI from '../ui.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

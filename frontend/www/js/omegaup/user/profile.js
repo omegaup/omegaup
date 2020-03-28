@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {

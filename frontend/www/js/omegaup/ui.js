@@ -1,5 +1,5 @@
 import API from './api.js';
-import { T } from './omegaup.js';
+import T from './lang';
 import * as moment from 'moment';
 
 let UI = {

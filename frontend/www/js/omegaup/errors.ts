@@ -1,13 +1,15 @@
+import T from './lang';
+
 const _errors: Array<any> = [];
 
 export function addError(error: any): void {
   _errors.push(error);
 }
 
-export function reportAnIssueURL(reportAnIssueTemplate: string): string {
+export function reportAnIssueURL(): string {
   // Not using UI.formatString() to avoid creating a circular
   // dependency.
-  const issueBody = reportAnIssueTemplate
+  const issueBody = T.reportAnIssueTemplate
     .replace(
       '%(userAgent)',
       window && window.navigator ? window.navigator.userAgent : '(null)',

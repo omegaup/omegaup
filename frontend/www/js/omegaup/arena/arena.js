@@ -1,4 +1,5 @@
-import { OmegaUp, T } from '../omegaup';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
 import API from '../api.js';
 import * as api from '../api_transitional';
 import ArenaAdmin from './admin_arena.js';

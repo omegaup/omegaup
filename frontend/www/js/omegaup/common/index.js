@@ -1,5 +1,7 @@
 import common_Index from '../components/common/Index.vue';
-import { UI, OmegaUp, T } from '../omegaup';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import UI from '../ui.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

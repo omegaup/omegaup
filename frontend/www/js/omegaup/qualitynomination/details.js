@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {

@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup';
+import T from '../../lang';
 import user_Username from '../user/Username.vue';
 
 @Component({

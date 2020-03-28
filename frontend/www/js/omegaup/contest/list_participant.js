@@ -1,5 +1,6 @@
 import contest_List from '../components/contest/ContestList.vue';
-import { OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
