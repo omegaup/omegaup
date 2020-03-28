@@ -77,7 +77,7 @@ export default {
 
     addUser: api.Contest.addUser,
 
-    adminDetails: api.apiCall('/api/contest/admindetails/', function(contest) {
+    adminDetails: api.apiCall('/api/contest/adminDetails/', function(contest) {
       // We cannot use |_normalizeContestFields| because admins need to be
       // able to get the unmodified times.
       contest.start_time = new Date(contest.start_time * 1000);
@@ -90,7 +90,7 @@ export default {
       return contest;
     }),
 
-    adminList: api.apiCall('/api/contest/adminlist/', function(result) {
+    adminList: api.apiCall('/api/contest/adminList/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
         OmegaUp.convertTimes(contest);
@@ -100,7 +100,7 @@ export default {
 
     admins: api.Contest.admins,
 
-    arbitrateRequest: api.Contest.arbitraterequest,
+    arbitrateRequest: api.Contest.arbitrateRequest,
 
     clarifications: api.apiCall('/api/contest/clarifications/', function(data) {
       for (var idx in data.clarifications) {
@@ -114,7 +114,7 @@ export default {
 
     create: api.Contest.create,
 
-    createVirtual: api.Contest.createvirtual,
+    createVirtual: api.Contest.createVirtual,
 
     clone: api.Contest.clone,
 
@@ -128,7 +128,7 @@ export default {
       return result;
     }),
 
-    myList: api.apiCall('/api/contest/mylist/', function(result) {
+    myList: api.apiCall('/api/contest/myList/', function(result) {
       for (var idx in result.contests) {
         var contest = result.contests[idx];
         OmegaUp.convertTimes(contest);
@@ -141,11 +141,11 @@ export default {
     problems: api.Contest.problems,
 
     publicDetails: api.apiCall(
-      '/api/contest/publicdetails/',
+      '/api/contest/publicDetails/',
       _normalizeContestFields,
     ),
 
-    registerForContest: api.Contest.registerforcontest,
+    registerForContest: api.Contest.registerForContest,
 
     removeAdmin: api.Contest.removeAdmin,
 
@@ -165,7 +165,7 @@ export default {
 
     scoreboard: api.Contest.scoreboard,
 
-    scoreboardMerge: api.Contest.scoreboardmerge,
+    scoreboardMerge: api.Contest.scoreboardMerge,
 
     stats: api.Contest.stats,
 
@@ -260,7 +260,7 @@ export default {
      * @param {string} problem_alias
      * @return {Promise}
      */
-    apiGetProblemUsers: api.Course.getProblemUsers,
+    getProblemUsers: api.Course.getProblemUsers,
 
     listAssignments: api.apiCall('/api/course/listAssignments/', function(
       result,
@@ -430,7 +430,7 @@ export default {
       return data;
     }),
 
-    myList: api.apiCall('/api/qualityNomination/mylist/', function(data) {
+    myList: api.apiCall('/api/qualityNomination/myList/', function(data) {
       data.nominations.forEach(nomination => {
         nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
       });
@@ -467,15 +467,15 @@ export default {
     list: api.School.list,
 
     monthlySolvedProblemsCount: api.apiCall(
-      '/api/school/monthlysolvedproblemscount',
+      '/api/school/monthlySolvedProblemsCount',
     ),
 
     rank: api.School.rank,
 
-    schoolsOfTheMonth: api.School.schoolsofthemonth,
+    schoolsOfTheMonth: api.School.schoolsOfTheMonth,
 
     schoolCodersOfTheMonth: api.apiCall(
-      '/api/school/schoolcodersofthemonth',
+      '/api/school/schoolCodersOfTheMonth',
       function(data) {
         data.coders = data.coders.map(
           coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
@@ -484,7 +484,7 @@ export default {
       },
     ),
 
-    selectSchoolOfTheMonth: api.School.selectschoolofthemonth,
+    selectSchoolOfTheMonth: api.School.selectSchoolOfTheMonth,
 
     users: api.apiCall('/api/school/users/', function(data) {
       data.users = data.users.map(
@@ -505,7 +505,7 @@ export default {
 
   Submission: {
     latestSubmissions: api.apiCall(
-      '/api/submission/latestsubmissions/',
+      '/api/submission/latestSubmissions/',
       function(data) {
         data.submissions.forEach(submission => {
           submission.time = new Date(submission.time * 1000);
@@ -532,7 +532,7 @@ export default {
 
     changePassword: api.User.changepassword,
 
-    contestStats: api.apiCall('/api/user/conteststats/', function(data) {
+    contestStats: api.apiCall('/api/user/contestStats/', function(data) {
       let contests = [];
       for (let contestAlias in data.contests) {
         const now = new Date();
@@ -546,7 +546,7 @@ export default {
       return contests;
     }),
 
-    coderOfTheMonthList: api.User.coderofthemonthlist,
+    coderOfTheMonthList: api.User.coderOfTheMonthList,
 
     /**
      * Creates a new user.
@@ -578,7 +578,7 @@ export default {
       },
     ),
 
-    problemsSolved: api.apiCall('/api/user/problemssolved/', function(data) {
+    problemsSolved: api.apiCall('/api/user/problemsSolved/', function(data) {
       if (data.hasOwnProperty('problems')) {
         data.problems = data.problems.map(
           problem => new types.Problem(problem),
@@ -587,7 +587,7 @@ export default {
       return data;
     }),
 
-    problemsCreated: api.apiCall('/api/user/problemscreated', function(data) {
+    problemsCreated: api.apiCall('/api/user/problemsCreated', function(data) {
       if (data.hasOwnProperty('problems')) {
         data.problems = data.problems.map(
           problem => new types.Problem(problem),
@@ -610,11 +610,11 @@ export default {
 
     rankByProblemsSolved: api.User.rankByProblemsSolved,
 
-    removeExperiment: api.User.removeexperiment,
+    removeExperiment: api.User.removeExperiment,
 
-    removeGroup: api.User.removegroup,
+    removeGroup: api.User.removeGroup,
 
-    removeRole: api.User.removerole,
+    removeRole: api.User.removeRole,
 
     stats: api.User.stats,
 
@@ -622,10 +622,10 @@ export default {
 
     update: api.User.update,
 
-    updateBasicInfo: api.User.updatebasicinfo,
+    updateBasicInfo: api.User.updateBasicInfo,
 
     updateMainEmail: api.User.updateMainEmail,
 
-    verifyEmail: api.User.verifyemail,
+    verifyEmail: api.User.verifyEmail,
   },
 };
