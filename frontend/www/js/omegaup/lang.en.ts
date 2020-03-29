@@ -1165,6 +1165,7 @@ const translations: { [key: string]: string; } = {
   wordsLanguage: "Language",
   wordsLanguages: "Languages",
   wordsLatestSubmissions: "Latest submissions",
+  wordsLecture: "Lecture",
   wordsLevels: "Dificult levels",
   wordsLiveStatistics: "Live statistics",
   wordsLogs: "Logs",
