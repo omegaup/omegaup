@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import problem_Mine from '../components/problem/Mine.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -76,7 +78,7 @@ OmegaUp.on('ready', () => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
-      .catch(omegaup.UI.apiError);
+      .catch(UI.apiError);
   }
 
   showProblems(showAllProblems, /*pageNumber=*/ 1);

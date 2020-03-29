@@ -1,5 +1,7 @@
 import { Arena } from '../arena/arena.js';
-import { API, UI, OmegaUp } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(

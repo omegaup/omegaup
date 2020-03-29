@@ -1,6 +1,9 @@
 import common_Stats from '../components/common/Stats.vue';
 import Vue from 'vue';
-import { API, OmegaUp, T, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   Highcharts.setOptions({ global: { useUTC: false } });
@@ -190,11 +193,11 @@ OmegaUp.on('ready', function() {
     if (entityType === 'contest') {
       API.Contest.stats({ contest_alias: payload.alias })
         .then(s => Vue.set(statsChart, 'stats', s))
-        .catch(omegaup.UI.apiError);
+        .catch(UI.apiError);
     } else {
       API.Problem.stats({ problem_alias: payload.alias })
         .then(s => Vue.set(statsChart, 'stats', s))
-        .catch(omegaup.UI.apiError);
+        .catch(UI.apiError);
     }
   }
 

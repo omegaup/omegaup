@@ -1744,7 +1744,11 @@ export namespace messages {
   }[];
   export type SchoolMonthlySolvedProblemsCountRequest = { [key: string]: any };
   export type SchoolMonthlySolvedProblemsCountResponse = {
-    distinct_problems_solved: { year: number; month: number; count: number }[];
+    distinct_problems_solved: {
+      month: number;
+      problems_solved: number;
+      year: number;
+    }[];
   };
   export type SchoolRankRequest = { [key: string]: any };
   export type SchoolRankResponse = {

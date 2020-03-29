@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import problem_Feedback from '../components/problem/Feedback.vue';
-import { OmegaUp } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

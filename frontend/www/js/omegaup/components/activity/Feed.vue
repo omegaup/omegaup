@@ -151,8 +151,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
-import UI from '../../ui.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 import user_Username from '../user/Username.vue';
 
 interface Mapping {
@@ -196,8 +197,8 @@ export default class ActivityFeed extends Vue {
 
   get wordsReportSummary(): string {
     return this.type == 'contest'
-      ? this.T.wordsActivityReportSummaryContest
-      : this.T.wordsActivityReportSummaryCourse;
+      ? T.wordsActivityReportSummaryContest
+      : T.wordsActivityReportSummaryCourse;
   }
 
   get classByUser(): { [key: string]: string } {

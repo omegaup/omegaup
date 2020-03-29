@@ -1,4 +1,5 @@
-import { OmegaUp, T } from '../omegaup';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
 import API from '../api.js';
 import * as api from '../api_transitional';
 import ArenaAdmin from './admin_arena.js';
@@ -11,7 +12,7 @@ import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import common_Navbar from '../components/common/Navbar.vue';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import Vue from 'vue';
 import * as ko from 'knockout';
 import * as secureBindingsProvider from 'knockout-secure-binding';
@@ -1850,7 +1851,7 @@ export class Arena {
         }
         if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
           self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
-          UI.warning(omegaup.T.firstSumbissionWithIdentity);
+          UI.warning(T.firstSumbissionWithIdentity);
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1896,14 +1897,11 @@ export class Arena {
       '#problem .problem-creation-date',
     );
     if (problem.problemsetter && creationDate) {
-      creationDate.innerText = omegaup.UI.formatString(
-        omegaup.T.wordsUploadedOn,
-        {
-          date: omegaup.UI.formatDate(
-            new Date(problem.problemsetter.creation_date * 1000),
-          ),
-        },
-      );
+      creationDate.innerText = UI.formatString(T.wordsUploadedOn, {
+        date: UI.formatDate(
+          new Date(problem.problemsetter.creation_date * 1000),
+        ),
+      });
     }
 
     UI.renderSampleToClipboardButton();

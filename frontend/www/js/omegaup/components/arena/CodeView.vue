@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { T } from '../../omegaup';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 import { codemirror } from 'vue-codemirror-lite';
 
 const languageModeMap: {

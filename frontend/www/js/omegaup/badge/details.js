@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import badge_Details from '../components/badge/Details.vue';
-import { OmegaUp, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

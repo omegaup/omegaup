@@ -1,5 +1,8 @@
 import course_Details from '../components/course/CourseDetails.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

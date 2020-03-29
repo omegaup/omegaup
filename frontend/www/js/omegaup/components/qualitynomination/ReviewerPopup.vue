@@ -70,8 +70,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Popup from './Popup.vue';
-import { T } from '../../omegaup';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 
 @Component({
   components: {

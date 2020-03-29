@@ -6,8 +6,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 
 @Component
 export default class CoderOfTheMonthNotice extends Vue {

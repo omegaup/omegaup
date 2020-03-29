@@ -96,19 +96,17 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        /*
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_count' => 3,
         ]))['distinct_problems_solved'];
         $this->assertCount(1, $response); // one month, the first one
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
-            $response[0]['count'],
+            $response[0]['problems_solved'],
             $firstMonthExpectedCount
         );
-        */
 
         // One month ago:
         // user2 => problem0, problem1 = 2 distinct problems
@@ -169,24 +167,22 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
             strtotime($runCreationDate)
         );
 
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        /*
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_count' => 3,
         ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // two months (first and second)
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
-            $response[0]['count'],
+            $response[0]['problems_solved'],
             $firstMonthExpectedCount
         );
         $this->assertEquals($response[1]['month'], $secondMonthNumber);
         $this->assertEquals(
-            $response[1]['count'],
+            $response[1]['problems_solved'],
             $secondMonthExpectedCount
         );
-        */
 
         // This month:
         // user1 => problem1 (he has already solved it, doesn't count)
@@ -201,14 +197,12 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        /*
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
         $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
             'school_id' => $schoolData['school']->school_id,
-            'months_count' => 3,
         ]))['distinct_problems_solved'];
         $this->assertCount(2, $response); // just two months (first and second)
-        */
     }
 
     /**

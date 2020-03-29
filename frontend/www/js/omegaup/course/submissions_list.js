@@ -1,5 +1,8 @@
 import course_SubmissionsList from '../components/activity/SubmissionsList.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 
 let course_alias = /\/course\/([^\/]+)\/list\/?/.exec(

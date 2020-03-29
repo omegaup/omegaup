@@ -161,8 +161,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, OmegaUp, T } from '../../omegaup';
-import UI from '../../ui.js';
+import { omegaup, OmegaUp } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_Admins from './Admins.vue';
 import contest_Clone from './Clone.vue';

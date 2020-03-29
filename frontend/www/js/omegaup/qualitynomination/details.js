@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
@@ -32,7 +34,7 @@ OmegaUp.on('ready', function() {
         on: {
           'mark-resolution': function(viewDetails, banProblem) {
             if (!viewDetails.rationale) {
-              omegaup.UI.error(T.editFieldRequired);
+              UI.error(T.editFieldRequired);
               return;
             }
             let newStatus = banProblem ? 'approved' : 'denied';
@@ -43,7 +45,7 @@ OmegaUp.on('ready', function() {
               rationale: viewDetails.rationale,
             })
               .then(function(data) {
-                omegaup.UI.success(T.qualityNominationResolutionSuccess);
+                UI.success(T.qualityNominationResolutionSuccess);
               })
               .catch(UI.apiError);
           },

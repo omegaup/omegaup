@@ -1,8 +1,10 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;

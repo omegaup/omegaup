@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { API, OmegaUp, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 import school_Profile from '../components/schools/Profile.vue';
 
 OmegaUp.on('ready', function() {
@@ -51,7 +53,6 @@ OmegaUp.on('ready', function() {
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,
-    months_count: 6,
   })
     .then(function(data) {
       schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;

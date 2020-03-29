@@ -127,10 +127,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 
-@Component({})
+@Component
 export default class AdminSupport extends Vue {
   @Prop() username!: string;
   @Prop() verified!: boolean;

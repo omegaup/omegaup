@@ -135,7 +135,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 
 interface GroupVisibility {

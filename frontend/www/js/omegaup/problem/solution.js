@@ -1,5 +1,7 @@
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 import problem_Solution from '../components/problem/Solution.vue';
 import Vue from 'vue';
 
@@ -39,7 +41,7 @@ OmegaUp.on('ready', function() {
                   }),
                 );
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           'get-tokens': function() {
             API.ProblemForfeited.getCounts({})
@@ -50,7 +52,7 @@ OmegaUp.on('ready', function() {
                   UI.warning(T.solutionNoTokens);
                 }
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           'get-solution': function() {
             if (payload['solution_status'] === 'unlocked') {
@@ -64,7 +66,7 @@ OmegaUp.on('ready', function() {
                     data.solution.images,
                   );
                 })
-                .catch(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
         },

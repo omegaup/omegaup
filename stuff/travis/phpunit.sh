@@ -5,10 +5,8 @@
 stage_before_install() {
 	init_submodules
 
-	if [[ "${UBUNTU}" == "focal" ]]; then
-		# In addition to the newer PHP version, this needs MySQL 8.
-		install_mysql8
-	fi
+	# In addition to the newer PHP version, this needs MySQL 8.
+	install_mysql8
 }
 
 stage_install() {
@@ -32,12 +30,7 @@ stage_before_script() {
 	mysql -uroot -e "CREATE USER 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
 	python3 stuff/db-migrate.py --username=travis --password= \
 		migrate --databases=omegaup-test
-	if [[ "${UBUNTU}" == "focal" ]]; then
-		# MySQL 8 uses a _slightly_ different syntax.
-		mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
-	else
-		mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
-	fi
+	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
 }
 
 stage_script() {

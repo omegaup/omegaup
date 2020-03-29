@@ -1,6 +1,9 @@
 import user_ManageIdentities from '../components/user/ManageIdentities.vue';
 import Vue from 'vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 
 OmegaUp.on('ready', function() {
   let manageIdentities = new Vue({

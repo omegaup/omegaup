@@ -134,9 +134,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import { types } from '../../api_types';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 import common_Paginator from '../common/Paginator.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 
@@ -179,9 +180,9 @@ export default class ProblemList extends Vue {
   }
 
   iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility >= 2) return this.T.wordsHighQualityProblem;
-    else if (visibility < 0) return this.T.wordsBannedProblem;
-    else if (visibility == 0) return this.T.wordsPrivate;
+    if (qualitySeal || visibility >= 2) return T.wordsHighQualityProblem;
+    else if (visibility < 0) return T.wordsBannedProblem;
+    else if (visibility == 0) return T.wordsPrivate;
     return '';
   }
 

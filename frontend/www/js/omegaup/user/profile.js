@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -211,5 +213,5 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       viewProfile.charts = data;
     })
-    .catch(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });
