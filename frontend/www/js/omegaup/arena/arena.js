@@ -400,7 +400,6 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
-      console.log(self.options.courseAlias);
       self.elements.navBar = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
