@@ -53,7 +53,6 @@ OmegaUp.on('ready', function() {
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,
-    months_count: 6,
   })
     .then(function(data) {
       schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;

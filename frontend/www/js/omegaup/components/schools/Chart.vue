@@ -53,7 +53,7 @@ export default {
   methods: {
     renderData: function() {
       const solvedProblemsCountData = this.data.map(
-        solvedProblemsCount => solvedProblemsCount.count,
+        solvedProblemsCount => solvedProblemsCount.problems_solved,
       );
       const solvedProblemsCountCategories = this.data.map(
         solvedProblemsCount =>

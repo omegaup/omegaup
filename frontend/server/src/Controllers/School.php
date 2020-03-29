@@ -182,14 +182,13 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the number of solved problems on the last X
+     * Returns the number of solved problems on the last
      * months (including the current one)
      * @param \OmegaUp\Request $r
-     * @return array{distinct_problems_solved: list<array{year: int, month: int, count: int}>}
+     * @return array{distinct_problems_solved: list<array{month: int, problems_solved: int, year: int}>}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
-        $r->ensureInt('months_count');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
         if (is_null($school)) {
@@ -198,8 +197,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return [
             'distinct_problems_solved' => \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
-                intval($r['school_id']),
-                intval($r['months_count'])
+                intval($r['school_id'])
             ),
         ];
     }
