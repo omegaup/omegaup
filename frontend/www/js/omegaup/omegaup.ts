@@ -237,7 +237,7 @@ export namespace omegaup {
   export interface ContestProblem {
     alias: string;
     text: string;
-    isPractice: boolean;
+    acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
     active: boolean;

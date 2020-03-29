@@ -400,6 +400,7 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
+      console.log(self.options.courseAlias);
       self.elements.navBar = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
@@ -407,7 +408,7 @@ export class Arena {
             props: {
               problems: this.problems,
               activeProblem: this.activeProblem,
-              inContest: this.inContest,
+              inAssignment: this.inAssignment,
             },
             on: {
               'navigate-to-problem': function(problemAlias) {
@@ -419,7 +420,9 @@ export class Arena {
         data: {
           problems: [],
           activeProblem: null,
-          inContest: self.options.contestAlias !== null,
+          inAssignment:
+            typeof self.options.courseAlias !== 'undefined' &&
+            self.options.courseAlias !== null,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
@@ -733,7 +736,7 @@ export class Arena {
         self.elements.navBar.problems.push({
           alias: problem.alias,
           text: problemName,
-          isPractice: problem.languages !== '',
+          acceptsSubmissions: problem.languages !== '',
           bestScore: 0,
           maxScore: problem.points,
         });

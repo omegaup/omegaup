@@ -9,11 +9,11 @@
     >
       <div class="row">
         <div class="col-xs-6 problem-type">
-          <span v-if="!inContest">{{
-            getProblemTypeTitle(problem.isPractice)
+          <span v-if="inAssignment">{{
+            getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
-        <div class="col-xs-6 solved" v-if="problem.isPractice">
+        <div class="col-xs-6 solved" v-if="problem.acceptsSubmissions">
           <span
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
@@ -83,13 +83,13 @@ import { omegaup, T } from '../../omegaup';
 export default class ArenaNavbarProblems extends Vue {
   @Prop() problems!: omegaup.ContestProblem[];
   @Prop() activeProblem!: string;
-  @Prop() inContest!: boolean;
+  @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
 
   T = T;
 
-  getProblemTypeTitle(isPractice: boolean): string {
-    return isPractice ? T.wordsPractice : T.wordsReading;
+  getProblemTypeTitle(acceptsSubmissions: boolean): string {
+    return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
   }
 }
 </script>
