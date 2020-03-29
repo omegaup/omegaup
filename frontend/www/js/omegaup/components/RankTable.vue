@@ -121,7 +121,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import Autocomplete from './Autocomplete.vue';
 import CountryFlag from './CountryFlag.vue';
 import user_Username from './user/Username.vue';

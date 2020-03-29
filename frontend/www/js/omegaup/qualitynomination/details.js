@@ -3,7 +3,7 @@ import qualitynomination_Details from '../components/qualitynomination/Details.v
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);

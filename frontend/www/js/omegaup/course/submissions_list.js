@@ -1,7 +1,7 @@
 import course_SubmissionsList from '../components/activity/SubmissionsList.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 

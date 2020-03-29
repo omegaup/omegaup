@@ -1,4 +1,3 @@
-import UI from './ui.js';
 import * as types from './types.ts';
 import { OmegaUp } from './omegaup';
 import * as api from './api_transitional';

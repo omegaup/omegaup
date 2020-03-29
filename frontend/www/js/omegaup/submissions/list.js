@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import submissions_List from '../components/submissions/List.vue';
 
 OmegaUp.on('ready', function() {

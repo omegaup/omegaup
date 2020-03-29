@@ -1,7 +1,7 @@
 import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import * as api from '../api_transitional';
 import Vue from 'vue';
 

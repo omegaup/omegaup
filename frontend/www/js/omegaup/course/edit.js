@@ -7,7 +7,7 @@ import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Clone from '../components/course/Clone.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import Sortable from 'sortablejs';

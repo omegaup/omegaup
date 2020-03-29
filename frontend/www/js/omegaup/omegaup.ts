@@ -1,8 +1,6 @@
-import UI from './ui.js';
+import * as ui from './ui_transitional';
 import * as api from './api_transitional';
 import * as errors from './errors';
-
-export { UI };
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -696,7 +694,7 @@ export namespace omegaup {
             this._notify('ready');
           }
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     }
 
     _notify(eventName: string): void {

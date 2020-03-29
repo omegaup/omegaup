@@ -4,7 +4,7 @@ import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;

@@ -66,7 +66,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 
 @Component
 export default class UserBasicEdit extends Vue {
