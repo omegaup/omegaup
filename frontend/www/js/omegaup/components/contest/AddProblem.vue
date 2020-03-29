@@ -128,7 +128,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import UI from '../../ui.js';
 import Autocomplete from '../Autocomplete.vue';
 import problem_Versions from '../problem/Versions.vue';

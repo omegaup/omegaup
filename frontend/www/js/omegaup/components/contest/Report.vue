@@ -75,7 +75,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import UI from '../../ui.js';
 
 interface ContestReport {
@@ -92,7 +93,7 @@ interface Total {
   points: number;
 }
 
-@Component({})
+@Component
 export default class Report extends Vue {
   @Prop() contestReport!: ContestReport;
   @Prop() contestAlias!: string;

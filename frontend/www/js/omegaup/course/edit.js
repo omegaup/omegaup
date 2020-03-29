@@ -5,7 +5,10 @@ import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Form from '../components/course/Form.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Clone from '../components/course/Clone.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import UI from '../ui.js';
+import T from '../lang';
 import Vue from 'vue';
 import Sortable from 'sortablejs';
 
@@ -99,10 +102,10 @@ OmegaUp.on('ready', function() {
               assignment_alias: assignment.alias,
             })
               .then(function(data) {
-                omegaup.UI.success(omegaup.T.courseAssignmentDeleted);
+                UI.success(T.courseAssignmentDeleted);
                 refreshAssignmentsList();
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           new: function() {
             assignmentDetails.show = true;
@@ -140,10 +143,10 @@ OmegaUp.on('ready', function() {
               usernameOrEmail: useradmin,
             })
               .then(function(data) {
-                omegaup.UI.success(omegaup.T.adminAdded);
+                UI.success(T.adminAdded);
                 refreshCourseAdmins();
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           'add-group-admin': function(groupadmin) {
             omegaup.API.Course.addGroupAdmin({
@@ -151,10 +154,10 @@ OmegaUp.on('ready', function() {
               group: groupadmin,
             })
               .then(function(data) {
-                omegaup.UI.success(omegaup.T.groupAdminAdded);
+                UI.success(T.groupAdminAdded);
                 refreshCourseAdmins();
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -205,10 +208,10 @@ OmegaUp.on('ready', function() {
               assignment_alias: assignment.alias,
             })
               .then(function(data) {
-                omegaup.UI.success(omegaup.T.courseAssignmentDeleted);
+                UI.success(T.courseAssignmentDeleted);
                 refreshAssignmentsList();
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           new: onNewAssignment,
           'sort-homeworks': function(courseAlias, homeworks) {
@@ -219,7 +222,7 @@ OmegaUp.on('ready', function() {
             omegaup.API.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: homeworks,
-            }).catch(omegaup.UI.apiError);
+            }).catch(UI.apiError);
           },
           'sort-tests': function(courseAlias, tests) {
             let index = 1;
@@ -231,7 +234,7 @@ OmegaUp.on('ready', function() {
               assignments: tests,
             })
               .then(function(response) {})
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -273,11 +276,11 @@ OmegaUp.on('ready', function() {
 
               omegaup.API.Course.updateAssignment(params)
                 .then(function() {
-                  omegaup.UI.success(omegaup.T.courseAssignmentUpdated);
+                  UI.success(T.courseAssignmentUpdated);
                   refreshAssignmentsList();
                 })
                 .catch(function(error) {
-                  omegaup.UI.apiError(error);
+                  UI.apiError(error);
                   assignmentDetails.show = true;
                 });
             } else {
@@ -298,12 +301,12 @@ OmegaUp.on('ready', function() {
 
               omegaup.API.Course.createAssignment(params)
                 .then(function() {
-                  omegaup.UI.success(omegaup.T.courseAssignmentAdded);
+                  UI.success(T.courseAssignmentAdded);
                   updateNewAssignmentButtonVisibility(true);
                   refreshAssignmentsList();
                 })
                 .catch(function(error) {
-                  omegaup.UI.apiError(error);
+                  UI.apiError(error);
                   assignmentDetails.show = true;
                 });
             }
@@ -420,9 +423,9 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 refreshProblemList(assignment);
                 problemList.$children[0].showForm = false;
-                omegaup.UI.success(T.courseAssignmentProblemAdded);
+                UI.success(T.courseAssignmentProblemAdded);
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           assignment: function(assignment) {
             refreshProblemList(assignment);
@@ -443,10 +446,10 @@ OmegaUp.on('ready', function() {
               assignment_alias: assignment.alias,
             })
               .then(function(response) {
-                omegaup.UI.success(T.courseAssignmentProblemRemoved);
+                UI.success(T.courseAssignmentProblemRemoved);
                 refreshProblemList(assignment);
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           sort: function(assignment, assignmentProblems) {
             let index = 1;
@@ -460,14 +463,14 @@ OmegaUp.on('ready', function() {
               problems: assignmentProblems,
             })
               .then(function(response) {})
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           tags: function(tags) {
             omegaup.API.Problem.list({ tag: tags.join() })
               .then(function(data) {
                 problemList.taggedProblems = data.results;
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -557,13 +560,13 @@ OmegaUp.on('ready', function() {
               start_time: ev.startTime.getTime() / 1000,
             })
               .then(function(data) {
-                omegaup.UI.success(
+                UI.success(
                   UI.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: ev.alias,
                   }),
                 );
               })
-              .catch(omegaup.UI.apiError);
+              .catch(UI.apiError);
           },
           cancel: function(ev) {
             window.location = '/course/' + courseAlias + '/';
@@ -632,7 +635,7 @@ OmegaUp.on('ready', function() {
       .then(function(response) {
         problemList.assignmentProblems = response.problems;
       })
-      .catch(omegaup.UI.apiError);
+      .catch(UI.apiError);
   }
 
   function refreshCourseAdmins() {

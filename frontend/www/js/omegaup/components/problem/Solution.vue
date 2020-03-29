@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { T } from '../../omegaup';
+import T from '../../lang';
 import UI from '../../ui.js';
 
 @Component
@@ -72,13 +72,13 @@ export default class ProblemSolution extends Vue {
   get statusMessage(): string {
     switch (this.status) {
       case 'unlocked':
-        return this.T.solutionConfirm;
+        return T.solutionConfirm;
       case 'locked':
-        return this.T.solutionLocked;
+        return T.solutionLocked;
       case 'not_found':
-        return this.T.solutionNotFound;
+        return T.solutionNotFound;
       case 'not_logged_in':
-        return this.T.solutionNotLoggedIn;
+        return T.solutionNotLoggedIn;
       default:
         return '';
     }

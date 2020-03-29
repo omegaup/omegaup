@@ -387,7 +387,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';

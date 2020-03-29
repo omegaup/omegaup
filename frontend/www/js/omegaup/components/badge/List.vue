@@ -7,7 +7,7 @@
           class="badges-link"
           href="/badge/list/"
           v-if="this.showAllBadgesLink"
-          >{{ this.T.wordsBadgesSeeAll }}</a
+          >{{ T.wordsBadgesSeeAll }}</a
         >
       </h2>
     </div>
@@ -40,7 +40,8 @@ a.badges-link {
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import Badge from '../badge/Badge.vue';
 
 @Component({
@@ -81,7 +82,7 @@ export default class BadgeList extends Vue {
   }
 
   getBadgeName(alias: string): string {
-    return this.T[`badge_${alias}_name`];
+    return T[`badge_${alias}_name`];
   }
 }
 </script>

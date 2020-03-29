@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import activity_Feed from '../components/activity/Feed.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
@@ -15,13 +16,13 @@ OmegaUp.on('ready', function() {
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(omegaup.UI.apiError);
+      .catch(UI.apiError);
   } else if (problemsetType == 'course') {
     API.Course.activityReport({ course_alias: problemsetAlias })
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(omegaup.UI.apiError);
+      .catch(UI.apiError);
   }
 
   function createComponent(problemsetType, problemsetAlias, report) {

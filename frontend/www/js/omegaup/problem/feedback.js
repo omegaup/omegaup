@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import problem_Feedback from '../components/problem/Feedback.vue';
-import { OmegaUp } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {

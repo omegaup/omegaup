@@ -83,7 +83,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import UI from '../../ui.js';
 
 @Component
@@ -93,7 +94,6 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() initialLanguage!: string;
 
   T = T;
-  UI = UI;
   commitMessage = '';
   currentLanguage = this.initialLanguage;
   currentMarkdown = this.markdownContents;
@@ -103,11 +103,11 @@ export default class ProblemStatementEdit extends Vue {
   getLanguageNameText(language: string): string {
     switch (language) {
       case 'en':
-        return this.T.statementLanguageEn;
+        return T.statementLanguageEn;
       case 'es':
-        return this.T.statementLanguageEs;
+        return T.statementLanguageEs;
       case 'pt':
-        return this.T.statementLanguagePt;
+        return T.statementLanguagePt;
       default:
         return '';
     }

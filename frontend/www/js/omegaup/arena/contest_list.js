@@ -1,9 +1,12 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import UI from '../ui.js';
+import T from '../lang';
 import Vue from 'vue';
 import arena_ContestList from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', function() {
-  Date.setLocale(omegaup.T.locale);
+  Date.setLocale(T.locale);
   const payload = JSON.parse(document.getElementById('payload').innerText);
   for (const [timeType, contests] of Object.entries(payload.contests)) {
     payload[timeType] = contests.forEach(contest =>

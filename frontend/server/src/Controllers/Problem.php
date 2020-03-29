@@ -4,6 +4,8 @@
 
 /**
  * ProblemsController
+ *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3164,15 +3166,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Defaults for offset and rowcount
         $offset = null;
-        $rowcount = null;
+        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $rowcount = intval($r['rowcount']);
         }
 
         [
@@ -3218,7 +3218,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $orderBy,
         string $mode,
         ?int $offset,
-        ?int $rowcount,
+        int $rowcount,
         array $tags,
         string $keyword,
         bool $requireAllTags,
@@ -3255,9 +3255,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (is_null($offset) || is_null($rowcount)) {
-            $offset = ($page - 1) * PROBLEMS_PER_PAGE;
-            $rowcount = PROBLEMS_PER_PAGE;
+        if (is_null($offset)) {
+            $offset = ($page - 1) * $rowcount;
         }
 
         [
@@ -3289,7 +3288,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3339,8 +3338,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
+            $pageSize,
             $page ?: 1,
-            '/problem/list/',
             5,
             []
         );
@@ -3354,22 +3353,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         // Defaults for offset and rowcount
         $offset = null;
-        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $pageSize = intval($r['rowcount']);
         }
 
         $r->ensureInt('page', null, null, false);
@@ -3383,7 +3380,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
-            $rowcount
+            $pageSize
         );
 
         $addedProblems = [];
@@ -3402,8 +3399,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
+            $pageSize,
             $page ?: 1,
-            '/problem/list/',
             5,
             []
         );
@@ -3812,7 +3809,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3825,17 +3822,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        // Defaults for offset and rowcount
+        // Defaults for offset and pageSize
         $offset = null;
-        $rowcount = null;
+        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $pageSize = intval($r['rowcount']);
         }
 
         [
@@ -3857,7 +3852,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $orderBy ?: 'problem_id',
             $mode ?: 'desc',
             $offset,
-            $rowcount,
+            $pageSize,
             $tags,
             $keyword,
             $requireAllTags,
@@ -3876,8 +3871,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'tag' => $tags
         ];
 
-        $pagerItems = \OmegaUp\Pager::paginate(
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
             $response['total'],
+            $pageSize,
             $page ?: 1,
             '/problem/list/',
             5,

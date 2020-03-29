@@ -49,6 +49,13 @@ export namespace types {
     owners_count: number;
   }
 
+  export interface PageItem {
+    class: string;
+    label: string;
+    page: number;
+    url: string;
+  }
+
   export interface Problem {
     title: string;
     alias: string;
@@ -1140,7 +1147,7 @@ export namespace messages {
   export type ProblemAddTagResponse = { name: string };
   export type ProblemAdminListRequest = { [key: string]: any };
   export type ProblemAdminListResponse = {
-    pagerItems: { class: string; label: string; url: string }[];
+    pagerItems: types.PageItem[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   export type ProblemAdminsRequest = { [key: string]: any };
@@ -1247,7 +1254,7 @@ export namespace messages {
   };
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
-    pagerItems: { class: string; label: string; url: string }[];
+    pagerItems: types.PageItem[];
     problems: { tags: { name: string; source: string }[] }[];
   };
   export type ProblemRejudgeRequest = { [key: string]: any };

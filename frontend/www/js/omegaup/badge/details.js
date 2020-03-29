@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import badge_Details from '../components/badge/Details.vue';
-import { OmegaUp, API } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {

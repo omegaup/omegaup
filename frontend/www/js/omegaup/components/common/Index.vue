@@ -70,7 +70,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import common_Welcome from './Welcome.vue';
 import common_SocialMedia from './SocialMedia.vue';
 import common_RecomendedMaterial from './RecomendedMaterial.vue';
