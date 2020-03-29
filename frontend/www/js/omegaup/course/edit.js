@@ -497,8 +497,6 @@ OmegaUp.on('ready', function() {
         on: {
           'add-student': function(ev) {
             let participants = [];
-            let participantsWithError = [];
-            let usersAdded = false;
             if (ev.participants !== '')
               participants = ev.participants.split(',');
             if (ev.participant !== '') participants.push(ev.participant);
@@ -515,15 +513,13 @@ OmegaUp.on('ready', function() {
               ),
             )
               .then(results => {
+                let participantsWithError = [];
                 results.forEach(result => {
-                  refreshStudentList();
                   if (result.status === 'rejected') {
                     participantsWithError.push(result.reason.userEmail);
                   }
-                  if (result.status === 'fulfilled' && !usersAdded) {
-                    usersAdded = true;
-                  }
                 });
+                refreshStudentList();
                 if (participantsWithError.length === 0) {
                   UI.success(T.courseStudentAdded);
                   return;
@@ -534,7 +530,7 @@ OmegaUp.on('ready', function() {
                   }),
                 );
               })
-              .catch(() => {});
+              .catch(UI.ignoreError);
           },
           'remove-student': function(student) {
             API.Course.removeStudent({

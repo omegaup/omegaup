@@ -169,8 +169,6 @@ OmegaUp.on('ready', function() {
               },
               'add-user': function(ev) {
                 let contestants = [];
-                let contestantsWithError = [];
-                let usersAdded = false;
                 if (ev.contestants !== '')
                   contestants = ev.contestants.split(',');
                 if (ev.contestant !== '') contestants.push(ev.contestant);
@@ -183,15 +181,13 @@ OmegaUp.on('ready', function() {
                   ),
                 )
                   .then(results => {
+                    let contestantsWithError = [];
                     results.forEach(result => {
-                      refresh(ev, API.Contest.users, 'users');
                       if (result.status === 'rejected') {
                         contestantsWithError.push(result.reason.userEmail);
                       }
-                      if (result.status === 'fulfilled' && !usersAdded) {
-                        usersAdded = true;
-                      }
                     });
+                    refresh(ev, API.Contest.users, 'users');
                     if (contestantsWithError.length === 0) {
                       UI.success(T.bulkUserAddSuccess);
                       return;
@@ -202,7 +198,7 @@ OmegaUp.on('ready', function() {
                       }),
                     );
                   })
-                  .catch(() => {});
+                  .catch(UI.ignoreError);
               },
               'remove-user': function(ev) {
                 API.Contest.removeUser({

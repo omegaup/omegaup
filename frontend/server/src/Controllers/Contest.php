@@ -2359,9 +2359,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail'],
             'usernameOrEmail'
         );
-        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
-            $r['usernameOrEmail']
-        );
         [$identity, $contest] = self::validateAddRemoveUser(
             $r['contest_alias'],
             $r['usernameOrEmail'],
