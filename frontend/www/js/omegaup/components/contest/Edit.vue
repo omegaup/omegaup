@@ -163,7 +163,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, OmegaUp } from '../../omegaup';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_Admins from './Admins.vue';
 import contest_Clone from './Clone.vue';

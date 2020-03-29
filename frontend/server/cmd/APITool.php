@@ -549,6 +549,7 @@ export function apiCall<
         .then(data => {
           if (!responseOk) {
             addError(data);
+            console.error(data);
             reject(data);
             return;
           }
@@ -561,6 +562,7 @@ export function apiCall<
         .catch(err => {
           const errorData = { status: 'error', error: err };
           addError(errorData);
+          console.error(errorData);
           reject(errorData);
         });
     });

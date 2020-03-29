@@ -2,7 +2,7 @@ import group_Members from '../components/group/Members.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

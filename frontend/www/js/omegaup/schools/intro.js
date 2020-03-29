@@ -2,7 +2,7 @@ import Vue from 'vue';
 import schools_Intro from '../components/schools/Intro.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 
 OmegaUp.on('ready', function() {

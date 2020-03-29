@@ -1,7 +1,7 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import T from '../lang';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 import Vue from 'vue';

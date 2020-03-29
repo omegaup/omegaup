@@ -3,7 +3,7 @@ import problem_Mine from '../components/problem/Mine.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = JSON.parse(document.getElementById('payload').innerText);

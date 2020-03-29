@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import school_Profile from '../components/schools/Profile.vue';
 
 OmegaUp.on('ready', function() {

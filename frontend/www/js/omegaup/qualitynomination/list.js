@@ -2,7 +2,7 @@ import Vue from 'vue';
 import qualitynomination_List from '../components/qualitynomination/List.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import UI from '../ui.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

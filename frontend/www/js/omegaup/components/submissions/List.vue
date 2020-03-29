@@ -180,7 +180,7 @@ table.submissions-table > tbody > tr > td {
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import UI from '../../ui.js';
+import * as UI from '../../ui';
 import UserName from '../user/Username.vue';
 import Autocomplete from '../Autocomplete.vue';
 

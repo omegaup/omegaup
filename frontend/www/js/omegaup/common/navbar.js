@@ -3,7 +3,7 @@ import { OmegaUp } from '../omegaup';
 import * as api from '../api_transitional';
 import API from '../api.js';
 import T from '../lang';
-import UI from '../ui.js';
+import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
