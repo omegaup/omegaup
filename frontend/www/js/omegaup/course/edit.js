@@ -497,6 +497,8 @@ OmegaUp.on('ready', function() {
         on: {
           'add-student': function(ev) {
             let participants = [];
+            let participantsWithError = [];
+            let usersAdded = false;
             if (ev.participants !== '')
               participants = ev.participants.split(',');
             if (ev.participant !== '') participants.push(ev.participant);
@@ -504,7 +506,7 @@ OmegaUp.on('ready', function() {
               UI.error(T.wordsEmptyAddStudentInput);
               return;
             }
-            Promise.all(
+            Promise.allSettled(
               participants.map(participant =>
                 API.Course.addStudent({
                   course_alias: courseAlias,
@@ -512,17 +514,27 @@ OmegaUp.on('ready', function() {
                 }),
               ),
             )
-              .then(function() {
-                refreshStudentList();
-                UI.success(T.courseStudentAdded);
-              })
-              .catch(function(event) {
+              .then(results => {
+                results.forEach(result => {
+                  refreshStudentList();
+                  if (result.status === 'rejected') {
+                    participantsWithError.push(result.reason.userEmail);
+                  }
+                  if (result.status === 'fulfilled' && !usersAdded) {
+                    usersAdded = true;
+                  }
+                });
+                if (participantsWithError.length === 0) {
+                  UI.success(T.courseStudentAdded);
+                  return;
+                }
                 UI.error(
                   UI.formatString(T.bulkUserAddError, {
-                    userEmail: event.userEmail,
+                    userEmail: participantsWithError.join('<br>'),
                   }),
                 );
-              });
+              })
+              .catch(() => {});
           },
           'remove-student': function(student) {
             API.Course.removeStudent({

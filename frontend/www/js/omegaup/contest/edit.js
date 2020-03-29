@@ -169,10 +169,12 @@ OmegaUp.on('ready', function() {
               },
               'add-user': function(ev) {
                 let contestants = [];
+                let contestantsWithError = [];
+                let usersAdded = false;
                 if (ev.contestants !== '')
                   contestants = ev.contestants.split(',');
                 if (ev.contestant !== '') contestants.push(ev.contestant);
-                Promise.all(
+                Promise.allSettled(
                   contestants.map(contestant =>
                     API.Contest.addUser({
                       contest_alias: contestAlias,
@@ -180,13 +182,27 @@ OmegaUp.on('ready', function() {
                     }),
                   ),
                 )
-                  .then(function() {
-                    UI.success(T.bulkUserAddSuccess);
-                    refresh(ev, API.Contest.users, 'users');
+                  .then(results => {
+                    results.forEach(result => {
+                      refresh(ev, API.Contest.users, 'users');
+                      if (result.status === 'rejected') {
+                        contestantsWithError.push(result.reason.userEmail);
+                      }
+                      if (result.status === 'fulfilled' && !usersAdded) {
+                        usersAdded = true;
+                      }
+                    });
+                    if (contestantsWithError.length === 0) {
+                      UI.success(T.bulkUserAddSuccess);
+                      return;
+                    }
+                    UI.error(
+                      UI.formatString(T.bulkUserAddError, {
+                        userEmail: contestantsWithError.join('<br>'),
+                      }),
+                    );
                   })
-                  .catch(function() {
-                    UI.error(T.bulkUserAddError);
-                  });
+                  .catch(() => {});
               },
               'remove-user': function(ev) {
                 API.Contest.removeUser({
