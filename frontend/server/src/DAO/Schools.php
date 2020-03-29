@@ -53,11 +53,11 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
         SELECT
-            MONTH(s.time) AS month,
+            IFNULL(MONTH(s.time), 0) AS month,
             s.problems_solved,
-            YEAR(s.time) AS year
+            IFNULL(YEAR(s.time), 0) AS year
         FROM
-            Schools_Problems_Solved_Per_Month s
+            Schools_Problems_Solved_Per_Month AS s
         WHERE
             s.school_id = ?
         ORDER BY

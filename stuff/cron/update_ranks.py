@@ -229,7 +229,7 @@ def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
         INNER JOIN
             `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
         INNER JOIN
-            `Runs` `r` ON `r`.`run_id` = `su`.`current_run_id`
+            `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
         INNER JOIN
             `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
         WHERE
