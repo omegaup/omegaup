@@ -312,11 +312,17 @@ export function markdownConverter(
         return `<pre><code${className}>${contents}</code></pre>`;
       };
       text = text.replace(
-        /^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gms,
+        new RegExp(
+          '^( {0,3})(`{3,})([^`\\n]*)\\n((?:.|\\n)*?\\n|) {0,3}\\2`* *$',
+          'gm',
+        ),
         fencedCodeBlock,
       );
       return text.replace(
-        /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gms,
+        new RegExp(
+          '^( {0,3})((?:~T){3,})(?!~)([^\\n]*)\\n((.|\\n)*?\\n|) {0,3}\\2(?:~T)* *$',
+          'gm',
+        ),
         fencedCodeBlock,
       );
     },
