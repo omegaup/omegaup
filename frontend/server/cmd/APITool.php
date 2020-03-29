@@ -35,6 +35,12 @@ class Method {
     public $apiTypePrefix = '';
 
     /**
+     * @var string
+     * @readonly
+     */
+    public $docstringComment = '';
+
+    /**
      * @var ConversionResult
      * @readonly
      */
@@ -42,6 +48,7 @@ class Method {
 
     public function __construct(
         string $apiTypePrefix,
+        string $docstringComment,
         ConversionResult $returnType
     ) {
         $this->apiTypePrefix = $apiTypePrefix;
@@ -62,10 +69,19 @@ class Controller {
      */
     public $apiName = '';
 
+    /**
+     * @var string
+     * @readonly
+     */
+    public $docstringComment = '';
+
     /** @var array<string, Method> */
     public $methods = [];
 
-    public function __construct(string $classBasename) {
+    public function __construct(
+        string $classBasename,
+        string $docstringComment
+    ) {
         $this->classBasename = $classBasename;
         $this->apiName = strtolower(
             $classBasename[0]
@@ -73,6 +89,7 @@ class Controller {
             $classBasename,
             1
         );
+        $this->docstringComment = $docstringComment;
     }
 }
 
@@ -274,16 +291,13 @@ class TypeMapper {
         );
     }
 
-    public function getReturnType(\ReflectionMethod $method): ConversionResult {
-        $returnType = $method->getReturnType();
-        if (
-            !is_null($returnType) &&
-            $returnType->getName() == 'void'
-        ) {
-            return new ConversionResult('void');
-        }
-
-        $docComment = \Psalm\DocComment::parse($method->getDocComment());
+    /**
+     * @param array{description: string, specials: array<string, array<int, string>>} $docComment
+     */
+    public function getReturnType(
+        \ReflectionMethod $reflectionMethod,
+        $docComment
+    ): ConversionResult {
         $returns = $docComment['specials']['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
@@ -301,7 +315,9 @@ class TypeMapper {
         }
         return $this->convertTypeToTypeScript(
             \Psalm\Type::parseString($returnTypeString),
-            $method->getDeclaringClass()->getName() . '::' . $method->getName()
+            $reflectionMethod->getDeclaringClass()->getName() .
+            '::' .
+            $reflectionMethod->getName()
         );
     }
 }
@@ -350,8 +366,10 @@ class APIGenerator {
             }
         }
 
-        $controller = new Controller($controllerClassBasename);
-        $this->controllers[$controllerClassBasename] = $controller;
+        $controller = new Controller(
+            $controllerClassBasename,
+            $docComment['description']
+        );
 
         foreach (
             $reflectionClass->getMethods(
@@ -361,14 +379,22 @@ class APIGenerator {
             if (strpos($reflectionMethod->name, 'api') !== 0) {
                 continue;
             }
-            $conversionResult = $this->typeMapper->getReturnType(
-                $reflectionMethod
-            );
-            if ($conversionResult->expansion == 'void') {
+            $returnType = $reflectionMethod->getReturnType();
+            if (
+                !is_null($returnType) &&
+                $returnType->getName() == 'void'
+            ) {
                 // void APIs are not really intended to be called from
                 // JavaScript, so they are not exposed.
                 continue;
             }
+            $docComment = \Psalm\DocComment::parse(
+                $reflectionMethod->getDocComment()
+            );
+            $conversionResult = $this->typeMapper->getReturnType(
+                $reflectionMethod,
+                $docComment
+            );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
             ) . substr(
@@ -380,10 +406,16 @@ class APIGenerator {
                     $reflectionMethod->name,
                     3
                 ),
+                $docComment['description'],
                 $conversionResult
             );
             $controller->methods[$apiMethodName] = $method;
         }
+
+        if (empty($controller->methods)) {
+            return;
+        }
+        $this->controllers[$controllerClassBasename] = $controller;
     }
 
     public function generateTypes(): void {
@@ -590,6 +622,29 @@ EOD;
             echo "};\n\n";
         }
     }
+
+    public function generateDocumentation(): void {
+        ksort($this->controllers);
+        foreach ($this->controllers as $controller) {
+            echo "# {$controller->classBasename}\n\n";
+            echo "{$controller->docstringComment}\n\n";
+            ksort($controller->methods);
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo "## `/api/{$controller->apiName}/{$apiMethodName}/`\n\n";
+
+                echo "### Descripción\n\n";
+                echo "{$method->docstringComment}\n\n";
+
+                echo "### Parámetros\n\n";
+                echo "_Por documentar_\n\n";
+
+                echo "### Regresa\n\n";
+                echo "```typescript\n";
+                echo "{$method->returnType->expansion}\n";
+                echo "```\n\n";
+            }
+        }
+    }
 }
 
 /**
@@ -619,6 +674,9 @@ $controllerFiles = listDir(
     sprintf('%s/server/src/Controllers', strval(OMEGAUP_ROOT))
 );
 foreach ($controllerFiles as $controllerFile) {
+    if (strpos($controllerFile, '.php') === false) {
+        continue;
+    }
     $apiGenerator->addController(basename($controllerFile, '.php'));
 }
 if ($options['file'] == 'api_types.ts') {
@@ -627,6 +685,8 @@ if ($options['file'] == 'api_types.ts') {
     $apiGenerator->generateDeclarations();
 } elseif ($options['file'] == 'api_transitional.ts') {
     $apiGenerator->generateTransitional();
+} elseif ($options['file'] == 'README.md') {
+    $apiGenerator->generateDocumentation();
 } else {
     throw new \Exception("Invalid option for --file: {$options['file']}");
 }

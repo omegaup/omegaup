@@ -65,8 +65,6 @@ export function apiCall<
     });
 }
 
-export const ACL = {};
-
 export const Admin = {
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
@@ -333,8 +331,6 @@ export const Contest = {
     '/api/contest/users/',
   ),
 };
-
-export const Controller = {};
 
 export const Course = {
   activityReport: apiCall<

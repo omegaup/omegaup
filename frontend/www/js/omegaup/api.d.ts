@@ -2,13 +2,11 @@
 import { controllers } from './api_types';
 
 const API = {
-  ACL: controllers.ACL,
   Admin: controllers.Admin,
   Authorization: controllers.Authorization,
   Badge: controllers.Badge,
   Clarification: controllers.Clarification,
   Contest: controllers.Contest,
-  Controller: controllers.Controller,
   Course: controllers.Course,
   Grader: controllers.Grader,
   Group: controllers.Group,

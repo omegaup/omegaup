@@ -2006,8 +2006,6 @@ export namespace messages {
 
 // Controller interfaces
 export namespace controllers {
-  export interface ACL {}
-
   export interface Admin {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
@@ -2175,8 +2173,6 @@ export namespace controllers {
       params?: messages.ContestUsersRequest,
     ) => Promise<messages.ContestUsersResponse>;
   }
-
-  export interface Controller {}
 
   export interface Course {
     activityReport: (
