@@ -419,9 +419,7 @@ export class Arena {
         data: {
           problems: [],
           activeProblem: null,
-          inAssignment:
-            typeof self.options.courseAlias !== 'undefined' &&
-            self.options.courseAlias !== null,
+          inAssignment: !!self.options.courseAlias,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
