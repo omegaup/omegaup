@@ -408,6 +408,7 @@ export class Arena {
             props: {
               problems: this.problems,
               activeProblem: this.activeProblem,
+              inAssignment: this.inAssignment,
             },
             on: {
               'navigate-to-problem': function(problemAlias) {
@@ -419,6 +420,7 @@ export class Arena {
         data: {
           problems: [],
           activeProblem: null,
+          inAssignment: !!self.options.courseAlias,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
@@ -732,8 +734,9 @@ export class Arena {
         self.elements.navBar.problems.push({
           alias: problem.alias,
           text: problemName,
+          acceptsSubmissions: problem.languages !== '',
           bestScore: 0,
-          maxScore: 0,
+          maxScore: problem.points,
         });
       }
 
