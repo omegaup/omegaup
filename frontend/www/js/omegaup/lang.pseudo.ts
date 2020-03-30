@@ -82,7 +82,7 @@ const translations: { [key: string]: string; } = {
   banningProblemDueToReport: "(Banning pr0b13m du3 70 u53r r3p0r7.)",
   birthdayInTheFuture: "(Y0u ar3 n07 01d 3n0ugh 70 u53 0m3gaUp)",
   bulkOperationError: "(Th3r3 wa5 an 3rr0r 3x3cu7ing 7h3 0p3ra7i0n)",
-  bulkUserAddError: "(Th3r3 wa5 an 3rr0r adding u53r5, <b>%(userEmail)</b> wa5 n07 5ucc355fu11y add3d b3cau53 u53r d035 n07 3xi57.)",
+  bulkUserAddError: "(Th3r3 wa5 an 3rr0r adding u53r5. Th3 f0110wing u53rnam35 0r 3mai15 w3r3 n07 f0und in 0m3gaUp:<br><br><b>%(userEmail)</b>.<br><br>H0w3v3r, 7h3 r357 0f u53r5 hav3 b33n add3d 5ucc355fu11y.)",
   bulkUserAddSuccess: "(U53r5 5ucc355fu11y add3d!)",
   cannotAddProb: "(Cann07 add pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",
   cannotRemoveProblem: "(Cann07 r3m0v3 7h3 pr0b13m. Y0u ar3 n07 a c0n7357 admin.)",

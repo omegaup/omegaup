@@ -2366,15 +2366,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         // Save the contest to the DB
-        \OmegaUp\DAO\ProblemsetIdentities::replace(new \OmegaUp\DAO\VO\ProblemsetIdentities([
-            'problemset_id' => $contest->problemset_id,
-            'identity_id' => $identity->identity_id,
-            'access_time' => null,
-            'end_time' => null,
-            'score' => 0,
-            'time' => 0,
-            'is_invited' => true,
-        ]));
+        \OmegaUp\DAO\ProblemsetIdentities::replace(
+            new \OmegaUp\DAO\VO\ProblemsetIdentities([
+                'problemset_id' => $contest->problemset_id,
+                'identity_id' => $identity->identity_id,
+                'access_time' => null,
+                'end_time' => null,
+                'score' => 0,
+                'time' => 0,
+                'is_invited' => true,
+            ])
+        );
 
         return ['status' => 'ok'];
     }

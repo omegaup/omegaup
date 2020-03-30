@@ -172,7 +172,7 @@ OmegaUp.on('ready', function() {
                 if (ev.contestants !== '')
                   contestants = ev.contestants.split(',');
                 if (ev.contestant !== '') contestants.push(ev.contestant);
-                Promise.all(
+                Promise.allSettled(
                   contestants.map(contestant =>
                     API.Contest.addUser({
                       contest_alias: contestAlias,
@@ -180,13 +180,25 @@ OmegaUp.on('ready', function() {
                     }),
                   ),
                 )
-                  .then(function() {
-                    UI.success(T.bulkUserAddSuccess);
+                  .then(results => {
+                    let contestantsWithError = [];
+                    results.forEach(result => {
+                      if (result.status === 'rejected') {
+                        contestantsWithError.push(result.reason.userEmail);
+                      }
+                    });
                     refresh(ev, API.Contest.users, 'users');
+                    if (contestantsWithError.length === 0) {
+                      UI.success(T.bulkUserAddSuccess);
+                      return;
+                    }
+                    UI.error(
+                      UI.formatString(T.bulkUserAddError, {
+                        userEmail: contestantsWithError.join('<br>'),
+                      }),
+                    );
                   })
-                  .catch(function() {
-                    UI.error(T.bulkUserAddError);
-                  });
+                  .catch(UI.ignoreError);
               },
               'remove-user': function(ev) {
                 API.Contest.removeUser({
