@@ -61,17 +61,19 @@ if (!String.prototype.padStart) {
 }
 
 // From https://medium.com/trabe/using-promise-allsettled-now-e1767d43e480
-Promise.allSettled = promises =>
-  Promise.all(
-    promises.map((promise, i) =>
-      promise
-        .then(value => ({
-          status: 'fulfilled',
-          value,
-        }))
-        .catch(reason => ({
-          status: 'rejected',
-          reason,
-        })),
-    ),
-  );
+if (window.Promise && !Promise.allSettled) {
+  Promise.allSettled = promises =>
+    Promise.all(
+      promises.map((promise, i) =>
+        promise
+          .then(value => ({
+            status: 'fulfilled',
+            value,
+          }))
+          .catch(reason => ({
+            status: 'rejected',
+            reason,
+          })),
+      ),
+    );
+}
