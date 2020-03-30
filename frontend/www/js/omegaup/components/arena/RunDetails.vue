@@ -122,7 +122,58 @@
   </form>
 </template>
 
-<style>
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+#overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999999 !important;
+  form {
+    background: #eee;
+    width: 80%;
+    height: 90%;
+    max-height: 500px;
+    margin: auto;
+    border: 2px solid #ccc;
+    padding: 1em;
+    position: absolute;
+    overflow: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    textarea {
+      width: 790px;
+      height: 23em;
+      margin: 0.5em 0;
+      font-family: monospace;
+    }
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: $omegaup-white;
+      border: 1px solid #ccc;
+      border-width: 0 0 1px 1px;
+      font-size: 110%;
+      width: 25px;
+      height: 25px;
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
+  input[type='submit'] {
+    font-size: 110%;
+    padding: 0.3em 0.5em;
+  }
+}
 .dropdown-cases {
   height: 100%;
   width: 100%;
