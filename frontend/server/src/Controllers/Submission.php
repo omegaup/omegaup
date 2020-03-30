@@ -13,6 +13,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the latest submissions
      *
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $username
+     *
      * @return array{submissions: list<array{time: int, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}>, totalRows: int}
      */
     public static function apiLatestSubmissions(\OmegaUp\Request $r) {
@@ -61,6 +65,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for the latest submissions with pagination
      *
+     * @omegaup-request-param mixed $length
+     * @omegaup-request-param mixed $page
+     *
      * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
      */
     public static function getLatestSubmissionsForSmarty(\OmegaUp\Request $r): array {
@@ -85,6 +92,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for the latest submissions of
      * a certain user with pagination
+     *
+     * @omegaup-request-param mixed $length
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $username
      *
      * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
      */
