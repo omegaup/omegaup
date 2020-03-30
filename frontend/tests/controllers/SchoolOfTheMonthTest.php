@@ -290,12 +290,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
@@ -319,12 +314,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now do the same but for the current month
         $nextMonth = date_create($today);
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData, $today);
@@ -349,12 +339,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $nextMonth = date_create($nextMonthDate);
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
         \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
 
@@ -386,12 +371,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $date = date_create($today);
-        date_add(
-            $date,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $date->modify('last day of next month');
         $runDate = date_format($date, 'Y-m-15');
 
         self::setUpSchoolsRuns($schoolsData, $runDate);
@@ -425,12 +405,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('ok', $result['status']);
 
         $nextMonth = $lastDayOfMonth;
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
         \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
 
