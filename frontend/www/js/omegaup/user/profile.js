@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -25,7 +27,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'update-period-statistics': (e, categories, data) => {
-            e.periodStatisticOptions.chart.categories = categories;
+            e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
           'update-aggregate-statistics': e =>
@@ -169,25 +171,25 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       viewProfile.contests = data;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.problemsSolved({ username: profile.username })
     .then(function(data) {
       viewProfile.solvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.listUnsolvedProblems({ username: profile.username })
     .then(function(data) {
       viewProfile.unsolvedProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.problemsCreated({ username: profile.username })
     .then(function(data) {
       viewProfile.createdProblems = data['problems'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myList({})
@@ -196,7 +198,7 @@ OmegaUp.on('ready', function() {
           data['badges'].map(badge => badge.badge_alias),
         );
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   API.Badge.userList({ target_username: profile.username })
@@ -205,11 +207,11 @@ OmegaUp.on('ready', function() {
         data['badges'].map(badge => badge.badge_alias),
       );
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.User.stats({ username: profile.username })
     .then(function(data) {
       viewProfile.charts = data;
     })
-    .fail(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });

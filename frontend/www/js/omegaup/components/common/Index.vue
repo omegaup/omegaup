@@ -1,9 +1,14 @@
 <template>
   <div>
     <omegaup-coder-of-the-month-notice
-      v-if="coderOfTheMonth && currentUserInfo"
+      v-if="
+        currentUserInfo &&
+          ((coderOfTheMonth &&
+            coderOfTheMonth.username == currentUserInfo.username) ||
+            (coderOfTheMonthFemale &&
+              coderOfTheMonthFemale.username == currentUserInfo.username))
+      "
       v-bind:coderUsername="currentUserInfo.username"
-      v-bind:currentUsername="coderOfTheMonth.username"
     ></omegaup-coder-of-the-month-notice>
     <div class="container-fluid">
       <div class="row">
@@ -28,7 +33,7 @@
                 v-bind:length="schoolsRank.length"
                 v-bind:showHeader="schoolsRank.showHeader"
                 v-bind:totalRows="schoolsRank.totalRows"
-                v-bind:rank="schoolsRank.ranking"
+                v-bind:rank="schoolsRank.rank"
               ></omegaup-schools-rank>
             </div>
           </div>
@@ -65,7 +70,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import common_Welcome from './Welcome.vue';
 import common_SocialMedia from './SocialMedia.vue';
 import common_RecomendedMaterial from './RecomendedMaterial.vue';
@@ -90,6 +96,7 @@ import schools_Rank from '../schools/Rank.vue';
 })
 export default class Index extends Vue {
   @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
+  @Prop() coderOfTheMonthFemale!: omegaup.CoderOfTheMonth;
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;

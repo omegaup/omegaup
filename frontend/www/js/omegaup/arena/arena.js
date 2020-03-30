@@ -1,7 +1,9 @@
-import { OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
 import API from '../api.js';
+import * as api from '../api_transitional';
 import ArenaAdmin from './admin_arena.js';
-import Notifications from './notifications.js';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
@@ -9,10 +11,43 @@ import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
-import UI from '../ui.js';
+import common_Navbar from '../components/common/Navbar.vue';
+import * as UI from '../ui';
 import Vue from 'vue';
+import * as ko from 'knockout';
+import * as secureBindingsProvider from 'knockout-secure-binding';
 
 export { ArenaAdmin };
+
+// TODO(#3456): Remove this once Knockout is gone.
+OmegaUp.on('ready', function() {
+  // ko.secureBindingsProvider.nodeHasBindings() has a bug in which if
+  // there happens to be a comment with no content (like `<!---->`), it
+  // tries to call .trim() on undefined, and crashes.
+  secureBindingsProvider.prototype.nodeHasBindings = function(node) {
+    if (node.nodeType === node.ELEMENT_NODE) {
+      return (
+        node.getAttribute(this.attribute) ||
+        (ko.components && ko.components.getComponentNameForNode(node))
+      );
+    }
+    if (node.nodeType === node.COMMENT_NODE) {
+      if (this.noVirtualElements) {
+        return false;
+      }
+      // Ensures that `value` is not undefined.
+      let value = '' + node.nodeValue || node.text;
+      if (!value) {
+        return false;
+      }
+      // See also: knockout/src/virtualElements.js
+      return value.trim().indexOf('ko ') === 0;
+    }
+  };
+  ko.bindingProvider.instance = new secureBindingsProvider({
+    attribute: 'data-bind',
+  });
+});
 
 let ScoreboardColors = [
   '#FB3F51',
@@ -38,6 +73,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    payload: {},
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -69,12 +105,13 @@ export function GetOptionsFromLocation(arenaLocation) {
     options.disableSockets = true;
   }
   const elementPayload = document.getElementById('payload');
-  if (elementPayload != null) {
+  if (elementPayload !== null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload != null) {
+    if (payload !== null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
+      options.payload = payload;
     }
   }
   return options;
@@ -88,7 +125,10 @@ class EventsSocket {
     self.arena = arena;
     self.socket = null;
     self.socketKeepalive = null;
-    self.deferred = $.Deferred();
+    self.promise = new Promise((accept, reject) => {
+      self.promiseAccept = accept;
+      self.promiseReject = reject;
+    });
     self.retries = 10;
   }
 
@@ -107,7 +147,7 @@ class EventsSocket {
     self.socket.onopen = self.onopen.bind(self);
     self.socket.onclose = self.onclose.bind(self);
 
-    return self.deferred;
+    return self.promise;
   }
 
   onmessage(message) {
@@ -158,7 +198,7 @@ class EventsSocket {
     }
 
     self.arena.elements.socketStatus.html('✗').css('color', '#800');
-    self.deferred.reject(e);
+    self.promiseReject(e);
   }
 }
 class EphemeralGrader {
@@ -256,11 +296,83 @@ export class Arena {
     // The Markdown-to-HTML converter.
     self.markdownConverter = UI.markdownConverter();
 
-    // Currently opened notifications.
-    self.notifications = new Notifications();
-    OmegaUp.on('ready', function() {
-      self.notifications.attach($('#notifications'));
-    });
+    // Currently opened clarification notifications.
+    self.commonNavbar = null;
+    if (document.getElementById('common-navbar')) {
+      self.commonNavbar = new Vue({
+        el: '#common-navbar',
+        render: function(createElement) {
+          return createElement('omegaup-common-navbar', {
+            props: {
+              omegaUpLockDown: this.omegaUpLockDown,
+              inContest: this.inContest,
+              isLoggedIn: this.isLoggedIn,
+              isReviewer: this.isReviewer,
+              gravatarURL51: this.gravatarURL51,
+              currentUsername: this.currentUsername,
+              isAdmin: this.isAdmin,
+              isMainUserIdentity: this.isMainUserIdentity,
+              lockDownImage: this.lockDownImage,
+              navbarSection: this.navbarSection,
+              graderInfo: this.graderInfo,
+              graderQueueLength: this.graderQueueLength,
+              errorMessage: this.errorMessage,
+              initialClarifications: this.initialClarifications,
+            },
+          });
+        },
+        data: {
+          omegaUpLockDown: self.options.payload.omegaUpLockDown,
+          inContest: self.options.payload.inContest,
+          isLoggedIn: self.options.payload.isLoggedIn,
+          isReviewer: self.options.payload.isReviewer,
+          gravatarURL51: self.options.payload.gravatarURL51,
+          currentUsername: self.options.payload.currentUsername,
+          isAdmin: self.options.payload.isAdmin,
+          isMainUserIdentity: self.options.payload.isMainUserIdentity,
+          lockDownImage: self.options.payload.lockDownImage,
+          navbarSection: self.options.payload.navbarSection,
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+        },
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+      });
+
+      if (self.options.payload.isAdmin) {
+        API.Notification.myList({})
+          .then(data => {
+            self.commonNavbar.notifications = data.notifications;
+          })
+          .catch(UI.apiError);
+
+        function updateGraderStatus() {
+          api.Grader.status()
+            .then(stats => {
+              self.commonNavbar.graderInfo = stats.grader;
+              if (stats.status !== 'ok') {
+                self.commonNavbar.errorMessage = T.generalError;
+                return;
+              }
+              if (stats.grader.queue) {
+                self.commonNavbar.graderQueueLength =
+                  stats.grader.queue.run_queue_length +
+                  stats.grader.queue.running.length;
+              }
+              self.commonNavbar.errorMessage = null;
+            })
+            .catch(stats => {
+              self.commonNavbar.errorMessage = stats.error;
+            });
+        }
+
+        updateGraderStatus();
+        setInterval(updateGraderStatus, 30000);
+      }
+    }
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -296,6 +408,7 @@ export class Arena {
             props: {
               problems: this.problems,
               activeProblem: this.activeProblem,
+              inAssignment: this.inAssignment,
             },
             on: {
               'navigate-to-problem': function(problemAlias) {
@@ -307,6 +420,7 @@ export class Arena {
         data: {
           problems: [],
           activeProblem: null,
+          inAssignment: !!self.options.courseAlias,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
@@ -481,7 +595,7 @@ export class Arena {
 
     function connect(uris, index) {
       self.socket = new EventsSocket(uris[index], self);
-      self.socket.connect().fail(function(e) {
+      self.socket.connect().catch(function(e) {
         console.log(e);
         // Try the next uri.
         index++;
@@ -537,7 +651,7 @@ export class Arena {
     self.finishTime = finish;
     // Once the clock is ready, we can now connect to the socket.
     self.connectSocket();
-    if (self.options.isPractice) {
+    if (self.options.isPractice || !self.finishTime) {
       self.elements.clock.html('&infin;');
       return;
     }
@@ -563,9 +677,9 @@ export class Arena {
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
-              API.Problemset.details({ problemset_id: x })
+              api.Problemset.details({ problemset_id: x })
                 .then(problemsetLoaded.bind(self))
-                .fail(UI.ignoreError);
+                .catch(UI.ignoreError);
             }
           };
         })(self.options.problemsetId, problemset.start_time);
@@ -620,8 +734,9 @@ export class Arena {
         self.elements.navBar.problems.push({
           alias: problem.alias,
           text: problemName,
+          acceptsSubmissions: problem.languages !== '',
           bestScore: 0,
-          maxScore: 0,
+          maxScore: problem.points,
         });
       }
 
@@ -707,7 +822,6 @@ export class Arena {
 
     let now = Date.now();
     let clock = '';
-
     if (now < self.startTime.getTime()) {
       clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
     } else if (now > countdownTime.getTime()) {
@@ -746,7 +860,7 @@ export class Arena {
     setTimeout(function() {
       API.Run.status({ run_alias: guid })
         .then(self.updateRun.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }, 5000);
   }
 
@@ -781,23 +895,23 @@ export class Arena {
     }
 
     if (self.options.contestAlias != null) {
-      API.Problemset.scoreboard(scoreboardParams)
+      api.Problemset.scoreboard(scoreboardParams)
         .then(function(response) {
           // Differentiate ranking change between virtual and normal contest
           if (self.options.originalContestAlias != null)
             self.virtualRankingChange(response);
           else self.rankingChange(response);
         })
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     } else if (
       self.options.problemsetAdmin ||
       self.options.contestAlias != null ||
       self.problemsetAdmin ||
       (self.options.courseAlias && self.options.assignmentAlias)
     ) {
-      API.Problemset.scoreboard(scoreboardParams)
+      api.Problemset.scoreboard(scoreboardParams)
         .then(self.rankingChange.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }
   }
 
@@ -888,7 +1002,7 @@ export class Arena {
       scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
-    API.Problemset.scoreboardEvents(scoreboardEventsParams)
+    api.Problemset.scoreboardEvents(scoreboardEventsParams)
       .then(function(response) {
         // Change username to username-virtual
         for (let evt of response.events) {
@@ -902,7 +1016,7 @@ export class Arena {
         response.events = response.events.concat(originalContestEvents);
         self.onRankingEvents(response);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
 
     self.virtualContestRefreshInterval = setTimeout(function() {
       self.onVirtualRankingChange(virtualContestData);
@@ -918,14 +1032,14 @@ export class Arena {
       clearTimeout(self.virtualContestRefreshInterval);
 
     if (self.originalContestScoreboardEvent == null) {
-      API.Problemset.scoreboardEvents({
+      api.Problemset.scoreboardEvents({
         problemset_id: self.options.originalProblemsetId,
       })
         .then(function(response) {
           self.originalContestScoreboardEvent = response.events;
           self.onVirtualRankingChange(data);
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     } else {
       self.onVirtualRankingChange(data);
     }
@@ -943,9 +1057,9 @@ export class Arena {
     }
 
     if (rankingEvent) {
-      API.Problemset.scoreboardEvents(scoreboardEventsParams)
+      api.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     }
   }
 
@@ -1160,7 +1274,7 @@ export class Arena {
       rowcount: self.clarificationsRowcount,
     })
       .then(self.clarificationsChange.bind(self))
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   updateClarification(clarification) {
@@ -1168,20 +1282,20 @@ export class Arena {
     let r = null;
     let anchor =
       'clarifications/clarification-' + clarification.clarification_id;
+    if (self.commonNavbar === null) {
+      return;
+    }
+    const clarifications = self.commonNavbar.initialClarifications;
     if (self.clarifications[clarification.clarification_id]) {
       r = self.clarifications[clarification.clarification_id];
-
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
+      if (self.problemsetAdmin) {
+        self.commonNavbar.initialClarifications = clarifications.filter(
+          notification =>
+            notification.clarification_id !== clarification.clarification_id,
+        );
+      } else {
+        clarifications.push(clarification);
+      }
     } else {
       r = $('.clarifications tbody.clarification-list tr.template')
         .clone()
@@ -1189,6 +1303,9 @@ export class Arena {
         .addClass('inserted');
 
       if (self.problemsetAdmin) {
+        if (clarifications !== null) {
+          clarifications.push(clarification);
+        }
         (function(id, answerNode) {
           let responseFormNode = $(
             '#create-response-form',
@@ -1222,7 +1339,7 @@ export class Arena {
                 this,
               ).html();
             }
-            API.Clarification.update({
+            api.Clarification.update({
               clarification_id: id,
               answer: responseText,
               public: $('#create-response-is-public', this)[0].checked ? 1 : 0,
@@ -1230,13 +1347,8 @@ export class Arena {
               .then(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
-                if (self.problemsetAdmin) {
-                  self.notifications.resolve({
-                    id: 'clarification-' + clarification.clarification_id,
-                  });
-                }
               })
-              .fail(function() {
+              .catch(function() {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               });
@@ -1257,20 +1369,6 @@ export class Arena {
     $('.answer pre', r).html(UI.escape(clarification.answer));
     if (clarification.answer) {
       self.answeredClarifications++;
-    }
-
-    if (self.problemsetAdmin != !!clarification.answer) {
-      self.notifications.notify({
-        id: 'clarification-' + clarification.clarification_id,
-        author: clarification.author,
-        contest: clarification.contest_alias,
-        problem: clarification.problem_alias,
-        message: clarification.message,
-        answer: clarification.answer,
-        public: clarification.public,
-        anchor: '#' + anchor,
-        modificationTime: clarification.time.getTime(),
-      });
     }
 
     if (!self.clarifications[clarification.clarification_id]) {
@@ -1314,6 +1412,20 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
+    if (self.commonNavbar !== null) {
+      self.commonNavbar.initialClarifications = data.clarifications
+        .filter(clarification =>
+          // Removing all unsolved clarifications.
+          self.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
+        )
+        .reverse();
+    }
     if (
       self.answeredClarifications > previouslyAnswered &&
       self.activeTab != 'clarifications'
@@ -1640,7 +1752,7 @@ export class Arena {
                       .then(() => {
                         UI.reportEvent('quality-nomination', 'submit');
                       })
-                      .fail(UI.apiError);
+                      .catch(UI.apiError);
                   },
                   dismiss: function(ev) {
                     const contents = {
@@ -1655,7 +1767,7 @@ export class Arena {
                         UI.info(T.qualityNominationRateProblemDesc);
                         UI.reportEvent('quality-nomination', 'dismiss');
                       })
-                      .fail(UI.apiError);
+                      .catch(UI.apiError);
                   },
                 },
               });
@@ -1681,7 +1793,7 @@ export class Arena {
             .then(function(data) {
               updateRuns(data.runs);
             })
-            .fail(UI.apiError);
+            .catch(UI.apiError);
         } else {
           updateRuns(problem.runs);
           showQualityNominationPopup();
@@ -1719,7 +1831,7 @@ export class Arena {
               self.preferredLanguage = problem_ext.preferred_language;
               update(problem);
             })
-            .fail(UI.apiError);
+            .catch(UI.apiError);
         }
       }
 
@@ -1739,7 +1851,7 @@ export class Arena {
         }
         if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
           self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
-          UI.warning(omegaup.T.firstSumbissionWithIdentity);
+          UI.warning(T.firstSumbissionWithIdentity);
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1785,14 +1897,11 @@ export class Arena {
       '#problem .problem-creation-date',
     );
     if (problem.problemsetter && creationDate) {
-      creationDate.innerText = omegaup.UI.formatString(
-        omegaup.T.wordsUploadedOn,
-        {
-          date: omegaup.UI.formatDate(
-            new Date(problem.problemsetter.creation_date * 1000),
-          ),
-        },
-      );
+      creationDate.innerText = UI.formatString(T.wordsUploadedOn, {
+        date: UI.formatDate(
+          new Date(problem.problemsetter.creation_date * 1000),
+        ),
+      });
     }
 
     UI.renderSampleToClipboardButton();
@@ -1834,7 +1943,7 @@ export class Arena {
         .then(function(data) {
           self.displayRunDetails(showRunMatch[1], data);
         })
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     }
   }
 
@@ -2087,7 +2196,7 @@ export class Arena {
         self.clearInputFile();
         self.initSubmissionCountdown();
       })
-      .fail(function(run) {
+      .catch(function(run) {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
         UI.reportEvent('submission', 'submit-fail', run.errorname);
@@ -2636,7 +2745,7 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   disqualify() {
@@ -2646,7 +2755,7 @@ class ObservableRun {
         self.type('disqualifed');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 
   debug_rejudge() {
@@ -2656,6 +2765,6 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .fail(UI.ignoreError);
+      .catch(UI.ignoreError);
   }
 }

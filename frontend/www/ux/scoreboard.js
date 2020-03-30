@@ -1,4 +1,7 @@
 omegaup.OmegaUp.on('ready', function() {
+  const payload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
   var params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
     window.location.pathname,
   );
@@ -7,6 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
     disableClarifications: true,
     contestAlias: params[1],
     scoreboardToken: params[2],
+    payload: payload,
   };
   var arenaInstance = new arena.Arena(options);
   var getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
@@ -24,7 +28,7 @@ omegaup.OmegaUp.on('ready', function() {
         token: arenaInstance.options.scoreboardToken,
       })
         .then(arenaInstance.rankingChange.bind(arenaInstance))
-        .fail(omegaup.UI.ignoreError);
+        .catch(omegaup.UI.ignoreError);
       if (new Date() < contest.finish_time && !arenaInstance.socket) {
         setInterval(function() {
           omegaup.API.Problemset.scoreboard({
@@ -32,7 +36,7 @@ omegaup.OmegaUp.on('ready', function() {
             token: arenaInstance.options.scoreboardToken,
           })
             .then(arenaInstance.rankingChange.bind(arenaInstance))
-            .fail(omegaup.UI.ignoreError);
+            .catch(omegaup.UI.ignoreError);
         }, getRankingByTokenRefresh);
       }
 
@@ -40,5 +44,5 @@ omegaup.OmegaUp.on('ready', function() {
       $('#root').fadeIn('slow');
       $('#loading').fadeOut('slow');
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

@@ -18,22 +18,19 @@
           <img
             alt="lockdown"
             title="lockdown"
-            v-bind:src="header.lockDownImage"
-            v-show="header.omegaUpLockDown"
+            v-bind:src="lockDownImage"
+            v-show="omegaUpLockDown"
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
-        <ul
-          class="nav navbar-nav"
-          v-if="!header.omegaUpLockDown && !header.inContest"
-        >
-          <li v-bind:class="{ active: header.navbarSection === 'arena' }">
+        <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
+          <li v-bind:class="{ active: navbarSection === 'arena' }">
             <a href="/arena/">{{ T.navArena }}</a>
           </li>
           <li
             class="dropdown nav-contests"
-            v-bind:class="{ active: header.navbarSection === 'contests' }"
-            v-if="header.isLoggedIn && header.isMainUserIdentity"
+            v-bind:class="{ active: navbarSection === 'contests' }"
+            v-if="isLoggedIn && isMainUserIdentity"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
@@ -55,8 +52,8 @@
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: header.navbarSection === 'problems' }"
-            v-if="header.isLoggedIn && header.isMainUserIdentity"
+            v-bind:class="{ active: navbarSection === 'problems' }"
+            v-if="isLoggedIn && isMainUserIdentity"
           >
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"
               ><span>{{ T.wordsProblems }}</span> <span class="caret"></span
@@ -77,14 +74,14 @@
               <li>
                 <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
               </li>
-              <li v-show="header.isReviewer">
+              <li v-show="isReviewer">
                 <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
               </li>
             </ul>
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: header.navbarSection === 'problems' }"
+            v-bind:class="{ active: navbarSection === 'problems' }"
             v-else=""
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -102,7 +99,7 @@
           </li>
           <li
             class="dropdown nav-rank"
-            v-bind:class="{ active: header.navbarSection === 'rank' }"
+            v-bind:class="{ active: navbarSection === 'rank' }"
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <span>{{ T.navRanking }}</span>
@@ -118,10 +115,10 @@
             </ul>
           </li>
           <li
-            class="nav-schools"
-            v-bind:class="{ active: header.navbarSection === 'schools' }"
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navSchools }}</a>
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li>
             <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
@@ -132,36 +129,40 @@
         </ul>
         <ul class="nav navbar-nav" v-else=""></ul>
         <!-- in lockdown or contest mode there is no left navbar -->
-        <ul class="nav navbar-nav navbar-right" v-if="!header.isLoggedIn">
+        <ul class="nav navbar-nav navbar-right" v-if="!isLoggedIn">
           <li>
             <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right" v-else="">
+          <omegaup-notifications-clarifications
+            v-bind:initialClarifications="initialClarifications"
+            v-if="inContest"
+          ></omegaup-notifications-clarifications>
           <omegaup-notification-list
             v-bind:notifications="notifications"
           ></omegaup-notification-list>
           <li
             class="dropdown nav-user"
-            v-bind:class="{ active: header.navbarSection === 'users' }"
+            v-bind:class="{ active: navbarSection === 'users' }"
           >
             <a
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
               href="#"
-              ><img v-bind:src="header.gravatarURL51"/>
-              <span class="username" v-bind:title="header.currentUsername">{{
-                header.currentUsername
+              ><img v-bind:src="gravatarURL51"/>
+              <span class="username" v-bind:title="currentUsername">{{
+                currentUsername
               }}</span>
               <omegaup-common-grader-badge
-                v-show="header.isAdmin"
+                v-show="isAdmin"
                 v-bind:queueLength="graderQueueLength"
                 v-bind:error="errorMessage !== null"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
             <ul class="dropdown-menu" v-if="showNavbar">
-              <li v-show="!header.omegaUpLockDown &amp;&amp; !header.inContest">
+              <li v-show="!omegaUpLockDown && !inContest">
                 <a href="/profile/"
                   ><span class="glyphicon glyphicon-user"></span>
                   {{ T.navViewProfile }}</a
@@ -180,7 +181,7 @@
               ></omegaup-common-grader-status>
             </ul>
             <ul class="dropdown-menu" v-else="">
-              <li v-show="!header.omegaUpLockDown &amp;&amp; !header.inContest">
+              <li v-show="!omegaUpLockDown && !inContest">
                 <a href="/profile/"
                   ><span class="glyphicon glyphicon-user"></span>
                   {{ T.navViewProfile }}</a
@@ -386,25 +387,39 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import notifications_List from '../notification/List.vue';
+import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 
 @Component({
   components: {
     'omegaup-notification-list': notifications_List,
+    'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
   },
 })
 export default class Navbar extends Vue {
-  @Prop() header!: omegaup.NavbarPayload;
+  @Prop() omegaUpLockDown!: boolean;
+  @Prop() inContest!: boolean;
+  @Prop() isLoggedIn!: boolean;
+  @Prop() isReviewer!: boolean;
+  @Prop() gravatarURL51!: string;
+  @Prop() currentUsername!: string;
+  @Prop() isAdmin!: boolean;
+  @Prop() isMainUserIdentity!: boolean;
+  @Prop() lockDownImage!: string;
+  @Prop() navbarSection!: string;
   @Prop() graderInfo!: omegaup.Grader;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string;
+  @Prop() initialClarifications!: omegaup.Clarification[];
 
   notifications: omegaup.Notification[] = [];
+  clarifications: omegaup.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {
@@ -412,11 +427,7 @@ export default class Navbar extends Vue {
   }
 
   get showNavbar(): boolean {
-    return (
-      this.header.isAdmin &&
-      !this.header.omegaUpLockDown &&
-      !this.header.inContest
-    );
+    return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
   }
 }
 </script>

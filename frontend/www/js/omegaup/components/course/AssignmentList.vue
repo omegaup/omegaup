@@ -67,7 +67,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th colspan="4" v-text="T.wordsTests"></th>
+            <th colspan="4" v-text="T.wordsExams"></th>
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortTests }">
@@ -131,7 +131,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 
 @Component
 export default class CourseAssignmentList extends Vue {

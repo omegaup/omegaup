@@ -1,4 +1,7 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import arena_virtual from '../components/arena/Virtual.vue';
 
@@ -32,7 +35,7 @@ OmegaUp.on('ready', function() {
                     window.location =
                       '/contest/' + virtualContestAlias + '/edit/';
                   })
-                  .fail(UI.apiError);
+                  .catch(UI.apiError);
               },
             },
           });
@@ -40,5 +43,5 @@ OmegaUp.on('ready', function() {
         components: { 'omegaup-arena-virtual': arena_virtual },
       });
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

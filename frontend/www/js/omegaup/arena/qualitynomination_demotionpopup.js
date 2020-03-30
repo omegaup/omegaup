@@ -1,4 +1,6 @@
-import { API, OmegaUp, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 import qualitynomination_demotionPopup from '../components/qualitynomination/DemotionPopup.vue';
 import Vue from 'vue';
 
@@ -22,7 +24,7 @@ OmegaUp.on('ready', function() {
                 reason: ev.selectedReason,
                 original: ev.original,
               }),
-            }).fail(UI.apiError);
+            }).catch(UI.apiError);
           },
         },
       });

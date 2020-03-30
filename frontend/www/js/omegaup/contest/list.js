@@ -1,18 +1,18 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
-import { API, OmegaUp, UI, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', () => {
   function fillContestsTable() {
-    const deferred = contestList.showAdmin
-      ? API.Contest.adminList()
-      : API.Contest.myList();
-    deferred
-      .then(function(result) {
+    (contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList())
+      .then(result => {
         contestList.contests = result.contests;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   const payloadElement = document.getElementById('payload');
@@ -41,8 +41,8 @@ OmegaUp.on('ready', function() {
             this.showAdmin = showAdmin;
             fillContestsTable();
           },
-          'bulk-update': admissionMode =>
-            this.changeAdmissionMode(admissionMode),
+          'bulk-update': (ev, selectedContests, admissionMode) =>
+            this.changeAdmissionMode(ev, selectedContests, admissionMode),
           'download-csv-users': contestAlias =>
             this.downloadCsvUsers(contestAlias),
         },
@@ -56,17 +56,26 @@ OmegaUp.on('ready', function() {
       'omegaup-contest-contestlist': contest_ContestList,
     },
     methods: {
-      changeAdmissionMode: function(admissionMode) {
-        UI.bulkOperation(function(alias, resolve, reject) {
-          API.Contest.update({
-            contest_alias: alias,
-            admission_mode: admissionMode,
+      changeAdmissionMode: (ev, selectedContests, admissionMode) => {
+        Promise.all(
+          selectedContests.map(contestAlias =>
+            API.Contest.update({
+              contest_alias: contestAlias,
+              admission_mode: admissionMode,
+            }),
+          ),
+        )
+          .then(() => {
+            UI.success(T.updateItemsSuccess);
           })
-            .then(resolve)
-            .fail(reject);
-        }, fillContestsTable);
+          .catch(error => {
+            UI.error(UI.formatString(T.bulkOperationError, error));
+          })
+          .finally(() => {
+            fillContestsTable();
+          });
       },
-      downloadCsvUsers: function(contestAlias) {
+      downloadCsvUsers: contestAlias => {
         API.Contest.contestants({
           contest_alias: contestAlias,
         })
@@ -109,7 +118,7 @@ OmegaUp.on('ready', function() {
 
             link.click(); // This will download the data
           })
-          .fail(omegaup.UI.apiError);
+          .catch(UI.apiError);
       },
     },
   });

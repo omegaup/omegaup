@@ -1,5 +1,6 @@
 import API from '../api.js';
-import UI from '../ui.js';
+import * as api from '../api_transitional';
+import * as UI from '../ui';
 
 export default class ArenaAdmin {
   constructor(arena) {
@@ -47,7 +48,7 @@ export default class ArenaAdmin {
         'disabled',
         'disabled',
       );
-      API.Clarification.create({
+      api.Clarification.create({
         contest_alias: self.arena.options.contestAlias,
         problem_alias: $(
           'select[name="problem"]',
@@ -66,10 +67,10 @@ export default class ArenaAdmin {
           self.arena.hideOverlay();
           self.refreshClarifications();
         })
-        .fail(function(run) {
+        .catch(function(run) {
           alert(run.error);
         })
-        .always(function() {
+        .finally(function() {
           $('input', self.arena.elements.clarification).prop('disabled', false);
         });
 
@@ -95,22 +96,22 @@ export default class ArenaAdmin {
       options.problem_alias = self.arena.options.onlyProblemAlias;
       API.Problem.runs(options)
         .then(self.runsChanged.bind(self))
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
       API.Run.list(options)
         .then(self.runsChanged.bind(self))
-        .fail(UI.ignoreError);
+        .catch(UI.ignoreError);
     } else if (self.arena.options.contestAlias != null) {
       options.contest_alias = self.arena.options.contestAlias;
       API.Contest.runs(options)
         .then(self.runsChanged.bind(self))
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     } else {
       options.course_alias = self.arena.options.courseAlias;
       options.assignment_alias = self.arena.options.assignmentAlias;
       API.Course.runs(options)
         .then(self.runsChanged.bind(self))
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     }
   }
 
@@ -124,7 +125,7 @@ export default class ArenaAdmin {
         rowcount: self.arena.clarificationsRowcount,
       })
         .then(self.arena.clarificationsChange.bind(self.arena))
-        .fail(UI.apiError);
+        .catch(UI.apiError);
     } else {
       self.arena.refreshClarifications();
     }

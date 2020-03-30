@@ -97,7 +97,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Api to create new school
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, school_id: int}
+     * @return array{school_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -121,8 +121,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
-            'school_id' => self::createSchool($r['name'], $state)
+            'school_id' => self::createSchool($r['name'], $state),
         ];
     }
 
@@ -159,7 +158,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns rank of best schools in last month
      *
      * @param \OmegaUp\Request $r
-     * @return array{coders: array{time: string, username: string, classname: string}[]}
+     * @return array{coders: list<array{time: string, username: string, classname: string}>}
      */
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -183,14 +182,13 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the number of solved problems on the last X
+     * Returns the number of solved problems on the last
      * months (including the current one)
      * @param \OmegaUp\Request $r
-     * @return array{distinct_problems_solved: array{year: int, month: int, count: int}[], status: string}
+     * @return array{distinct_problems_solved: list<array{month: int, problems_solved: int, year: int}>}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
-        $r->ensureInt('months_count');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
         if (is_null($school)) {
@@ -199,10 +197,8 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return [
             'distinct_problems_solved' => \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
-                intval($r['school_id']),
-                intval($r['months_count'])
+                intval($r['school_id'])
             ),
-            'status' => 'ok'
         ];
     }
 
@@ -211,7 +207,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * with the number of created problems, solved problems and organized contests.
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, users: array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}[]}
+     * @return array{users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
@@ -222,7 +218,6 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'status' => 'ok',
             'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
                 intval($school->school_id)
             ),
@@ -231,7 +226,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the top X schools of the month
-     * @return list<array{school_id: int, name: string, country_id: string, score: float}>
+     * @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>
      */
     public static function getTopSchoolsOfTheMonth(
         int $rowcount
@@ -239,37 +234,19 @@ class School extends \OmegaUp\Controllers\Controller {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
-
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
-            /** @return list<array{school_id: int, name: string, country_id: string, score: float}> */
+            /** @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
             function () use (
-                $date,
                 $rowcount
             ): array {
-                return \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
-                    $date,
+                return \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
                     $rowcount
                 );
             },
             60 * 60 * 12 // 12 hours
         );
-    }
-
-    /**
-     * Gets the top schools that are showed on the index page.
-     * @return array{rank: list<array{school_id: int, name: string, country_id: string, score: float}>}
-     */
-    public static function apiSchoolsOfTheMonth(\OmegaUp\Request $r) {
-        $r->ensureInt('rowcount', null, null, false);
-        $rowcount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        return [
-            'rank' => self::getTopSchoolsOfTheMonth(
-                $rowcount
-            ),
-        ];
     }
 
     /**
@@ -325,7 +302,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{name: string, ranking: int, school_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, ranking: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, ranking: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -479,7 +456,8 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $schools = \OmegaUp\DAO\SchoolOfTheMonth::calculateSchoolsOfMonthByGivenDate(
+        $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
+            100,
             $dateToSelect
         );
 
@@ -489,17 +467,21 @@ class School extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            foreach ($schools as $index => $school) {
-                $newSchoolOfTheMonth = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
-                    'school_id' => $school['school_id'],
-                    'time' => $dateToSelect,
-                    'ranking' => $index + 1,
-                ]);
-
+            foreach ($schools as $school) {
                 if ($school['school_id'] === $selectedSchool->school_id) {
-                    $newSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                    $selectedSchoolOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByPK(
+                        $school['school_of_the_month_id']
+                    );
+                    if (is_null($selectedSchoolOfTheMonth)) {
+                        throw new \OmegaUp\Exceptions\NotFoundException(
+                            'schoolNotFound'
+                        );
+                    }
+                    $selectedSchoolOfTheMonth->selected_by = $r->identity->identity_id;
+                    \OmegaUp\DAO\SchoolOfTheMonth::update(
+                        $selectedSchoolOfTheMonth
+                    );
                 }
-                \OmegaUp\DAO\SchoolOfTheMonth::create($newSchoolOfTheMonth);
             }
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {

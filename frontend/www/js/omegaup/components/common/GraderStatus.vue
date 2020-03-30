@@ -50,14 +50,25 @@ a.grader-submissions-link:hover {
 hr.dropdown-separator {
   margin: 0;
 }
+
+li,
+ul {
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
-import UI from '../../ui.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 
-@Component({})
+@Component
 export default class GraderStatus extends Vue {
   @Prop() status!: string;
   @Prop() error!: string;

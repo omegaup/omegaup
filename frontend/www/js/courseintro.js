@@ -16,5 +16,5 @@ omegaup.OmegaUp.on('ready', function() {
 
   omegaup.API.Course.details({ alias: courseAlias })
     .then(onCourseLoaded)
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 });

@@ -46,57 +46,28 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
     /**
      * @param int $schoolId
-     * @param int $monthsNumber
-     * @return array{year: int, month: int, count: int}[]
+     * @return list<array{month: int, problems_solved: int, year: int}>
      */
     public static function getMonthlySolvedProblemsCount(
-        int $schoolId,
-        int $monthsNumber
+        int $schoolId
     ): array {
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return [];
         $sql = '
         SELECT
-            IFNULL(YEAR(su.time), 0) AS year,
-            IFNULL(MONTH(su.time), 0) AS month,
-            COUNT(DISTINCT su.problem_id) AS `count`
+            IFNULL(MONTH(s.time), 0) AS month,
+            s.problems_solved,
+            IFNULL(YEAR(s.time), 0) AS year
         FROM
-            Submissions su
-        INNER JOIN
-            Schools sc ON sc.school_id = su.school_id
-        INNER JOIN
-            Runs r ON r.run_id = su.current_run_id
-        INNER JOIN
-            Problems p ON p.problem_id = su.problem_id
+            Schools_Problems_Solved_Per_Month AS s
         WHERE
-            su.school_id = ? AND su.time >= CURDATE() - INTERVAL ? MONTH
-            AND r.verdict = "AC" AND p.visibility >= 1
-            AND NOT EXISTS (
-                SELECT
-                    *
-                FROM
-                    Submissions sub
-                INNER JOIN
-                    Runs ru ON ru.run_id = sub.current_run_id
-                WHERE
-                    sub.problem_id = su.problem_id
-                    AND sub.identity_id = su.identity_id
-                    AND ru.verdict = "AC"
-                    AND sub.time < su.time
-            )
-        GROUP BY
-            IFNULL(YEAR(su.time), 0),
-            IFNULL(MONTH(su.time), 0)
+            s.school_id = ?
         ORDER BY
             year ASC,
             month ASC;';
 
-        $params = [$schoolId, $monthsNumber];
-
-        /** @var list<array{count: int, month: int, year: int}> */
+        /** @var list<array{month: int, problems_solved: int, year: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            $params
+            [ $schoolId ]
         );
     }
 

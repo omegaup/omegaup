@@ -1,22 +1,21 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
-    apt install --no-install-recommends -y curl ca-certificates && \
+    apt install --no-install-recommends -y curl ca-certificates gnupg2 && \
     /usr/sbin/update-ca-certificates && \
     apt autoremove -y && \
     apt clean
 
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash -
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
 
 RUN apt update -y && \
     apt install --no-install-recommends -y \
-        php7.2-fpm php7.2-curl php7.2-mysql php7.2-sqlite3 php7.2-zip \
-        php7.2-mbstring php7.2-json php7.2-opcache php7.2-xml nginx git \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
+        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml nginx git \
         yarn nodejs supervisor python3-requests python3-mysqldb \
-        mysql-client-core-5.7 sudo wait-for-it && \
+        mysql-client-core-8.0 sudo wait-for-it && \
     apt autoremove -y && \
     apt clean
 
@@ -31,7 +30,7 @@ RUN mkdir -p /var/log/supervisor && chown -R ubuntu /var/log/supervisor
 
 COPY ./etc/omegaup/frontend/* /etc/omegaup/frontend/
 COPY ./etc/supervisor/* /etc/supervisor/
-COPY ./etc/php/7.2/fpm/* /etc/php/7.2/fpm/
+COPY ./etc/php/7.4/fpm/* /etc/php/7.4/fpm/
 COPY ./etc/nginx/* /etc/nginx/
 COPY ./etc/sudoers.d/* /etc/sudoers.d/
 RUN chmod 440 /etc/sudoers.d/ubuntu

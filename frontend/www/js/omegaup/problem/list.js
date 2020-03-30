@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
-import { OmegaUp, T, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -15,6 +17,7 @@ OmegaUp.on('ready', function() {
               problems: this.problems,
               loggedIn: this.loggedIn,
               currentTags: this.currentTags,
+              pagerItems: this.pagerItems,
               wizardTags: tagData,
             },
             on: {
@@ -26,8 +29,9 @@ OmegaUp.on('ready', function() {
         },
         data: {
           problems: payload.problems,
-          loggedIn: payload.logged_in,
-          currentTags: payload.current_tags,
+          loggedIn: payload.loggedIn,
+          currentTags: payload.currentTags,
+          pagerItems: payload.pagerItems,
           wizardTags: {},
         },
         components: {
@@ -35,5 +39,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(UI.apiError);
 });
