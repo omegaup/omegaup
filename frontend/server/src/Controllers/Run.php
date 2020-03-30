@@ -73,6 +73,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         'NO-AC',
     ];
 
+    public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
+
     /**
      *
      * Validates Create Run request
@@ -766,7 +768,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -848,7 +850,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -882,7 +884,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      */
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
@@ -904,7 +906,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!is_string($detailsJson)) {
             return $response;
         }
-        /** @var array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: array<array-key, array{cases: array<array-key, array{contest_score: float, max_score: float, meta: array<string, mixed>, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float} */
+        /** @var array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float} */
         $details = json_decode($detailsJson, true);
         if (
             isset($details['compile_error']) &&
@@ -1046,49 +1048,122 @@ class Run extends \OmegaUp\Controllers\Controller {
             return null;
         }
 
-        $descriptorspec = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
+        if (strpos($resourcePath, '/') !== 0) {
+            $resourcePath = "/{$resourcePath}";
+        }
+        $accessKeyId = strval(AWS_CLI_ACCESS_KEY_ID);
+        $secretAccessKey = strval(AWS_CLI_SECRET_ACCESS_KEY);
+        $regionName = 'us-east-1';
+        $bucketName = 'omegaup-runs';
+        $serviceName = 's3';
+        $signingAlgorithm = 'AWS4-HMAC-SHA256';
+
+        $now = \OmegaUp\Time::get();
+        $datestamp = gmstrftime('%Y%m%d', $now);
+        $timestamp = gmstrftime('%Y%m%dT%H%M%SZ', $now);
+        $emptySHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+        $headers = [
+            'Host' => "{$bucketName}.{$serviceName}.amazonaws.com",
+            'X-Amz-Content-Sha256' => $emptySHA256,
+            'X-Amz-Date' => $timestamp,
         ];
-        $proc = proc_open(
-            AWS_CLI_BINARY . " s3 cp s3://omegaup-runs/{$resourcePath} -",
-            $descriptorspec,
-            $pipes,
-            '/tmp',
+        $signedHeaders = join(
+            ';',
+            array_map(
+                function (string $key): string {
+                    return strtolower($key);
+                },
+                array_keys($headers)
+            )
+        );
+        $canonicalRequest = join(
+            "\n",
             [
-                'AWS_ACCESS_KEY_ID' => AWS_CLI_ACCESS_KEY_ID,
-                'AWS_SECRET_ACCESS_KEY' => AWS_CLI_SECRET_ACCESS_KEY,
+                'GET',
+                $resourcePath,
+                '',
+                join(
+                    '',
+                    array_map(
+                        function (string $key) use ($headers): string {
+                            return strtolower($key) . ":{$headers[$key]}\n";
+                        },
+                        array_keys($headers)
+                    )
+                ),
+                $signedHeaders,
+                $emptySHA256,
             ]
         );
 
-        if (!is_resource($proc)) {
-            $errors = error_get_last();
-            if (is_null($errors)) {
-                self::$log->error("Getting {$resourcePath} failed");
-            } else {
-                self::$log->error(
-                    "Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}"
-                );
-            }
-            return null;
-        }
+        $scope = "{$datestamp}/{$regionName}/{$serviceName}/aws4_request";
+        $stringToSign = join(
+            "\n",
+            [
+                $signingAlgorithm,
+                $timestamp,
+                $scope,
+                hash('sha256', $canonicalRequest),
+            ]
+        );
 
-        fclose($pipes[0]);
-        $err = trim(stream_get_contents($pipes[2]));
-        fclose($pipes[2]);
+        $dateSignature = hash_hmac(
+            'sha256',
+            $datestamp,
+            "AWS4{$secretAccessKey}",
+            true
+        );
+        $regionSignature = hash_hmac(
+            'sha256',
+            $regionName,
+            $dateSignature,
+            true
+        );
+        $serviceSignature = hash_hmac(
+            'sha256',
+            $serviceName,
+            $regionSignature,
+            true
+        );
+        $signingKey = hash_hmac(
+            'sha256',
+            'aws4_request',
+            $serviceSignature,
+            true
+        );
+        $signature = hash_hmac(
+            'sha256',
+            $stringToSign,
+            $signingKey,
+            false
+        );
+        $headers['Authorization'] = "{$signingAlgorithm} Credential={$accessKeyId}/{$scope}, SignedHeaders={$signedHeaders}, Signature={$signature}";
+
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl,
+            [
+                CURLOPT_URL => "https://{$headers['Host']}{$resourcePath}",
+                CURLOPT_HTTPHEADER => array_map(
+                    function (string $key) use ($headers): string {
+                        return "{$key}: {$headers[$key]}";
+                    },
+                    array_keys($headers)
+                ),
+                CURLOPT_RETURNTRANSFER => intval(!$passthru),
+            ]
+        );
+
+        $output = curl_exec($curl);
         if ($passthru) {
-            fpassthru($pipes[1]);
             $result = '';
         } else {
-            $result = stream_get_contents($pipes[1]);
+            $result = strval($output);
         }
-        fclose($pipes[1]);
-
-        $retval = proc_close($proc);
-
-        if ($retval != 0) {
-            self::$log->error("Getting {$resourcePath} failed: $retval $err");
+        /** @var int */
+        $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($output === false || $retval != 200) {
+            self::$log->error("Getting {$resourcePath} failed: {$output}");
             return null;
         }
         return $result;
@@ -1124,6 +1199,37 @@ class Run extends \OmegaUp\Controllers\Controller {
                 }
 
                 return $totals;
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
+    }
+
+    /**
+     * Get total of runs have been submitted last 3 months.
+     *
+     * @return array{date: list<string>, total: list<int>}
+     */
+    public static function getCounts() {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::RUN_TOTAL_COUNTS,
+            '',
+            function () {
+                $result = [];
+                $result['date'] = [];
+                $result['total'] = [];
+                $runCounts = \OmegaUp\DAO\RunCounts::getAll(
+                    1,
+                    90,
+                    'date',
+                    'DESC'
+                );
+
+                foreach ($runCounts as $runCount) {
+                    $result['date'][] = strval($runCount->date);
+                    $result['total'][] = intval($runCount->total);
+                }
+
+                return $result;
             },
             24 * 60 * 60 /*expire in 1 day*/
         );
@@ -1191,7 +1297,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1210,7 +1316,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready']
+            self::STATUS
         );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['verdict'],

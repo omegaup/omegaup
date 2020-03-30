@@ -12,8 +12,9 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { T } from '../omegaup.js';
-import UI from '../ui.js';
+import T from '../lang';
+import * as UI from '../ui';
+import '../../../third_party/js/bootstrap-datepicker.js';
 
 @Component
 export default class DatePicker extends Vue {
@@ -29,7 +30,7 @@ export default class DatePicker extends Vue {
   mounted() {
     if ((this.$el as HTMLInputElement).type === 'text') {
       // Even though we declared the input as having date type,
-      // browsers that don't support it will silently change the type to ext'.
+      // browsers that don't support it will silently change the type to text.
       // In that case, use the bootstrap datepicker.
       this.mountedFallback();
     }
@@ -67,3 +68,7 @@ export default class DatePicker extends Vue {
   }
 }
 </script>
+
+<style>
+@import '../../../third_party/css/bootstrap-datepicker.css';
+</style>

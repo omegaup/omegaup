@@ -47,7 +47,7 @@ abstract class UserRank {
             REPLACE INTO
                 User_Rank (
                     `user_id`,
-                    `rank`,
+                    `ranking`,
                     `problems_solved_count`,
                     `score`,
                     `username`,
@@ -69,8 +69,8 @@ abstract class UserRank {
         $params = [
             $User_Rank->user_id,
             (
-                !is_null($User_Rank->rank) ?
-                intval($User_Rank->rank) :
+                !is_null($User_Rank->ranking) ?
+                intval($User_Rank->ranking) :
                 null
             ),
             intval($User_Rank->problems_solved_count),
@@ -103,7 +103,7 @@ abstract class UserRank {
             UPDATE
                 `User_Rank`
             SET
-                `rank` = ?,
+                `ranking` = ?,
                 `problems_solved_count` = ?,
                 `score` = ?,
                 `username` = ?,
@@ -117,9 +117,9 @@ abstract class UserRank {
                 );';
         $params = [
             (
-                is_null($User_Rank->rank) ?
+                is_null($User_Rank->ranking) ?
                 null :
-                intval($User_Rank->rank)
+                intval($User_Rank->ranking)
             ),
             intval($User_Rank->problems_solved_count),
             floatval($User_Rank->score),
@@ -158,7 +158,7 @@ abstract class UserRank {
         $sql = '
             SELECT
                 `User_Rank`.`user_id`,
-                `User_Rank`.`rank`,
+                `User_Rank`.`ranking`,
                 `User_Rank`.`problems_solved_count`,
                 `User_Rank`.`score`,
                 `User_Rank`.`username`,
@@ -248,7 +248,7 @@ abstract class UserRank {
         $sql = '
             SELECT
                 `User_Rank`.`user_id`,
-                `User_Rank`.`rank`,
+                `User_Rank`.`ranking`,
                 `User_Rank`.`problems_solved_count`,
                 `User_Rank`.`score`,
                 `User_Rank`.`username`,
@@ -305,9 +305,9 @@ abstract class UserRank {
     ): int {
         $sql = '
             INSERT INTO
-                User_Rank (
+                `User_Rank` (
                     `user_id`,
-                    `rank`,
+                    `ranking`,
                     `problems_solved_count`,
                     `score`,
                     `username`,
@@ -333,9 +333,9 @@ abstract class UserRank {
                 intval($User_Rank->user_id)
             ),
             (
-                is_null($User_Rank->rank) ?
+                is_null($User_Rank->ranking) ?
                 null :
-                intval($User_Rank->rank)
+                intval($User_Rank->ranking)
             ),
             intval($User_Rank->problems_solved_count),
             floatval($User_Rank->score),

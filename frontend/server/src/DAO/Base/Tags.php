@@ -194,7 +194,7 @@ abstract class Tags {
     ): int {
         $sql = '
             INSERT INTO
-                Tags (
+                `Tags` (
                     `name`
                 ) VALUES (
                     ?

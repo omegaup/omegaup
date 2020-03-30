@@ -42,7 +42,7 @@ omegaup.OmegaUp.on('ready', function() {
         fillCandidatesTable();
         $('#invitepeople > table > tbody').html('');
       })
-      .fail(function(response) {
+      .catch(function(response) {
         omegaup.UI.error(response.error);
         fillCandidatesTable();
       });
@@ -66,7 +66,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('.new_interview_form #description').val(contest.description);
       $('#window_length').val(contest.window_length);
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   function fillCandidatesTable() {
     omegaup.API.Interview.details({ interview_alias: interviewAlias })
@@ -106,7 +106,7 @@ omegaup.OmegaUp.on('ready', function() {
           .empty()
           .html(html);
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 
   $('#add-problem-form').on('submit', function() {
@@ -121,7 +121,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('div.post.footer').show();
         refreshContestProblems();
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
 
     return false; // Prevent page refresh
   });
@@ -164,7 +164,7 @@ omegaup.OmegaUp.on('ready', function() {
                           $('div.post.footer').show();
                           $(e.target.parentElement.parentElement).remove();
                         })
-                        .fail(omegaup.UI.apiError);
+                        .catch(omegaup.UI.apiError);
                     };
                   })(response.problems[i].alias),
                 ),
@@ -172,7 +172,7 @@ omegaup.OmegaUp.on('ready', function() {
           );
         }
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
 
   omegaup.API.Problem.list()
@@ -187,7 +187,7 @@ omegaup.OmegaUp.on('ready', function() {
         );
       }
     })
-    .fail(omegaup.UI.apiError);
+    .catch(omegaup.UI.apiError);
 
   omegaup.UI.problemTypeahead($('#problems-dropdown'));
 
@@ -207,7 +207,7 @@ omegaup.OmegaUp.on('ready', function() {
 
         refreshContestAdmins();
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
 
     return false; // Prevent refresh
   });
@@ -250,7 +250,7 @@ omegaup.OmegaUp.on('ready', function() {
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .fail(omegaup.UI.apiError);
+                            .catch(omegaup.UI.apiError);
                         };
                       })(admin.username),
                     ),
@@ -290,7 +290,7 @@ omegaup.OmegaUp.on('ready', function() {
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .fail(omegaup.UI.apiError);
+                            .catch(omegaup.UI.apiError);
                         };
                       })(group_admin.alias),
                     ),
@@ -298,7 +298,7 @@ omegaup.OmegaUp.on('ready', function() {
           );
         }
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
   }
   $('#add-group-admin-form').on('submit', function() {
     omegaup.API.Contest.addGroupAdmin({
@@ -310,7 +310,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('div.post.footer').show();
         refreshContestAdmins();
       })
-      .fail(omegaup.UI.apiError);
+      .catch(omegaup.UI.apiError);
 
     return false; // Prevent refresh
   });

@@ -85,6 +85,21 @@
         <omegaup-user-charts
           v-bind:data="charts"
           v-bind:username="profile.username"
+          v-bind:periodStatisticOptions="periodStatisticOptions"
+          v-on:emit-update-period-statistics="
+            (profileComponent, categories, data) =>
+              $emit(
+                'update-period-statistics',
+                profileComponent,
+                categories,
+                data,
+              )
+          "
+          v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
+          v-on:emit-update-aggregate-statistics="
+            profileComponent =>
+              $emit('update-aggregate-statistics', profileComponent)
+          "
           v-if="charts"
         ></omegaup-user-charts>
       </div>
@@ -103,8 +118,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import { Chart } from 'highcharts-vue';
 import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
@@ -129,6 +145,8 @@ export default class UserProfile extends Vue {
   @Prop() createdProblems!: Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
+  @Prop() periodStatisticOptions!: Chart;
+  @Prop() aggregateStatisticOptions!: Chart;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
 

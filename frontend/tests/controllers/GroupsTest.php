@@ -53,7 +53,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Group creation should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals($e->getMessage(), 'aliasInUse');
+            $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Add identity to group
      */
     public function testAddUserToGroup() {
-        $group = GroupsFactory::createGroup();
+        $group = \OmegaUp\Test\Factories\Groups::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($group['owner']);
@@ -81,29 +81,32 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Add user to group
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddUserToGroupNotOwned() {
-        $group = GroupsFactory::createGroup();
+        $group = \OmegaUp\Test\Factories\Groups::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $userCalling, 'identity' => $identityCalling] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identityCalling);
-        $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $group['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $group['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Remove user from group test
      */
     public function testRemoveUserFromGroup() {
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup($groupData, $identity);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup($groupData, $identity);
 
         $login = self::login($groupData['owner']);
         $response = \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
@@ -123,36 +126,43 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Remove user from group test
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveUserFromGroupUserNotInGroup() {
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($groupData['owner']);
-        \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $groupData['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $groupData['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('User', $e->parameter);
+        }
     }
 
     /**
      * Remove user from group test
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveUserFromGroupUserNotOwner() {
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'group_alias' => $groupData['group']->alias
-        ]));
+        try {
+            \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'group_alias' => $groupData['group']->alias
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
@@ -164,11 +174,11 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
-            $groups[] = GroupsFactory::createGroup($identity);
+            $groups[] = \OmegaUp\Test\Factories\Groups::createGroup($identity);
         }
 
         // Create a group for another user
-        GroupsFactory::createGroup();
+        \OmegaUp\Test\Factories\Groups::createGroup();
 
         // Call API
         $login = self::login($identity);
@@ -184,13 +194,16 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGroupDetails() {
         // Create a group with 5 users
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         $users = [];
         $identities = [];
         $nUsers = 5;
         for ($i = 0; $i < $nUsers; $i++) {
             ['user' => $users[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
-            GroupsFactory::addUserToGroup($groupData, $identities[$i]);
+            \OmegaUp\Test\Factories\Groups::addUserToGroup(
+                $groupData,
+                $identities[$i]
+            );
         }
 
         // Call API
@@ -200,8 +213,8 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'group_alias' => $groupData['group']->alias,
         ]));
         $this->assertEquals(
-            $groupData['group']->group_id,
-            $response['group']['group_id']
+            $groupData['group']->alias,
+            $response['group']['alias']
         );
 
         $response = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
@@ -215,7 +228,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Test add a scoreboard
      */
     public function testCreateScoreboard() {
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         $name = \OmegaUp\Test\Utils::createRandomString();
         $description = \OmegaUp\Test\Utils::createRandomString();
         $alias = \OmegaUp\Test\Utils::createRandomString();
@@ -245,8 +258,10 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Adding a contest to a scoreboard
      */
     public function testAddContestToScoreboard() {
-        $groupData = GroupsFactory::createGroup();
-        $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addAdminUser(
             $contestData,
@@ -275,12 +290,12 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Adding a contest to a scoreboard not being contest admin
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddContestToScoreboardNoContestAdmin() {
-        $groupData = GroupsFactory::createGroup();
-        $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
                 ['admissionMode' => 'private']
@@ -288,27 +303,34 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($groupData['owner']);
-        \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'group_alias' => $groupData['request']['alias'],
-            'scoreboard_alias' => $scoreboardData['request']['alias'],
-            'contest_alias' => $contestData['request']['alias']
-        ]));
+        try {
+            \OmegaUp\Controllers\GroupScoreboard::apiAddContest(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'group_alias' => $groupData['request']['alias'],
+                'scoreboard_alias' => $scoreboardData['request']['alias'],
+                'contest_alias' => $contestData['request']['alias']
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Removes contest from scoreboard
      */
     public function testRemoveContestFromScoreboard() {
-        $groupData = GroupsFactory::createGroup();
-        $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         \OmegaUp\Test\Factories\Contest::addAdminUser(
             $contestData,
             $groupData['owner']
         );
 
-        GroupsFactory::addContestToScoreboard(
+        \OmegaUp\Test\Factories\Groups::addContestToScoreboard(
             $contestData,
             $scoreboardData,
             $groupData
@@ -336,13 +358,18 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * apiDetails
      */
     public function testScoreboardDetails() {
-        $groupData = GroupsFactory::createGroup();
-        $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
         $contestsData = [];
 
         // Create contestants to submit runs
         ['user' => $contestantInGroup, 'identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup($groupData, $identityInGroup);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroup
+        );
         ['user' => $contestantNotInGroup, 'identity' => $identityNotInGroup] = \OmegaUp\Test\Factories\User::createUser();
 
         $n = 5;
@@ -353,7 +380,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 $contestsData[$i],
                 $groupData['owner']
             );
-            GroupsFactory::addContestToScoreboard(
+            \OmegaUp\Test\Factories\Groups::addContestToScoreboard(
                 $contestsData[$i],
                 $scoreboardData,
                 $groupData
@@ -403,11 +430,11 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * apiList
      */
     public function testScoreboardsList() {
-        $groupData = GroupsFactory::createGroup();
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         $n = 5;
         $scoreboardsData = [];
         for ($i = 0; $i < $n; $i++) {
-            $scoreboardsData[] = GroupsFactory::createGroupScoreboard(
+            $scoreboardsData[] = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
                 $groupData
             );
         }
@@ -425,15 +452,23 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * apiDetails with only AC and Weights
      */
     public function testScoreboardDetailsOnlyAcAndWeight() {
-        $groupData = GroupsFactory::createGroup();
-        $scoreboardData = GroupsFactory::createGroupScoreboard($groupData);
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
         $contestsData = [];
 
         // Create contestants to submit runs
         ['user' => $contestantInGroup, 'identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup($groupData, $identityInGroup);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroup
+        );
         ['user' => $contestantInGroupNoAc, 'identity' => $identityInGroupNoAc] = \OmegaUp\Test\Factories\User::createUser();
-        GroupsFactory::addUserToGroup($groupData, $identityInGroupNoAc);
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroupNoAc
+        );
 
         $n = 5;
 
@@ -443,7 +478,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 $contestsData[$i],
                 $groupData['owner']
             );
-            GroupsFactory::addContestToScoreboard(
+            \OmegaUp\Test\Factories\Groups::addContestToScoreboard(
                 $contestsData[$i],
                 $scoreboardData,
                 $groupData,

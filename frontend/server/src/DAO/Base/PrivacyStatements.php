@@ -198,7 +198,7 @@ abstract class PrivacyStatements {
     ): int {
         $sql = '
             INSERT INTO
-                PrivacyStatements (
+                `PrivacyStatements` (
                     `git_object_id`,
                     `type`
                 ) VALUES (

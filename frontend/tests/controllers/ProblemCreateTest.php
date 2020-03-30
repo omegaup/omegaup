@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
+class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for creating a problem
      */
@@ -372,8 +372,8 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
         // Verify we have the accents, lol
-        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
-        if (strpos($markdown_contents, 'ó') === false) {
+        $markdownContents = $problemArtifacts->get('statements/es.markdown');
+        if (strpos($markdownContents, 'ó') === false) {
             $this->fail('ó not found when expected.');
         }
     }
@@ -415,15 +415,21 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
 
         // Do image path checks in the markdown file
-        $markdown_contents = $problemArtifacts->get('statements/es.markdown');
-        $this->assertContains('![Saluda](bunny.jpg)', $markdown_contents);
+        $markdownContents = $problemArtifacts->get('statements/es.markdown');
+        $this->assertStringContainsString(
+            '![Saluda](bunny.jpg)',
+            $markdownContents
+        );
         // And the direct URL.
-        $this->assertContains(
+        $this->assertStringContainsString(
             "![Saluda]($imageAbsoluteUrl)",
-            $markdown_contents
+            $markdownContents
         );
         // And the unmodified, not found image.
-        $this->assertContains('![404](notfound.jpg)', $markdown_contents);
+        $this->assertStringContainsString(
+            '![404](notfound.jpg)',
+            $markdownContents
+        );
 
         // Check that the images are there.
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
@@ -750,12 +756,12 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $problemParams->updatePublished
         );
-        $this->assertEquals(1000, $problemParams->validatorTimeLimit);
-        $this->assertEquals(60000, $problemParams->overallWallTimeLimit);
-        $this->assertEquals(0, $problemParams->extraWallTime);
-        $this->assertEquals(10240, $problemParams->outputLimit);
+        $this->assertEquals(null, $problemParams->validatorTimeLimit);
+        $this->assertEquals(null, $problemParams->overallWallTimeLimit);
+        $this->assertEquals(null, $problemParams->extraWallTime);
+        $this->assertEquals(null, $problemParams->outputLimit);
         $this->assertEquals(10240, $problemParams->inputLimit);
-        $this->assertFalse($problemParams->emailClarifications);
+        $this->assertEquals(null, $problemParams->emailClarifications);
 
         // New object with custom values
         $titleAlias = \OmegaUp\Test\Utils::createRandomString();
@@ -778,5 +784,68 @@ class CreateProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemParams->overallWallTimeLimit
         );
         $this->assertTrue($problemParams->emailClarifications);
+    }
+
+    public function testCreateProblemWithDefaultValues() {
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $title = \OmegaUp\Test\Utils::createRandomString();
+        $problemAlias = substr(
+            preg_replace(
+                '/[^a-zA-Z0-9_-]/',
+                '',
+                str_replace(' ', '-', $title)
+            ),
+            0,
+            32
+        );
+
+        /** @var array<string, array{tmp_name: string}> $_FILES */
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip';
+
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
+
+        \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'title' => $title,
+            'problem_alias' => $problemAlias,
+            'source' => 'yo',
+        ]));
+
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemAlias,
+            ])
+        );
+
+        $this->assertEquals(10240, $response['input_limit']);
+        {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                )
+            );
+
+            $this->assertEquals('1s', $problemSettings->Limits->TimeLimit);
+            $this->assertEquals('0s', $problemSettings->Limits->ExtraWallTime);
+            $this->assertEquals(
+                \Omegaup\Controllers\Problem::parseSize('64MiB'),
+                $problemSettings->Limits->MemoryLimit
+            );
+            $this->assertEquals(
+                \Omegaup\Controllers\Problem::parseSize('10240KiB'),
+                $problemSettings->Limits->OutputLimit
+            );
+            $this->assertEquals(
+                '30s',
+                $problemSettings->Limits->OverallWallTimeLimit
+            );
+        }
     }
 }

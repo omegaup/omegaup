@@ -18,6 +18,7 @@ let config = [
     entry: {
       omegaup: [
         '@babel/polyfill',
+        'unfetch/polyfill',
         './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js',
       ],
@@ -26,13 +27,16 @@ let config = [
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
+      arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.js',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
       badge_details: './frontend/www/js/omegaup/badge/details.js',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
-      coder_of_the_month_notice:
-        './frontend/www/js/omegaup/coderofthemonth/notice.js',
+      common_footer: './frontend/www/js/omegaup/common/footer.js',
+      common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.js',
+      common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
+      common_stats: './frontend/www/js/omegaup/common/stats.js',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
@@ -40,7 +44,7 @@ let config = [
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:
         './frontend/www/js/omegaup/contest/scoreboardmerge.js',
-      contest_stats: './frontend/www/js/omegaup/contest/stats.js',
+      course_details: './frontend/www/js/omegaup/course/details.js',
       course_edit: './frontend/www/js/omegaup/course/edit.js',
       course_intro: './frontend/www/js/omegaup/course/intro.js',
       course_list: './frontend/www/js/omegaup/course/list.js',
@@ -57,7 +61,7 @@ let config = [
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
-      problem_stats: './frontend/www/js/omegaup/problem/stats.js',
+      problem_mine: './frontend/www/js/omegaup/problem/mine.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
@@ -71,12 +75,12 @@ let config = [
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
-      school_of_the_month: './frontend/www/js/omegaup/schools/schoolofthemonth.js',
+      school_of_the_month:
+        './frontend/www/js/omegaup/schools/schoolofthemonth.js',
       school_profile: './frontend/www/js/omegaup/schools/profile.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
-      user_charts: './frontend/www/js/omegaup/user/charts.js',
       user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
       user_manage_identities:
         './frontend/www/js/omegaup/user/manage_identities.js',
@@ -197,6 +201,11 @@ let config = [
         {
           test: /\.css$/,
           loader: 'style-loader!css-loader',
+        },
+        // inline scss styles on vue components
+        {
+          test: /\.scss$/,
+          use: ['vue-style-loader', 'css-loader', 'sass-loader'],
         },
       ],
     },

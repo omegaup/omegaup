@@ -76,6 +76,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         $group = self::validateGroupOwnership($r);
+        if (is_null($group->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['name'],
+            'name'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password'],
+            'password'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['gender'],
+            'gender'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['school_name'],
+            'school_name'
+        );
 
         // Save objects into DB
         try {
@@ -95,7 +120,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 $countryId,
                 $stateId,
                 $r['gender'],
-                $r['group_alias']
+                $group->alias
             );
 
             $state = null;
@@ -152,10 +177,27 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         $group = self::validateGroupOwnership($r);
+        if (is_null($group->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
 
-        /** @var list<array<string, string>> */
-        $identities = $r['identities'];
-        /** @var array<string, bool> */
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['identities'],
+            'identities'
+        );
+
+        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}>|null $identities */
+        $identities = json_decode($r['identities'], true);
+
+        if (!is_array($identities)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
+        /** @var array<string, bool> $seenUsernames */
         $seenUsernames = [];
         foreach ($identities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
@@ -189,7 +231,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $countryId,
                     $stateId,
                     $identity['gender'],
-                    $r['group_alias']
+                    $group->alias
                 );
 
                 $state = null;
@@ -268,11 +310,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     private static function updateIdentity(
-        $username,
-        $name,
+        ?string $username,
+        ?string $name,
         ?\OmegaUp\DAO\VO\States $state,
-        $gender,
-        $aliasGroup,
+        ?string $gender,
+        string $aliasGroup,
         \OmegaUp\DAO\VO\Identities $originalIdentity
     ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
@@ -301,6 +343,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Groups $group
     ): void {
+        if (is_null($identity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
@@ -330,6 +377,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Experiments::IDENTITIES
         );
         self::validateUpdateRequest($r);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['original_username'],
+            'original_username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['name'],
+            'name'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['gender'],
+            'gender'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group_alias'],
+            'group_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['school_name'],
+            'school_name'
+        );
+
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
         $originalSchoolId = null;
@@ -362,9 +434,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $identity->identity_id = $originalIdentity->identity_id;
 
         $schoolId = \OmegaUp\Controllers\School::createSchool(
-            trim(
-                $r['school_name']
-            ),
+            trim($r['school_name']),
             $state
         );
 
@@ -401,6 +471,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
             \OmegaUp\Experiments::IDENTITIES
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['password'],
+            'password'
+        );
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 
@@ -436,6 +514,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['group_alias'],
+            'group_alias'
+        );
         \OmegaUp\Controllers\Group::validateGroup(
             $r['group_alias'],
             $r->identity
@@ -454,11 +536,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     public static function validateIdentity(
-        $username,
-        &$name,
-        &$gender,
-        $groupAlias
+        ?string $username,
+        ?string &$name,
+        ?string &$gender,
+        string $groupAlias
     ): void {
+        // Validate request
+        \OmegaUp\Validators::validateValidUsernameIdentity(
+            $username,
+            'username'
+        );
+
         // Check group is present
         $identityUsername = explode(':', $username);
         if (count($identityUsername) != 2) {
@@ -474,11 +562,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'group_alias'
             );
         }
-        // Validate request
-        \OmegaUp\Validators::validateValidUsernameIdentity(
-            $username,
-            'username'
-        );
 
         if (!is_null($name)) {
             /** @var null|string $name */
@@ -504,13 +587,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     private static function createIdentity(
-        $username,
-        $name,
-        $password,
+        ?string $username,
+        ?string $name,
+        string $password,
         ?string $countryId,
         ?string $stateId,
-        $gender,
-        $aliasGroup
+        ?string $gender,
+        string $aliasGroup
     ): \OmegaUp\DAO\VO\Identities {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
@@ -537,7 +620,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
-        bool $omitRank
+        bool $omitRank,
+        string $category = 'all'
     ): array {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -587,7 +671,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             !is_null($loggedIdentity)
             && \OmegaUp\Authorization::canViewEmail($loggedIdentity)
             && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth(
-                $identity->username
+                $identity->username,
+                $category
             )
         ) {
             return $response;
@@ -677,7 +762,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             // break up string into pieces (languages and q factors)
-            /** @var array{0: string, 1: string, 2: string} $langParse */
             if (
                 preg_match_all(
                     '/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
@@ -687,12 +771,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 !empty($langParse[1])
             ) {
                 // create a list like "en" => 0.8
-                $langs = array_combine($langParse[1], $langParse[2]);
+                /** @var array{0: list<string>, 1: list<string>, 2: list<string>} $langParse */
+                [$_, $lang, $q] = $langParse;
+                $langs = array_combine($lang, $q);
 
                 // set default to 1 for any without q factor
                 foreach ($langs as $lang => $val) {
                     if ($val === '') {
                         $langs[$lang] = 1.0;
+                    } else {
+                        $langs[$lang] = floatval($val);
                     }
                 }
 

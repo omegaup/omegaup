@@ -129,14 +129,15 @@ class ApiUtils {
 
     /**
      * @param string $format
-     * @param array<string, string> $namedArgs
+     * @param array<string, mixed> $namedArgs
      */
     public static function formatString(
         string $format,
         array $namedArgs
     ): string {
+        /** @var mixed $value*/
         foreach ($namedArgs as $key => $value) {
-            $format = str_replace("%($key)", $value, $format);
+            $format = str_replace("%($key)", strval($value), $format);
         }
         return $format;
     }

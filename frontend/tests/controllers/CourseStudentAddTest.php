@@ -41,7 +41,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
             'optional'
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -155,8 +155,6 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Students can only be added by course admins
-     *
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddStudentNonAdmin() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
@@ -166,27 +164,36 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $nonAdminLogin = \OmegaUp\Test\ControllerTestCase::login(
             $nonAdminIdentity
         );
-        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
-            'auth_token' => $nonAdminLogin->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'course_alias' => $courseData['course_alias'],
+        try {
+            \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+                'auth_token' => $nonAdminLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
             ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Can't self-register unless Public
-     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testSelfAddStudentNoPublic() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
-        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $identity->username,
-            'course_alias' => $courseData['course_alias'],
+        try {
+            \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
             ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
@@ -196,7 +203,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true /*public*/
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -227,7 +234,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         $courseDataPublic = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
-            true
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         ['user' => $student, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

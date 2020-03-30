@@ -89,7 +89,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             null,
             null,
-            false,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             'no',
             'false',
             $startTimeDelay
@@ -185,10 +185,9 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals(
+            $this->assertEqualsWithDelta(
                 (\OmegaUp\Time::get() - $contest->start_time) / 60,
                 $run->penalty,
-                '',
                 0.5
             );
         }
@@ -232,7 +231,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add user's school
         $login = self::login($identity);
-        $school = SchoolsFactory::createSchool();
+        $school = \OmegaUp\Test\Factories\Schools::createSchool();
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $school['school']->school_id,
@@ -308,8 +307,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Test a invalid submission to a private contest
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunPrivateContestWithUserNotRegistred() {
         $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
@@ -317,14 +314,21 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create a second user not regitered to private contest
-        ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        [
+            'user' => $contestant2,
+            'identity' => $identity2,
+        ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Log in this second user
         $login = self::login($identity2);
         $r['auth_token'] = $login->auth_token;
 
-        // Call API
-        \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotEvenOpened', $e->getMessage());
+        }
     }
 
     /**
@@ -346,6 +350,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail(
                 'api should have not created run, because contest has not started yet.'
             );
+            $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
@@ -354,8 +359,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test that a user cannot submit once he has already submitted something
      * and the submissions gap time has not expired
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
@@ -374,7 +377,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertRun($r, $response);
 
         // Send a second run. This one should fail
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runWaitGap', $e->getMessage());
+        }
     }
 
     /**
@@ -414,8 +422,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test that grabbing a problem from a contest A and using it as
      * parameter of contest B does not work
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testInvalidContestProblemCombination() {
         // Set the context for the first contest
@@ -427,8 +433,13 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Mix problems
         $r2['problem_alias'] = $r1['problem_alias'];
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r2);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r2);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('problem_alias', $e->parameter);
+        }
     }
 
     /**
@@ -531,8 +542,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Admin is god, but even he is unable to submit even when contest has ended
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunWhenContestEndedForContestDirector() {
         $startTime = \OmegaUp\Time::get() - 60 * 60;
@@ -549,9 +558,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
-
-        $this->assertRun($r, $response);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
@@ -704,8 +716,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * User cannot send runs to a private problem, regardless of it being
      * in a contest
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunToPrivateProblemWhileInsideAPublicContest() {
         // Get a contest
@@ -727,22 +737,23 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($this->contestantIdentity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => '', // Not inside a contest
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c11-gcc',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-        ]);
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => '', // Not inside a contest
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'language' => 'c11-gcc',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('problemIsNotPublic', $e->getMessage());
+        }
     }
 
     /**
      * User should wait between consecutive runs.
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunsToPublicProblemInsideSubmissionGap() {
         $originalGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
@@ -774,7 +785,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertRun($r, $response);
 
             // Call API
-            $response = \OmegaUp\Controllers\Run::apiCreate($r);
+            try {
+                \OmegaUp\Controllers\Run::apiCreate($r);
+                $this->fail('Should have failed');
+            } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+                $this->assertEquals('runWaitGap', $e->getMessage());
+            }
         } finally {
             \OmegaUp\Controllers\Run::$defaultSubmissionGap = $originalGap;
         }
@@ -797,15 +813,21 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Can't set both params at the same time
-     *
-     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunWithProblemsetIdAndContestAlias() {
         $r = $this->setValidRequest();
         $r['problemset_id'] = $this->contestData['contest']->problemset_id;
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('incompatibleArgs', $e->getMessage());
+            $this->assertEquals(
+                'problemset_id and contest_alias',
+                $e->parameter
+            );
+        }
     }
 
     /**
@@ -822,22 +844,22 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Can't submit by a user that is not enrolled in a course.
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromNonStudent() {
         $r = $this->setUpAssignment();
         $login = self::login($this->non_student_identity);
         $r['auth_token'] = $login->auth_token;
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotEvenOpened', $e->getMessage());
+        }
     }
 
     /**
      * Run from a student before assignment opens.
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromStudentBeforeStart() {
         $r = $this->setUpAssignment(10);
@@ -845,14 +867,16 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($this->studentIdentity);
         $r['auth_token'] = $login->auth_token;
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
      * Run from a student after the deadline passed.
-     *
-     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromStudentAfterDeadline() {
         $r = $this->setUpAssignment();
@@ -873,13 +897,16 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($this->studentIdentity);
         $r['auth_token'] = $login->auth_token;
 
-        // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Run::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
      * Should not allow sending to banned public problems.
-     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPubliclyBannedProblems() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -894,18 +921,21 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
              'message' => 'public_banned',
         ]));
 
-        // Call API
-        \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-             'auth_token' => $login->auth_token,
-             'problem_alias' => $problem->alias,
-             'language' => 'c11-gcc',
-             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
-        ]));
+        try {
+            \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                 'auth_token' => $login->auth_token,
+                 'problem_alias' => $problem->alias,
+                 'language' => 'c11-gcc',
+                 'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('problemNotFound', $e->getMessage());
+        }
     }
 
      /**
      * Should not allow sending to privately banned problems.
-     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPrivatelyBannedProblems() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -920,13 +950,17 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
              'message' => 'private_banned',
         ]));
 
-        // Call API
-        \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-             'auth_token' => $login->auth_token,
-             'problem_alias' => $problem->alias,
-             'language' => 'c11-gcc',
-             'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
-        ]));
+        try {
+            \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                 'auth_token' => $login->auth_token,
+                 'problem_alias' => $problem->alias,
+                 'language' => 'c11-gcc',
+                 'source'   => "#include <stdio.h>\nint main() {printf(\"3\"); return 0; }",
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('problemNotFound', $e->getMessage());
+        }
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Description of CreateClarificationTest
+ * Description of ClarificationCreateTest
  *
  * @author joemmanuel
  */
 
-class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
+class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      *
@@ -55,7 +55,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             'contestant' => $contestant,
         ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/true);
 
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestant
@@ -97,10 +97,8 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-    * Creates a clarification with message too long
-    *
-    * @expectedException \OmegaUp\Exceptions\InvalidParameterException
-    */
+     * Creates a clarification with message too long
+     */
     public function testCreateClarificationMessageTooLong() {
         [
             'problemData' => $problemData,
@@ -108,12 +106,17 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             'contestant' => $contestant,
         ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
 
-        $clarificationData = ClarificationsFactory::createClarification(
-            $problemData,
-            $contestData,
-            $contestant,
-            'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
-        );
+        try {
+            \OmegaUp\Test\Factories\Clarification::createClarification(
+                $problemData,
+                $contestData,
+                $contestant,
+                'Lorem ipsum dolor sit amet, mauris faucibus pede congue curae nullam, mauris maecenas tincidunt amet, nec wisi vestibulum ut cras in, velit in dolor. Elit hendrerit pede auctor tincidunt neque, lorem nunc sit a vivamus nibh. Auctor habitant, etiam ut nam'
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterStringTooLong', $e->getMessage());
+        }
     }
 
     /**
@@ -142,7 +145,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $messageToEveryone = ClarificationsFactory::createClarification(
+        $messageToEveryone = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -150,7 +153,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['director']->username
         );
 
-        $messageToSpecificUser = ClarificationsFactory::createClarification(
+        $messageToSpecificUser = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -158,7 +161,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
             $contestant->username
         );
 
-        $messageToSpecificUserWithPublicAnswer = ClarificationsFactory::createClarification(
+        $messageToSpecificUserWithPublicAnswer = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
             $contestData['director'],
@@ -189,7 +192,7 @@ class CreateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Now, director answers one message, and it turns public
-        $response = ClarificationsFactory::answer(
+        $response = \OmegaUp\Test\Factories\Clarification::answer(
             $messageToSpecificUserWithPublicAnswer,
             $contestData,
             'answer to everyone',

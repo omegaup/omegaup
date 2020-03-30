@@ -32,62 +32,42 @@ class Pager {
      *                                           |
      *                                      current page
      *
-     * @param int $rows The total number of rows to show.
+     * @param int $rows The number of rows to show per page.
+     * @param int $pageSize The total number of rows available.
      * @param int $current  The page we want to show, the 'c' in the figure.
-     * @param string $url   The base URL that each item will point to.
      * @param int $adjacent Number of items before and after the current page,
      * the 'a' in the figure.
      * @param array<string, string[]|string> $params Additional key => value
      * parameters to append to the item's URL.
      *
-     * @return array{label: string, url: string, class: string}[] The
+     * @return list<array{class: string, label: string, page: int}> The
      * information for each item of the pager.
      */
     public static function paginate(
         int $rows,
+        int $pageSize,
         int $current,
-        string $url,
         int $adjacent,
         array $params
     ): array {
-        $pages = intval(($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+        $pages = intval(($rows + $pageSize - 1) / $pageSize);
         if ($current < 1 || $current > $pages) {
             $current = 1;
         }
 
-        $query = '';
-        if (!empty($params)) {
-            $query = '&' . self::buildQueryString($params);
-        }
-
-        /** @var array{label: string, url: string, class: string}[] */
+        /** @var list<array{class: string, label: string, page: int}> */
         $items = [];
-        $prev = ['label' => '«', 'url' => '', 'class' => ''];
+        $prev = ['label' => '«', 'class' => '', 'page' => 0];
         if ($current > 1) {
-            $prev['url'] = $url . '?page=' . ($current - 1) . $query;
+            $prev['page'] = ($current - 1);
         } else {
-            $prev['url'] = '';
             $prev['class'] = 'disabled';
         }
-        array_push($items, $prev);
+        $items[] = $prev;
 
         if ($current > $adjacent + 1) {
-            array_push(
-                $items,
-                [
-                    'label' => '1',
-                    'url'   => "{$url}?page=1{$query}",
-                    'class' => '',
-                ]
-            );
-            array_push(
-                $items,
-                [
-                    'label' => '...',
-                    'url'   => '',
-                    'class' => 'disabled',
-                ]
-            );
+            $items[] = ['label' => '1', 'class' => '', 'page' => 1];
+            $items[] = ['label' => '...', 'class' => 'disabled', 'page' => 0];
         }
 
         for (
@@ -99,44 +79,75 @@ class Pager {
                 $current + $adjacent
             ); $i++
         ) {
-            array_push(
-                $items,
-                [
-                    'label' => strval($i),
-                    'url'   => "{$url}?page={$i}{$query}",
-                    'class' => ($i == $current) ? 'active' : '',
-                ]
-            );
+            $items[] = [
+                'label' => strval($i),
+                'class' => ($i == $current) ? 'active' : '',
+                'page' => $i,
+            ];
         }
 
         if ($current + $adjacent < $pages) {
-            array_push(
-                $items,
-                [
-                    'label' => '...',
-                    'url'   => '',
-                    'class' => 'disabled',
-                ]
-            );
-            array_push(
-                $items,
-                [
-                    'label' => strval($pages),
-                    'url'   => "{$url}?page={$pages}{$query}",
-                    'class' => '',
-                ]
-            );
+            $items[] = ['label' => '...', 'class' => 'disabled', 'page' => 0];
+            $items[] = [
+                'label' => strval($pages),
+                'class' => '',
+                'page' => $pages,
+            ];
         }
 
-        $next = ['label' => '»', 'url' => '', 'class' => ''];
+        $next = ['label' => '»', 'class' => '', 'page' => 0];
         if ($current < $pages) {
-            $next['url'] = $url . '?page=' . ($current + 1) . $query;
+            $next['page'] = ($current + 1);
         } else {
-            $next['url'] = '';
             $next['class'] = 'disabled';
         }
-        array_push($items, $next);
+        $items[] = $next;
 
         return $items;
+    }
+
+    /**
+     * The function gets all the items of paginator function and it adds the
+     * base url to each one.
+     *
+     * @param int $rows     The number of rows to show per page.
+     * @param int $pageSize The total number of rows available.
+     * @param int $current  The page we want to show, the 'c' in the figure.
+     * @param string $url   The base URL that each item will point to.
+     * @param int $adjacent Number of items before and after the current page,
+     * the 'a' in the figure.
+     * @param array<string, string[]|string> $params Additional key => value
+     * parameters to append to the item's URL.
+     *
+     * @return list<array{class: string, label: string, page: int, url?: string}> The
+     * information for each item of the pager.
+     */
+    public static function paginateWithUrl(
+        int $rows,
+        int $pageSize,
+        int $current,
+        string $url,
+        int $adjacent,
+        array $params
+    ) {
+        $pagerItems = self::paginate(
+            $rows,
+            $pageSize,
+            $current,
+            $adjacent,
+            $params
+        );
+        $query = '';
+        if (!empty($params)) {
+            $query = '&' . self::buildQueryString($params);
+        }
+        foreach ($pagerItems as &$item) {
+            if ($item['page'] === 0) {
+                continue;
+            }
+            $item['url'] = "{$url}?page={$item['page']}{$query}";
+        }
+
+        return $pagerItems;
     }
 }

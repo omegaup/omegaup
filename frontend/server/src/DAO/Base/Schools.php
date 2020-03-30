@@ -35,7 +35,7 @@ abstract class Schools {
                 `country_id` = ?,
                 `state_id` = ?,
                 `name` = ?,
-                `rank` = ?,
+                `ranking` = ?,
                 `score` = ?
             WHERE
                 (
@@ -46,9 +46,9 @@ abstract class Schools {
             $Schools->state_id,
             $Schools->name,
             (
-                is_null($Schools->rank) ?
+                is_null($Schools->ranking) ?
                 null :
-                intval($Schools->rank)
+                intval($Schools->ranking)
             ),
             floatval($Schools->score),
             intval($Schools->school_id),
@@ -76,7 +76,7 @@ abstract class Schools {
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
                 `Schools`.`name`,
-                `Schools`.`rank`,
+                `Schools`.`ranking`,
                 `Schools`.`score`
             FROM
                 `Schools`
@@ -163,7 +163,7 @@ abstract class Schools {
                 `Schools`.`country_id`,
                 `Schools`.`state_id`,
                 `Schools`.`name`,
-                `Schools`.`rank`,
+                `Schools`.`ranking`,
                 `Schools`.`score`
             FROM
                 `Schools`
@@ -214,11 +214,11 @@ abstract class Schools {
     ): int {
         $sql = '
             INSERT INTO
-                Schools (
+                `Schools` (
                     `country_id`,
                     `state_id`,
                     `name`,
-                    `rank`,
+                    `ranking`,
                     `score`
                 ) VALUES (
                     ?,
@@ -232,9 +232,9 @@ abstract class Schools {
             $Schools->state_id,
             $Schools->name,
             (
-                is_null($Schools->rank) ?
+                is_null($Schools->ranking) ?
                 null :
-                intval($Schools->rank)
+                intval($Schools->ranking)
             ),
             floatval($Schools->score),
         ];

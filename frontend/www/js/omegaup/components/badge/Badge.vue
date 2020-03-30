@@ -38,8 +38,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
@@ -51,14 +51,12 @@ import { VTooltip } from 'v-tooltip';
 export default class Badge extends Vue {
   @Prop() badge!: omegaup.Badge;
 
-  T = T;
-
   get name(): string {
-    return this.T[`badge_${this.badge.badge_alias}_name`];
+    return T[`badge_${this.badge.badge_alias}_name`];
   }
 
   get description(): string {
-    return this.T[`badge_${this.badge.badge_alias}_description`];
+    return T[`badge_${this.badge.badge_alias}_description`];
   }
 
   get iconUrl(): string {

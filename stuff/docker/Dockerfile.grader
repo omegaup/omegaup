@@ -1,9 +1,9 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
     apt install --no-install-recommends -y \
-        curl ca-certificates xz-utils openjdk-11-jre-headless && \
+        curl ca-certificates xz-utils openjdk-11-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt autoremove -y && \
     apt clean
@@ -22,4 +22,4 @@ COPY ./etc/omegaup/grader/* /etc/omegaup/grader/
 USER ubuntu
 WORKDIR /var/lib
 
-CMD ["/usr/bin/omegaup-grader"]
+CMD ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]

@@ -5,40 +5,31 @@
 </template>
 
 <script>
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 
 export default {
   props: {
     data: Array,
     school: String,
   },
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-    };
-  },
   mounted: function() {
     this.chart = Highcharts.chart('monthly-solved-problems-chart', {
       title: {
-        text: this.UI.formatString(
-          this.T.profileSchoolMonthlySolvedProblemsCount,
-          {
-            school: this.school,
-          },
-        ),
+        text: UI.formatString(T.profileSchoolMonthlySolvedProblemsCount, {
+          school: this.school,
+        }),
       },
       chart: { type: 'line' },
       yAxis: {
         min: 0,
         title: {
-          text: this.T.profileSolvedProblems,
+          text: T.profileSolvedProblems,
         },
       },
       xAxis: {
         title: {
-          text: this.T.wordsMonths,
+          text: T.wordsMonths,
         },
         labels: {
           rotation: -45,
@@ -62,7 +53,7 @@ export default {
   methods: {
     renderData: function() {
       const solvedProblemsCountData = this.data.map(
-        solvedProblemsCount => solvedProblemsCount.count,
+        solvedProblemsCount => solvedProblemsCount.problems_solved,
       );
       const solvedProblemsCountCategories = this.data.map(
         solvedProblemsCount =>

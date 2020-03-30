@@ -36,9 +36,12 @@ abstract class CoderOfTheMonth {
                 `description` = ?,
                 `time` = ?,
                 `interview_url` = ?,
-                `rank` = ?,
+                `ranking` = ?,
                 `selected_by` = ?,
-                `school_id` = ?
+                `school_id` = ?,
+                `category` = ?,
+                `score` = ?,
+                `problems_solved` = ?
             WHERE
                 (
                     `coder_of_the_month_id` = ?
@@ -53,9 +56,9 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->rank) ?
+                is_null($Coder_Of_The_Month->ranking) ?
                 null :
-                intval($Coder_Of_The_Month->rank)
+                intval($Coder_Of_The_Month->ranking)
             ),
             (
                 is_null($Coder_Of_The_Month->selected_by) ?
@@ -67,6 +70,9 @@ abstract class CoderOfTheMonth {
                 null :
                 intval($Coder_Of_The_Month->school_id)
             ),
+            $Coder_Of_The_Month->category,
+            floatval($Coder_Of_The_Month->score),
+            intval($Coder_Of_The_Month->problems_solved),
             intval($Coder_Of_The_Month->coder_of_the_month_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -93,9 +99,12 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`description`,
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
-                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`ranking`,
                 `Coder_Of_The_Month`.`selected_by`,
-                `Coder_Of_The_Month`.`school_id`
+                `Coder_Of_The_Month`.`school_id`,
+                `Coder_Of_The_Month`.`category`,
+                `Coder_Of_The_Month`.`score`,
+                `Coder_Of_The_Month`.`problems_solved`
             FROM
                 `Coder_Of_The_Month`
             WHERE
@@ -182,9 +191,12 @@ abstract class CoderOfTheMonth {
                 `Coder_Of_The_Month`.`description`,
                 `Coder_Of_The_Month`.`time`,
                 `Coder_Of_The_Month`.`interview_url`,
-                `Coder_Of_The_Month`.`rank`,
+                `Coder_Of_The_Month`.`ranking`,
                 `Coder_Of_The_Month`.`selected_by`,
-                `Coder_Of_The_Month`.`school_id`
+                `Coder_Of_The_Month`.`school_id`,
+                `Coder_Of_The_Month`.`category`,
+                `Coder_Of_The_Month`.`score`,
+                `Coder_Of_The_Month`.`problems_solved`
             FROM
                 `Coder_Of_The_Month`
         ';
@@ -234,15 +246,21 @@ abstract class CoderOfTheMonth {
     ): int {
         $sql = '
             INSERT INTO
-                Coder_Of_The_Month (
+                `Coder_Of_The_Month` (
                     `user_id`,
                     `description`,
                     `time`,
                     `interview_url`,
-                    `rank`,
+                    `ranking`,
                     `selected_by`,
-                    `school_id`
+                    `school_id`,
+                    `category`,
+                    `score`,
+                    `problems_solved`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -261,9 +279,9 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->rank) ?
+                is_null($Coder_Of_The_Month->ranking) ?
                 null :
-                intval($Coder_Of_The_Month->rank)
+                intval($Coder_Of_The_Month->ranking)
             ),
             (
                 is_null($Coder_Of_The_Month->selected_by) ?
@@ -275,6 +293,9 @@ abstract class CoderOfTheMonth {
                 null :
                 intval($Coder_Of_The_Month->school_id)
             ),
+            $Coder_Of_The_Month->category,
+            floatval($Coder_Of_The_Month->score),
+            intval($Coder_Of_The_Month->problems_solved),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

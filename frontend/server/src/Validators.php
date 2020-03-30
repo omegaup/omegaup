@@ -325,6 +325,7 @@ class Validators {
      * @param int|float|null $lowerBound
      * @param int|float|null $upperBound
      * @param boolean   $required
+     * @psalm-assert numeric $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumberInRange(
@@ -413,7 +414,7 @@ class Validators {
      *
      * @param mixed  $parameter
      * @param string $parameterName
-     * @psalm-assert int $parameter
+     * @psalm-assert numeric $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumber(
@@ -435,7 +436,7 @@ class Validators {
      *
      * @param mixed  $parameter
      * @param string $parameterName
-     * @psalm-assert int $parameter
+     * @psalm-assert numeric|null $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateOptionalNumber(

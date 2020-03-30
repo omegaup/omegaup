@@ -22,7 +22,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
      */
     private $originalFileUploader;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
         \OmegaUp\Test\Utils::CleanupDb();
@@ -32,7 +32,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->originalFileUploader

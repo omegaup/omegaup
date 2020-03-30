@@ -21,9 +21,12 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'description' => true,
         'time' => true,
         'interview_url' => true,
-        'rank' => true,
+        'ranking' => true,
         'selected_by' => true,
         'school_id' => true,
+        'category' => true,
+        'score' => true,
+        'problems_solved' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -61,9 +64,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
                 $data['interview_url']
             );
         }
-        if (isset($data['rank'])) {
-            $this->rank = intval(
-                $data['rank']
+        if (isset($data['ranking'])) {
+            $this->ranking = intval(
+                $data['ranking']
             );
         }
         if (isset($data['selected_by'])) {
@@ -74,6 +77,21 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         if (isset($data['school_id'])) {
             $this->school_id = intval(
                 $data['school_id']
+            );
+        }
+        if (isset($data['category'])) {
+            $this->category = strval(
+                $data['category']
+            );
+        }
+        if (isset($data['score'])) {
+            $this->score = floatval(
+                $data['score']
+            );
+        }
+        if (isset($data['problems_solved'])) {
+            $this->problems_solved = intval(
+                $data['problems_solved']
             );
         }
     }
@@ -120,7 +138,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $rank = null;
+    public $ranking = null;
 
     /**
      * Id de la identidad que seleccionó al coder.
@@ -135,4 +153,25 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $school_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string
+     */
+    public $category = 'all';
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var float
+     */
+    public $score = 0.00;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $problems_solved = 0;
 }

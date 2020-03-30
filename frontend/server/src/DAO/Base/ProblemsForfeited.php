@@ -260,7 +260,7 @@ abstract class ProblemsForfeited {
     ): int {
         $sql = '
             INSERT INTO
-                Problems_Forfeited (
+                `Problems_Forfeited` (
                     `user_id`,
                     `problem_id`,
                     `forfeited_date`

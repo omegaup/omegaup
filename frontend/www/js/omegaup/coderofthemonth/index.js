@@ -1,13 +1,16 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
-import coder_of_the_month from '../components/coderofthemonth/CoderOfTheMonth.vue';
+import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
-  let coderOfTheMonth = new Vue({
+  let coderOfTheMonthList = new Vue({
     el: '#coder-of-the-month',
     render: function(createElement) {
-      return createElement('coder-of-the-month', {
+      return createElement('omegaup-coder-of-the-month-list', {
         props: {
           codersOfCurrentMonth: this.codersOfCurrentMonth,
           codersOfPreviousMonth: this.codersOfPreviousMonth,
@@ -15,6 +18,7 @@ OmegaUp.on('ready', function() {
           isMentor: this.isMentor,
           canChooseCoder: this.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
+          category: this.category,
         },
         on: {
           'select-coder': function(coderUsername) {
@@ -22,10 +26,14 @@ OmegaUp.on('ready', function() {
               username: coderUsername,
             })
               .then(function(data) {
-                UI.success(T.coderOfTheMonthSelectedSuccessfully);
-                coderOfTheMonth.coderIsSelected = true;
+                UI.success(
+                  category == 'all'
+                    ? T.coderOfTheMonthSelectedSuccessfully
+                    : T.coderOfTheMonthFemaleSelectedSuccessfully,
+                );
+                coderOfTheMonthList.coderIsSelected = true;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -37,7 +45,8 @@ OmegaUp.on('ready', function() {
       candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
       canChooseCoder: payload.isMentor && payload.options.canChooseCoder,
       coderIsSelected: payload.isMentor && payload.options.coderIsSelected,
+      category: payload.category,
     },
-    components: { 'coder-of-the-month': coder_of_the_month },
+    components: { 'omegaup-coder-of-the-month-list': coderofthemonth_List },
   });
 });

@@ -119,8 +119,9 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { T, OmegaUp } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
+import * as UI from '../ui';
 import Autocomplete from './Autocomplete.vue';
 import CountryFlag from './CountryFlag.vue';
 import user_Username from './user/Username.vue';

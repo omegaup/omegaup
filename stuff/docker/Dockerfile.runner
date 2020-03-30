@@ -1,8 +1,9 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
-    apt install --no-install-recommends -y curl ca-certificates xz-utils && \
+    apt install --no-install-recommends -y curl ca-certificates xz-utils \
+        wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt autoremove -y && \
     apt clean
@@ -20,4 +21,4 @@ COPY ./etc/omegaup/runner/* /etc/omegaup/runner/
 USER ubuntu
 WORKDIR /var/lib
 
-CMD ["/usr/bin/omegaup-runner", "-noop-sandbox"]
+CMD ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]

@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { API, OmegaUp, UI } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 import school_Profile from '../components/schools/Profile.vue';
 
 OmegaUp.on('ready', function() {
@@ -24,7 +26,7 @@ OmegaUp.on('ready', function() {
       country: payload.country,
       monthlySolvedProblemsCount: [],
       name: payload.school_name,
-      rank: payload.rank,
+      rank: payload.ranking,
       stateName: payload.state_name,
       users: [],
     },
@@ -39,7 +41,7 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       schoolProfile.codersOfTheMonth = data.coders;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.School.users({
     school_id: payload.school_id,
@@ -47,14 +49,13 @@ OmegaUp.on('ready', function() {
     .then(function(data) {
       schoolProfile.users = data.users;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   API.School.monthlySolvedProblemsCount({
     school_id: payload.school_id,
-    months_count: 6,
   })
     .then(function(data) {
       schoolProfile.monthlySolvedProblemsCount = data.distinct_problems_solved;
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 });

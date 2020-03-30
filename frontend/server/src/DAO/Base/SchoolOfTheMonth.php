@@ -34,8 +34,9 @@ abstract class SchoolOfTheMonth {
             SET
                 `school_id` = ?,
                 `time` = ?,
-                `rank` = ?,
-                `selected_by` = ?
+                `ranking` = ?,
+                `selected_by` = ?,
+                `score` = ?
             WHERE
                 (
                     `school_of_the_month_id` = ?
@@ -48,15 +49,16 @@ abstract class SchoolOfTheMonth {
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->rank) ?
+                is_null($School_Of_The_Month->ranking) ?
                 null :
-                intval($School_Of_The_Month->rank)
+                intval($School_Of_The_Month->ranking)
             ),
             (
                 is_null($School_Of_The_Month->selected_by) ?
                 null :
                 intval($School_Of_The_Month->selected_by)
             ),
+            floatval($School_Of_The_Month->score),
             intval($School_Of_The_Month->school_of_the_month_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -81,8 +83,9 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month`.`school_of_the_month_id`,
                 `School_Of_The_Month`.`school_id`,
                 `School_Of_The_Month`.`time`,
-                `School_Of_The_Month`.`rank`,
-                `School_Of_The_Month`.`selected_by`
+                `School_Of_The_Month`.`ranking`,
+                `School_Of_The_Month`.`selected_by`,
+                `School_Of_The_Month`.`score`
             FROM
                 `School_Of_The_Month`
             WHERE
@@ -167,8 +170,9 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month`.`school_of_the_month_id`,
                 `School_Of_The_Month`.`school_id`,
                 `School_Of_The_Month`.`time`,
-                `School_Of_The_Month`.`rank`,
-                `School_Of_The_Month`.`selected_by`
+                `School_Of_The_Month`.`ranking`,
+                `School_Of_The_Month`.`selected_by`,
+                `School_Of_The_Month`.`score`
             FROM
                 `School_Of_The_Month`
         ';
@@ -218,12 +222,14 @@ abstract class SchoolOfTheMonth {
     ): int {
         $sql = '
             INSERT INTO
-                School_Of_The_Month (
+                `School_Of_The_Month` (
                     `school_id`,
                     `time`,
-                    `rank`,
-                    `selected_by`
+                    `ranking`,
+                    `selected_by`,
+                    `score`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -237,15 +243,16 @@ abstract class SchoolOfTheMonth {
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->rank) ?
+                is_null($School_Of_The_Month->ranking) ?
                 null :
-                intval($School_Of_The_Month->rank)
+                intval($School_Of_The_Month->ranking)
             ),
             (
                 is_null($School_Of_The_Month->selected_by) ?
                 null :
                 intval($School_Of_The_Month->selected_by)
             ),
+            floatval($School_Of_The_Month->score),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

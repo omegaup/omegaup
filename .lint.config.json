@@ -1,6 +1,11 @@
 {
 	"custom_linters": [
 		{
+			"name": "api",
+			"path": "stuff/api.py",
+			"class_name": "ApiLinter"
+		},
+		{
 			"name": "dao",
 			"path": "stuff/dao_linter.py",
 			"class_name": "DaoLinter"
@@ -58,6 +63,14 @@
 			"blacklist": [
 				"bin/karel_mdo_convert.py",
 				"frontend/tests/ui/integration-test.py"
+			]
+		},
+		"api": {
+			"whitelist": [
+				"frontend/server/src/Controllers/.*\\.php$",
+				"frontend/www/js/omegaup/api.d.ts$",
+				"frontend/www/js/omegaup/api_transitional.ts$",
+				"frontend/www/js/omegaup/api_types.ts$"
 			]
 		},
 		"i18n": {

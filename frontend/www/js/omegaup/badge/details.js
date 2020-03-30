@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import badge_Details from '../components/badge/Details.vue';
-import { OmegaUp, API } from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -34,13 +35,13 @@ OmegaUp.on('ready', function() {
       badgeDetails.badge['total_users'] = data['total_users'];
       badgeDetails.badge['owners_count'] = data['owners_count'];
     })
-    .fail(UI.apiError);
+    .catch(UI.apiError);
 
   if (payload.logged_in) {
     API.Badge.myBadgeAssignationTime({ badge_alias: payload.badge })
       .then(function(data) {
         badgeDetails.badge['assignation_time'] = data['assignation_time'];
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 });

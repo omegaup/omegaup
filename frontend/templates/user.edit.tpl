@@ -195,5 +195,8 @@
 		{/block}
 	</div>
 
-	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}"></script>
+	<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
+	<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
+	<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}" defer></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}" defer></script>
 {/block}

@@ -84,7 +84,12 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                     foreach ($action['scripts'] as $script) {
                         switch ($script) {
                             case 'update_ranks.py':
-                                \OmegaUp\Test\Utils::runUpdateRanks();
+                                \OmegaUp\Test\Utils::runUpdateRanks(
+                                    date(
+                                        'Y-m-01',
+                                        \OmegaUp\Time::get()
+                                    )
+                                );
                                 break;
                             case 'aggregate_feedback.py':
                                 \OmegaUp\Test\Utils::runAggregateFeedback();
@@ -354,7 +359,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         ]));
         $this->assertNotNull($details['first_assignation']);
         $this->assertThat(
-            $details['first_assignation'],
+            $details['first_assignation']->time,
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
                 $this->lessThanOrEqual(\OmegaUp\Time::get())

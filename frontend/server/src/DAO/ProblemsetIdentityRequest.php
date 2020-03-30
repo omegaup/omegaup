@@ -12,9 +12,12 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
+    /**
+     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}>
+     */
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
-    ): ?array {
+    ) {
         $sql = '
             SELECT
                 r.*,
@@ -34,27 +37,25 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
             WHERE
                 r.problemset_id = ?;';
 
-        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string}> */
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
         );
     }
 
-    public static function getRequestsForProblemset(int $problemsetId): array {
+    /**
+     * @return list<array{accepted: bool|null, country: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>
+     */
+    public static function getRequestsForProblemset(int $problemsetId) {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
                 i.username,
-                i.user_id,
-                i.username,
-                i.country_id,
                 c.name AS country,
-                r.problemset_id,
                 r.request_time,
                 r.last_update,
-                r.accepted,
-                r.extra_note
+                r.accepted
             FROM
                 `Problemset_Identity_Request` r
             INNER JOIN
@@ -71,14 +72,14 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                 i.identity_id;';
 
         $result = [];
-        /** @var array{accepted: bool|null, country: null|string, country_id: null|string, extra_note: null|string, identity_id: int, last_update: null|string, problemset_id: int, request_time: string, user_id: int|null, username: string, username: string} $row */
+        /** @var array{accepted: bool|null, country: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
                 [$problemsetId]
             ) as $row
         ) {
-            $row['accepted'] = $row['accepted'] == '1';
+            $row['accepted'] = boolval($row['accepted']);
             $result[] = $row;
         }
         return $result;

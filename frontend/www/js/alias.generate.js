@@ -41,7 +41,7 @@ omegaup.OmegaUp.on('ready', function() {
       existsFn = function(alias) {
         omegaup.API.Problem.details({ problem_alias: alias })
           .then(onAliasReady)
-          .fail(omegaup.UI.apiError);
+          .catch(omegaup.UI.apiError);
       };
       aliasLength = 32;
       break;
@@ -50,7 +50,7 @@ omegaup.OmegaUp.on('ready', function() {
       existsFn = function(alias) {
         omegaup.API.Group.details({ group_alias: alias })
           .then(onAliasReady)
-          .fail(omegaup.UI.apiError);
+          .catch(omegaup.UI.apiError);
       };
       aliasLength = 50;
       break;
@@ -59,7 +59,7 @@ omegaup.OmegaUp.on('ready', function() {
       existsFn = function(alias) {
         omegaup.API.Interview.details({ interview_alias: alias })
           .then(onAliasReady)
-          .fail(omegaup.UI.apiError);
+          .catch(omegaup.UI.apiError);
       };
       aliasLength = 32;
       break;

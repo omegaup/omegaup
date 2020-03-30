@@ -1,4 +1,7 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import Vue from 'vue';
 
@@ -41,7 +44,7 @@ OmegaUp.on('ready', function() {
               problem_alias: qualityPayload.problem_alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
-            }).fail(UI.apiError);
+            }).catch(UI.apiError);
           },
           dismiss: function(ev) {
             let contents = {};
@@ -56,7 +59,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 UI.info(T.qualityNominationRateProblemDesc);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

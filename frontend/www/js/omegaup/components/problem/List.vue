@@ -102,6 +102,9 @@
         </tbody>
       </table>
     </div>
+    <omegaup-common-paginator
+      v-bind:pagerItems="pagerItems"
+    ></omegaup-common-paginator>
   </div>
 </template>
 
@@ -131,20 +134,24 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import { types } from '../../api_types';
+import * as UI from '../../ui';
+import common_Paginator from '../common/Paginator.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 
 @Component({
   components: {
     'omegaup-problem-finder': problem_FinderWizard,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class ProblemList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];
+  @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
 
   T = T;
@@ -173,9 +180,9 @@ export default class ProblemList extends Vue {
   }
 
   iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility >= 2) return this.T.wordsHighQualityProblem;
-    else if (visibility < 0) return this.T.wordsBannedProblem;
-    else if (visibility == 0) return this.T.wordsPrivate;
+    if (qualitySeal || visibility >= 2) return T.wordsHighQualityProblem;
+    else if (visibility < 0) return T.wordsBannedProblem;
+    else if (visibility == 0) return T.wordsPrivate;
     return '';
   }
 

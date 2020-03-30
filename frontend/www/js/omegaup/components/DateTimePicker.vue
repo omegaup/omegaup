@@ -14,8 +14,11 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { T } from '../omegaup.js';
-import UI from '../ui.js';
+import T from '../lang';
+import * as UI from '../ui';
+import '../../../third_party/js/bootstrap-datetimepicker.min.js';
+import '../../../third_party/js/locales/bootstrap-datetimepicker.es.js';
+import '../../../third_party/js/locales/bootstrap-datetimepicker.pt-BR.js';
 
 @Component
 export default class DateTimePicker extends Vue {
@@ -35,7 +38,7 @@ export default class DateTimePicker extends Vue {
   public mounted() {
     if ((this.$el as HTMLInputElement).type === 'text') {
       // Even though we declared the input as having datetime-local type,
-      // browsers that don't support it will silently change the type to ext'.
+      // browsers that don't support it will silently change the type to text.
       // In that case, use the bootstrap datetimepicker.
       this.mountedFallback();
     }
@@ -94,3 +97,7 @@ export default class DateTimePicker extends Vue {
   }
 }
 </script>
+
+<style>
+@import '../../../third_party/css/bootstrap-datetimepicker.css';
+</style>

@@ -1,33 +1,20 @@
-declare namespace omegaup {
-  export interface UI {
-    buildURLQuery: (queryParameters: { [key: string]: string; }) => string;
-    info: (message: string) => void;
-    error: (message: string) => void;
-    escape: (s: string) => string;
-    formatDate: (date: Date) => string;
-    formatDateTime: (date: Date) => string;
-    formatDateLocal: (date: Date) => string;
-    parseDateLocal: (dateString: string) => Date;
-    formatDateTimeLocal: (date: Date) => string;
-    parseDateTimeLocal: (dateString: string) => Date;
-    formatString: (template: string, values: { [key: string]: string; }) => string;
-    groupTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
-    isVirtual: (contest: omegaup.Contest) => boolean,
-    markdownConverter: (options?: MarkdownConverterOptions) => Converter;
-    navigateTo: (url: string) => void;
-    problemTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
-    schoolTypeahead: (elem: any, cb: (event: HTMLEvent, val: any) => void) => void;
-    userTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
-  };
+export * from './ui_transitional';
+export * from './time';
+export * from './markdown';
 
-  interface MarkdownConverterOptions {
-    preview: boolean;
-  }
-
-  interface Converter {
-    makeHtml: (text: string) => string;
-  }
-}
-
-declare let UI: omegaup.UI;
-export default UI;
+export function groupTypeahead(
+  elem: HTMLElement,
+  cb: (event: HTMLEvent, val: any) => void,
+): void;
+export function problemTypeahead(
+  elem: HTMLElement,
+  cb: (event: HTMLEvent, val: any) => void,
+): void;
+export function schoolTypeahead(
+  elem: any,
+  cb: (event: HTMLEvent, val: any) => void,
+): void;
+export function userTypeahead(
+  elem: HTMLElement,
+  cb: (event: HTMLEvent, val: any) => void,
+): void;

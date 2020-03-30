@@ -1,6 +1,9 @@
 import user_ManageIdentities from '../components/user/ManageIdentities.vue';
 import Vue from 'vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 
 OmegaUp.on('ready', function() {
   let manageIdentities = new Vue({
@@ -20,7 +23,7 @@ OmegaUp.on('ready', function() {
                 refreshIdentityList();
                 UI.success(T.profileIdentityAdded);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });
@@ -38,7 +41,7 @@ OmegaUp.on('ready', function() {
       .then(function(data) {
         manageIdentities.identities = data.identities;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
   }
 
   refreshIdentityList();
