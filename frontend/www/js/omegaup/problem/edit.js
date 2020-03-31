@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
+import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
@@ -614,9 +615,7 @@ OmegaUp.on('ready', function() {
     );
 
     $('#statement-preview .title').html(UI.escape(problem.title));
-    let languages = problem.languages.sort().join();
-    document.getElementsByName('languages')[0].value = languages;
-    problemSettings.languages = languages;
+    problemSettings.languages = problem.languages.sort().join();
     $('input[name=title]').val(problem.title);
     problemSettings.timeLimit = UI.parseDuration(
       problem.settings.limits.TimeLimit,

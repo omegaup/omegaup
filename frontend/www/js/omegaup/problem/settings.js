@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import problem_Settings from '../components/problem/Settings.vue';
-import { OmegaUp } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(
