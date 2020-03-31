@@ -6,6 +6,7 @@
  * ProblemsController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type ProblemList=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3154,7 +3155,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * List of public and user's private problems
      *
      * @param \OmegaUp\Request $r
-     * @return array{results: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}>, total: int}
+     * @return array{results: list<ProblemList>, total: int}
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3210,7 +3211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $tags
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
-     * @return array{results: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}>, total: int}
+     * @return array{results: list<ProblemList>, total: int}
      */
     private static function getList(
         int $page,
@@ -3809,7 +3810,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemList>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3891,6 +3892,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $tags,
                     'pagerItems' => $pagerItems,
+                    'keyword' => $keyword,
+                    'mode' => $mode,
+                    'column' => $orderBy,
+                    'language' => $language,
+                    'languages' => array_merge(
+                        ['all'],
+                        \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+                    ),
+                    'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
+                    'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
+                    'tags' => $tags,
                 ],
             ],
             'template' => 'problems.tpl',

@@ -555,30 +555,6 @@ padding-right: 5px;
 
 th.contains-long-desc{ min-width:369px; }
 
-.search-bar {
-	margin-bottom: 10px;
-}
-
-.search-bar #problem-search-language {
-	width: 100px;
-	margin-left: 2px;
-}
-
-.search-bar #problem-search-order {
-	width: 160px;
-	margin-left: 2px;
-}
-
-.search-bar #problem-search-mode {
-	width: 120px;
-	margin-left: 2px;
-}
-
-.search-bar #problem-search-button {
-	height: 32px;
-	margin-left: 5px;
-}
-
 table.problem-list td {
 	vertical-align: middle !important;
 }

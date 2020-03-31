@@ -1931,7 +1931,7 @@ _Por documentar_
 ### Regresa
 
 ```typescript
-{ results: { alias: string; difficulty?: number; difficulty_histogram: number[]; points: number; quality?: number; quality_histogram: number[]; ratio: number; score: number; tags: { source: string; name: string; }[]; title: string; visibility: number; quality_seal: boolean; }[]; total: number; }
+{ results: types.ProblemList[]; total: number; }
 ```
 
 ## `/api/problem/myList/`

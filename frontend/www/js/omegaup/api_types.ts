@@ -64,6 +64,21 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemList {
+    alias: string;
+    difficulty?: number;
+    difficulty_histogram: number[];
+    points: number;
+    quality?: number;
+    quality_histogram: number[];
+    ratio: number;
+    score: number;
+    tags: { source: string; name: string }[];
+    title: string;
+    visibility: number;
+    quality_seal: boolean;
+  }
+
   export interface Progress {
     score: number;
     max_score: number;
@@ -1236,20 +1251,7 @@ export namespace messages {
   };
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
-    results: {
-      alias: string;
-      difficulty?: number;
-      difficulty_histogram: number[];
-      points: number;
-      quality?: number;
-      quality_histogram: number[];
-      ratio: number;
-      score: number;
-      tags: { source: string; name: string }[];
-      title: string;
-      visibility: number;
-      quality_seal: boolean;
-    }[];
+    results: types.ProblemList[];
     total: number;
   };
   export type ProblemMyListRequest = { [key: string]: any };
