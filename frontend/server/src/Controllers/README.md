@@ -1931,7 +1931,7 @@ _Por documentar_
 ### Regresa
 
 ```typescript
-{ results: types.ProblemList[]; total: number; }
+{ results: types.ProblemListItem[]; total: number; }
 ```
 
 ## `/api/problem/myList/`

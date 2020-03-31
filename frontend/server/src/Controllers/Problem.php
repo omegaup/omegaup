@@ -6,7 +6,7 @@
  * ProblemsController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
- * @psalm-type ProblemList=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
+ * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3155,7 +3155,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * List of public and user's private problems
      *
      * @param \OmegaUp\Request $r
-     * @return array{results: list<ProblemList>, total: int}
+     * @return array{results: list<ProblemListItem>, total: int}
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3211,7 +3211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $tags
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
-     * @return array{results: list<ProblemList>, total: int}
+     * @return array{results: list<ProblemListItem>, total: int}
      */
     private static function getList(
         int $page,
@@ -3810,7 +3810,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemList>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tags: list<string>}}, template: string}
+     * @return array{smartyProperties: array{payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tags: list<string>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r

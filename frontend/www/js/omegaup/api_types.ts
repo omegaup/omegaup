@@ -64,7 +64,7 @@ export namespace types {
     difficulty: number;
   }
 
-  export interface ProblemList {
+  export interface ProblemListItem {
     alias: string;
     difficulty?: number;
     difficulty_histogram: number[];
@@ -1251,7 +1251,7 @@ export namespace messages {
   };
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
-    results: types.ProblemList[];
+    results: types.ProblemListItem[];
     total: number;
   };
   export type ProblemMyListRequest = { [key: string]: any };
