@@ -100,7 +100,8 @@ export function problemTypeahead(elem, cb) {
       {
         source: typeaheadWrapper(API.Problem.list),
         async: true,
-        limit: 50,
+        limit: 10,
+        items: 10,
         display: 'alias',
         templates: {
           suggestion: val => {
