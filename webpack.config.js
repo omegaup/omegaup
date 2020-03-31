@@ -18,6 +18,7 @@ let config = [
     entry: {
       omegaup: [
         '@babel/polyfill',
+        'unfetch/polyfill',
         './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js',
       ],
@@ -31,6 +32,7 @@ let config = [
       badge_details: './frontend/www/js/omegaup/badge/details.js',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
+      common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.js',
       common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
@@ -42,6 +44,7 @@ let config = [
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:
         './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+      course_details: './frontend/www/js/omegaup/course/details.js',
       course_edit: './frontend/www/js/omegaup/course/edit.js',
       course_intro: './frontend/www/js/omegaup/course/intro.js',
       course_list: './frontend/www/js/omegaup/course/list.js',
@@ -58,6 +61,7 @@ let config = [
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
+      problem_mine: './frontend/www/js/omegaup/problem/mine.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       problem_settings: './frontend/www/js/omegaup/problem/settings.js',
       qualitynomination_popup:
@@ -72,7 +76,8 @@ let config = [
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
-      school_of_the_month: './frontend/www/js/omegaup/schools/schoolofthemonth.js',
+      school_of_the_month:
+        './frontend/www/js/omegaup/schools/schoolofthemonth.js',
       school_profile: './frontend/www/js/omegaup/schools/profile.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
@@ -201,11 +206,7 @@ let config = [
         // inline scss styles on vue components
         {
           test: /\.scss$/,
-          use: [
-            'vue-style-loader',
-            'css-loader',
-            'sass-loader'
-          ]
+          use: ['vue-style-loader', 'css-loader', 'sass-loader'],
         },
       ],
     },

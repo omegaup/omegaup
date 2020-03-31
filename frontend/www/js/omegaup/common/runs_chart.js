@@ -1,4 +1,5 @@
-import { OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import T from '../lang';
 import Vue from 'vue';
 import { Chart } from 'highcharts-vue';
 

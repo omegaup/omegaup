@@ -1,4 +1,7 @@
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
@@ -30,7 +33,7 @@ OmegaUp.on('ready', function() {
                 );
                 coderOfTheMonthList.coderIsSelected = true;
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
         },
       });

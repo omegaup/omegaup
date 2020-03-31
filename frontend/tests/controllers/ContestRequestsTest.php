@@ -82,8 +82,8 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
                     $this->assertTrue($result['users'][$i]['accepted']);
                 }
                 $this->assertEquals(
-                    $result['users'][$i]['admin']['user_id'],
-                    $mainAdmin->user_id
+                    $result['users'][$i]['admin']['username'],
+                    $mainAdmin->username
                 );
                 $hasRequestResponse = true;
             }

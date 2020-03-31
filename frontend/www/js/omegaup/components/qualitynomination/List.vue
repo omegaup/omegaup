@@ -78,9 +78,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 
 @Component
 export default class QualityNominationList extends Vue {

@@ -1,17 +1,12 @@
 <?php
 
-/**
- * SchoolsFactory
- *
- * This class is a helper for creating schools as needed in other places
- *
- * @author joemmanuel
- */
-class SchoolsFactory {
+namespace OmegaUp\Test\Factories;
+
+class Schools {
     /**
      * Create a random school
      * @param  string $name
-     * @return array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools}
+     * @return array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{school_id: int}, school: \OmegaUp\DAO\VO\Schools}
      */
     public static function createSchool($name = null) {
         if (is_null($name)) {
@@ -39,7 +34,7 @@ class SchoolsFactory {
 
     /**
      * Add user to school
-     * @param array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string, school_id: int}, school: \OmegaUp\DAO\VO\Schools} $schoolData
+     * @param array{creator: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{school_id: int}, school: \OmegaUp\DAO\VO\Schools} $schoolData
      * @param \OmegaUp\DAO\VO\Identities $user
      */
     public static function addUserToSchool(

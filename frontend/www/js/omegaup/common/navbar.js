@@ -1,10 +1,13 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
-import omegaup from '../api.js';
+import { OmegaUp } from '../omegaup';
+import * as api from '../api_transitional';
+import API from '../api.js';
+import T from '../lang';
+import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  const headerPayload = JSON.parse(
+  const payload = JSON.parse(
     document.getElementById('header-payload').innerText,
   );
   let commonNavbar = new Vue({
@@ -12,33 +15,53 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
-          header: this.header,
+          omegaUpLockDown: this.omegaUpLockDown,
+          inContest: this.inContest,
+          isLoggedIn: this.isLoggedIn,
+          isReviewer: this.isReviewer,
+          gravatarURL51: this.gravatarURL51,
+          currentUsername: this.currentUsername,
+          isAdmin: this.isAdmin,
+          isMainUserIdentity: this.isMainUserIdentity,
+          lockDownImage: this.lockDownImage,
+          navbarSection: this.navbarSection,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
+          initialClarifications: this.initialClarifications,
         },
       });
     },
     data: {
-      header: headerPayload,
+      omegaUpLockDown: payload.omegaUpLockDown,
+      inContest: payload.inContest,
+      isLoggedIn: payload.isLoggedIn,
+      isReviewer: payload.isReviewer,
+      gravatarURL51: payload.gravatarURL51,
+      currentUsername: payload.currentUsername,
+      isAdmin: payload.isAdmin,
+      isMainUserIdentity: payload.isMainUserIdentity,
+      lockDownImage: payload.lockDownImage,
+      navbarSection: payload.navbarSection,
       graderInfo: null,
       graderQueueLength: -1,
       errorMessage: null,
+      initialClarifications: [],
     },
     components: {
       'omegaup-common-navbar': common_Navbar,
     },
   });
 
-  if (headerPayload.isAdmin) {
-    API.Notification.myList({})
-      .then(function(data) {
+  if (payload.isAdmin) {
+    API.Notification.myList()
+      .then(data => {
         commonNavbar.notifications = data.notifications;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     function updateGraderStatus() {
-      API.Grader.status()
+      api.Grader.status()
         .then(stats => {
           commonNavbar.graderInfo = stats.grader;
           if (stats.status !== 'ok') {
@@ -52,7 +75,7 @@ OmegaUp.on('ready', function() {
           }
           commonNavbar.errorMessage = null;
         })
-        .fail(stats => {
+        .catch(stats => {
           commonNavbar.errorMessage = stats.error;
         });
     }

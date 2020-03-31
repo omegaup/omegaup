@@ -113,7 +113,7 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/login.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/login.js"}" defer></script>
 {if $GOOGLECLIENTID != ""}
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 {/if}

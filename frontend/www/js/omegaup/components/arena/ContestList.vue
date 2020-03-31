@@ -192,8 +192,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import contest_FilteredList from '../contest/FilteredList.vue';
 
 @Component({

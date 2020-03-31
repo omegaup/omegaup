@@ -1,14 +1,14 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
     apt install --no-install-recommends -y \
-        curl ca-certificates xz-utils openjdk-11-jre-headless && \
+        curl ca-certificates xz-utils openjdk-11-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt autoremove -y && \
     apt clean
 
-RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.6/omegaup-gitserver.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.8/omegaup-gitserver.tar.xz | tar xJ -C /
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
 RUN mkdir -p /etc/omegaup/gitserver
 
@@ -23,4 +23,4 @@ COPY ./etc/omegaup/gitserver/* /etc/omegaup/gitserver/
 USER ubuntu
 WORKDIR /var/lib
 
-CMD ["/usr/bin/omegaup-gitserver"]
+CMD ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-gitserver"]

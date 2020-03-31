@@ -32,7 +32,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
         $args = [$name];
 
         $result = [];
-        /** @var array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float, state_id: null|string} $row */
+        /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -46,64 +46,35 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
     /**
      * @param int $schoolId
-     * @param int $monthsNumber
-     * @return array{year: int, month: int, count: int}[]
+     * @return list<array{month: int, problems_solved: int, year: int}>
      */
     public static function getMonthlySolvedProblemsCount(
-        int $schoolId,
-        int $monthsNumber
+        int $schoolId
     ): array {
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return [];
         $sql = '
         SELECT
-            IFNULL(YEAR(su.time), 0) AS year,
-            IFNULL(MONTH(su.time), 0) AS month,
-            COUNT(DISTINCT su.problem_id) AS `count`
+            IFNULL(MONTH(s.time), 0) AS month,
+            s.problems_solved,
+            IFNULL(YEAR(s.time), 0) AS year
         FROM
-            Submissions su
-        INNER JOIN
-            Schools sc ON sc.school_id = su.school_id
-        INNER JOIN
-            Runs r ON r.run_id = su.current_run_id
-        INNER JOIN
-            Problems p ON p.problem_id = su.problem_id
+            Schools_Problems_Solved_Per_Month AS s
         WHERE
-            su.school_id = ? AND su.time >= CURDATE() - INTERVAL ? MONTH
-            AND r.verdict = "AC" AND p.visibility >= 1
-            AND NOT EXISTS (
-                SELECT
-                    *
-                FROM
-                    Submissions sub
-                INNER JOIN
-                    Runs ru ON ru.run_id = sub.current_run_id
-                WHERE
-                    sub.problem_id = su.problem_id
-                    AND sub.identity_id = su.identity_id
-                    AND ru.verdict = "AC"
-                    AND sub.time < su.time
-            )
-        GROUP BY
-            IFNULL(YEAR(su.time), 0),
-            IFNULL(MONTH(su.time), 0)
+            s.school_id = ?
         ORDER BY
             year ASC,
             month ASC;';
 
-        $params = [$schoolId, $monthsNumber];
-
-        /** @var list<array{count: int, month: int, year: int}> */
+        /** @var list<array{month: int, problems_solved: int, year: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            $params
+            [ $schoolId ]
         );
     }
 
     /**
      * Gets the schools ordered by rank and score
      *
-     * @return array{rank: list<array{country_id: string|null, name: string, rank: int|null, school_id: int, score: float}>, totalRows: int}
+     * @return array{rank: list<array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}>, totalRows: int}
      */
     public static function getRank(
         int $page,
@@ -115,7 +86,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             ORDER BY
-                s.rank IS NULL, s.rank ASC
+                s.`ranking` IS NULL, s.`ranking` ASC
         ';
 
         $sqlCount = '
@@ -126,7 +97,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             SELECT
                 s.school_id,
                 s.name,
-                s.rank,
+                s.`ranking`,
                 s.score,
                 s.country_id';
 
@@ -138,7 +109,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             []
         ) ?? 0;
 
-        /** @var list<array{country_id: null|string, name: string, rank: int|null, school_id: int, score: float}> */
+        /** @var list<array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlFrom . $sqlLimit,
             [$offset, $rowsPerPage]
@@ -162,7 +133,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
         SELECT
-            i.username,
+            IFNULL(i.username, "") AS `username`,
             IFNULL(
                 (
                     SELECT urc.classname

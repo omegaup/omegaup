@@ -48,8 +48,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import omegaup from '../../api.js';
-import { T } from '../../omegaup.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
@@ -146,7 +146,7 @@ export default class CourseViewProgress extends Vue {
 
   get progressTable(): string[][] {
     let table: string[][] = [];
-    let header = [this.T.profileUsername, this.T.wordsName];
+    let header = [T.profileUsername, T.wordsName];
     for (let assignment of this.assignments) {
       header.push(assignment.name);
     }

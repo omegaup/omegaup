@@ -33,10 +33,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 
-@Component({})
+@Component
 export default class Publish extends Vue {
   @Prop() data!: omegaup.Contest;
 

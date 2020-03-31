@@ -1,5 +1,5 @@
 import contest_Report from '../components/contest/Report.vue';
-import { OmegaUp } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {

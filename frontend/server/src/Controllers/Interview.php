@@ -234,7 +234,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{description?: null|string, contest_alias?: null|string, problemset_id?: int|null, users?: list<array{user_id: int|null, username: string, access_time: null|string, email: null|string, opened_interview: bool, country: null|string}>, exists: bool}
+     * @return array{description?: null|string, contest_alias?: null|string, problemset_id?: int|null, users?: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>, exists: bool}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -301,7 +301,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function showIntro(\OmegaUp\Request $r): bool {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
             'contest_alias'
         );

@@ -16,11 +16,11 @@
     >
     <ul class="dropdown-menu notification-dropdown">
       <li class="text-center" v-if="notifications.length === 0">
-        {{ this.T.notificationsNoNewNotifications }}
+        {{ T.notificationsNoNewNotifications }}
       </li>
       <li v-else="">
         <a role="button" v-on:click="$emit('read', notifications)"
-          >{{ this.T.notificationsMarkAllAsRead }} ✔️</a
+          >{{ T.notificationsMarkAllAsRead }} ✔️</a
         >
       </li>
       <transition-group name="list"
@@ -73,8 +73,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import Notification from './Notification.vue';
 
 @Component({

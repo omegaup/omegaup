@@ -179,7 +179,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             FROM
                 Groups_Identities gi
             INNER JOIN
-                `Groups` AS g ON gi.group_id = g.group_id
+                `Groups_` AS g ON gi.group_id = g.group_id
             WHERE
                 gi.identity_id = ? AND g.name LIKE '%omegaup:%';";
         $params = [

@@ -248,11 +248,12 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Asserts that $array has at least one element that matches $predicate.
      *
-     * @param array $array
-     * @param callable $predicate
+     * @psalm-template T
+     * @param list<T> $array
+     * @param callable(T):bool $predicate
      */
-    public function assertArrayContainsWithPredicate($array, $predicate) {
-        foreach ($array as $key => $value) {
+    public function assertArrayContainsWithPredicate($array, $predicate): void {
+        foreach ($array as $_ => $value) {
             if ($predicate($value)) {
                 return;
             }
@@ -261,13 +262,42 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Asserts that $array has exactly one element that matches $predicate.
+     *
+     * @psalm-template T
+     * @param list<T> $array
+     * @param callable(T):bool $predicate
+     */
+    public function assertArrayContainsWithPredicateExactlyOnce(
+        $array,
+        $predicate
+    ): void {
+        $count = 0;
+        foreach ($array as $_ => $value) {
+            if ($predicate($value)) {
+                $count++;
+            }
+        }
+        if ($count == 0) {
+            $this->fail('No elements in array satisfied predicate');
+        }
+        if ($count > 1) {
+            $this->fail('Multiple elements in array satisfied predicate');
+        }
+    }
+
+    /**
      * Asserts that $array has no elements that matches $predicate.
      *
-     * @param array $array
-     * @param callable $predicate
+     * @psalm-template T
+     * @param list<T> $array
+     * @param callable(T):bool $predicate
      */
-    public function assertArrayNotContainsWithPredicate($array, $predicate) {
-        foreach ($array as $key => $value) {
+    public function assertArrayNotContainsWithPredicate(
+        $array,
+        $predicate
+    ): void {
+        foreach ($array as $_ => $value) {
             if ($predicate($value)) {
                 $this->fail(
                     'At least one element in array satisfied predicate'
@@ -279,8 +309,10 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Finds the first element in $array that matches $predicate.
      *
-     * @param array $array
-     * @param callable $predicate
+     * @psalm-template T
+     * @param list<T> $array
+     * @param callable(T):bool $predicate
+     * @return T|null
      */
     public function findByPredicate($array, $predicate) {
         foreach ($array as $key => $value) {

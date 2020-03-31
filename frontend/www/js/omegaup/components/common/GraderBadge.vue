@@ -32,11 +32,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
-import omegaup from '../../api.js';
 
-@Component({})
+@Component
 export default class GraderCountBadge extends Vue {
   @Prop() queueLength!: number;
   @Prop() error!: boolean;

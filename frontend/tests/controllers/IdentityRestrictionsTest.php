@@ -150,7 +150,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
         $creatorLogin = self::login($creatorIdentity);
 
         // Create a group, where identities will be added
-        $group = GroupsFactory::createGroup(
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
             null,
             null,
@@ -160,7 +160,7 @@ class IdentityRestrictionsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create identities and get one unassociated and other one to be
         // associated with a user
-        return IdentityFactory::createIdentitiesFromAGroup(
+        return \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
             $group,
             $creatorLogin,
             $password

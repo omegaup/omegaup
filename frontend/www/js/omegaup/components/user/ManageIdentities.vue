@@ -70,8 +70,8 @@ th.align-right {
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 
 @Component
 export default class UserManageIdentities extends Vue {

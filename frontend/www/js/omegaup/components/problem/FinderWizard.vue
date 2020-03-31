@@ -166,8 +166,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 // https://binarcode.github.io/vue-form-wizard/
 import { FormWizard, TabContent } from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
@@ -234,7 +234,7 @@ export default class ProblemFinderWizard extends Vue {
     this.possibleTags.forEach(tagObject => {
       tagObjects.push({
         key: tagObject.name,
-        value: this.T.hasOwnProperty(tagObject.name)
+        value: T.hasOwnProperty(tagObject.name)
           ? T[tagObject.name]
           : tagObject.name,
       });

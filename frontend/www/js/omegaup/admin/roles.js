@@ -1,5 +1,8 @@
 import user_Roles from '../components/admin/Roles.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -21,18 +24,18 @@ OmegaUp.on('ready', function() {
                 role: selectedRole.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                 username: payload.username,
                 role: selectedRole.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
           'on-change-group': function(selectedGroup) {
@@ -42,18 +45,18 @@ OmegaUp.on('ready', function() {
                 group: selectedGroup.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                 username: payload.username,
                 group: selectedGroup.value.name,
               })
                 .then(function() {
-                  omegaup.UI.success(T.userEditSuccess);
+                  UI.success(T.userEditSuccess);
                 })
-                .fail(omegaup.UI.apiError);
+                .catch(UI.apiError);
             }
           },
         },

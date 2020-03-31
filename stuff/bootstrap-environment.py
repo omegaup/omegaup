@@ -102,26 +102,29 @@ class Session:
 
 def _does_resource_exist(s, request):
     '''Returns whether a resource already exist.'''
-    if request['api'] == '/problem/create':
+    api_endpoint = request['api'].lower()
+    if not api_endpoint.endswith('/'):
+        api_endpoint += '/'
+    if api_endpoint == '/problem/create/':
         if s.request('/problem/details/',
                      {'problem_alias':
                       request['params']['problem_alias']})['exists']:
             logging.warning('Problem %s exists, skipping',
                             request['params']['problem_alias'])
             return True
-    if request['api'] == '/contest/create':
+    if api_endpoint == '/contest/create/':
         if s.request('/contest/adminDetails/',
                      {'contest_alias': request['params']['alias']}):
             logging.warning('Contest %s exists, skipping',
                             request['params']['alias'])
             return True
-    if request['api'] == '/course/create':
+    if api_endpoint == '/course/create/':
         if s.request('/course/adminDetails/',
                      {'alias': request['params']['alias']}):
             logging.warning('Course %s exists, skipping',
                             request['params']['alias'])
             return True
-    if request['api'] == '/course/createAssignment':
+    if api_endpoint == '/course/createassignment/':
         if s.request(
                 '/course/assignmentDetails/', {
                     'course': request['params']['course_alias'],
@@ -130,7 +133,7 @@ def _does_resource_exist(s, request):
             logging.warning('Assignment %s exists, skipping',
                             request['params']['alias'])
             return True
-    if request['api'] == '/user/create':
+    if api_endpoint == '/user/create/':
         if s.request('/user/profile',
                      {'username': request['params']['username']}):
             logging.warning('User %s exists, skipping',

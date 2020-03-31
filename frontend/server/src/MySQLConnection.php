@@ -7,6 +7,7 @@ class FieldType {
     const TYPE_INT = 1;
     const TYPE_FLOAT = 2;
     const TYPE_BOOL = 3;
+    const TYPE_TIMESTAMP = 4;
 }
 
 /**
@@ -89,8 +90,11 @@ class MySQLConnection {
             );
         }
         $this->_connection->autocommit(false);
-        $this->_connection->set_charset('utf8');
-        $this->_connection->query('SET NAMES "utf8";', MYSQLI_STORE_RESULT);
+        $this->_connection->set_charset('utf8mb4');
+        $this->_connection->query(
+            'SET NAMES "utf8mb4" COLLATE "utf8mb4_unicode_ci";',
+            MYSQLI_STORE_RESULT
+        );
     }
 
     /**
@@ -189,12 +193,14 @@ class MySQLConnection {
             case MYSQLI_TYPE_YEAR:
                 return FieldType::TYPE_INT;
 
-            case MYSQLI_TYPE_TIMESTAMP:
             case MYSQLI_TYPE_DATE:
             case MYSQLI_TYPE_TIME:
-            case MYSQLI_TYPE_DATETIME:
             case MYSQLI_TYPE_NEWDATE:
                 return FieldType::TYPE_STRING;
+
+            case MYSQLI_TYPE_TIMESTAMP:
+            case MYSQLI_TYPE_DATETIME:
+                return FieldType::TYPE_TIMESTAMP;
 
             case MYSQLI_TYPE_ENUM:
             case MYSQLI_TYPE_SET:
@@ -231,7 +237,7 @@ class MySQLConnection {
 
     /**
      * @param mixed $value
-     * @return null|int|bool|float|string
+     * @return null|int|bool|float|string|\OmegaUp\Timestamp
      */
     private function MapValue($value, int $fieldType) {
         if (is_null($value)) {
@@ -246,6 +252,9 @@ class MySQLConnection {
 
             case FieldType::TYPE_FLOAT:
                 return floatval($value);
+
+            case FieldType::TYPE_TIMESTAMP:
+                return new \OmegaUp\Timestamp(strtotime(strval($value)));
 
             case FieldType::TYPE_STRING:
             default:
@@ -282,6 +291,10 @@ class MySQLConnection {
 
             case FieldType::TYPE_FLOAT:
                 $typeName = 'float';
+                break;
+
+            case FieldType::TYPE_TIMESTAMP:
+                $typeName = '\\OmegaUp\\Timestamp';
                 break;
         }
         if ((intval($field->flags) & MYSQLI_NOT_NULL_FLAG) == 0) {

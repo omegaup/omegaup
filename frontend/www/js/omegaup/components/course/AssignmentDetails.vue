@@ -45,7 +45,7 @@
                   {{ T.wordsHomework }}
                 </option>
                 <option value="test">
-                  {{ T.wordsTest }}
+                  {{ T.wordsExam }}
                 </option>
               </select></label
             >
@@ -157,8 +157,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
 
 @Component({

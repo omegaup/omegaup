@@ -99,11 +99,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
-import omegaup from '../../api.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 
-@Component({})
+@Component
 export default class ScoreboardMerge extends Vue {
   @Prop() availableContests!: omegaup.Contest[];
   @Prop() scoreboard!: omegaup.Scoreboard[];

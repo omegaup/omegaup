@@ -1,4 +1,4 @@
-<script src="{version_hash src="/js/problem.edit.form.js"}" type="text/javascript"></script>
+<script src="{version_hash src="/js/problem.edit.form.js"}" type="text/javascript" defer></script>
 
 <div class="panel panel-primary">
 	{if $IS_UPDATE eq false}

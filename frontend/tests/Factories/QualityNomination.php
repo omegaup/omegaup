@@ -1,11 +1,8 @@
 <?php
 
-/**
- * Description of ProblemsFactory
- *
- * @author heduenas
- */
-class QualityNominationFactory {
+namespace OmegaUp\Test\Factories;
+
+class QualityNomination {
     /** @var list<\OmegaUp\DAO\VO\Identities> */
     public static $reviewers = [];
 

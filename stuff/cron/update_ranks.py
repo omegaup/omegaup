@@ -163,7 +163,7 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
         prev_score = row['score']
         cur.execute('''
                     INSERT INTO
-                        `User_Rank` (`user_id`, `rank`,
+                        `User_Rank` (`user_id`, `ranking`,
                                      `problems_solved_count`, `score`,
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
@@ -199,6 +199,61 @@ def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                     VALUES(%s, %s, %s);''',
                     (scores[int(len(scores) * cutoff.percentile)],
                      cutoff.percentile, cutoff.classname))
+
+
+def update_schools_solved_problems(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the solved problems count by each school the last 6 months'''
+
+    logging.info('Updating schools solved problems...')
+
+    months = 6  # in case this parameter requires adjustments
+    cur.execute('DELETE FROM `Schools_Problems_Solved_Per_Month`')
+    cur.execute('''
+        INSERT INTO
+            `Schools_Problems_Solved_Per_Month` (
+                `school_id`,
+                `time`,
+                `problems_solved`
+            )
+        SELECT
+            `sc`.`school_id`,
+            STR_TO_DATE(
+                CONCAT (
+                    YEAR(`su`.`time`), '-', MONTH(`su`.`time`), '-01'
+                ),
+                "%%Y-%%m-%%d"
+            ) AS `time`,
+            COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
+        FROM
+            `Submissions` AS `su`
+        INNER JOIN
+            `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
+        INNER JOIN
+            `Runs` AS `r` ON `r`.`run_id` = `su`.`current_run_id`
+        INNER JOIN
+            `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+        WHERE
+            `su`.`time` >= CURDATE() - INTERVAL %s MONTH
+            AND `r`.`verdict` = "AC" AND `p`.`visibility` >= 1
+            AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    `Submissions` AS `sub`
+                INNER JOIN
+                    `Runs` AS `ru` ON `ru`.`run_id` = `sub`.`current_run_id`
+                WHERE
+                    `sub`.`problem_id` = `su`.`problem_id`
+                    AND `sub`.`identity_id` = `su`.`identity_id`
+                    AND `ru`.`verdict` = "AC"
+                    AND `sub`.`time` < `su`.`time`
+            )
+        GROUP BY
+            `sc`.`school_id`,
+            `time`
+        ORDER BY
+            `time` ASC;
+    ''', (months,))
 
 
 def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
@@ -251,7 +306,7 @@ def update_school_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `Schools` AS `s`
                         SET
                             `s`.`score` = %s,
-                            `s`.`rank` = %s
+                            `s`.`ranking` = %s
                         WHERE
                             `s`.`school_id` = %s;
                     ''',
@@ -350,7 +405,7 @@ def update_school_of_the_month_candidates(
                     `sotm`.`school_id` = `s`.`school_id`
                     AND (
                         `sotm`.`selected_by` IS NOT NULL OR
-                        `sotm`.`rank` = 1
+                        `sotm`.`ranking` = 1
                     )
                 GROUP BY
                     `sotm`.`school_id`
@@ -375,7 +430,7 @@ def update_school_of_the_month_candidates(
                         `School_Of_The_Month` (
                             `school_id`,
                             `time`,
-                            `rank`,
+                            `ranking`,
                             `score`
                         )
                     VALUES (
@@ -391,6 +446,234 @@ def update_school_of_the_month_candidates(
                         index + 1,
                         row['score']
                     ))
+
+
+def update_coder_of_the_month_candidates(
+        cur: MySQLdb.cursors.BaseCursor,
+        first_day_of_current_month: datetime.date,
+        category: str) -> None:
+    '''Updates the list of candidates to coder of the current month'''
+
+    logging.info('Updating the candidates to coder of the month...')
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1,
+            1,
+            1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1,
+            1)
+
+    # First make sure there are not already selected coder of the month
+        cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Coder_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL AND
+                    `category` = %s;
+                ''', (first_day_of_next_month, category))
+    for row in cur:
+        if row['count'] > 0:
+            logging.info('Skipping because already exist selected coder')
+            return
+    cur.execute('''
+                DELETE FROM
+                    `Coder_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `category` = %s;
+                ''',
+                (first_day_of_next_month, category))
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
+    sql = f'''
+         SELECT DISTINCT
+            IFNULL(i.user_id, 0) AS user_id,
+            i.username,
+            IFNULL(i.country_id, 'xx') AS country_id,
+            isc.school_id,
+            COUNT(ps.problem_id) ProblemsSolved,
+            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
+            IFNULL(
+                (
+                    SELECT urc.classname FROM
+                        User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT
+                        1
+                ),
+                'user-rank-unranked'
+            ) AS classname
+          FROM
+            (
+              SELECT DISTINCT
+                s.identity_id, s.problem_id
+              FROM
+                Submissions s
+              INNER JOIN
+                Runs r
+              ON
+                r.run_id = s.current_run_id
+              WHERE
+                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.time >= %s AND s.time <= %s
+            ) AS up
+          INNER JOIN
+            Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
+          INNER JOIN
+            Identities i ON i.identity_id = up.identity_id
+          LEFT JOIN
+            Identities_Schools isc ON isc.identity_school_id =
+            i.current_identity_school_id
+          LEFT JOIN
+            (
+              SELECT
+                user_id,
+                MAX(time) latest_time,
+                selected_by
+              FROM
+                Coder_Of_The_Month
+              WHERE
+                category = %s
+              GROUP BY
+                user_id,
+                selected_by
+            ) AS cm on i.user_id = cm.user_id
+          WHERE
+            (cm.user_id IS NULL OR
+            DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
+            i.user_id IS NOT NULL
+            {gender_clause}
+          GROUP BY
+            up.identity_id
+          ORDER BY
+            score DESC,
+            ProblemsSolved DESC
+          LIMIT 100;
+        '''
+    cur.execute(
+        sql,
+        (
+            first_day_of_current_month,
+            first_day_of_next_month,
+            category,
+            first_day_of_next_month,
+        ))
+
+    for index, row in enumerate(cur):
+        cur.execute('''
+                    INSERT INTO
+                        `Coder_Of_The_Month` (
+                            `user_id`,
+                            `time`,
+                            `ranking`,
+                            `school_id`,
+                            `category`,
+                            `score`
+                        )
+                    VALUES (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    );
+                    ''',
+                    (
+                        row['user_id'],
+                        first_day_of_next_month,
+                        index + 1,
+                        row['school_id'],
+                        category,
+                        row['score']
+                    ))
+
+
+def update_users_stats(
+        cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
+        date: datetime.date) -> None:
+    '''Updates all the information and ranks related to users'''
+    logging.info('Updating users stats...')
+    try:
+        try:
+            scores = update_user_rank(cur)
+            update_user_rank_cutoffs(cur, scores)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update user ranking')
+            raise
+
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'all')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month')
+            raise
+
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'female')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month female')
+            raise
+        logging.info('Users stats updated')
+    except:  # noqa: bare-except
+        logging.exception('Failed to update all users stats')
+
+
+def update_schools_stats(
+        cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
+        date: datetime.date) -> None:
+    '''Updates all the information and ranks related to schools'''
+    logging.info('Updating schools stats...')
+    try:
+        try:
+            update_schools_solved_problems(cur)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update schools solved problems')
+            raise
+
+        try:
+            update_school_rank(cur)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update school ranking')
+            raise
+
+        try:
+            update_school_of_the_month_candidates(cur, date)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to school of the month')
+            raise
+        logging.info('Schools stats updated')
+    except:  # noqa: bare-except
+        logging.exception('Failed to update all schools stats')
 
 
 def main() -> None:
@@ -412,28 +695,8 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            try:
-                scores = update_user_rank(cur)
-                update_user_rank_cutoffs(cur, scores)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception('Failed to update user ranking')
-                raise
-
-            try:
-                update_school_rank(cur)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception('Failed to update school ranking')
-                raise
-
-            try:
-                update_school_of_the_month_candidates(cur, args.date)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to school of the month')
-                raise
+            update_users_stats(cur, dbconn, args.date)
+            update_schools_stats(cur, dbconn, args.date)
     finally:
         dbconn.close()
         logging.info('Done')

@@ -5,7 +5,7 @@
 class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats for an overall platform report.
-     * @return array{status: 'ok', report: array<string, mixed>}
+     * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
      */
     public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -31,7 +31,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
             intval($r['end_time']);
 
         return [
-            'status' => 'ok',
             'report' => [
                 'activeUsers' => array_merge(...array_map(
                     /**

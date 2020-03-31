@@ -21,7 +21,6 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api
         $response = \OmegaUp\Controllers\School::apiCreate($r);
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             1,
             count(
@@ -47,7 +46,6 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api
         $response = \OmegaUp\Controllers\School::apiCreate($r);
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             1,
             count(
@@ -60,7 +58,6 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call api again
         $response = \OmegaUp\Controllers\School::apiCreate($r);
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             1,
             count(
