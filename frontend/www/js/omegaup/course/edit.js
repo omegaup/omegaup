@@ -504,7 +504,7 @@ OmegaUp.on('ready', function() {
               UI.error(T.wordsEmptyAddStudentInput);
               return;
             }
-            Promise.all(
+            Promise.allSettled(
               participants.map(participant =>
                 API.Course.addStudent({
                   course_alias: courseAlias,
@@ -512,17 +512,25 @@ OmegaUp.on('ready', function() {
                 }),
               ),
             )
-              .then(function() {
+              .then(results => {
+                let participantsWithError = [];
+                results.forEach(result => {
+                  if (result.status === 'rejected') {
+                    participantsWithError.push(result.reason.userEmail);
+                  }
+                });
                 refreshStudentList();
-                UI.success(T.courseStudentAdded);
-              })
-              .catch(function(event) {
+                if (participantsWithError.length === 0) {
+                  UI.success(T.courseStudentAdded);
+                  return;
+                }
                 UI.error(
                   UI.formatString(T.bulkUserAddError, {
-                    userEmail: event.userEmail,
+                    userEmail: participantsWithError.join('<br>'),
                   }),
                 );
-              });
+              })
+              .catch(UI.ignoreError);
           },
           'remove-student': function(student) {
             API.Course.removeStudent({
