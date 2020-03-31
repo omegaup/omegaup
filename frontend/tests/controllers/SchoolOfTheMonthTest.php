@@ -16,12 +16,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     ): void {
         if (is_null($runDate)) {
             $previousMonth = date_create(date('Y-m-d'));
-            date_add(
-                $previousMonth,
-                date_interval_create_from_date_string(
-                    '-1 month'
-                )
-            );
+            $previousMonth->modify('last day of previous month');
             $runDate = date_format($previousMonth, 'Y-m-d');
         }
 
@@ -171,12 +166,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
