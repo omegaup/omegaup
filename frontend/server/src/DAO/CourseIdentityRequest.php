@@ -78,7 +78,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
             ORDER BY
                 i.identity_id;';
 
-        /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}> */
+        /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $courseId]
