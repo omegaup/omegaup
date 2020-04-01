@@ -90,6 +90,16 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $course
+     * @omegaup-request-param mixed $interview_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
+     * @omegaup-request-param mixed $username
+     *
      * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, description?: null|string, director?: \OmegaUp\DAO\VO\Identities|null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: null|string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter?: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -125,6 +135,14 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $course
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
+     *
      * @return array{finish_time?: int|null, problems?: list<array{alias: string, order: int}>, ranking?: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time?: int, time?: int, title?: string}
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
@@ -158,6 +176,14 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the Scoreboard events
      *
+     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $course
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
+     *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}>}
@@ -190,11 +216,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param \OmegaUp\Request $r
-     * $r['tokens'][0] = invalid filter
-     * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
-     * $r['tokens'][2] = Id of entity ($tokens[2])
-     * $r['tokens'][3] = Token given by the filter
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
+     *
+     * @param \OmegaUp\Request $r $r['tokens'][0] = invalid filter $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem) $r['tokens'][2] = Id of entity ($tokens[2]) $r['tokens'][3] = Token given by the filter
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *

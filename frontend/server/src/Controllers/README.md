@@ -1,8 +1,240 @@
+- [Admin](#admin)
+  - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [Authorization](#authorization)
+  - [`/api/authorization/problem/`](#apiauthorizationproblem)
+- [Badge](#badge)
+  - [`/api/badge/badgeDetails/`](#apibadgebadgedetails)
+  - [`/api/badge/list/`](#apibadgelist)
+  - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
+  - [`/api/badge/myList/`](#apibadgemylist)
+  - [`/api/badge/userList/`](#apibadgeuserlist)
+- [Clarification](#clarification)
+  - [`/api/clarification/create/`](#apiclarificationcreate)
+  - [`/api/clarification/details/`](#apiclarificationdetails)
+  - [`/api/clarification/update/`](#apiclarificationupdate)
+- [Contest](#contest)
+  - [`/api/contest/activityReport/`](#apicontestactivityreport)
+  - [`/api/contest/addAdmin/`](#apicontestaddadmin)
+  - [`/api/contest/addGroup/`](#apicontestaddgroup)
+  - [`/api/contest/addGroupAdmin/`](#apicontestaddgroupadmin)
+  - [`/api/contest/addProblem/`](#apicontestaddproblem)
+  - [`/api/contest/addUser/`](#apicontestadduser)
+  - [`/api/contest/adminDetails/`](#apicontestadmindetails)
+  - [`/api/contest/adminList/`](#apicontestadminlist)
+  - [`/api/contest/admins/`](#apicontestadmins)
+  - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
+  - [`/api/contest/clarifications/`](#apicontestclarifications)
+  - [`/api/contest/clone/`](#apicontestclone)
+  - [`/api/contest/contestants/`](#apicontestcontestants)
+  - [`/api/contest/create/`](#apicontestcreate)
+  - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
+  - [`/api/contest/details/`](#apicontestdetails)
+  - [`/api/contest/list/`](#apicontestlist)
+  - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
+  - [`/api/contest/myList/`](#apicontestmylist)
+  - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problems/`](#apicontestproblems)
+  - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
+  - [`/api/contest/registerForContest/`](#apicontestregisterforcontest)
+  - [`/api/contest/removeAdmin/`](#apicontestremoveadmin)
+  - [`/api/contest/removeGroup/`](#apicontestremovegroup)
+  - [`/api/contest/removeGroupAdmin/`](#apicontestremovegroupadmin)
+  - [`/api/contest/removeProblem/`](#apicontestremoveproblem)
+  - [`/api/contest/removeUser/`](#apicontestremoveuser)
+  - [`/api/contest/report/`](#apicontestreport)
+  - [`/api/contest/requests/`](#apicontestrequests)
+  - [`/api/contest/role/`](#apicontestrole)
+  - [`/api/contest/runs/`](#apicontestruns)
+  - [`/api/contest/runsDiff/`](#apicontestrunsdiff)
+  - [`/api/contest/scoreboard/`](#apicontestscoreboard)
+  - [`/api/contest/scoreboardEvents/`](#apicontestscoreboardevents)
+  - [`/api/contest/scoreboardMerge/`](#apicontestscoreboardmerge)
+  - [`/api/contest/setRecommended/`](#apicontestsetrecommended)
+  - [`/api/contest/stats/`](#apiconteststats)
+  - [`/api/contest/update/`](#apicontestupdate)
+  - [`/api/contest/updateEndTimeForIdentity/`](#apicontestupdateendtimeforidentity)
+  - [`/api/contest/users/`](#apicontestusers)
+- [Course](#course)
+  - [`/api/course/activityReport/`](#apicourseactivityreport)
+  - [`/api/course/addAdmin/`](#apicourseaddadmin)
+  - [`/api/course/addGroupAdmin/`](#apicourseaddgroupadmin)
+  - [`/api/course/addProblem/`](#apicourseaddproblem)
+  - [`/api/course/addStudent/`](#apicourseaddstudent)
+  - [`/api/course/adminDetails/`](#apicourseadmindetails)
+  - [`/api/course/admins/`](#apicourseadmins)
+  - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
+  - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
+  - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
+  - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
+  - [`/api/course/clone/`](#apicourseclone)
+  - [`/api/course/create/`](#apicoursecreate)
+  - [`/api/course/createAssignment/`](#apicoursecreateassignment)
+  - [`/api/course/details/`](#apicoursedetails)
+  - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
+  - [`/api/course/introDetails/`](#apicourseintrodetails)
+  - [`/api/course/listAssignments/`](#apicourselistassignments)
+  - [`/api/course/listCourses/`](#apicourselistcourses)
+  - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
+  - [`/api/course/listStudents/`](#apicourseliststudents)
+  - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
+  - [`/api/course/myProgress/`](#apicoursemyprogress)
+  - [`/api/course/registerForCourse/`](#apicourseregisterforcourse)
+  - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
+  - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
+  - [`/api/course/removeProblem/`](#apicourseremoveproblem)
+  - [`/api/course/removeStudent/`](#apicourseremovestudent)
+  - [`/api/course/requests/`](#apicourserequests)
+  - [`/api/course/runs/`](#apicourseruns)
+  - [`/api/course/studentProgress/`](#apicoursestudentprogress)
+  - [`/api/course/update/`](#apicourseupdate)
+  - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
+  - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
+  - [`/api/course/updateProblemsOrder/`](#apicourseupdateproblemsorder)
+- [Grader](#grader)
+  - [`/api/grader/status/`](#apigraderstatus)
+- [Group](#group)
+  - [`/api/group/addUser/`](#apigroupadduser)
+  - [`/api/group/create/`](#apigroupcreate)
+  - [`/api/group/createScoreboard/`](#apigroupcreatescoreboard)
+  - [`/api/group/details/`](#apigroupdetails)
+  - [`/api/group/list/`](#apigrouplist)
+  - [`/api/group/members/`](#apigroupmembers)
+  - [`/api/group/myList/`](#apigroupmylist)
+  - [`/api/group/removeUser/`](#apigroupremoveuser)
+- [GroupScoreboard](#groupscoreboard)
+  - [`/api/groupScoreboard/addContest/`](#apigroupscoreboardaddcontest)
+  - [`/api/groupScoreboard/details/`](#apigroupscoreboarddetails)
+  - [`/api/groupScoreboard/list/`](#apigroupscoreboardlist)
+  - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
+- [Identity](#identity)
+  - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
+  - [`/api/identity/changePassword/`](#apiidentitychangepassword)
+  - [`/api/identity/create/`](#apiidentitycreate)
+  - [`/api/identity/update/`](#apiidentityupdate)
+- [Interview](#interview)
+  - [`/api/interview/addUsers/`](#apiinterviewaddusers)
+  - [`/api/interview/create/`](#apiinterviewcreate)
+  - [`/api/interview/details/`](#apiinterviewdetails)
+  - [`/api/interview/list/`](#apiinterviewlist)
+- [Notification](#notification)
+  - [`/api/notification/myList/`](#apinotificationmylist)
+  - [`/api/notification/readNotifications/`](#apinotificationreadnotifications)
+- [Problem](#problem)
+  - [`/api/problem/addAdmin/`](#apiproblemaddadmin)
+  - [`/api/problem/addGroupAdmin/`](#apiproblemaddgroupadmin)
+  - [`/api/problem/addTag/`](#apiproblemaddtag)
+  - [`/api/problem/adminList/`](#apiproblemadminlist)
+  - [`/api/problem/admins/`](#apiproblemadmins)
+  - [`/api/problem/bestScore/`](#apiproblembestscore)
+  - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/create/`](#apiproblemcreate)
+  - [`/api/problem/delete/`](#apiproblemdelete)
+  - [`/api/problem/details/`](#apiproblemdetails)
+  - [`/api/problem/list/`](#apiproblemlist)
+  - [`/api/problem/myList/`](#apiproblemmylist)
+  - [`/api/problem/rejudge/`](#apiproblemrejudge)
+  - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
+  - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
+  - [`/api/problem/removeTag/`](#apiproblemremovetag)
+  - [`/api/problem/runs/`](#apiproblemruns)
+  - [`/api/problem/runsDiff/`](#apiproblemrunsdiff)
+  - [`/api/problem/selectVersion/`](#apiproblemselectversion)
+  - [`/api/problem/solution/`](#apiproblemsolution)
+  - [`/api/problem/stats/`](#apiproblemstats)
+  - [`/api/problem/tags/`](#apiproblemtags)
+  - [`/api/problem/update/`](#apiproblemupdate)
+  - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
+  - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
+  - [`/api/problem/versions/`](#apiproblemversions)
+- [ProblemForfeited](#problemforfeited)
+  - [`/api/problemForfeited/getCounts/`](#apiproblemforfeitedgetcounts)
+- [Problemset](#problemset)
+  - [`/api/problemset/details/`](#apiproblemsetdetails)
+  - [`/api/problemset/scoreboard/`](#apiproblemsetscoreboard)
+  - [`/api/problemset/scoreboardEvents/`](#apiproblemsetscoreboardevents)
+- [QualityNomination](#qualitynomination)
+  - [`/api/qualityNomination/create/`](#apiqualitynominationcreate)
+  - [`/api/qualityNomination/details/`](#apiqualitynominationdetails)
+  - [`/api/qualityNomination/list/`](#apiqualitynominationlist)
+  - [`/api/qualityNomination/myAssignedList/`](#apiqualitynominationmyassignedlist)
+  - [`/api/qualityNomination/myList/`](#apiqualitynominationmylist)
+  - [`/api/qualityNomination/resolve/`](#apiqualitynominationresolve)
+- [Reset](#reset)
+  - [`/api/reset/create/`](#apiresetcreate)
+  - [`/api/reset/generateToken/`](#apiresetgeneratetoken)
+  - [`/api/reset/update/`](#apiresetupdate)
+- [Run](#run)
+  - [`/api/run/counts/`](#apiruncounts)
+  - [`/api/run/create/`](#apiruncreate)
+  - [`/api/run/details/`](#apirundetails)
+  - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/list/`](#apirunlist)
+  - [`/api/run/rejudge/`](#apirunrejudge)
+  - [`/api/run/source/`](#apirunsource)
+  - [`/api/run/status/`](#apirunstatus)
+- [School](#school)
+  - [`/api/school/create/`](#apischoolcreate)
+  - [`/api/school/list/`](#apischoollist)
+  - [`/api/school/monthlySolvedProblemsCount/`](#apischoolmonthlysolvedproblemscount)
+  - [`/api/school/rank/`](#apischoolrank)
+  - [`/api/school/schoolCodersOfTheMonth/`](#apischoolschoolcodersofthemonth)
+  - [`/api/school/selectSchoolOfTheMonth/`](#apischoolselectschoolofthemonth)
+  - [`/api/school/users/`](#apischoolusers)
+- [Scoreboard](#scoreboard)
+  - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
+- [Session](#session)
+  - [`/api/session/currentSession/`](#apisessioncurrentsession)
+  - [`/api/session/googleLogin/`](#apisessiongooglelogin)
+- [Submission](#submission)
+  - [`/api/submission/latestSubmissions/`](#apisubmissionlatestsubmissions)
+- [Tag](#tag)
+  - [`/api/tag/list/`](#apitaglist)
+- [Time](#time)
+  - [`/api/time/get/`](#apitimeget)
+- [User](#user)
+  - [`/api/user/acceptPrivacyPolicy/`](#apiuseracceptprivacypolicy)
+  - [`/api/user/addExperiment/`](#apiuseraddexperiment)
+  - [`/api/user/addGroup/`](#apiuseraddgroup)
+  - [`/api/user/addRole/`](#apiuseraddrole)
+  - [`/api/user/associateIdentity/`](#apiuserassociateidentity)
+  - [`/api/user/changePassword/`](#apiuserchangepassword)
+  - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
+  - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
+  - [`/api/user/contestStats/`](#apiuserconteststats)
+  - [`/api/user/create/`](#apiusercreate)
+  - [`/api/user/extraInformation/`](#apiuserextrainformation)
+  - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
+  - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
+  - [`/api/user/interviewStats/`](#apiuserinterviewstats)
+  - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
+  - [`/api/user/list/`](#apiuserlist)
+  - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
+  - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
+  - [`/api/user/login/`](#apiuserlogin)
+  - [`/api/user/mailingListBackfill/`](#apiusermailinglistbackfill)
+  - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
+  - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
+  - [`/api/user/profile/`](#apiuserprofile)
+  - [`/api/user/rankByProblemsSolved/`](#apiuserrankbyproblemssolved)
+  - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
+  - [`/api/user/removeGroup/`](#apiuserremovegroup)
+  - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
+  - [`/api/user/stats/`](#apiuserstats)
+  - [`/api/user/statusVerified/`](#apiuserstatusverified)
+  - [`/api/user/update/`](#apiuserupdate)
+  - [`/api/user/updateBasicInfo/`](#apiuserupdatebasicinfo)
+  - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
+  - [`/api/user/validateFilter/`](#apiuservalidatefilter)
+  - [`/api/user/verifyEmail/`](#apiuserverifyemail)
+
 # Admin
 
 ## `/api/admin/platformReportStats/`
 
 ### Descripción
+
+Get stats for an overall platform report.
 
 ### Parámetros
 
@@ -45,6 +277,9 @@ BadgesController
 
 ### Descripción
 
+Returns the number of owners and the first
+assignation timestamp for a certain badge
+
 ### Parámetros
 
 _Por documentar_
@@ -58,6 +293,8 @@ types.Badge;
 ## `/api/badge/list/`
 
 ### Descripción
+
+Returns a list of existing badges
 
 ### Parámetros
 
@@ -73,6 +310,9 @@ string[]
 
 ### Descripción
 
+Returns a the assignation timestamp of a badge
+for current user.
+
 ### Parámetros
 
 _Por documentar_
@@ -87,6 +327,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns a list of badges owned by current user
+
 ### Parámetros
 
 _Por documentar_
@@ -100,6 +342,8 @@ _Por documentar_
 ## `/api/badge/userList/`
 
 ### Descripción
+
+Returns a list of badges owned by a certain user
 
 ### Parámetros
 
@@ -119,6 +363,8 @@ Description of ClarificationController
 
 ### Descripción
 
+Creates a Clarification
+
 ### Parámetros
 
 _Por documentar_
@@ -135,6 +381,8 @@ _Por documentar_
 
 ### Descripción
 
+API for getting a clarification
+
 ### Parámetros
 
 _Por documentar_
@@ -149,6 +397,8 @@ _Por documentar_
 
 ### Descripción
 
+Update a clarification
+
 ### Parámetros
 
 _Por documentar_
@@ -157,7 +407,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -168,6 +417,8 @@ ContestController
 ## `/api/contest/activityReport/`
 
 ### Descripción
+
+Returns a report with all user activity for a contest.
 
 ### Parámetros
 
@@ -192,6 +443,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds an admin to a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -200,7 +453,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -208,6 +460,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds an group to a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -216,7 +470,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -224,6 +477,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds an group admin to a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -232,7 +487,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -240,6 +494,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds a problem to a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -248,7 +504,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -256,6 +511,10 @@ _Por documentar_
 
 ### Descripción
 
+Adds a user to a contest.
+By default, any user can view details of public contests.
+Only users added through this API can view private contests
+
 ### Parámetros
 
 _Por documentar_
@@ -264,13 +523,16 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/adminDetails/`
 
 ### Descripción
+
+Returns details of a Contest, for administrators. This differs from
+apiDetails in the sense that it does not attempt to calculate the
+remaining time from the contest, or register the opened time.
 
 ### Parámetros
 
@@ -285,6 +547,9 @@ _Por documentar_
 ## `/api/contest/adminList/`
 
 ### Descripción
+
+Returns a list of contests where current user has admin rights (or is
+the director).
 
 ### Parámetros
 
@@ -311,6 +576,8 @@ _Por documentar_
 ## `/api/contest/admins/`
 
 ### Descripción
+
+Returns all contest administrators
 
 ### Parámetros
 
@@ -346,13 +613,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/clarifications/`
 
 ### Descripción
+
+Get clarifications of a contest
 
 ### Parámetros
 
@@ -367,6 +635,8 @@ _Por documentar_
 ## `/api/contest/clone/`
 
 ### Descripción
+
+Clone a contest
 
 ### Parámetros
 
@@ -384,6 +654,10 @@ _Por documentar_
 
 ### Descripción
 
+Return users who participate in a contest, as long as contest admin
+has chosen to ask for users information and contestants have
+previously agreed to share their information.
+
 ### Parámetros
 
 _Por documentar_
@@ -398,6 +672,8 @@ _Por documentar_
 
 ### Descripción
 
+Creates a new contest
+
 ### Parámetros
 
 _Por documentar_
@@ -406,7 +682,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -430,6 +705,10 @@ _Por documentar_
 
 ### Descripción
 
+Returns details of a Contest. Requesting the details of a contest will
+not start the current user into that contest. In order to participate
+in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
+
 ### Parámetros
 
 _Por documentar_
@@ -443,6 +722,8 @@ _Por documentar_
 ## `/api/contest/list/`
 
 ### Descripción
+
+Returns a list of contests
 
 ### Parámetros
 
@@ -458,6 +739,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns a list of contests where current user is participating in
+
 ### Parámetros
 
 _Por documentar_
@@ -471,6 +754,8 @@ _Por documentar_
 ## `/api/contest/myList/`
 
 ### Descripción
+
+Returns a list of contests where current user is the director
 
 ### Parámetros
 
@@ -486,6 +771,8 @@ _Por documentar_
 
 ### Descripción
 
+Joins a contest - explicitly adds a identity to a contest.
+
 ### Parámetros
 
 _Por documentar_
@@ -494,13 +781,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/problems/`
 
 ### Descripción
+
+Gets the problems from a contest
 
 ### Parámetros
 
@@ -555,7 +843,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -563,6 +850,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes an admin from a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -571,7 +860,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -579,6 +867,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a group from a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -587,7 +877,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -595,6 +884,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a group admin from a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -603,7 +894,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -611,6 +901,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a problem from a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -619,7 +911,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -627,6 +918,8 @@ _Por documentar_
 
 ### Descripción
 
+Remove a user from a private contest
+
 ### Parámetros
 
 _Por documentar_
@@ -635,13 +928,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/report/`
 
 ### Descripción
+
+Returns a detailed report of the contest
 
 ### Parámetros
 
@@ -671,6 +965,9 @@ _Por documentar_
 
 ### Descripción
 
+Given a contest_alias and user_id, returns the role of the user within
+the context of a contest.
+
 ### Parámetros
 
 _Por documentar_
@@ -687,6 +984,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns all runs for a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -700,6 +999,8 @@ _Por documentar_
 ## `/api/contest/runsDiff/`
 
 ### Descripción
+
+Return a report of which runs would change due to a version change.
 
 ### Parámetros
 
@@ -715,6 +1016,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns the Scoreboard
+
 ### Parámetros
 
 _Por documentar_
@@ -728,6 +1031,8 @@ _Por documentar_
 ## `/api/contest/scoreboardEvents/`
 
 ### Descripción
+
+Returns the Scoreboard events
 
 ### Parámetros
 
@@ -743,6 +1048,8 @@ _Por documentar_
 
 ### Descripción
 
+Gets the accomulative scoreboard for an array of contests
+
 ### Parámetros
 
 _Por documentar_
@@ -757,6 +1064,9 @@ _Por documentar_
 
 ### Descripción
 
+Given a contest_alias, sets the recommended flag on/off.
+Only omegaUp admins can call this API.
+
 ### Parámetros
 
 _Por documentar_
@@ -765,13 +1075,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/stats/`
 
 ### Descripción
+
+Stats of a contest
 
 ### Parámetros
 
@@ -787,6 +1098,8 @@ _Por documentar_
 
 ### Descripción
 
+Update a Contest
+
 ### Parámetros
 
 _Por documentar_
@@ -795,7 +1108,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -803,6 +1115,9 @@ _Por documentar_
 
 ### Descripción
 
+Update Contest end time for an identity when window_length
+option is turned on
+
 ### Parámetros
 
 _Por documentar_
@@ -811,13 +1126,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/contest/users/`
 
 ### Descripción
+
+Returns ALL identities participating in a contest
 
 ### Parámetros
 
@@ -836,6 +1152,8 @@ CourseController
 ## `/api/course/activityReport/`
 
 ### Descripción
+
+Returns a report with all user activity for a course.
 
 ### Parámetros
 
@@ -860,6 +1178,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds an admin to a course
+
 ### Parámetros
 
 _Por documentar_
@@ -868,7 +1188,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -876,6 +1195,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds an group admin to a course
+
 ### Parámetros
 
 _Por documentar_
@@ -884,7 +1205,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -892,6 +1212,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds a problem to an assignment
+
 ### Parámetros
 
 _Por documentar_
@@ -900,7 +1222,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -908,6 +1229,8 @@ _Por documentar_
 
 ### Descripción
 
+Add Student to Course.
+
 ### Parámetros
 
 _Por documentar_
@@ -916,13 +1239,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/course/adminDetails/`
 
 ### Descripción
+
+Returns all details of a given Course
 
 ### Parámetros
 
@@ -937,6 +1261,8 @@ _Por documentar_
 ## `/api/course/admins/`
 
 ### Descripción
+
+Returns all course administrators
 
 ### Parámetros
 
@@ -960,9 +1286,29 @@ _Por documentar_
 }
 ```
 
+## `/api/course/arbitrateRequest/`
+
+### Descripción
+
+Stores the resolution given to a certain request made by a contestant
+interested to join the course.
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{
+}
+```
+
 ## `/api/course/assignmentDetails/`
 
 ### Descripción
+
+Returns details of a given assignment
 
 ### Parámetros
 
@@ -978,6 +1324,8 @@ _Por documentar_
 
 ### Descripción
 
+Gets Scoreboard for an assignment
+
 ### Parámetros
 
 _Por documentar_
@@ -992,6 +1340,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns the Scoreboard events
+
 ### Parámetros
 
 _Por documentar_
@@ -1005,6 +1355,8 @@ _Por documentar_
 ## `/api/course/clone/`
 
 ### Descripción
+
+Clone a course
 
 ### Parámetros
 
@@ -1022,6 +1374,8 @@ _Por documentar_
 
 ### Descripción
 
+Create new course API
+
 ### Parámetros
 
 _Por documentar_
@@ -1030,7 +1384,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1038,6 +1391,8 @@ _Por documentar_
 
 ### Descripción
 
+API to Create an assignment
+
 ### Parámetros
 
 _Por documentar_
@@ -1046,13 +1401,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/course/details/`
 
 ### Descripción
+
+Returns details of a given course
 
 ### Parámetros
 
@@ -1082,6 +1438,8 @@ _Por documentar_
 
 ### Descripción
 
+Show course intro only on public courses when user is not yet registered
+
 ### Parámetros
 
 _Por documentar_
@@ -1095,6 +1453,8 @@ _Por documentar_
 ## `/api/course/listAssignments/`
 
 ### Descripción
+
+List course assignments
 
 ### Parámetros
 
@@ -1110,6 +1470,11 @@ _Por documentar_
 
 ### Descripción
 
+Lists all the courses this user is associated with.
+
+Returns courses for which the current user is an admin and
+for in which the user is a student.
+
 ### Parámetros
 
 _Por documentar_
@@ -1123,6 +1488,8 @@ _Por documentar_
 ## `/api/course/listSolvedProblems/`
 
 ### Descripción
+
+Get Problems solved by users of a course
 
 ### Parámetros
 
@@ -1138,6 +1505,8 @@ _Por documentar_
 
 ### Descripción
 
+List students in a course
+
 ### Parámetros
 
 _Por documentar_
@@ -1152,6 +1521,8 @@ _Por documentar_
 
 ### Descripción
 
+Get Problems unsolved by users of a course
+
 ### Parámetros
 
 _Por documentar_
@@ -1165,6 +1536,8 @@ _Por documentar_
 ## `/api/course/myProgress/`
 
 ### Descripción
+
+Returns details of a given course
 
 ### Parámetros
 
@@ -1190,7 +1563,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1198,6 +1570,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes an admin from a course
+
 ### Parámetros
 
 _Por documentar_
@@ -1206,7 +1580,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1214,6 +1587,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a group admin from a course
+
 ### Parámetros
 
 _Por documentar_
@@ -1222,7 +1597,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1230,6 +1604,8 @@ _Por documentar_
 
 ### Descripción
 
+Remove a problem from an assignment
+
 ### Parámetros
 
 _Por documentar_
@@ -1238,7 +1614,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1246,6 +1621,8 @@ _Por documentar_
 
 ### Descripción
 
+Remove Student from Course
+
 ### Parámetros
 
 _Por documentar_
@@ -1254,13 +1631,31 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
+```
+
+## `/api/course/requests/`
+
+### Descripción
+
+Returns the list of requests made by participants who are interested to
+join the course
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{ users: { accepted?: boolean; admin: { name?: string; username: string; }; country?: string; country_id?: string; last_update?: Date; request_time: Date; username: string; }[]; }
 ```
 
 ## `/api/course/runs/`
 
 ### Descripción
+
+Returns all runs for a course
 
 ### Parámetros
 
@@ -1290,6 +1685,8 @@ _Por documentar_
 
 ### Descripción
 
+Edit Course contents
+
 ### Parámetros
 
 _Por documentar_
@@ -1298,7 +1695,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1306,6 +1702,8 @@ _Por documentar_
 
 ### Descripción
 
+Update an assignment
+
 ### Parámetros
 
 _Por documentar_
@@ -1314,7 +1712,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1330,7 +1727,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1346,7 +1742,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1357,6 +1752,8 @@ Description of GraderController
 ## `/api/grader/status/`
 
 ### Descripción
+
+Calls to /status grader
 
 ### Parámetros
 
@@ -1376,6 +1773,8 @@ GroupController
 
 ### Descripción
 
+Add identity to group
+
 ### Parámetros
 
 _Por documentar_
@@ -1384,7 +1783,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1392,6 +1790,8 @@ _Por documentar_
 
 ### Descripción
 
+New group
+
 ### Parámetros
 
 _Por documentar_
@@ -1400,7 +1800,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1408,6 +1807,8 @@ _Por documentar_
 
 ### Descripción
 
+Create a scoreboard set to a group
+
 ### Parámetros
 
 _Por documentar_
@@ -1416,13 +1817,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/group/details/`
 
 ### Descripción
+
+Details of a group (scoreboards)
 
 ### Parámetros
 
@@ -1437,6 +1839,9 @@ _Por documentar_
 ## `/api/group/list/`
 
 ### Descripción
+
+Returns a list of groups that match a partial name. This returns an
+array instead of an object since it is used by typeahead.
 
 ### Parámetros
 
@@ -1456,6 +1861,8 @@ _Por documentar_
 
 ### Descripción
 
+Members of a group (usernames only).
+
 ### Parámetros
 
 _Por documentar_
@@ -1469,6 +1876,8 @@ _Por documentar_
 ## `/api/group/myList/`
 
 ### Descripción
+
+Returns a list of groups by owner
 
 ### Parámetros
 
@@ -1484,6 +1893,8 @@ _Por documentar_
 
 ### Descripción
 
+Remove user from group
+
 ### Parámetros
 
 _Por documentar_
@@ -1492,7 +1903,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1504,6 +1914,8 @@ GroupScoreboardController
 
 ### Descripción
 
+Add contest to a group scoreboard
+
 ### Parámetros
 
 _Por documentar_
@@ -1512,13 +1924,15 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/groupScoreboard/details/`
 
 ### Descripción
+
+Details of a scoreboard. Returns a list with all contests that belong to
+the given scoreboard_alias
 
 ### Parámetros
 
@@ -1533,6 +1947,8 @@ _Por documentar_
 ## `/api/groupScoreboard/list/`
 
 ### Descripción
+
+Details of a scoreboard
 
 ### Parámetros
 
@@ -1558,6 +1974,8 @@ _Por documentar_
 
 ### Descripción
 
+Add contest to a group scoreboard
+
 ### Parámetros
 
 _Por documentar_
@@ -1566,7 +1984,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1578,6 +1995,8 @@ IdentityController
 
 ### Descripción
 
+Entry point for Create bulk Identities API
+
 ### Parámetros
 
 _Por documentar_
@@ -1586,7 +2005,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1594,6 +2012,8 @@ _Por documentar_
 
 ### Descripción
 
+Entry point for change passowrd of an identity
+
 ### Parámetros
 
 _Por documentar_
@@ -1602,13 +2022,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/identity/create/`
 
 ### Descripción
+
+Entry point for Create an Identity API
 
 ### Parámetros
 
@@ -1626,6 +2047,8 @@ _Por documentar_
 
 ### Descripción
 
+Entry point for Update an Identity API
+
 ### Parámetros
 
 _Por documentar_
@@ -1634,7 +2057,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1652,7 +2074,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1668,7 +2089,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1719,6 +2139,8 @@ BadgesController
 
 ### Descripción
 
+Returns a list of unread notifications for user
+
 ### Parámetros
 
 _Por documentar_
@@ -1740,6 +2162,8 @@ _Por documentar_
 
 ### Descripción
 
+Updates notifications as read in database
+
 ### Parámetros
 
 _Por documentar_
@@ -1748,7 +2172,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1760,6 +2183,8 @@ ProblemsController
 
 ### Descripción
 
+Adds an admin to a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1768,7 +2193,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1776,6 +2200,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds a group admin to a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1784,13 +2210,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/problem/addTag/`
 
 ### Descripción
+
+Adds a tag to a problem
 
 ### Parámetros
 
@@ -1808,6 +2235,9 @@ _Por documentar_
 
 ### Descripción
 
+Returns a list of problems where current user has admin rights (or is
+the owner).
+
 ### Parámetros
 
 _Por documentar_
@@ -1821,6 +2251,8 @@ _Por documentar_
 ## `/api/problem/admins/`
 
 ### Descripción
+
+Returns all problem administrators
 
 ### Parámetros
 
@@ -1848,6 +2280,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns the best score for a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1864,6 +2298,8 @@ _Por documentar_
 
 ### Descripción
 
+Entry point for Problem clarifications API
+
 ### Parámetros
 
 _Por documentar_
@@ -1878,6 +2314,8 @@ _Por documentar_
 
 ### Descripción
 
+Create a new problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1886,7 +2324,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1894,6 +2331,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a problem whether user is the creator
+
 ### Parámetros
 
 _Por documentar_
@@ -1902,13 +2341,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/problem/details/`
 
 ### Descripción
+
+Entry point for Problem Details API
 
 ### Parámetros
 
@@ -1924,6 +2364,8 @@ _Por documentar_
 
 ### Descripción
 
+List of public and user's private problems
+
 ### Parámetros
 
 _Por documentar_
@@ -1937,6 +2379,8 @@ _Por documentar_
 ## `/api/problem/myList/`
 
 ### Descripción
+
+Gets a list of problems where current user is the owner
 
 ### Parámetros
 
@@ -1952,6 +2396,8 @@ _Por documentar_
 
 ### Descripción
 
+Rejudge problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1960,7 +2406,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1968,6 +2413,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes an admin from a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1976,7 +2423,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1984,6 +2430,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a group admin from a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -1992,7 +2440,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2000,6 +2447,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes a tag from a contest
+
 ### Parámetros
 
 _Por documentar_
@@ -2008,13 +2457,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/problem/runs/`
 
 ### Descripción
+
+Entry point for Problem runs API
 
 ### Parámetros
 
@@ -2030,6 +2480,8 @@ _Por documentar_
 
 ### Descripción
 
+Return a report of which runs would change due to a version change.
+
 ### Parámetros
 
 _Por documentar_
@@ -2044,6 +2496,8 @@ _Por documentar_
 
 ### Descripción
 
+Change the version of the problem.
+
 ### Parámetros
 
 _Por documentar_
@@ -2052,13 +2506,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/problem/solution/`
 
 ### Descripción
+
+Returns the solution for a problem if conditions are satisfied.
 
 ### Parámetros
 
@@ -2074,6 +2529,8 @@ _Por documentar_
 
 ### Descripción
 
+Stats of a problem
+
 ### Parámetros
 
 _Por documentar_
@@ -2087,6 +2544,8 @@ _Por documentar_
 ## `/api/problem/tags/`
 
 ### Descripción
+
+Returns every tag associated to a given problem.
 
 ### Parámetros
 
@@ -2108,6 +2567,8 @@ _Por documentar_
 
 ### Descripción
 
+Update problem contents
+
 ### Parámetros
 
 _Por documentar_
@@ -2124,6 +2585,8 @@ _Por documentar_
 
 ### Descripción
 
+Updates problem solution only
+
 ### Parámetros
 
 _Por documentar_
@@ -2132,7 +2595,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2140,6 +2602,8 @@ _Por documentar_
 
 ### Descripción
 
+Updates problem statement only
+
 ### Parámetros
 
 _Por documentar_
@@ -2148,13 +2612,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/problem/versions/`
 
 ### Descripción
+
+Entry point for Problem Versions API
 
 ### Parámetros
 
@@ -2173,6 +2638,9 @@ ProblemForfeitedController
 ## `/api/problemForfeited/getCounts/`
 
 ### Descripción
+
+Returns the number of solutions allowed
+and the number of solutions already seen
 
 ### Parámetros
 
@@ -2221,6 +2689,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns the Scoreboard events
+
 ### Parámetros
 
 _Por documentar_
@@ -2237,6 +2707,67 @@ _Por documentar_
 
 ### Descripción
 
+Creates a new QualityNomination
+
+There are three ways in which users can interact with this:
+
+# Suggestion
+
+A user that has already solved a problem can make suggestions about a
+problem. This expects the `nomination` field to be `suggestion` and the
+`contents` field should be a JSON blob with at least one the following fields:
+
+- `difficulty`: (Optional) A number in the range [0-4] indicating the
+  difficulty of the problem.
+- `quality`: (Optional) A number in the range [0-4] indicating the quality
+  of the problem.
+- `tags`: (Optional) An array of tag names that will be added to the
+  problem upon promotion.
+- `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
+  before receiving an AC verdict for problem run.
+
+# Quality tag
+
+A reviewer could send this type of nomination to make the user marked as
+a quality problem or not. The reviewer could also specify which category
+is the one the problem belongs to. The 'contents' field should have the
+following subfields:
+
+- tag: The name of the tag corresponding to the category of the problem
+- quality_seal: A boolean that if activated, means that the problem is a
+  quality problem
+
+# Promotion
+
+A user that has already solved a problem can nominate it to be promoted
+as a Quality Problem. This expects the `nomination` field to be
+`promotion` and the `contents` field should be a JSON blob with the
+following fields:
+
+- `statements`: A dictionary of languages to objects that contain a
+  `markdown` field, which is the markdown-formatted
+  problem statement for that language.
+- `source`: A URL or string clearly documenting the source or full name
+  of original author of the problem.
+- `tags`: An array of tag names that will be added to the problem upon
+  promotion.
+
+# Demotion
+
+A demoted problem is banned, and cannot be un-banned or added to any new
+problemsets. This expects the `nomination` field to be `demotion` and
+the `contents` field should be a JSON blob with the following fields:
+
+- `rationale`: A small text explaining the rationale for demotion.
+- `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
+- `original`: If the `reason` is `duplicate`, the alias of the original
+  problem.
+
+# Dismissal
+
+A user that has already solved a problem can dismiss suggestions. The
+`contents` field is empty.
+
 ### Parámetros
 
 _Por documentar_
@@ -2252,6 +2783,9 @@ _Por documentar_
 ## `/api/qualityNomination/details/`
 
 ### Descripción
+
+Displays the details of a nomination. The user needs to be either the
+nominator or a member of the reviewer group.
 
 ### Parámetros
 
@@ -2281,6 +2815,8 @@ _Por documentar_
 
 ### Descripción
 
+Displays the nominations that this user has been assigned.
+
 ### Parámetros
 
 _Por documentar_
@@ -2309,6 +2845,8 @@ _Por documentar_
 
 ### Descripción
 
+Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+
 ### Parámetros
 
 _Por documentar_
@@ -2317,7 +2855,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2326,6 +2863,10 @@ _Por documentar_
 ## `/api/reset/create/`
 
 ### Descripción
+
+Creates a reset operation, the first of two steps needed to reset a
+password. The first step consist of sending an email to the user with
+instructions to reset he's password, if and only if the email is valid.
 
 ### Parámetros
 
@@ -2344,6 +2885,9 @@ _Por documentar_
 
 ### Descripción
 
+Creates a reset operation, support team members can generate a valid
+token and then they can send it to end user
+
 ### Parámetros
 
 _Por documentar_
@@ -2360,6 +2904,10 @@ _Por documentar_
 ## `/api/reset/update/`
 
 ### Descripción
+
+Updates the password of a given user, this is the second and last step
+in order to reset the password. This operation is done if and only if
+the correct parameters are suplied.
 
 ### Parámetros
 
@@ -2381,6 +2929,8 @@ RunController
 
 ### Descripción
 
+Get total of last 6 months
+
 ### Parámetros
 
 _Por documentar_
@@ -2394,6 +2944,8 @@ _Por documentar_
 ## `/api/run/create/`
 
 ### Descripción
+
+Create a new run
 
 ### Parámetros
 
@@ -2413,6 +2965,8 @@ _Por documentar_
 
 ### Descripción
 
+Gets the details of a run. Includes admin details if admin.
+
 ### Parámetros
 
 _Por documentar_
@@ -2427,6 +2981,8 @@ _Por documentar_
 
 ### Descripción
 
+Disqualify a submission
+
 ### Parámetros
 
 _Por documentar_
@@ -2435,13 +2991,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/run/list/`
 
 ### Descripción
+
+Gets a list of latest runs overall
 
 ### Parámetros
 
@@ -2457,6 +3014,8 @@ _Por documentar_
 
 ### Descripción
 
+Re-sends a problem to Grader.
+
 ### Parámetros
 
 _Por documentar_
@@ -2465,13 +3024,15 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/run/source/`
 
 ### Descripción
+
+Given the run alias, returns the source code and any compile errors if any
+Used in the arena, any contestant can view its own codes and compile errors
 
 ### Parámetros
 
@@ -2486,6 +3047,8 @@ _Por documentar_
 ## `/api/run/status/`
 
 ### Descripción
+
+Get basic details of a run
 
 ### Parámetros
 
@@ -2505,6 +3068,8 @@ Description of SchoolController
 
 ### Descripción
 
+Api to create new school
+
 ### Parámetros
 
 _Por documentar_
@@ -2520,6 +3085,8 @@ _Por documentar_
 ## `/api/school/list/`
 
 ### Descripción
+
+Gets a list of schools
 
 ### Parámetros
 
@@ -2539,6 +3106,9 @@ _Por documentar_
 ## `/api/school/monthlySolvedProblemsCount/`
 
 ### Descripción
+
+Returns the number of solved problems on the last
+months (including the current one)
 
 ### Parámetros
 
@@ -2561,6 +3131,8 @@ _Por documentar_
 
 ### Descripción
 
+Returns the historical rank of schools
+
 ### Parámetros
 
 _Por documentar_
@@ -2574,6 +3146,8 @@ _Por documentar_
 ## `/api/school/schoolCodersOfTheMonth/`
 
 ### Descripción
+
+Returns rank of best schools in last month
 
 ### Parámetros
 
@@ -2596,6 +3170,8 @@ _Por documentar_
 
 ### Descripción
 
+Selects a certain school as school of the month
+
 ### Parámetros
 
 _Por documentar_
@@ -2604,13 +3180,15 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/school/users/`
 
 ### Descripción
+
+Returns the list of current students registered in a certain school
+with the number of created problems, solved problems and organized contests.
 
 ### Parámetros
 
@@ -2639,6 +3217,8 @@ ScoreboardController
 
 ### Descripción
 
+Returns a list of contests
+
 ### Parámetros
 
 _Por documentar_
@@ -2647,7 +3227,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2658,6 +3237,11 @@ Session controller handles sessions.
 ## `/api/session/currentSession/`
 
 ### Descripción
+
+Returns information about current session. In order to avoid one full
+server roundtrip (about ~100msec on each pageload), it also returns the
+current time to be able to calculate the time delta between the
+contestant's machine and the server.
 
 ### Parámetros
 
@@ -2691,6 +3275,8 @@ SubmissionController
 
 ### Descripción
 
+Returns the latest submissions
+
 ### Parámetros
 
 _Por documentar_
@@ -2708,6 +3294,8 @@ TagController
 ## `/api/tag/list/`
 
 ### Descripción
+
+Gets a list of tags
 
 ### Parámetros
 
@@ -2732,6 +3320,8 @@ Used by arena to sync time between client and server from time to time
 
 ### Descripción
 
+Entry point for /time API
+
 ### Parámetros
 
 _Por documentar_
@@ -2752,6 +3342,8 @@ UserController
 
 ### Descripción
 
+Keeps a record of a user who accepts the privacy policy
+
 ### Parámetros
 
 _Por documentar_
@@ -2760,7 +3352,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2768,6 +3359,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds the experiment to the user.
+
 ### Parámetros
 
 _Por documentar_
@@ -2776,7 +3369,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2784,6 +3376,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds the identity to the group.
+
 ### Parámetros
 
 _Por documentar_
@@ -2792,7 +3386,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2800,6 +3393,8 @@ _Por documentar_
 
 ### Descripción
 
+Adds the role to the user.
+
 ### Parámetros
 
 _Por documentar_
@@ -2808,7 +3403,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2816,6 +3410,8 @@ _Por documentar_
 
 ### Descripción
 
+Associates an identity to the logged user given the username
+
 ### Parámetros
 
 _Por documentar_
@@ -2824,7 +3420,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2832,6 +3427,8 @@ _Por documentar_
 
 ### Descripción
 
+Changes the password of a user
+
 ### Parámetros
 
 _Por documentar_
@@ -2840,13 +3437,16 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/user/coderOfTheMonth/`
 
 ### Descripción
+
+Get coder of the month by trying to find it in the table using the first
+day of the current month. If there's no coder of the month for the given
+date, calculate it and save it.
 
 ### Parámetros
 
@@ -2861,6 +3461,8 @@ _Por documentar_
 ## `/api/user/coderOfTheMonthList/`
 
 ### Descripción
+
+Returns the list of coders of the month
 
 ### Parámetros
 
@@ -2885,6 +3487,8 @@ _Por documentar_
 
 ### Descripción
 
+Get Contests which a certain user has participated in
+
 ### Parámetros
 
 _Por documentar_
@@ -2898,6 +3502,8 @@ _Por documentar_
 ## `/api/user/create/`
 
 ### Descripción
+
+Entry point for Create a User API
 
 ### Parámetros
 
@@ -2915,6 +3521,11 @@ _Por documentar_
 
 ### Descripción
 
+Gets extra information of the identity:
+
+- last password change request
+- verify status
+
 ### Parámetros
 
 _Por documentar_
@@ -2928,6 +3539,9 @@ _Por documentar_
 ## `/api/user/generateGitToken/`
 
 ### Descripción
+
+Generate a new gitserver token. This token can be used to authenticate
+against the gitserver.
 
 ### Parámetros
 
@@ -2959,6 +3573,8 @@ _Por documentar_
 
 ### Descripción
 
+Get the results for this user in a given interview
+
 ### Parámetros
 
 _Por documentar_
@@ -2972,6 +3588,8 @@ _Por documentar_
 ## `/api/user/lastPrivacyPolicyAccepted/`
 
 ### Descripción
+
+Gets the last privacy policy accepted by user
 
 ### Parámetros
 
@@ -2989,6 +3607,9 @@ _Por documentar_
 
 ### Descripción
 
+Gets a list of users. This returns an array instead of an object since
+it is used by typeahead.
+
 ### Parámetros
 
 _Por documentar_
@@ -3002,6 +3623,8 @@ types.UserListItem[]
 ## `/api/user/listAssociatedIdentities/`
 
 ### Descripción
+
+Get the identities that have been associated to the logged user
 
 ### Parámetros
 
@@ -3017,6 +3640,8 @@ _Por documentar_
 
 ### Descripción
 
+Get Problems unsolved by user
+
 ### Parámetros
 
 _Por documentar_
@@ -3030,6 +3655,11 @@ _Por documentar_
 ## `/api/user/login/`
 
 ### Descripción
+
+Exposes API /user/login
+Expects in request:
+user
+password
 
 ### Parámetros
 
@@ -3047,6 +3677,8 @@ _Por documentar_
 
 ### Descripción
 
+Registers to the mailing list all users that have not been added before. Admin only
+
 ### Parámetros
 
 _Por documentar_
@@ -3060,6 +3692,8 @@ _Por documentar_
 ## `/api/user/problemsCreated/`
 
 ### Descripción
+
+Get Problems created by user
 
 ### Parámetros
 
@@ -3075,6 +3709,8 @@ _Por documentar_
 
 ### Descripción
 
+Get Problems solved by user
+
 ### Parámetros
 
 _Por documentar_
@@ -3088,6 +3724,8 @@ _Por documentar_
 ## `/api/user/profile/`
 
 ### Descripción
+
+Get general user info
 
 ### Parámetros
 
@@ -3103,6 +3741,9 @@ _Por documentar_
 
 ### Descripción
 
+If no username provided: Gets the top N users who have solved more problems
+If username provided: Gets rank for username provided
+
 ### Parámetros
 
 _Por documentar_
@@ -3117,6 +3758,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes the experiment from the user.
+
 ### Parámetros
 
 _Por documentar_
@@ -3125,7 +3768,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3133,6 +3775,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes the user to the group.
+
 ### Parámetros
 
 _Por documentar_
@@ -3141,7 +3785,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3149,6 +3792,8 @@ _Por documentar_
 
 ### Descripción
 
+Removes the role from the user.
+
 ### Parámetros
 
 _Por documentar_
@@ -3157,7 +3802,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3165,6 +3809,8 @@ _Por documentar_
 
 ### Descripción
 
+Selects coder of the month for next month.
+
 ### Parámetros
 
 _Por documentar_
@@ -3173,13 +3819,14 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/user/stats/`
 
 ### Descripción
+
+Get stats
 
 ### Parámetros
 
@@ -3194,6 +3841,8 @@ _Por documentar_
 ## `/api/user/statusVerified/`
 
 ### Descripción
+
+Gets verify status of a user
 
 ### Parámetros
 
@@ -3212,6 +3861,8 @@ _Por documentar_
 
 ### Descripción
 
+Update user profile
+
 ### Parámetros
 
 _Por documentar_
@@ -3220,7 +3871,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3228,6 +3878,8 @@ _Por documentar_
 
 ### Descripción
 
+Update basic user profile info when logged with fb/gool
+
 ### Parámetros
 
 _Por documentar_
@@ -3236,7 +3888,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3244,6 +3895,8 @@ _Por documentar_
 
 ### Descripción
 
+Updates the main email of the current user
+
 ### Parámetros
 
 _Por documentar_
@@ -3252,13 +3905,24 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
 ## `/api/user/validateFilter/`
 
 ### Descripción
+
+Parses and validates a filter string to be used for event notification
+filtering.
+
+The Request must have a 'filter' key with comma-delimited URI paths
+representing the resources the caller is interested in receiving events
+for. If the caller has enough privileges to receive notifications for
+ALL the requested filters, the request will return successfully,
+otherwise an exception will be thrown.
+
+This API does not need authentication to be used. This allows to track
+contest updates with an access token.
 
 ### Parámetros
 
@@ -3274,6 +3938,8 @@ _Por documentar_
 
 ### Descripción
 
+Verifies the user given its verification id
+
 ### Parámetros
 
 _Por documentar_
@@ -3282,6 +3948,5 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
