@@ -1,6 +1,8 @@
 			<form id="submit" method="POST">
-				<button class="close">&times;</button>
-				<div>
+				<div class="close-container">
+					<button class="close">&times;</button>
+				</div>
+				<div class="languages">
 					{#wordsLanguage#}
 					<select name="language">
 						<option value="" default="default"></option>
@@ -23,12 +25,24 @@
 						<option value="cat">{#wordsJustOutput#}</option>
 					</select>
 				</div>
-				<div>{#arenaRunSubmitFilename#} <tt>Main<span class="submit-filename-extension"></span></tt></div>
-				<label for="editor">{#arenaRunSubmitPaste#}</label>
-				<textarea id="editor" name="code"></textarea><br/>
-				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
-				<input type="submit" />
-				{if !empty($payload)}
-					<script type="text/json" id="payload">{$payload|json_encode}</script>
-				{/if}
+				<div class="filename-extension">{#arenaRunSubmitFilename#}
+					<tt>
+						Main<span class="submit-filename-extension"></span>
+					</tt>
+				</div>
+				<div class="run-submit-paste-text">
+					<label for="editor">{#arenaRunSubmitPaste#}</label>
+				</div>
+				<div class="code-view">
+					<textarea id="editor" name="code"></textarea><br/>
+				</div>
+				<div class="upload-file">
+					<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
+				</div>
+				<div class="submit-run">
+					<input type="submit" />
+					{if !empty($payload)}
+						<script type="text/json" id="payload">{$payload|json_encode}</script>
+					{/if}
+				</div>
 			</form>

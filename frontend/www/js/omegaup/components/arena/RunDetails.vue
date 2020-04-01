@@ -138,35 +138,53 @@
     background: #eee;
     width: 80%;
     height: 90%;
-    max-height: 500px;
     margin: auto;
     border: 2px solid #ccc;
     padding: 1em;
     position: absolute;
-    overflow: auto;
+    overflow: hidden;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    textarea {
-      width: 790px;
-      height: 23em;
-      margin: 0.5em 0;
-      font-family: monospace;
-    }
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-      &:hover {
-        background-color: #eee;
+    display: flex;
+    flex-direction: column;
+    .close-container {
+      width: 100%;
+      .close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: $omegaup-white;
+        border: 1px solid #ccc;
+        border-width: 0 0 1px 1px;
+        font-size: 110%;
+        width: 25px;
+        height: 25px;
+        &:hover {
+          background-color: #eee;
+        }
       }
+    }
+    .languages {
+      width: 100%;
+    }
+    .filename-extension {
+      width: 100%;
+    }
+    .run-submit-paste-text {
+      width: 100%;
+    }
+    .code-view {
+      width: 100%;
+      flex-grow: 1;
+      overflow: auto;
+    }
+    .upload-file {
+      width: 100%;
+    }
+    .submit-run {
+      width: 100%;
     }
   }
   input[type='submit'] {
@@ -181,6 +199,12 @@
   text-align: center;
   background: rgb(245, 245, 245);
   border-radius: 5px;
+}
+.vue-codemirror-wrap {
+  height: 85%;
+  .CodeMirror {
+    height: 100%;
+  }
 }
 </style>
 
