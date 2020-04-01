@@ -296,55 +296,6 @@ body#only-problem #problems .main {
 	background: #fff;
 }
 
-#overlay {
-	display: none;
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: rgba(0, 0, 0, .5);
-	z-index: 9999999 !important;
-}
-#overlay form {
-	background: #eee;
-	width: 850px;
-	height: 38em;
-	margin: 4em auto 0 auto;
-	border: 2px solid #ccc;
-	padding: 1em;
-	position: relative;
-	overflow: auto;
-}
-
-#overlay form textarea {
-	width: 790px;
-	height: 23em;
-	margin: 0.5em 0;
-	font-family: monospace;
-}
-
-#overlay form .close {
-	position: absolute;
-	top: 0;
-	right: 0;
-	background-color: white;
-	border: 1px solid #ccc;
-	border-width: 0 0 1px 1px;
-	font-size: 110%;
-	width: 25px;
-	height: 25px;
-}
-
-#overlay form .close:hover {
-	background-color: #eee;
-}
-
-#overlay input[type=submit] {
-	font-size: 110%;
-	padding: 0.3em 0.5em;
-}
-
 #run-details .compile_error {
 	display: none;
 }
