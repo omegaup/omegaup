@@ -38,9 +38,9 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
-{if isset($bootstrap4) && $bootstrap4}
+{if isset($BOOTSTRAP_4) && $BOOTSTRAP_4}
 		<link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
-    <script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
+		<script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
 {else}
 		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
