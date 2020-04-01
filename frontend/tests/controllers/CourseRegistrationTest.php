@@ -303,12 +303,12 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             if ($expectedRequest['admin'] === 'main') {
                 $this->assertEquals(
                     self::$curator->username,
-                    $result[$id]['admin_username']
+                    $result[$id]['admin']['username']
                 );
             } else {
                 $this->assertNotEquals(
                     self::$curator->username,
-                    $result[$id]['admin_username']
+                    $result[$id]['admin']['username']
                 );
             }
         }

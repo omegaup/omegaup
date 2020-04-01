@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}>
+     * @return list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: null|string, request_time: string, username: string}>
      */
     public static function getRequestsForCourseWithFirstAdmin(int $courseId) {
         $sql = '
@@ -79,9 +79,22 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
                 i.identity_id;';
 
         /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: null|string, request_time: string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $courseId]
         );
+
+        return array_map(function ($request) {
+            if (!is_null($request['admin_username'])) {
+                $request['admin'] = [
+                    'name' => $request['admin_name'],
+                    'username' => $request['admin_username'],
+                ];
+            }
+            unset($request['identity_id']);
+            unset($request['admin_name']);
+            unset($request['admin_username']);
+            return $request;
+        }, $result);
     }
 }

@@ -1332,7 +1332,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{users: list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, last_update: null|string, request_time: string, username: string}>}
+     * @return array{users: list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: null|string, request_time: string, username: string}>}
      */
     public static function apiRequests(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1351,16 +1351,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $resultRequestsForCourseWithFirstAdmin =
+        $usersRequests =
             \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 $course->course_id
             );
-        $usersRequests = array_map(function ($request) {
-            unset($request['identity_id']);
-            return $request;
-        }, $resultRequestsForCourseWithFirstAdmin);
 
-        error_log(print_r($usersRequests, true));
         return ['users' => $usersRequests];
     }
 

@@ -360,6 +360,10 @@ export const Course = {
   admins: apiCall<messages.CourseAdminsRequest, messages.CourseAdminsResponse>(
     '/api/course/admins/',
   ),
+  arbitrateRequest: apiCall<
+    messages.CourseArbitrateRequestRequest,
+    messages.CourseArbitrateRequestResponse
+  >('/api/course/arbitrateRequest/'),
   assignmentDetails: apiCall<
     messages.CourseAssignmentDetailsRequest,
     messages.CourseAssignmentDetailsResponse
@@ -438,6 +442,10 @@ export const Course = {
     messages.CourseRemoveStudentRequest,
     messages.CourseRemoveStudentResponse
   >('/api/course/removeStudent/'),
+  requests: apiCall<
+    messages.CourseRequestsRequest,
+    messages.CourseRequestsResponse
+  >('/api/course/requests/'),
   runs: apiCall<messages.CourseRunsRequest, messages.CourseRunsResponse>(
     '/api/course/runs/',
   ),
