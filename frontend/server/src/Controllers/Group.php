@@ -55,7 +55,12 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * New group
      *
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param mixed $description
+     * @omegaup-request-param mixed $name
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{status: string}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
@@ -113,6 +118,9 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Add identity to group
      *
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $usernameOrEmail
+     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
@@ -159,6 +167,9 @@ class Group extends \OmegaUp\Controllers\Controller {
 
     /**
      * Remove user from group
+     *
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $usernameOrEmail
      *
      * @param \OmegaUp\Request $r
      *
@@ -226,6 +237,8 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups that match a partial name. This returns an
      * array instead of an object since it is used by typeahead.
      *
+     * @omegaup-request-param mixed $query
+     *
      * @param \OmegaUp\Request $r
      *
      * @return list<array{label: string, value: string}>
@@ -254,6 +267,8 @@ class Group extends \OmegaUp\Controllers\Controller {
 
     /**
      * Details of a group (scoreboards)
+     *
+     * @omegaup-request-param mixed $group_alias
      *
      * @param \OmegaUp\Request $r
      *
@@ -302,6 +317,8 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Members of a group (usernames only).
      *
+     * @omegaup-request-param mixed $group_alias
+     *
      * @param \OmegaUp\Request $r
      *
      * @return array{identities: list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>}
@@ -329,6 +346,11 @@ class Group extends \OmegaUp\Controllers\Controller {
 
     /**
      * Create a scoreboard set to a group
+     *
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param mixed $description
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $name
      *
      * @return array{status: string}
      */
