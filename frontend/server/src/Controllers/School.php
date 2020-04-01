@@ -11,6 +11,9 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $term
+     *
      * @return list<array{id: int, label: string, value: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {
@@ -42,7 +45,11 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns the basic details for school
+     *
+     * @omegaup-request-param mixed $school_id
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}}}
      */
     public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
@@ -96,7 +103,12 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Api to create new school
      *
+     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $state_id
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{school_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
@@ -157,7 +169,11 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $school_id
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{coders: list<array{time: string, username: string, classname: string}>}
      */
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
@@ -184,7 +200,11 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the number of solved problems on the last
      * months (including the current one)
+     *
+     * @omegaup-request-param mixed $school_id
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{distinct_problems_solved: list<array{month: int, problems_solved: int, year: int}>}
      */
     public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
@@ -206,7 +226,10 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the list of current students registered in a certain school
      * with the number of created problems, solved problems and organized contests.
      *
+     * @omegaup-request-param mixed $school_id
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
      */
     public static function apiUsers(\OmegaUp\Request $r): array {
@@ -252,6 +275,9 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the historical rank of schools
      *
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $rowcount
+     *
      * @return array{rank: list<array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}>, totalRows: int}
      */
     public static function apiRank(\OmegaUp\Request $r) {
@@ -277,6 +303,9 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the details for historical rank of schools with pagination
+     *
+     * @omegaup-request-param mixed $length
+     * @omegaup-request-param mixed $page
      *
      * @return array{smartyProperties: array{schoolRankPayload: array{page: int, length: int, showHeader: bool}}, template: string}
      */
@@ -408,6 +437,8 @@ class School extends \OmegaUp\Controllers\Controller {
 
     /**
      * Selects a certain school as school of the month
+     *
+     * @omegaup-request-param mixed $school_id
      *
      * @return array{status: string}
      */

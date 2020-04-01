@@ -10,6 +10,10 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param mixed $course_alias
+     * @omegaup-request-param mixed $token
+     *
      * @return array{status: string}
      */
     public static function apiRefresh(\OmegaUp\Request $r) {

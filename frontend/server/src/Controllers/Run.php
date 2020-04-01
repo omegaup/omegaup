@@ -76,8 +76,12 @@ class Run extends \OmegaUp\Controllers\Controller {
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
 
     /**
-     *
      * Validates Create Run request
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
      *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotAllowedToSubmitException
@@ -323,6 +327,12 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Create a new run
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $source
      *
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
@@ -572,6 +582,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Get basic details of a run
      *
+     * @omegaup-request-param mixed $run_alias
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: int}
@@ -631,6 +643,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Re-sends a problem to Grader.
+     *
+     * @omegaup-request-param mixed $debug
+     * @omegaup-request-param mixed $run_alias
      *
      * @return array{status: string}
      */
@@ -693,6 +708,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Disqualify a submission
+     *
+     * @omegaup-request-param mixed $run_alias
      *
      * @return array{status: string}
      */
@@ -767,6 +784,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the details of a run. Includes admin details if admin.
+     *
+     * @omegaup-request-param mixed $run_alias
      *
      * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
@@ -848,6 +867,8 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Given the run alias, returns the source code and any compile errors if any
      * Used in the arena, any contestant can view its own codes and compile errors
      *
+     * @omegaup-request-param mixed $run_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
@@ -922,6 +943,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
+     *
+     * @omegaup-request-param mixed $run_alias
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
@@ -1238,6 +1261,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Validator for List API
      *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $username
+     *
      * @return array{problem: null|\OmegaUp\DAO\VO\Problems, identity: null|\OmegaUp\DAO\VO\Identities}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -1296,6 +1322,14 @@ class Run extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets a list of latest runs overall
+     *
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $username
+     * @omegaup-request-param mixed $verdict
      *
      * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
      */
