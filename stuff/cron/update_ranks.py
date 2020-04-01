@@ -587,9 +587,11 @@ def update_coder_of_the_month_candidates(
                             `ranking`,
                             `school_id`,
                             `category`,
-                            `score`
+                            `score`,
+                            `problems_solved`
                         )
                     VALUES (
+                        %s,
                         %s,
                         %s,
                         %s,
@@ -604,7 +606,8 @@ def update_coder_of_the_month_candidates(
                         index + 1,
                         row['school_id'],
                         category,
-                        row['score']
+                        row['score'],
+                        row['ProblemsSolved']
                     ))
 
 

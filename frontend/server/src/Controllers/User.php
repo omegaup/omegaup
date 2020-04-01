@@ -1622,6 +1622,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'ranking' => $user['ranking'],
                     'category' => $user['category'],
                     'score' => $user['score'],
+                    'problems_solved' => $user['problems_solved'],
                 ]);
                 // Only the CoderOfTheMonth selected by the mentor is going to be
                 // updated.
