@@ -52,6 +52,7 @@ class Method {
         ConversionResult $returnType
     ) {
         $this->apiTypePrefix = $apiTypePrefix;
+        $this->docstringComment = $docstringComment;
         $this->returnType = $returnType;
     }
 }
