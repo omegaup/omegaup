@@ -960,6 +960,22 @@ _Por documentar_
 }
 ```
 
+## `/api/course/arbitrateRequest/`
+
+### Descripción
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{
+  status: string;
+}
+```
+
 ## `/api/course/assignmentDetails/`
 
 ### Descripción
@@ -1256,6 +1272,20 @@ _Por documentar_
 {
   status: string;
 }
+```
+
+## `/api/course/requests/`
+
+### Descripción
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{ users: { accepted?: boolean; admin: { name?: string; username: string; }; country?: string; country_id?: string; last_update?: Date; request_time: Date; username: string; }[]; }
 ```
 
 ## `/api/course/runs/`
@@ -1931,7 +1961,7 @@ _Por documentar_
 ### Regresa
 
 ```typescript
-{ results: { alias: string; difficulty?: number; difficulty_histogram: number[]; points: number; quality?: number; quality_histogram: number[]; ratio: number; score: number; tags: { source: string; name: string; }[]; title: string; visibility: number; quality_seal: boolean; }[]; total: number; }
+{ results: types.ProblemListItem[]; total: number; }
 ```
 
 ## `/api/problem/myList/`

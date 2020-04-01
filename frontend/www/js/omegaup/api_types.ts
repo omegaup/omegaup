@@ -64,6 +64,21 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemListItem {
+    alias: string;
+    difficulty?: number;
+    difficulty_histogram: number[];
+    points: number;
+    quality?: number;
+    quality_histogram: number[];
+    ratio: number;
+    score: number;
+    tags: { source: string; name: string }[];
+    title: string;
+    visibility: number;
+    quality_seal: boolean;
+  }
+
   export interface Progress {
     score: number;
     max_score: number;
@@ -676,6 +691,8 @@ export namespace messages {
     admins: { role: string; username: string }[];
     group_admins: { alias: string; name: string; role: string }[];
   };
+  export type CourseArbitrateRequestRequest = { [key: string]: any };
+  export type CourseArbitrateRequestResponse = { status: string };
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type CourseAssignmentDetailsResponse = {
     name?: string;
@@ -890,6 +907,19 @@ export namespace messages {
   export type CourseRemoveProblemResponse = { status: string };
   export type CourseRemoveStudentRequest = { [key: string]: any };
   export type CourseRemoveStudentResponse = { status: string };
+  export type CourseRequestsRequest = { [key: string]: any };
+  export type _CourseRequestsServerResponse = any;
+  export type CourseRequestsResponse = {
+    users: {
+      accepted?: boolean;
+      admin: { name?: string; username: string };
+      country?: string;
+      country_id?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+  };
   export type CourseRunsRequest = { [key: string]: any };
   export type CourseRunsResponse = {
     runs: {
@@ -1236,20 +1266,7 @@ export namespace messages {
   };
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
-    results: {
-      alias: string;
-      difficulty?: number;
-      difficulty_histogram: number[];
-      points: number;
-      quality?: number;
-      quality_histogram: number[];
-      ratio: number;
-      score: number;
-      tags: { source: string; name: string }[];
-      title: string;
-      visibility: number;
-      quality_seal: boolean;
-    }[];
+    results: types.ProblemListItem[];
     total: number;
   };
   export type ProblemMyListRequest = { [key: string]: any };
@@ -2196,6 +2213,9 @@ export namespace controllers {
     admins: (
       params?: messages.CourseAdminsRequest,
     ) => Promise<messages.CourseAdminsResponse>;
+    arbitrateRequest: (
+      params?: messages.CourseArbitrateRequestRequest,
+    ) => Promise<messages.CourseArbitrateRequestResponse>;
     assignmentDetails: (
       params?: messages.CourseAssignmentDetailsRequest,
     ) => Promise<messages.CourseAssignmentDetailsResponse>;
@@ -2256,6 +2276,9 @@ export namespace controllers {
     removeStudent: (
       params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
+    requests: (
+      params?: messages.CourseRequestsRequest,
+    ) => Promise<messages.CourseRequestsResponse>;
     runs: (
       params?: messages.CourseRunsRequest,
     ) => Promise<messages.CourseRunsResponse>;
