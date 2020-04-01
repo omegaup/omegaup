@@ -3,6 +3,9 @@
     class="typeahead form-control"
     ref="input"
     v-on:change="onUpdateInput"
+    v-bind:placeholder="placeholder"
+    v-bind:name="name"
+    v-bind:value="value"
   />
 </template>
 
@@ -13,6 +16,8 @@ import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
 export default class Autocomplete extends Vue {
   @Ref() input!: HTMLInputElement;
   @Prop() value!: string;
+  @Prop() placeholder!: string;
+  @Prop() name!: string;
   @Prop() init!: Function;
 
   mounted() {
