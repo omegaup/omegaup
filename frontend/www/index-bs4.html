@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+  <head data-locale="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#563d7c" />
+
+    <script
+      type="text/javascript"
+      src="/third_party/js/jquery-3.4.1.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"
+    />
+    <script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body class="d-flex flex-column h-100">
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">
+          <img
+            src="/media/omegaup_curves.png"
+            alt="omegaUp"
+            height="34"
+            class="d-inline-block align-top"
+          />
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/arena/">Arena</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="nav-contests"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >Contests</a
+              >
+              <div class="dropdown-menu" aria-labelledby="nav-contests">
+                <a class="dropdown-item" href="/contest/new/"
+                  >Create a new contest</a
+                >
+                <a class="dropdown-item" href="/contest/mine/">My contests</a>
+                <a class="dropdown-item" href="/group/">My groups</a>
+                <a class="dropdown-item" href="/scoreboardmerge/"
+                  >Merge scoreboards</a
+                >
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="nav-problems"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >Problems</a
+              >
+              <div class="dropdown-menu" aria-labelledby="nav-problems">
+                <a class="dropdown-item" href="/problem/new/"
+                  >Create a problem</a
+                >
+                <a class="dropdown-item" href="/problem/mine/">My problems</a>
+                <a class="dropdown-item" href="/problem/">Problems</a>
+                <a class="dropdown-item" href="/submissions/"
+                  >Latest submissions</a
+                >
+                <a class="dropdown-item" href="/nomination/mine/"
+                  >My quality nominations</a
+                >
+                <a class="dropdown-item" href="/nomination/"
+                  >View nomination queue</a
+                >
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="nav-ranking"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >Ranking</a
+              >
+              <ul class="dropdown-menu" aria-labelledby="nav-ranking">
+                <a class="dropdown-item" href="/rank/">User ranking</a>
+                <a class="dropdown-item" href="/rank/schools/"
+                  >School ranking</a
+                >
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/schools/">Schools</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://blog.omegaup.com/">Blog</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://omegaup.com/preguntas/"
+                >Questions</a
+              >
+            </li>
+          </ul>
+
+          <!-- right-hand side nav -->
+          <ul class="navbar-nav">
+            <li id="notifications-list"></li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="user-dropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <img
+                  src="https://secure.gravatar.com/avatar/307aeed2f8a75f6fe407411671e3ca87?s=51"
+                  height="34"
+                />
+                <span class="grader-count badge badge-primary">…</span>
+              </a>
+              <div
+                class="dropdown-menu dropdown-menu-right"
+                aria-labelledby="user-dropdown"
+              >
+                <span class="dropdown-item-text username" title="omegaup"
+                  >omegaup</span
+                >
+                <div class="dropdown-divider"></div>
+                <a href="/profile/" class="dropdown-item"
+                  ><span class="glyphicon glyphicon-user"></span> My profile</a
+                >
+                <a href="/logout/" class="dropdown-item"
+                  ><span class="glyphicon glyphicon-log-out"></span> Log out</a
+                >
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/arena/admin/"
+                  >Latest submissions</a
+                >
+                <a class="dropdown-item grader grader-status"></a>
+                <a class="dropdown-item grader grader-broadcaster-sockets"></a>
+                <a class="dropdown-item grader grader-embedded-runner"></a>
+                <a class="dropdown-item grader grader-queues"></a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="mt-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-8">
+            <div class="jumbotron">
+              <h1 class="text-center">Welcome!</h1>
+              <p class="lead">
+                omegaUp is a web project aimed at raising the level of
+                competitiveness of software developers through problem solving
+                with a fun and competitive approach.
+              </p>
+              <div class="text-center">
+                <a
+                  href="/contest/new/"
+                  class="btn btn-primary btn-lg"
+                  role="button"
+                  >Create your own contest!</a
+                >
+              </div>
+              <p class="lead">First time using omegaUp?</p>
+              <div class="text-center">
+                <a
+                  href="http://blog.omegaup.com/category/omegaup/omegaup-101/"
+                  class="btn btn-primary btn-lg"
+                  role="button"
+                  >Read the tutorial</a
+                >
+              </div>
+              <p class="lead">
+                Do you want to learn programming but do not know where to start?
+              </p>
+              <div class="text-center">
+                <a
+                  href="/course/Curso-OMI"
+                  class="btn btn-primary btn-lg"
+                  role="button"
+                  >Learn to program with omegaUp</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                Suggested book
+              </div>
+              <div class="card-body">
+                <a
+                  class="text-center center"
+                  href="https://omegaup.com/img/libropre3.pdf"
+                  >Descarga en PDF aquí:
+                  <img
+                    class="center top-margin"
+                    src="https://omegaup.com/img/libroluis.gif"
+                    width="75%"
+                  />
+                </a>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                Upcoming contests
+              </div>
+              <ul class="list-group" id="next-contests-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer mt-auto py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <img alt="omegaUp" src="/media/omegaup_curves.png" height="20" />
+            is a place for getting better at software development.
+            <h6><a href="mailto:hello@omegaup.com">hello@omegaup.com</a></h6>
+          </div>
+          <div class="col-md-3">
+            <h5><strong>Organization</strong></h5>
+            <h6>
+              <a href="https://omegaup.org/#about" target="_blank">About us</a>
+            </h6>
+            <h6>
+              <a href="https://omegaup.org/#team" target="_blank">Team</a>
+            </h6>
+            <h6>
+              <a href="https://blog.omegaup.com/privacy-policy/" target="_blank"
+                >Privacy policy</a
+              >
+            </h6>
+          </div>
+          <div class="col-md-3">
+            <h5><strong>Developers</strong></h5>
+            <h6>
+              <a
+                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                target="_blank"
+                >Help us</a
+              >
+            </h6>
+            <h6>
+              <a href="https://github.com/omegaup/omegaup" target="_blank"
+                >GitHub</a
+              >
+            </h6>
+            <h6>
+              <a
+                href="https://github.com/omegaup/omegaup/issues/new"
+                target="_blank"
+                rel="nofollow"
+                id="report-an-issue"
+                >Report an issue</a
+              >
+            </h6>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
