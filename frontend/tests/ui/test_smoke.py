@@ -136,7 +136,9 @@ def prepare_run(driver, problem_alias):
 
     search_box_element = driver.wait.until(
         EC.visibility_of_element_located(
-            (By.ID, 'problem-search-box')))
+            (By.XPATH,
+             ('//div[@id="root"]//input[contains(concat(" ", '
+              'normalize-space(@class), " "), " tt-input ")]'))))
     search_box_element.send_keys(problem_alias)
     with driver.page_transition():
         search_box_element.submit()

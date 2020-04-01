@@ -198,10 +198,13 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
         // again by the DAO as it has already been selected current year.
+
+        $previousMonth->modify('last day of previous month');
+        $today = date_format($previousMonth, 'Y-m-01');
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'ranking' => 1
+            'ranking' => 1,
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -249,7 +252,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'ranking' => 4
+            'ranking' => 4,
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
