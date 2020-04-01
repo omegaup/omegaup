@@ -67,6 +67,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create an Identity API
      *
+     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param mixed $gender
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param mixed $state_id
+     * @omegaup-request-param mixed $username
+     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{username: string}
@@ -169,6 +179,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
     /**
      * Entry point for Create bulk Identities API
+     *
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $username
      *
      * @return array{status: string}
      */
@@ -275,6 +290,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $username
+     */
     private static function validateGroupOwnership(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Groups {
         $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
@@ -370,6 +391,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Update an Identity API
      *
+     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param mixed $gender
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $original_username
+     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param mixed $state_id
+     * @omegaup-request-param mixed $username
+     *
      * @return array{status: string}
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
@@ -463,6 +494,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for change passowrd of an identity
      *
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $username
+     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{status: string}
@@ -501,6 +538,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $username
+     *
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
