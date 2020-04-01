@@ -50,7 +50,9 @@ OmegaUp.on('ready', function() {
       initialClarifications: [],
     },
     components: {
-      'omegaup-common-navbar': payload.bootstrap4 ? common_NavbarV2 : common_Navbar,
+      'omegaup-common-navbar': payload.bootstrap4
+        ? common_NavbarV2
+        : common_Navbar,
     },
   });
 
