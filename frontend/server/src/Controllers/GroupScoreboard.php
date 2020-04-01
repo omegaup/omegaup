@@ -75,6 +75,12 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Add contest to a group scoreboard
      *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $only_ac
+     * @omegaup-request-param mixed $scoreboard_alias
+     * @omegaup-request-param mixed $weight
+     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
@@ -121,6 +127,10 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
 
     /**
      * Add contest to a group scoreboard
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $scoreboard_alias
      *
      * @param \OmegaUp\Request $r
      *
@@ -170,6 +180,9 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Details of a scoreboard. Returns a list with all contests that belong to
      * the given scoreboard_alias
+     *
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param mixed $scoreboard_alias
      *
      * @param \OmegaUp\Request $r
      *
@@ -257,6 +270,8 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
 
     /**
      * Details of a scoreboard
+     *
+     * @omegaup-request-param mixed $group_alias
      *
      * @return array{scoreboards: list<array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}>}
      */

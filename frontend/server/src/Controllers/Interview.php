@@ -4,6 +4,11 @@
 
 class Interview extends \OmegaUp\Controllers\Controller {
     /**
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param mixed $description
+     * @omegaup-request-param mixed $duration
+     * @omegaup-request-param mixed $title
+     *
      * @return array{status: string}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
@@ -89,6 +94,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $interview_alias
+     * @omegaup-request-param mixed $usernameOrEmailsCSV
+     *
      * @return array{status: string}
      */
     public static function apiAddUsers(\OmegaUp\Request $r): array {
@@ -234,6 +242,8 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $interview_alias
+     *
      * @return array{description?: null|string, contest_alias?: null|string, problemset_id?: int|null, users?: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>, exists: bool}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
@@ -300,6 +310,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @omegaup-request-param mixed $contest_alias
+     */
     public static function showIntro(\OmegaUp\Request $r): bool {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
