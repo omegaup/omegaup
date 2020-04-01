@@ -82,7 +82,7 @@ const translations: { [key: string]: string; } = {
   banningProblemDueToReport: "Banning problem due to user report.",
   birthdayInTheFuture: "You are not old enough to use omegaUp",
   bulkOperationError: "There was an error executing the operation",
-  bulkUserAddError: "There was an error adding users, <b>%(userEmail)</b> was not successfully added because user does not exist.",
+  bulkUserAddError: "There was an error adding users. The following usernames or emails were not found in omegaUp:<br><br><b>%(userEmail)</b>.<br><br>However, the rest of users have been added successfully.",
   bulkUserAddSuccess: "Users successfully added!",
   cannotAddProb: "Cannot add problem. You are not a contest admin.",
   cannotRemoveProblem: "Cannot remove the problem. You are not a contest admin.",
