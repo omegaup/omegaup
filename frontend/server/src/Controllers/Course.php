@@ -1441,6 +1441,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the list of requests made by participants who are interested to
+     * join the course
+     *
+     * @omegaup-request-param string $course_alias
+     *
      * @return array{users: list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>}
      */
     public static function apiRequests(\OmegaUp\Request $r): array {
@@ -1469,6 +1474,13 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Stores the resolution given to a certain request made by a contestant
+     * interested to join the course.
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param bool $resolution
+     * @omegaup-request-param string $username
+     *
      * @return array{status: string}
      */
     public static function apiArbitrateRequest(\OmegaUp\Request $r): array {
