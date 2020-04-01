@@ -893,14 +893,15 @@ export namespace messages {
   export type CourseRemoveStudentRequest = { [key: string]: any };
   export type CourseRemoveStudentResponse = { status: string };
   export type CourseRequestsRequest = { [key: string]: any };
+  export type _CourseRequestsServerResponse = any;
   export type CourseRequestsResponse = {
     users: {
       accepted?: boolean;
       admin: { name?: string; username: string };
       country?: string;
       country_id?: string;
-      last_update?: string;
-      request_time: string;
+      last_update?: Date;
+      request_time: Date;
       username: string;
     }[];
   };

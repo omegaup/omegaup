@@ -1285,7 +1285,7 @@ _Por documentar_
 ### Regresa
 
 ```typescript
-{ users: { accepted?: boolean; admin: { name?: string; username: string; }; country?: string; country_id?: string; last_update?: string; request_time: string; username: string; }[]; }
+{ users: { accepted?: boolean; admin: { name?: string; username: string; }; country?: string; country_id?: string; last_update?: Date; request_time: Date; username: string; }[]; }
 ```
 
 ## `/api/course/runs/`

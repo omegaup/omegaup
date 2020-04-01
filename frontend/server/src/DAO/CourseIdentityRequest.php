@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: null|string, request_time: string, username: string}>
+     * @return list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>
      */
     public static function getRequestsForCourseWithFirstAdmin(int $courseId) {
         $sql = '

@@ -444,8 +444,22 @@ export const Course = {
   >('/api/course/removeStudent/'),
   requests: apiCall<
     messages.CourseRequestsRequest,
+    messages._CourseRequestsServerResponse,
     messages.CourseRequestsResponse
-  >('/api/course/requests/'),
+  >('/api/course/requests/', x => {
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.last_update)
+          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
+        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
+        return x;
+      });
+    })(x.users);
+    return x;
+  }),
   runs: apiCall<messages.CourseRunsRequest, messages.CourseRunsResponse>(
     '/api/course/runs/',
   ),
