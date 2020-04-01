@@ -960,6 +960,22 @@ _Por documentar_
 }
 ```
 
+## `/api/course/arbitrateRequest/`
+
+### Descripción
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{
+  status: string;
+}
+```
+
 ## `/api/course/assignmentDetails/`
 
 ### Descripción
@@ -1256,6 +1272,20 @@ _Por documentar_
 {
   status: string;
 }
+```
+
+## `/api/course/requests/`
+
+### Descripción
+
+### Parámetros
+
+_Por documentar_
+
+### Regresa
+
+```typescript
+{ users: { accepted?: boolean; admin: { name?: string; username: string; }; country?: string; country_id?: string; last_update?: Date; request_time: Date; username: string; }[]; }
 ```
 
 ## `/api/course/runs/`

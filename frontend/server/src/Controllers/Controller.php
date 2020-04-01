@@ -17,6 +17,8 @@ class Controller {
      * This is to allow unauthenticated access to APIs that work for both
      * current authenticated user and a targeted user (via $r["username"])
      *
+     * @omegaup-request-param mixed $username
+     *
      * @param \OmegaUp\Request $r
      */
     protected static function authenticateOrAllowUnauthenticatedRequest(
@@ -38,6 +40,8 @@ class Controller {
      * user.
      *
      * Request must be authenticated before this function is called.
+     *
+     * @omegaup-request-param mixed $username
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
@@ -67,6 +71,8 @@ class Controller {
      * identity.
      *
      * Request must be authenticated before this function is called.
+     *
+     * @omegaup-request-param mixed $username
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
@@ -122,6 +128,7 @@ class Controller {
      *     it into the proper form that should be stored in $object. For example:
      *     function($value) { return gmdate('Y-m-d H:i:s', $value); }
      *
+     * @psalm-suppress RequestAccessNotALiteralString  This is the only function that's allowed to access parameters as a non-string literal.
      * @param \OmegaUp\Request $request
      * @param object $object
      * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties

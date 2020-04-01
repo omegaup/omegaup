@@ -15,6 +15,7 @@
 				<directory>../server/cmd/</directory>
 				<directory>../server/libs/third_party/</directory>
 				<directory>../server/libs/dao/base/</directory>
+				<directory>../server/src/Psalm/</directory>
 			</exclude>
 		</whitelist>
 	</filter>
