@@ -1,119 +1,51 @@
-SELECT
-    `u`.`user_id`
-FROM
-    `Users` AS `u`
-GROUP BY
-	`u`.`user_id`
-HAVING
+select
+u2.user_id
+from
+Users as u2
+inner join
+(Select distinct user_id,sum(count)over (partition by user_id,time) as count,time
+from (
 (SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
+    distinct u.user_id,
+    year(c.last_updated) as time,
+    count(c.contest_id) over (partition by year(c.last_updated)) as count
 FROM
-    `Problems` AS `p`
+	Users AS u
 INNER JOIN
-    `Submissions` AS `s` ON `p`.`problem_id` = `s`.`problem_id`
+	ACLs AS a ON a.owner_id = u.user_id
 INNER JOIN
-    `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
-INNER JOIN
-    `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
+    Contests AS c ON c.acl_id = a.acl_id
 WHERE
-    `r`.`verdict` = "AC" AND
-    YEAR(`s`.`time`) = YEAR(NOW())
-    AND `u2`.`user_id` = `u`.`user_id`
- ) >= 1 OR
-(SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
+    year(c.last_updated) >= year(now())-2)
+    union all
+    (SELECT
+	distinct u.user_id,
+    year(p.creation_date) as time,
+    count(p.problem_id) over (partition by year(p.creation_date)) as count
 FROM
-    `Problems` AS `p`
+	Users AS u
 INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+	ACLs AS a ON a.owner_id = u.user_id
 INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
+    Problems AS p ON p.acl_id = a.acl_id
 WHERE
-	`u2`.`user_id` = `u`.`user_id` AND
-	YEAR(`p`.`creation_date`) = YEAR(NOW())) >= 1 OR
-(SELECT
-    COUNT(DISTINCT `c`.`contest_id`)
+    year(p.creation_date) >= year(now())-2)
+  union all
+  (SELECT
+	distinct u.user_id,
+	year(s.time) as time,
+	count(s.problem_id) over (partition by year(s.time)) as count
 FROM
-    `Contests` AS `c`
+	Users AS u
 INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id`=`c`.`acl_id`
+	Submissions AS s ON s.identity_id = u.main_identity_id
 INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
-WHERE `u2`.`user_id`=`u`.`user_id` AND
-    YEAR(`c`.`last_updated`) = YEAR(NOW())) AND (SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
-FROM
-    `Problems` AS `p`
-INNER JOIN
-    `Submissions` AS `s` ON `p`.`problem_id` = `s`.`problem_id`
-INNER JOIN
-    `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
-INNER JOIN
-    `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
+	Runs AS r ON r.run_id = s.current_run_id
 WHERE
-    (`r`.`verdict`= "AC" ) AND
-    YEAR(`s`.`time`) = YEAR(NOW())-1
-    AND `u2`.`user_id` = `u`.`user_id`
- )>=1 OR
- (SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
-FROM
-    `Problems` AS `p`
-INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
-WHERE
-    `u2`.`user_id` = `u`.`user_id` AND
-    YEAR(`p`.`creation_date`) = YEAR(NOW())-1) >= 1 OR
-(SELECT
-    COUNT(DISTINCT `c`.`contest_id`)
-FROM
-    `Contests` AS `c`
-INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
-    where `u2`.`user_id` = `u`.`user_id` AND
-    YEAR(`c`.`last_updated`) = YEAR(NOW())-1) AND
-(SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
-FROM
-    `Problems` AS `p`
-INNER JOIN
-    `Submissions` AS `s` ON `p`.`problem_id` = `s`.`problem_id`
-INNER JOIN
-    `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
-INNER JOIN
-    `Identities` AS `i` ON `s`.`identity_id` = `i`.`identity_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`main_identity_id` = `i`.`identity_id`
-WHERE
-    (`r`.`verdict`= "AC" ) AND
-    YEAR(`s`.`time`) = YEAR(NOW())-2
-    AND `u2`.`user_id` = `u`.`user_id`
- )>=1 OR
- (SELECT
-    COUNT(DISTINCT `p`.`problem_id`)
-FROM
-    `Problems` AS `p`
-INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
-where `u2`.`user_id` = `u`.`user_id` AND
-YEAR(`p`.`creation_date`) = YEAR(NOW())-2) >= 1 OR
-(SELECT
-    COUNT(DISTINCT `c`.`contest_id`)
-FROM
-    `Contests` AS `c`
-INNER JOIN
-	`ACLs` AS `a` ON `a`.`acl_id` = `c`.`acl_id`
-INNER JOIN
-    `Users` AS `u2` ON `u2`.`user_id` = `a`.`owner_id`
-    where `u2`.`user_id` = `u`.`user_id` AND
-    YEAR(`c`.`last_updated`) = YEAR(NOW())-2 >=1 );
+    r.verdict = 'AC' AND year(s.time)>=year(now())-2)
+) valores
+group by valores.user_id,valores.count,valores.time
+) as total on total.user_id=u2.user_id
+group by u2.user_id
+having
+count(total.user_id)= 3;
