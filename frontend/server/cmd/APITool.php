@@ -627,9 +627,25 @@ EOD;
     public function generateDocumentation(): void {
         ksort($this->controllers);
         foreach ($this->controllers as $controller) {
+            echo (
+                "- [{$controller->classBasename}](#" .
+                strtolower($controller->classBasename) .
+                ")\n"
+            );
+            ksort($controller->methods);
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo (
+                    "  - [`/api/{$controller->apiName}/{$apiMethodName}/`](#" .
+                    strtolower("api{$controller->apiName}{$apiMethodName}") .
+                    ")\n"
+                );
+            }
+        }
+        echo "\n";
+
+        foreach ($this->controllers as $controller) {
             echo "# {$controller->classBasename}\n\n";
             echo "{$controller->docstringComment}\n\n";
-            ksort($controller->methods);
             foreach ($controller->methods as $apiMethodName => $method) {
                 echo "## `/api/{$controller->apiName}/{$apiMethodName}/`\n\n";
 
