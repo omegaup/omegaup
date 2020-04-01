@@ -14,7 +14,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(result) {
         window.location.reload();
       })
-      .fail(function(result) {
+      .catch(function(result) {
         omegaup.UI.error(result.error);
         $('#start-contest-form').show();
       });
@@ -28,7 +28,7 @@ omegaup.OmegaUp.on('ready', function() {
       .then(function(result) {
         $('#registration_pending').removeClass('hidden');
       })
-      .fail(function(result) {
+      .catch(function(result) {
         omegaup.UI.error(result.error);
         $('#request-access-form').show();
         $('#start-contest-submit').prop('disabled', false);
@@ -96,7 +96,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('.contest #window_length').val(contest.window_length);
       readyToStart(contest);
     })
-    .fail(function(contest) {
+    .catch(function(contest) {
       $('#contest-details').hide();
       $('#contest-details')
         .parent()

@@ -118,8 +118,9 @@ label {
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
-import UI from '../../ui.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';

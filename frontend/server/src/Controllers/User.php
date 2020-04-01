@@ -6,6 +6,7 @@ namespace OmegaUp\Controllers;
  *  UserController
  *
  * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1620,6 +1621,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'time' => $user['time'],
                     'ranking' => $user['ranking'],
                     'category' => $user['category'],
+                    'score' => $user['score'],
                 ]);
                 // Only the CoderOfTheMonth selected by the mentor is going to be
                 // updated.
@@ -1766,7 +1768,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by user
      *
-     * @return array{problems: list<array{title: string, alias: string, submissions: int, accepted: int}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiProblemsSolved(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1779,14 +1781,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        /** @var list<array{title: string, alias: string, submissions: int, accepted: int}> */
+        /** @var list<Problem> */
         $responseProblems = [];
-        $relevantColumns = ['title', 'alias', 'submissions', 'accepted'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
         foreach ($problems as $problem) {
             if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                 continue;
             }
-            /** @var array{title: string, alias: string, submissions: int, accepted: int} */
+            /** @var Problem */
             $responseProblems[] = $problem->asFilteredArray($relevantColumns);
         }
 
@@ -1798,7 +1800,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems unsolved by user
      *
-     * @return array{problems: list<array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1812,14 +1814,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
-        /** @var list<array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}> */
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        /** @var list<Problem> */
         $filteredProblems = [];
         foreach ($problems as $problem) {
             if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                /** @var array{title: string, alias: string, submissions: int, accepted: int, difficulty: float} */
+                /** @var Problem */
                 $filteredProblems[] = $problem->asFilteredArray(
-                    $relevant_columns
+                    $relevantColumns
                 );
             }
         }
@@ -1832,7 +1834,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems created by user
      *
-     * @return array{problems: list<array{title: string, alias: string}>}
+     * @return array{problems: list<Problem>}
      */
     public static function apiProblemsCreated(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1842,22 +1844,24 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        /** @var list<array{title: string, alias: string}> */
-        $problems = [];
-        $relevant_columns = ['title', 'alias'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        /** @var list<Problem> */
+        $filteredProblems = [];
         foreach (
             \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
                 intval($identity->identity_id)
             ) as $problem
         ) {
-            /** @var array{title: string, alias: string} */
-            $problems[] = $problem->asFilteredArray(
-                $relevant_columns
-            );
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+                /** @var Problem */
+                $filteredProblems[] = $problem->asFilteredArray(
+                    $relevantColumns
+                );
+            }
         }
 
         return [
-            'problems' => $problems,
+            'problems' => $filteredProblems,
         ];
     }
 
@@ -3219,7 +3223,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{birth_date: int|null, classname: string, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{country_id: string, name: string, school_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{all: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, female: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: true, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3258,10 +3262,16 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'coderOfTheMonthData' => self::getCodersOfTheMonth(
-                        $firstDay,
-                        $category
-                    )['coderinfo'],
+                    'coderOfTheMonthData' => [
+                        'all' => self::getCodersOfTheMonth(
+                            $firstDay,
+                            'all'
+                        )['coderinfo'],
+                        'female' => self::getCodersOfTheMonth(
+                            $firstDay,
+                            'female'
+                        )['coderinfo']
+                    ],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
                     'rankTable' => self::getRankByProblemsSolved(
                         $r->identity,
@@ -3335,7 +3345,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth($category)
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth(
+                    $category
+                )
             ),
             'codersOfPreviousMonth' => self::processCodersList(
                 \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(

@@ -1,12 +1,6 @@
-import * as lang_en from './lang.en';
-import * as lang_es from './lang.es';
-import * as lang_pt from './lang.pt';
-import * as lang_pseudo from './lang.pseudo';
-
-import API from './api.js';
-import UI from './ui.js';
-
-export { API, UI };
+import * as ui from './ui_transitional';
+import * as api from './api_transitional';
+import * as errors from './errors';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -66,28 +60,6 @@ export class EventListenerList {
     this.listenerList.push(listener);
   }
 }
-
-// Translation strings.
-export const T = (function() {
-  const head =
-    (document && document.querySelector && document.querySelector('head')) ||
-    null;
-
-  switch ((head && head.dataset && head.dataset.locale) || 'es') {
-    case 'pseudo':
-      return lang_pseudo.default;
-
-    case 'pt':
-      return lang_pt.default;
-
-    case 'en':
-      return lang_en.default;
-
-    case 'es':
-    default:
-      return lang_es.default;
-  }
-})();
 
 export namespace omegaup {
   export interface Selectable<T> {
@@ -236,6 +208,7 @@ export namespace omegaup {
   export interface ContestProblem {
     alias: string;
     text: string;
+    acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
     active: boolean;
@@ -417,12 +390,6 @@ export namespace omegaup {
     badge?: string;
   }
 
-  export interface Paginator {
-    label: string;
-    url: string;
-    class: string;
-  }
-
   export interface Profile extends User {
     email: string;
     country_id: string;
@@ -509,6 +476,10 @@ export namespace omegaup {
     markdown: string;
   }
 
+  export interface StatementProblems {
+    name: string;
+  }
+
   export interface Report {
     classname: string;
     event: {
@@ -581,7 +552,7 @@ export namespace omegaup {
     country_id: string;
     score?: number;
     name: string;
-    rank?: number;
+    ranking?: number;
   }
 
   export interface SchoolRankTable {
@@ -685,36 +656,10 @@ export namespace omegaup {
     _initialized: boolean = false;
     _remoteDeltaTime?: number = undefined;
     _deltaTimeForTesting: number = 0;
-    _errors: Array<any> = [];
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
         () => {
           this.experiments = Experiments.loadGlobal();
-        },
-        () => {
-          const reportAnIssue = <HTMLAnchorElement>(
-            document.getElementById('report-an-issue')
-          );
-          if (
-            !reportAnIssue ||
-            !window.navigator ||
-            !window.navigator.userAgent ||
-            !T.reportAnIssueTemplate
-          ) {
-            return;
-          }
-          reportAnIssue.addEventListener('click', (event: Event): void => {
-            // Not using UI.formatString() to avoid creating a circular
-            // dependency.
-            let issueBody = T.reportAnIssueTemplate
-              .replace('%(userAgent)', window.navigator.userAgent)
-              .replace('%(referer)', window.location.href)
-              .replace('%(serializedErrors)', JSON.stringify(this._errors))
-              .replace(/\\n/g, '\n');
-            reportAnIssue.href =
-              'https://github.com/omegaup/omegaup/issues/new?body=' +
-              encodeURIComponent(issueBody);
-          });
         },
       ]),
     };
@@ -735,7 +680,7 @@ export namespace omegaup {
       }
       this._initialized = true;
       const t0 = this._realTime();
-      API.Session.currentSession()
+      api.Session.currentSession()
         .then((data: { [name: string]: any }) => {
           if (data.session.valid) {
             this.loggedIn = true;
@@ -750,7 +695,7 @@ export namespace omegaup {
             this._notify('ready');
           }
         })
-        .fail(UI.apiError);
+        .catch(ui.apiError);
     }
 
     _notify(eventName: string): void {
@@ -810,7 +755,7 @@ export namespace omegaup {
     }
 
     addError(error: any): void {
-      this._errors.push(error);
+      errors.addError(error);
     }
   }
 }

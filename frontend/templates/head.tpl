@@ -17,8 +17,6 @@
 		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
 		{js_include entrypoint="omegaup" runtime}
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>

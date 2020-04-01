@@ -4,6 +4,8 @@
 
 /**
  * ProblemsController
+ *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3164,15 +3166,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Defaults for offset and rowcount
         $offset = null;
-        $rowcount = null;
+        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $rowcount = intval($r['rowcount']);
         }
 
         [
@@ -3218,7 +3218,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $orderBy,
         string $mode,
         ?int $offset,
-        ?int $rowcount,
+        int $rowcount,
         array $tags,
         string $keyword,
         bool $requireAllTags,
@@ -3255,9 +3255,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (is_null($offset) || is_null($rowcount)) {
-            $offset = ($page - 1) * PROBLEMS_PER_PAGE;
-            $rowcount = PROBLEMS_PER_PAGE;
+        if (is_null($offset)) {
+            $offset = ($page - 1) * $rowcount;
         }
 
         [
@@ -3289,7 +3288,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3339,8 +3338,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
+            $pageSize,
             $page ?: 1,
-            '/problem/list/',
             5,
             []
         );
@@ -3354,22 +3353,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{pagerItems: list<array{class: string, label: string, url: string}>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         // Defaults for offset and rowcount
         $offset = null;
-        $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $pageSize = intval($r['rowcount']);
         }
 
         $r->ensureInt('page', null, null, false);
@@ -3383,7 +3380,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
-            $rowcount
+            $pageSize
         );
 
         $addedProblems = [];
@@ -3402,8 +3399,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $count,
+            $pageSize,
             $page ?: 1,
-            '/problem/list/',
             5,
             []
         );
@@ -3609,7 +3606,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{isSysadmin: bool, privateProblemsAlert: bool}, template: string}
+     * @return array{smartyProperties: array{payload: array{isSysadmin: bool, privateProblemsAlert: bool}}, template: string}
      */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3627,17 +3624,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin(
-                    $r->identity
-                ),
-                'privateProblemsAlert' => $privateProblemsAlert,
+                'payload' => [
+                    'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin(
+                        $r->identity
+                    ),
+                    'privateProblemsAlert' => $privateProblemsAlert,
+                ],
             ],
             'template' => 'problem.mine.tpl',
         ];
     }
 
     /**
-     * @return array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{MemoryLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}
+     * @return array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
      */
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3747,7 +3746,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             || is_null($r->identity->user_id)
             || is_null($problem->problem_id)
         ) {
-            return $result;
+            return [
+                'smartyProperties' => $result,
+                'template' => 'arena.problem.tpl',
+            ];
         }
         $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
             $problem->problem_id,
@@ -3800,11 +3802,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem,
             $r->identity
         );
-        return $result;
+        return [
+            'smartyProperties' => $result,
+            'template' => 'arena.problem.tpl',
+        ];
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: array{class: string, label: string, url: string}[], problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3817,17 +3822,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        // Defaults for offset and rowcount
+        // Defaults for offset and pageSize
         $offset = null;
-        $rowcount = null;
+        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-            $rowcount = is_null(
-                $r['rowcount']
-            ) ? \OmegaUp\Controllers\Problem::PAGE_SIZE : intval(
-                $r['rowcount']
-            );
+        }
+        if (!is_null($r['rowcount'])) {
+            $pageSize = intval($r['rowcount']);
         }
 
         [
@@ -3849,7 +3852,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $orderBy ?: 'problem_id',
             $mode ?: 'desc',
             $offset,
-            $rowcount,
+            $pageSize,
             $tags,
             $keyword,
             $requireAllTags,
@@ -3868,8 +3871,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'tag' => $tags
         ];
 
-        $pagerItems = \OmegaUp\Pager::paginate(
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
             $response['total'],
+            $pageSize,
             $page ?: 1,
             '/problem/list/',
             5,

@@ -1,6 +1,7 @@
 import rank_table from './components/RankTable.vue';
 import Vue from 'vue';
-import { OmegaUp } from './omegaup.js';
+import { OmegaUp } from './omegaup';
+import * as ui from './ui_transitional';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(
@@ -61,5 +62,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .fail(omegaup.UI.apiError);
+    .catch(ui.apiError);
 });

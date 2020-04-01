@@ -1,5 +1,8 @@
 import group_Identities from '../components/group/Identities.vue';
-import { API, OmegaUp, UI, T } from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
+import API from '../api.js';
+import * as UI from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 
@@ -19,7 +22,7 @@ OmegaUp.on('ready', function() {
               .then(function(data) {
                 UI.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .fail(UI.apiError);
+              .catch(UI.apiError);
           },
           'download-identities': function(identities) {
             const csv = CSV.serialize({

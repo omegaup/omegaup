@@ -714,7 +714,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // But user should be update to 'with registration' mode because there
-        // is no restrictions.
+        // is no restriction.
         \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $alias,

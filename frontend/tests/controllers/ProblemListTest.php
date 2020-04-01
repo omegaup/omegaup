@@ -884,11 +884,12 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
 
+        $pageSize = 2;
+
         $login = self::login($identity);
-        $request = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Problem::apiList($request);
+        ]));
 
         // Test search by title
         $titles = [];
@@ -896,16 +897,21 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             array_push($titles, $problem['title']);
         }
         foreach ($titles as $title) {
-            $request['query'] = $title;
-            $response = \OmegaUp\Controllers\Problem::apiList($request);
+            $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'rowcount' => $pageSize,
+                'query' => $title,
+            ]));
             $this->assertTrue(count($response['results']) == 1);
             $this->assertTrue($title === $response['results'][0]['title']);
         }
 
-        $request['query'] = null;
-        $response = \OmegaUp\Controllers\Problem::apiList($request);
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'rowcount' => $pageSize,
+        ]));
         $total = $response['total'];
-        $pages = intval(($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+        $pages = intval(($total + $pageSize - 1) / $pageSize);
 
         // The following tests will try the different scenarios that can occur
         // with the additions of the three features to apiList(), that is, paging,
@@ -919,34 +925,33 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 foreach ($modes as $mode) {
                     $first = null;
                     $last = null;
-                    $request['mode'] = $mode;
-                    $request['order_by'] = $col;
                     if ($paging == 1) {
-                        // Clear offset and rowcount if set.
-                        if (isset($request['offset'])) {
-                            unset($request['offset']);
-                        }
-                        if (isset($request['rowcount'])) {
-                            unset($request['rowcount']);
-                        }
-                        $request['page'] = 1;
-                        $response = \OmegaUp\Controllers\Problem::apiList(
-                            $request
-                        );
+                        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+                            'auth_token' => $login->auth_token,
+                            'rowcount' => $pageSize,
+                            'mode' => $mode,
+                            'order_by' => $col,
+                            'page' => 1,
+                        ]));
                         $first = $response['results'];
-                        $request['page'] = $pages;
-                        $response = \OmegaUp\Controllers\Problem::apiList(
-                            $request
-                        );
+                        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+                            'auth_token' => $login->auth_token,
+                            'rowcount' => $pageSize,
+                            'mode' => $mode,
+                            'order_by' => $col,
+                            'page' => $pages,
+                        ]));
                         $last = $response['results'];
 
                         // Test number of problems per page
-                        $this->assertEquals(PROBLEMS_PER_PAGE, count($first));
+                        $this->assertEquals($pageSize, count($first));
                     } else {
-                        $request['page'] = null;
-                        $response = \OmegaUp\Controllers\Problem::apiList(
-                            $request
-                        );
+                        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
+                            'auth_token' => $login->auth_token,
+                            'rowcount' => $pageSize,
+                            'mode' => $mode,
+                            'order_by' => $col,
+                        ]));
                         $first = $response['results'];
                         $last = $first;
                     }
@@ -1091,35 +1096,41 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $request = new \OmegaUp\Request([
+        $pageSize = 2;
+        // Call apiList to define the number of problems and pages
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'rowcount' => 1000,
-        ]);
-        // Call apiList to define the number of problems and pages
-        $apiListResponse = \OmegaUp\Controllers\Problem::apiList($request);
+        ]));
         $total = $apiListResponse['total'];
-        $pages = intval(($total + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
+        $pages = intval(($total + $pageSize - 1) / $pageSize);
 
         // Fetching every page to get all the problems, starting on page 1
-        $request['page'] = 1;
         $problems = [];
+        $requestParams = [];
         for ($i = 1; $i <= $pages; $i++) {
             $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
-                $request
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'rowcount' => 1000,
+                    'page' => $i,
+                ] + $requestParams)
             )['smartyProperties']['payload'];
+            foreach ($response['problems'] as $problem) {
+                $problems[] = $problem['alias'];
+            }
             $nextPage = end($response['pagerItems']);
+            if ($nextPage['page'] === 0) {
+                continue;
+            }
             $nextPageURL = $nextPage['url'];
             $nextPageURLQuery = parse_url($nextPageURL);
-            // Getting all the parameters gotten by the url, even if some of them is empty
+            // Getting all the parameters gotten by the url, even if some of them are empty
             if (isset($nextPageURLQuery['query'])) {
                 parse_str($nextPageURLQuery['query'], $params);
                 foreach ($params as $param => $value) {
-                    $request[$param] = $value;
+                    $requestParams[$param] = $value;
                 }
-            }
-
-            foreach ($response['problems'] as $problem) {
-                $problems[] = $problem['alias'];
             }
         }
         // Asserting the number of non-repeated problems is the same than the total

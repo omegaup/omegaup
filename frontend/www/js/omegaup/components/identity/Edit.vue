@@ -122,7 +122,8 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 
 @Component

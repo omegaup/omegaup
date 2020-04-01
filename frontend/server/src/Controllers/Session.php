@@ -21,12 +21,7 @@ class ScopedFacebook {
 }
 
 /**
- * Description:
- *     Session controller handles sessions.
- *
- * Author:
- *     Alan Gonzalez alanboy@alanboy.net
- *
+ * Session controller handles sessions.
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;

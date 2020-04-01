@@ -580,7 +580,7 @@ def _get_browser(request, browser_name):
         chrome_capabilities = DesiredCapabilities.CHROME
         chrome_capabilities['loggingPrefs'] = {'browser': 'ALL'}
         chrome_browser = webdriver.Chrome(
-            chrome_options=chrome_options,
+            options=chrome_options,
             desired_capabilities=chrome_capabilities)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
@@ -595,7 +595,7 @@ def _get_browser(request, browser_name):
         firefox_options.add_argument('-headless')
     firefox_browser = webdriver.Firefox(
         capabilities=firefox_capabilities,
-        firefox_options=firefox_options,
+        options=firefox_options,
         firefox_profile=firefox_profile)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser

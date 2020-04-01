@@ -115,10 +115,10 @@
             </ul>
           </li>
           <li
-            class="nav-schools"
-            v-bind:class="{ active: navbarSection === 'schools' }"
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navSchools }}</a>
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li>
             <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
@@ -387,7 +387,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';

@@ -1,6 +1,9 @@
 import common_Navbar from '../components/common/Navbar.vue';
-import { API, UI, OmegaUp, T } from '../omegaup.js';
-import omegaup from '../api.js';
+import { OmegaUp } from '../omegaup';
+import * as api from '../api_transitional';
+import API from '../api.js';
+import T from '../lang';
+import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -51,14 +54,14 @@ OmegaUp.on('ready', function() {
   });
 
   if (payload.isAdmin) {
-    API.Notification.myList({})
-      .then(function(data) {
+    API.Notification.myList()
+      .then(data => {
         commonNavbar.notifications = data.notifications;
       })
-      .fail(UI.apiError);
+      .catch(UI.apiError);
 
     function updateGraderStatus() {
-      API.Grader.status()
+      api.Grader.status()
         .then(stats => {
           commonNavbar.graderInfo = stats.grader;
           if (stats.status !== 'ok') {
@@ -72,7 +75,7 @@ OmegaUp.on('ready', function() {
           }
           commonNavbar.errorMessage = null;
         })
-        .fail(stats => {
+        .catch(stats => {
           commonNavbar.errorMessage = stats.error;
         });
     }

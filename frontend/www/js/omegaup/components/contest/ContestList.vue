@@ -24,13 +24,17 @@
         </button>
         <ul class="dropdown-menu" role="menu">
           <li>
-            <a v-on:click="onBulkUpdate('public')">{{ T.makePublic }}</a>
+            <a v-on:click="onBulkUpdate(selectedContests, 'public')">{{
+              T.makePublic
+            }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate('private')">{{ T.makePrivate }}</a>
+            <a v-on:click="onBulkUpdate(selectedContests, 'private')">{{
+              T.makePrivate
+            }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate('registration')">{{
+            <a v-on:click="onBulkUpdate(selectedContests, 'registration')">{{
               T.makeRegistration
             }}</a>
           </li>
@@ -53,7 +57,12 @@
       <tbody>
         <tr v-for="contest in contests">
           <td v-if="isAdmin">
-            <input type="checkbox" v-bind:id="contest.alias" />
+            <input
+              type="checkbox"
+              v-model="selectedContests"
+              v-bind:value="contest.alias"
+              v-bind:id="contest.alias"
+            />
           </td>
 
           <td>
@@ -163,10 +172,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
-import UI from '../../ui.js';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
 
-@Component({})
+@Component
 export default class List extends Vue {
   @Prop() contests!: omegaup.Contest[];
   @Prop() isAdmin!: boolean;
@@ -174,6 +184,7 @@ export default class List extends Vue {
 
   T = T;
   UI = UI;
+  selectedContests = [];
 
   makeWorldClockLink(date: Date): string {
     if (!date) {
@@ -187,6 +198,7 @@ export default class List extends Vue {
 
   @Emit('bulk-update')
   onBulkUpdate(admissionMode: string): string {
+    this.selectedContests = [];
     return admissionMode;
   }
 

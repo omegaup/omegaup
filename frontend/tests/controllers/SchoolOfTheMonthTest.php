@@ -16,12 +16,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     ): void {
         if (is_null($runDate)) {
             $previousMonth = date_create(date('Y-m-d'));
-            date_add(
-                $previousMonth,
-                date_interval_create_from_date_string(
-                    '-1 month'
-                )
-            );
+            $previousMonth->modify('last day of previous month');
             $runDate = date_format($previousMonth, 'Y-m-d');
         }
 
@@ -171,12 +166,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
@@ -196,6 +186,14 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $schoolsData[2]['request']['name'],
             $schools[2]['name']
+        );
+        $this->assertGreaterThan(
+            $schools[1]['score'],
+            $schools[0]['score']
+        );
+        $this->assertGreaterThan(
+            $schools[2]['score'],
+            $schools[1]['score']
         );
 
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
@@ -282,12 +280,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
@@ -308,6 +301,49 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $schoolsData[1]['school']->name,
             $results[0]['name']
         );
+
+        // Now do the same but for the current month
+        $nextMonth = date_create($today);
+        $nextMonth->modify('last day of next month');
+        $nextMonthDate = date_format($nextMonth, 'Y-m-d');
+
+        self::setUpSchoolsRuns($schoolsData, $today);
+        \OmegaUp\Test\Utils::runUpdateRanks($today);
+
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
+            $nextMonthDate
+        );
+        $this->assertCount(count($schoolsData) - 1, $results);
+        $this->assertEquals(
+            $schoolsData[0]['school']->name,
+            $results[0]['name']
+        );
+
+        // School of the month (of the next month) should not be retrieved because
+        // it is a calculation for the future.
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
+        $this->assertCount(1, $results);
+        $this->assertEquals(
+            $results[0]['school_id'],
+            $schoolsData[1]['school']->school_id
+        );
+
+        $nextMonth = date_create($nextMonthDate);
+        $nextMonth->modify('last day of next month');
+        $nextMonthDate = date_format($nextMonth, 'Y-m-d');
+        \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
+
+        // Finally verify that both best schools of each month are retrieved
+        $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
+        $this->assertCount(2, $results);
+        $this->assertEquals(
+            $results[0]['school_id'],
+            $schoolsData[0]['school']->school_id
+        );
+        $this->assertEquals(
+            $results[1]['school_id'],
+            $schoolsData[1]['school']->school_id
+        );
     }
 
     public function testApiSelectSchoolOfTheMonth() {
@@ -316,22 +352,21 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $mentorIdentity,
         ] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
-        $runDate = date_create(date('Y-m-15'));
-        date_add(
-            $runDate,
-            date_interval_create_from_date_string(
-                '-6 month'
-            )
-        );
-
         $schoolsData = [
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
             \OmegaUp\Test\Factories\Schools::createSchool(),
         ];
 
-        \OmegaUp\Time::setTimeForTesting($runDate->getTimestamp());
-        self::setUpSchoolsRuns($schoolsData);
+        $today = date('Y-m-d', \OmegaUp\Time::get());
+
+        $date = date_create($today);
+        $date->modify('last day of next month');
+        $runDate = date_format($date, 'Y-m-15');
+
+        self::setUpSchoolsRuns($schoolsData, $runDate);
+        \OmegaUp\Test\Utils::runUpdateRanks($runDate);
+        \OmegaUp\Time::setTimeForTesting(strtotime($runDate));
 
         // Mentor's login
         $login = self::login($mentorIdentity);
@@ -349,27 +384,26 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Today must be the end of the month
-        $lastDayOfMonth = $runDate;
+        $lastDayOfMonth = $date;
         $lastDayOfMonth->modify('last day of this month');
         \OmegaUp\Time::setTimeForTesting($lastDayOfMonth->getTimestamp());
 
-        // TODO(https://github.com/omegaup/omegaup/issues/3438): Remove this.
-        return;
-
         $result = \OmegaUp\Controllers\School::apiSelectSchoolOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'school_id' => $schoolsData[0]['school']->school_id
+            'school_id' => $schoolsData[2]['school']->school_id
         ]));
         $this->assertEquals('ok', $result['status']);
 
+        $nextMonth = $lastDayOfMonth;
+        $nextMonth->modify('last day of next month');
+        $nextMonthDate = date_format($nextMonth, 'Y-m-d');
+        \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
+
         $results = \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth();
-        // Should contain exactly two schools of the month, the one from previous test and
-        // the one selected on the current one.
-        $this->assertCount(2, $results);
+        $this->assertCount(3, $results);
         $this->assertEquals(
-            $schoolsData[0]['school']->name,
-            $results[1]['name']
+            $schoolsData[2]['school']->name,
+            $results[0]['name']
         );
-        $this->assertGreaterThan($results[1]['time'], $results[0]['time']);
     }
 }

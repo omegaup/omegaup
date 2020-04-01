@@ -51,9 +51,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, T } from '../../omegaup';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 
-@Component({})
+@Component
 export default class Links extends Vue {
   @Prop() data!: omegaup.Contest;
 

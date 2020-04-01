@@ -65,21 +65,20 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
+import T from '../../lang';
+import * as UI from '../../ui';
 
 @Component
 export default class UserBasicEdit extends Vue {
   @Prop() username!: string;
 
   T = T;
-  UI = UI;
   newPassword1 = '';
   newPassword2 = '';
 
   formSubmit(): void {
     if (this.newPassword1 != this.newPassword2) {
-      this.UI.error(this.T.userPasswordMustBeSame);
+      UI.error(T.userPasswordMustBeSame);
       return;
     }
     this.$emit('update', this.username, this.newPassword1);
