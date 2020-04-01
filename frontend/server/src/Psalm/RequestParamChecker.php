@@ -151,13 +151,23 @@ class RequestParamChecker implements
                     ) {
                         continue;
                     }
-                    /** @var array{0: string, 1: string, 2: string, 3: ?string} $matches */
-                    [
-                        $_,
-                        $annotationType,
-                        $annotationVariable,
-                        $annotationDescription,
-                    ] = $matches;
+                    if (count($matches) == 4) {
+                        /** @var array{0: string, 1: string, 2: string, 3: ?string} $matches */
+                        [
+                            $_,
+                            $annotationType,
+                            $annotationVariable,
+                            $annotationDescription,
+                        ] = $matches;
+                    } else {
+                        /** @var array{0: string, 1: string, 2: string} $matches */
+                        [
+                            $_,
+                            $annotationType,
+                            $annotationVariable,
+                        ] = $matches;
+                        $annotationDescription = null;
+                    }
                     self::$parsedMethodTypeMapping[$functionId][$annotationVariable] = (
                         new RequestParamDescription(
                             \Psalm\Type::parseString($annotationType),
