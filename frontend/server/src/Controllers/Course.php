@@ -1441,6 +1441,117 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns the list of requests made by participants who are interested to
+     * join the course
+     *
+     * @omegaup-request-param string $course_alias
+     *
+     * @return array{users: list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>}
+     */
+    public static function apiRequests(\OmegaUp\Request $r): array {
+        // Authenticate request
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+
+        $course = self::validateCourseExists($r['course_alias']);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $usersRequests =
+            \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
+                $course->course_id
+            );
+
+        return ['users' => $usersRequests];
+    }
+
+    /**
+     * Stores the resolution given to a certain request made by a contestant
+     * interested to join the course.
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param bool $resolution
+     * @omegaup-request-param string $username
+     *
+     * @return array{status: string}
+     */
+    public static function apiArbitrateRequest(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['username'],
+            'username'
+        );
+
+        if (is_null($r['resolution'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $course = self::validateCourseExists($r['course_alias']);
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $targetIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $r['username']
+        );
+        if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
+
+        $request = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+            $targetIdentity->identity_id,
+            $course->course_id
+        );
+
+        if (is_null($request)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'userNotInListOfRequests'
+            );
+        }
+
+        $r->ensureBool('resolution');
+
+        $request->accepted = boolval($r['resolution']);
+        $request->last_update = \OmegaUp\Time::get();
+
+        \OmegaUp\DAO\CourseIdentityRequest::update($request);
+
+        // Save this action in the history
+        \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+            new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                'identity_id' => $request->identity_id,
+                'course_id' => $course->course_id,
+                'time' => $request->last_update,
+                'admin_id' => intval($r->user->user_id),
+                'accepted' => $request->accepted,
+            ])
+        );
+
+        self::$log->info(
+            "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * List students in a course
      *
      * @omegaup-request-param mixed $course_alias
