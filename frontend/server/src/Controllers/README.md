@@ -177,7 +177,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -224,7 +223,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -242,7 +240,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -260,7 +257,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -278,7 +274,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -298,7 +293,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -389,7 +383,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -459,7 +452,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -559,7 +551,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -622,7 +613,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -640,7 +630,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -658,7 +647,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -676,7 +664,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -694,7 +681,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -712,7 +698,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -860,7 +845,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -894,7 +878,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -913,7 +896,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -976,7 +958,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -994,7 +975,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1012,7 +992,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1030,7 +1009,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1093,7 +1071,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1177,7 +1154,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1195,7 +1171,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1358,7 +1333,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1376,7 +1350,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1394,7 +1367,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1412,7 +1384,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1430,7 +1401,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1495,7 +1465,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1513,7 +1482,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1529,7 +1497,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1545,7 +1512,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1587,7 +1553,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1605,7 +1570,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1623,7 +1587,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1710,7 +1673,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1732,7 +1694,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1793,7 +1754,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1815,7 +1775,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1833,7 +1792,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1869,7 +1827,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1887,7 +1844,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1903,7 +1859,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -1987,7 +1942,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2009,7 +1963,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2027,7 +1980,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2142,7 +2094,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2160,7 +2111,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2226,7 +2176,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2244,7 +2193,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2262,7 +2210,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2280,7 +2227,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2330,7 +2276,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2420,7 +2365,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2438,7 +2382,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2682,7 +2625,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2819,7 +2761,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -2853,7 +2794,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3010,7 +2950,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3058,7 +2997,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3184,7 +3122,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3202,7 +3139,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3220,7 +3156,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3238,7 +3173,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3256,7 +3190,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3274,7 +3207,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3606,7 +3538,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3624,7 +3555,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3642,7 +3572,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3660,7 +3589,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3713,7 +3641,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3731,7 +3658,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3749,7 +3675,6 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```
 
@@ -3793,6 +3718,5 @@ _Por documentar_
 
 ```typescript
 {
-  status: string;
 }
 ```

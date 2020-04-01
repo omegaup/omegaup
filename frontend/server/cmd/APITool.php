@@ -131,7 +131,7 @@ class TypeMapper {
                                 "Property {$path}.{$propertyName} is non-string: {$propertyType}"
                             );
                         }
-                        if ($path == '' && $propertyName == 'status') {
+                        if (empty($propertyPath) && $propertyName == 'status') {
                             // Omit this.
                             continue;
                         }
