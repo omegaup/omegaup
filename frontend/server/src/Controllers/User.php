@@ -3293,6 +3293,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
             ],
+            'bootstrap4' => false, //TODO: Esto cambiará pronto por eso lo dejo
             'template' => 'index.tpl',
         ];
     }

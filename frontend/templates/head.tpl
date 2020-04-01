@@ -38,7 +38,7 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
-{if isset($BOOTSTRAP_4) && $BOOTSTRAP_4}
+{if isset($headerPayload) && $headerPayload.bootstrap4}
 		<link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
 		<script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
 {else}
@@ -54,9 +54,7 @@
 {if isset($inArena) && $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
 {else}
-	{if !isset($BOOTSTRAP_4) || !$BOOTSTRAP_4}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
-	{/if}
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
 		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}" defer></script>
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
@@ -88,7 +86,6 @@
 {/if}
 		<div id="root">
 {if isset($headerPayload)}
-	{$headerPayload['bootstrap4'] = isset($BOOTSTRAP_4) && $BOOTSTRAP_4}
 	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 {else}
 	{include file='common.navbar.tpl' headerPayload=[] inline}

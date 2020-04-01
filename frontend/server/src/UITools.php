@@ -167,6 +167,7 @@ class UITools {
         \Smarty $smarty,
         $payload = [],
         bool $inContest = false,
+        bool $bootstrap4 = false,
         string $navbarSection = ''
     ): void {
         [
@@ -208,6 +209,7 @@ class UITools {
             'headerPayload',
             [
                 'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
+                'bootstrap4' => $bootstrap4,
                 'inContest' => $inContest,
                 'isLoggedIn' => !is_null($identity),
                 'isReviewer' => !is_null(
@@ -233,7 +235,7 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, bootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -241,6 +243,7 @@ class UITools {
             $response = $callback(new Request($_REQUEST));
             $smartyProperties = $response['smartyProperties'];
             $template = $response['template'];
+            $bootstrap4 = $response['bootstrap4'] ?? false;
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
@@ -258,6 +261,7 @@ class UITools {
             $smarty,
             $payload,
             $inContest,
+            $bootstrap4,
             $navbarSection
         );
 
