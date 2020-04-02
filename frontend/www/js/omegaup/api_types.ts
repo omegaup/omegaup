@@ -49,6 +49,38 @@ export namespace types {
     owners_count: number;
   }
 
+  export interface CourseAssignment {
+    alias: string;
+    assignment_type: string;
+    description: string;
+    finish_time?: number;
+    max_points: number;
+    name: string;
+    order: number;
+    publish_time_delay?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    start_time: number;
+  }
+
+  export interface CourseDetails {
+    admission_mode: string;
+    alias: string;
+    assignments: types.CourseAssignment[];
+    basic_information_required: boolean;
+    description: string;
+    finish_time?: number;
+    isCurator: boolean;
+    is_admin: boolean;
+    name: string;
+    requests_user_information: string;
+    school_id?: number;
+    school_name?: string;
+    show_scoreboard: boolean;
+    start_time: number;
+    student_count: number;
+  }
+
   export interface PageItem {
     class: string;
     label: string;
@@ -658,34 +690,7 @@ export namespace messages {
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = { status: string };
   export type CourseAdminDetailsRequest = { [key: string]: any };
-  export type CourseAdminDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseAdminDetailsResponse = types.CourseDetails;
   export type CourseAdminsRequest = { [key: string]: any };
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
@@ -780,34 +785,7 @@ export namespace messages {
   export type CourseCreateAssignmentRequest = { [key: string]: any };
   export type CourseCreateAssignmentResponse = { status: string };
   export type CourseDetailsRequest = { [key: string]: any };
-  export type CourseDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseDetailsResponse = types.CourseDetails;
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };

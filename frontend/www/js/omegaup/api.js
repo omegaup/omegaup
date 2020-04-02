@@ -303,6 +303,8 @@ export default {
 
     listUnsolvedProblems: api.Course.listUnsolvedProblems,
 
+    registerForCourse: api.Course.registerForCourse,
+
     removeAdmin: api.Course.removeAdmin,
 
     removeAssignment: api.Course.removeAssignment,

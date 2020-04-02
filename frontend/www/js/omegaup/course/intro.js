@@ -13,15 +13,18 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('course-intro', {
         props: {
-          name: coursePayload.name,
-          description: coursePayload.description,
-          needsBasicInformation: coursePayload.needsBasicInformation,
-          requestsUserInformation: coursePayload.requestsUserInformation,
-          shouldShowAcceptTeacher: coursePayload.shouldShowAcceptTeacher,
-          statements: coursePayload.statements,
+          name: this.name,
+          description: this.description,
+          needsBasicInformation: this.needsBasicInformation,
+          requestsUserInformation: this.requestsUserInformation,
+          shouldShowAcceptTeacher: this.shouldShowAcceptTeacher,
+          statements: this.statements,
+          userRegistrationRequested: this.userRegistrationRequested,
+          userRegistrationAnswered: this.userRegistrationAnswered,
+          userRegistrationAccepted: this.userRegistrationAccepted,
         },
         on: {
-          submit: function(ev) {
+          submit: ev => {
             API.Course.addStudent({
               course_alias: coursePayload.alias,
               usernameOrEmail: coursePayload.currentUsername,
@@ -33,13 +36,31 @@ OmegaUp.on('ready', function() {
                 coursePayload.statements.acceptTeacher.gitObjectId,
               statement_type: coursePayload.statements.privacy.statementType,
             })
-              .then(function(data) {
+              .then(data => {
                 window.location.replace('/course/' + coursePayload.alias);
               })
               .catch(UI.apiError);
           },
+          'request-access-course': () => {
+            API.Course.registerForCourse({ course_alias: coursePayload.alias })
+              .then(() => {
+                courseIntro.userRegistrationRequested = true;
+              })
+              .catch(UI.error);
+          },
         },
       });
+    },
+    data: {
+      name: coursePayload.name,
+      description: coursePayload.description,
+      needsBasicInformation: coursePayload.needsBasicInformation,
+      requestsUserInformation: coursePayload.requestsUserInformation,
+      shouldShowAcceptTeacher: coursePayload.shouldShowAcceptTeacher,
+      statements: coursePayload.statements,
+      userRegistrationRequested: coursePayload.userRegistrationRequested,
+      userRegistrationAnswered: coursePayload.userRegistrationAnswered,
+      userRegistrationAccepted: coursePayload.userRegistrationAccepted,
     },
     components: {
       'course-intro': course_Intro,
