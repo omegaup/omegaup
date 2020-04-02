@@ -25,6 +25,11 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification
      *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $username
+     *
      * @return array{clarification_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
@@ -106,6 +111,8 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * API for getting a clarification
      *
+     * @omegaup-request-param mixed $clarification_id
+     *
      * @return array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -149,6 +156,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
     /**
      * Update a clarification
+     *
+     * @omegaup-request-param mixed $answer
+     * @omegaup-request-param mixed $clarification_id
+     * @omegaup-request-param mixed $message
      *
      * @return array{status: string}
      */

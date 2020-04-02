@@ -8,6 +8,8 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * password. The first step consist of sending an email to the user with
      * instructions to reset he's password, if and only if the email is valid.
      *
+     * @omegaup-request-param mixed $email
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @return array{message?: string, token?: string}
@@ -68,6 +70,8 @@ class Reset extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a reset operation, support team members can generate a valid
      * token and then they can send it to end user
+     *
+     * @omegaup-request-param mixed $email
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -133,6 +137,11 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * Updates the password of a given user, this is the second and last step
      * in order to reset the password. This operation is done if and only if
      * the correct parameters are suplied.
+     *
+     * @omegaup-request-param mixed $email
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $password_confirmation
+     * @omegaup-request-param mixed $reset_token
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -219,6 +228,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @omegaup-request-param mixed $email
+     */
     private static function validateCreateRequest(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);

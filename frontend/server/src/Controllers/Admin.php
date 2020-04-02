@@ -5,6 +5,10 @@
 class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats for an overall platform report.
+     *
+     * @omegaup-request-param mixed $end_time
+     * @omegaup-request-param mixed $start_time
+     *
      * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
      */
     public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
