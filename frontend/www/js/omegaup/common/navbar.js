@@ -1,4 +1,5 @@
 import common_Navbar from '../components/common/Navbar.vue';
+import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api_transitional';
 import API from '../api.js';
@@ -49,7 +50,9 @@ OmegaUp.on('ready', function() {
       initialClarifications: [],
     },
     components: {
-      'omegaup-common-navbar': common_Navbar,
+      'omegaup-common-navbar': payload.bootstrap4
+        ? common_NavbarV2
+        : common_Navbar,
     },
   });
 

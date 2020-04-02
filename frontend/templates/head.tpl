@@ -38,11 +38,16 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
+{if isset($headerPayload) && $headerPayload.bootstrap4}
+		<link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
+		<script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
+{else}
 		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="/third_party/bootstrap-3.4.1/css/bootstrap.min.css">
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/bootstrap-3.4.1/js/bootstrap.min.js"}" defer></script>
+{/if}
 		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
 		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.min.js"}" defer></script>
 
@@ -81,9 +86,9 @@
 {/if}
 		<div id="root">
 {if isset($headerPayload)}
-{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 {else}
-{include file='common.navbar.tpl' headerPayload=[] inline}
+	{include file='common.navbar.tpl' headerPayload=[] inline}
 {/if}
 {if !isset($inArena) || !$inArena}
 {include file='mainmenu.tpl' inline}
