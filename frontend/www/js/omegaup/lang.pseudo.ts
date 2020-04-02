@@ -64,7 +64,7 @@ const translations: { [key: string]: string; } = {
   badge_javaExpert_name: "(Java Exp3r7 U53r)",
   badge_karelExpert_description: "(Th3 u53r ha5 501v3d m0r3 7han 10 pr0b13m5 in Kar31.)",
   badge_karelExpert_name: "(Kar31 Exp3r7 U53r)",
-  badge_legacyUser_description: "(U53r mad3 a 5ubmi55i0n wi7hin 7h3 fir57 y3ar 5inc3 0m3gaUp 1aunchm3n7.)",
+  badge_legacyUser_description: "(U53r ha5 mad3 a 5ubmi55i0n f0r 7hr33 y3ar5 in a r0w.)",
   badge_legacyUser_name: "(L3gacy U53r)",
   badge_pascalExpert_description: "(Th3 u53r ha5 501v3d m0r3 7han 10 pr0b13m5 in Pa5ca1.)",
   badge_pascalExpert_name: "(Pa5ca1 Exp3r7 U53r)",
