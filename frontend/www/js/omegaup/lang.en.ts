@@ -64,7 +64,7 @@ const translations: { [key: string]: string; } = {
   badge_javaExpert_name: "Java Expert User",
   badge_karelExpert_description: "The user has solved more than 10 problems in Karel.",
   badge_karelExpert_name: "Karel Expert User",
-  badge_legacyUser_description: "User has made a shipment for three years in a row.",
+  badge_legacyUser_description: "User has made a submission for three years in a row.",
   badge_legacyUser_name: "Legacy User",
   badge_pascalExpert_description: "The user has solved more than 10 problems in Pascal.",
   badge_pascalExpert_name: "Pascal Expert User",
