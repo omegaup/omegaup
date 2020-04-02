@@ -386,6 +386,11 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Changes the password of a user
      *
+     * @omegaup-request-param mixed $old_password
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $permission_key
+     * @omegaup-request-param mixed $username
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -484,6 +489,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Verifies the user given its verification id
+     *
+     * @omegaup-request-param mixed $id
+     * @omegaup-request-param mixed $usernameOrEmail
      *
      * @param \OmegaUp\Request $r
      *
@@ -620,6 +628,15 @@ class User extends \OmegaUp\Controllers\Controller {
      * contest.
      * If the user does not exists, we create him.
      *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $change_password
+     * @omegaup-request-param mixed $id
+     * @omegaup-request-param mixed $old_password
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $permission_key
+     * @omegaup-request-param mixed $username
+     * @omegaup-request-param mixed $usernameOrEmail
+     *
      * @param \OmegaUp\Request $r
      * @param string $username
      * @param string $password
@@ -677,6 +694,17 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $change_password
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $contest_type
+     * @omegaup-request-param mixed $id
+     * @omegaup-request-param mixed $old_password
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $permission_key
+     * @omegaup-request-param mixed $username
+     * @omegaup-request-param mixed $usernameOrEmail
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array<string, string>
@@ -1299,6 +1327,10 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get general user info
      *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $omit_rank
+     * @omegaup-request-param mixed $username
+     *
      * @return array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
      */
     public static function apiProfile(\OmegaUp\Request $r): array {
@@ -1393,6 +1425,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Gets verify status of a user
      *
+     * @omegaup-request-param mixed $email
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -1428,6 +1462,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * - last password change request
      * - verify status
      *
+     * @omegaup-request-param mixed $email
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -1455,7 +1491,11 @@ class User extends \OmegaUp\Controllers\Controller {
      * day of the current month. If there's no coder of the month for the given
      * date, calculate it and save it.
      *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $date
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{coderinfo: array{birth_date: int|null, country: null|string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
@@ -1530,6 +1570,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the list of coders of the month
      *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $date
+     *
      * @return array{coders: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>}
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r): array {
@@ -1557,6 +1600,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Selects coder of the month for next month.
+     *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $username
      *
      * @return array{status: 'ok'}
      */
@@ -1622,6 +1668,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'ranking' => $user['ranking'],
                     'category' => $user['category'],
                     'score' => $user['score'],
+                    'problems_solved' => $user['problems_solved'],
                 ]);
                 // Only the CoderOfTheMonth selected by the mentor is going to be
                 // updated.
@@ -1660,6 +1707,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get the results for this user in a given interview
+     *
+     * @omegaup-request-param mixed $interview
+     * @omegaup-request-param mixed $username
      *
      * @param \OmegaUp\Request $r
      *
@@ -1711,6 +1761,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get Contests which a certain user has participated in
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $username
      *
      * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int}, place: int|null}>}
      */
@@ -1869,6 +1924,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $term
+     *
      * @return list<UserListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
@@ -1935,6 +1993,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Update basic user profile info when logged with fb/gool
      *
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $username
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @return array{status: string}
@@ -1992,6 +2053,19 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Update user profile
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $birth_date
+     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param mixed $gender
+     * @omegaup-request-param mixed $graduation_date
+     * @omegaup-request-param mixed $locale
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $scholar_degree
+     * @omegaup-request-param mixed $school_id
+     * @omegaup-request-param mixed $school_name
+     * @omegaup-request-param mixed $state_id
+     * @omegaup-request-param mixed $username
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -2272,6 +2346,12 @@ class User extends \OmegaUp\Controllers\Controller {
      * If no username provided: Gets the top N users who have solved more problems
      * If username provided: Gets rank for username provided
      *
+     * @omegaup-request-param null|string $auth_token
+     * @omegaup-request-param mixed $filter
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $username
+     *
      * @return array{rank: int|list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total?: int, name?: string, problems_solved?: int}
      */
     public static function apiRankByProblemsSolved(\OmegaUp\Request $r): array {
@@ -2418,6 +2498,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the main email of the current user
      *
+     * @omegaup-request-param mixed $email
+     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
@@ -2511,6 +2593,14 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * This API does not need authentication to be used. This allows to track
      * contest updates with an access token.
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_admin
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $filter
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
      *
      * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
      */
@@ -2705,6 +2795,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Adds the role to the user.
      *
+     * @omegaup-request-param mixed $role
+     *
      * @return array{status: string}
      */
     public static function apiAddRole(\OmegaUp\Request $r): array {
@@ -2731,6 +2823,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Removes the role from the user.
      *
+     * @omegaup-request-param mixed $role
+     *
      * @return array{status: string}
      */
     public static function apiRemoveRole(\OmegaUp\Request $r): array {
@@ -2756,6 +2850,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Adds the identity to the group.
      *
+     * @omegaup-request-param mixed $group
+     *
      * @return array{status: string}
      */
     public static function apiAddGroup(\OmegaUp\Request $r): array {
@@ -2780,6 +2876,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Removes the user to the group.
      *
+     * @omegaup-request-param mixed $group
+     *
      * @return array{status: string}
      */
     public static function apiRemoveGroup(\OmegaUp\Request $r): array {
@@ -2800,6 +2898,9 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @omegaup-request-param mixed $experiment
+     */
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r): void {
         /** @var \OmegaUp\DAO\VO\Identities $r->identity */
         if (
@@ -2829,6 +2930,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Adds the experiment to the user.
      *
+     * @omegaup-request-param mixed $experiment
+     *
      * @return array{status: string}
      */
     public static function apiAddExperiment(\OmegaUp\Request $r): array {
@@ -2851,6 +2954,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Removes the experiment from the user.
+     *
+     * @omegaup-request-param mixed $experiment
      *
      * @return array{status: string}
      */
@@ -2988,6 +3093,10 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Keeps a record of a user who accepts the privacy policy
      *
+     * @omegaup-request-param mixed $privacy_git_object_id
+     * @omegaup-request-param mixed $statement_type
+     * @omegaup-request-param mixed $username
+     *
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
@@ -3037,6 +3146,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Associates an identity to the logged user given the username
+     *
+     * @omegaup-request-param mixed $password
+     * @omegaup-request-param mixed $username
      *
      * @param \OmegaUp\Request $r
      *
@@ -3152,6 +3264,10 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
+     * @omegaup-request-param mixed $filter
+     * @omegaup-request-param mixed $length
+     * @omegaup-request-param mixed $page
+     *
      * @return array{smartyProperties: array{rankTablePayload: array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}}, template: string}
      */
     public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
@@ -3223,6 +3339,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param mixed $date
+     *
      * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{all: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, female: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: true, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
@@ -3293,12 +3412,15 @@ class User extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
             ],
+            'bootstrap4' => false, //TODO: Esto cambiará pronto por eso lo dejo
             'template' => 'index.tpl',
         ];
     }
 
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
+     *
+     * @omegaup-request-param mixed $category
      *
      * @return array{smartyProperties: array{payload: array{codersOfCurrentMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, codersOfPreviousMonth: list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>, candidatesToCoderOfTheMonth: list<mixed>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}}, template: string}
      */

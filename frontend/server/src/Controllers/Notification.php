@@ -25,6 +25,8 @@ class Notification extends \OmegaUp\Controllers\Controller {
     /**
      * Updates notifications as read in database
      *
+     * @omegaup-request-param mixed $notifications
+     *
      * @return array{status: string}
      */
     public static function apiReadNotifications(\OmegaUp\Request $r) {

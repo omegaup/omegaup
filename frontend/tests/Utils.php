@@ -200,6 +200,8 @@ class Utils {
             'Contest_Log',
             'Contests',
             'Courses',
+            'Course_Identity_Request',
+            'Course_Identity_Request_History',
             'Emails',
             'Group_Roles',
             'Groups_Identities',

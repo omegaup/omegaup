@@ -73,7 +73,7 @@
             class="numericColumn"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
-            {{ coder.ProblemsSolved }}
+            {{ coder.problems_solved }}
           </td>
           <td
             class="numericColumn"
