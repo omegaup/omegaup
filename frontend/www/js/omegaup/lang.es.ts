@@ -296,6 +296,7 @@ const translations: { [key: string]: string; } = {
   courseEditGroupAdminsEmpty: "No hay grupos de administradores",
   courseEditRegisteredAdminRole: "Rol",
   courseEditStudents: "Estudiantes",
+  courseExamEmpty: "No hay ex\u00e1menes",
   courseGroupNotFound: "No se encontr\u00f3 el grupo del curso",
   courseInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
   courseList: "Lista de cursos",
