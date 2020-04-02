@@ -267,18 +267,20 @@
       font-size: 15px;
     }
 
-    a.nav-link {
-      color: $black;
-
+    .nav-item {
       &.active {
-        color: $white;
+        font-weight: bold;
       }
 
-      padding-left: 15px;
-      padding-right: 15px;
+      a.nav-link {
+        color: $white;
 
-      &:hover {
-        color: rgba($white, 0.9);
+        padding-left: 15px;
+        padding-right: 15px;
+
+        &:hover {
+          color: rgba($black, 0.7);
+        }
       }
     }
 
