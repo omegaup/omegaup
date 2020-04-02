@@ -296,6 +296,7 @@ const translations: { [key: string]: string; } = {
   courseEditGroupAdminsEmpty: "(N0 admini57ra70r gr0up5)",
   courseEditRegisteredAdminRole: "(R013)",
   courseEditStudents: "(S7ud3n75)",
+  courseExamEmpty: "(N0 3xam5)",
   courseGroupNotFound: "(C0ur53 gr0up n07 f0und)",
   courseInvalidStartTime: "(Th3 57ar7 7im3 mu57 b3 b3f0r3 7h3 3nd 7im3.)",
   courseList: "(C0ur535 1i57)",
