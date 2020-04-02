@@ -30,7 +30,7 @@
               <a class="nav-link" href="/arena/">{{ T.navArena }}</a>
             </li>
             <li
-              class="nav-item dropdown"
+              class="nav-item dropdown nav-contests"
               v-bind:class="{ active: navbarSection === 'contests' }"
               v-if="isLoggedIn && isMainUserIdentity"
             >
@@ -58,7 +58,7 @@
               </div>
             </li>
             <li
-              class="nav-item dropdown"
+              class="nav-item dropdown nav-problems"
               v-bind:class="{ active: navbarSection === 'problems' }"
               v-if="isLoggedIn && isMainUserIdentity"
             >
@@ -97,7 +97,7 @@
               </div>
             </li>
             <li
-              class="nav-item dropdown"
+              class="nav-item dropdown nav-problems"
               v-bind:class="{ active: navbarSection === 'problems' }"
               v-else=""
             >
@@ -121,7 +121,7 @@
               </div>
             </li>
             <li
-              class="nav-item dropdown"
+              class="nav-item dropdown nav-rank"
               v-bind:class="{ active: navbarSection === 'rank' }"
             >
               <a
@@ -144,7 +144,7 @@
               </div>
             </li>
             <li
-              class="nav-item"
+              class="nav-item nav-courses"
               v-bind:class="{ active: navbarSection === 'courses' }"
             >
               <a class="nav-link" href="/schools/">{{ T.navCourses }}</a>
@@ -180,9 +180,9 @@
               v-bind:notifications="notifications"
             ></omegaup-notification-list>
             -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown nav-user">
               <a
-                class="nav-link dropdown-toggle nav-user"
+                class="nav-link dropdown-toggle nav-user-link"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
@@ -268,16 +268,21 @@
     }
 
     a.nav-link {
-      color: $white;
+      color: $black;
+
+      &.active {
+        color: $white;
+      }
+
       padding-left: 15px;
       padding-right: 15px;
 
       &:hover {
-        color: rgba(0, 0, 0, 0.7);
+        color: rgba($white, 0.9);
       }
     }
 
-    .nav-user {
+    .nav-user-link {
       padding: 0 15px;
       img.gravatar-img {
         width: 45px;
