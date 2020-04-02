@@ -126,18 +126,27 @@ class Method {
     public $returnType;
 
     /**
+     * @var array<string, string>|string
+     * @readonly
+     */
+    public $responseTypeMapping;
+
+    /**
      * @param list<RequestParam> $requestParams
+     * @param array<string, string>|string $responseTypeMapping
      */
     public function __construct(
         string $apiTypePrefix,
         string $docstringComment,
         $requestParams,
-        ConversionResult $returnType
+        ConversionResult $returnType,
+        $responseTypeMapping
     ) {
         $this->apiTypePrefix = $apiTypePrefix;
         $this->docstringComment = $docstringComment;
         $this->requestParams = $requestParams;
         $this->returnType = $returnType;
+        $this->responseTypeMapping = $responseTypeMapping;
     }
 }
 
@@ -379,10 +388,11 @@ class TypeMapper {
     /**
      * @param array{description: string, specials: array<string, array<int, string>>} $docComment
      */
-    public function getReturnType(
+    public function convertMethod(
         \ReflectionMethod $reflectionMethod,
-        $docComment
-    ): ConversionResult {
+        $docComment,
+        string $controllerClassBasename
+    ): Method {
         $returns = $docComment['specials']['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
@@ -398,11 +408,52 @@ class TypeMapper {
                 break;
             }
         }
-        return $this->convertTypeToTypeScript(
-            \Psalm\Type::parseString($returnTypeString),
+        $unionType = \Psalm\Type::parseString($returnTypeString);
+        $methodName = (
             $reflectionMethod->getDeclaringClass()->getName() .
             '::' .
             $reflectionMethod->getName()
+        );
+        if (!$unionType->isSingle()) {
+            throw new Exception(
+                "Method {$methodName} does not return a single type! {$unionType}"
+            );
+        }
+
+        $conversionResult = $this->convertTypeToTypeScript(
+            $unionType,
+            $methodName
+        );
+        $returnType = array_values($unionType->getAtomicTypes())[0];
+        if ($returnType instanceof \Psalm\Type\Atomic\ObjectLike) {
+            /** @var array<string, string> */
+            $responseTypeMapping = [];
+            foreach ($returnType->properties as $propertyName => $propertyType) {
+                if ($propertyName == 'status') {
+                    continue;
+                }
+                $responseTypeMapping[strval(
+                    $propertyName
+                )] = $this->convertTypeToTypeScript(
+                    $propertyType,
+                    $methodName,
+                    [strval($propertyName)]
+                )->typescriptExpansion;
+            }
+        } else {
+            $responseTypeMapping = $conversionResult->typescriptExpansion;
+        }
+        return new Method(
+            $controllerClassBasename . substr(
+                $reflectionMethod->name,
+                3
+            ),
+            $docComment['description'],
+            RequestParam::parse(
+                $docComment['specials']['omegaup-request-param'] ?? []
+            ),
+            $conversionResult,
+            $responseTypeMapping
         );
     }
 }
@@ -476,28 +527,17 @@ class APIGenerator {
             $docComment = \Psalm\DocComment::parse(
                 $reflectionMethod->getDocComment()
             );
-            $conversionResult = $this->typeMapper->getReturnType(
-                $reflectionMethod,
-                $docComment
-            );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
             ) . substr(
                 $reflectionMethod->name,
                 4
             );
-            $method = new Method(
-                $controllerClassBasename . substr(
-                    $reflectionMethod->name,
-                    3
-                ),
-                $docComment['description'],
-                RequestParam::parse(
-                    $docComment['specials']['omegaup-request-param'] ?? []
-                ),
-                $conversionResult
+            $controller->methods[$apiMethodName] = $this->typeMapper->convertMethod(
+                $reflectionMethod,
+                $docComment,
+                $controllerClassBasename
             );
-            $controller->methods[$apiMethodName] = $method;
         }
 
         if (empty($controller->methods)) {
@@ -749,9 +789,19 @@ EOD;
                 }
 
                 echo "### Returns\n\n";
-                echo "```typescript\n";
-                echo "{$method->returnType->typescriptExpansion}\n";
-                echo "```\n\n";
+                if (empty($method->responseTypeMapping)) {
+                    echo "_Nothing_\n";
+                } elseif (is_string($method->responseTypeMapping)) {
+                    echo "```typescript\n";
+                    echo "{$method->returnType->typescriptExpansion}\n";
+                    echo "```\n\n";
+                } else {
+                    echo "| Name | Type |\n";
+                    echo "|------|------|\n";
+                    foreach ($method->responseTypeMapping as $paramName => $paramType) {
+                        echo "| `{$paramName}` | `{$paramType}` |\n";
+                    }
+                }
             }
         }
     }
