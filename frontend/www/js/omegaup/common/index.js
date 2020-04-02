@@ -1,4 +1,5 @@
 import common_Index from '../components/common/Index.vue';
+import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as UI from '../ui';
