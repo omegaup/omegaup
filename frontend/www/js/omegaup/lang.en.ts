@@ -288,6 +288,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddStudentsTooltip: "Add students using their omegaUp username",
   courseEditAdmins: "Administrators",
   courseEditAdminsEmpty: "No administrators",
+  courseEditAdmissionModeDescription: "Select course admission mode. There are two different modalities:<br /><ul><li>Private: Course does not appear in any list, users can not access it, unless they have been explicitly invited.</li><li>Registration/open: Anyone can join after registering, but only previously admitted people can officially participate in the course.</li></ul>",
   courseEditClone: "Clone",
   courseEditCourseClonedSuccessfully: "Your course has been cloned successfully! <a href=\"/course/%(course_alias)/edit/\">Edit course</a>",
   courseEditCourseEdited: "Your course has been edited",

@@ -4,6 +4,7 @@ import course_AssignmentDetails from '../components/course/AssignmentDetails.vue
 import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Form from '../components/course/Form.vue';
 import course_ProblemList from '../components/course/ProblemList.vue';
+import common_Publish from '../components/common/Publish.vue';
 import course_Clone from '../components/course/Clone.vue';
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
@@ -486,6 +487,35 @@ OmegaUp.on('ready', function() {
     },
   });
 
+  let publish = new Vue({
+    el: '#publish div',
+    render: function(createElement) {
+      return createElement('omegaup-common-publish', {
+        props: {
+          initialAdmissionMode: this.admissionMode,
+          eventType: this.eventType,
+          isCurator: this.isCurator,
+        },
+        on: {
+          'emit-update-admission-mode': function(publishComponent) {
+            API.Course.update({
+              course_alias: courseAlias,
+              admission_mode: publishComponent.admissionMode,
+            })
+              .then(() => {
+                UI.success(T.courseEditCourseEdited);
+              })
+              .catch(UI.apiError);
+          },
+        },
+      });
+    },
+    data: { admissionMode: null, isCurator: false, eventType: 'course' },
+    components: {
+      'omegaup-common-publish': common_Publish,
+    },
+  });
+
   var addStudents = new Vue({
     el: '#students div',
     render: function(createElement) {
@@ -614,6 +644,8 @@ OmegaUp.on('ready', function() {
         .text(course.name)
         .attr('href', '/course/' + courseAlias + '/');
       details.course = course;
+      publish.admissionMode = course.admission_mode;
+      publish.isCurator = course.isCurator;
       clone.initialName = course.name;
     })
     .catch(UI.apiError);

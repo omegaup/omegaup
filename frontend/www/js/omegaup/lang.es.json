@@ -287,6 +287,7 @@
 	"courseEditAddStudentsTooltip": "Agrega estudiantes utilizando su nombre de usuario de omegaUp",
 	"courseEditAdmins": "Administradores",
 	"courseEditAdminsEmpty": "No hay administradores",
+	"courseEditAdmissionModeDescription": "Selecciona el modo de acceso del curso. Existen dos modalidades distintas:<br /><ul><li>Privado: El curso no aparece en ninguna lista y los usuarios no pueden acceder a \u00e9l a menos que hayan sido invitados expl\u00edcitamente.</li><li>Registro/abierto: Cualquiera puede participar despu\u00e9s de haberse registrado, pero s\u00f3lo las personas previamente admitidas pueden participar oficialmente en el curso.</li></ul>",
 	"courseEditClone": "Clonar",
 	"courseEditCourseClonedSuccessfully": "\u00a1Tu curso ha sido clonado exitosamente! <a href=\"/course/%(course_alias)/edit/\">Editar curso</a>",
 	"courseEditCourseEdited": "Tu curso ha sido editado!",

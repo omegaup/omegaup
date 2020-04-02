@@ -81,12 +81,13 @@
         </omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active" v-if="showTab === 'publish'">
-        <omegaup-contest-publish
-          v-bind:data="contest"
+        <omegaup-common-publish
+          v-bind:initialAdmissionMode="contest.admission_mode"
+          v-bind:eventType="'contest'"
           v-on:emit-update-admission-mode="
             publishComponent => $emit('update-admission-mode', publishComponent)
           "
-        ></omegaup-contest-publish>
+        />
       </div>
       <div class="tab-pane active contestants" v-if="showTab === 'contestants'">
         <omegaup-contest-contestant
@@ -173,7 +174,7 @@ import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from './GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import contest_Publish from './Publish.vue';
+import common_Publish from '../common/Publish.vue';
 
 interface ContestEdit {
   admins: omegaup.UserRole[];
@@ -196,7 +197,7 @@ interface ContestEdit {
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
-    'omegaup-contest-publish': contest_Publish,
+    'omegaup-common-publish': common_Publish,
   },
 })
 export default class Edit extends Vue {

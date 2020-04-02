@@ -12,6 +12,7 @@
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
 		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
+		<li><a href="#publish" data-toggle="tab">{#contestNewFormAdmissionMode#}</a></li>
 		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
 		<li><a href="#admins" data-toggle="tab">{#courseEditAdmins#}</a></li>
 		<li><a href="#clone" data-toggle="tab">{#courseEditClone#}</a></li>
@@ -27,6 +28,9 @@
 		<div class="tab-pane" id="problems">
 			<div class="list"></div>
 			<div class="form"></div>
+		</div>
+		<div class="tab-pane" id="publish">
+			<div></div>
 		</div>
 		<div class="tab-pane" id="students">
 			<div></div>
