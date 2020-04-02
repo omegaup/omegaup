@@ -323,11 +323,12 @@ OmegaUp.on('ready', function() {
         },
         methods: {
           arbitrateRequest: function(ev, username, resolution) {
+            const resolutionText = resolution ? 'Accepted' : 'rejected';
             omegaup.API.Contest.arbitrateRequest({
               contest_alias: contestAlias,
               username: username,
               resolution: resolution,
-              note: '',
+              note: resolutionText,
             })
               .then(function(response) {
                 UI.success(T.successfulOperation);

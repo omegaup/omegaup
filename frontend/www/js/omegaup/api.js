@@ -221,6 +221,8 @@ export default {
 
     assignmentScoreboard: api.Course.assignmentScoreboard,
 
+    arbitrateRequest: api.Course.arbitrateRequest,
+
     clone: api.Course.clone,
 
     create: api.Course.create,
@@ -314,6 +316,8 @@ export default {
     removeProblem: api.Course.removeProblem,
 
     removeStudent: api.Course.removeStudent,
+
+    requests: api.Course.requests,
 
     runs: api.apiCall('/api/course/runs/', _convertRuntimes),
 

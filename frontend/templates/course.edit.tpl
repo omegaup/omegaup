@@ -33,7 +33,8 @@
 			<div></div>
 		</div>
 		<div class="tab-pane" id="students">
-			<div></div>
+			<div class="requests"></div>
+			<div class="list"></div>
 		</div>
 		<div class="tab-pane" id="admins">
 			<div></div>

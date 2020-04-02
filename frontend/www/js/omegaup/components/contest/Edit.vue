@@ -101,7 +101,7 @@
           "
           v-on:emit-save-end-time="selected => $emit('save-end-time', selected)"
         ></omegaup-contest-contestant>
-        <omegaup-contest-requests
+        <omegaup-common-requests
           v-bind:data="requests"
           v-bind:text-add-participant="T.contestAdduserAddContestant"
           v-on:emit-accept-request="
@@ -112,7 +112,7 @@
             (requestsComponent, username) =>
               $emit('deny-request', requestsComponent, username)
           "
-        ></omegaup-contest-requests>
+        ></omegaup-common-requests>
         <omegaup-contest-groups
           v-bind:data="groups"
           v-if="isIdentitiesExperimentEnabled"
@@ -192,7 +192,7 @@ interface ContestEdit {
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-contestant': contest_Contestant,
-    'omegaup-contest-requests': common_Requests,
+    'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,

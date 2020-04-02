@@ -516,15 +516,20 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  var addStudents = new Vue({
-    el: '#students div',
+  let addStudents = new Vue({
+    el: '#students div.list',
     render: function(createElement) {
       return createElement('omegaup-course-addstudents', {
         props: {
           students: this.students,
           courseAlias: courseAlias,
+          data: this.data,
         },
         on: {
+          'accept-request': (ev, username) =>
+            this.arbitrateRequest(ev, username, true),
+          'deny-request': (ev, username) =>
+            this.arbitrateRequest(ev, username, false),
           'add-student': function(ev) {
             let participants = [];
             if (ev.participants !== '')
@@ -576,8 +581,21 @@ OmegaUp.on('ready', function() {
         },
       });
     },
-    data: {
-      students: [],
+    data: { students: [], data: [] },
+    methods: {
+      arbitrateRequest: (ev, username, resolution) => {
+        omegaup.API.Course.arbitrateRequest({
+          course_alias: courseAlias,
+          username: username,
+          resolution: resolution,
+          note: '',
+        })
+          .then(response => {
+            UI.success(T.successfulOperation);
+            refreshStudentList();
+          })
+          .catch(UI.apiError);
+      },
     },
     components: {
       'omegaup-course-addstudents': course_AddStudents,
@@ -654,6 +672,11 @@ OmegaUp.on('ready', function() {
     API.Course.listStudents({ course_alias: courseAlias })
       .then(function(data) {
         addStudents.students = data.students;
+      })
+      .catch(UI.apiError);
+    API.Course.requests({ course_alias: courseAlias })
+      .then(function(data) {
+        addStudents.data = data.users;
       })
       .catch(UI.apiError);
   }
