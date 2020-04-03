@@ -8,7 +8,7 @@ OmegaUp.on('ready', function() {
     document.getElementById('rank-table-payload').innerText,
   );
 
-  omegaup.API.User.rankByProblemsSolved({
+  API.User.rankByProblemsSolved({
     offset: payload.page,
     rowcount: payload.length,
     filter: payload.filter,

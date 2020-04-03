@@ -14,7 +14,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: function(newEmail) {
-            omegaup.API.User.updateMainEmail({ email: newEmail })
+            API.User.updateMainEmail({ email: newEmail })
               .then(function(response) {
                 UI.success(T.userEditSuccessfulEmailUpdate);
               })
