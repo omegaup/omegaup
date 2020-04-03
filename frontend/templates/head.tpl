@@ -93,7 +93,7 @@
 	{else}
 		{include file='common.navbar.tpl' headerPayload=[] inline}
 	{/if}
-	<main role="main" class="mt-3">
+	<main role="main">
 		{if !isset($inArena) || !$inArena}
 			{include file='mainmenu.tpl' inline}
 		{/if}
