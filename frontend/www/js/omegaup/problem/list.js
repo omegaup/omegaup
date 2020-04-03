@@ -7,7 +7,7 @@ import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  omegaup.API.Tag.list({ query: '' })
+  API.Tag.list({ query: '' })
     .then(tagData => {
       let problemsList = new Vue({
         el: '#problem-list',
