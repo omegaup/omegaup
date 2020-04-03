@@ -1,6 +1,6 @@
 <template>
-  <div class="nav-container fixed-top">
-    <div class="omegaup-container">
+  <header class="nav-container fixed-top">
+    <div class="container-xl">
       <nav class="navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand" href="/">
           <img alt="omegaUp" src="/media/omegaup_curves.png" />
@@ -239,32 +239,33 @@
         </div>
       </nav>
     </div>
-  </div>
+  </header>
 </template>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+header.nav-container {
+  .container-xl {
+    padding-left: 0; // Permite que el logo esté al extremo izquierdo en pantallas pequeñas
+  }
 
-#root .nav-container {
   background-color: $header-primary-color;
 
   nav.navbar {
-    font-size: 15px;
     padding: 0;
 
     .navbar-brand {
       margin: 0;
       padding: 10px 15px;
+      background-color: $white;
+      background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
       img {
         height: 20px;
       }
-      background-color: $white;
-      background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
     }
 
     .dropdown-menu {
       padding: 5px 0;
-      font-size: 15px;
     }
 
     .nav-item {
@@ -274,7 +275,6 @@
 
       a.nav-link {
         color: $white;
-
         padding-left: 15px;
         padding-right: 15px;
 

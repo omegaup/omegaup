@@ -1,5 +1,5 @@
 body {
-  padding-top: 60px; // Espacio para el navbar
+  padding-top: 51px; // FIXME: eliminar cuando no se use más BS3
 }
 
 // Cambio de background al pasar el mouse sobre las pestañas o al
@@ -54,10 +54,4 @@ body {
 	display: block;
 	height: 51px;
 	margin: -51px 0 0;
-}
-
-.omegaup-container {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
