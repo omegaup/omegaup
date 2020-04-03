@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominación a promoción / democión de problemas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La cola de nominación a promoción / democión de problemas';
 
 ALTER TABLE `QualityNominations`
   ADD CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Reviewers` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
   PRIMARY KEY (`qualitynomination_id`, `user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominación';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La lista de revisores para cada nominación';
 
 ALTER TABLE `QualityNomination_Reviewers`
   ADD CONSTRAINT `fk_qnr_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Comments` (
   PRIMARY KEY (`qualitynomination_comment_id`),
   KEY `user_id` (`user_id`),
   KEY `qualitynomination_id` (`qualitynomination_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominación';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Comentarios para una nominación';
 
 ALTER TABLE `QualityNomination_Comments`
   ADD CONSTRAINT `fk_qnc_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

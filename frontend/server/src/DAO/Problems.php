@@ -109,7 +109,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
-        $collation = ($orderBy === 'title') ? 'COLLATE utf8_bin' : '';
+        $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
         $select = '';
         $sql = '';
         $args = [];
