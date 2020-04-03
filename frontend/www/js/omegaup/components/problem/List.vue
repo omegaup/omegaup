@@ -1,5 +1,15 @@
 <template>
   <div>
+    <omegaup-problem-search-bar
+      v-bind:initialLanguage="language"
+      v-bind:languages="languages"
+      v-bind:initialKeyword="keyword"
+      v-bind:modes="modes"
+      v-bind:columns="columns"
+      v-bind:initialMode="mode"
+      v-bind:initialColumn="column"
+      v-bind:tags="tags"
+    ></omegaup-problem-search-bar>
     <a class="show-finder-button" v-on:click="showFinderWizard = true">{{
       T.wizardLinkText
     }}</a>
@@ -140,11 +150,13 @@ import { types } from '../../api_types';
 import * as UI from '../../ui';
 import common_Paginator from '../common/Paginator.vue';
 import problem_FinderWizard from './FinderWizard.vue';
+import problem_SearchBar from './SearchBar.vue';
 
 @Component({
   components: {
     'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-problem-search-bar': problem_SearchBar,
   },
 })
 export default class ProblemList extends Vue {
@@ -153,6 +165,14 @@ export default class ProblemList extends Vue {
   @Prop() currentTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
+  @Prop() language!: string;
+  @Prop() languages!: string[];
+  @Prop() keyword!: string;
+  @Prop() modes!: string[];
+  @Prop() columns!: string[];
+  @Prop() mode!: string;
+  @Prop() column!: string;
+  @Prop() tags!: string[];
 
   T = T;
   UI = UI;

@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
         on: {
           'change-experiment': function(experiment) {
             if (experiment.selected) {
-              omegaup.API.User.addExperiment({
+              API.User.addExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
                 })
                 .catch(UI.apiError);
             } else {
-              omegaup.API.User.removeExperiment({
+              API.User.removeExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
           },
           'change-role': function(role) {
             if (role.selected) {
-              omegaup.API.User.addRole({
+              API.User.addRole({
                 username: payload.username,
                 role: role.value.name,
               })
@@ -54,7 +54,7 @@ OmegaUp.on('ready', function() {
                 })
                 .catch(UI.apiError);
             } else {
-              omegaup.API.User.removeRole({
+              API.User.removeRole({
                 username: payload.username,
                 role: role.value.name,
               })
@@ -65,7 +65,7 @@ OmegaUp.on('ready', function() {
             }
           },
           'verify-user': function() {
-            omegaup.API.User.verifyEmail({ usernameOrEmail: payload.username })
+            API.User.verifyEmail({ usernameOrEmail: payload.username })
               .then(function() {
                 adminUser.verified = true;
               })

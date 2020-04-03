@@ -7,7 +7,7 @@ import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  omegaup.API.Tag.list({ query: '' })
+  API.Tag.list({ query: '' })
     .then(tagData => {
       let problemsList = new Vue({
         el: '#problem-list',
@@ -19,6 +19,14 @@ OmegaUp.on('ready', function() {
               currentTags: this.currentTags,
               pagerItems: this.pagerItems,
               wizardTags: tagData,
+              language: this.language,
+              languages: this.languages,
+              keyword: this.keyword,
+              modes: this.modes,
+              columns: this.columns,
+              mode: this.mode,
+              column: this.column,
+              tags: this.tags,
             },
             on: {
               'wizard-search': function(queryParameters) {
@@ -33,6 +41,14 @@ OmegaUp.on('ready', function() {
           currentTags: payload.currentTags,
           pagerItems: payload.pagerItems,
           wizardTags: {},
+          language: payload.language,
+          languages: payload.languages,
+          keyword: payload.keyword,
+          modes: payload.modes,
+          columns: payload.columns,
+          mode: payload.mode,
+          column: payload.column,
+          tags: payload.tags,
         },
         components: {
           'omegaup-problem-list': problem_List,

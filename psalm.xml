@@ -30,4 +30,8 @@
        <file name="frontend/server/libs/third_party/stubs/phpunit.php" />
        <file name="frontend/server/libs/third_party/stubs/smarty.php" />
     </stubs>
+
+    <plugins>
+        <plugin filename="frontend/server/src/Psalm/RequestParamChecker.php" />
+    </plugins>
 </psalm>

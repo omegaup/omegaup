@@ -10,7 +10,7 @@ class ConversionResult {
      * @var string
      * @readonly
      */
-    public $expansion;
+    public $typescriptExpansion;
 
     /**
      * @var ?string
@@ -19,11 +19,84 @@ class ConversionResult {
     public $conversionFunction;
 
     public function __construct(
-        string $expansion,
+        string $typescriptExpansion,
         ?string $conversionFunction = null
     ) {
-        $this->expansion = $expansion;
+        $this->typescriptExpansion = $typescriptExpansion;
         $this->conversionFunction = $conversionFunction;
+    }
+}
+
+class RequestParam {
+    /**
+     * @var string
+     * @readonly
+     */
+    public $type;
+
+    /**
+     * @var string
+     * @readonly
+     */
+    public $name;
+
+    /**
+     * @var null|string
+     */
+    public $description;
+
+    public function __construct(
+        string $type,
+        string $name,
+        ?string $description
+    ) {
+        $this->type = $type;
+        $this->name = $name;
+        $this->description = $description;
+    }
+
+    /**
+     * @param array<int, string> $stringParams
+     *
+     * @return list<RequestParam>
+     */
+    public static function parse($stringParams) {
+        $result = [];
+        foreach ($stringParams as $stringParam) {
+            if (
+                preg_match(
+                    '/^([^$]+)\s+\$([_a-zA-Z]\S*)\s*(\S.*)?$/',
+                    $stringParam,
+                    $matches,
+                    PREG_UNMATCHED_AS_NULL
+                ) !== 1
+            ) {
+                continue;
+            }
+            if (count($matches) == 4) {
+                /** @var array{0: string, 1: string, 2: string, 3: ?string} $matches */
+                [
+                    $_,
+                    $annotationType,
+                    $annotationVariable,
+                    $annotationDescription,
+                ] = $matches;
+            } else {
+                /** @var array{0: string, 1: string, 2: string} $matches */
+                [
+                    $_,
+                    $annotationType,
+                    $annotationVariable,
+                ] = $matches;
+                $annotationDescription = null;
+            }
+            $result[] = new RequestParam(
+                $annotationType,
+                $annotationVariable,
+                $annotationDescription
+            );
+        }
+        return $result;
     }
 }
 
@@ -41,18 +114,39 @@ class Method {
     public $docstringComment = '';
 
     /**
+     * @var list<RequestParam>
+     * @readonly
+     */
+    public $requestParams = [];
+
+    /**
      * @var ConversionResult
      * @readonly
      */
     public $returnType;
 
+    /**
+     * @var array<string, string>|string
+     * @readonly
+     */
+    public $responseTypeMapping;
+
+    /**
+     * @param list<RequestParam> $requestParams
+     * @param array<string, string>|string $responseTypeMapping
+     */
     public function __construct(
         string $apiTypePrefix,
         string $docstringComment,
-        ConversionResult $returnType
+        $requestParams,
+        ConversionResult $returnType,
+        $responseTypeMapping
     ) {
         $this->apiTypePrefix = $apiTypePrefix;
+        $this->docstringComment = $docstringComment;
+        $this->requestParams = $requestParams;
         $this->returnType = $returnType;
+        $this->responseTypeMapping = $responseTypeMapping;
     }
 }
 
@@ -130,7 +224,7 @@ class TypeMapper {
                                 "Property {$path}.{$propertyName} is non-string: {$propertyType}"
                             );
                         }
-                        if ($path == '' && $propertyName == 'status') {
+                        if (empty($propertyPath) && $propertyName == 'status') {
                             // Omit this.
                             continue;
                         }
@@ -162,7 +256,7 @@ class TypeMapper {
                         if ($isNullable) {
                             $propertyName .= '?';
                         }
-                        $propertyTypes[] = "{$propertyName}: {$conversionResult->expansion};";
+                        $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
                     $conversionFunction[] = 'x => { ' . join(
                         ' ',
@@ -181,7 +275,7 @@ class TypeMapper {
                             "x => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
                         );
                     }
-                    $typeNames[] = "{$conversionResult->expansion}[]";
+                    $typeNames[] = "{$conversionResult->typescriptExpansion}[]";
                 } elseif ($type instanceof \Psalm\Type\Atomic\TArray) {
                     if (count($type->type_params) != 2) {
                         throw new \Exception(
@@ -199,7 +293,7 @@ class TypeMapper {
                             $methodName,
                             $propertyPath
                         );
-                        $typeNames[] = "{ [key: string]: {$conversionResult->expansion}; }";
+                        $typeNames[] = "{ [key: string]: {$conversionResult->typescriptExpansion}; }";
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
@@ -214,7 +308,7 @@ class TypeMapper {
                             $methodName,
                             $propertyPath
                         );
-                        $typeNames[] = "{ [key: number]: {$conversionResult->expansion}; }";
+                        $typeNames[] = "{ [key: number]: {$conversionResult->typescriptExpansion}; }";
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
@@ -294,10 +388,11 @@ class TypeMapper {
     /**
      * @param array{description: string, specials: array<string, array<int, string>>} $docComment
      */
-    public function getReturnType(
+    public function convertMethod(
         \ReflectionMethod $reflectionMethod,
-        $docComment
-    ): ConversionResult {
+        $docComment,
+        string $controllerClassBasename
+    ): Method {
         $returns = $docComment['specials']['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
@@ -313,11 +408,52 @@ class TypeMapper {
                 break;
             }
         }
-        return $this->convertTypeToTypeScript(
-            \Psalm\Type::parseString($returnTypeString),
+        $unionType = \Psalm\Type::parseString($returnTypeString);
+        $methodName = (
             $reflectionMethod->getDeclaringClass()->getName() .
             '::' .
             $reflectionMethod->getName()
+        );
+        if (!$unionType->isSingle()) {
+            throw new Exception(
+                "Method {$methodName} does not return a single type! {$unionType}"
+            );
+        }
+
+        $conversionResult = $this->convertTypeToTypeScript(
+            $unionType,
+            $methodName
+        );
+        $returnType = array_values($unionType->getAtomicTypes())[0];
+        if ($returnType instanceof \Psalm\Type\Atomic\ObjectLike) {
+            /** @var array<string, string> */
+            $responseTypeMapping = [];
+            foreach ($returnType->properties as $propertyName => $propertyType) {
+                if ($propertyName == 'status') {
+                    continue;
+                }
+                $responseTypeMapping[strval(
+                    $propertyName
+                )] = $this->convertTypeToTypeScript(
+                    $propertyType,
+                    $methodName,
+                    [strval($propertyName)]
+                )->typescriptExpansion;
+            }
+        } else {
+            $responseTypeMapping = $conversionResult->typescriptExpansion;
+        }
+        return new Method(
+            $controllerClassBasename . substr(
+                $reflectionMethod->name,
+                3
+            ),
+            $docComment['description'],
+            RequestParam::parse(
+                $docComment['specials']['omegaup-request-param'] ?? []
+            ),
+            $conversionResult,
+            $responseTypeMapping
         );
     }
 }
@@ -356,10 +492,10 @@ class APIGenerator {
                 );
                 if (
                     isset($this->typeMapper->typeAliases[$typeName]) &&
-                    $this->typeMapper->typeAliases[$typeName]->expansion != $conversionResult->expansion
+                    $this->typeMapper->typeAliases[$typeName]->typescriptExpansion != $conversionResult->typescriptExpansion
                 ) {
                     throw new \Exception(
-                        "Mismatched definition of `@psalm-type {$typeAlias}`. Previous definition was {$conversionResult->expansion}."
+                        "Mismatched definition of `@psalm-type {$typeAlias}`. Previous definition was {$conversionResult->typescriptExpansion}."
                     );
                 }
                 $this->typeMapper->typeAliases[$typeName] = $conversionResult;
@@ -391,25 +527,17 @@ class APIGenerator {
             $docComment = \Psalm\DocComment::parse(
                 $reflectionMethod->getDocComment()
             );
-            $conversionResult = $this->typeMapper->getReturnType(
-                $reflectionMethod,
-                $docComment
-            );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
             ) . substr(
                 $reflectionMethod->name,
                 4
             );
-            $method = new Method(
-                $controllerClassBasename . substr(
-                    $reflectionMethod->name,
-                    3
-                ),
-                $docComment['description'],
-                $conversionResult
+            $controller->methods[$apiMethodName] = $this->typeMapper->convertMethod(
+                $reflectionMethod,
+                $docComment,
+                $controllerClassBasename
             );
-            $controller->methods[$apiMethodName] = $method;
         }
 
         if (empty($controller->methods)) {
@@ -460,7 +588,7 @@ class APIGenerator {
                     ] = $localTypeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
-                    )->expansion;
+                    )->typescriptExpansion;
                 }
                 ksort($properties);
                 foreach ($properties as $propertyTypeName => $propertyTypeExpansion) {
@@ -476,7 +604,7 @@ class APIGenerator {
             echo "export namespace types {\n";
             ksort($this->typeMapper->typeAliases);
             foreach ($this->typeMapper->typeAliases as $typeName => $conversionResult) {
-                echo "  export interface {$typeName} {$conversionResult->expansion};\n\n";
+                echo "  export interface {$typeName} {$conversionResult->typescriptExpansion};\n\n";
             }
             echo "}\n";
         }
@@ -497,7 +625,7 @@ class APIGenerator {
                 if (!is_null($method->returnType->conversionFunction)) {
                     echo "  export type _{$method->apiTypePrefix}ServerResponse = any\n";
                 }
-                echo "  export type {$method->apiTypePrefix}Response = {$method->returnType->expansion};\n";
+                echo "  export type {$method->apiTypePrefix}Response = {$method->returnType->typescriptExpansion};\n";
             }
             echo "\n";
         }
@@ -626,22 +754,54 @@ EOD;
     public function generateDocumentation(): void {
         ksort($this->controllers);
         foreach ($this->controllers as $controller) {
+            echo (
+                "- [{$controller->classBasename}](#" .
+                strtolower($controller->classBasename) .
+                ")\n"
+            );
+            ksort($controller->methods);
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo (
+                    "  - [`/api/{$controller->apiName}/{$apiMethodName}/`](#" .
+                    strtolower("api{$controller->apiName}{$apiMethodName}") .
+                    ")\n"
+                );
+            }
+        }
+        echo "\n";
+
+        foreach ($this->controllers as $controller) {
             echo "# {$controller->classBasename}\n\n";
             echo "{$controller->docstringComment}\n\n";
-            ksort($controller->methods);
             foreach ($controller->methods as $apiMethodName => $method) {
                 echo "## `/api/{$controller->apiName}/{$apiMethodName}/`\n\n";
 
-                echo "### Descripción\n\n";
+                echo "### Description\n\n";
                 echo "{$method->docstringComment}\n\n";
 
-                echo "### Parámetros\n\n";
-                echo "_Por documentar_\n\n";
+                if (!empty($method->requestParams)) {
+                    echo "### Parameters\n\n";
+                    echo "| Name | Type | Description |\n";
+                    echo "|------|------|-------------|\n";
+                    foreach ($method->requestParams as $requestParam) {
+                        echo "| `{$requestParam->name}` | `{$requestParam->type}` | {$requestParam->description} |\n";
+                    }
+                }
 
-                echo "### Regresa\n\n";
-                echo "```typescript\n";
-                echo "{$method->returnType->expansion}\n";
-                echo "```\n\n";
+                echo "### Returns\n\n";
+                if (empty($method->responseTypeMapping)) {
+                    echo "_Nothing_\n";
+                } elseif (is_string($method->responseTypeMapping)) {
+                    echo "```typescript\n";
+                    echo "{$method->returnType->typescriptExpansion}\n";
+                    echo "```\n\n";
+                } else {
+                    echo "| Name | Type |\n";
+                    echo "|------|------|\n";
+                    foreach ($method->responseTypeMapping as $paramName => $paramType) {
+                        echo "| `{$paramName}` | `{$paramType}` |\n";
+                    }
+                }
             }
         }
     }

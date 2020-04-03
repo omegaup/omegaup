@@ -97,7 +97,7 @@ OmegaUp.on('ready', function() {
             ) {
               return;
             }
-            omegaup.API.Course.removeAssignment({
+            API.Course.removeAssignment({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
             })
@@ -138,7 +138,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'add-admin': function(useradmin) {
-            omegaup.API.Course.addAdmin({
+            API.Course.addAdmin({
               course_alias: courseAlias,
               usernameOrEmail: useradmin,
             })
@@ -149,7 +149,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'add-group-admin': function(groupadmin) {
-            omegaup.API.Course.addGroupAdmin({
+            API.Course.addGroupAdmin({
               course_alias: courseAlias,
               group: groupadmin,
             })
@@ -203,7 +203,7 @@ OmegaUp.on('ready', function() {
             ) {
               return;
             }
-            omegaup.API.Course.removeAssignment({
+            API.Course.removeAssignment({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
             })
@@ -219,7 +219,7 @@ OmegaUp.on('ready', function() {
             for (let homework of homeworks) {
               homework.order = index++;
             }
-            omegaup.API.Course.updateAssignmentsOrder({
+            API.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: homeworks,
             }).catch(UI.apiError);
@@ -229,7 +229,7 @@ OmegaUp.on('ready', function() {
             for (let test of tests) {
               test.order = index++;
             }
-            omegaup.API.Course.updateAssignmentsOrder({
+            API.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: tests,
             })
@@ -274,7 +274,7 @@ OmegaUp.on('ready', function() {
                 params.finish_time = ev.finishTime.getTime() / 1000;
               }
 
-              omegaup.API.Course.updateAssignment(params)
+              API.Course.updateAssignment(params)
                 .then(function() {
                   UI.success(T.courseAssignmentUpdated);
                   refreshAssignmentsList();
@@ -299,7 +299,7 @@ OmegaUp.on('ready', function() {
                 params.finish_time = ev.finishTime.getTime() / 1000;
               }
 
-              omegaup.API.Course.createAssignment(params)
+              API.Course.createAssignment(params)
                 .then(function() {
                   UI.success(T.courseAssignmentAdded);
                   updateNewAssignmentButtonVisibility(true);
@@ -415,7 +415,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'add-problem': function(assignment, problemAlias) {
-            omegaup.API.Course.addProblem({
+            API.Course.addProblem({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
               problem_alias: problemAlias,
@@ -440,7 +440,7 @@ OmegaUp.on('ready', function() {
             ) {
               return;
             }
-            omegaup.API.Course.removeProblem({
+            API.Course.removeProblem({
               course_alias: courseAlias,
               problem_alias: problem.alias,
               assignment_alias: assignment.alias,
@@ -457,7 +457,7 @@ OmegaUp.on('ready', function() {
               problem.order = index;
               index++;
             }
-            omegaup.API.Course.updateProblemsOrder({
+            API.Course.updateProblemsOrder({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
               problems: assignmentProblems,
@@ -466,7 +466,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           tags: function(tags) {
-            omegaup.API.Problem.list({ tag: tags.join() })
+            API.Problem.list({ tag: tags.join() })
               .then(function(data) {
                 problemList.taggedProblems = data.results;
               })
@@ -561,7 +561,7 @@ OmegaUp.on('ready', function() {
         props: { initialAlias: courseAlias, initialName: this.initialName },
         on: {
           clone: function(ev) {
-            omegaup.API.Course.clone({
+            API.Course.clone({
               course_alias: courseAlias,
               name: ev.name,
               alias: ev.alias,
@@ -636,7 +636,7 @@ OmegaUp.on('ready', function() {
   }
 
   function refreshProblemList(assignment) {
-    omegaup.API.Course.getAssignment({
+    API.Course.getAssignment({
       assignment: assignment.alias,
       course: courseAlias,
     })
@@ -647,7 +647,7 @@ OmegaUp.on('ready', function() {
   }
 
   function refreshCourseAdmins() {
-    omegaup.API.Course.admins({ course_alias: courseAlias })
+    API.Course.admins({ course_alias: courseAlias })
       .then(function(data) {
         administrators.admins = data.admins;
         administrators.groupadmins = data.group_admins;

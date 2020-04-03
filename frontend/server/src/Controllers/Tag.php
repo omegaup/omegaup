@@ -17,6 +17,9 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of tags
      *
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $term
+     *
      * @return list<array{name: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {

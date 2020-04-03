@@ -6,6 +6,7 @@
  * ProblemsController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -57,6 +58,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a ProblemParams instance from the Request values.
      *
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
      */
     private static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
@@ -283,6 +300,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new problem
      *
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
+     *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
@@ -400,6 +434,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Adds an admin to a problem
      *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $usernameOrEmail
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -447,6 +484,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a group admin to a problem
      *
+     * @omegaup-request-param mixed $group
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -492,6 +532,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Adds a tag to a problem
+     *
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $public
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -562,6 +606,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Removes an admin from a problem
      *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $usernameOrEmail
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -615,6 +662,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Removes a group admin from a problem
      *
+     * @omegaup-request-param mixed $group
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -659,6 +709,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Removes a tag from a contest
+     *
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $problem_alias
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -709,6 +762,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Removes a problem whether user is the creator
      *
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
@@ -748,6 +803,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all problem administrators
      *
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @return array{admins: list<array{role: string, username: string}>, group_admins: list<array{alias: string, name: string, role: string}>}
      */
     public static function apiAdmins(\OmegaUp\Request $r): array {
@@ -779,6 +836,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns every tag associated to a given problem.
      *
+     * @omegaup-request-param mixed $include_voted
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @return array{tags: list<array{name: string, public: bool}>}
      */
     public static function apiTags(\OmegaUp\Request $r): array {
@@ -806,6 +866,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Rejudge problem
+     *
+     * @omegaup-request-param mixed $problem_alias
      *
      * @throws \OmegaUp\Exceptions\ApiException
      *
@@ -875,8 +937,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Update problem contents
      *
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $redirect
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
+     *
      * @param \OmegaUp\Request $r
+     *
      * @return array{rejudged: bool}
+     *
      * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
@@ -1384,6 +1467,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates problem statement only
      *
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $statement
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
+     *
      * @throws \OmegaUp\Exceptions\ApiException
      *
      * @return array{status: string}
@@ -1453,6 +1556,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Updates problem solution only
+     *
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $solution
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
      *
      * @throws \OmegaUp\Exceptions\ApiException
      *
@@ -1870,6 +1993,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem Download API
      *
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
@@ -1996,6 +2121,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Entry point for Problem Details API
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $prevent_problemset_open
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $show_solvers
+     * @omegaup-request-param mixed $statement_type
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
@@ -2313,6 +2446,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the solution for a problem if conditions are satisfied.
      *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $forfeit_problem
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $statement_type
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{exists: bool, solution?: array{language: string, markdown: string, images: array<string, string>}}
@@ -2405,6 +2545,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem Versions API
      *
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
@@ -2492,6 +2634,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Change the version of the problem.
+     *
+     * @omegaup-request-param mixed $commit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $update_published
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
@@ -2664,6 +2810,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Return a report of which runs would change due to a version change.
      *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $version
+     *
      * @return array{diff: list<array{username: string, guid: string, problemset_id: ?int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?float}>}
      */
     public static function apiRunsDiff(\OmegaUp\Request $r): array {
@@ -2763,6 +2912,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem runs API
      *
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $show_all
+     * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $username
+     * @omegaup-request-param mixed $verdict
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{runs: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int, alias: string, username: string, run_id?: int, judged_by?: null|string, type?: null|string, country_id?: null|string, contest_alias?: null|string}>}
@@ -2838,6 +2996,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Problem clarifications API
      *
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $rowcount
+     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{clarifications: list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: int, answer: null|string, public: bool}>}
@@ -2881,6 +3043,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Stats of a problem
      *
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}
@@ -2902,6 +3066,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $problem_alias
+     *
      * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
@@ -3062,6 +3228,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $difficulty_range
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $max_difficulty
+     * @omegaup-request-param mixed $min_difficulty
+     * @omegaup-request-param mixed $min_visibility
+     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $programming_languages
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param mixed $some_tags
+     *
      * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, mode: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
      */
     private static function validateListParams(\OmegaUp\Request $r) {
@@ -3161,8 +3341,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * List of public and user's private problems
      *
-     * @param \OmegaUp\Request $r
-     * @return array{results: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}>, total: int}
+     * @omegaup-request-param mixed $difficulty_range
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $max_difficulty
+     * @omegaup-request-param mixed $min_difficulty
+     * @omegaup-request-param mixed $min_visibility
+     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $programming_languages
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $some_tags
+     *
+     * @return array{results: list<ProblemListItem>, total: int}
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3218,7 +3413,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $tags
      * @param array{0: int, 1: int}|null $difficultyRange
      * @param list<string> $programmingLanguages
-     * @return array{results: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}>, total: int}
+     * @return array{results: list<ProblemListItem>, total: int}
      */
     private static function getList(
         int $page,
@@ -3296,6 +3491,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $page_size
+     *
      * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
@@ -3361,6 +3559,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $rowcount
+     *
      * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
@@ -3421,6 +3623,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns the best score for a problem
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $statement_type
+     * @omegaup-request-param mixed $username
      *
      * @return array{score: float}
      */
@@ -3644,6 +3853,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param mixed $prevent_problemset_open
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $statement_type
+     *
      * @return array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: int, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: int, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: int, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: int, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
      */
     public static function getProblemDetailsForSmarty(
@@ -3817,7 +4033,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{KEYWORD: string, LANGUAGE: string, MODE: string, ORDER_BY: string, payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: array{name: string, source: string}[], title: string, visibility: int}>}}, template: string}
+     * @omegaup-request-param mixed $difficulty_range
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $max_difficulty
+     * @omegaup-request-param mixed $min_difficulty
+     * @omegaup-request-param mixed $min_visibility
+     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param mixed $programming_languages
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $some_tags
+     *
+     * @return array{smartyProperties: array{payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tags: list<string>}}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -3890,15 +4122,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'KEYWORD' => $keyword,
-                'MODE' => $mode,
-                'ORDER_BY' => $orderBy,
-                'LANGUAGE' => $language,
                 'payload' => [
                     'problems' => $response['results'],
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $tags,
                     'pagerItems' => $pagerItems,
+                    'keyword' => $keyword,
+                    'mode' => $mode,
+                    'column' => $orderBy,
+                    'language' => $language,
+                    'languages' => array_merge(
+                        ['all'],
+                        \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+                    ),
+                    'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
+                    'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
+                    'tags' => $tags,
                 ],
             ],
             'template' => 'problems.tpl',
@@ -3945,6 +4184,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $redirect
+     * @omegaup-request-param mixed $request
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $statement-language
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param mixed $wmd-input-statement
+     *
      * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
      */
     public static function getProblemEditDetailsForSmarty(
@@ -4037,9 +4299,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param mixed $extra_wall_time
+     * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param mixed $memory_limit
+     * @omegaup-request-param mixed $output_limit
+     * @omegaup-request-param mixed $overall_wall_time_limit
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $request
+     * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $source
+     * @omegaup-request-param mixed $time_limit
+     * @omegaup-request-param mixed $title
+     * @omegaup-request-param mixed $update_published
+     * @omegaup-request-param mixed $validator
+     * @omegaup-request-param mixed $validator_time_limit
+     * @omegaup-request-param mixed $visibility
      *
-     * @param \OmegaUp\Request $r The request object.
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: array<array-key, mixed>}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: non-empty-array<array-key, mixed>}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4235,6 +4514,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [$minDifficulty, $maxDifficulty];
     }
 
+    /**
+     * @omegaup-request-param mixed $commit
+     * @omegaup-request-param mixed $filename
+     * @omegaup-request-param mixed $problem_alias
+     */
     public static function apiTemplate(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
@@ -4299,6 +4583,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemDeployer->generateLibinteractiveTemplates($commit);
     }
 
+    /**
+     * @omegaup-request-param mixed $extension
+     * @omegaup-request-param mixed $object_id
+     * @omegaup-request-param mixed $problem_alias
+     */
     public static function apiImage(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
@@ -4369,6 +4658,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $idl
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $os
+     *
      * @return array{smartyProperties: array{error?: string, error_field?: string}, template: string}
      */
     public static function getLibinteractiveGenForSmarty(\OmegaUp\Request $r): array {
