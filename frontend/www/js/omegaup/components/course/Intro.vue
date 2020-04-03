@@ -54,13 +54,12 @@
           >
         </template>
         <div class="text-center">
-          <form v-on:submit.prevent="">
+          <form v-on:submit.prevent="onSubmit">
             <button
               class="btn btn-primary btn-lg"
               name="start-course-submit"
-              type="button"
+              type="submit"
               v-bind:disabled="isButtonDisabled"
-              v-on:click="onSubmit"
             >
               {{ T.startCourse }}
             </button>

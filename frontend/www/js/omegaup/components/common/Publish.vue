@@ -15,7 +15,7 @@
             <option value="registration">
               {{ T.wordsRegistration }}
             </option>
-            <option value="public" v-if="isCurator || eventType === 'contest'">
+            <option value="public" v-if="shouldShowPublicOption">
               {{ T.wordsPublic }}
             </option>
           </select>
@@ -39,18 +39,11 @@ import T from '../../lang';
 @Component
 export default class Publish extends Vue {
   @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
-  @Prop() eventType!: omegaup.EventType;
-  @Prop({ default: false, required: false }) isCurator!: boolean;
+  @Prop() admissionModeDescription!: string;
+  @Prop() shouldShowPublicOption!: boolean;
 
   T = T;
   admissionMode = this.initialAdmissionMode;
-
-  get admissionModeDescription(): string {
-    if (this.eventType === 'contest') {
-      return T.contestNewFormAdmissionModeDescription;
-    }
-    return T.courseEditAdmissionModeDescription;
-  }
 
   onSubmit(): void {
     this.$emit('emit-update-admission-mode', this);

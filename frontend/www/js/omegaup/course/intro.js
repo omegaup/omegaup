@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import api from '../api';
 import * as UI from '../ui';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
@@ -25,7 +25,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: ev => {
-            API.Course.addStudent({
+            api.Course.addStudent({
               course_alias: coursePayload.alias,
               usernameOrEmail: coursePayload.currentUsername,
               share_user_information: ev.shareUserInformation,
@@ -37,12 +37,12 @@ OmegaUp.on('ready', function() {
               statement_type: coursePayload.statements.privacy.statementType,
             })
               .then(data => {
-                window.location.replace('/course/' + coursePayload.alias);
+                window.location.replace(`/course/${coursePayload.alias}/`);
               })
               .catch(UI.apiError);
           },
           'request-access-course': () => {
-            API.Course.registerForCourse({ course_alias: coursePayload.alias })
+            api.Course.registerForCourse({ course_alias: coursePayload.alias })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })

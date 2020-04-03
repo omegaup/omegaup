@@ -288,7 +288,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddStudentsTooltip: "(Add 57ud3n75 u5ing 7h3ir 0m3gaUp u53rnam3)",
   courseEditAdmins: "(Admini57ra70r5)",
   courseEditAdminsEmpty: "(N0 admini57ra70r5)",
-  courseEditAdmissionModeDescription: "(S313c7 c0ur53 admi55i0n m0d3. Th3r3 ar3 7w0 diff3r3n7 m0da1i7i35:<br /><u1><1i>Priva73: C0ur53 d035 n07 app3ar in any 1i57, u53r5 can n07 acc355 i7, un1355 7h3y hav3 b33n 3xp1ici71y invi73d.</1i><1i>R3gi57ra7i0n/0p3n: Any0n3 can j0in af73r r3gi573ring, bu7 0n1y pr3vi0u51y admi773d p30p13 can 0fficia11y par7icipa73 in 7h3 c0ur53.</1i></u1>)",
+  courseEditAdmissionModeDescription: "(S313c7 c0ur53 admi55i0n m0d3. Th3r3 ar3 7w0 diff3r3n7 0p7i0n5:<br /><u1><1i>Priva73: C0ur53 d035 n07 app3ar in any 1i57, u53r5 can n07 acc355 i7, un1355 7h3y hav3 b33n 3xp1ici71y invi73d.</1i><1i>R3gi57ra7i0n/0p3n: Any0n3 can j0in af73r r3gi573ring, bu7 0n1y pr3vi0u51y admi773d p30p13 can 0fficia11y par7icipa73 in 7h3 c0ur53.</1i></u1>)",
   courseEditClone: "(C10n3)",
   courseEditCourseClonedSuccessfully: "(Y0ur c0ur53 ha5 b33n c10n3d 5ucc355fu11y! <a hr3f=\"/c0ur53/%(course_alias)/3di7/\">Edi7 c0ur53</a>)",
   courseEditCourseEdited: "(Y0ur c0ur53 ha5 b33n 3di73d)",

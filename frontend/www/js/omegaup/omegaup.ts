@@ -73,11 +73,6 @@ export namespace omegaup {
     Public = 'public',
   }
 
-  export enum EventType {
-    Contest = 'contest',
-    Course = 'course',
-  }
-
   export enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',

@@ -85,7 +85,7 @@
         (requestsComponent, username) =>
           $emit('deny-request', requestsComponent, username)
       "
-    />
+    ></omegaup-common-requests>
   </div>
 </template>
 

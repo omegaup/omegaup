@@ -83,11 +83,11 @@
       <div class="tab-pane active" v-if="showTab === 'publish'">
         <omegaup-common-publish
           v-bind:initialAdmissionMode="contest.admission_mode"
-          v-bind:eventType="'contest'"
+          v-bind:shouldShowPublicOption="true"
           v-on:emit-update-admission-mode="
             publishComponent => $emit('update-admission-mode', publishComponent)
           "
-        />
+        ></omegaup-common-publish>
       </div>
       <div class="tab-pane active contestants" v-if="showTab === 'contestants'">
         <omegaup-contest-contestant
