@@ -1,5 +1,6 @@
 <template>
   <div>
+    <omegaup-carousel></omegaup-carousel>
     <omegaup-coder-of-the-month-notice
       v-if="
         currentUserInfo &&
@@ -72,6 +73,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import homepage_Carousel from './Carousel.vue';
 import common_Welcome from '../common/Welcome.vue';
 import common_SocialMedia from '../common/SocialMedia.vue';
 import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
@@ -83,6 +85,7 @@ import schools_Rank from '../schools/Rank.vue';
 
 @Component({
   components: {
+    'omegaup-carousel': homepage_Carousel,
     'omegaup-common-welcome': common_Welcome,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
@@ -94,7 +97,7 @@ import schools_Rank from '../schools/Rank.vue';
     highcharts: Chart,
   },
 })
-export default class Home extends Vue {
+export default class Homepage extends Vue {
   @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
   @Prop() coderOfTheMonthFemale!: omegaup.CoderOfTheMonth;
   @Prop() currentUserInfo!: omegaup.User;
