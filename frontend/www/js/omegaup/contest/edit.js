@@ -324,7 +324,7 @@ OmegaUp.on('ready', function() {
         methods: {
           arbitrateRequest: function(ev, username, resolution) {
             const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
-            omegaup.API.Contest.arbitrateRequest({
+            API.Contest.arbitrateRequest({
               contest_alias: contestAlias,
               username: username,
               resolution: resolution,

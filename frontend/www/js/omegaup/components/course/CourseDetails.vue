@@ -52,7 +52,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="homework in filteredHomeworks">
+                <tr v-if="!filteredHomeworks.length">
+                  <td class="empty-category" colspan="5">
+                    {{ T.courseAssignmentEmpty }}
+                  </td>
+                </tr>
+                <tr v-else="" v-for="homework in filteredHomeworks">
                   <td>
                     <a
                       v-bind:href="
@@ -117,7 +122,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="exam in filteredExams">
+                <tr v-if="!filteredExams.length">
+                  <td class="empty-category" colspan="5">
+                    {{ T.courseExamEmpty }}
+                  </td>
+                </tr>
+                <tr v-else="" v-for="exam in filteredExams">
                   <td>
                     <a
                       v-bind:href="
