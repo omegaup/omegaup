@@ -7,7 +7,7 @@ import course_ProblemList from '../components/course/ProblemList.vue';
 import common_Publish from '../components/common/Publish.vue';
 import course_Clone from '../components/course/Clone.vue';
 import { OmegaUp } from '../omegaup';
-import api from '../api';
+import * as api from '../api_transitional';
 import API from '../api';
 import * as UI from '../ui';
 import T from '../lang';
@@ -495,6 +495,7 @@ OmegaUp.on('ready', function() {
         props: {
           initialAdmissionMode: this.admissionMode,
           shouldShowPublicOption: this.shouldShowPublicOption,
+          admissionModeDescription: this.admissionModeDescription,
         },
         on: {
           'emit-update-admission-mode': function(publishComponent) {
@@ -510,7 +511,11 @@ OmegaUp.on('ready', function() {
         },
       });
     },
-    data: { admissionMode: null, shouldShowPublicOption: false },
+    data: {
+      admissionMode: null,
+      shouldShowPublicOption: false,
+      admissionModeDescription: T.courseEditAdmissionModeDescription,
+    },
     components: {
       'omegaup-common-publish': common_Publish,
     },
@@ -656,7 +661,7 @@ OmegaUp.on('ready', function() {
     }
   }
 
-  api.Course.adminDetails({ alias: courseAlias })
+  API.Course.adminDetails({ alias: courseAlias })
     .then(function(course) {
       $('.course-header')
         .text(course.name)
@@ -682,7 +687,7 @@ OmegaUp.on('ready', function() {
   }
 
   function refreshAssignmentsList() {
-    api.Course.listAssignments({ course_alias: courseAlias })
+    API.Course.listAssignments({ course_alias: courseAlias })
       .then(function(data) {
         problemList.assignments = data.assignments;
         assignmentList.assignments = data.assignments;

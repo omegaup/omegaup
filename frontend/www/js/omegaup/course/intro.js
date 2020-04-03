@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import api from '../api';
+import * as api from '../api_transitional';
 import * as UI from '../ui';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
