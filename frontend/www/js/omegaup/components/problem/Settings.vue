@@ -109,7 +109,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
 
 @Component
 export default class ProblemSettings extends Vue {
@@ -126,7 +125,6 @@ export default class ProblemSettings extends Vue {
   @Prop() validatorTypes!: Array<string>;
 
   T = T;
-  UI = UI;
 
   validator = this.initialValidator;
   languages = this.initialLanguage;
