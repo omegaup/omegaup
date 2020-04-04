@@ -74,6 +74,18 @@
         </tbody>
       </table>
     </div>
+    <omegaup-common-requests
+      v-bind:data="data"
+      v-bind:text-add-participant="T.wordsAddStudent"
+      v-on:emit-accept-request="
+        (requestsComponent, username) =>
+          $emit('accept-request', requestsComponent, username)
+      "
+      v-on:emit-deny-request="
+        (requestsComponent, username) =>
+          $emit('deny-request', requestsComponent, username)
+      "
+    ></omegaup-common-requests>
   </div>
 </template>
 
@@ -84,29 +96,38 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
 import Autocomplete from '../Autocomplete.vue';
+import common_Requests from '../common/Requests.vue';
 
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-requests': common_Requests,
   },
 })
 export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
   @Prop() students!: omegaup.CourseStudent[];
+  @Prop({ required: false }) data!: omegaup.IdentityRequest[];
 
   T = T;
   UI = UI;
   studentUsername = '';
   participant = '';
   participants = '';
+  requests: omegaup.IdentityRequest[] = [];
 
   studentProgressUrl(student: omegaup.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+
+  @Watch('data')
+  onDataChange(): void {
+    this.requests = this.data;
   }
 }
 </script>

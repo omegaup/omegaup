@@ -1429,22 +1429,9 @@ Returns all details of a given Course
 
 ### Returns
 
-| Name                         | Type                                                                                                                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`                       | `string`                                                                                                                                                                                                                                         |
-| `description`                | `string`                                                                                                                                                                                                                                         |
-| `alias`                      | `string`                                                                                                                                                                                                                                         |
-| `basic_information_required` | `boolean`                                                                                                                                                                                                                                        |
-| `requests_user_information`  | `string`                                                                                                                                                                                                                                         |
-| `assignments`                | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: number; finish_time: number; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `school_id`                  | `number`                                                                                                                                                                                                                                         |
-| `start_time`                 | `number`                                                                                                                                                                                                                                         |
-| `finish_time`                | `number`                                                                                                                                                                                                                                         |
-| `is_admin`                   | `boolean`                                                                                                                                                                                                                                        |
-| `public`                     | `boolean`                                                                                                                                                                                                                                        |
-| `show_scoreboard`            | `boolean`                                                                                                                                                                                                                                        |
-| `student_count`              | `number`                                                                                                                                                                                                                                         |
-| `school_name`                | `string`                                                                                                                                                                                                                                         |
+```typescript
+types.CourseDetails;
+```
 
 ## `/api/course/admins/`
 
@@ -1644,22 +1631,9 @@ Returns details of a given course
 
 ### Returns
 
-| Name                         | Type                                                                                                                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`                       | `string`                                                                                                                                                                                                                                         |
-| `description`                | `string`                                                                                                                                                                                                                                         |
-| `alias`                      | `string`                                                                                                                                                                                                                                         |
-| `basic_information_required` | `boolean`                                                                                                                                                                                                                                        |
-| `requests_user_information`  | `string`                                                                                                                                                                                                                                         |
-| `assignments`                | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: number; finish_time: number; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `school_id`                  | `number`                                                                                                                                                                                                                                         |
-| `start_time`                 | `number`                                                                                                                                                                                                                                         |
-| `finish_time`                | `number`                                                                                                                                                                                                                                         |
-| `is_admin`                   | `boolean`                                                                                                                                                                                                                                        |
-| `public`                     | `boolean`                                                                                                                                                                                                                                        |
-| `show_scoreboard`            | `boolean`                                                                                                                                                                                                                                        |
-| `student_count`              | `number`                                                                                                                                                                                                                                         |
-| `school_name`                | `string`                                                                                                                                                                                                                                         |
+```typescript
+types.CourseDetails;
+```
 
 ## `/api/course/getProblemUsers/`
 
