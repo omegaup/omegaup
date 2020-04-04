@@ -2022,9 +2022,9 @@ Calls to /status grader
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                         |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `grader` | `{ status: string; broadcaster_sockets: number; embedded_runner: boolean; queue: { running: { name: string; id: number; }[]; run_queue_length: number; runner_queue_length: number; runners: string[]; }; }` |
+| Name     | Type                 |
+| -------- | -------------------- |
+| `grader` | `types.GraderStatus` |
 
 # Group
 
@@ -2425,9 +2425,9 @@ Returns a list of unread notifications for user
 
 ### Returns
 
-| Name            | Type                                                                  |
-| --------------- | --------------------------------------------------------------------- |
-| `notifications` | `{ contents: string; notification_id: number; timestamp: number; }[]` |
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `notifications` | `types.Notification[]` |
 
 ## `/api/notification/readNotifications/`
 

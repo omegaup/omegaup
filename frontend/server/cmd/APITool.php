@@ -355,6 +355,7 @@ class TypeMapper {
                     $typeNames[] = "types.{$type->value}";
                     $conversionResult = $this->typeAliases[$type->value];
                     if (!is_null($conversionResult->conversionFunction)) {
+                        $requiresConversion = true;
                         $conversionFunction[] = $conversionResult->conversionFunction;
                     }
                     continue;
@@ -557,7 +558,6 @@ class APIGenerator {
             echo "\n// DAO types\n";
             echo "export namespace dao {\n";
             ksort($this->daoTypes);
-            $localTypeMapper = new TypeMapper();
             foreach ($this->daoTypes as $typeName => $typeExpansion) {
                 echo "  export interface {$typeName} {\n";
                 /** @var class-string */
@@ -589,7 +589,7 @@ class APIGenerator {
                     }
                     $properties[
                         strval($reflectionProperty->name)
-                    ] = $localTypeMapper->convertTypeToTypeScript(
+                    ] = $this->typeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
                     )->typescriptExpansion;

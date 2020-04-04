@@ -5,20 +5,33 @@
 /**
  * BadgesController
  *
- * @author carlosabcs
+ * @psalm-type NotificationContents=array{type: string, badge?: string}
+ * @psalm-type Notification=array{contents: NotificationContents, notification_id: int, timestamp: \OmegaUp\Timestamp}
  */
 class Notification extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of unread notifications for user
      *
-     * @return array{notifications: list<array{contents: string, notification_id: int, timestamp: int}>}
+     * @return array{notifications: list<Notification>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         $r->ensureIdentity();
+        /** @var list<Notification> */
+        $notifications = [];
+        foreach (
+            is_null($r->user) ?
+            [] :
+            \OmegaUp\DAO\Notifications::getUnreadNotifications($r->user) as $notification
+        ) {
+            /** @var NotificationContents */
+            $notification['contents'] = json_decode(
+                $notification['contents'],
+                /*$assoc=*/true
+            );
+            $notifications[] = $notification;
+        }
         return [
-            'notifications' => is_null($r->user) ?
-                [] :
-                \OmegaUp\DAO\Notifications::getUnreadNotifications($r->user),
+            'notifications' => $notifications,
         ];
     }
 
