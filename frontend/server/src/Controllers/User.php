@@ -3294,6 +3294,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'filter' => $filter,
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
+                    'isLogged' => false,
                 ],
             ],
             'template' => 'rank.tpl',
@@ -3302,7 +3303,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
-            $response['smartyProperties']['rankTablePayload']['isLogged'] = false;
             return $response;
         }
 
@@ -3413,7 +3413,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
             ],
-            'bootstrap4' => false, //TODO: Esto cambiará pronto por eso lo dejo
+            'supportsBootstrap4' => true,
             'template' => 'index.tpl',
         ];
     }

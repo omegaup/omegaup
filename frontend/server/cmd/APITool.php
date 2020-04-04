@@ -243,15 +243,15 @@ class TypeMapper {
                         );
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
+                            $conversionStatement = (
+                                "x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
+                            );
                             if ($isNullable) {
-                                $convertedProperties[] = (
-                                    "if (x.{$propertyName}) x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
-                                );
-                            } else {
-                                $convertedProperties[] = (
-                                    "x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
+                                $conversionStatement = (
+                                    "if (x.{$propertyName}) {$conversionStatement}"
                                 );
                             }
+                            $convertedProperties[] = $conversionStatement;
                         }
                         if ($isNullable) {
                             $propertyName .= '?';
