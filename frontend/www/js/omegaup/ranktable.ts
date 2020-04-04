@@ -1,26 +1,28 @@
 import rank_table from './components/RankTable.vue';
 import Vue from 'vue';
 import { OmegaUp } from './omegaup';
+import { types } from './api_types';
+import * as api from './api_transitional';
 import * as ui from './ui_transitional';
 
-OmegaUp.on('ready', function() {
-  const payload = JSON.parse(
-    document.getElementById('rank-table-payload').innerText,
+OmegaUp.on('ready', () => {
+  const payload: types.UserRankTablePayload = JSON.parse(
+    (<HTMLElement>document.getElementById('rank-table-payload')).innerText,
   );
 
-  API.User.rankByProblemsSolved({
+  api.User.rankByProblemsSolved({
     offset: payload.page,
     rowcount: payload.length,
     filter: payload.filter,
   })
-    .then(function(result) {
+    .then(result => {
       const ranking = [];
       for (const user of result.rank) {
         let problemsSolvedUser = undefined;
         if (payload.isIndex !== true) {
           problemsSolvedUser = user.problems_solved;
         }
-        ranking.add({
+        ranking.push({
           rank: user.ranking,
           country: user.country_id,
           username: user.username,
@@ -31,7 +33,7 @@ OmegaUp.on('ready', function() {
         });
       }
 
-      let rankTable = new Vue({
+      const rankTable = new Vue({
         el: '#rank-table',
         render: function(createElement) {
           return createElement('rankTable', {
@@ -55,7 +57,7 @@ OmegaUp.on('ready', function() {
           availableFilters: payload.availableFilters,
           filter: payload.filter,
           ranking: ranking,
-          resultTotal: parseInt(result.total),
+          resultTotal: result.total,
         },
         components: {
           rankTable: rank_table,

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
+import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
@@ -15,6 +16,45 @@ OmegaUp.on('ready', function() {
       .find('a[href="' + window.location.hash + '"]')
       .tab('show');
   }
+  const payload = JSON.parse(
+    document.getElementById('problem-payload').innerText,
+  );
+  let problemSettings = new Vue({
+    el: '#problem-settings',
+    render: function(createElement) {
+      return createElement('omegaup-problem-settings', {
+        props: {
+          timeLimit: this.timeLimit,
+          extraWallTime: this.extraWallTime,
+          memoryLimit: this.memoryLimit,
+          outputLimit: this.outputLimit,
+          inputLimit: this.inputLimit,
+          overallWallTimeLimit: this.overallWallTimeLimit,
+          validatorTimeLimit: this.validatorTimeLimit,
+          initialLanguage: this.languages,
+          validLanguages: this.validLanguages,
+          initialValidator: this.validator,
+          validatorTypes: this.validatorTypes,
+        },
+      });
+    },
+    data: {
+      timeLimit: 0,
+      extraWallTime: 0,
+      memoryLimit: 0,
+      outputLimit: 0,
+      inputLimit: 0,
+      overallWallTimeLimit: 0,
+      validatorTimeLimit: 0,
+      validLanguages: payload.validLanguages,
+      validatorTypes: payload.validatorTypes,
+      validator: '',
+      languages: '',
+    },
+    components: {
+      'omegaup-problem-settings': problem_Settings,
+    },
+  });
 
   $('#sections').on('click', 'a', function(e) {
     e.preventDefault();
@@ -573,34 +613,33 @@ OmegaUp.on('ready', function() {
         T.problemEditGoToProblem +
         '</a>',
     );
-    $('input[name=title]').val(problem.title);
+
     $('#statement-preview .title').html(UI.escape(problem.title));
-    $('input[name=time_limit]').val(
-      UI.parseDuration(problem.settings.limits.TimeLimit),
+    problemSettings.languages = problem.languages.sort().join();
+    $('input[name=title]').val(problem.title);
+    problemSettings.timeLimit = UI.parseDuration(
+      problem.settings.limits.TimeLimit,
     );
+
     if (
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      $('input[name=validator_time_limit]').val(
-        UI.parseDuration(
-          problem.settings.validator.custom_validator.limits.TimeLimit,
-        ),
+      problemSettings.validatorTimeLimit = UI.parseDuration(
+        problem.settings.validator.custom_validator.limits.TimeLimit,
       );
     } else {
-      $('input[name=validator_time_limit]').val(0);
+      problemSettings.validatorTimeLimit = 0;
     }
-    $('input[name=overall_wall_time_limit]').val(
-      UI.parseDuration(problem.settings.limits.OverallWallTimeLimit),
+    problemSettings.overallWallTimeLimit = UI.parseDuration(
+      problem.settings.limits.OverallWallTimeLimit,
     );
-    $('input[name=extra_wall_time]').val(
-      UI.parseDuration(problem.settings.limits.ExtraWallTime),
+    problemSettings.extraWallTime = UI.parseDuration(
+      problem.settings.limits.ExtraWallTime,
     );
-    $('input[name=memory_limit]').val(
-      problem.settings.limits.MemoryLimit / 1024,
-    );
-    $('input[name=output_limit]').val(problem.settings.limits.OutputLimit);
-    $('input[name=input_limit]').val(problem.input_limit);
+    problemSettings.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
+    problemSettings.outputLimit = problem.settings.limits.OutputLimit;
+    problemSettings.inputLimit = problem.input_limit;
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
@@ -611,7 +650,7 @@ OmegaUp.on('ready', function() {
         (problem.email_clarifications ? '1' : '0') +
         ']',
     ).attr('checked', 1);
-    $('select[name=validator]').val(problem.settings.validator.name);
+    problemSettings.validator = problem.settings.validator.name;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {
@@ -619,7 +658,6 @@ OmegaUp.on('ready', function() {
       // make change visibility.
       $('input[name=visibility]').attr('disabled', 1);
     }
-    $('#languages').val(problem.languages.sort().join());
     $('input[name=alias]').val(problemAlias);
 
     if (
