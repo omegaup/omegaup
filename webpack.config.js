@@ -35,7 +35,6 @@ let config = [
       common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_index: './frontend/www/js/omegaup/common/index.js',
       common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
-      common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
       common_stats: './frontend/www/js/omegaup/common/stats.js',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
