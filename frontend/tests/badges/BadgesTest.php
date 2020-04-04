@@ -11,6 +11,10 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         foreach ($expected as $username) {
             // From each username, obtaining its ID
             $user = \OmegaUp\DAO\Users::FindByUsername($username);
+            self::assertNotNull(
+                $user,
+                "User '{$username}' not found"
+            );
             $results[] = $user->user_id;
         }
         asort($results);
@@ -40,12 +44,12 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             $r = new \OmegaUp\Request($params);
             $r->method = $req['api'];
             $fullResponse = \OmegaUp\ApiCaller::call($r);
-            if ($fullResponse['status'] !== 'ok') {
-                throw new Exception(
-                    'request=' . json_encode($req) .
-                    "\nresponse=" . json_encode($fullResponse)
-                );
-            }
+            self::assertEquals(
+                'ok',
+                $fullResponse['status'],
+                'request=' . json_encode($req) .
+                "\nresponse=" . json_encode($fullResponse)
+            );
             if ($r->method === '\\OmegaUp\\Controllers\\Run::apiCreate') {
                 $points = array_key_exists(
                     'points',
@@ -85,24 +89,24 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                         switch ($script) {
                             case 'update_ranks.py':
                                 \OmegaUp\Test\Utils::runUpdateRanks(
-                                    date(
-                                        'Y-m-01',
-                                        \OmegaUp\Time::get()
-                                    )
+                                    date('Y-m-01', \OmegaUp\Time::get())
                                 );
                                 break;
+
                             case 'aggregate_feedback.py':
                                 \OmegaUp\Test\Utils::runAggregateFeedback();
                                 break;
+
                             default:
-                                throw new Exception(
+                                $this->fail(
                                     "Script {$script} doesn't exist."
                                 );
                         }
                     }
                     break;
+
                 default:
-                    throw new Exception(
+                    $this->fail(
                         "Action {$action['type']} doesn't exist"
                     );
             }
@@ -113,17 +117,45 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         \OmegaUp\Time::setTimeForTesting(null);
     }
 
-    public function phpUnitTest($badge): void {
-        $testPath = static::BADGES_TESTS_ROOT . "/${badge}Test.php";
+    /**
+     * @dataProvider allBadgesProvider
+     */
+    public function testBadge(string $badgeAlias) {
+        $this->assertTrue(
+            \OmegaUp\Validators::isValidAlias($badgeAlias),
+            'The alias for this badge is invalid.'
+        );
+
+        $badgePath = static::OMEGAUP_BADGES_ROOT . "/{$badgeAlias}";
+
+        $iconPath = "{$badgePath}/" . static::ICON_FILE;
+        if (file_exists($iconPath)) {
+            $this->assertLessThanOrEqual(
+                static::MAX_BADGE_SIZE,
+                filesize($iconPath),
+                "The size of {$iconPath} must be less than or equal to 20KB."
+            );
+        }
+
+        $localizationsPath = "{$badgePath}/" . static::LOCALIZATIONS_FILE;
+        $this->assertTrue(
+            file_exists($localizationsPath),
+            "The file '{$localizationsPath}' doesn't exist."
+        );
+
+        $queryPath = "{$badgePath}/" . static::QUERY_FILE;
+        $this->assertTrue(
+            file_exists($queryPath),
+            "The file '{$queryPath}' doesn't exist."
+        );
+
+        $testPath = "{$badgePath}/" . static::TEST_FILE;
         $this->assertTrue(
             file_exists($testPath),
-            "$badge:> The file ${badge}.php doesn't exist in frontend/tests/badges."
+            "The file '{$testPath}' doesn't exist."
         );
-    }
 
-    public function runBadgeTest($testPath, $queryPath, $badge): void {
         $content = json_decode(file_get_contents($testPath), true);
-        \OmegaUp\Test\Utils::cleanupFilesAndDB();
         switch ($content['testType']) {
             case 'apicall':
                 self::apicallTest(
@@ -132,66 +164,40 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                     $queryPath
                 );
                 break;
+
             case 'phpunit':
-                self::phpUnitTest($badge);
+                $testPath = static::BADGES_TESTS_ROOT . "/{$badgeAlias}Test.php";
+                $this->assertTrue(
+                    file_exists($testPath),
+                    "The file '{$testPath}' doesn't exist."
+                );
                 break;
+
             default:
-                throw new Exception(
+                $this->fail(
                     "Test type {$content['testType']} doesn't exist"
                 );
         }
     }
 
-    public function testAllBadges() {
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public function allBadgesProvider(): iterable {
         $aliases = array_diff(
             scandir(
                 static::OMEGAUP_BADGES_ROOT
             ),
             ['..', '.', 'default_icon.svg']
         );
-        foreach ($aliases as $alias) {
-            $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
+        foreach ($aliases as $badgeAlias) {
+            $badgePath = static::OMEGAUP_BADGES_ROOT . "/{$badgeAlias}";
 
             if (!is_dir($badgePath)) {
                 continue;
             }
 
-            if (!\OmegaUp\Validators::isValidAlias($alias)) {
-                throw new Exception('The alias for this badge is invalid.');
-            }
-
-            $iconPath = "${badgePath}/" . static::ICON_FILE;
-            if (file_exists($iconPath)) {
-                $this->assertLessThanOrEqual(
-                    static::MAX_BADGE_SIZE,
-                    filesize($iconPath),
-                    "$alias:> The size of icon.svg must be less than or equal to 20KB."
-                );
-            }
-
-            $localizationsPath = "${badgePath}/" . static::LOCALIZATIONS_FILE;
-            $this->assertTrue(
-                file_exists($localizationsPath),
-                "$alias:> The file localizations.json doesn't exist."
-            );
-
-            $queryPath = "${badgePath}/" . static::QUERY_FILE;
-            $this->assertTrue(
-                file_exists($queryPath),
-                "$alias:> The file query.sql doesn't exist."
-            );
-
-            $testPath = "${badgePath}/" . static::TEST_FILE;
-            $this->assertTrue(
-                file_exists($testPath),
-                "$alias:> The file test.json doesn't exist."
-            );
-
-            try {
-                self::runBadgeTest($testPath, $queryPath, $alias);
-            } catch (Exception $e) {
-                $this->fail("For badge {$alias}: $e");
-            }
+            yield [$badgeAlias];
         }
     }
 
@@ -214,7 +220,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     public function testListBadges() {
         // Manually creates a new badge
         $newBadge = 'testBadge';
-        $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/${newBadge}";
+        $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/{$newBadge}";
         $results = [];
         try {
             mkdir($newBadgePath);
