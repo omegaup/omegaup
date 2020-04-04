@@ -12,4 +12,4 @@ CREATE TABLE `QualityNomination_Log` (
   KEY `qualitynomination_id` (`qualitynomination_id`),
   CONSTRAINT `fk_qnl_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_qnl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de cambios a nominaciones';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bitácora de cambios a nominaciones';

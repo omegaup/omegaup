@@ -7,4 +7,4 @@ CREATE TABLE `Problem_Of_The_Week` (
   UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de problemas de la semana.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lista de problemas de la semana.';
