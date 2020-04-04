@@ -88,6 +88,15 @@ export namespace types {
     label: string;
     value: string;
   }
+
+  export interface UserRankTablePayload {
+    availableFilters: { country?: string; school?: string; state?: string };
+    filter: string;
+    isIndex: boolean;
+    isLogged: boolean;
+    length: number;
+    page: number;
+  }
 }
 
 // API messages

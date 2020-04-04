@@ -5,8 +5,9 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
+ * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3268,7 +3269,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{rankTablePayload: array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}}, template: string}
+     * @return array{smartyProperties: array{rankTablePayload: UserRankTablePayload}, template: string}
      */
     public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
