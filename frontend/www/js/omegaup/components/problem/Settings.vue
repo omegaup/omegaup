@@ -33,6 +33,7 @@
         <input
           name="validator_time_limit"
           v-bind:value="validatorTimeLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -43,6 +44,7 @@
         <input
           name="time_limit"
           v-bind:value="timeLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -57,6 +59,7 @@
         <input
           name="overall_wall_time_limit"
           v-bind:value="overallWallTimeLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -67,6 +70,7 @@
         <input
           name="extra_wall_time"
           v-bind:value="extraWallTime"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -79,6 +83,7 @@
         <input
           name="memory_limit"
           v-bind:value="memoryLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -89,6 +94,7 @@
         <input
           name="output_limit"
           v-bind:value="outputLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
@@ -98,6 +104,7 @@
         <input
           name="input_limit"
           v-bind:value="inputLimit"
+          v-bind:disabled="languages == ''"
           type="text"
           class="form-control"
         />
