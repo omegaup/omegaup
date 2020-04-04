@@ -212,7 +212,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getBadgesFromNotificationContents(array $notifications): array {
         $badges = [];
         foreach ($notifications as $notification) {
-            $badges[] = json_decode($notification['contents'])->badge;
+            $badges[] = $notification['contents']['badge'];
         }
         return $badges;
     }

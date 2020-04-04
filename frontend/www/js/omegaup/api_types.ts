@@ -49,6 +49,20 @@ export namespace types {
     owners_count: number;
   }
 
+  export interface CommonPayload {
+    omegaUpLockDown: boolean;
+    bootstrap4: boolean;
+    inContest: boolean;
+    isLoggedIn: boolean;
+    isReviewer: boolean;
+    gravatarURL51: string;
+    currentUsername: string;
+    isMainUserIdentity: boolean;
+    isAdmin: boolean;
+    lockDownImage: string;
+    navbarSection: string;
+  }
+
   export interface CourseAssignment {
     alias: string;
     assignment_type: string;
@@ -79,6 +93,28 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: number;
     student_count: number;
+  }
+
+  export interface GraderStatus {
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: {
+      running: { name: string; id: number }[];
+      run_queue_length: number;
+      runner_queue_length: number;
+      runners: string[];
+    };
+  }
+
+  export interface Notification {
+    contents: types.NotificationContents;
+    notification_id: number;
+    timestamp: Date;
+  }
+
+  export interface NotificationContents {
+    type: string;
+    badge: string;
   }
 
   export interface PageItem {
@@ -160,6 +196,7 @@ export namespace messages {
 
   // Badge
   export type BadgeBadgeDetailsRequest = { [key: string]: any };
+  export type _BadgeBadgeDetailsServerResponse = any;
   export type BadgeBadgeDetailsResponse = types.Badge;
   export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
@@ -168,8 +205,10 @@ export namespace messages {
     assignation_time?: number;
   };
   export type BadgeMyListRequest = { [key: string]: any };
+  export type _BadgeMyListServerResponse = any;
   export type BadgeMyListResponse = { badges: types.Badge[] };
   export type BadgeUserListRequest = { [key: string]: any };
+  export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Clarification
@@ -973,19 +1012,7 @@ export namespace messages {
 
   // Grader
   export type GraderStatusRequest = { [key: string]: any };
-  export type GraderStatusResponse = {
-    grader: {
-      status: string;
-      broadcaster_sockets: number;
-      embedded_runner: boolean;
-      queue: {
-        running: { name: string; id: number }[];
-        run_queue_length: number;
-        runner_queue_length: number;
-        runners: string[];
-      };
-    };
-  };
+  export type GraderStatusResponse = { grader: types.GraderStatus };
 
   // Group
   export type GroupAddUserRequest = { [key: string]: any };
@@ -1145,12 +1172,9 @@ export namespace messages {
 
   // Notification
   export type NotificationMyListRequest = { [key: string]: any };
+  export type _NotificationMyListServerResponse = any;
   export type NotificationMyListResponse = {
-    notifications: {
-      contents: string;
-      notification_id: number;
-      timestamp: number;
-    }[];
+    notifications: types.Notification[];
   };
   export type NotificationReadNotificationsRequest = { [key: string]: any };
   export type NotificationReadNotificationsResponse = {};

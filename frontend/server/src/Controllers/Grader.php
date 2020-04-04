@@ -5,13 +5,13 @@
 /**
  * Description of GraderController
  *
- * @author joemmanuel
+ * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
      * Calls to /status grader
      *
-     * @return array{grader: array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}}
+     * @return array{grader: GraderStatus}
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         $r->ensureIdentity();

@@ -20,12 +20,7 @@ function _normalizeContestFields(contest) {
 
 export default {
   Badge: {
-    badgeDetails: api.apiCall('/api/badge/badgeDetails/', function(result) {
-      result.first_assignation = result.first_assignation
-        ? new Date(result.first_assignation * 1000)
-        : null;
-      return result;
-    }),
+    badgeDetails: api.Badge.badgeDetails,
 
     list: api.Badge.list,
 
@@ -39,19 +34,9 @@ export default {
       },
     ),
 
-    myList: api.apiCall('/api/badge/myList/', function(result) {
-      result.badges.forEach(badge => {
-        badge.assignation_time = new Date(badge.assignation_time * 1000);
-      });
-      return result;
-    }),
+    myList: api.Badge.myList,
 
-    userList: api.apiCall('/api/badge/userList/', function(result) {
-      result.badges.forEach(badge => {
-        badge.assignation_time = new Date(badge.assignation_time * 1000);
-      });
-      return result;
-    }),
+    userList: api.Badge.userList,
   },
 
   Clarification: api.Clarification,
@@ -351,17 +336,7 @@ export default {
 
   Interview: api.Interview,
 
-  Notification: {
-    myList: api.apiCall('/api/notification/myList/', function(result) {
-      result.notifications.forEach(notification => {
-        notification.timestamp = new Date(notification.timestamp * 1000);
-        notification.contents = JSON.parse(notification.contents);
-      });
-      return result;
-    }),
-
-    readNotifications: api.Notification.readNotifications,
-  },
+  Notification: api.Notification,
 
   Problem: {
     addAdmin: api.Problem.addAdmin,

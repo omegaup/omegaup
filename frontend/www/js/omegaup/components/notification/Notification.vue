@@ -58,13 +58,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 
 @Component
 export default class Notification extends Vue {
-  @Prop() notification!: omegaup.Notification;
+  @Prop() notification!: types.Notification;
 
   get iconUrl(): string {
     switch (this.notification.contents.type) {

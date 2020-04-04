@@ -298,20 +298,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface GraderQueue {
-    running: string[];
-    run_queue_length: number;
-    runner_queue_length: number;
-    runners: string[];
-  }
-
-  export interface Grader {
-    status: string;
-    broadcaster_sockets: number;
-    embedded_runner: boolean;
-    queue: omegaup.GraderQueue;
-  }
-
   export interface Group {
     alias: string;
     create_time: Date;
@@ -377,17 +363,6 @@ export namespace omegaup {
     status: string;
     time: string;
     votes: NominationVote[];
-  }
-
-  export interface Notification {
-    notification_id: number;
-    contents: NotificationContents;
-    timestamp: Date;
-  }
-
-  export interface NotificationContents {
-    type: string;
-    badge?: string;
   }
 
   export interface Profile extends User {
