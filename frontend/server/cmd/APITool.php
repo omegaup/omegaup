@@ -332,7 +332,11 @@ class TypeMapper {
                 $typeNames[] = 'string';
             } elseif ($typeName == 'null') {
                 $typeNames[] = 'null';
-            } elseif ($typeName == 'bool') {
+            } elseif (
+                $typeName == 'bool' ||
+                $typeName == 'false' ||
+                $typeName == 'true'
+            ) {
                 $typeNames[] = 'boolean';
             } elseif ($type instanceof \Psalm\Type\Atomic\TNamedObject) {
                 if ($type->value == 'stdClass') {

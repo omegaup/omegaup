@@ -74,7 +74,7 @@ let config = [
         './frontend/www/js/omegaup/qualitynomination/details.js',
       qualitynomination_qualityreview:
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.js',
+      rank_table: './frontend/www/js/omegaup/ranktable.ts',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',
