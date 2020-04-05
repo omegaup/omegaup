@@ -1,6 +1,6 @@
 (function() {
   var payload = JSON.parse(document.getElementById('payload').innerText);
-  var markdownConverter = omegaup.UI.markdownConverter({ preview: true });
+  var markdownConverter = omegaup.Markdown.markdownConverter({ preview: true });
 
   var statement = document.querySelector('div.statement');
   statement.innerHTML = markdownConverter.makeHtmlWithImages(

@@ -3622,13 +3622,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
         );
 
-        // Happy ending
-        $response = [];
-        $response['status'] = 'ok';
+        self::$log->info("Contest updated (alias): {$r['contest_alias']}");
 
-        self::$log->info('Contest updated (alias): ' . $r['contest_alias']);
-
-        return $response;
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**

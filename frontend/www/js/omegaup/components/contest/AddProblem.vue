@@ -5,7 +5,7 @@
         <div class="form-group col-md-6">
           <label>{{ T.wordsProblem }}</label>
           <omegaup-autocomplete
-            v-bind:init="el =&gt; UI.problemTypeahead(el)"
+            v-bind:init="el => typeahead.problemTypeahead(el)"
             v-model="alias"
           ></omegaup-autocomplete>
         </div>
@@ -130,7 +130,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import problem_Versions from '../problem/Versions.vue';
 
@@ -155,7 +155,7 @@ export default class AddProblem extends Vue {
   @Prop() data!: omegaup.Problem[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   alias = '';
   points = 100;
   order = this.data.length + 1;

@@ -1,4 +1,4 @@
-import * as ui from './ui_transitional';
+import * as ui from './ui';
 import * as api from './api_transitional';
 import * as errors from './errors';
 

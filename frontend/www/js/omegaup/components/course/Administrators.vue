@@ -17,7 +17,7 @@
                 v-bind:title="T.courseEditAddAdminsTooltip"
               ></span>
               <omegaup-autocomplete
-                v-bind:init="el =&gt; UI.userTypeahead(el)"
+                v-bind:init="el => typeahead.userTypeahead(el)"
                 v-model="adminUsername"
               ></omegaup-autocomplete>
             </div>
@@ -97,7 +97,7 @@
                 v-bind:title="T.courseEditAddGroupAdminsTooltip"
               ></span>
               <omegaup-autocomplete
-                v-bind:init="el =&gt; UI.userTypeahead(el)"
+                v-bind:init="el => typeahead.userTypeahead(el)"
                 v-model="adminGroup"
               ></omegaup-autocomplete>
             </div>
@@ -155,7 +155,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 
 @Component({
@@ -168,7 +168,7 @@ export default class CourseAdministrators extends Vue {
   @Prop() groupadmins!: omegaup.CourseGroupAdmin[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   showSiteAdmins = false;
   adminUsername = '';
   adminGroup = '';

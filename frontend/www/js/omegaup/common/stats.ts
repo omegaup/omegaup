@@ -4,7 +4,7 @@ import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api_transitional';
 import { types } from '../api_types';
-import * as ui from '../ui_transitional';
+import * as ui from '../ui';
 import * as Highcharts from 'highcharts';
 
 OmegaUp.on('ready', () => {

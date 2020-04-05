@@ -7,7 +7,7 @@
             >{{ T.wordsMember }}
             <omegaup-autocomplete
               class="form-control"
-              v-bind:init="el =&gt; UI.userTypeahead(el)"
+              v-bind:init="el => typeahead.userTypeahead(el)"
               v-model="searchedUsername"
             ></omegaup-autocomplete
           ></label>
@@ -120,7 +120,7 @@ label {
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
@@ -145,7 +145,7 @@ export default class UserProfile extends Vue {
   @Prop() countries!: Array<string>;
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   identity = {};
   username = '';
   showEditForm = false;
