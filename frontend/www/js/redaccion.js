@@ -1,5 +1,5 @@
 omegaup.OmegaUp.on('ready', function() {
-  var markdownConverter = omegaup.UI.markdownConverter({ preview: true });
+  var markdownConverter = omegaup.Markdown.markdownConverter({ preview: true });
   var markdownEditor = new Markdown.Editor(markdownConverter);
   var defaultStatement = `# Descripción
 

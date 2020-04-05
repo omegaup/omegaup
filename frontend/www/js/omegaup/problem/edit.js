@@ -5,8 +5,10 @@ import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import * as UI from '../ui';
+import * as markdown from '../markdown';
+import * as time from '../time';
 import * as typeahead from '../typeahead';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;
@@ -108,17 +110,17 @@ OmegaUp.on('ready', function() {
           public: isPublic,
         })
           .then(function(response) {
-            UI.success('Tag successfully added!');
+            ui.success('Tag successfully added!');
             $('div.post.footer').show();
 
             refreshProblemTags();
           })
-          .catch(UI.apiError);
+          .catch(ui.apiError);
 
         return false; // Prevent refresh
       });
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 
   $('#tag-name')
     .typeahead(
@@ -144,11 +146,11 @@ OmegaUp.on('ready', function() {
       usernameOrEmail: username,
     })
       .then(function(response) {
-        UI.success(T.adminAdded);
+        ui.success(T.adminAdded);
         $('div.post.footer').show();
         refreshProblemAdmins();
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
 
     return false; // Prevent refresh
   });
@@ -167,18 +169,18 @@ OmegaUp.on('ready', function() {
       group: $('#groupalias-admin').attr('data-alias'),
     })
       .then(function(response) {
-        UI.success(T.groupAdminAdded);
+        ui.success(T.groupAdminAdded);
         $('div.post.footer').show();
 
         refreshProblemAdmins();
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
 
     return false; // Prevent refresh
   });
 
   $('#download form').on('submit', function() {
-    window.location = `/api/problem/download/problem_alias/${UI.escape(
+    window.location = `/api/problem/download/problem_alias/${ui.escape(
       problemAlias,
     )}/`;
     return false;
@@ -190,7 +192,7 @@ OmegaUp.on('ready', function() {
       .then(function(response) {
         window.location = '/problem/mine/';
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
     return false;
   });
 
@@ -218,19 +220,19 @@ OmegaUp.on('ready', function() {
 
     $('.has-error').removeClass('has-error');
     if ($('#markdown-message').val() == '') {
-      UI.error(T.editFieldRequired);
+      ui.error(T.editFieldRequired);
       $('#markdown-message-group').addClass('has-error');
       return false;
     }
 
     Promise.all(promises)
       .then(function(results) {
-        UI.success(T.problemEditUpdatedSuccessfully);
+        ui.success(T.problemEditUpdatedSuccessfully);
         for (var lang in statements) {
           statements[lang].original = statements[lang].current;
         }
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
     return false;
   });
 
@@ -268,12 +270,12 @@ OmegaUp.on('ready', function() {
                             usernameOrEmail: username,
                           })
                             .then(function(response) {
-                              UI.success(T.adminRemoved);
+                              ui.success(T.adminRemoved);
                               $('div.post.footer').show();
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .catch(UI.apiError);
+                            .catch(ui.apiError);
                         };
                       })(admin.username),
                     ),
@@ -309,12 +311,12 @@ OmegaUp.on('ready', function() {
                             group: alias,
                           })
                             .then(function(response) {
-                              UI.success(T.groupAdminRemoved);
+                              ui.success(T.groupAdminRemoved);
                               $('div.post.footer').show();
                               var tr = e.target.parentElement.parentElement;
                               $(tr).remove();
                             })
-                            .catch(UI.apiError);
+                            .catch(ui.apiError);
                         };
                       })(group_admin.alias),
                     ),
@@ -324,7 +326,7 @@ OmegaUp.on('ready', function() {
 
         $('#problem-admins .site-admin').hide();
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   const problemVersions = new Vue({
@@ -346,9 +348,9 @@ OmegaUp.on('ready', function() {
             })
               .then(function(response) {
                 problemVersions.publishedRevision = selectedRevision;
-                UI.success(T.problemVersionUpdated);
+                ui.success(T.problemVersionUpdated);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'runs-diff': function(versions, selectedCommit) {
             API.Problem.runsDiff({
@@ -362,7 +364,7 @@ OmegaUp.on('ready', function() {
                   response.diff,
                 );
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -385,7 +387,7 @@ OmegaUp.on('ready', function() {
         }
       }
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 
   const solutionEdit = new Vue({
     el: '#solution-edit',
@@ -424,7 +426,7 @@ OmegaUp.on('ready', function() {
                 solutionEdit.solutions[language] = response.solution.markdown;
                 solutionEdit.updateAndRefresh(response.solution.markdown);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'edit-solution': function(solutions, commitMessage, currentLanguage) {
             let promises = [];
@@ -440,23 +442,23 @@ OmegaUp.on('ready', function() {
                     lang: lang,
                   })
                     .then(resolve)
-                    .catch(UI.apiError);
+                    .catch(ui.apiError);
                 }),
               );
             }
             Promise.all(promises)
               .then(function() {
-                UI.success(T.problemEditUpdatedSuccessfully);
+                ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(function(error) {
-                UI.apiError(error);
+                ui.apiError(error);
               });
           },
         },
       });
     },
     mounted: function() {
-      const markdownConverter = UI.markdownConverter({
+      const markdownConverter = markdown.markdownConverter({
         preview: true,
         imageMapping: {},
       });
@@ -491,7 +493,7 @@ OmegaUp.on('ready', function() {
             self.solutions[lang] = response.solution.markdown;
             self.updateAndRefresh(response.solution.markdown);
           })
-          .catch(UI.apiError);
+          .catch(ui.apiError);
       },
     },
     components: {
@@ -510,12 +512,12 @@ OmegaUp.on('ready', function() {
       public: isPublic,
     })
       .then(function(response) {
-        UI.success('Tag successfully added!');
+        ui.success('Tag successfully added!');
         $('div.post.footer').show();
 
         refreshProblemTags();
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
 
     return false; // Prevent refresh
   });
@@ -553,7 +555,7 @@ OmegaUp.on('ready', function() {
                         name: tagname,
                       })
                         .then(function(response) {
-                          UI.success('Tag successfully removed!');
+                          ui.success('Tag successfully removed!');
                           $('div.post.footer').show();
                           var tr = e.target.parentElement.parentElement;
                           $('#tags .tag-list').append(
@@ -566,7 +568,7 @@ OmegaUp.on('ready', function() {
                           );
                           $(tr).remove();
                         })
-                        .catch(UI.apiError);
+                        .catch(ui.apiError);
                     };
                   })(tag.name),
                 ),
@@ -574,11 +576,11 @@ OmegaUp.on('ready', function() {
           );
         }
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   var imageMapping = {};
-  var markdownConverter = UI.markdownConverter({
+  var markdownConverter = markdown.markdownConverter({
     preview: true,
     imageMapping: imageMapping,
   });
@@ -604,12 +606,12 @@ OmegaUp.on('ready', function() {
       statement_type: 'markdown',
     })
       .then(problemCallback)
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function problemCallback(problem) {
     $('.page-header h1 span').html(
-      T.problemEditEditProblem + ' ' + UI.escape(problem.title),
+      `${T.problemEditEditProblem} ${ui.escape(problem.title)}`,
     );
     $('.page-header h1 small').html(
       '&ndash; <a href="/arena/problem/' +
@@ -619,10 +621,10 @@ OmegaUp.on('ready', function() {
         '</a>',
     );
 
-    $('#statement-preview .title').html(UI.escape(problem.title));
+    $('#statement-preview .title').html(ui.escape(problem.title));
     problemSettings.languages = problem.languages.sort().join();
     $('input[name=title]').val(problem.title);
-    problemSettings.timeLimit = UI.parseDuration(
+    problemSettings.timeLimit = time.parseDuration(
       problem.settings.limits.TimeLimit,
     );
 
@@ -630,26 +632,26 @@ OmegaUp.on('ready', function() {
       problem.settings.validator.custom_validator &&
       problem.settings.validator.custom_validator.limits
     ) {
-      problemSettings.validatorTimeLimit = UI.parseDuration(
+      problemSettings.validatorTimeLimit = time.parseDuration(
         problem.settings.validator.custom_validator.limits.TimeLimit,
       );
     } else {
       problemSettings.validatorTimeLimit = 0;
     }
-    problemSettings.overallWallTimeLimit = UI.parseDuration(
+    problemSettings.overallWallTimeLimit = time.parseDuration(
       problem.settings.limits.OverallWallTimeLimit,
     );
-    problemSettings.extraWallTime = UI.parseDuration(
+    problemSettings.extraWallTime = time.parseDuration(
       problem.settings.limits.ExtraWallTime,
     );
     problemSettings.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
     problemSettings.outputLimit = problem.settings.limits.OutputLimit;
     problemSettings.inputLimit = problem.input_limit;
     $('input[name=source]').val(problem.source);
-    $('#statement-preview .source').html(UI.escape(problem.source));
+    $('#statement-preview .source').html(ui.escape(problem.source));
     $('#statement-preview .problemsetter')
       .attr('href', '/profile/' + problem.problemsetter.username + '/')
-      .html(UI.escape(problem.problemsetter.name));
+      .html(ui.escape(problem.problemsetter.name));
     $(
       'input[name=email_clarifications][value=' +
         (problem.email_clarifications ? '1' : '0') +
@@ -710,7 +712,7 @@ OmegaUp.on('ready', function() {
       lang: chosenLanguage,
     })
       .then(problemCallback)
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   });
 
   $('#wmd-input-statement').on('blur', function(e) {

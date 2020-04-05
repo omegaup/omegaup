@@ -92,7 +92,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class BadgeDetails extends Vue {
@@ -120,13 +120,13 @@ export default class BadgeDetails extends Vue {
 
   get firstAssignationDate(): string {
     return this.badge.first_assignation
-      ? UI.formatDate(this.badge.first_assignation)
+      ? time.formatDate(this.badge.first_assignation)
       : '';
   }
 
   get assignationDate(): string {
     return !!this.badge.assignation_time
-      ? UI.formatDate(this.badge.assignation_time)
+      ? time.formatDate(this.badge.assignation_time)
       : '';
   }
 

@@ -2,8 +2,8 @@
   <div class="contest panel">
     <div class="panel-body">
       <div class="text-center">
-        <h2>{{ UI.formatString(T.virtualTitle, { title: title }) }}</h2>
-        <span>{{ UI.formatDelta(finishTime - startTime) }}</span>
+        <h2>{{ ui.formatString(T.virtualTitle, { title: title }) }}</h2>
+        <span>{{ time.formatDelta(finishTime - startTime) }}</span>
         <form class="form" v-on:submit.prevent="onSubmit">
           <div class="row">
             <div class="form-group col-md-4"></div>
@@ -30,14 +30,14 @@
         <ul>
           <li>
             {{
-              UI.formatString(T.contestIntroScoreboardTimePercent, {
+              ui.formatString(T.contestIntroScoreboardTimePercent, {
                 window_length: scoreboard,
               })
             }}
           </li>
           <li>
             {{
-              UI.formatString(T.contestIntroSubmissionsSeparationDesc, {
+              ui.formatString(T.contestIntroSubmissionsSeparationDesc, {
                 window_length: Math.floor(submissionsGap / 60),
               })
             }}
@@ -52,7 +52,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import * as time from '../../time';
 import DateTimePicker from '../DateTimePicker.vue';
 
 @Component({
@@ -69,7 +70,8 @@ export default class ArenaVirtual extends Vue {
   @Prop() submissionsGap!: number;
 
   T = T;
-  UI = UI;
+  ui = ui;
+  time = time;
   virtualContestStartTime = new Date();
 
   onSubmit(): void {

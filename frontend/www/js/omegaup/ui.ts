@@ -269,3 +269,14 @@ export function reportEvent(
   }
   window.ga('send', 'event', category, action, label);
 }
+
+export function rankingUsername(
+  rank: omegaup.User & { virtual?: boolean },
+): string {
+  let username = rank.username;
+  if (!!rank.name && rank.name != rank.username)
+    username += ` (${escapeString(rank.name)})`;
+  if (rank.virtual)
+    username = formatString(T.virtualSuffix, { username: username });
+  return username;
+}

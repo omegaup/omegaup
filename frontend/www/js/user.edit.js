@@ -64,7 +64,7 @@ omegaup.OmegaUp.on('ready', function() {
         .data('date', data.birth_date)
         .val(
           data.birth_date
-            ? omegaup.UI.formatDate(data.birth_date)
+            ? omegaup.Time.formatDate(data.birth_date)
             : data.birth_date,
         );
       $('#gender').val(data.gender);
@@ -72,7 +72,7 @@ omegaup.OmegaUp.on('ready', function() {
         .data('date', data.graduation_date)
         .val(
           data.graduation_date
-            ? omegaup.UI.formatDate(data.graduation_date)
+            ? omegaup.Time.formatDate(data.graduation_date)
             : data.graduation_date,
         );
       $('#country_id').val(data.country_id);

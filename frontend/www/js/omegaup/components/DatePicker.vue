@@ -13,7 +13,7 @@
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import T from '../lang';
-import * as UI from '../ui';
+import * as time from '../time';
 import '../../../third_party/js/bootstrap-datepicker.js';
 
 @Component
@@ -25,7 +25,7 @@ export default class DatePicker extends Vue {
   @Prop({ default: T.datePickerFormat }) format!: string;
 
   private usedFallback: boolean = false;
-  private stringValue: string = UI.formatDateLocal(this.value);
+  private stringValue: string = time.formatDateLocal(this.value);
 
   mounted() {
     if ((this.$el as HTMLInputElement).type === 'text') {
@@ -56,12 +56,12 @@ export default class DatePicker extends Vue {
       // If the fallback was used, we don't need to update anything.
       return;
     }
-    this.$emit('input', UI.parseDateLocal(newStringValue));
+    this.$emit('input', time.parseDateLocal(newStringValue));
   }
 
   @Watch('value')
   onPropertyChanged(newValue: Date) {
-    this.stringValue = UI.formatDateLocal(newValue);
+    this.stringValue = time.formatDateLocal(newValue);
     if (this.usedFallback) {
       $(this.$el).datepicker('setValue', newValue);
     }

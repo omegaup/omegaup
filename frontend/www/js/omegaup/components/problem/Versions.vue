@@ -54,7 +54,7 @@
                   </td>
 
                   <td>
-                    {{ UI.formatDateTime(new Date(revision.committer.time))
+                    {{ time.formatDateTime(new Date(revision.committer.time))
                     }}<br />
                     <acronym v-bind:title="revision.commit"
                       ><tt>{{ revision.commit.substr(0, 8) }}</tt></acronym
@@ -171,7 +171,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as time from '../../time';
 
 interface RunsDiff {
   guid: string;
@@ -197,7 +197,7 @@ export default class ProblemVersions extends Vue {
   @Prop() value!: omegaup.Commit;
 
   T = T;
-  UI = UI;
+  time = time;
   diffMode = 'files';
   selectedRevision: omegaup.Commit = this.value;
   runsDiff: CommitRunsDiff = {};
