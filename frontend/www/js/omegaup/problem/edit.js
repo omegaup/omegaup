@@ -72,12 +72,9 @@ OmegaUp.on('ready', function() {
   // Add typeaheads
   refreshProblemAdmins();
   typeahead.userTypeahead($('#username-admin'));
-  typeahead.typeahead($('#groupalias-admin'), API.Group.list, function(
-    event,
-    val,
-  ) {
-    $(event.target).attr('data-alias', val.value);
-  });
+  typeahead.groupTypeahead($('#groupalias-admin'), (event, val) =>
+    $(event.target).attr('data-alias', val.value),
+  );
 
   refreshProblemTags();
 
@@ -122,21 +119,7 @@ OmegaUp.on('ready', function() {
     })
     .catch(ui.apiError);
 
-  $('#tag-name')
-    .typeahead(
-      {
-        minLength: 2,
-        highlight: true,
-      },
-      {
-        source: typeahead.typeaheadWrapper(API.Tag.list),
-        async: true,
-        display: 'name',
-      },
-    )
-    .on('typeahead:select', function(event, val) {
-      $(event.target).val(val.name);
-    });
+  typeahead.tagTypeahead($('#tag-name'));
 
   $('#add-admin-form').on('submit', function() {
     var username = $('#username-admin').val();
