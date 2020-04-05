@@ -86,11 +86,7 @@
 		{/if}
 {/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}
-	{if isset($headerPayload)}
-		{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
-	{else}
-		{include file='common.navbar.tpl' headerPayload=[] inline}
-	{/if}
+	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 	<main role="main">
 		{if !isset($inArena) || !$inArena}
 			{include file='mainmenu.tpl' inline}

@@ -1,14 +1,21 @@
 <template>
-  <header class="nav-container fixed-top">
-    <div class="container-xl">
-      <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="/">
-          <img alt="omegaUp" src="/media/omegaup_curves.png" />
+  <header class="fixed-top">
+    <div class="container-xl pl-0 pl-xl-3">
+      <nav class="navbar navbar-expand-lg navbar-dark p-0">
+        <a class="navbar-brand p-3" href="/">
+          <img
+            alt="omegaUp"
+            src="/media/omegaup_curves.png"
+            height="20"
+            class="d-inline-block"
+          />
           <img
             alt="lockdown"
             title="lockdown"
             v-bind:src="lockDownImage"
             v-show="omegaUpLockDown"
+            v-bind:class="{ 'd-inline-block': omegaUpLockDown }"
+            height="20"
           />
         </a>
         <button
@@ -27,7 +34,7 @@
               class="nav-item"
               v-bind:class="{ active: navbarSection === 'arena' }"
             >
-              <a class="nav-link" href="/arena/">{{ T.navArena }}</a>
+              <a class="nav-link px-2" href="/arena/">{{ T.navArena }}</a>
             </li>
             <li
               class="nav-item dropdown nav-contests"
@@ -35,7 +42,7 @@
               v-if="isLoggedIn && isMainUserIdentity"
             >
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link px-2 dropdown-toggle"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
@@ -63,7 +70,7 @@
               v-if="isLoggedIn && isMainUserIdentity"
             >
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link px-2 dropdown-toggle"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
@@ -102,7 +109,7 @@
               v-else=""
             >
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link px-2 dropdown-toggle"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
@@ -125,7 +132,7 @@
               v-bind:class="{ active: navbarSection === 'rank' }"
             >
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link px-2 dropdown-toggle"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
@@ -147,15 +154,15 @@
               class="nav-item nav-courses"
               v-bind:class="{ active: navbarSection === 'courses' }"
             >
-              <a class="nav-link" href="/schools/">{{ T.navCourses }}</a>
+              <a class="nav-link px-2" href="/schools/">{{ T.navCourses }}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="http://blog.omegaup.com/">{{
+              <a class="nav-link px-2" href="http://blog.omegaup.com/">{{
                 T.navBlog
               }}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="https://omegaup.com/preguntas/">{{
+              <a class="nav-link px-2" href="https://omegaup.com/preguntas/">{{
                 T.navQuestions
               }}</a>
             </li>
@@ -164,7 +171,7 @@
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul class="navbar-nav navbar-right" v-if="!isLoggedIn">
             <li class="nav-item">
-              <a class="nav-link" v-bind:href="formattedLoginURL">{{
+              <a class="nav-link px-2" v-bind:href="formattedLoginURL">{{
                 T.navLogIn
               }}</a>
             </li>
@@ -182,14 +189,14 @@
             -->
             <li class="nav-item dropdown nav-user">
               <a
-                class="nav-link dropdown-toggle nav-user-link"
+                class="nav-link px-2 dropdown-toggle nav-user-link"
                 href="#"
                 role="button"
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img class="gravatar-img" v-bind:src="gravatarURL51" /><span
+                <img v-bind:src="gravatarURL51" height="45" /><span
                   class="username"
                   v-bind:title="currentUsername"
                   >{{ currentUsername }}</span
@@ -244,53 +251,12 @@
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-header.nav-container {
-  .container-xl {
-    padding-left: 0; // Permite que el logo esté al extremo izquierdo en pantallas pequeñas
-  }
-
+header {
   background-color: $header-primary-color;
 
-  nav.navbar {
-    padding: 0;
-
-    .navbar-brand {
-      margin: 0;
-      padding: 10px 15px;
-      background-color: $white;
-      background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
-      img {
-        height: 20px;
-      }
-    }
-
-    .dropdown-menu {
-      padding: 5px 0;
-    }
-
-    .nav-item {
-      &.active {
-        font-weight: bold;
-      }
-
-      a.nav-link {
-        color: $white;
-        padding-left: 15px;
-        padding-right: 15px;
-
-        &:hover {
-          color: rgba($black, 0.7);
-        }
-      }
-    }
-
-    .nav-user-link {
-      padding: 0 15px;
-      img.gravatar-img {
-        width: 45px;
-        height: 45px;
-      }
-    }
+  .navbar-brand {
+    background-color: $white;
+    background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
   }
 }
 </style>
