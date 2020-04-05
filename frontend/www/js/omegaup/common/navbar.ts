@@ -8,9 +8,7 @@ import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload: types.CommonPayload = JSON.parse(
-    (<HTMLElement>document.getElementById('header-payload')).innerText,
-  );
+  const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
     render: function(createElement) {

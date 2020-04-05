@@ -6,8 +6,8 @@ import * as api from './api_transitional';
 import * as ui from './ui_transitional';
 
 OmegaUp.on('ready', () => {
-  const payload: types.UserRankTablePayload = JSON.parse(
-    (<HTMLElement>document.getElementById('rank-table-payload')).innerText,
+  const payload = types.payloadParsers.UserRankTablePayload(
+    'rank-table-payload',
   );
 
   api.User.rankByProblemsSolved({

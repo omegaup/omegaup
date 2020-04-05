@@ -8,9 +8,7 @@ import * as ui from '../ui_transitional';
 import * as Highcharts from 'highcharts';
 
 OmegaUp.on('ready', () => {
-  const payload: types.StatsPayload = JSON.parse(
-    (<HTMLElement>document.getElementById('stats-payload')).innerText,
-  );
+  const payload = types.payloadParsers.StatsPayload('stats-payload');
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 

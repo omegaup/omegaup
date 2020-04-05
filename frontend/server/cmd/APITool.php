@@ -607,6 +607,31 @@ class APIGenerator {
             echo "\n// Type aliases\n";
             echo "export namespace types {\n";
             ksort($this->typeMapper->typeAliases);
+
+            echo "  export namespace payloadParsers {\n";
+            foreach ($this->typeMapper->typeAliases as $typeName => $conversionResult) {
+                if (
+                    strpos($typeName, 'Payload') !==
+                    strlen($typeName) - strlen('Payload')
+                ) {
+                    continue;
+                }
+                if (is_null($conversionResult->conversionFunction)) {
+                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
+                    echo "     return JSON.parse(\n";
+                    echo "       (<HTMLElement>document.getElementById(elementId)).innerText,\n";
+                    echo "     );\n\n";
+                    echo "   }\n\n";
+                } else {
+                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
+                    echo "     return ({$conversionResult->conversionFunction})(\n";
+                    echo "       JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),\n";
+                    echo "     );\n\n";
+                    echo "   }\n\n";
+                }
+            }
+            echo "  }\n\n";
+
             foreach ($this->typeMapper->typeAliases as $typeName => $conversionResult) {
                 echo "  export interface {$typeName} {$conversionResult->typescriptExpansion};\n\n";
             }

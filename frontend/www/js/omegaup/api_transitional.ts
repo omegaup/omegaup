@@ -99,8 +99,15 @@ export const Badge = {
   ),
   myBadgeAssignationTime: apiCall<
     messages.BadgeMyBadgeAssignationTimeRequest,
+    messages._BadgeMyBadgeAssignationTimeServerResponse,
     messages.BadgeMyBadgeAssignationTimeResponse
-  >('/api/badge/myBadgeAssignationTime/'),
+  >('/api/badge/myBadgeAssignationTime/', x => {
+    if (x.assignation_time)
+      x.assignation_time = ((x: number) => new Date(x * 1000))(
+        x.assignation_time,
+      );
+    return x;
+  }),
   myList: apiCall<
     messages.BadgeMyListRequest,
     messages._BadgeMyListServerResponse,
