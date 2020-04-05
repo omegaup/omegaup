@@ -58,13 +58,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class Notification extends Vue {
-  @Prop() notification!: omegaup.Notification;
+  @Prop() notification!: types.Notification;
 
   get iconUrl(): string {
     switch (this.notification.contents.type) {
@@ -78,7 +79,7 @@ export default class Notification extends Vue {
   get text(): string {
     switch (this.notification.contents.type) {
       case 'badge':
-        return UI.formatString(T.notificationNewBadge, {
+        return ui.formatString(T.notificationNewBadge, {
           badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
       default:
@@ -87,7 +88,7 @@ export default class Notification extends Vue {
   }
 
   get date() {
-    return UI.formatDate(this.notification.timestamp);
+    return time.formatDate(this.notification.timestamp);
   }
 }
 </script>

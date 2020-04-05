@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
@@ -62,13 +62,18 @@ export default class Requests extends Vue {
   @Prop() textAddParticipant!: string;
 
   T = T;
-  requests = this.data;
+  requests: omegaup.IdentityRequest[] = this.data;
 
   onAcceptRequest(username: string): void {
     this.$emit('emit-accept-request', this, username);
   }
   onDenyRequest(username: string): void {
     this.$emit('emit-deny-request', this, username);
+  }
+
+  @Watch('data')
+  onDataChange(): void {
+    this.requests = this.data;
   }
 }
 </script>

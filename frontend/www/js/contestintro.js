@@ -3,7 +3,7 @@ omegaup.OmegaUp.on('ready', function() {
   var contestObject = null;
 
   if ($('.requests-user-information').length) {
-    var markdownConverter = omegaup.UI.markdownConverter();
+    var markdownConverter = omegaup.Markdown.markdownConverter();
     var payload = JSON.parse(document.getElementById('payload').innerText);
     document.getElementsByClassName(
       'requests-user-information',

@@ -324,9 +324,9 @@ for current user.
 
 ### Returns
 
-| Name               | Type     |
-| ------------------ | -------- |
-| `assignation_time` | `number` |
+| Name               | Type   |
+| ------------------ | ------ |
+| `assignation_time` | `Date` |
 
 ## `/api/badge/myList/`
 
@@ -1429,22 +1429,9 @@ Returns all details of a given Course
 
 ### Returns
 
-| Name                         | Type                                                                                                                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`                       | `string`                                                                                                                                                                                                                                         |
-| `description`                | `string`                                                                                                                                                                                                                                         |
-| `alias`                      | `string`                                                                                                                                                                                                                                         |
-| `basic_information_required` | `boolean`                                                                                                                                                                                                                                        |
-| `requests_user_information`  | `string`                                                                                                                                                                                                                                         |
-| `assignments`                | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: number; finish_time: number; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `school_id`                  | `number`                                                                                                                                                                                                                                         |
-| `start_time`                 | `number`                                                                                                                                                                                                                                         |
-| `finish_time`                | `number`                                                                                                                                                                                                                                         |
-| `is_admin`                   | `boolean`                                                                                                                                                                                                                                        |
-| `public`                     | `boolean`                                                                                                                                                                                                                                        |
-| `show_scoreboard`            | `boolean`                                                                                                                                                                                                                                        |
-| `student_count`              | `number`                                                                                                                                                                                                                                         |
-| `school_name`                | `string`                                                                                                                                                                                                                                         |
+```typescript
+types.CourseDetails;
+```
 
 ## `/api/course/admins/`
 
@@ -1644,22 +1631,9 @@ Returns details of a given course
 
 ### Returns
 
-| Name                         | Type                                                                                                                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`                       | `string`                                                                                                                                                                                                                                         |
-| `description`                | `string`                                                                                                                                                                                                                                         |
-| `alias`                      | `string`                                                                                                                                                                                                                                         |
-| `basic_information_required` | `boolean`                                                                                                                                                                                                                                        |
-| `requests_user_information`  | `string`                                                                                                                                                                                                                                         |
-| `assignments`                | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: number; finish_time: number; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `school_id`                  | `number`                                                                                                                                                                                                                                         |
-| `start_time`                 | `number`                                                                                                                                                                                                                                         |
-| `finish_time`                | `number`                                                                                                                                                                                                                                         |
-| `is_admin`                   | `boolean`                                                                                                                                                                                                                                        |
-| `public`                     | `boolean`                                                                                                                                                                                                                                        |
-| `show_scoreboard`            | `boolean`                                                                                                                                                                                                                                        |
-| `student_count`              | `number`                                                                                                                                                                                                                                         |
-| `school_name`                | `string`                                                                                                                                                                                                                                         |
+```typescript
+types.CourseDetails;
+```
 
 ## `/api/course/getProblemUsers/`
 
@@ -2048,9 +2022,9 @@ Calls to /status grader
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                         |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `grader` | `{ status: string; broadcaster_sockets: number; embedded_runner: boolean; queue: { running: { name: string; id: number; }[]; run_queue_length: number; runner_queue_length: number; runners: string[]; }; }` |
+| Name     | Type                 |
+| -------- | -------------------- |
+| `grader` | `types.GraderStatus` |
 
 # Group
 
@@ -2451,9 +2425,9 @@ Returns a list of unread notifications for user
 
 ### Returns
 
-| Name            | Type                                                                  |
-| --------------- | --------------------------------------------------------------------- |
-| `notifications` | `{ contents: string; notification_id: number; timestamp: number; }[]` |
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `notifications` | `types.Notification[]` |
 
 ## `/api/notification/readNotifications/`
 
@@ -2932,7 +2906,7 @@ Stats of a problem
 | Name             | Type                         |
 | ---------------- | ---------------------------- |
 | `cases_stats`    | `{ [key: string]: number; }` |
-| `pending_runs`   | `{ guid: string; }[]`        |
+| `pending_runs`   | `string[]`                   |
 | `total_runs`     | `number`                     |
 | `verdict_counts` | `{ [key: string]: number; }` |
 

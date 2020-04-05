@@ -9,7 +9,7 @@ CREATE TABLE `Courses` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un curso/clase que un maestro da.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Un curso/clase que un maestro da.';
 
 CREATE TABLE `Assignments` (
   `assignment_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -24,7 +24,7 @@ CREATE TABLE `Assignments` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`, `alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
 
 ALTER TABLE `Assignments`
   ADD CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

@@ -1,36 +1,8 @@
 import T from './lang';
-import API from './api.js';
+import API from './api';
+import * as ui from './ui';
 
-import {
-  escape as escapeString,
-  formatString,
-  error,
-  success,
-  ignoreError,
-} from './ui_transitional';
-export * from './ui_transitional';
-export * from './time';
-export * from './markdown';
-
-export function rankingUsername(rank) {
-  let username = rank.username;
-  if (!!rank.name && rank.name != rank.username)
-    username += ` (${escapeString(rank.name)})`;
-  if (rank.virtual)
-    username = formatString(T.virtualSuffix, { username: username });
-  return username;
-}
-
-export function contestUpdated(data, contestAlias) {
-  if (data.status != 'ok') {
-    error(data.error || 'error');
-    return;
-  }
-  success(
-    T.contestEditContestEdited +
-      ` <a href="/arena/${contestAlias}">${T.contestEditGoToContest}</a>`,
-  );
-}
+import '../../third_party/js/typeahead.jquery.js';
 
 export function typeaheadWrapper(searchFn) {
   let lastRequest = null;
@@ -43,7 +15,7 @@ export function typeaheadWrapper(searchFn) {
     pendingRequest = true;
     searchFn({ query: query })
       .then(data => asyncResults(data.results || data))
-      .catch(ignoreError)
+      .catch(ui.ignoreError)
       .finally(() => {
         pendingRequest = false;
 
@@ -74,7 +46,7 @@ export function typeahead(elem, searchFn, cb) {
         display: 'label',
         templates: {
           suggestion: val => {
-            return formatString(
+            return ui.formatString(
               '<div data-value="%(value)">%(label)</div>',
               val,
             );
@@ -103,7 +75,7 @@ export function problemTypeahead(elem, cb) {
         display: 'alias',
         templates: {
           suggestion: val => {
-            return formatString(
+            return ui.formatString(
               '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
               val,
             );
@@ -143,7 +115,7 @@ export function problemContestTypeahead(elem, problemList, cb) {
         display: 'alias',
         templates: {
           suggestion: val => {
-            return formatString(
+            return ui.formatString(
               '<div data-value="%(alias)">%(alias)</div>',
               val,
             );
@@ -173,7 +145,7 @@ export function schoolTypeahead(elem, cb) {
         templates: {
           empty: T.schoolToBeAdded,
           suggestion: val => {
-            return formatString(
+            return ui.formatString(
               '<div data-value="%(value)">%(label)</div>',
               val,
             );

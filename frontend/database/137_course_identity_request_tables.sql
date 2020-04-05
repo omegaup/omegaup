@@ -10,7 +10,7 @@ CREATE TABLE `Course_Identity_Request` (
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_ciri_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_circ_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Usado cuando un curso se registra con admission_mode = registration';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Usado cuando un curso se registra con admission_mode = registration';
 
 CREATE TABLE `Course_Identity_Request_History` (
   `history_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -24,7 +24,7 @@ CREATE TABLE `Course_Identity_Request_History` (
   KEY `identity_course_hist` (`identity_id`,`course_id`),
   CONSTRAINT `fk_cirhi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cirhc_curse_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla para almacenar la respuesta de cada una de las peticiones hechas al curso con admission_mode = registration';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla para almacenar la respuesta de cada una de las peticiones hechas al curso con admission_mode = registration';
 
 -- Update Groups_Identities, adding is_invited column
 ALTER TABLE

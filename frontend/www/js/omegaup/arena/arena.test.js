@@ -3,21 +3,8 @@
 require('../../dist/commons.js');
 var omegaup = require('../../dist/omegaup.js');
 var arena = require('../../dist/arena.js');
-var Markdown = require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
 
 describe('arena', function() {
-  describe('FormatDelta', function() {
-    it('Should handle zeroes', function() {
-      expect(omegaup.UI.formatDelta(0)).toEqual('00:00:00');
-    });
-
-    it('Should handle large deltas as human readable text', function() {
-      expect(omegaup.UI.formatDelta(31 * 24 * 3600 * 1000)).toEqual(
-        'en un mes',
-      );
-    });
-  });
-
   describe('GetOptionsFromLocation', function() {
     it('Should detect normal contests', function() {
       var options = arena.GetOptionsFromLocation(
@@ -66,9 +53,6 @@ describe('arena', function() {
     });
 
     it('can be instantiated', function() {
-      if (typeof global !== 'undefined' && !global.Markdown) {
-        global.Markdown = Markdown;
-      }
       var arenaInstance = new arena.Arena({ contestAlias: 'test' });
       expect(arenaInstance.options.contestAlias).toEqual('test');
       expect(arenaInstance.problemsetAdmin).toEqual(false);

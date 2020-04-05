@@ -81,12 +81,16 @@
         </omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active" v-if="showTab === 'publish'">
-        <omegaup-contest-publish
-          v-bind:data="contest"
+        <omegaup-common-publish
+          v-bind:initialAdmissionMode="contest.admission_mode"
+          v-bind:shouldShowPublicOption="true"
+          v-bind:admissionModeDescription="
+            T.contestNewFormAdmissionModeDescription
+          "
           v-on:emit-update-admission-mode="
             publishComponent => $emit('update-admission-mode', publishComponent)
           "
-        ></omegaup-contest-publish>
+        ></omegaup-common-publish>
       </div>
       <div class="tab-pane active contestants" v-if="showTab === 'contestants'">
         <omegaup-contest-contestant
@@ -100,7 +104,7 @@
           "
           v-on:emit-save-end-time="selected => $emit('save-end-time', selected)"
         ></omegaup-contest-contestant>
-        <omegaup-contest-requests
+        <omegaup-common-requests
           v-bind:data="requests"
           v-bind:text-add-participant="T.contestAdduserAddContestant"
           v-on:emit-accept-request="
@@ -111,7 +115,7 @@
             (requestsComponent, username) =>
               $emit('deny-request', requestsComponent, username)
           "
-        ></omegaup-contest-requests>
+        ></omegaup-common-requests>
         <omegaup-contest-groups
           v-bind:data="groups"
           v-if="isIdentitiesExperimentEnabled"
@@ -173,7 +177,7 @@ import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from './GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import contest_Publish from './Publish.vue';
+import common_Publish from '../common/Publish.vue';
 
 interface ContestEdit {
   admins: omegaup.UserRole[];
@@ -191,12 +195,12 @@ interface ContestEdit {
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-contestant': contest_Contestant,
-    'omegaup-contest-requests': common_Requests,
+    'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
-    'omegaup-contest-publish': contest_Publish,
+    'omegaup-common-publish': common_Publish,
   },
 })
 export default class Edit extends Vue {

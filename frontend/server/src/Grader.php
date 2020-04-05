@@ -2,6 +2,9 @@
 
 namespace OmegaUp;
 
+/**
+ * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
+ */
 class Grader {
     /** @var null|\OmegaUp\Grader */
     private static $_instance = null;
@@ -96,7 +99,7 @@ class Grader {
     /**
      * Returns the response of the /status entry point
      *
-     * @return array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
+     * @return GraderStatus
      */
     public function status(): array {
         if (OMEGAUP_GRADER_FAKE) {
@@ -112,7 +115,7 @@ class Grader {
                 ],
             ];
         }
-        /** @var array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}} */
+        /** @var GraderStatus */
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . '/grader/status/',
             self::REQUEST_MODE_JSON

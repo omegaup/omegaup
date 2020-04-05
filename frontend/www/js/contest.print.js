@@ -1,5 +1,5 @@
 (function() {
-  var markdownConverter = omegaup.UI.markdownConverter({ preview: true });
+  var markdownConverter = omegaup.Markdown.markdownConverter({ preview: true });
 
   var problems = document.querySelectorAll('div.problem');
   for (var i = 0; i < problems.length; i++) {

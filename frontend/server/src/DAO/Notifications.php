@@ -15,21 +15,28 @@ namespace OmegaUp\DAO;
  */
 class Notifications extends \OmegaUp\DAO\Base\Notifications {
     /**
-     * @return list<array{contents: string, notification_id: int, timestamp: int}>
+     * @return list<array{contents: string, notification_id: int, timestamp: \OmegaUp\Timestamp}>
      */
     public static function getUnreadNotifications(
         \OmegaUp\DAO\VO\Users $user
     ): array {
-        $sql = 'SELECT
-                    n.notification_id, n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp
-                FROM
-                    Notifications n
-                WHERE
-                    n.user_id = ? AND n.read = 0
-                ORDER BY
-                    n.timestamp ASC;';
-        $args = [$user->user_id];
-        /** @var list<array{contents: string, notification_id: int, timestamp: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        $sql = '
+            SELECT
+                `n`.`notification_id`,
+                `n`.`contents`,
+                `n`.`timestamp`
+            FROM
+                Notifications `n`
+            WHERE
+                `n`.`user_id` = ? AND
+                `n`.`read` = 0
+            ORDER BY
+                `n`.`timestamp` ASC;
+        ';
+        /** @var list<array{contents: string, notification_id: int, timestamp: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$user->user_id]
+        );
     }
 }

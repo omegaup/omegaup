@@ -67,7 +67,7 @@
               </thead>
               <tbody>
                 <tr v-for="run in selectedProblem.runs">
-                  <td>{{ UI.formatDateTime(run.time) }}</td>
+                  <td>{{ time.formatDateTime(run.time) }}</td>
                   <td>{{ run.verdict }}</td>
                   <td class="numeric">{{ 100 * run.score }}</td>
                 </tr>
@@ -92,7 +92,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as time from '../../ui';
 
 @Component
 export default class CourseViewStudent extends Vue {
@@ -103,7 +103,7 @@ export default class CourseViewStudent extends Vue {
   @Prop() students!: omegaup.CourseStudent[];
 
   T = T;
-  UI = UI;
+  time = time;
   selectedAssignment: Partial<omegaup.Assignment> = {};
   selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
   selectedStudent: Partial<omegaup.CourseStudent> = this.initialStudent || {};

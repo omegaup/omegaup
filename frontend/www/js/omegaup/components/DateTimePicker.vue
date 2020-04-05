@@ -5,8 +5,8 @@
     size="16"
     type="datetime-local"
     v-bind:disabled="!enabled"
-    v-bind:max="finish ? UI.formatDateTimeLocal(finish) : null"
-    v-bind:min="start ? UI.formatDateTimeLocal(start) : null"
+    v-bind:max="finish ? time.formatDateTimeLocal(finish) : null"
+    v-bind:min="start ? time.formatDateTimeLocal(start) : null"
     v-bind:readonly="readonly || usedFallback"
     v-model="stringValue"
   />
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import T from '../lang';
-import * as UI from '../ui';
+import * as time from '../time';
 import '../../../third_party/js/bootstrap-datetimepicker.min.js';
 import '../../../third_party/js/locales/bootstrap-datetimepicker.es.js';
 import '../../../third_party/js/locales/bootstrap-datetimepicker.pt-BR.js';
@@ -23,7 +23,7 @@ import '../../../third_party/js/locales/bootstrap-datetimepicker.pt-BR.js';
 @Component
 export default class DateTimePicker extends Vue {
   T = T;
-  UI = UI;
+  time = time;
 
   @Prop() value!: Date;
   @Prop({ default: true }) enabled!: boolean;
@@ -33,7 +33,7 @@ export default class DateTimePicker extends Vue {
   @Prop({ default: false }) readonly!: boolean;
 
   private usedFallback: boolean = false;
-  private stringValue: string = UI.formatDateTimeLocal(this.value);
+  private stringValue: string = time.formatDateTimeLocal(this.value);
 
   public mounted() {
     if ((this.$el as HTMLInputElement).type === 'text') {
@@ -83,12 +83,12 @@ export default class DateTimePicker extends Vue {
       // If the fallback was used, we don't need to update anything.
       return;
     }
-    this.$emit('input', UI.parseDateTimeLocal(newStringValue));
+    this.$emit('input', time.parseDateTimeLocal(newStringValue));
   }
 
   @Watch('value')
   onPropertyChanged(newValue: Date) {
-    this.stringValue = UI.formatDateTimeLocal(newValue);
+    this.stringValue = time.formatDateTimeLocal(newValue);
     if (this.usedFallback) {
       $(this.$el)
         .data('datetimepicker')
