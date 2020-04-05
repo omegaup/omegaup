@@ -234,7 +234,7 @@
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
 
 @Component({
@@ -246,7 +246,6 @@ export default class CourseDetails extends Vue {
   @Prop() update!: boolean;
   @Prop() course!: omegaup.Course;
 
-  UI = UI;
   T = T;
   alias = this.course.alias || '';
   description = this.course.description || '';
@@ -267,14 +266,13 @@ export default class CourseDetails extends Vue {
   }
 
   mounted(): void {
-    let self = this;
-    this.UI.schoolTypeahead($('input.typeahead', self.$el), function(
-      event: Event,
-      item: any,
-    ) {
-      self.school_name = item.value;
-      self.school_id = item.id;
-    });
+    typeahead.schoolTypeahead(
+      $('input.typeahead', this.$el),
+      (event: Event, item: any) => {
+        this.school_name = item.value;
+        this.school_id = item.id;
+      },
+    );
   }
 
   @Watch('course')
