@@ -2906,7 +2906,7 @@ Stats of a problem
 | Name             | Type                         |
 | ---------------- | ---------------------------- |
 | `cases_stats`    | `{ [key: string]: number; }` |
-| `pending_runs`   | `{ guid: string; }[]`        |
+| `pending_runs`   | `string[]`                   |
 | `total_runs`     | `number`                     |
 | `verdict_counts` | `{ [key: string]: number; }` |
 

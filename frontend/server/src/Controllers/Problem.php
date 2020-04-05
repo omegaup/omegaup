@@ -7,6 +7,7 @@
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
+ * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3047,7 +3048,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}
+     * @return array{cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         // Get user
@@ -3068,7 +3069,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $problem_alias
      *
-     * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}}, template: string}
+     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3085,7 +3086,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'payload' => array_merge(
+                'statsPayload' => array_merge(
                     [
                         'alias' => $r['problem_alias'],
                         'entity_type' => 'problem',
@@ -3098,7 +3099,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{cases_stats: array<string, int>, pending_runs: list<array{guid: string}>, total_runs: int, verdict_counts: array<string, int>}
+     * @return array{cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>}
      */
     public static function getStats(
         \OmegaUp\DAO\VO\Problems $problem,
