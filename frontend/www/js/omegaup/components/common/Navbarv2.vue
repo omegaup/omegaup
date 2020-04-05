@@ -1,7 +1,7 @@
 <template>
-  <header class="fixed-top">
-    <div class="container-xl pl-0 pl-xl-3">
-      <nav class="navbar navbar-expand-lg navbar-dark p-0">
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0">
+      <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3" href="/">
           <img
             alt="omegaUp"
@@ -244,14 +244,14 @@
             </li>
           </ul>
         </div>
-      </nav>
-    </div>
+      </div>
+    </nav>
   </header>
 </template>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-header {
+nav.navbar {
   background-color: $header-primary-color;
 
   .navbar-brand {
