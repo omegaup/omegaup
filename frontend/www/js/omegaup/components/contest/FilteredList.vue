@@ -24,7 +24,7 @@
             <tr>
               <td class="col-md-6">
                 <a v-bind:href="`/arena/${contest.alias}/`">
-                  <span>{{ UI.contestTitle(contest) }}</span>
+                  <span>{{ ui.contestTitle(contest) }}</span>
                   <span
                     class="glyphicon glyphicon-ok"
                     aria-hidden="true"
@@ -43,7 +43,7 @@
                 }}</a>
               </td>
               <td class="no-wrap col-md-2" v-if="showTimes">
-                {{ UI.toDDHHMM(contest.duration) }}
+                {{ time.toDDHHMM(contest.duration) }}
               </td>
               <td class="col-md-2" v-if="showPractice">
                 <a v-bind:href="`/arena/${contest.alias}/practice/`">
@@ -55,7 +55,7 @@
                   <span>{{ T.wordsContestsResults }}</span>
                 </a>
               </td>
-              <td class="col-md-2" v-if="!UI.isVirtual(contest) && showVirtual">
+              <td class="col-md-2" v-if="!ui.isVirtual(contest) && showVirtual">
                 <a v-bind:href="`/arena/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
@@ -93,7 +93,8 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class FilteredList extends Vue {
@@ -105,7 +106,8 @@ export default class FilteredList extends Vue {
   @Prop() recommended!: boolean;
 
   T = T;
-  UI = UI;
+  ui = ui;
+  time = time;
   pageNumber = 1;
   pageSize = 10;
 

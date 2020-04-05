@@ -12,7 +12,9 @@ import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import common_Navbar from '../components/common/Navbar.vue';
-import * as UI from '../ui';
+import * as markdown from '../markdown';
+import * as ui from '../ui';
+import * as time from '../time';
 import * as typeahead from '../typeahead';
 import Vue from 'vue';
 import * as ko from 'knockout';
@@ -295,7 +297,7 @@ export class Arena {
     self.currentEvents = null;
 
     // The Markdown-to-HTML converter.
-    self.markdownConverter = UI.markdownConverter();
+    self.markdownConverter = markdown.markdownConverter();
 
     // Currently opened clarification notifications.
     self.commonNavbar = null;
@@ -348,7 +350,7 @@ export class Arena {
           .then(data => {
             self.commonNavbar.notifications = data.notifications;
           })
-          .catch(UI.apiError);
+          .catch(ui.apiError);
 
         function updateGraderStatus() {
           api.Grader.status()
@@ -549,7 +551,7 @@ export class Arena {
       let lang = form.find('.download-lang').val();
       let extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
-      UI.navigateTo(
+      ui.navigateTo(
         window.location.protocol +
           '//' +
           window.location.host +
@@ -673,14 +675,14 @@ export class Arena {
           return function() {
             let t = new Date();
             self.elements.loadingOverlay.html(
-              x + ' ' + UI.formatDelta(y.getTime() - t.getTime()),
+              `${x} ${time.formatDelta(y.getTime() - t.getTime())}`,
             );
             if (t.getTime() < y.getTime()) {
               setTimeout(f, 1000);
             } else {
               api.Problemset.details({ problemset_id: x })
                 .then(problemsetLoaded.bind(self))
-                .catch(UI.ignoreError);
+                .catch(ui.ignoreError);
             }
           };
         })(self.options.problemsetId, problemset.start_time);
@@ -712,7 +714,7 @@ export class Arena {
     }
 
     $('#title .contest-title').html(
-      UI.escape(problemset.title || problemset.name),
+      ui.escape(problemset.title || problemset.name),
     );
     self.updateSummary(problemset);
     self.submissionGap = parseInt(problemset.submission_gap);
@@ -729,7 +731,7 @@ export class Arena {
     let problemSelect = $('select', self.elements.clarification);
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
-      let problemName = problem.letter + '. ' + UI.escape(problem.title);
+      let problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
       if (self.elements.navBar) {
         self.elements.navBar.problems.push({
@@ -824,7 +826,7 @@ export class Arena {
     let now = Date.now();
     let clock = '';
     if (now < self.startTime.getTime()) {
-      clock = '-' + UI.formatDelta(self.startTime.getTime() - now);
+      clock = `-${time.formatDelta(self.startTime.getTime() - now)}`;
     } else if (now > countdownTime.getTime()) {
       // Contest for self user is over
       clock = '00:00:00';
@@ -834,23 +836,19 @@ export class Arena {
       // Show go-to-practice-mode messages on contest end
       if (now > self.finishTime.getTime()) {
         if (self.options.contestAlias) {
-          UI.warning(
-            '<a href="/arena/' +
-              self.options.contestAlias +
-              '/practice/">' +
-              T.arenaContestEndedUsePractice +
-              '</a>',
+          ui.warning(
+            `<a href="/arena/${self.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
           );
           $('#new-run-practice-msg').show();
           $('#new-run-practice-msg a').prop(
             'href',
-            '/arena/' + self.options.contestAlias + '/practice/',
+            `/arena/${self.options.contestAlias}/practice/`,
           );
         }
         $('#new-run').hide();
       }
     } else {
-      clock = UI.formatDelta(countdownTime.getTime() - now);
+      clock = time.formatDelta(countdownTime.getTime() - now);
     }
     self.elements.clock.text(clock);
   }
@@ -861,7 +859,7 @@ export class Arena {
     setTimeout(function() {
       API.Run.status({ run_alias: guid })
         .then(self.updateRun.bind(self))
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
     }, 5000);
   }
 
@@ -903,7 +901,7 @@ export class Arena {
             self.virtualRankingChange(response);
           else self.rankingChange(response);
         })
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
     } else if (
       self.options.problemsetAdmin ||
       self.options.contestAlias != null ||
@@ -912,7 +910,7 @@ export class Arena {
     ) {
       api.Problemset.scoreboard(scoreboardParams)
         .then(self.rankingChange.bind(self))
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
     }
   }
 
@@ -1007,17 +1005,17 @@ export class Arena {
       .then(function(response) {
         // Change username to username-virtual
         for (let evt of response.events) {
-          evt.username = UI.formatString(T.virtualSuffix, {
+          evt.username = ui.formatString(T.virtualSuffix, {
             username: evt.username,
           });
-          evt.name = UI.formatString(T.virtualSuffix, { username: evt.name });
+          evt.name = ui.formatString(T.virtualSuffix, { username: evt.name });
         }
 
         // Merge original contest and virtual contest scoreboard events
         response.events = response.events.concat(originalContestEvents);
         self.onRankingEvents(response);
       })
-      .catch(UI.ignoreError);
+      .catch(ui.ignoreError);
 
     self.virtualContestRefreshInterval = setTimeout(function() {
       self.onVirtualRankingChange(virtualContestData);
@@ -1040,7 +1038,7 @@ export class Arena {
           self.originalContestScoreboardEvent = response.events;
           self.onVirtualRankingChange(data);
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     } else {
       self.onVirtualRankingChange(data);
     }
@@ -1060,7 +1058,7 @@ export class Arena {
     if (rankingEvent) {
       api.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(self.onRankingEvents.bind(self))
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
     }
   }
 
@@ -1089,7 +1087,7 @@ export class Arena {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = UI.rankingUsername(rank);
+      let username = ui.rankingUsername(rank);
       currentRankingState[username] = { place: rank.place, accepted: {} };
 
       // Update problem scores.
@@ -1119,7 +1117,7 @@ export class Arena {
       // update miniranking
       if (i < 10) {
         if (typeof self.elements.miniRanking !== 'undefined') {
-          const username = UI.rankingUsername(rank);
+          const username = ui.rankingUsername(rank);
           self.elements.miniRanking.users.push({
             position: rank.place,
             username: username,
@@ -1275,14 +1273,13 @@ export class Arena {
       rowcount: self.clarificationsRowcount,
     })
       .then(self.clarificationsChange.bind(self))
-      .catch(UI.ignoreError);
+      .catch(ui.ignoreError);
   }
 
   updateClarification(clarification) {
     let self = this;
     let r = null;
-    let anchor =
-      'clarifications/clarification-' + clarification.clarification_id;
+    let anchor = `clarifications/clarification-${clarification.clarification_id}`;
     if (self.commonNavbar === null) {
       return;
     }
@@ -1366,8 +1363,8 @@ export class Arena {
     $('.time', r).html(
       Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()),
     );
-    $('.message', r).html(UI.escape(clarification.message));
-    $('.answer pre', r).html(UI.escape(clarification.answer));
+    $('.message', r).html(ui.escape(clarification.message));
+    $('.answer pre', r).html(ui.escape(clarification.answer));
     if (clarification.answer) {
       self.answeredClarifications++;
     }
@@ -1400,9 +1397,9 @@ export class Arena {
       data.clarifications.length > 0 &&
       data.clarifications.length < self.clarificationsRowcount
     ) {
-      $('#clarifications-count').html('(' + data.clarifications.length + ')');
+      $('#clarifications-count').html(`(${data.clarifications.length})`);
     } else if (data.clarifications.length >= self.clarificationsRowcount) {
-      $('#clarifications-count').html('(' + data.clarifications.length + '+)');
+      $('#clarifications-count').html(`(${data.clarifications.length}+)`);
     }
 
     let previouslyAnswered = self.answeredClarifications;
@@ -1625,17 +1622,17 @@ export class Arena {
         $('#summary').hide();
         $('#problem').show();
         $('#problem > .title').text(
-          problem.letter + '. ' + UI.escape(problem.title),
+          `${problem.letter}. ${ui.escape(problem.title)}`,
         );
         $('#problem .data .points').text(problem.points);
         $('#problem .memory_limit').text(
-          problem.settings.limits.MemoryLimit / 1024 / 1024 + ' MiB',
+          `${problem.settings.limits.MemoryLimit / 1024 / 1024} MiB`,
         );
         $('#problem .time_limit').text(problem.settings.limits.TimeLimit);
         $('#problem .overall_wall_time_limit').text(
           problem.settings.limits.OverallWallTimeLimit,
         );
-        $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
+        $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
@@ -1664,15 +1661,15 @@ export class Arena {
           $('#problem .karel-js-link').addClass('hide');
         }
         if (problem.source) {
-          $('#problem .source span').html(UI.escape(problem.source));
+          $('#problem .source span').html(ui.escape(problem.source));
           $('#problem .source').show();
         } else {
           $('#problem .source').hide();
         }
         if (problem.problemsetter) {
           $('#problem .problemsetter a')
-            .html(UI.escape(problem.problemsetter.name))
-            .attr('href', '/profile/' + problem.problemsetter.username + '/');
+            .html(ui.escape(problem.problemsetter.name))
+            .attr('href', `/profile/${problem.problemsetter.username}/`);
           $('#problem .problemsetter').show();
         } else {
           $('#problem .problemsetter').hide();
@@ -1680,7 +1677,7 @@ export class Arena {
         if (self.problemsetOpened) {
           $('#problem .runs tfoot td a').attr(
             'href',
-            '#problems/' + problem.alias + '/new-run',
+            `#problems/${problem.alias}/new-run`,
           );
         }
 
@@ -1719,7 +1716,7 @@ export class Arena {
           self.qualityNominationForm = new Vue({
             el: '#qualitynomination-popup',
             mounted: function() {
-              UI.reportEvent('quality-nomination', 'shown');
+              ui.reportEvent('quality-nomination', 'shown');
             },
             render: function(createElement) {
               return createElement('qualitynomination-popup', {
@@ -1751,9 +1748,9 @@ export class Arena {
                       contents: JSON.stringify(contents),
                     })
                       .then(() => {
-                        UI.reportEvent('quality-nomination', 'submit');
+                        ui.reportEvent('quality-nomination', 'submit');
                       })
-                      .catch(UI.apiError);
+                      .catch(ui.apiError);
                   },
                   dismiss: function(ev) {
                     const contents = {
@@ -1765,10 +1762,10 @@ export class Arena {
                       contents: JSON.stringify(contents),
                     })
                       .then(function(data) {
-                        UI.info(T.qualityNominationRateProblemDesc);
-                        UI.reportEvent('quality-nomination', 'dismiss');
+                        ui.info(T.qualityNominationRateProblemDesc);
+                        ui.reportEvent('quality-nomination', 'dismiss');
                       })
-                      .catch(UI.apiError);
+                      .catch(ui.apiError);
                   },
                 },
               });
@@ -1794,7 +1791,7 @@ export class Arena {
             .then(function(data) {
               updateRuns(data.runs);
             })
-            .catch(UI.apiError);
+            .catch(ui.apiError);
         } else {
           updateRuns(problem.runs);
           showQualityNominationPopup();
@@ -1832,7 +1829,7 @@ export class Arena {
               self.preferredLanguage = problem_ext.preferred_language;
               update(problem);
             })
-            .catch(UI.apiError);
+            .catch(ui.apiError);
         }
       }
 
@@ -1852,7 +1849,7 @@ export class Arena {
         }
         if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
           self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
-          UI.warning(T.firstSumbissionWithIdentity);
+          ui.warning(T.firstSumbissionWithIdentity);
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1898,14 +1895,14 @@ export class Arena {
       '#problem .problem-creation-date',
     );
     if (problem.problemsetter && creationDate) {
-      creationDate.innerText = UI.formatString(T.wordsUploadedOn, {
-        date: UI.formatDate(
+      creationDate.innerText = ui.formatString(T.wordsUploadedOn, {
+        date: time.formatDate(
           new Date(problem.problemsetter.creation_date * 1000),
         ),
       });
     }
 
-    UI.renderSampleToClipboardButton();
+    ui.renderSampleToClipboardButton();
 
     let libinteractiveInterfaceName = statement.querySelector(
       'span.libinteractive-interface-name',
@@ -1944,7 +1941,7 @@ export class Arena {
         .then(function(data) {
           self.displayRunDetails(showRunMatch[1], data);
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     }
   }
 
@@ -2029,7 +2026,7 @@ export class Arena {
         $('#submit input[type=submit]')
           .attr('disabled', 'disabled')
           .val(
-            UI.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+            ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
               submissionGap: submissionGapSecondsRemaining,
             }),
           );
@@ -2053,7 +2050,7 @@ export class Arena {
     } else if (lang.startsWith('py')) {
       ext.text('.py');
     } else if (lang && lang != 'cat') {
-      ext.text('.' + lang);
+      ext.text(`.${lang}`);
     } else {
       ext.text('');
     }
@@ -2073,7 +2070,7 @@ export class Arena {
         Date.now()
     ) {
       alert(
-        UI.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+        ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: self.submissionGap,
         }),
       );
@@ -2118,8 +2115,8 @@ export class Arena {
       ) {
         if (file.size >= self.currentProblem.input_limit) {
           alert(
-            UI.formatString(T.arenaRunSubmitFilesize, {
-              limit: self.currentProblem.input_limit / 1024 + ' KiB',
+            ui.formatString(T.arenaRunSubmitFilesize, {
+              limit: `${self.currentProblem.input_limit / 1024} KiB`,
             }),
           );
           return false;
@@ -2128,7 +2125,7 @@ export class Arena {
       } else {
         // 100kB _must_ be enough for anybody.
         if (file.size >= 100 * 1024) {
-          alert(UI.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
+          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
           return false;
         }
         reader.readAsDataURL(file);
@@ -2171,9 +2168,9 @@ export class Arena {
       }),
     )
       .then(function(run) {
-        UI.reportEvent('submission', 'submit');
+        ui.reportEvent('submission', 'submit');
         if (self.options.isLockdownMode && sessionStorage) {
-          sessionStorage.setItem('run:' + run.guid, code);
+          sessionStorage.setItem(`run:${run.guid}`, code);
         }
 
         if (!self.options.isOnlyProblem) {
@@ -2200,7 +2197,7 @@ export class Arena {
       .catch(function(run) {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
-        UI.reportEvent('submission', 'submit-fail', run.errorname);
+        ui.reportEvent('submission', 'submit-fail', run.errorname);
       });
   }
 
@@ -2211,7 +2208,7 @@ export class Arena {
       ko.applyBindings(self.summaryView, summary[0]);
       self.summaryView.attached = true;
     }
-    self.summaryView.title(UI.contestTitle(contest));
+    self.summaryView.title(ui.contestTitle(contest));
     self.summaryView.description(contest.description);
     let duration = null;
     if (contest.finish_time) {
@@ -2219,7 +2216,7 @@ export class Arena {
     }
     self.summaryView.windowLength(
       duration
-        ? UI.formatDelta(contest.window_length * 60000 || duration)
+        ? time.formatDelta(contest.window_length * 60000 || duration)
         : T.wordsUnlimitedDuration,
     );
     self.summaryView.contestOrganizer(contest.director);
@@ -2258,7 +2255,7 @@ export class Arena {
     } else if (data.source == 'lockdownDetailsDisabled') {
       sourceHTML =
         (typeof sessionStorage !== 'undefined' &&
-          sessionStorage.getItem('run:' + guid)) ||
+          sessionStorage.getItem(`run:${guid}`)) ||
         T.lockdownDetailsDisabled;
     } else {
       sourceHTML = data.source;
@@ -2309,7 +2306,7 @@ export class Arena {
       source_url: window.URL.createObjectURL(
         new Blob([data.source], { type: 'text/plain' }),
       ),
-      source_name: 'Main.' + data.language,
+      source_name: `Main.${data.language}`,
       problem_admin: data.admin,
       guid: data.guid,
       groups: groups,
@@ -2480,10 +2477,10 @@ class RunView {
       self.filter_username('');
     });
 
-    if (self.arena.options.contestAlias) {
+    if (Object.values(self.arena.problems).length > 0) {
       typeahead.problemContestTypeahead(
         $('.runsproblem', elm),
-        self.arena.problems,
+        Object.values(self.arena.problems),
         function(event, item) {
           self.filter_problem(item.alias);
         },
@@ -2584,19 +2581,19 @@ class ObservableRun {
 
   $problem_url() {
     let self = this;
-    return '/arena/problem/' + self.alias() + '/';
+    return `/arena/problem/${self.alias()}/`;
   }
 
   $contest_alias_url() {
     let self = this;
     return self.contest_alias() === null
       ? ''
-      : '/arena/' + self.contest_alias() + '/';
+      : `/arena/${self.contest_alias()}/`;
   }
 
   $user_html() {
     let self = this;
-    return UI.getProfileLink(self.username()) + UI.getFlag(self.country_id());
+    return ui.getProfileLink(self.username()) + ui.getFlag(self.country_id());
   }
 
   $time_text() {
@@ -2616,9 +2613,9 @@ class ObservableRun {
       if (self.verdict() == 'TLE') {
         prefix = '>';
       }
-      return (
-        prefix + (parseFloat(self.runtime() || '0') / 1000).toFixed(2) + ' s'
-      );
+      return `${prefix}${(parseFloat(self.runtime() || '0') / 1000).toFixed(
+        2,
+      )} s`;
     } else {
       return '—';
     }
@@ -2636,9 +2633,9 @@ class ObservableRun {
       if (self.verdict() == 'MLE') {
         prefix = '>';
       }
-      return (
-        prefix + (parseFloat(self.memory()) / (1024 * 1024)).toFixed(2) + ' MB'
-      );
+      return `${prefix}${(parseFloat(self.memory()) / (1024 * 1024)).toFixed(
+        2,
+      )} MB`;
     } else {
       return '—';
     }
@@ -2664,7 +2661,7 @@ class ObservableRun {
     if (self.type() == 'disqualified') return T['wordsDisqualified'];
 
     return self.status() == 'ready'
-      ? T['verdict' + self.verdict()]
+      ? T[`verdict${self.verdict()}`]
       : self.status();
   }
 
@@ -2684,7 +2681,7 @@ class ObservableRun {
     }
     if (self.type() == 'disqualified') return T.verdictHelpDisqualified;
 
-    return T['verdictHelp' + self.verdict()];
+    return T[`verdictHelp${self.verdict()}`];
   }
 
   $status_color() {
@@ -2728,7 +2725,7 @@ class ObservableRun {
       self.verdict() != 'VE' &&
       self.verdict() != 'CE'
     ) {
-      return (parseFloat(self.score() || '0') * 100).toFixed(2) + '%';
+      return `${(parseFloat(self.score() || '0') * 100).toFixed(2)}%`;
     } else {
       return '—';
     }
@@ -2736,7 +2733,7 @@ class ObservableRun {
 
   details() {
     let self = this;
-    window.location.hash += '/show-run:' + self.guid;
+    window.location.hash += `/show-run:${self.guid}`;
   }
 
   rejudge() {
@@ -2746,7 +2743,7 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .catch(UI.ignoreError);
+      .catch(ui.ignoreError);
   }
 
   disqualify() {
@@ -2756,7 +2753,7 @@ class ObservableRun {
         self.type('disqualifed');
         self.arena.updateRunFallback(self.guid);
       })
-      .catch(UI.ignoreError);
+      .catch(ui.ignoreError);
   }
 
   debug_rejudge() {
@@ -2766,6 +2763,6 @@ class ObservableRun {
         self.status('rejudging');
         self.arena.updateRunFallback(self.guid);
       })
-      .catch(UI.ignoreError);
+      .catch(ui.ignoreError);
   }
 }

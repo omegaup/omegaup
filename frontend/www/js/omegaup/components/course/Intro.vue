@@ -89,7 +89,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as markdown from '../../markdown';
 
 interface Statement {
   [name: string]: {
@@ -113,7 +113,7 @@ export default class CourseIntro extends Vue {
 
   T = T;
   shareUserInformation = false;
-  markdownConverter = UI.markdownConverter();
+  markdownConverter = markdown.markdownConverter();
   acceptTeacher = false;
 
   get consentHtml(): string {

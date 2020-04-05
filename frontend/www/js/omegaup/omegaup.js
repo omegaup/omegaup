@@ -1,9 +1,21 @@
 import { Experiments, EventListenerList, OmegaUp } from './omegaup.ts';
 import API from './api.js';
-import * as UI from './ui.js';
+import * as Markdown from './markdown';
+import * as Time from './time';
 import * as Typeahead from './typeahead';
+import * as UI from './ui';
 import T from './lang';
-export { API, EventListenerList, Experiments, OmegaUp, T, Typeahead, UI };
+export {
+  API,
+  EventListenerList,
+  Experiments,
+  Markdown,
+  OmegaUp,
+  T,
+  Time,
+  Typeahead,
+  UI,
+};
 
 if (
   document.readyState === 'complete' ||
