@@ -152,6 +152,20 @@ export namespace types {
     max_score: number;
   }
 
+  export interface StatsPayload {
+    alias: string;
+    entity_type: string;
+    cases_stats: { [key: string]: number };
+    pending_runs: string[];
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+    max_wait_time: number;
+    max_wait_time_guid?: string;
+    distribution: { [key: number]: number };
+    size_of_bucket: number;
+    total_points: number;
+  }
+
   export interface UserListItem {
     label: string;
     value: string;
@@ -1344,7 +1358,7 @@ export namespace messages {
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
     cases_stats: { [key: string]: number };
-    pending_runs: { guid: string }[];
+    pending_runs: string[];
     total_runs: number;
     verdict_counts: { [key: string]: number };
   };

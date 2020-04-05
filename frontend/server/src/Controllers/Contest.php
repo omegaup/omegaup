@@ -5,6 +5,7 @@
 /**
  * ContestController
  *
+ * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -3915,7 +3916,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $contest_alias
      *
-     * @return array{smartyProperties: array{payload: array{alias: string, entity_type: string, total_runs: int, pending_runs: list<string>, max_wait_time: int, max_wait_time_guid: null|string, verdict_counts: array<string, int>, distribution: array<int, int>, size_of_bucket: float, total_points: float}}, template: string}
+     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3927,7 +3928,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'payload' => array_merge(
+                'statsPayload' => array_merge(
                     [
                         'alias' => $r['contest_alias'],
                         'entity_type' => 'contest',
