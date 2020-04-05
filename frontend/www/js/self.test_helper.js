@@ -1,4 +1,4 @@
-(function fetch_helper() {
+(function self_helper() {
   'use strict';
 
   if (typeof self === 'undefined') {
