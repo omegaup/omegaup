@@ -36,6 +36,48 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
+  export namespace payloadParsers {
+    export function BadgeDetailsPayload(
+      elementId: string,
+    ): types.BadgeDetailsPayload {
+      return (x => {
+        x.badge = (x => {
+          x.assignation_time = ((x: number) => new Date(x * 1000))(
+            x.assignation_time,
+          );
+          if (x.first_assignation)
+            x.first_assignation = ((x: number) => new Date(x * 1000))(
+              x.first_assignation,
+            );
+          return x;
+        })(x.badge);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CommonPayload(elementId: string): types.CommonPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function StatsPayload(elementId: string): types.StatsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function UserRankTablePayload(
+      elementId: string,
+    ): types.UserRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+  }
+
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -47,6 +89,10 @@ export namespace types {
     first_assignation?: Date;
     total_users: number;
     owners_count: number;
+  }
+
+  export interface BadgeDetailsPayload {
+    badge: types.Badge;
   }
 
   export interface CommonPayload {
@@ -215,9 +261,8 @@ export namespace messages {
   export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
   export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any };
-  export type BadgeMyBadgeAssignationTimeResponse = {
-    assignation_time?: number;
-  };
+  export type _BadgeMyBadgeAssignationTimeServerResponse = any;
+  export type BadgeMyBadgeAssignationTimeResponse = { assignation_time?: Date };
   export type BadgeMyListRequest = { [key: string]: any };
   export type _BadgeMyListServerResponse = any;
   export type BadgeMyListResponse = { badges: types.Badge[] };

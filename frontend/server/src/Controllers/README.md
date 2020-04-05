@@ -324,9 +324,9 @@ for current user.
 
 ### Returns
 
-| Name               | Type     |
-| ------------------ | -------- |
-| `assignation_time` | `number` |
+| Name               | Type   |
+| ------------------ | ------ |
+| `assignation_time` | `Date` |
 
 ## `/api/badge/myList/`
 

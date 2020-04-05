@@ -109,15 +109,6 @@ export namespace omegaup {
     version: string;
   }
 
-  export interface Badge {
-    badge_alias: string;
-    assignation_time?: Date;
-    unlocked?: boolean;
-    first_assignation?: Date;
-    total_users?: number;
-    owners_count?: number;
-  }
-
   export interface Case {
     contest_score: number;
     max_score: number;

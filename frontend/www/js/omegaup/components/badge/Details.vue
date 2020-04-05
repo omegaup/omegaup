@@ -90,13 +90,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 
 @Component
 export default class BadgeDetails extends Vue {
-  @Prop() badge!: omegaup.Badge;
+  @Prop() badge!: types.Badge;
 
   T = T;
 

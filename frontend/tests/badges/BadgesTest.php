@@ -331,7 +331,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         ]));
         $this->assertNotNull($problemSetterResult['assignation_time']);
         $this->assertThat(
-            $problemSetterResult['assignation_time'],
+            $problemSetterResult['assignation_time']->time,
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
                 $this->lessThanOrEqual(\OmegaUp\Time::get())

@@ -19,25 +19,7 @@ function _normalizeContestFields(contest) {
 }
 
 export default {
-  Badge: {
-    badgeDetails: api.Badge.badgeDetails,
-
-    list: api.Badge.list,
-
-    myBadgeAssignationTime: api.apiCall(
-      '/api/badge/myBadgeAssignationTime/',
-      function(result) {
-        result.assignation_time = result.assignation_time
-          ? new Date(result.assignation_time * 1000)
-          : null;
-        return result;
-      },
-    ),
-
-    myList: api.Badge.myList,
-
-    userList: api.Badge.userList,
-  },
+  Badge: api.Badge,
 
   Clarification: api.Clarification,
 
