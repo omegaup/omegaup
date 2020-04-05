@@ -21,7 +21,7 @@
       <label
         ><omegaup-autocomplete
           class="form-control"
-          v-bind:init="el =&gt; UI.userTypeahead(el)"
+          v-bind:init="el => typeahead.userTypeahead(el)"
           v-model="searchedUsername"
         ></omegaup-autocomplete
       ></label>
@@ -122,6 +122,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as UI from '../ui';
+import * as typeahead from '../typeahead';
 import Autocomplete from './Autocomplete.vue';
 import CountryFlag from './CountryFlag.vue';
 import user_Username from './user/Username.vue';
@@ -154,6 +155,7 @@ export default class RankTable extends Vue {
 
   T = T;
   UI = UI;
+  typeahead = typeahead;
   searchedUsername = '';
 
   onSubmit(): void {

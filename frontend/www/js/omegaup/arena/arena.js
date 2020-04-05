@@ -13,6 +13,7 @@ import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue'
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import * as UI from '../ui';
+import * as typeahead from '../typeahead';
 import Vue from 'vue';
 import * as ko from 'knockout';
 import * as secureBindingsProvider from 'knockout-secure-binding';
@@ -2470,7 +2471,7 @@ class RunView {
       self.filter_offset(self.filter_offset() + self.row_count);
     });
 
-    UI.userTypeahead($('.runsusername', elm), function(event, item) {
+    typeahead.userTypeahead($('.runsusername', elm), function(event, item) {
       self.filter_username(item.value);
     });
 
@@ -2480,7 +2481,7 @@ class RunView {
     });
 
     if (self.arena.options.contestAlias) {
-      UI.problemContestTypeahead(
+      typeahead.problemContestTypeahead(
         $('.runsproblem', elm),
         self.arena.problems,
         function(event, item) {
@@ -2488,7 +2489,7 @@ class RunView {
         },
       );
     } else {
-      UI.problemTypeahead($('.runsproblem', elm), function(event, item) {
+      typeahead.problemTypeahead($('.runsproblem', elm), function(event, item) {
         self.filter_problem(item.alias);
       });
     }

@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
       $(this).data('date', e.date);
     });
   $('#school_id').val('');
-  omegaup.UI.schoolTypeahead($('#school'), function(item, val, text) {
+  omegaup.Typeahead.schoolTypeahead($('#school'), function(item, val, text) {
     $('#school_id').val(val.id);
     $('#school_name').val(val.label);
   });

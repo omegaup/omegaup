@@ -189,12 +189,12 @@ omegaup.OmegaUp.on('ready', function() {
     })
     .catch(omegaup.UI.apiError);
 
-  omegaup.UI.problemTypeahead($('#problems-dropdown'));
+  omegaup.Typeahead.problemTypeahead($('#problems-dropdown'));
 
   // Edit users
-  omegaup.UI.userTypeahead($('#username-admin'));
-  omegaup.UI.userTypeahead($('#usernameOrEmail'));
-  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
+  omegaup.Typeahead.userTypeahead($('#username-admin'));
+  omegaup.Typeahead.userTypeahead($('#usernameOrEmail'));
+  omegaup.Typeahead.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
 
   $('#add-admin-form').on('submit', function() {
     omegaup.API.Contest.addAdmin({

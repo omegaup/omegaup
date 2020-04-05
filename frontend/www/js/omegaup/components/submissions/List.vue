@@ -29,7 +29,7 @@
           <label
             ><omegaup-autocomplete
               class="form-control"
-              v-bind:init="el =&gt; UI.userTypeahead(el)"
+              v-bind:init="el => typeahead.userTypeahead(el)"
               v-model="searchedUsername"
             ></omegaup-autocomplete
           ></label>
@@ -181,6 +181,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import UserName from '../user/Username.vue';
 import Autocomplete from '../Autocomplete.vue';
 
@@ -199,6 +200,7 @@ export default class SubmissionsList extends Vue {
 
   T = T;
   UI = UI;
+  typeahead = typeahead;
   searchedUsername = '';
 
   get showNextPage(): boolean {

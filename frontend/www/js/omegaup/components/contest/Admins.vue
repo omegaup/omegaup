@@ -5,7 +5,7 @@
         <div class="form-group">
           <label>{{ T.wordsAdmin }}</label>
           <omegaup-autocomplete
-            v-bind:init="el =&gt; UI.userTypeahead(el)"
+            v-bind:init="el => typeahead.userTypeahead(el)"
             v-model="user"
           ></omegaup-autocomplete>
         </div>
@@ -57,7 +57,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import user_Username from '../user/Username.vue';
 
@@ -71,7 +71,7 @@ export default class Admins extends Vue {
   @Prop() data!: omegaup.UserRole[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   user = '';
   showSiteAdmin = false;
   admins = this.data;

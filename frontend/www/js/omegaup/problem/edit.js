@@ -6,6 +6,7 @@ import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
 import * as UI from '../ui';
+import * as typeahead from '../typeahead';
 
 OmegaUp.on('ready', function() {
   var chosenLanguage = null;
@@ -68,8 +69,11 @@ OmegaUp.on('ready', function() {
 
   // Add typeaheads
   refreshProblemAdmins();
-  UI.userTypeahead($('#username-admin'));
-  UI.typeahead($('#groupalias-admin'), API.Group.list, function(event, val) {
+  typeahead.userTypeahead($('#username-admin'));
+  typeahead.typeahead($('#groupalias-admin'), API.Group.list, function(
+    event,
+    val,
+  ) {
     $(event.target).attr('data-alias', val.value);
   });
 
@@ -123,7 +127,7 @@ OmegaUp.on('ready', function() {
         highlight: true,
       },
       {
-        source: UI.typeaheadWrapper(API.Tag.list),
+        source: typeahead.typeaheadWrapper(API.Tag.list),
         async: true,
         display: 'name',
       },
@@ -174,8 +178,9 @@ OmegaUp.on('ready', function() {
   });
 
   $('#download form').on('submit', function() {
-    window.location =
-      '/api/problem/download/problem_alias/' + UI.escape(problemAlias) + '/';
+    window.location = `/api/problem/download/problem_alias/${UI.escape(
+      problemAlias,
+    )}/`;
     return false;
   });
 

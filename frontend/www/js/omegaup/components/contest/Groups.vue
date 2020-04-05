@@ -5,7 +5,7 @@
         <div class="form-group">
           <label>{{ T.wordsGroup }}</label>
           <omegaup-autocomplete
-            v-bind:init="el => UI.groupTypeahead(el)"
+            v-bind:init="el => typeahead.groupTypeahead(el)"
             v-model="groupName"
           ></omegaup-autocomplete>
         </div>
@@ -41,7 +41,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 
 @Component({
@@ -53,7 +53,7 @@ export default class Groups extends Vue {
   @Prop() data!: omegaup.ContestGroup[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   groupName = '';
   groups = this.data;
   selected: omegaup.ContestGroup | null = null;

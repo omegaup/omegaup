@@ -17,7 +17,7 @@
             v-bind:title="T.courseEditAddStudentsTooltip"
           ></span>
           <omegaup-autocomplete
-            v-bind:init="el =&gt; UI.userTypeahead(el)"
+            v-bind:init="el => typeahead.userTypeahead(el)"
             v-model="participant"
           ></omegaup-autocomplete>
         </div>
@@ -99,7 +99,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import common_Requests from '../common/Requests.vue';
 
@@ -115,7 +115,7 @@ export default class CourseAddStudents extends Vue {
   @Prop({ required: false }) data!: omegaup.IdentityRequest[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
   studentUsername = '';
   participant = '';
   participants = '';

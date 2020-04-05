@@ -6,7 +6,7 @@
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
-              v-bind:init="el =&gt; UI.userTypeahead(el)"
+              v-bind:init="el => typeahead.userTypeahead(el)"
               v-model="contestant"
             ></omegaup-autocomplete>
           </div>
@@ -90,6 +90,7 @@ import { Vue, Component, Emit, Prop } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as typeahead from '../../typeahead';
 import * as UI from '../../ui';
 import Autocomplete from '../Autocomplete.vue';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -108,6 +109,7 @@ export default class Contestant extends Vue {
 
   T = T;
   UI = UI;
+  typeahead = typeahead;
   contestant = '';
   contestants = '';
   users = this.data;
