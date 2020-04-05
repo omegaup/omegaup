@@ -50,7 +50,7 @@ export function contestTitle(contest: omegaup.Contest): string {
 
 export function formatString(
   template: string,
-  values: { [key: string]: string | number },
+  values: { [key: string]: any },
 ): string {
   const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
   return template.replace(re, (match, key, modifier) => {
