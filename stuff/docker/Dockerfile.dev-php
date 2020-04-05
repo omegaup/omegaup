@@ -2,7 +2,8 @@ FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
-    apt install --no-install-recommends -y curl ca-certificates gnupg2 && \
+    apt install --no-install-recommends -y openjdk-11-jre-headless curl \
+        ca-certificates gnupg2 xz-utils && \
     /usr/sbin/update-ca-certificates && \
     apt autoremove -y && \
     apt clean
@@ -19,11 +20,14 @@ RUN apt update -y && \
     apt autoremove -y && \
     apt clean
 
-RUN curl -sL https://phar.phpunit.de/phpunit-6.5.9.phar -o /usr/bin/phpunit
+RUN curl -sL https://phar.phpunit.de/phpunit-8.5.2.phar -o /usr/bin/phpunit
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
 RUN chmod +x /usr/bin/phpunit
 
 RUN curl -sL https://getcomposer.org/download/1.10.1/composer.phar -o /usr/bin/composer
 RUN chmod +x /usr/bin/composer
+
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.8/omegaup-gitserver.tar.xz | tar xJ -C /
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
 
