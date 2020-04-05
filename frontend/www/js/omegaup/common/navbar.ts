@@ -1,17 +1,15 @@
 import common_Navbar from '../components/common/Navbar.vue';
 import common_NavbarV2 from '../components/common/Navbarv2.vue';
-import { OmegaUp } from '../omegaup';
+import { omegaup, OmegaUp } from '../omegaup';
 import * as api from '../api_transitional';
-import API from '../api.js';
+import { types } from '../api_types';
 import T from '../lang';
 import * as UI from '../ui';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
-  const payload = JSON.parse(
-    document.getElementById('header-payload').innerText,
-  );
-  let commonNavbar = new Vue({
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.CommonPayload('header-payload');
+  const commonNavbar = new Vue({
     el: '#common-navbar',
     render: function(createElement) {
       return createElement('omegaup-common-navbar', {
@@ -44,9 +42,10 @@ OmegaUp.on('ready', function() {
       isMainUserIdentity: payload.isMainUserIdentity,
       lockDownImage: payload.lockDownImage,
       navbarSection: payload.navbarSection,
-      graderInfo: null,
+      notifications: <types.Notification[]>[],
+      graderInfo: <types.GraderStatus | null>null,
       graderQueueLength: -1,
-      errorMessage: null,
+      errorMessage: <string | null>null,
       initialClarifications: [],
     },
     components: {
@@ -57,20 +56,16 @@ OmegaUp.on('ready', function() {
   });
 
   if (payload.isAdmin) {
-    API.Notification.myList()
+    api.Notification.myList()
       .then(data => {
         commonNavbar.notifications = data.notifications;
       })
       .catch(UI.apiError);
 
-    function updateGraderStatus() {
+    const updateGraderStatus = () => {
       api.Grader.status()
         .then(stats => {
           commonNavbar.graderInfo = stats.grader;
-          if (stats.status !== 'ok') {
-            commonNavbar.errorMessage = T.generalError;
-            return;
-          }
           if (stats.grader.queue) {
             commonNavbar.graderQueueLength =
               stats.grader.queue.run_queue_length +
@@ -81,7 +76,7 @@ OmegaUp.on('ready', function() {
         .catch(stats => {
           commonNavbar.errorMessage = stats.error;
         });
-    }
+    };
 
     updateGraderStatus();
     setInterval(updateGraderStatus, 30000);

@@ -82,22 +82,76 @@ export const Authorization = {
 export const Badge = {
   badgeDetails: apiCall<
     messages.BadgeBadgeDetailsRequest,
+    messages._BadgeBadgeDetailsServerResponse,
     messages.BadgeBadgeDetailsResponse
-  >('/api/badge/badgeDetails/'),
+  >('/api/badge/badgeDetails/', x => {
+    x.assignation_time = ((x: number) => new Date(x * 1000))(
+      x.assignation_time,
+    );
+    if (x.first_assignation)
+      x.first_assignation = ((x: number) => new Date(x * 1000))(
+        x.first_assignation,
+      );
+    return x;
+  }),
   list: apiCall<messages.BadgeListRequest, messages.BadgeListResponse>(
     '/api/badge/list/',
   ),
   myBadgeAssignationTime: apiCall<
     messages.BadgeMyBadgeAssignationTimeRequest,
+    messages._BadgeMyBadgeAssignationTimeServerResponse,
     messages.BadgeMyBadgeAssignationTimeResponse
-  >('/api/badge/myBadgeAssignationTime/'),
-  myList: apiCall<messages.BadgeMyListRequest, messages.BadgeMyListResponse>(
-    '/api/badge/myList/',
-  ),
+  >('/api/badge/myBadgeAssignationTime/', x => {
+    if (x.assignation_time)
+      x.assignation_time = ((x: number) => new Date(x * 1000))(
+        x.assignation_time,
+      );
+    return x;
+  }),
+  myList: apiCall<
+    messages.BadgeMyListRequest,
+    messages._BadgeMyListServerResponse,
+    messages.BadgeMyListResponse
+  >('/api/badge/myList/', x => {
+    x.badges = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.assignation_time = ((x: number) => new Date(x * 1000))(
+          x.assignation_time,
+        );
+        if (x.first_assignation)
+          x.first_assignation = ((x: number) => new Date(x * 1000))(
+            x.first_assignation,
+          );
+        return x;
+      });
+    })(x.badges);
+    return x;
+  }),
   userList: apiCall<
     messages.BadgeUserListRequest,
+    messages._BadgeUserListServerResponse,
     messages.BadgeUserListResponse
-  >('/api/badge/userList/'),
+  >('/api/badge/userList/', x => {
+    x.badges = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.assignation_time = ((x: number) => new Date(x * 1000))(
+          x.assignation_time,
+        );
+        if (x.first_assignation)
+          x.first_assignation = ((x: number) => new Date(x * 1000))(
+            x.first_assignation,
+          );
+        return x;
+      });
+    })(x.badges);
+    return x;
+  }),
 };
 
 export const Clarification = {
@@ -591,8 +645,20 @@ export const Interview = {
 export const Notification = {
   myList: apiCall<
     messages.NotificationMyListRequest,
+    messages._NotificationMyListServerResponse,
     messages.NotificationMyListResponse
-  >('/api/notification/myList/'),
+  >('/api/notification/myList/', x => {
+    x.notifications = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.notifications);
+    return x;
+  }),
   readNotifications: apiCall<
     messages.NotificationReadNotificationsRequest,
     messages.NotificationReadNotificationsResponse

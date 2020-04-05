@@ -7,6 +7,8 @@
  *
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}
+ * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, basic_information_required: bool, description: string, finish_time?: int|null, isCurator?: bool, is_admin?: bool, name: string, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -233,7 +235,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         bool $isUpdate = false
     ): void {
         $r->ensureMainUserIdentity();
-        $isRequired = true;
+        $isRequired = !$isUpdate;
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['name'],
@@ -2204,7 +2206,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $student
      *
-     * @return array{payload: array{course: array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
+     * @return array{payload: array{course: CourseDetails, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2254,7 +2256,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: array{details?: array{alias: string, assignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}>, basic_information_required: bool, description: string, finish_time?: int|null, is_admin?: bool, name: string, public?: bool, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: int, student_count?: int}, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning?: bool}, showRanking?: bool}, template: string}
+     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: array{details?: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning?: bool}, showRanking?: bool}, template: string}
      */
     public static function getIntroDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2482,7 +2484,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * Returns course details common between admin & non-admin
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
+     *
+     * @return CourseDetails
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
@@ -2518,6 +2521,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $course->finish_time
                 ),
                 'is_admin' => $isAdmin,
+                'isCurator' => \OmegaUp\Authorization::canCreatePublicCourse(
+                    $identity
+                ),
                 'admission_mode' => $course->admission_mode,
                 'basic_information_required' => boolval(
                     $course->needs_basic_information
@@ -2560,7 +2566,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $alias
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return CourseDetails
      */
     public static function apiAdminDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -3059,7 +3065,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $alias
      *
-     * @return array{name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: list<array{name: string, description: string, alias: string, publish_time_delay: int|null, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int|null, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: null|string}
+     * @return CourseDetails
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {

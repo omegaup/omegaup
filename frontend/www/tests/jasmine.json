@@ -4,6 +4,7 @@
     "**/*.test.js"
   ],
   "helpers": [
+    "omegaup/api.fake.js",
     "**/*.test_helper.js",
     "dist/npm.*.js"
   ],

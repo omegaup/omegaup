@@ -19,40 +19,7 @@ function _normalizeContestFields(contest) {
 }
 
 export default {
-  Badge: {
-    badgeDetails: api.apiCall('/api/badge/badgeDetails/', function(result) {
-      result.first_assignation = result.first_assignation
-        ? new Date(result.first_assignation * 1000)
-        : null;
-      return result;
-    }),
-
-    list: api.Badge.list,
-
-    myBadgeAssignationTime: api.apiCall(
-      '/api/badge/myBadgeAssignationTime/',
-      function(result) {
-        result.assignation_time = result.assignation_time
-          ? new Date(result.assignation_time * 1000)
-          : null;
-        return result;
-      },
-    ),
-
-    myList: api.apiCall('/api/badge/myList/', function(result) {
-      result.badges.forEach(badge => {
-        badge.assignation_time = new Date(badge.assignation_time * 1000);
-      });
-      return result;
-    }),
-
-    userList: api.apiCall('/api/badge/userList/', function(result) {
-      result.badges.forEach(badge => {
-        badge.assignation_time = new Date(badge.assignation_time * 1000);
-      });
-      return result;
-    }),
-  },
+  Badge: api.Badge,
 
   Clarification: api.Clarification,
 
@@ -221,6 +188,8 @@ export default {
 
     assignmentScoreboard: api.Course.assignmentScoreboard,
 
+    arbitrateRequest: api.Course.arbitrateRequest,
+
     clone: api.Course.clone,
 
     create: api.Course.create,
@@ -303,6 +272,8 @@ export default {
 
     listUnsolvedProblems: api.Course.listUnsolvedProblems,
 
+    registerForCourse: api.Course.registerForCourse,
+
     removeAdmin: api.Course.removeAdmin,
 
     removeAssignment: api.Course.removeAssignment,
@@ -312,6 +283,8 @@ export default {
     removeProblem: api.Course.removeProblem,
 
     removeStudent: api.Course.removeStudent,
+
+    requests: api.Course.requests,
 
     runs: api.apiCall('/api/course/runs/', _convertRuntimes),
 
@@ -345,17 +318,7 @@ export default {
 
   Interview: api.Interview,
 
-  Notification: {
-    myList: api.apiCall('/api/notification/myList/', function(result) {
-      result.notifications.forEach(notification => {
-        notification.timestamp = new Date(notification.timestamp * 1000);
-        notification.contents = JSON.parse(notification.contents);
-      });
-      return result;
-    }),
-
-    readNotifications: api.Notification.readNotifications,
-  },
+  Notification: api.Notification,
 
   Problem: {
     addAdmin: api.Problem.addAdmin,

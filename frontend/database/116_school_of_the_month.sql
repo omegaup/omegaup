@@ -10,4 +10,4 @@ CREATE TABLE `School_Of_The_Month` (
   KEY `selected_by` (`selected_by`),
   CONSTRAINT `fk_sotms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Escuelas del Mes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Escuelas del Mes';

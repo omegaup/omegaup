@@ -1,12 +1,13 @@
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import API from '../api.js';
-import * as UI from '../ui';
+import * as markdown from '../markdown';
+import * as ui from '../ui';
 import problem_Solution from '../components/problem/Solution.vue';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  const mdConverter = UI.markdownConverter();
+  const mdConverter = markdown.markdownConverter();
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let problemSolution = new Vue({
     el: '#problem-solution',
@@ -26,7 +27,7 @@ OmegaUp.on('ready', function() {
             })
               .then(function(data) {
                 if (!data.exists || !data.solution) {
-                  UI.error(T.wordsProblemOrSolutionNotExist);
+                  ui.error(T.wordsProblemOrSolutionNotExist);
                   return;
                 }
                 problemSolution.solution = mdConverter.makeHtmlWithImages(
@@ -34,14 +35,14 @@ OmegaUp.on('ready', function() {
                   data.solution.images,
                 );
                 problemSolution.status = 'unlocked';
-                UI.info(
-                  UI.formatString(T.solutionTokens, {
+                ui.info(
+                  ui.formatString(T.solutionTokens, {
                     available: problemSolution.availableTokens - 1,
                     total: problemSolution.allTokens,
                   }),
                 );
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'get-tokens': function() {
             API.ProblemForfeited.getCounts({})
@@ -49,10 +50,10 @@ OmegaUp.on('ready', function() {
                 problemSolution.allTokens = data.allowed;
                 problemSolution.availableTokens = data.allowed - data.seen;
                 if (problemSolution.availableTokens <= 0) {
-                  UI.warning(T.solutionNoTokens);
+                  ui.warning(T.solutionNoTokens);
                 }
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'get-solution': function() {
             if (payload['solution_status'] === 'unlocked') {
@@ -66,7 +67,7 @@ OmegaUp.on('ready', function() {
                     data.solution.images,
                   );
                 })
-                .catch(UI.apiError);
+                .catch(ui.apiError);
             }
           },
         },

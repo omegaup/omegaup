@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import Notification from './Notification.vue';
 
@@ -83,7 +83,7 @@ import Notification from './Notification.vue';
   },
 })
 export default class NotificationList extends Vue {
-  @Prop() notifications!: omegaup.Notification[];
+  @Prop() notifications!: types.Notification[];
   T = T;
 }
 </script>

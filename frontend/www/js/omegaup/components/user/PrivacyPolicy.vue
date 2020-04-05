@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as markdown from '../../markdown';
 
 @Component
 export default class UserPrivacyPolicy extends Vue {
@@ -42,7 +42,7 @@ export default class UserPrivacyPolicy extends Vue {
 
   T = T;
   agreed = this.initialAgreed;
-  markdownConverter = UI.markdownConverter();
+  markdownConverter = markdown.markdownConverter();
 
   get policyHtml(): string {
     return this.markdownConverter.makeHtml(this.policyMarkdown);

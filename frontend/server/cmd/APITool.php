@@ -243,15 +243,15 @@ class TypeMapper {
                         );
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
+                            $conversionStatement = (
+                                "x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
+                            );
                             if ($isNullable) {
-                                $convertedProperties[] = (
-                                    "if (x.{$propertyName}) x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
-                                );
-                            } else {
-                                $convertedProperties[] = (
-                                    "x.{$propertyName} = ({$conversionResult->conversionFunction})(x.{$propertyName});"
+                                $conversionStatement = (
+                                    "if (x.{$propertyName}) {$conversionStatement}"
                                 );
                             }
+                            $convertedProperties[] = $conversionStatement;
                         }
                         if ($isNullable) {
                             $propertyName .= '?';
@@ -332,7 +332,11 @@ class TypeMapper {
                 $typeNames[] = 'string';
             } elseif ($typeName == 'null') {
                 $typeNames[] = 'null';
-            } elseif ($typeName == 'bool') {
+            } elseif (
+                $typeName == 'bool' ||
+                $typeName == 'false' ||
+                $typeName == 'true'
+            ) {
                 $typeNames[] = 'boolean';
             } elseif ($type instanceof \Psalm\Type\Atomic\TNamedObject) {
                 if ($type->value == 'stdClass') {
@@ -351,6 +355,7 @@ class TypeMapper {
                     $typeNames[] = "types.{$type->value}";
                     $conversionResult = $this->typeAliases[$type->value];
                     if (!is_null($conversionResult->conversionFunction)) {
+                        $requiresConversion = true;
                         $conversionFunction[] = $conversionResult->conversionFunction;
                     }
                     continue;
@@ -553,7 +558,6 @@ class APIGenerator {
             echo "\n// DAO types\n";
             echo "export namespace dao {\n";
             ksort($this->daoTypes);
-            $localTypeMapper = new TypeMapper();
             foreach ($this->daoTypes as $typeName => $typeExpansion) {
                 echo "  export interface {$typeName} {\n";
                 /** @var class-string */
@@ -585,7 +589,7 @@ class APIGenerator {
                     }
                     $properties[
                         strval($reflectionProperty->name)
-                    ] = $localTypeMapper->convertTypeToTypeScript(
+                    ] = $this->typeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
                     )->typescriptExpansion;
@@ -603,6 +607,31 @@ class APIGenerator {
             echo "\n// Type aliases\n";
             echo "export namespace types {\n";
             ksort($this->typeMapper->typeAliases);
+
+            echo "  export namespace payloadParsers {\n";
+            foreach ($this->typeMapper->typeAliases as $typeName => $conversionResult) {
+                if (
+                    strpos($typeName, 'Payload') !==
+                    strlen($typeName) - strlen('Payload')
+                ) {
+                    continue;
+                }
+                if (is_null($conversionResult->conversionFunction)) {
+                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
+                    echo "     return JSON.parse(\n";
+                    echo "       (<HTMLElement>document.getElementById(elementId)).innerText,\n";
+                    echo "     );\n\n";
+                    echo "   }\n\n";
+                } else {
+                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
+                    echo "     return ({$conversionResult->conversionFunction})(\n";
+                    echo "       JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),\n";
+                    echo "     );\n\n";
+                    echo "   }\n\n";
+                }
+            }
+            echo "  }\n\n";
+
             foreach ($this->typeMapper->typeAliases as $typeName => $conversionResult) {
                 echo "  export interface {$typeName} {$conversionResult->typescriptExpansion};\n\n";
             }

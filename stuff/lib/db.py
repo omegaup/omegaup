@@ -19,8 +19,16 @@ import MySQLdb.connections
 
 def default_config_file_path() -> Optional[str]:
     '''Try to autodetect the config file path.'''
-    for candidate_path in (os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
-                           '/etc/mysql/conf.d/mysql_password.cnf'):
+    for candidate_path in (
+            # ${OMEGAUP_ROOT}/.my.cnf
+            os.path.join(
+                os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), '..', '..')),
+                '.my.cnf'),
+            # ~/.my.cnf
+            os.path.join(os.getenv('HOME') or '.', '.my.cnf'),
+            '/etc/mysql/conf.d/mysql_password.cnf',
+    ):
         if os.path.isfile(candidate_path):
             return candidate_path
     return None

@@ -21,7 +21,7 @@ OmegaUp.on('ready', function() {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
-            omegaup.API.User.extraInformation({ email: email })
+            API.User.extraInformation({ email: email })
               .then(function(data) {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'verify-user': function(email) {
-            omegaup.API.User.verifyEmail({ usernameOrEmail: email })
+            API.User.verifyEmail({ usernameOrEmail: email })
               .then(function() {
                 adminSupport.verified = true;
                 UI.success(T.userVerified);
@@ -41,7 +41,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'generate-token': function(email) {
-            omegaup.API.Reset.generateToken({
+            API.Reset.generateToken({
               email: email,
             })
               .then(function(data) {

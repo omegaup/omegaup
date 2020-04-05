@@ -40,7 +40,7 @@ a.badges-link {
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import Badge from '../badge/Badge.vue';
 
@@ -56,15 +56,18 @@ export default class BadgeList extends Vue {
 
   T = T;
 
-  get badges(): omegaup.Badge[] {
+  get badges(): types.Badge[] {
     return Array.from(this.allBadges)
       .map((badge: string) => {
         return {
           badge_alias: badge,
           unlocked: this.visitorBadges.has(badge),
+          assignation_time: new Date(),
+          total_users: 0,
+          owners_count: 0,
         };
       })
-      .sort((a: omegaup.Badge, b: omegaup.Badge) => {
+      .sort((a: types.Badge, b: types.Badge) => {
         // Alphabetical order BY NAME, not alias.
         const aName = this.getBadgeName(a.badge_alias);
         const bName = this.getBadgeName(b.badge_alias);

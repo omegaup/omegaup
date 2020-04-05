@@ -40,11 +40,11 @@
                       course.name
                     }}</a>
                   </td>
-                  <td>{{ UI.formatDate(course.start_time) }}</td>
+                  <td>{{ time.formatDate(course.start_time) }}</td>
                   <td>
                     {{
                       course.finish_time
-                        ? UI.formatDate(course.finish_time)
+                        ? time.formatDate(course.finish_time)
                         : T.wordsUnlimitedDuration
                     }}
                   </td>
@@ -80,7 +80,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class CourseFilteredList extends Vue {
@@ -88,7 +88,7 @@ export default class CourseFilteredList extends Vue {
   @Prop() activeTab!: string;
 
   T = T;
-  UI = UI;
+  time = time;
   showTab = this.activeTab;
 }
 </script>

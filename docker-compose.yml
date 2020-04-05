@@ -88,6 +88,11 @@ services:
       - '3306'
     volumes:
       - 'dbdata:/var/lib/mysql'
+    ports:
+      - target: 3306
+        published: 13306
+        protocol: tcp
+        mode: host
 
 volumes:
   dbdata:

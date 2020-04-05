@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="contest-publish-form" v-on:submit.prevent="onSubmit">
+      <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
@@ -15,12 +15,12 @@
             <option value="registration">
               {{ T.wordsRegistration }}
             </option>
-            <option value="public">
+            <option value="public" v-if="shouldShowPublicOption">
               {{ T.wordsPublic }}
             </option>
           </select>
           <p class="help-block">
-            <span v-html="T.contestNewFormAdmissionModeDescription"></span>
+            <span v-html="admissionModeDescription"></span>
           </p>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">
@@ -38,14 +38,20 @@ import T from '../../lang';
 
 @Component
 export default class Publish extends Vue {
-  @Prop() data!: omegaup.Contest;
+  @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
+  @Prop() admissionModeDescription!: string;
+  @Prop() shouldShowPublicOption!: boolean;
 
   T = T;
-  contest = this.data;
-  admissionMode = this.data.admission_mode;
+  admissionMode = this.initialAdmissionMode;
 
   onSubmit(): void {
     this.$emit('emit-update-admission-mode', this);
+  }
+
+  @Watch('initialAdmissionMode')
+  onCourseChange(): void {
+    this.admissionMode = this.initialAdmissionMode;
   }
 }
 </script>

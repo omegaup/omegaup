@@ -36,6 +36,48 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
+  export namespace payloadParsers {
+    export function BadgeDetailsPayload(
+      elementId: string,
+    ): types.BadgeDetailsPayload {
+      return (x => {
+        x.badge = (x => {
+          x.assignation_time = ((x: number) => new Date(x * 1000))(
+            x.assignation_time,
+          );
+          if (x.first_assignation)
+            x.first_assignation = ((x: number) => new Date(x * 1000))(
+              x.first_assignation,
+            );
+          return x;
+        })(x.badge);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CommonPayload(elementId: string): types.CommonPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function StatsPayload(elementId: string): types.StatsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function UserRankTablePayload(
+      elementId: string,
+    ): types.UserRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+  }
+
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -47,6 +89,78 @@ export namespace types {
     first_assignation?: Date;
     total_users: number;
     owners_count: number;
+  }
+
+  export interface BadgeDetailsPayload {
+    badge: types.Badge;
+  }
+
+  export interface CommonPayload {
+    omegaUpLockDown: boolean;
+    bootstrap4: boolean;
+    inContest: boolean;
+    isLoggedIn: boolean;
+    isReviewer: boolean;
+    gravatarURL51: string;
+    currentUsername: string;
+    isMainUserIdentity: boolean;
+    isAdmin: boolean;
+    lockDownImage: string;
+    navbarSection: string;
+  }
+
+  export interface CourseAssignment {
+    alias: string;
+    assignment_type: string;
+    description: string;
+    finish_time?: number;
+    max_points: number;
+    name: string;
+    order: number;
+    publish_time_delay?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    start_time: number;
+  }
+
+  export interface CourseDetails {
+    admission_mode: string;
+    alias: string;
+    assignments: types.CourseAssignment[];
+    basic_information_required: boolean;
+    description: string;
+    finish_time?: number;
+    isCurator: boolean;
+    is_admin: boolean;
+    name: string;
+    requests_user_information: string;
+    school_id?: number;
+    school_name?: string;
+    show_scoreboard: boolean;
+    start_time: number;
+    student_count: number;
+  }
+
+  export interface GraderStatus {
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: {
+      running: { name: string; id: number }[];
+      run_queue_length: number;
+      runner_queue_length: number;
+      runners: string[];
+    };
+  }
+
+  export interface Notification {
+    contents: types.NotificationContents;
+    notification_id: number;
+    timestamp: Date;
+  }
+
+  export interface NotificationContents {
+    type: string;
+    badge: string;
   }
 
   export interface PageItem {
@@ -84,9 +198,32 @@ export namespace types {
     max_score: number;
   }
 
+  export interface StatsPayload {
+    alias: string;
+    entity_type: string;
+    cases_stats: { [key: string]: number };
+    pending_runs: string[];
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+    max_wait_time: number;
+    max_wait_time_guid?: string;
+    distribution: { [key: number]: number };
+    size_of_bucket: number;
+    total_points: number;
+  }
+
   export interface UserListItem {
     label: string;
     value: string;
+  }
+
+  export interface UserRankTablePayload {
+    availableFilters: { country?: string; school?: string; state?: string };
+    filter: string;
+    isIndex: boolean;
+    isLogged: boolean;
+    length: number;
+    page: number;
   }
 }
 
@@ -119,16 +256,18 @@ export namespace messages {
 
   // Badge
   export type BadgeBadgeDetailsRequest = { [key: string]: any };
+  export type _BadgeBadgeDetailsServerResponse = any;
   export type BadgeBadgeDetailsResponse = types.Badge;
   export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
   export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any };
-  export type BadgeMyBadgeAssignationTimeResponse = {
-    assignation_time?: number;
-  };
+  export type _BadgeMyBadgeAssignationTimeServerResponse = any;
+  export type BadgeMyBadgeAssignationTimeResponse = { assignation_time?: Date };
   export type BadgeMyListRequest = { [key: string]: any };
+  export type _BadgeMyListServerResponse = any;
   export type BadgeMyListResponse = { badges: types.Badge[] };
   export type BadgeUserListRequest = { [key: string]: any };
+  export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Clarification
@@ -658,34 +797,7 @@ export namespace messages {
   export type CourseAddStudentRequest = { [key: string]: any };
   export type CourseAddStudentResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
-  export type CourseAdminDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseAdminDetailsResponse = types.CourseDetails;
   export type CourseAdminsRequest = { [key: string]: any };
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
@@ -780,34 +892,7 @@ export namespace messages {
   export type CourseCreateAssignmentRequest = { [key: string]: any };
   export type CourseCreateAssignmentResponse = {};
   export type CourseDetailsRequest = { [key: string]: any };
-  export type CourseDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseDetailsResponse = types.CourseDetails;
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -986,19 +1071,7 @@ export namespace messages {
 
   // Grader
   export type GraderStatusRequest = { [key: string]: any };
-  export type GraderStatusResponse = {
-    grader: {
-      status: string;
-      broadcaster_sockets: number;
-      embedded_runner: boolean;
-      queue: {
-        running: { name: string; id: number }[];
-        run_queue_length: number;
-        runner_queue_length: number;
-        runners: string[];
-      };
-    };
-  };
+  export type GraderStatusResponse = { grader: types.GraderStatus };
 
   // Group
   export type GroupAddUserRequest = { [key: string]: any };
@@ -1158,12 +1231,9 @@ export namespace messages {
 
   // Notification
   export type NotificationMyListRequest = { [key: string]: any };
+  export type _NotificationMyListServerResponse = any;
   export type NotificationMyListResponse = {
-    notifications: {
-      contents: string;
-      notification_id: number;
-      timestamp: number;
-    }[];
+    notifications: types.Notification[];
   };
   export type NotificationReadNotificationsRequest = { [key: string]: any };
   export type NotificationReadNotificationsResponse = {};
@@ -1333,7 +1403,7 @@ export namespace messages {
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
     cases_stats: { [key: string]: number };
-    pending_runs: { guid: string }[];
+    pending_runs: string[];
     total_runs: number;
     verdict_counts: { [key: string]: number };
   };

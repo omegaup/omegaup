@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import API from '../api.js';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import contest_Edit from '../components/contest/Edit.vue';
@@ -17,7 +17,7 @@ OmegaUp.on('ready', function() {
         ev[param] = response[key] || response;
         ev.$parent[param] = response[key] || response;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   Promise.all([
@@ -78,8 +78,13 @@ OmegaUp.on('ready', function() {
                   basic_information: ev.needsBasicInformation ? 1 : 0,
                   requests_user_information: ev.requestsUserInformation,
                 })
-                  .then(data => UI.contestUpdated(data, contestAlias))
-                  .catch(UI.apiError);
+                  .then(data => {
+                    ui.success(
+                      T.contestEditContestEdited +
+                        ` <a href="/arena/${contestAlias}/">${T.contestEditGoToContest}</a>`,
+                    );
+                  })
+                  .catch(ui.apiError);
               },
               'add-problem': function(ev) {
                 API.Contest.addProblem({
@@ -94,13 +99,13 @@ OmegaUp.on('ready', function() {
                 })
                   .then(function(response) {
                     if (response.status != 'ok') {
-                      UI.error(response.error || 'error');
+                      ui.error(response.error || 'error');
                       return;
                     }
-                    UI.success(T.problemSuccessfullyAdded);
+                    ui.success(T.problemSuccessfullyAdded);
                     refresh(ev, API.Contest.problems, 'problems');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'remove-problem': function(ev) {
                 API.Contest.removeProblem({
@@ -109,13 +114,13 @@ OmegaUp.on('ready', function() {
                 })
                   .then(function(response) {
                     if (response.status != 'ok') {
-                      UI.error(response.error || 'error');
+                      ui.error(response.error || 'error');
                       return;
                     }
-                    UI.success(T.problemSuccessfullyRemoved);
+                    ui.success(T.problemSuccessfullyRemoved);
                     refresh(ev, API.Contest.problems, 'problems');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'runs-diff': (ev, versions, selectedCommit) => {
                 API.Contest.runsDiff({
@@ -130,7 +135,7 @@ OmegaUp.on('ready', function() {
                       response.diff,
                     );
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'get-versions': (problemAlias, problemComponent) => {
                 API.Problem.versions({ problem_alias: problemAlias })
@@ -154,18 +159,21 @@ OmegaUp.on('ready', function() {
                       }
                     }
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'update-admission-mode': function(ev) {
                 API.Contest.update({
                   contest_alias: contestAlias,
                   admission_mode: ev.admissionMode,
                 })
-                  .then(function(response) {
-                    UI.contestUpdated(response, contestAlias);
+                  .then(data => {
+                    ui.success(
+                      T.contestEditContestEdited +
+                        ` <a href="/arena/${contestAlias}/">${T.contestEditGoToContest}</a>`,
+                    );
                     refresh(ev, API.Contest.adminDetails, 'contest');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'add-user': function(ev) {
                 let contestants = [];
@@ -189,16 +197,16 @@ OmegaUp.on('ready', function() {
                     });
                     refresh(ev, API.Contest.users, 'users');
                     if (contestantsWithError.length === 0) {
-                      UI.success(T.bulkUserAddSuccess);
+                      ui.success(T.bulkUserAddSuccess);
                       return;
                     }
-                    UI.error(
-                      UI.formatString(T.bulkUserAddError, {
+                    ui.error(
+                      ui.formatString(T.bulkUserAddError, {
                         userEmail: contestantsWithError.join('<br>'),
                       }),
                     );
                   })
-                  .catch(UI.ignoreError);
+                  .catch(ui.ignoreError);
               },
               'remove-user': function(ev) {
                 API.Contest.removeUser({
@@ -207,12 +215,12 @@ OmegaUp.on('ready', function() {
                 })
                   .then(function(response) {
                     if (response.status != 'ok') {
-                      UI.error(response.error || 'error');
+                      ui.error(response.error || 'error');
                     }
-                    UI.success(T.userRemoveSuccess);
+                    ui.success(T.userRemoveSuccess);
                     refresh(ev, API.Contest.users, 'users');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'save-end-time': function(selected) {
                 API.Contest.updateEndTimeForIdentity({
@@ -221,9 +229,9 @@ OmegaUp.on('ready', function() {
                   end_time: selected.end_time.getTime() / 1000,
                 })
                   .then(function(response) {
-                    UI.success(T.userEndTimeUpdatedSuccessfully);
+                    ui.success(T.userEndTimeUpdatedSuccessfully);
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'clone-contest': function(ev) {
                 API.Contest.clone({
@@ -234,9 +242,9 @@ OmegaUp.on('ready', function() {
                   start_time: ev.startTime.getTime() / 1000,
                 })
                   .then(function(response) {
-                    UI.success(T.contestEditContestClonedSuccessfully);
+                    ui.success(T.contestEditContestClonedSuccessfully);
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'add-group': function(ev) {
                 API.Contest.addGroup({
@@ -244,10 +252,10 @@ OmegaUp.on('ready', function() {
                   group: ev.groupName,
                 })
                   .then(function(response) {
-                    UI.success(T.contestGroupAdded);
+                    ui.success(T.contestGroupAdded);
                     refresh(ev, API.Contest.users, 'groups', 'groups');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'remove-group': function(ev) {
                 API.Contest.removeGroup({
@@ -255,10 +263,10 @@ OmegaUp.on('ready', function() {
                   group: ev.selected.alias,
                 })
                   .then(function(response) {
-                    UI.success(T.contestGroupRemoved);
+                    ui.success(T.contestGroupRemoved);
                     refresh(ev, API.Contest.users, 'groups', 'groups');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'add-admin': function(ev) {
                 API.Contest.addAdmin({
@@ -266,10 +274,10 @@ OmegaUp.on('ready', function() {
                   usernameOrEmail: ev.user,
                 })
                   .then(function(response) {
-                    UI.success(T.adminAdded);
+                    ui.success(T.adminAdded);
                     refresh(ev, API.Contest.admins, 'admins');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'remove-admin': function(ev) {
                 API.Contest.removeAdmin({
@@ -278,13 +286,13 @@ OmegaUp.on('ready', function() {
                 })
                   .then(function(response) {
                     if (response.status != 'ok') {
-                      UI.error(response.error || 'error');
+                      ui.error(response.error || 'error');
                       return;
                     }
-                    UI.success(T.adminRemoved);
+                    ui.success(T.adminRemoved);
                     refresh(ev, API.Contest.admins, 'admins');
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'add-group-admin': function(ev) {
                 API.Contest.addGroupAdmin({
@@ -292,7 +300,7 @@ OmegaUp.on('ready', function() {
                   group: ev.groupName,
                 })
                   .then(function(response) {
-                    UI.success(T.groupAdminAdded);
+                    ui.success(T.groupAdminAdded);
                     refresh(
                       ev,
                       API.Contest.admins,
@@ -300,7 +308,7 @@ OmegaUp.on('ready', function() {
                       'group_admins',
                     );
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
               'remove-group-admin': function(ev) {
                 API.Contest.removeGroupAdmin({
@@ -308,7 +316,7 @@ OmegaUp.on('ready', function() {
                   group: ev.selected.alias,
                 })
                   .then(function(response) {
-                    UI.success(T.groupAdminRemoved);
+                    ui.success(T.groupAdminRemoved);
                     refresh(
                       ev,
                       API.Contest.admins,
@@ -316,24 +324,25 @@ OmegaUp.on('ready', function() {
                       'group_admins',
                     );
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
             },
           });
         },
         methods: {
           arbitrateRequest: function(ev, username, resolution) {
-            omegaup.API.Contest.arbitrateRequest({
+            const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+            API.Contest.arbitrateRequest({
               contest_alias: contestAlias,
               username: username,
               resolution: resolution,
-              note: '',
+              note: resolutionText,
             })
               .then(function(response) {
-                UI.success(T.successfulOperation);
+                ui.success(T.successfulOperation);
                 refresh(ev, API.Contest.requests, 'requests', 'users');
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
         components: {
@@ -341,5 +350,5 @@ OmegaUp.on('ready', function() {
         },
       });
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });

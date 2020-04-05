@@ -12,7 +12,7 @@
         <div class="form-group">
           <omegaup-autocomplete
             class="form-control"
-            v-bind:init="el => UI.problemTypeahead(el)"
+            v-bind:init="el => typeahead.problemTypeahead(el)"
             v-model="keyword"
             v-bind:placeholder="T.wordsKeyword"
             name="query"
@@ -103,7 +103,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 
 @Component({
@@ -122,7 +122,7 @@ export default class ProblemSearchBar extends Vue {
   @Prop() columns!: string[];
 
   T = T;
-  UI = UI;
+  typeahead = typeahead;
 
   keyword = this.initialKeyword;
   language = this.initialLanguage;
