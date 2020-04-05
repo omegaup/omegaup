@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{#locale#}">
+<html lang="{#locale#}" {if isset($headerPayload) && $headerPayload.bootstrap4} class="h-100" {/if}>
 	<head data-locale="{#locale#}">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 {if !is_null($smarty.const.NEW_RELIC_SCRIPT)}
@@ -75,20 +75,33 @@
 		<script type="text/javascript" src="{$recaptchaFile}"></script>
 {/if}
 	</head>
-	<body{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} class="lockdown"{/if}>
+	<body
+		{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}
+		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if} {if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
+	>
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
 		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
 		{/if}
 {/if}
-		<div id="root">
-{if isset($headerPayload)}
+{if isset($headerPayload) && $headerPayload.bootstrap4}
 	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+	<main role="main">
+		{if !isset($inArena) || !$inArena}
+			{include file='mainmenu.tpl' inline}
+		{/if}
+		{include file='status.tpl' inline}
+	</main>
 {else}
-	{include file='common.navbar.tpl' headerPayload=[] inline}
+	<div id="root">
+	{if isset($headerPayload)}
+		{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+	{else}
+		{include file='common.navbar.tpl' headerPayload=[] inline}
+	{/if}
+	{if !isset($inArena) || !$inArena}
+	{include file='mainmenu.tpl' inline}
+	{/if}
+	{include file='status.tpl' inline}
 {/if}
-{if !isset($inArena) || !$inArena}
-{include file='mainmenu.tpl' inline}
-{/if}
-{include file='status.tpl' inline}
