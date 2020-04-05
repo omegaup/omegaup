@@ -2,6 +2,8 @@ import T from './lang';
 import API from './api';
 import * as ui from './ui';
 
+import '../../third_party/js/typeahead.jquery.js';
+
 export function typeaheadWrapper(searchFn) {
   let lastRequest = null;
   let pendingRequest = false;
