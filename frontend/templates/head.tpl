@@ -48,8 +48,6 @@
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="{version_hash src="/third_party/bootstrap-3.4.1/js/bootstrap.min.js"}" defer></script>
 {/if}
-		<!-- typeahead plugin from https://github.com/twitter/typeahead.js -->
-		<script type="text/javascript" src="{version_hash src="/third_party/js/typeahead.jquery.min.js"}" defer></script>
 
 {if isset($inArena) && $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
