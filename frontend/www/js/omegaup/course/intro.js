@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api_transitional';
 import * as UI from '../ui';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
@@ -13,16 +13,19 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('course-intro', {
         props: {
-          name: coursePayload.name,
-          description: coursePayload.description,
-          needsBasicInformation: coursePayload.needsBasicInformation,
-          requestsUserInformation: coursePayload.requestsUserInformation,
-          shouldShowAcceptTeacher: coursePayload.shouldShowAcceptTeacher,
-          statements: coursePayload.statements,
+          name: this.name,
+          description: this.description,
+          needsBasicInformation: this.needsBasicInformation,
+          requestsUserInformation: this.requestsUserInformation,
+          shouldShowAcceptTeacher: this.shouldShowAcceptTeacher,
+          statements: this.statements,
+          userRegistrationRequested: this.userRegistrationRequested,
+          userRegistrationAnswered: this.userRegistrationAnswered,
+          userRegistrationAccepted: this.userRegistrationAccepted,
         },
         on: {
-          submit: function(ev) {
-            API.Course.addStudent({
+          submit: ev => {
+            api.Course.addStudent({
               course_alias: coursePayload.alias,
               usernameOrEmail: coursePayload.currentUsername,
               share_user_information: ev.shareUserInformation,
@@ -33,13 +36,31 @@ OmegaUp.on('ready', function() {
                 coursePayload.statements.acceptTeacher.gitObjectId,
               statement_type: coursePayload.statements.privacy.statementType,
             })
-              .then(function(data) {
-                window.location.replace('/course/' + coursePayload.alias);
+              .then(data => {
+                window.location.replace(`/course/${coursePayload.alias}/`);
               })
               .catch(UI.apiError);
           },
+          'request-access-course': () => {
+            api.Course.registerForCourse({ course_alias: coursePayload.alias })
+              .then(() => {
+                courseIntro.userRegistrationRequested = true;
+              })
+              .catch(UI.error);
+          },
         },
       });
+    },
+    data: {
+      name: coursePayload.name,
+      description: coursePayload.description,
+      needsBasicInformation: coursePayload.needsBasicInformation,
+      requestsUserInformation: coursePayload.requestsUserInformation,
+      shouldShowAcceptTeacher: coursePayload.shouldShowAcceptTeacher,
+      statements: coursePayload.statements,
+      userRegistrationRequested: coursePayload.userRegistrationRequested,
+      userRegistrationAnswered: coursePayload.userRegistrationAnswered,
+      userRegistrationAccepted: coursePayload.userRegistrationAccepted,
     },
     components: {
       'course-intro': course_Intro,

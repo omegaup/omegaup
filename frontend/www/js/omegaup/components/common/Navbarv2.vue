@@ -288,6 +288,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
@@ -313,12 +314,12 @@ export default class Navbar extends Vue {
   @Prop() isMainUserIdentity!: boolean;
   @Prop() lockDownImage!: string;
   @Prop() navbarSection!: string;
-  @Prop() graderInfo!: omegaup.Grader;
+  @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
-  @Prop() errorMessage!: string;
+  @Prop() errorMessage!: string | null;
   @Prop() initialClarifications!: omegaup.Clarification[];
 
-  notifications: omegaup.Notification[] = [];
+  notifications: types.Notification[] = [];
   clarifications: omegaup.Clarification[] = this.initialClarifications;
   T = T;
 

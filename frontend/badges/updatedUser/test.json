@@ -4,10 +4,10 @@
         {
             "type": "apicalls",
             "apicalls": [
-                {    
+                {
                     "username": "admintest",
                     "password": "testtesttest",
-                    "requests": [          
+                    "requests": [
                         {
                             "api": "\\OmegaUp\\Controllers\\User::apiCreate",
                             "params": {
@@ -48,7 +48,7 @@
                                 "name": "usuario verificado",
                                 "gender": "male",
                                 "school_name": "ITSF",
-                                "scholar_degree": "bachelors", 
+                                "scholar_degree": "bachelors",
                                 "graduation_date": "2020-03-03",
                                 "birth_date": "1996-02-02",
                                 "locale": "es",
@@ -73,7 +73,7 @@
                                 "username": "test_user_2",
                                 "name": "usuario verificado dos",
                                 "school_name": "ITSF",
-                                "scholar_degree": "bachelors", 
+                                "scholar_degree": "bachelors",
                                 "graduation_date": "2020-03-03",
                                 "birth_date": "1996-02-02",
                                 "locale": "es",
@@ -89,6 +89,6 @@
         }
     ],
     "expectedResults": [
-        "test_user_0 "
+        "test_user_0"
     ]
 }

@@ -2,12 +2,13 @@ import common_Stats from '../components/common/Stats.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
-import * as UI from '../ui';
+import * as api from '../api_transitional';
+import { types } from '../api_types';
+import * as ui from '../ui_transitional';
+import * as Highcharts from 'highcharts';
 
-OmegaUp.on('ready', function() {
-  Highcharts.setOptions({ global: { useUTC: false } });
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.StatsPayload('stats-payload');
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
@@ -15,15 +16,55 @@ OmegaUp.on('ready', function() {
     payload.entity_type === 'contest'
       ? T.wordsPointsDistribution
       : T.wordsPointsDistributionProblem;
-  const stats = {
-    total_runs: 0,
-    pending_runs: [],
-    max_wait_time: 0,
-    max_wait_time_guid: 0,
-    verdict_counts: {},
-    distribution: [],
-    size_of_bucket: 10,
-    total_points: 0,
+
+  const getStats = (entityType: string): void => {
+    if (entityType === 'contest') {
+      api.Contest.stats({ contest_alias: payload.alias })
+        .then(s => Vue.set(statsChart, 'stats', s))
+        .catch(ui.apiError);
+    } else {
+      api.Problem.stats({ problem_alias: payload.alias })
+        .then(s => Vue.set(statsChart, 'stats', s))
+        .catch(ui.apiError);
+    }
+  };
+
+  const normalizeRunCounts = (stats: types.StatsPayload) => {
+    let result = [];
+    for (const verdict in stats.verdict_counts) {
+      if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
+      if (verdict === 'NO-AC') continue;
+      if (verdict === 'AC') {
+        result.push({
+          name: verdict,
+          y: stats.verdict_counts[verdict],
+          sliced: true,
+          selected: true,
+        });
+        continue;
+      }
+      result.push([verdict, stats.verdict_counts[verdict]]);
+    }
+    return result;
+  };
+
+  const getDistribution = (stats: types.StatsPayload) => {
+    const distribution: number[] = [];
+    for (const val in stats.distribution) {
+      distribution.push(stats.distribution[val]);
+    }
+
+    return distribution;
+  };
+
+  const getCategories = (stats: types.StatsPayload) => {
+    const categoriesDistributionValues: { [key: number]: number } = {};
+    let startOfBucket = 0;
+    for (const val in stats.distribution) {
+      categoriesDistributionValues[val] = startOfBucket;
+      startOfBucket += stats.size_of_bucket;
+    }
+    return categoriesDistributionValues;
   };
 
   let statsChart = new Vue({
@@ -37,7 +78,7 @@ OmegaUp.on('ready', function() {
           pendingChartOptions: this.pendingChartOptions,
         },
         on: {
-          'update-series': function(series) {
+          'update-series': (series: types.StatsPayload): void => {
             statsChart.verdictChartOptions.series[0].data = normalizeRunCounts(
               series,
             );
@@ -61,16 +102,9 @@ OmegaUp.on('ready', function() {
           plotShadow: false,
         },
         title: {
-          text: UI.formatString(T.wordsVerdictsOf, {
+          text: ui.formatString(T.wordsVerdictsOf, {
             alias: payload.alias,
           }),
-        },
-        tooltip: {
-          formatter() {
-            return UI.formatString(T.wordsNumberOfRuns, {
-              number: this.point.y,
-            });
-          },
         },
         plotOptions: {
           pie: {
@@ -80,17 +114,8 @@ OmegaUp.on('ready', function() {
               enabled: true,
               color: '#000000',
               connectorColor: '#000000',
-              formatter() {
-                return (
-                  '<b>' +
-                  this.point.name +
-                  '</b>: ' +
-                  this.percentage.toFixed(2) +
-                  '% (' +
-                  this.point.y +
-                  ')'
-                );
-              },
+              format:
+                '<b>{point.name}</b>: {point.percentage:.2f}% ({point.y})',
             },
           },
         },
@@ -101,11 +126,14 @@ OmegaUp.on('ready', function() {
             data: normalizeRunCounts(payload),
           },
         ],
+        time: {
+          useUTC: true,
+        },
       },
       distributionChartOptions: {
         chart: { type: 'column' },
         title: {
-          text: UI.formatString(pointsDistributionLabel, {
+          text: ui.formatString(pointsDistributionLabel, {
             alias: payload.alias,
           }),
         },
@@ -113,13 +141,7 @@ OmegaUp.on('ready', function() {
           categories: getCategories(payload),
           title: { text: T.wordsPointsDistributionInIntervals },
           labels: {
-            formatter: function() {
-              if (this.value % 10 == 0) {
-                return this.value;
-              } else {
-                return '';
-              }
-            },
+            step: 10,
           },
         },
         yAxis: { min: 0, title: { text: T.wordsNumberOfContestants } },
@@ -128,17 +150,20 @@ OmegaUp.on('ready', function() {
         series: [
           { name: T.wordsNumberOfContestants, data: getDistribution(payload) },
         ],
+        time: {
+          useUTC: true,
+        },
       },
       pendingChartOptions: {
         chart: {
           type: 'spline',
-          animation: Highcharts.svg, // don't animate in old IE
           marginRight: 10,
           events: {
-            load: function() {
+            load: (ev: Event): void => {
               // set up the updating of the chart each second
-              const series = this.series[0];
-              setInterval(function() {
+              const series = (<Highcharts.Chart>(ev.target as unknown))
+                .series[0];
+              setInterval(() => {
                 const x = new Date().getTime(), // current time
                   y = statsChart.stats.pending_runs.length;
                 series.addPoint([x, y], true, true);
@@ -153,91 +178,34 @@ OmegaUp.on('ready', function() {
           plotLines: [{ value: 0, width: 1, color: '#808080' }],
         },
         tooltip: {
-          formatter: function() {
-            return (
-              '<b>' +
-              this.series.name +
-              '</b><br/>' +
-              Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +
-              '<br/>' +
-              Highcharts.numberFormat(this.y, 2)
-            );
-          },
+          format: '<b>{series.name}</b><br/>{point.x}<br/>{point.y}',
         },
         legend: { enabled: false },
         exporting: { enabled: false },
         series: [
           {
             name: T.wordsPendingRuns,
-            data: (function() {
+            data: (() => {
               // generate an array of random data
-              let data = [],
-                time = new Date().getTime(),
-                i;
+              const data = [];
+              const time = new Date().getTime();
 
-              for (i = -5; i <= 0; i++) {
+              for (let i = -5; i <= 0; i++) {
                 data.push({ x: time + i * 1000, y: 0 });
               }
               return data;
             })(),
           },
         ],
+        time: {
+          useUTC: true,
+        },
       },
     },
     components: {
       'omegaup-common-stats': common_Stats,
     },
   });
-
-  function getStats(entityType) {
-    if (entityType === 'contest') {
-      API.Contest.stats({ contest_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
-        .catch(UI.apiError);
-    } else {
-      API.Problem.stats({ problem_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
-        .catch(UI.apiError);
-    }
-  }
-
-  function normalizeRunCounts(stats) {
-    let result = [];
-    for (const verdict in stats.verdict_counts) {
-      if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
-      if (verdict === 'NO-AC') continue;
-      if (verdict === 'AC') {
-        result.push({
-          name: verdict,
-          y: stats.verdict_counts[verdict],
-          sliced: true,
-          selected: true,
-        });
-        continue;
-      }
-      result.push([verdict, stats.verdict_counts[verdict]]);
-    }
-    return result;
-  }
-
-  function getDistribution(stats) {
-    const distribution = [];
-    for (const val in stats.distribution) {
-      distribution.push(parseInt(stats.distribution[val]));
-    }
-
-    return distribution;
-  }
-
-  function getCategories(stats) {
-    const categoriesDistributionValues = [];
-    let startOfBucket = 0;
-    for (const val in stats.distribution) {
-      categoriesDistributionValues[val] = startOfBucket;
-      startOfBucket += stats.size_of_bucket;
-    }
-    return categoriesDistributionValues;
-  }
 
   setInterval(() => getStats(payload.entity_type), callStatsApiTimeout);
 });

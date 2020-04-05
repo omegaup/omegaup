@@ -121,6 +121,7 @@ export function warning(message: string): void {
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
+  console.error(response);
   error(
     response.error && response.payload
       ? formatString(response.error, response.payload)

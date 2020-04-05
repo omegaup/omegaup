@@ -33,9 +33,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, sizeof($notifications));
         $this->assertEquals(
             'testUnread',
-            json_decode(
-                $notifications[0]['contents']
-            )->badge
+            $notifications[0]['contents']['badge']
         );
     }
 

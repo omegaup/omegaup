@@ -5,8 +5,10 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
+ * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3268,7 +3270,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{rankTablePayload: array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}}, template: string}
+     * @return array{smartyProperties: array{rankTablePayload: UserRankTablePayload}, template: string}
      */
     public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
@@ -3293,6 +3295,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'filter' => $filter,
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
+                    'isLogged' => false,
                 ],
             ],
             'template' => 'rank.tpl',
@@ -3301,7 +3304,6 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
-            $response['smartyProperties']['rankTablePayload']['isLogged'] = false;
             return $response;
         }
 
@@ -3412,7 +3414,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
             ],
-            'bootstrap4' => false, //TODO: Esto cambiará pronto por eso lo dejo
+            'supportsBootstrap4' => true,
             'template' => 'index.tpl',
         ];
     }
