@@ -53,6 +53,7 @@ frontend/tests/controllers/templates/
 frontend/tests/omegaup.db
 frontend/tests/ui/results/
 omegaup_test.log
+coverage.xml
 
 # Ignore runtime and test stuff
 test-env
