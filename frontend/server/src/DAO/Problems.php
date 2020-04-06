@@ -9,8 +9,6 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Problems}.
  *
- * @psalm-type ProblemItem=array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}
- *
  * @author alanboy
  * @access public
  * @package docs
@@ -363,7 +361,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params = [$alias];
 
         /** @var array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
-        /** @var ProblemItem|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
                 return null;
@@ -459,7 +456,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $val = [$identityId];
 
         $problems = [];
-        /** @var list<ProblemItem> $row */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -503,7 +500,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [$identityId];
 
-        /** @var list<ProblemItem> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -538,7 +535,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         $params = [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $identityId];
 
-        /** @var list<ProblemItem> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
@@ -918,7 +915,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = $offset;
         $params[] = $pageSize;
 
-        /** @var list<ProblemItem> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits};",
             $params
@@ -977,7 +974,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = $offset;
         $params[] = $pageSize;
 
-        /** @var list<ProblemItem> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql} {$limits};",
             $params
@@ -1148,7 +1145,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     title = ?;';
 
-        /** @var list<ProblemItem> */
+        /** @var list<array{accepted: int, acl_id: int, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $problems = [];
