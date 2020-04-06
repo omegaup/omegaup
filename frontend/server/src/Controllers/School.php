@@ -169,7 +169,6 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $school_id
      *
      * @param \OmegaUp\Request $r
