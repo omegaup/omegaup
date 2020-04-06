@@ -75,6 +75,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $show_diff
      */
     private static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
@@ -143,6 +144,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($r['visibility'])) {
             $params['visibility'] = intval($r['visibility']);
+        }
+        if (!is_null($r['show_diff'])) {
+            $params['show_diff'] = strval($r['show_diff']);
         }
         return new \OmegaUp\ProblemParams($params, $isRequired);
     }
@@ -310,6 +314,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -363,6 +368,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'alias' => $params->problemAlias,
             'languages' => $languages,
             'email_clarifications' => $params->emailClarifications,
+            'show_diff' => $params->showDiff,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
@@ -949,6 +955,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -976,7 +983,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             $problemParams,
-            strval($r['message']),
+            $r['message'],
             $problemParams->updatePublished,
             boolval($r['redirect'])
         );
@@ -1207,6 +1214,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'emailClarifications' => [
                 'alias' => 'email_clarifications',
+            ],
+            'showDiff' => [
+                'alias' => 'show_diff',
             ],
             'source',
             'order',
@@ -1479,6 +1489,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $statement
      * @omegaup-request-param mixed $time_limit
@@ -1569,6 +1580,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $solution
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
@@ -4198,6 +4210,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $statement-language
      * @omegaup-request-param mixed $time_limit
@@ -4311,6 +4324,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title

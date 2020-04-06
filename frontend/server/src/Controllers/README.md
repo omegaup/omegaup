@@ -2594,24 +2594,25 @@ Create a new problem
 
 ### Parameters
 
-| Name                      | Type    | Description |
-| ------------------------- | ------- | ----------- |
-| `email_clarifications`    | `mixed` |             |
-| `extra_wall_time`         | `mixed` |             |
-| `input_limit`             | `mixed` |             |
-| `languages`               | `mixed` |             |
-| `memory_limit`            | `mixed` |             |
-| `output_limit`            | `mixed` |             |
-| `overall_wall_time_limit` | `mixed` |             |
-| `problem_alias`           | `mixed` |             |
-| `selected_tags`           | `mixed` |             |
-| `source`                  | `mixed` |             |
-| `time_limit`              | `mixed` |             |
-| `title`                   | `mixed` |             |
-| `update_published`        | `mixed` |             |
-| `validator`               | `mixed` |             |
-| `validator_time_limit`    | `mixed` |             |
-| `visibility`              | `mixed` |             |
+| Name                      | Type     | Description |
+| ------------------------- | -------- | ----------- |
+| `email_clarifications`    | `mixed`  |             |
+| `extra_wall_time`         | `mixed`  |             |
+| `input_limit`             | `mixed`  |             |
+| `languages`               | `mixed`  |             |
+| `memory_limit`            | `mixed`  |             |
+| `output_limit`            | `mixed`  |             |
+| `overall_wall_time_limit` | `mixed`  |             |
+| `problem_alias`           | `mixed`  |             |
+| `selected_tags`           | `mixed`  |             |
+| `show_diff`               | `string` |             |
+| `source`                  | `mixed`  |             |
+| `time_limit`              | `mixed`  |             |
+| `title`                   | `mixed`  |             |
+| `update_published`        | `mixed`  |             |
+| `validator`               | `mixed`  |             |
+| `validator_time_limit`    | `mixed`  |             |
+| `visibility`              | `mixed`  |             |
 
 ### Returns
 
@@ -2937,26 +2938,27 @@ Update problem contents
 
 ### Parameters
 
-| Name                      | Type    | Description |
-| ------------------------- | ------- | ----------- |
-| `email_clarifications`    | `mixed` |             |
-| `extra_wall_time`         | `mixed` |             |
-| `input_limit`             | `mixed` |             |
-| `languages`               | `mixed` |             |
-| `memory_limit`            | `mixed` |             |
-| `message`                 | `mixed` |             |
-| `output_limit`            | `mixed` |             |
-| `overall_wall_time_limit` | `mixed` |             |
-| `problem_alias`           | `mixed` |             |
-| `redirect`                | `mixed` |             |
-| `selected_tags`           | `mixed` |             |
-| `source`                  | `mixed` |             |
-| `time_limit`              | `mixed` |             |
-| `title`                   | `mixed` |             |
-| `update_published`        | `mixed` |             |
-| `validator`               | `mixed` |             |
-| `validator_time_limit`    | `mixed` |             |
-| `visibility`              | `mixed` |             |
+| Name                      | Type     | Description |
+| ------------------------- | -------- | ----------- |
+| `email_clarifications`    | `mixed`  |             |
+| `extra_wall_time`         | `mixed`  |             |
+| `input_limit`             | `mixed`  |             |
+| `languages`               | `mixed`  |             |
+| `memory_limit`            | `mixed`  |             |
+| `message`                 | `mixed`  |             |
+| `output_limit`            | `mixed`  |             |
+| `overall_wall_time_limit` | `mixed`  |             |
+| `problem_alias`           | `mixed`  |             |
+| `redirect`                | `mixed`  |             |
+| `selected_tags`           | `mixed`  |             |
+| `show_diff`               | `string` |             |
+| `source`                  | `mixed`  |             |
+| `time_limit`              | `mixed`  |             |
+| `title`                   | `mixed`  |             |
+| `update_published`        | `mixed`  |             |
+| `validator`               | `mixed`  |             |
+| `validator_time_limit`    | `mixed`  |             |
+| `visibility`              | `mixed`  |             |
 
 ### Returns
 
@@ -2972,27 +2974,28 @@ Updates problem solution only
 
 ### Parameters
 
-| Name                      | Type    | Description |
-| ------------------------- | ------- | ----------- |
-| `email_clarifications`    | `mixed` |             |
-| `extra_wall_time`         | `mixed` |             |
-| `input_limit`             | `mixed` |             |
-| `lang`                    | `mixed` |             |
-| `languages`               | `mixed` |             |
-| `memory_limit`            | `mixed` |             |
-| `message`                 | `mixed` |             |
-| `output_limit`            | `mixed` |             |
-| `overall_wall_time_limit` | `mixed` |             |
-| `problem_alias`           | `mixed` |             |
-| `selected_tags`           | `mixed` |             |
-| `solution`                | `mixed` |             |
-| `source`                  | `mixed` |             |
-| `time_limit`              | `mixed` |             |
-| `title`                   | `mixed` |             |
-| `update_published`        | `mixed` |             |
-| `validator`               | `mixed` |             |
-| `validator_time_limit`    | `mixed` |             |
-| `visibility`              | `mixed` |             |
+| Name                      | Type     | Description |
+| ------------------------- | -------- | ----------- |
+| `email_clarifications`    | `mixed`  |             |
+| `extra_wall_time`         | `mixed`  |             |
+| `input_limit`             | `mixed`  |             |
+| `lang`                    | `mixed`  |             |
+| `languages`               | `mixed`  |             |
+| `memory_limit`            | `mixed`  |             |
+| `message`                 | `mixed`  |             |
+| `output_limit`            | `mixed`  |             |
+| `overall_wall_time_limit` | `mixed`  |             |
+| `problem_alias`           | `mixed`  |             |
+| `selected_tags`           | `mixed`  |             |
+| `show_diff`               | `string` |             |
+| `solution`                | `mixed`  |             |
+| `source`                  | `mixed`  |             |
+| `time_limit`              | `mixed`  |             |
+| `title`                   | `mixed`  |             |
+| `update_published`        | `mixed`  |             |
+| `validator`               | `mixed`  |             |
+| `validator_time_limit`    | `mixed`  |             |
+| `visibility`              | `mixed`  |             |
 
 ### Returns
 
@@ -3006,27 +3009,28 @@ Updates problem statement only
 
 ### Parameters
 
-| Name                      | Type    | Description |
-| ------------------------- | ------- | ----------- |
-| `email_clarifications`    | `mixed` |             |
-| `extra_wall_time`         | `mixed` |             |
-| `input_limit`             | `mixed` |             |
-| `lang`                    | `mixed` |             |
-| `languages`               | `mixed` |             |
-| `memory_limit`            | `mixed` |             |
-| `message`                 | `mixed` |             |
-| `output_limit`            | `mixed` |             |
-| `overall_wall_time_limit` | `mixed` |             |
-| `problem_alias`           | `mixed` |             |
-| `selected_tags`           | `mixed` |             |
-| `source`                  | `mixed` |             |
-| `statement`               | `mixed` |             |
-| `time_limit`              | `mixed` |             |
-| `title`                   | `mixed` |             |
-| `update_published`        | `mixed` |             |
-| `validator`               | `mixed` |             |
-| `validator_time_limit`    | `mixed` |             |
-| `visibility`              | `mixed` |             |
+| Name                      | Type     | Description |
+| ------------------------- | -------- | ----------- |
+| `email_clarifications`    | `mixed`  |             |
+| `extra_wall_time`         | `mixed`  |             |
+| `input_limit`             | `mixed`  |             |
+| `lang`                    | `mixed`  |             |
+| `languages`               | `mixed`  |             |
+| `memory_limit`            | `mixed`  |             |
+| `message`                 | `mixed`  |             |
+| `output_limit`            | `mixed`  |             |
+| `overall_wall_time_limit` | `mixed`  |             |
+| `problem_alias`           | `mixed`  |             |
+| `selected_tags`           | `mixed`  |             |
+| `show_diff`               | `string` |             |
+| `source`                  | `mixed`  |             |
+| `statement`               | `mixed`  |             |
+| `time_limit`              | `mixed`  |             |
+| `title`                   | `mixed`  |             |
+| `update_published`        | `mixed`  |             |
+| `validator`               | `mixed`  |             |
+| `validator_time_limit`    | `mixed`  |             |
+| `visibility`              | `mixed`  |             |
 
 ### Returns
 
