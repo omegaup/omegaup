@@ -38,6 +38,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'quality_histogram' => true,
         'difficulty_histogram' => true,
         'quality_seal' => true,
+        'show_diff' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -166,6 +167,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         if (isset($data['quality_seal'])) {
             $this->quality_seal = boolval(
                 $data['quality_seal']
+            );
+        }
+        if (isset($data['show_diff'])) {
+            $this->show_diff = strval(
+                $data['show_diff']
             );
         }
     }
@@ -325,4 +331,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $quality_seal = false;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string
+     */
+    public $show_diff = 'none';
 }
