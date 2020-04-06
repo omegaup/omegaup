@@ -194,7 +194,7 @@ omegaup.OmegaUp.on('ready', function() {
   // Edit users
   omegaup.Typeahead.userTypeahead($('#username-admin'));
   omegaup.Typeahead.userTypeahead($('#usernameOrEmail'));
-  omegaup.Typeahead.typeahead($('#groupalias-admin'), omegaup.API.Group.list);
+  omegaup.Typeahead.groupTypeahead($('#groupalias-admin'));
 
   $('#add-admin-form').on('submit', function() {
     omegaup.API.Contest.addAdmin({

@@ -6,12 +6,8 @@
 
 
 (function(root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define([ "jquery" ], function(a0) {
-            return factory(a0);
-        });
-    } else if (typeof module === "object" && module.exports) {
-        module.exports = factory(require("jquery"));
+    if (typeof exports === "object") {
+        module.exports = factory(global.jQuery);
     } else {
         factory(root["jQuery"]);
     }
