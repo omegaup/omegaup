@@ -25,13 +25,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
 
 @Component
 export default class Slide extends Vue {
   @Prop() title!: string;
   @Prop() description!: string;
   @Prop() imageSrc!: string;
-  T = T;
 }
 </script>

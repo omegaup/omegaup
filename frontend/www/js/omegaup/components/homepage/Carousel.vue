@@ -3,30 +3,25 @@
   <div class="carousel slide" data-ride="carousel" id="carousel-display">
     <!-- id-lint on -->
     <ol class="carousel-indicators">
-      <li data-target=".carousel" data-slide-to="0" class="active"></li>
-      <li data-target=".carousel" data-slide-to="1"></li>
-      <li data-target=".carousel" data-slide-to="2"></li>
+      <li
+        data-target=".carousel"
+        v-bind:key="index"
+        v-bind:data-slide-to="index"
+        v-bind:class="{ active: !index }"
+        v-for="(_, index) in slides"
+      ></li>
     </ol>
     <div class="carousel-inner text-center py-5 py-md-0">
-      <div class="carousel-item active">
+      <div
+        class="carousel-item"
+        v-bind:class="{ active: !index }"
+        v-bind:key="index"
+        v-for="(slide, index) in slides"
+      >
         <omegaup-homepage-slide
-          v-bind:title="T.carouselSlideWelcomeTitle"
-          v-bind:description="T.carouselSlideWelcomeDescription"
-          v-bind:image-src="'/media/homepage/carousel_slide_1.svg'"
-        ></omegaup-homepage-slide>
-      </div>
-      <div class="carousel-item">
-        <omegaup-homepage-slide
-          v-bind:title="T.carouselSlideMentorsTitle"
-          v-bind:description="T.carouselSlideMentorsDescription"
-          v-bind:image-src="'/media/homepage/carousel_slide_2.svg'"
-        ></omegaup-homepage-slide>
-      </div>
-      <div class="carousel-item">
-        <omegaup-homepage-slide
-          v-bind:title="T.carouselSlideSchoolsTitle"
-          v-bind:description="T.carouselSlideSchoolsDescription"
-          v-bind:image-src="'/media/homepage/carousel_slide_3.svg'"
+          v-bind:title="slide.title[T.locale]"
+          v-bind:description="slide.description[T.locale]"
+          v-bind:image-src="slide.image"
         ></omegaup-homepage-slide>
       </div>
     </div>
@@ -65,16 +60,16 @@ $omegaup-primary--accent: #0275d8;
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { VueAgile } from 'vue-agile';
 import homepageSlide from './Slide.vue';
+import carouselConfig from '../../carousel.config';
 
 @Component({
   components: {
-    VueAgile,
     'omegaup-homepage-slide': homepageSlide,
   },
 })
 export default class Carousel extends Vue {
   T = T;
+  slides = carouselConfig.splice(1);
 }
 </script>

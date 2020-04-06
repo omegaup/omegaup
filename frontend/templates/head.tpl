@@ -77,7 +77,7 @@
 	</head>
 	<body
 		{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}
-		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-4{/if} {if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
+		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
 	>
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
@@ -88,11 +88,12 @@
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 	<main role="main">
-		{if !isset($inArena) || !$inArena}
-			{include file='mainmenu.tpl' inline}
+		{if (!isset($inArena) || !$inArena) && isset($ERROR_TO_USER)}
+			<div class="alert alert-danger">
+				{$ERROR_MESSAGE}
+			</div>
 		{/if}
 		{include file='status.tpl' inline}
-	</main>
 {else}
 	<div id="root">
 	{if isset($headerPayload)}
