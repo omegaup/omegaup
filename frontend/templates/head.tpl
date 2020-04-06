@@ -77,7 +77,7 @@
 	</head>
 	<body
 		{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}
-		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if} {if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
+		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-4{/if} {if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
 	>
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
