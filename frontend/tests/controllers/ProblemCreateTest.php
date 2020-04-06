@@ -848,4 +848,45 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    public function testCreateProblemWithDifferentShowDiffValues() {
+        $showDiffValues = ['none', 'examples', 'all', 'invalid'];
+
+        foreach ($showDiffValues as $showDiffValue) {
+            $problemData = \OmegaUp\Test\Factories\Problem::getRequest(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'show_diff' => $showDiffValue,
+                ])
+            );
+            $r = $problemData['request'];
+            $problemAuthor = $problemData['author'];
+
+            // Login user
+            $login = self::login($problemAuthor);
+            $r['auth_token'] = $login->auth_token;
+
+            // Get File Uploader Mock and tell Omegaup API to use it
+            \OmegaUp\FileHandler::setFileUploaderForTesting(
+                $this->createFileUploaderMock()
+            );
+
+            try {
+                \OmegaUp\Controllers\Problem::apiCreate($r);
+                if ($showDiffValue === 'invalid') {
+                    $this->fail('Exception was expected.');
+                } else {
+                    $problem = \OmegaUp\DAO\Problems::getByAlias(
+                        $r['problem_alias']
+                    );
+
+                    $this->assertEquals($showDiffValue, $problem->show_diff);
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertEquals(
+                    'parameterNotInExpectedSet',
+                    $e->getMessage()
+                );
+            }
+        }
+    }
 }

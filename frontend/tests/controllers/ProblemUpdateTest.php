@@ -1788,4 +1788,46 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(1, $response['visibility']);
     }
+
+    public function testUpdateProblemWithDifferentShowDiffValues() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $showDiffValues = ['none', 'examples', 'all', 'invalid'];
+
+        foreach ($showDiffValues as $showDiffValue) {
+            // Call API
+            $login = self::login($problemData['author']);
+            try {
+                $response = \OmegaUp\Controllers\Problem::apiUpdate(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                        'show_diff' => $showDiffValue,
+                        'problem_alias' => $problemData['request']['problem_alias'],
+                        'message' => 'Changed show_diff',
+                    ])
+                );
+                if ($showDiffValue === 'invalid') {
+                    $this->fail('Exception was expected.');
+                } else {
+                    // Verify data in DB
+                    $problem = \OmegaUp\DAO\Problems::getByAlias(
+                        $problemData['request']['problem_alias']
+                    );
+
+                    // Check that we retrieved 1 element
+                    $this->assertNotNull($problem);
+                    $this->assertEqualSets(
+                        $showDiffValue,
+                        $problem->show_diff
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertEquals(
+                    'parameterNotInExpectedSet',
+                    $e->getMessage()
+                );
+            }
+        }
+    }
 }
