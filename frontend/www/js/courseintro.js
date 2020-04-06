@@ -6,10 +6,10 @@ omegaup.OmegaUp.on('ready', function() {
       $('.course #title').text(course.name);
       $('.course #description').text(course.description);
       $('.course #start_time').val(
-        omegaup.UI.formatDateTime(course.start_time),
+        omegaup.Time.formatDateTime(course.start_time),
       );
       $('.course #finish_time').val(
-        omegaup.UI.formatDateTime(course.finish_time),
+        omegaup.Time.formatDateTime(course.finish_time),
       );
     }
   }

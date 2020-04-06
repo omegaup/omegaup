@@ -6,6 +6,7 @@ namespace OmegaUp\Controllers;
  * BadgesController
  *
  * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
+ * @psalm-type BadgeDetailsPayload=array{badge: Badge}
  */
 class Badge extends \OmegaUp\Controllers\Controller {
     /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
@@ -57,6 +58,8 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of badges owned by a certain user
      *
+     * @omegaup-request-param mixed $target_username
+     *
      * @return array{badges: list<Badge>}
      */
     public static function apiUserList(\OmegaUp\Request $r): array {
@@ -77,7 +80,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @return array{assignation_time: int|null}
+     * @omegaup-request-param mixed $badge_alias
+     *
+     * @return array{assignation_time: \OmegaUp\Timestamp|null}
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -103,6 +108,8 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
+     * @omegaup-request-param mixed $badge_alias
+     *
      * @return Badge
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
@@ -114,15 +121,25 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $r['badge_alias'],
             self::getAllBadges()
         );
+        return self::getBadgeDetails($r['badge_alias']);
+    }
+
+    /**
+     * Returns the number of owners and the first
+     * assignation timestamp for a certain badge
+     *
+     * @return Badge
+     */
+    private static function getBadgeDetails(string $badgeAlias): array {
         $totalUsers = max(\OmegaUp\DAO\Users::getUsersCount(), 1);
         $ownersCount = \OmegaUp\DAO\UsersBadges::getBadgeOwnersCount(
-            $r['badge_alias']
+            $badgeAlias
         );
         $firstAssignation = \OmegaUp\DAO\UsersBadges::getBadgeFirstAssignationTime(
-            $r['badge_alias']
+            $badgeAlias
         );
         return [
-            'badge_alias' => $r['badge_alias'],
+            'badge_alias' => $badgeAlias,
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
             'owners_count' => $ownersCount,
@@ -130,7 +147,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{badge_alias: string}, template: string}
+     * @omegaup-request-param mixed $badge_alias
+     *
+     * @return array{smartyProperties: array{badgeDetailsPayload: BadgeDetailsPayload}, template: string}
      */
     public static function getDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -145,7 +164,19 @@ class Badge extends \OmegaUp\Controllers\Controller {
         );
         return [
             'smartyProperties' => [
-                'badge_alias' => $r['badge_alias'],
+                'badgeDetailsPayload' => [
+                    'badge' => (
+                        self::getBadgeDetails($r['badge_alias']) +
+                        [
+                            'assignation_time' => is_null($r->user) ?
+                                null :
+                                \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
+                                    $r->user,
+                                    $r['badge_alias']
+                                ),
+                        ]
+                    ),
+                ],
             ],
             'template' => 'badge.details.tpl',
         ];

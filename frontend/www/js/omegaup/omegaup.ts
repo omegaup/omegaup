@@ -1,4 +1,4 @@
-import * as ui from './ui_transitional';
+import * as ui from './ui';
 import * as api from './api_transitional';
 import * as errors from './errors';
 
@@ -107,15 +107,6 @@ export namespace omegaup {
     points: number;
     title: string;
     version: string;
-  }
-
-  export interface Badge {
-    badge_alias: string;
-    assignation_time?: Date;
-    unlocked?: boolean;
-    first_assignation?: Date;
-    total_users?: number;
-    owners_count?: number;
   }
 
   export interface Case {
@@ -298,20 +289,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface GraderQueue {
-    running: string[];
-    run_queue_length: number;
-    runner_queue_length: number;
-    runners: string[];
-  }
-
-  export interface Grader {
-    status: string;
-    broadcaster_sockets: number;
-    embedded_runner: boolean;
-    queue: omegaup.GraderQueue;
-  }
-
   export interface Group {
     alias: string;
     create_time: Date;
@@ -377,17 +354,6 @@ export namespace omegaup {
     status: string;
     time: string;
     votes: NominationVote[];
-  }
-
-  export interface Notification {
-    notification_id: number;
-    contents: NotificationContents;
-    timestamp: Date;
-  }
-
-  export interface NotificationContents {
-    type: string;
-    badge?: string;
   }
 
   export interface Profile extends User {

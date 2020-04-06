@@ -57,7 +57,7 @@
                       ></omegaup-user-username></strong
                   ></a>
                 </td>
-                <td>{{ UI.formatDateTime(event.time) }}</td>
+                <td>{{ time.formatDateTime(event.time) }}</td>
                 <td>{{ event.ip.toString() }}</td>
                 <td>{{ event.event.name }}</td>
                 <td>
@@ -153,7 +153,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as time from '../../time';
 import user_Username from '../user/Username.vue';
 
 interface Mapping {
@@ -185,7 +185,7 @@ export default class ActivityFeed extends Vue {
   @Prop() report!: omegaup.Report[];
 
   T = T;
-  UI = UI;
+  time = time;
 
   addMapping(mapping: Mapping, key: string, value: string): void {
     if (key in mapping) {

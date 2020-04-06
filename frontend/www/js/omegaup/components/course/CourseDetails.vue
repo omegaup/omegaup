@@ -20,7 +20,7 @@
         <div class="panel-body table-responsive">
           <div v-if="course.is_admin">
             <span>{{
-              UI.formatString(T.courseStudentCountLabel, {
+              ui.formatString(T.courseStudentCountLabel, {
                 student_count: course.student_count,
               })
             }}</span>
@@ -52,7 +52,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="homework in filteredHomeworks">
+                <tr v-if="!filteredHomeworks.length">
+                  <td class="empty-category" colspan="5">
+                    {{ T.courseAssignmentEmpty }}
+                  </td>
+                </tr>
+                <tr v-else="" v-for="homework in filteredHomeworks">
                   <td>
                     <a
                       v-bind:href="
@@ -117,7 +122,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="exam in filteredExams">
+                <tr v-if="!filteredExams.length">
+                  <td class="empty-category" colspan="5">
+                    {{ T.courseExamEmpty }}
+                  </td>
+                </tr>
+                <tr v-else="" v-for="exam in filteredExams">
                   <td>
                     <a
                       v-bind:href="
@@ -184,7 +194,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp, omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import * as time from '../../time';
 import { types } from '../../api_types';
 
 @Component
@@ -193,7 +204,7 @@ export default class CourseDetails extends Vue {
   @Prop() progress!: types.AssignmentProgress[];
 
   T = T;
-  UI = UI;
+  ui = ui;
   OmegaUp = OmegaUp;
 
   get filteredHomeworks(): omegaup.Assignment[] {
@@ -215,7 +226,7 @@ export default class CourseDetails extends Vue {
   }
 
   getFormattedTime(timestamp: number): string {
-    return UI.formatDateTime(OmegaUp.remoteTime(timestamp * 1000));
+    return time.formatDateTime(OmegaUp.remoteTime(timestamp * 1000));
   }
 }
 </script>

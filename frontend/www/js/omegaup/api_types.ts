@@ -36,6 +36,48 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
+  export namespace payloadParsers {
+    export function BadgeDetailsPayload(
+      elementId: string,
+    ): types.BadgeDetailsPayload {
+      return (x => {
+        x.badge = (x => {
+          x.assignation_time = ((x: number) => new Date(x * 1000))(
+            x.assignation_time,
+          );
+          if (x.first_assignation)
+            x.first_assignation = ((x: number) => new Date(x * 1000))(
+              x.first_assignation,
+            );
+          return x;
+        })(x.badge);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CommonPayload(elementId: string): types.CommonPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function StatsPayload(elementId: string): types.StatsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function UserRankTablePayload(
+      elementId: string,
+    ): types.UserRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+  }
+
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -47,6 +89,78 @@ export namespace types {
     first_assignation?: Date;
     total_users: number;
     owners_count: number;
+  }
+
+  export interface BadgeDetailsPayload {
+    badge: types.Badge;
+  }
+
+  export interface CommonPayload {
+    omegaUpLockDown: boolean;
+    bootstrap4: boolean;
+    inContest: boolean;
+    isLoggedIn: boolean;
+    isReviewer: boolean;
+    gravatarURL51: string;
+    currentUsername: string;
+    isMainUserIdentity: boolean;
+    isAdmin: boolean;
+    lockDownImage: string;
+    navbarSection: string;
+  }
+
+  export interface CourseAssignment {
+    alias: string;
+    assignment_type: string;
+    description: string;
+    finish_time?: number;
+    max_points: number;
+    name: string;
+    order: number;
+    publish_time_delay?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    start_time: number;
+  }
+
+  export interface CourseDetails {
+    admission_mode: string;
+    alias: string;
+    assignments: types.CourseAssignment[];
+    basic_information_required: boolean;
+    description: string;
+    finish_time?: number;
+    isCurator: boolean;
+    is_admin: boolean;
+    name: string;
+    requests_user_information: string;
+    school_id?: number;
+    school_name?: string;
+    show_scoreboard: boolean;
+    start_time: number;
+    student_count: number;
+  }
+
+  export interface GraderStatus {
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: {
+      running: { name: string; id: number }[];
+      run_queue_length: number;
+      runner_queue_length: number;
+      runners: string[];
+    };
+  }
+
+  export interface Notification {
+    contents: types.NotificationContents;
+    notification_id: number;
+    timestamp: Date;
+  }
+
+  export interface NotificationContents {
+    type: string;
+    badge: string;
   }
 
   export interface PageItem {
@@ -64,14 +178,52 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemListItem {
+    alias: string;
+    difficulty?: number;
+    difficulty_histogram: number[];
+    points: number;
+    quality?: number;
+    quality_histogram: number[];
+    ratio: number;
+    score: number;
+    tags: { source: string; name: string }[];
+    title: string;
+    visibility: number;
+    quality_seal: boolean;
+  }
+
   export interface Progress {
     score: number;
     max_score: number;
   }
 
+  export interface StatsPayload {
+    alias: string;
+    entity_type: string;
+    cases_stats: { [key: string]: number };
+    pending_runs: string[];
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+    max_wait_time: number;
+    max_wait_time_guid?: string;
+    distribution: { [key: number]: number };
+    size_of_bucket: number;
+    total_points: number;
+  }
+
   export interface UserListItem {
     label: string;
     value: string;
+  }
+
+  export interface UserRankTablePayload {
+    availableFilters: { country?: string; school?: string; state?: string };
+    filter: string;
+    isIndex: boolean;
+    isLogged: boolean;
+    length: number;
+    page: number;
   }
 }
 
@@ -104,16 +256,18 @@ export namespace messages {
 
   // Badge
   export type BadgeBadgeDetailsRequest = { [key: string]: any };
+  export type _BadgeBadgeDetailsServerResponse = any;
   export type BadgeBadgeDetailsResponse = types.Badge;
   export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
   export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any };
-  export type BadgeMyBadgeAssignationTimeResponse = {
-    assignation_time?: number;
-  };
+  export type _BadgeMyBadgeAssignationTimeServerResponse = any;
+  export type BadgeMyBadgeAssignationTimeResponse = { assignation_time?: Date };
   export type BadgeMyListRequest = { [key: string]: any };
+  export type _BadgeMyListServerResponse = any;
   export type BadgeMyListResponse = { badges: types.Badge[] };
   export type BadgeUserListRequest = { [key: string]: any };
+  export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Clarification
@@ -128,7 +282,7 @@ export namespace messages {
     problemset_id?: number;
   };
   export type ClarificationUpdateRequest = { [key: string]: any };
-  export type ClarificationUpdateResponse = { status: string };
+  export type ClarificationUpdateResponse = {};
 
   // Contest
   export type ContestActivityReportRequest = { [key: string]: any };
@@ -142,15 +296,15 @@ export namespace messages {
     }[];
   };
   export type ContestAddAdminRequest = { [key: string]: any };
-  export type ContestAddAdminResponse = { status: string };
+  export type ContestAddAdminResponse = {};
   export type ContestAddGroupRequest = { [key: string]: any };
-  export type ContestAddGroupResponse = { status: string };
+  export type ContestAddGroupResponse = {};
   export type ContestAddGroupAdminRequest = { [key: string]: any };
-  export type ContestAddGroupAdminResponse = { status: string };
+  export type ContestAddGroupAdminResponse = {};
   export type ContestAddProblemRequest = { [key: string]: any };
-  export type ContestAddProblemResponse = { status: string };
+  export type ContestAddProblemResponse = {};
   export type ContestAddUserRequest = { [key: string]: any };
-  export type ContestAddUserResponse = { status: string };
+  export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
   export type ContestAdminDetailsResponse = {
     admin: boolean;
@@ -218,7 +372,7 @@ export namespace messages {
     group_admins: { alias: string; name: string; role: string }[];
   };
   export type ContestArbitrateRequestRequest = { [key: string]: any };
-  export type ContestArbitrateRequestResponse = { status: string };
+  export type ContestArbitrateRequestResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
   export type ContestClarificationsResponse = {
     clarifications: {
@@ -246,7 +400,7 @@ export namespace messages {
     }[];
   };
   export type ContestCreateRequest = { [key: string]: any };
-  export type ContestCreateResponse = { status: string };
+  export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };
   export type ContestCreateVirtualResponse = { alias: string };
   export type ContestDetailsRequest = { [key: string]: any };
@@ -381,7 +535,7 @@ export namespace messages {
     }[];
   };
   export type ContestOpenRequest = { [key: string]: any };
-  export type ContestOpenResponse = { status: string };
+  export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
   export type ContestProblemsResponse = {
     problems: {
@@ -426,17 +580,17 @@ export namespace messages {
     user_registration_accepted?: boolean;
   };
   export type ContestRegisterForContestRequest = { [key: string]: any };
-  export type ContestRegisterForContestResponse = { status: string };
+  export type ContestRegisterForContestResponse = {};
   export type ContestRemoveAdminRequest = { [key: string]: any };
-  export type ContestRemoveAdminResponse = { status: string };
+  export type ContestRemoveAdminResponse = {};
   export type ContestRemoveGroupRequest = { [key: string]: any };
-  export type ContestRemoveGroupResponse = { status: string };
+  export type ContestRemoveGroupResponse = {};
   export type ContestRemoveGroupAdminRequest = { [key: string]: any };
-  export type ContestRemoveGroupAdminResponse = { status: string };
+  export type ContestRemoveGroupAdminResponse = {};
   export type ContestRemoveProblemRequest = { [key: string]: any };
-  export type ContestRemoveProblemResponse = { status: string };
+  export type ContestRemoveProblemResponse = {};
   export type ContestRemoveUserRequest = { [key: string]: any };
-  export type ContestRemoveUserResponse = { status: string };
+  export type ContestRemoveUserResponse = {};
   export type ContestReportRequest = { [key: string]: any };
   export type ContestReportResponse = {
     finish_time?: number;
@@ -595,7 +749,7 @@ export namespace messages {
     }[];
   };
   export type ContestSetRecommendedRequest = { [key: string]: any };
-  export type ContestSetRecommendedResponse = { status: string };
+  export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
   export type ContestStatsResponse = {
     total_runs: number;
@@ -608,9 +762,9 @@ export namespace messages {
     total_points: number;
   };
   export type ContestUpdateRequest = { [key: string]: any };
-  export type ContestUpdateResponse = { status: string };
+  export type ContestUpdateResponse = {};
   export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
-  export type ContestUpdateEndTimeForIdentityResponse = { status: string };
+  export type ContestUpdateEndTimeForIdentityResponse = {};
   export type ContestUsersRequest = { [key: string]: any };
   export type ContestUsersResponse = {
     users: {
@@ -635,47 +789,22 @@ export namespace messages {
     }[];
   };
   export type CourseAddAdminRequest = { [key: string]: any };
-  export type CourseAddAdminResponse = { status: string };
+  export type CourseAddAdminResponse = {};
   export type CourseAddGroupAdminRequest = { [key: string]: any };
-  export type CourseAddGroupAdminResponse = { status: string };
+  export type CourseAddGroupAdminResponse = {};
   export type CourseAddProblemRequest = { [key: string]: any };
-  export type CourseAddProblemResponse = { status: string };
+  export type CourseAddProblemResponse = {};
   export type CourseAddStudentRequest = { [key: string]: any };
-  export type CourseAddStudentResponse = { status: string };
+  export type CourseAddStudentResponse = {};
   export type CourseAdminDetailsRequest = { [key: string]: any };
-  export type CourseAdminDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseAdminDetailsResponse = types.CourseDetails;
   export type CourseAdminsRequest = { [key: string]: any };
   export type CourseAdminsResponse = {
     admins: { role: string; username: string }[];
     group_admins: { alias: string; name: string; role: string }[];
   };
+  export type CourseArbitrateRequestRequest = { [key: string]: any };
+  export type CourseArbitrateRequestResponse = {};
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type CourseAssignmentDetailsResponse = {
     name?: string;
@@ -759,38 +888,11 @@ export namespace messages {
   export type CourseCloneRequest = { [key: string]: any };
   export type CourseCloneResponse = { alias: string };
   export type CourseCreateRequest = { [key: string]: any };
-  export type CourseCreateResponse = { status: string };
+  export type CourseCreateResponse = {};
   export type CourseCreateAssignmentRequest = { [key: string]: any };
-  export type CourseCreateAssignmentResponse = { status: string };
+  export type CourseCreateAssignmentResponse = {};
   export type CourseDetailsRequest = { [key: string]: any };
-  export type CourseDetailsResponse = {
-    name: string;
-    description: string;
-    alias: string;
-    basic_information_required: boolean;
-    requests_user_information: string;
-    assignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: number;
-      finish_time?: number;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    school_id?: number;
-    start_time: number;
-    finish_time?: number;
-    is_admin: boolean;
-    public: boolean;
-    show_scoreboard: boolean;
-    student_count: number;
-    school_name?: string;
-  };
+  export type CourseDetailsResponse = types.CourseDetails;
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -881,15 +983,28 @@ export namespace messages {
     assignments: types.AssignmentProgress;
   };
   export type CourseRegisterForCourseRequest = { [key: string]: any };
-  export type CourseRegisterForCourseResponse = { status: string };
+  export type CourseRegisterForCourseResponse = {};
   export type CourseRemoveAdminRequest = { [key: string]: any };
-  export type CourseRemoveAdminResponse = { status: string };
+  export type CourseRemoveAdminResponse = {};
   export type CourseRemoveGroupAdminRequest = { [key: string]: any };
-  export type CourseRemoveGroupAdminResponse = { status: string };
+  export type CourseRemoveGroupAdminResponse = {};
   export type CourseRemoveProblemRequest = { [key: string]: any };
-  export type CourseRemoveProblemResponse = { status: string };
+  export type CourseRemoveProblemResponse = {};
   export type CourseRemoveStudentRequest = { [key: string]: any };
-  export type CourseRemoveStudentResponse = { status: string };
+  export type CourseRemoveStudentResponse = {};
+  export type CourseRequestsRequest = { [key: string]: any };
+  export type _CourseRequestsServerResponse = any;
+  export type CourseRequestsResponse = {
+    users: {
+      accepted?: boolean;
+      admin: { name?: string; username: string };
+      country?: string;
+      country_id?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+  };
   export type CourseRunsRequest = { [key: string]: any };
   export type CourseRunsResponse = {
     runs: {
@@ -946,37 +1061,25 @@ export namespace messages {
     }[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
-  export type CourseUpdateResponse = { status: string };
+  export type CourseUpdateResponse = {};
   export type CourseUpdateAssignmentRequest = { [key: string]: any };
-  export type CourseUpdateAssignmentResponse = { status: string };
+  export type CourseUpdateAssignmentResponse = {};
   export type CourseUpdateAssignmentsOrderRequest = { [key: string]: any };
-  export type CourseUpdateAssignmentsOrderResponse = { status: string };
+  export type CourseUpdateAssignmentsOrderResponse = {};
   export type CourseUpdateProblemsOrderRequest = { [key: string]: any };
-  export type CourseUpdateProblemsOrderResponse = { status: string };
+  export type CourseUpdateProblemsOrderResponse = {};
 
   // Grader
   export type GraderStatusRequest = { [key: string]: any };
-  export type GraderStatusResponse = {
-    grader: {
-      status: string;
-      broadcaster_sockets: number;
-      embedded_runner: boolean;
-      queue: {
-        running: { name: string; id: number }[];
-        run_queue_length: number;
-        runner_queue_length: number;
-        runners: string[];
-      };
-    };
-  };
+  export type GraderStatusResponse = { grader: types.GraderStatus };
 
   // Group
   export type GroupAddUserRequest = { [key: string]: any };
-  export type GroupAddUserResponse = { status: string };
+  export type GroupAddUserResponse = {};
   export type GroupCreateRequest = { [key: string]: any };
-  export type GroupCreateResponse = { status: string };
+  export type GroupCreateResponse = {};
   export type GroupCreateScoreboardRequest = { [key: string]: any };
-  export type GroupCreateScoreboardResponse = { status: string };
+  export type GroupCreateScoreboardResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
     exists: boolean;
@@ -1019,11 +1122,11 @@ export namespace messages {
     }[];
   };
   export type GroupRemoveUserRequest = { [key: string]: any };
-  export type GroupRemoveUserResponse = { status: string };
+  export type GroupRemoveUserResponse = {};
 
   // GroupScoreboard
   export type GroupScoreboardAddContestRequest = { [key: string]: any };
-  export type GroupScoreboardAddContestResponse = { status: string };
+  export type GroupScoreboardAddContestResponse = {};
   export type GroupScoreboardDetailsRequest = { [key: string]: any };
   export type GroupScoreboardDetailsResponse = {
     ranking: {
@@ -1080,23 +1183,23 @@ export namespace messages {
     }[];
   };
   export type GroupScoreboardRemoveContestRequest = { [key: string]: any };
-  export type GroupScoreboardRemoveContestResponse = { status: string };
+  export type GroupScoreboardRemoveContestResponse = {};
 
   // Identity
   export type IdentityBulkCreateRequest = { [key: string]: any };
-  export type IdentityBulkCreateResponse = { status: string };
+  export type IdentityBulkCreateResponse = {};
   export type IdentityChangePasswordRequest = { [key: string]: any };
-  export type IdentityChangePasswordResponse = { status: string };
+  export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
   export type IdentityCreateResponse = { username: string };
   export type IdentityUpdateRequest = { [key: string]: any };
-  export type IdentityUpdateResponse = { status: string };
+  export type IdentityUpdateResponse = {};
 
   // Interview
   export type InterviewAddUsersRequest = { [key: string]: any };
-  export type InterviewAddUsersResponse = { status: string };
+  export type InterviewAddUsersResponse = {};
   export type InterviewCreateRequest = { [key: string]: any };
-  export type InterviewCreateResponse = { status: string };
+  export type InterviewCreateResponse = {};
   export type InterviewDetailsRequest = { [key: string]: any };
   export type _InterviewDetailsServerResponse = any;
   export type InterviewDetailsResponse = {
@@ -1128,21 +1231,18 @@ export namespace messages {
 
   // Notification
   export type NotificationMyListRequest = { [key: string]: any };
+  export type _NotificationMyListServerResponse = any;
   export type NotificationMyListResponse = {
-    notifications: {
-      contents: string;
-      notification_id: number;
-      timestamp: number;
-    }[];
+    notifications: types.Notification[];
   };
   export type NotificationReadNotificationsRequest = { [key: string]: any };
-  export type NotificationReadNotificationsResponse = { status: string };
+  export type NotificationReadNotificationsResponse = {};
 
   // Problem
   export type ProblemAddAdminRequest = { [key: string]: any };
-  export type ProblemAddAdminResponse = { status: string };
+  export type ProblemAddAdminResponse = {};
   export type ProblemAddGroupAdminRequest = { [key: string]: any };
-  export type ProblemAddGroupAdminResponse = { status: string };
+  export type ProblemAddGroupAdminResponse = {};
   export type ProblemAddTagRequest = { [key: string]: any };
   export type ProblemAddTagResponse = { name: string };
   export type ProblemAdminListRequest = { [key: string]: any };
@@ -1170,9 +1270,9 @@ export namespace messages {
     }[];
   };
   export type ProblemCreateRequest = { [key: string]: any };
-  export type ProblemCreateResponse = { status: string };
+  export type ProblemCreateResponse = {};
   export type ProblemDeleteRequest = { [key: string]: any };
-  export type ProblemDeleteResponse = { status: string };
+  export type ProblemDeleteResponse = {};
   export type ProblemDetailsRequest = { [key: string]: any };
   export type ProblemDetailsResponse = {
     accepted: number;
@@ -1236,20 +1336,7 @@ export namespace messages {
   };
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
-    results: {
-      alias: string;
-      difficulty?: number;
-      difficulty_histogram: number[];
-      points: number;
-      quality?: number;
-      quality_histogram: number[];
-      ratio: number;
-      score: number;
-      tags: { source: string; name: string }[];
-      title: string;
-      visibility: number;
-      quality_seal: boolean;
-    }[];
+    results: types.ProblemListItem[];
     total: number;
   };
   export type ProblemMyListRequest = { [key: string]: any };
@@ -1258,13 +1345,13 @@ export namespace messages {
     problems: { tags: { name: string; source: string }[] }[];
   };
   export type ProblemRejudgeRequest = { [key: string]: any };
-  export type ProblemRejudgeResponse = { status: string };
+  export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
-  export type ProblemRemoveAdminResponse = { status: string };
+  export type ProblemRemoveAdminResponse = {};
   export type ProblemRemoveGroupAdminRequest = { [key: string]: any };
-  export type ProblemRemoveGroupAdminResponse = { status: string };
+  export type ProblemRemoveGroupAdminResponse = {};
   export type ProblemRemoveTagRequest = { [key: string]: any };
-  export type ProblemRemoveTagResponse = { status: string };
+  export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
   export type ProblemRunsResponse = {
     runs: {
@@ -1303,7 +1390,7 @@ export namespace messages {
     }[];
   };
   export type ProblemSelectVersionRequest = { [key: string]: any };
-  export type ProblemSelectVersionResponse = { status: string };
+  export type ProblemSelectVersionResponse = {};
   export type ProblemSolutionRequest = { [key: string]: any };
   export type ProblemSolutionResponse = {
     exists: boolean;
@@ -1316,7 +1403,7 @@ export namespace messages {
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
     cases_stats: { [key: string]: number };
-    pending_runs: { guid: string }[];
+    pending_runs: string[];
     total_runs: number;
     verdict_counts: { [key: string]: number };
   };
@@ -1327,9 +1414,9 @@ export namespace messages {
   export type ProblemUpdateRequest = { [key: string]: any };
   export type ProblemUpdateResponse = { rejudged: boolean };
   export type ProblemUpdateSolutionRequest = { [key: string]: any };
-  export type ProblemUpdateSolutionResponse = { status: string };
+  export type ProblemUpdateSolutionResponse = {};
   export type ProblemUpdateStatementRequest = { [key: string]: any };
-  export type ProblemUpdateStatementResponse = { status: string };
+  export type ProblemUpdateStatementResponse = {};
   export type ProblemVersionsRequest = { [key: string]: any };
   export type ProblemVersionsResponse = {
     published?: string;
@@ -1593,7 +1680,7 @@ export namespace messages {
       | null[];
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
-  export type QualityNominationResolveResponse = { status: string };
+  export type QualityNominationResolveResponse = {};
 
   // Reset
   export type ResetCreateRequest = { [key: string]: any };
@@ -1659,7 +1746,7 @@ export namespace messages {
     source: string;
   };
   export type RunDisqualifyRequest = { [key: string]: any };
-  export type RunDisqualifyResponse = { status: string };
+  export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
   export type RunListResponse = {
     runs: {
@@ -1683,7 +1770,7 @@ export namespace messages {
     }[];
   };
   export type RunRejudgeRequest = { [key: string]: any };
-  export type RunRejudgeResponse = { status: string };
+  export type RunRejudgeResponse = {};
   export type RunSourceRequest = { [key: string]: any };
   export type RunSourceResponse = {
     compile_error: string;
@@ -1766,7 +1853,7 @@ export namespace messages {
     coders: { time: string; username: string; classname: string }[];
   };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
-  export type SchoolSelectSchoolOfTheMonthResponse = { status: string };
+  export type SchoolSelectSchoolOfTheMonthResponse = {};
   export type SchoolUsersRequest = { [key: string]: any };
   export type SchoolUsersResponse = {
     users: {
@@ -1780,7 +1867,7 @@ export namespace messages {
 
   // Scoreboard
   export type ScoreboardRefreshRequest = { [key: string]: any };
-  export type ScoreboardRefreshResponse = { status: string };
+  export type ScoreboardRefreshResponse = {};
 
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
@@ -1826,17 +1913,17 @@ export namespace messages {
 
   // User
   export type UserAcceptPrivacyPolicyRequest = { [key: string]: any };
-  export type UserAcceptPrivacyPolicyResponse = { status: string };
+  export type UserAcceptPrivacyPolicyResponse = {};
   export type UserAddExperimentRequest = { [key: string]: any };
-  export type UserAddExperimentResponse = { status: string };
+  export type UserAddExperimentResponse = {};
   export type UserAddGroupRequest = { [key: string]: any };
-  export type UserAddGroupResponse = { status: string };
+  export type UserAddGroupResponse = {};
   export type UserAddRoleRequest = { [key: string]: any };
-  export type UserAddRoleResponse = { status: string };
+  export type UserAddRoleResponse = {};
   export type UserAssociateIdentityRequest = { [key: string]: any };
-  export type UserAssociateIdentityResponse = { status: string };
+  export type UserAssociateIdentityResponse = {};
   export type UserChangePasswordRequest = { [key: string]: any };
-  export type UserChangePasswordResponse = { status: string };
+  export type UserChangePasswordResponse = {};
   export type UserCoderOfTheMonthRequest = { [key: string]: any };
   export type UserCoderOfTheMonthResponse = {
     coderinfo?: {
@@ -1970,13 +2057,13 @@ export namespace messages {
     problems_solved: number;
   };
   export type UserRemoveExperimentRequest = { [key: string]: any };
-  export type UserRemoveExperimentResponse = { status: string };
+  export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
-  export type UserRemoveGroupResponse = { status: string };
+  export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
-  export type UserRemoveRoleResponse = { status: string };
+  export type UserRemoveRoleResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
-  export type UserSelectCoderOfTheMonthResponse = { status: string };
+  export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
   export type UserStatsResponse = {
     runs: { date?: string; runs: number; verdict: string }[];
@@ -1987,11 +2074,11 @@ export namespace messages {
     verified: boolean;
   };
   export type UserUpdateRequest = { [key: string]: any };
-  export type UserUpdateResponse = { status: string };
+  export type UserUpdateResponse = {};
   export type UserUpdateBasicInfoRequest = { [key: string]: any };
-  export type UserUpdateBasicInfoResponse = { status: string };
+  export type UserUpdateBasicInfoResponse = {};
   export type UserUpdateMainEmailRequest = { [key: string]: any };
-  export type UserUpdateMainEmailResponse = { status: string };
+  export type UserUpdateMainEmailResponse = {};
   export type UserValidateFilterRequest = { [key: string]: any };
   export type UserValidateFilterResponse = {
     user?: string;
@@ -2001,7 +2088,7 @@ export namespace messages {
     problemset_admin: number[];
   };
   export type UserVerifyEmailRequest = { [key: string]: any };
-  export type UserVerifyEmailResponse = { status: string };
+  export type UserVerifyEmailResponse = {};
 }
 
 // Controller interfaces
@@ -2196,6 +2283,9 @@ export namespace controllers {
     admins: (
       params?: messages.CourseAdminsRequest,
     ) => Promise<messages.CourseAdminsResponse>;
+    arbitrateRequest: (
+      params?: messages.CourseArbitrateRequestRequest,
+    ) => Promise<messages.CourseArbitrateRequestResponse>;
     assignmentDetails: (
       params?: messages.CourseAssignmentDetailsRequest,
     ) => Promise<messages.CourseAssignmentDetailsResponse>;
@@ -2256,6 +2346,9 @@ export namespace controllers {
     removeStudent: (
       params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
+    requests: (
+      params?: messages.CourseRequestsRequest,
+    ) => Promise<messages.CourseRequestsResponse>;
     runs: (
       params?: messages.CourseRunsRequest,
     ) => Promise<messages.CourseRunsResponse>;

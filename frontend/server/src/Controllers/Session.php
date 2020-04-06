@@ -70,6 +70,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @omegaup-request-param null|string $auth_token
+     */
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
         $sessionManager = self::getSessionManagerInstance();
         $authToken = null;
@@ -97,6 +100,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param null|string $auth_token
+     *
      * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, auth_token: ?string, is_admin: bool}
      */
     public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
@@ -137,6 +142,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param null|string $auth_token
+     *
      * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
      */
     private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
@@ -332,6 +339,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param string $storeToken
+     *
      * @return array<string, string>
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
@@ -441,9 +450,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     /**
      * Does login for a user given username or email and password.
-     * Expects in request:
-     * usernameOrEmail
-     * password
+     *
+     * @omegaup-request-param string $password
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function nativeLogin(\OmegaUp\Request $r): string {
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');

@@ -29,14 +29,13 @@ let config = [
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
       arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.js',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
-      badge_details: './frontend/www/js/omegaup/badge/details.js',
+      badge_details: './frontend/www/js/omegaup/badge/details.ts',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
       common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_index: './frontend/www/js/omegaup/common/index.js',
-      common_navbar: './frontend/www/js/omegaup/common/navbar.js',
-      common_runs_chart: './frontend/www/js/omegaup/common/runs_chart.js',
-      common_stats: './frontend/www/js/omegaup/common/stats.js',
+      common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
+      common_stats: './frontend/www/js/omegaup/common/stats.ts',
       contest_edit: './frontend/www/js/omegaup/contest/edit.js',
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
@@ -63,6 +62,7 @@ let config = [
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
+      problem_settings: './frontend/www/js/omegaup/problem/settings.js',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:
@@ -73,7 +73,7 @@ let config = [
         './frontend/www/js/omegaup/qualitynomination/details.js',
       qualitynomination_qualityreview:
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.js',
+      rank_table: './frontend/www/js/omegaup/ranktable.ts',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',

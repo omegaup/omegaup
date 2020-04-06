@@ -7,6 +7,7 @@
 			</div>
 		</div>
 		<div id="overlay">
+			<script type="text/json" id="payload">{$payload|json_encode}</script>
 			<div id="run-details"></div>
 		</div>
 {include file='common.analytics.tpl' inline}

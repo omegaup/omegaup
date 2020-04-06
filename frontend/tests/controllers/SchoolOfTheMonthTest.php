@@ -16,12 +16,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     ): void {
         if (is_null($runDate)) {
             $previousMonth = date_create(date('Y-m-d'));
-            date_add(
-                $previousMonth,
-                date_interval_create_from_date_string(
-                    '-1 month'
-                )
-            );
+            $previousMonth->modify('last day of previous month');
             $runDate = date_format($previousMonth, 'Y-m-d');
         }
 
@@ -171,12 +166,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
@@ -208,10 +198,13 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now insert one of the Schools as SchoolOfTheMonth, it should not be retrieved
         // again by the DAO as it has already been selected current year.
+
+        $previousMonth->modify('last day of previous month');
+        $today = date_format($previousMonth, 'Y-m-01');
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'ranking' => 1
+            'ranking' => 1,
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
 
@@ -259,7 +252,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $newSchool = new \OmegaUp\DAO\VO\SchoolOfTheMonth([
             'school_id' => $schoolsData[2]['school']->school_id,
             'time' => $today,
-            'ranking' => 4
+            'ranking' => 4,
         ]);
         \OmegaUp\DAO\SchoolOfTheMonth::create($newSchool);
         $schools = \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth();
@@ -290,12 +283,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $previousMonth = date_create($today);
-        date_add(
-            $previousMonth,
-            date_interval_create_from_date_string(
-                '-1 month'
-            )
-        );
+        $previousMonth->modify('last day of previous month');
         $runDate = date_format($previousMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData);
@@ -319,12 +307,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now do the same but for the current month
         $nextMonth = date_create($today);
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
 
         self::setUpSchoolsRuns($schoolsData, $today);
@@ -349,12 +332,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $nextMonth = date_create($nextMonthDate);
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
         \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
 
@@ -386,12 +364,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $today = date('Y-m-d', \OmegaUp\Time::get());
 
         $date = date_create($today);
-        date_add(
-            $date,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $date->modify('last day of next month');
         $runDate = date_format($date, 'Y-m-15');
 
         self::setUpSchoolsRuns($schoolsData, $runDate);
@@ -425,12 +398,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('ok', $result['status']);
 
         $nextMonth = $lastDayOfMonth;
-        date_add(
-            $nextMonth,
-            date_interval_create_from_date_string(
-                '+1 month'
-            )
-        );
+        $nextMonth->modify('last day of next month');
         $nextMonthDate = date_format($nextMonth, 'Y-m-d');
         \OmegaUp\Time::setTimeForTesting(strtotime($nextMonthDate));
 

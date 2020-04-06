@@ -17,7 +17,7 @@
       <div class="panel-heading">
         <h3 class="panel-title">
           {{
-            UI.formatString(T.submissionsRangeHeader, {
+            ui.formatString(T.submissionsRangeHeader, {
               lowCount: (page - 1) * length + 1,
               highCount: page * length,
             })
@@ -29,7 +29,7 @@
           <label
             ><omegaup-autocomplete
               class="form-control"
-              v-bind:init="el =&gt; UI.userTypeahead(el)"
+              v-bind:init="el => typeahead.userTypeahead(el)"
               v-model="searchedUsername"
             ></omegaup-autocomplete
           ></label>
@@ -78,7 +78,7 @@
         <tbody>
           <tr v-for="submission in submissions">
             <td class="text-center">
-              {{ UI.formatDateTime(submission.time) }}
+              {{ time.formatDateTime(submission.time) }}
             </td>
             <td class="text-center" v-if="includeUser">
               <omegaup-username
@@ -110,7 +110,7 @@
               {{
                 submission.runtime === 0
                   ? '—'
-                  : UI.formatString(T.submissionRunTimeInSeconds, {
+                  : ui.formatString(T.submissionRunTimeInSeconds, {
                       value: (
                         parseFloat(submission.runtime || '0') / 1000
                       ).toFixed(2),
@@ -121,7 +121,7 @@
               {{
                 submission.memory === 0
                   ? '—'
-                  : UI.formatString(T.submissionMemoryInMegabytes, {
+                  : ui.formatString(T.submissionMemoryInMegabytes, {
                       value: (
                         parseFloat(submission.memory) /
                         (1024 * 1024)
@@ -180,7 +180,9 @@ table.submissions-table > tbody > tr > td {
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import * as time from '../../time';
+import * as typeahead from '../../typeahead';
 import UserName from '../user/Username.vue';
 import Autocomplete from '../Autocomplete.vue';
 
@@ -198,7 +200,9 @@ export default class SubmissionsList extends Vue {
   @Prop() submissions!: omegaup.Submission[];
 
   T = T;
-  UI = UI;
+  ui = ui;
+  time = time;
+  typeahead = typeahead;
   searchedUsername = '';
 
   get showNextPage(): boolean {

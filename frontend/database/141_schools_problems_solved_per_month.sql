@@ -7,4 +7,4 @@ CREATE TABLE `Schools_Problems_Solved_Per_Month` (
     KEY `school_id` (`school_id`),
     CONSTRAINT `fk_spspms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     UNIQUE KEY `school_time` (`school_id`, `time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cantidad de problemas que resolvieron los usuarios de una escuela en un mes y año determinados.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La cantidad de problemas que resolvieron los usuarios de una escuela en un mes y año determinados.';

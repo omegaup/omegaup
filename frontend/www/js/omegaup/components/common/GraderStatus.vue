@@ -64,7 +64,7 @@ ul {
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 
@@ -72,7 +72,7 @@ import * as UI from '../../ui';
 export default class GraderStatus extends Vue {
   @Prop() status!: string;
   @Prop() error!: string;
-  @Prop() graderInfo!: omegaup.Grader;
+  @Prop() graderInfo!: types.GraderStatus | null;
 
   T = T;
   UI = UI;
