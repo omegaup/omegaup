@@ -1068,7 +1068,7 @@ CREATE EVENT `Update_Run_Counts`
 ON SCHEDULE EVERY 1 DAY STARTS NOW()
 DO BEGIN
    INSERT INTO
-       Run_Counts (date, total, ac_count)
+       Run_Counts (`date`, total, ac_count)
    SELECT
        CURDATE(),
        COUNT(*) AS total,
@@ -1076,7 +1076,7 @@ DO BEGIN
    FROM
        Runs
    WHERE
-       time <= CURDATE();
+       `time` <= CURDATE();
 END$$
 DELIMITER ;
 
