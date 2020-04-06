@@ -333,7 +333,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
     public $quality_seal = false;
 
     /**
-     * [Campo no documentado]
+     * Determina si el problema es educativo y debe mostrar diferencias en casos de ejemplos, en todos o en ninguno.
      *
      * @var string
      */

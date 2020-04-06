@@ -68,6 +68,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -75,7 +76,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
-     * @omegaup-request-param string $show_diff
      */
     private static function convertRequestToProblemParams(
         \OmegaUp\Request $r,
