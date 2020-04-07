@@ -3696,7 +3696,6 @@ Returns rank of best schools in last month
 
 | Name        | Type    | Description |
 | ----------- | ------- | ----------- |
-| `category`  | `mixed` |             |
 | `school_id` | `mixed` |             |
 
 ### Returns
