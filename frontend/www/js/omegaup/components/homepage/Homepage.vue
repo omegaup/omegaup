@@ -1,6 +1,5 @@
 <template>
   <div>
-    <omegaup-carousel></omegaup-carousel>
     <omegaup-coder-of-the-month-notice
       v-if="
         currentUserInfo &&
@@ -11,6 +10,15 @@
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
+    <!-- TODO: esto debe ser acomodado al final de toda la migración -->
+    <omegaup-carousel></omegaup-carousel>
+    <omegaup-ranks-section
+      v-bind:coder-of-the-month="coderOfTheMonth"
+      v-bind:coder-of-the-month-female="coderOfTheMonthFemale"
+      v-bind:school-of-the-month="schoolOfTheMonth"
+      v-bind:users-rank="rankTable"
+      v-bind:schools-rank="schoolsRank"
+    ></omegaup-ranks-section>
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-8">
@@ -74,6 +82,7 @@ import { Chart } from 'highcharts-vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
+import homepage_RanksSection from './RanksSection.vue';
 import common_Welcome from '../common/Welcome.vue';
 import common_SocialMedia from '../common/SocialMedia.vue';
 import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
@@ -86,6 +95,7 @@ import schools_Rank from '../schools/Rank.vue';
 @Component({
   components: {
     'omegaup-carousel': homepage_Carousel,
+    'omegaup-ranks-section': homepage_RanksSection,
     'omegaup-common-welcome': common_Welcome,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
@@ -100,6 +110,7 @@ import schools_Rank from '../schools/Rank.vue';
 export default class Homepage extends Vue {
   @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
   @Prop() coderOfTheMonthFemale!: omegaup.CoderOfTheMonth;
+  @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
