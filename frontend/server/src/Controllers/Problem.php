@@ -4208,7 +4208,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $visibility
      * @omegaup-request-param mixed $wmd-input-statement
      *
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
+     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4225,7 +4225,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
-                'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
                 'payload' => self::getCommonPayloadForSmarty(),
             ];
@@ -4253,7 +4252,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 return [
                     'IS_UPDATE' => true,
                     'LOAD_MATHJAX' => true,
-                    'LOAD_PAGEDOWN' => true,
                     'STATUS_ERROR' => $statusError,
                     'payload' => self::getCommonPayloadForSmarty(),
                 ];
@@ -4291,7 +4289,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'IS_UPDATE' => true,
             'LOAD_MATHJAX' => true,
-            'LOAD_PAGEDOWN' => true,
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
