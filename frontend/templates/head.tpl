@@ -25,8 +25,6 @@
 {/if}
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}" defer></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js" defer}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js" defer}"></script>
 {/if}
 
 {if isset($jsfile)}
@@ -62,12 +60,6 @@
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 
-{if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}" defer></script>
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}" defer></script>
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}" defer></script>
-	<link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
-{/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
 {/if}
@@ -77,7 +69,7 @@
 	</head>
 	<body
 		{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}
-		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if} {if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
+		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
 	>
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
@@ -88,8 +80,10 @@
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 	<main role="main">
-		{if !isset($inArena) || !$inArena}
-			{include file='mainmenu.tpl' inline}
+		{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+			<div class="alert alert-danger">
+				{$ERROR_MESSAGE}
+			</div>
 		{/if}
 		{include file='status.tpl' inline}
 	</main>
@@ -100,8 +94,10 @@
 	{else}
 		{include file='common.navbar.tpl' headerPayload=[] inline}
 	{/if}
-	{if !isset($inArena) || !$inArena}
-	{include file='mainmenu.tpl' inline}
+	{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+		<div class="alert alert-danger">
+			{$ERROR_MESSAGE}
+		</div>
 	{/if}
 	{include file='status.tpl' inline}
 {/if}
