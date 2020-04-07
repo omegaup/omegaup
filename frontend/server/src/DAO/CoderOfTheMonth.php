@@ -125,8 +125,8 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     ): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
         $sql = "
-            SELECT
-              distinct cm.time,
+            SELECT DISTINCT
+              cm.time,
               i.username,
               IFNULL(
                 (
