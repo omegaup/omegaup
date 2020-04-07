@@ -341,6 +341,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
+        $sqlOrder = ' ORDER BY qn.qualitynomination_id';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */
@@ -356,7 +357,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         /** @var array{alias: string, author_name: null|string, author_username: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql . $sqlFrom . $sqlLimit,
+                $sql . $sqlFrom . $sqlOrder . $sqlLimit,
                 $params
             ) as $nomination
         ) {
