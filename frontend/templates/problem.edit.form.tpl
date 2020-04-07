@@ -41,7 +41,7 @@
 			{/if}
 			<div class="row">
 				<div class="form-group  col-md-6" id="source-group">
-					<label class="control-label" for="source">{#wordsSource#}</label>
+					<label class="control-label" for="source">{#problemEditSource#}</label>
 					<input id='source' name='source' value='{if $IS_UPDATE eq false}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 				</div>
 
@@ -80,7 +80,7 @@
 						<div class="tag-list pull-left"></div>
 					</div>
 					<div class="form-group">
-						<label for="tag-public">{#wordsPublic#}</label>
+						<label for="tag-public">{#problemEditTagPublic#}</label>
 						<select id="tag-public" class="form-control">
 							<option value="false" selected="selected">{#wordsNo#}</option>
 							<option value="true">{#wordsYes#}</option>

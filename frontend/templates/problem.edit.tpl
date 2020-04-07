@@ -165,7 +165,7 @@
             <div class="tag-list pull-left"></div>
           </div>
           <div class="form-group">
-            <label for="tag-public">{#wordsPublic#}</label>
+            <label for="tag-public">{#problemEditTagPublic#}</label>
             <select id="tag-public" name="tag_public" class="form-control">
               <option value="0" selected="selected">{#wordsNo#}</option>
               <option value="1">{#wordsYes#}</option>
