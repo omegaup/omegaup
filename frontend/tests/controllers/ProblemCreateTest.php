@@ -17,19 +17,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * A PHPUnit data provider for the test with valid show_diff values.
-     *
-     * @return list<list<string>>
-     */
-    public function showDiffValueProvider(): array {
-        return [
-            ['none'],
-            ['examples'],
-            ['all'],
-        ];
-    }
-
-    /**
      * Basic test for creating a problem
      */
     public function testCreateValidProblem() {
@@ -790,44 +777,44 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * A PHPUnit data provider for the test with valid show_diff values.
+     *
+     * @return list<list<string>>
+     */
+    public function showDiffValueProvider(): array {
+        return [
+            ['none'],
+            ['examples'],
+            ['all'],
+        ];
+    }
+
+    /**
      * @dataProvider showDiffValueProvider
      */
     public function testCreateProblemWithValidShowDiffValues(
         string $showDiffValue
     ) {
-        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(
+        [
+            'problem' => $problem,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'show_diff' => $showDiffValue,
             ])
         );
-        $r = $problemData['request'];
-        $problemAuthor = $problemData['author'];
-
-        // Login user
-        $login = self::login($problemAuthor);
-        $r['auth_token'] = $login->auth_token;
-
-        \OmegaUp\Controllers\Problem::apiCreate($r);
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
 
         $this->assertEquals($showDiffValue, $problem->show_diff);
     }
 
     public function testCreateProblemWithInvalidShowDiffValue() {
-        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'show_diff' => 'invalid',
-            ])
-        );
-        $r = $problemData['request'];
-        $problemAuthor = $problemData['author'];
-
-        // Login user
-        $login = self::login($problemAuthor);
-        $r['auth_token'] = $login->auth_token;
-
         try {
-            \OmegaUp\Controllers\Problem::apiCreate($r);
+            [
+                'problem' => $problem,
+            ] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'show_diff' => 'invalid',
+                ])
+            );
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());

@@ -1813,7 +1813,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Call API
         $login = self::login($problemData['author']);
 
-        $response = \OmegaUp\Controllers\Problem::apiUpdate(
+        \OmegaUp\Controllers\Problem::apiUpdate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'show_diff' => $showDiffValue,
