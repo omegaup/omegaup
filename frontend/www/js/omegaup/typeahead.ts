@@ -121,6 +121,7 @@ export function problemTypeahead(
             ),
         ),
         async: true,
+        limit: 10,
         display: 'alias',
         templates: {
           suggestion: val =>

@@ -7,6 +7,28 @@
  */
 
 class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
+    }
+
+    /**
+     * A PHPUnit data provider for the test with valid show_diff values.
+     *
+     * @return list<list<string>>
+     */
+    public function showDiffValueProvider(): array {
+        return [
+            ['none'],
+            ['examples'],
+            ['all'],
+        ];
+    }
+
     public function testProblemUpdateLanguages() {
         // Get a problem (with 'es' statements)
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -69,11 +91,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData[0]);
         \OmegaUp\Test\Factories\Run::gradeRun($runData[1]);
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
@@ -415,11 +432,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUpdateProblemFailed() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
@@ -1787,5 +1799,63 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertEquals(1, $response['visibility']);
+    }
+
+    /**
+     * @dataProvider showDiffValueProvider
+     */
+    public function testUpdateProblemWithValidShowDiffValues(
+        string $showDiffValue
+    ) {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Call API
+        $login = self::login($problemData['author']);
+
+        \OmegaUp\Controllers\Problem::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'show_diff' => $showDiffValue,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed show_diff',
+            ])
+        );
+        // Verify data in DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+
+        // Check that we retrieved 1 element
+        $this->assertNotNull($problem);
+        $this->assertEqualSets($showDiffValue, $problem->show_diff);
+    }
+
+    public function testUpdateProblemWithInvalidShowDiffValue() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $showDiffValues = ['none', 'examples', 'all', 'invalid'];
+
+        foreach ($showDiffValues as $showDiffValue) {
+            // Call API
+            $login = self::login($problemData['author']);
+            try {
+                $response = \OmegaUp\Controllers\Problem::apiUpdate(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                        'show_diff' => 'invalid',
+                        'problem_alias' => $problemData['request']['problem_alias'],
+                        'message' => 'Changed show_diff',
+                    ])
+                );
+                $this->fail('Exception was expected.');
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertEquals(
+                    'parameterNotInExpectedSet',
+                    $e->getMessage()
+                );
+            }
+        }
     }
 }

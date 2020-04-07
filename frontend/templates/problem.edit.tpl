@@ -1,6 +1,10 @@
 {include file='redirect.tpl' inline}
 {include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemEdit#}" inline}
 
+<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}" defer></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}" defer></script>
+<link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
+
 {js_include entrypoint="problem_edit"}
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
