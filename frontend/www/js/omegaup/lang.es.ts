@@ -641,7 +641,7 @@ const translations: { [key: string]: string; } = {
   problemEditAddAdmin: "Administradores",
   problemEditAddGroupAdmin: "Grupos administradores",
   problemEditAddTags: "Etiquetas",
-  problemEditChooseVersion: "Ver historial",
+  problemEditChooseVersion: "Ver historial de versi\u00f3n",
   problemEditCommitMessage: "Descripci\u00f3n del cambio",
   problemEditEditMarkdown: "Editar Redacci\u00f3n",
   problemEditEditProblem: "Editar Problema",
