@@ -88,12 +88,13 @@
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
 	<main role="main">
-		{if (!isset($inArena) || !$inArena) && isset($ERROR_TO_USER)}
+		{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
 			<div class="alert alert-danger">
 				{$ERROR_MESSAGE}
 			</div>
 		{/if}
 		{include file='status.tpl' inline}
+	</main>
 {else}
 	<div id="root">
 	{if isset($headerPayload)}
@@ -101,8 +102,10 @@
 	{else}
 		{include file='common.navbar.tpl' headerPayload=[] inline}
 	{/if}
-	{if !isset($inArena) || !$inArena}
-	{include file='mainmenu.tpl' inline}
+	{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+		<div class="alert alert-danger">
+			{$ERROR_MESSAGE}
+		</div>
 	{/if}
 	{include file='status.tpl' inline}
 {/if}

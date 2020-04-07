@@ -32,7 +32,7 @@
       data-slide="prev"
     >
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">Previous</span>
+      <span class="sr-only">{{ T.wordsPrevious }}</span>
     </a>
     <a
       class="carousel-control-next"
@@ -41,7 +41,7 @@
       data-slide="next"
     >
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">Next</span>
+      <span class="sr-only">{{ T.wordsNext }}</span>
     </a>
   </div>
 </template>
@@ -70,6 +70,6 @@ import carouselConfig from '../../carousel.config';
 })
 export default class Carousel extends Vue {
   T = T;
-  slides = carouselConfig.splice(1);
+  slides = carouselConfig;
 }
 </script>
