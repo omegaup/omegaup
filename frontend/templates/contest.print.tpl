@@ -6,9 +6,6 @@
     <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
     <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.4.1.min.js"}"></script>
-    {js_include entrypoint="omegaup" runtime}
-    <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 
     <link rel="stylesheet" href="{version_hash src="/third_party/css/reset.css"}" />
     <link rel="stylesheet" href="{version_hash src="/css/common.css"}" />
@@ -39,6 +36,6 @@
       <div class="statement"></div>
     </div>
 {/foreach}
-  <script type="text/javascript" src="{version_hash src="/js/contest.print.js"}"></script>
+  {js_include entrypoint="contest_print" runtime}
   </body>
 </html>

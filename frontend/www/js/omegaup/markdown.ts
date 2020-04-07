@@ -1,31 +1,9 @@
 import T from './lang';
 
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
+import { getSanitizingConverter } from '@/third_party/js/pagedown/Markdown.Sanitizer.js';
+
 export type ProblemSettings = any;
-
-declare namespace Markdown {
-  export type ImageMapping = {
-    [url: string]: string;
-  };
-
-  export interface Hooks {
-    chain: (eventName: string, callback: any) => void;
-  }
-
-  export interface Converter {
-    hooks: Markdown.Hooks;
-    _settings?: ProblemSettings;
-    _imageMapping?: Markdown.ImageMapping;
-
-    makeHtml: (markdown: string) => string;
-    makeHtmlWithImages: (
-      markdown: string,
-      imageMapping: Markdown.ImageMapping,
-      settings: ProblemSettings,
-    ) => string;
-  }
-
-  function getSanitizingConverter(): Markdown.Converter;
-}
 
 export function markdownConverter(
   options: {
@@ -93,7 +71,7 @@ export function markdownConverter(
     </div>`;
   }
 
-  const converter = Markdown.getSanitizingConverter();
+  const converter = getSanitizingConverter();
   const whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
   const imageWhitelist = new RegExp(
     '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',

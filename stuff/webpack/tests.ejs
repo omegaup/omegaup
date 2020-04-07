@@ -15,15 +15,12 @@
 
 		<!-- dependencies -->
 		<script type="text/javascript" src="/third_party/js/jquery-3.4.1.min.js"></script>
-		<script type="text/javascript" src="/third_party/js/typeahead.jquery.js"></script>
 		<script type="text/javascript" src="/js/omegaup/api.fake.js"></script>
 <% for (var js in htmlWebpackPlugin.files.js) { %>
 		<script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[js] %>" defer></script>
 <% } %>
 		<script type="text/javascript" src="/js/mathjax-config.js"></script>
 		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-		<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Converter.js"></script>
-		<script type="text/javascript" src="/third_party/js/pagedown/Markdown.Sanitizer.js"></script>
 
 		<!-- specs -->
 		<script type="text/javascript" src="/js/omegaup/arena/admin_arena.test.js" defer></script>

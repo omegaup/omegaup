@@ -25,8 +25,6 @@
 {/if}
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}" defer></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js" defer}"></script>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js" defer}"></script>
 {/if}
 
 {if isset($jsfile)}
@@ -62,12 +60,6 @@
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/third_party/wenk/demo/wenk.min.css"}" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 
-{if isset($LOAD_PAGEDOWN) && $LOAD_PAGEDOWN}
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}" defer></script>
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}" defer></script>
-	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}" defer></script>
-	<link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
-{/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
 {/if}
