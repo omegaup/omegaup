@@ -23,9 +23,6 @@ OmegaUp.on('ready', function() {
     data: {
       nominations: [],
       totalRows: 0,
-      page: payload.page,
-      length: payload.length,
-      myView: payload.myView,
     },
     components: {
       'omegaup-qualitynomination-list': qualitynomination_List,
@@ -34,8 +31,8 @@ OmegaUp.on('ready', function() {
 
   if (!payload.myView) {
     API.QualityNomination.list({
-      offset: nominationsList.page,
-      rowcount: nominationsList.length,
+      offset: payload.page,
+      rowcount: payload.length,
     })
       .then(data => {
         nominationsList.totalRows = data.totalRows;
@@ -44,8 +41,8 @@ OmegaUp.on('ready', function() {
       .catch(UI.apiError);
   } else {
     API.QualityNomination.myList({
-      offset: nominationsList.page,
-      rowcount: nominationsList.length,
+      offset: payload.page,
+      rowcount: payload.length,
     })
       .then(data => {
         nominationsList.totalRows = data.totalRows;
