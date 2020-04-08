@@ -101,6 +101,7 @@
 			{$ERROR_MESSAGE}
 		</div>
 		{/if}
+		</div>
 	{/if}
 	{include file='status.tpl' inline}
 {/if}
