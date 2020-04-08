@@ -86,8 +86,9 @@ class Driver:  # pylint: disable=too-many-instance-attributes
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
-    def __init__(self, browser, wait, url, worker_id, options):
+    def __init__(self, browser, browser_name, wait, url, worker_id, options):
         self.browser = browser
+        self.browser_name = browser_name
         self.wait = wait
         self._worker_id = worker_id
         self._next_id = 0
@@ -621,7 +622,8 @@ def driver(request, browser_name):
                              poll_frequency=0.1)
 
         try:
-            yield Driver(browser, wait, request.config.option.url,
+            yield Driver(browser, browser_name, wait,
+                         request.config.option.url,
                          os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
