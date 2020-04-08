@@ -1,24 +1,24 @@
 FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update -y && \
-    apt install --no-install-recommends -y openjdk-11-jre-headless curl \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y openjdk-11-jre-headless curl \
         ca-certificates gnupg2 xz-utils && \
     /usr/sbin/update-ca-certificates && \
-    apt autoremove -y && \
-    apt clean
+    apt-get autoremove -y && \
+    apt-get clean
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
 
-RUN apt update -y && \
-    apt install --no-install-recommends -y \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
         php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
         php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml nginx git \
         yarn nodejs supervisor python3-requests python3-mysqldb \
         mysql-client-core-8.0 sudo wait-for-it && \
-    apt autoremove -y && \
-    apt clean
+    apt-get autoremove -y && \
+    apt-get clean
 
 RUN curl -sL https://phar.phpunit.de/phpunit-8.5.2.phar -o /usr/bin/phpunit
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
@@ -42,7 +42,7 @@ COPY ./etc/nginx/* /etc/nginx/
 COPY ./etc/sudoers.d/* /etc/sudoers.d/
 RUN chmod 440 /etc/sudoers.d/ubuntu
 COPY ./usr/bin/* /usr/bin/
-RUN chmod +x /usr/bin/yarn-dev.sh
+RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/developer-environment.sh
 COPY ./my.cnf /home/ubuntu/.my.cnf
 
 RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup

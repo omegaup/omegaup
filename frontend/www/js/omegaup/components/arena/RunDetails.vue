@@ -142,7 +142,8 @@
     border: 2px solid #ccc;
     padding: 1em;
     position: absolute;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     top: 0;
     bottom: 0;
     left: 0;

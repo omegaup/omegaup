@@ -94,9 +94,13 @@
 	{else}
 		{include file='common.navbar.tpl' headerPayload=[] inline}
 	{/if}
-	{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+	{if (!isset($inArena) || !$inArena)}
+		<div id="content">
+		{if isset($ERROR_MESSAGE)}
 		<div class="alert alert-danger">
 			{$ERROR_MESSAGE}
+		</div>
+		{/if}
 		</div>
 	{/if}
 	{include file='status.tpl' inline}

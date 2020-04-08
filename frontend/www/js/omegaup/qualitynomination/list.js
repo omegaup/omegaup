@@ -31,8 +31,8 @@ OmegaUp.on('ready', function() {
 
   if (!payload.myView) {
     API.QualityNomination.list({
-      offset: nominationsList.page,
-      rowcount: nominationsList.length,
+      offset: payload.page,
+      rowcount: payload.length,
     })
       .then(data => {
         nominationsList.totalRows = data.totalRows;
@@ -41,8 +41,8 @@ OmegaUp.on('ready', function() {
       .catch(UI.apiError);
   } else {
     API.QualityNomination.myList({
-      offset: nominationsList.page,
-      rowcount: nominationsList.length,
+      offset: payload.page,
+      rowcount: payload.length,
     })
       .then(data => {
         nominationsList.totalRows = data.totalRows;
