@@ -1,12 +1,12 @@
 FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update -y && \
-    apt install --no-install-recommends -y \
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
         curl ca-certificates xz-utils openjdk-11-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
-    apt autoremove -y && \
-    apt clean
+    apt-get autoremove -y && \
+    apt-get clean
 
 RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.29/omegaup-backend.tar.xz | tar xJ -C /
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
