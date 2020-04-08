@@ -6,7 +6,14 @@
       <div>
         <h3>{{ title }}</h3>
         <p>{{ description }}</p>
-        <div slot="buttons"></div>
+        <a
+          class="btn btn-primary mb-3"
+          v-if="button"
+          v-bind:href="button.href"
+          role="button"
+        >
+          {{ button.text[T.locale] }}
+        </a>
       </div>
       <div>
         <img class="d-block" height="320" v-bind:src="imageSrc" />
@@ -25,11 +32,22 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
 
 @Component
 export default class Slide extends Vue {
   @Prop() title!: string;
   @Prop() description!: string;
   @Prop() imageSrc!: string;
+  @Prop() button!: {
+    text: {
+      en: string;
+      es: string;
+      pt: string;
+    };
+    href: string;
+  };
+
+  T = T;
 }
 </script>
