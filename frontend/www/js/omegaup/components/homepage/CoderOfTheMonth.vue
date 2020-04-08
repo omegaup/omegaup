@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h5 class="card-header">
-      {{ female ? T.wordsCoderOfTheMonthFemale : T.wordsCoderOfTheMonth }}
+      {{ category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth }}
     </h5>
     <div class="card-body text-center">
       <a v-bind:href="`/profile/${coderOfTheMonth.username}/`">
@@ -46,7 +46,7 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class CoderOfTheMonth extends Vue {
-  @Prop() female!: boolean;
+  @Prop({ default: 'all' }) category!: string;
   @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
 
   T = T;

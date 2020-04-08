@@ -12,13 +12,37 @@
     ></omegaup-coder-of-the-month-notice>
     <!-- TODO: esto debe ser acomodado al final de toda la migración -->
     <omegaup-carousel></omegaup-carousel>
-    <omegaup-ranks-section
-      v-bind:coder-of-the-month="coderOfTheMonth"
-      v-bind:coder-of-the-month-female="coderOfTheMonthFemale"
-      v-bind:school-of-the-month="schoolOfTheMonth"
-      v-bind:users-rank="rankTable"
-      v-bind:schools-rank="schoolsRank"
-    ></omegaup-ranks-section>
+    <div class="container-lg py-5">
+      <div class="row align-items-center justify-content-around">
+        <div
+          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          v-if="coderOfTheMonthFemale"
+        >
+          <omegaup-coder-of-the-month
+            v-bind:category="'female'"
+            v-bind:coder-of-the-month="coderOfTheMonthFemale"
+          ></omegaup-coder-of-the-month>
+        </div>
+        <div
+          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          v-if="coderOfTheMonth"
+        >
+          <omegaup-coder-of-the-month
+            v-bind:category="'all'"
+            v-bind:coder-of-the-month="coderOfTheMonth"
+          ></omegaup-coder-of-the-month>
+        </div>
+        <div
+          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          v-if="schoolOfTheMonth"
+        >
+          <omegaup-school-of-the-month
+            v-bind:school-of-the-month="schoolOfTheMonth"
+          >
+          </omegaup-school-of-the-month>
+        </div>
+      </div>
+    </div>
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-8">
@@ -52,17 +76,6 @@
           <omegaup-common-social-media
             v-if="enableSocialMediaResources"
           ></omegaup-common-social-media>
-          <omegaup-coder-of-the-month
-            v-if="coderOfTheMonth"
-            v-bind:username="coderOfTheMonth.username"
-            v-bind:classname="coderOfTheMonth.classname"
-            v-bind:name="coderOfTheMonth.name"
-            v-bind:country="coderOfTheMonth.country"
-            v-bind:country_id="coderOfTheMonth.country_id"
-            v-bind:state="coderOfTheMonth.state"
-            v-bind:gravatar_92="coderOfTheMonth.gravatar_92"
-            v-bind:school="coderOfTheMonth.school"
-          ></omegaup-coder-of-the-month>
           <omegaup-common-recomended-material></omegaup-common-recomended-material>
           <omegaup-contest-upcoming
             v-bind:contests="upcomingContests"
@@ -82,26 +95,26 @@ import { Chart } from 'highcharts-vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
-import homepage_RanksSection from './RanksSection.vue';
+import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
+import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import common_Welcome from '../common/Welcome.vue';
 import common_SocialMedia from '../common/SocialMedia.vue';
 import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
 import contest_Upcoming from '../contest/Upcoming.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
-import coderofthemonth from '../coderofthemonth/CoderOfTheMonth.vue';
 import rankTable from '../RankTable.vue';
 import schools_Rank from '../schools/Rank.vue';
 
 @Component({
   components: {
     'omegaup-carousel': homepage_Carousel,
-    'omegaup-ranks-section': homepage_RanksSection,
+    'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
+    'omegaup-school-of-the-month': homepage_SchoolOfTheMonth,
     'omegaup-common-welcome': common_Welcome,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
     'omegaup-contest-upcoming': contest_Upcoming,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
-    'omegaup-coder-of-the-month': coderofthemonth,
     'omegaup-rank-table': rankTable,
     'omegaup-schools-rank': schools_Rank,
     highcharts: Chart,

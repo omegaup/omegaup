@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h5 class="card-header">
-      {{ T.wordsSchoolOfTheMonth }}
+      {{ T.schoolOfTheMonth }}
     </h5>
     <div class="card-body text-center">
       <h5 class="card-title">
