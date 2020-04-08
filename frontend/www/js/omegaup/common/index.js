@@ -35,7 +35,7 @@ OmegaUp.on('ready', function() {
           rankTable: this.rankTable,
           schoolsRank: this.schoolsRank,
           enableSocialMediaResources: this.enableSocialMediaResources,
-          schoolOfTheMonthData: this.schoolOfTheMonthData,
+          schoolOfTheMonth: this.schoolOfTheMonthData,
           upcomingContests: this.upcomingContests,
           chartOptions: this.chartOptions,
         },
