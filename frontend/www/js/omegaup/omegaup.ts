@@ -135,6 +135,7 @@ export namespace omegaup {
     country?: string;
     state?: string;
     school?: string;
+    school_id?: number;
   }
 
   export interface Commit {
@@ -511,6 +512,8 @@ export namespace omegaup {
 
   export interface SchoolOfTheMonth extends SchoolsRank {
     time?: string;
+    country?: string;
+    state?: string;
   }
 
   export interface SchoolsRank {

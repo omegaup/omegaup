@@ -15,7 +15,7 @@
     <div class="container-lg py-5">
       <div class="row align-items-center justify-content-around">
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonthFemale"
         >
           <omegaup-coder-of-the-month
@@ -24,7 +24,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonth"
         >
           <omegaup-coder-of-the-month
@@ -33,7 +33,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="schoolOfTheMonth"
         >
           <omegaup-school-of-the-month
