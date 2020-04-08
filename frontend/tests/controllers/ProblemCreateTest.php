@@ -837,7 +837,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider allowUserAddTagsValueProvider
      */
     public function testCreateProblemWithAllowUserAddTagsValues(
-        string $allowUserAddTagsValue
+        bool $allowUserAddTagsValue
     ) {
         [
             'problem' => $problem,

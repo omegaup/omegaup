@@ -1872,10 +1872,10 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider showDiffValueProvider
+     * @dataProvider allowUserAddTagsValueProvider
      */
     public function testUpdateProblemWithallowUserAddTagsValues(
-        string $allowUserAddTagsValue
+        bool $allowUserAddTagsValue
     ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
