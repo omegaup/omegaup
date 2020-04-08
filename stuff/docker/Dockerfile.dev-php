@@ -42,7 +42,7 @@ COPY ./etc/nginx/* /etc/nginx/
 COPY ./etc/sudoers.d/* /etc/sudoers.d/
 RUN chmod 440 /etc/sudoers.d/ubuntu
 COPY ./usr/bin/* /usr/bin/
-RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/db-setup.sh
+RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/developer-environment.sh
 COPY ./my.cnf /home/ubuntu/.my.cnf
 
 RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
