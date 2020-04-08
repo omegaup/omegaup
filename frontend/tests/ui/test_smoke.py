@@ -46,14 +46,16 @@ def test_js_errors(driver):
     with util.assert_no_js_errors(driver):
         driver.browser.execute_script('console.log("foo");')
 
-    with util.assert_js_errors(driver, expected_messages=('bar', )):
-        driver.browser.execute_script('console.error("bar");')
+    if driver.browser_name != 'firefox':
+        # Firefox does not support this.
+        with util.assert_js_errors(driver, expected_messages=('bar', )):
+            driver.browser.execute_script('console.error("bar");')
 
-    with util.assert_no_js_errors(driver):
-        # Within an asset_js_error() context manager, messages should not be
-        # bubbled up.
-        with util.assert_js_errors(driver, expected_messages=('baz', )):
-            driver.browser.execute_script('console.error("baz");')
+        with util.assert_no_js_errors(driver):
+            # Within an asset_js_error() context manager, messages should not
+            # be bubbled up.
+            with util.assert_js_errors(driver, expected_messages=('baz', )):
+                driver.browser.execute_script('console.error("baz");')
 
 
 @util.no_javascript_errors()

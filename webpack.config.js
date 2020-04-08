@@ -40,6 +40,7 @@ let config = [
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
         './frontend/www/js/omegaup/contest/list_participant.js',
+      contest_print: './frontend/www/js/omegaup/contest/print.ts',
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:
         './frontend/www/js/omegaup/contest/scoreboardmerge.js',
@@ -61,6 +62,7 @@ let config = [
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
+      problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       problem_settings: './frontend/www/js/omegaup/problem/settings.js',
       qualitynomination_popup:
