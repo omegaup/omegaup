@@ -820,4 +820,36 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
         }
     }
+
+    /**
+     * A PHPUnit data provider for the test with allow_user_add_tags values.
+     *
+     * @return list<list<string>>
+     */
+    public function allowUserAddTagsValueProvider(): array {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    /**
+     * @dataProvider allowUserAddTagsValueProvider
+     */
+    public function testCreateProblemWithAllowUserAddTagsValues(
+        string $allowUserAddTagsValue
+    ) {
+        [
+            'problem' => $problem,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'allow_user_add_tags' => $allowUserAddTagsValue,
+            ])
+        );
+
+        $this->assertEquals(
+            $allowUserAddTagsValue,
+            $problem->allow_user_add_tags
+        );
+    }
 }
