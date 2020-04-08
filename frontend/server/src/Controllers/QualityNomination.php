@@ -8,6 +8,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     const REVIEWERS_PER_NOMINATION = 2;
 
+    // Number of rows shown in nominations list
+    const PAGE_SIZE = 100;
+
     const ALLOWED_TAGS = [
         'problemTopic2Sat',
         'problemTopicArrays',
@@ -699,7 +702,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
+        $pageSize = is_null(
+            $r['page_size']
+        ) ? self::PAGE_SIZE : intval(
+            $r['page_size']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -760,7 +767,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+        $rowCount = is_null(
+            $r['rowcount']
+        ) ? self::PAGE_SIZE : intval(
+            $r['rowcount']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
         \OmegaUp\Validators::validateValidSubset(
@@ -819,7 +830,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('rowcount', null, null, false);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+        $rowCount = is_null(
+            $r['rowcount']
+        ) ? self::PAGE_SIZE : intval(
+            $r['rowcount']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -992,7 +1007,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $length = is_null(
+            $r['length']
+        ) ? self::PAGE_SIZE : intval(
+            $r['length']
+        );
 
         return [
             'smartyProperties' => [
@@ -1025,7 +1044,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('length', null, null, false);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $length = is_null(
+            $r['length']
+        ) ? self::PAGE_SIZE : intval(
+            $r['length']
+        );
 
         return [
             'smartyProperties' => [
