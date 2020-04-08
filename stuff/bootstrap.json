@@ -18,6 +18,8 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
@@ -40,6 +42,8 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
+					"show_diff": "all",
+					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
@@ -61,6 +65,7 @@
 					"memory_limit": 32768,
 					"output_limit": 10240,
 					"input_limit": 10240,
+					"allow_user_add_tags": "true",
 					"source": "omegaUp classics",
 					"languages": "kp,kj",
 					"email_clarifications": 1
