@@ -93,7 +93,7 @@ const translations: { [key: string]: string; } = {
   coderOfTheMonth: "(C0d3r 0f 7h3 m0n7h)",
   coderOfTheMonthAlreadySelected: "(C0d3r 0f 7h3 m0n7h ha5 b33n pr3vi0u51y 5313c73d)",
   coderOfTheMonthChooseAsCoder: "(Ch0053 a5 c0d3r 0f 7h3 m0n7h)",
-  coderOfTheMonthFemale: "(C0d3r 0f 7h3 m0n7h)",
+  coderOfTheMonthFemale: "(F3ma13 c0d3r 0f 7h3 m0n7h)",
   coderOfTheMonthFemaleAlreadySelected: "(F3ma13 c0d3r 0f 7h3 m0n7h ha5 b33n pr3vi0u51y 5313c73d)",
   coderOfTheMonthFemaleChooseAsCoder: "(Ch0053 a5 f3ma13 c0d3r 0f 7h3 m0n7h)",
   coderOfTheMonthFemaleIsNotInPeriodToBeChosen: "(F3ma13 c0d3r 0f 7h3 m0n7h i5 n07 in 7h3 p3ri0d 70 b3 ch053n)",

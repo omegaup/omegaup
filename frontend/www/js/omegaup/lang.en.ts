@@ -93,7 +93,7 @@ const translations: { [key: string]: string; } = {
   coderOfTheMonth: "Coder of the month",
   coderOfTheMonthAlreadySelected: "Coder of the month has been previously selected",
   coderOfTheMonthChooseAsCoder: "Choose as coder of the month",
-  coderOfTheMonthFemale: "Coder of the month",
+  coderOfTheMonthFemale: "Female coder of the month",
   coderOfTheMonthFemaleAlreadySelected: "Female coder of the month has been previously selected",
   coderOfTheMonthFemaleChooseAsCoder: "Choose as female coder of the month",
   coderOfTheMonthFemaleIsNotInPeriodToBeChosen: "Female coder of the month is not in the period to be chosen",
