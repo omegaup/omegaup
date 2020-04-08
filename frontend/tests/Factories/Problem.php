@@ -45,7 +45,13 @@ class ProblemParams {
     public $showDiff;
 
     /**
-     * @param array{zipName?: string, title?: string, visibility?: int, author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
+     * @readonly
+     * @var bool
+     */
+    public $allowUserAddTags;
+
+    /**
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: int, author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -53,6 +59,7 @@ class ProblemParams {
         $this->languages = $params['languages'] ?? 'c11-gcc,c11-clang,cpp17-gcc,cpp17-clang,py2,py3';
         $this->visibility = $params['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
         $this->showDiff = $params['show_diff'] ?? 'none';
+        $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -124,6 +131,7 @@ class Problem {
             'input_limit' => 10240,
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
+            'allow_user_add_tags' => $params->allowUserAddTags,
         ]);
 
         // Set file upload context

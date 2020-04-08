@@ -1858,4 +1858,49 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
     }
+
+    /**
+     * A PHPUnit data provider for the test with allow_user_add_tags values.
+     *
+     * @return list<list<string>>
+     */
+    public function allowUserAddTagsValueProvider(): array {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    /**
+     * @dataProvider allowUserAddTagsValueProvider
+     */
+    public function testUpdateProblemWithallowUserAddTagsValues(
+        bool $allowUserAddTagsValue
+    ) {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Call API
+        $login = self::login($problemData['author']);
+
+        \OmegaUp\Controllers\Problem::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'allow_user_add_tags' => $allowUserAddTagsValue,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'message' => 'Changed allow_user_add_tags',
+            ])
+        );
+        // Verify data in DB
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+
+        // Check that we retrieved 1 element
+        $this->assertNotNull($problem);
+        $this->assertEqualSets(
+            $allowUserAddTagsValue,
+            $problem->allow_user_add_tags
+        );
+    }
 }
