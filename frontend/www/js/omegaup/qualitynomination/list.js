@@ -12,9 +12,9 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {
-          page: this.page,
-          length: this.length,
-          myView: this.myView,
+          page: payload.page,
+          length: payload.length,
+          myView: payload.myView,
           nominations: this.nominations,
           totalRows: this.totalRows,
         },
