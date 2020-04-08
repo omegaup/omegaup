@@ -15,7 +15,7 @@
     <div class="container-lg py-5">
       <div class="row align-items-center justify-content-around">
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-sm-6 col-lg mb-3 mb-lg-0 customized-card"
           v-if="coderOfTheMonthFemale"
         >
           <omegaup-coder-of-the-month
@@ -24,7 +24,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-sm-6 col-lg mb-3 mb-lg-0 customized-card"
           v-if="coderOfTheMonth"
         >
           <omegaup-coder-of-the-month
@@ -33,7 +33,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-sm-6 col-lg mb-3 mb-lg-0 customized-card"
           v-if="schoolOfTheMonth"
         >
           <omegaup-school-of-the-month
@@ -88,6 +88,12 @@
     </div>
   </div>
 </template>
+
+<style>
+.customized-card {
+  max-width: 400px;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
