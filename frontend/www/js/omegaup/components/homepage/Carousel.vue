@@ -22,6 +22,7 @@
           v-bind:title="slide.title[T.locale]"
           v-bind:description="slide.description[T.locale]"
           v-bind:image-src="slide.image"
+          v-bind:button="slide.button"
         ></omegaup-homepage-slide>
       </div>
     </div>
