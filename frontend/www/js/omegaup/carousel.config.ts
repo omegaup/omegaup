@@ -43,9 +43,9 @@ const carouselConfig: {
   {
     "image": "/media/homepage/carousel_slide_2.svg",
     "title": {
-        "en": "Introductory course to C++",
-        "es": "Curso de introducción a C++",
-        "pt": "Curso introdutório ao C++"
+        "en": "Introductory Course to C++",
+        "es": "Curso de Introducción a C++",
+        "pt": "Curso Introdutório ao C++"
     },
     "description": {
         "en": "Would you like to learn to program? Join the Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules",
