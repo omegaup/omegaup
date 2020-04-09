@@ -258,6 +258,10 @@ nav.navbar {
     background-color: $white;
     background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
   }
+
+  a.dropdown-item {
+    color: black;
+  }
 }
 </style>
 
