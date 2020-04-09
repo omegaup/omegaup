@@ -55,3 +55,12 @@ body {
 	height: 51px;
 	margin: -51px 0 0;
 }
+
+a {
+  color: #8bb0d3;
+  text-decoration: none;
+  &:hover {
+    color: #666;
+    text-decoration: none;
+  }
+}
