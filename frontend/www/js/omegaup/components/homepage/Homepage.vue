@@ -42,36 +42,35 @@
           </omegaup-school-of-the-month>
         </div>
       </div>
+      <div class="row align-items-center justify-content-around mt-3">
+        <div class="col-xs-10 col-md-6 mb-3 mb-md-0" v-if="coderOfTheMonth">
+          <omegaup-user-rank
+            v-bind:page="rankTable.page"
+            v-bind:length="rankTable.length"
+            v-bind:isIndex="rankTable.isIndex"
+            v-bind:isLogged="rankTable.isLogged"
+            v-bind:availableFilters="rankTable.availableFilters"
+            v-bind:filter="rankTable.filter"
+            v-bind:ranking="rankTable.ranking"
+            v-bind:resultTotal="rankTable.resultTotal"
+          ></omegaup-user-rank>
+        </div>
+        <div
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
+          v-if="schoolsRank !== null"
+        >
+          <omegaup-school-rank
+            v-bind:page="schoolsRank.page"
+            v-bind:length="schoolsRank.length"
+            v-bind:showHeader="schoolsRank.showHeader"
+            v-bind:totalRows="schoolsRank.totalRows"
+            v-bind:rank="schoolsRank.rank"
+          ></omegaup-school-rank>
+        </div>
+      </div>
     </div>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-8">
-          <omegaup-common-welcome></omegaup-common-welcome>
-          <div class="row">
-            <div class="col-md-6">
-              <omegaup-rank-table
-                v-bind:page="rankTable.page"
-                v-bind:length="rankTable.length"
-                v-bind:isIndex="rankTable.isIndex"
-                v-bind:isLogged="rankTable.isLogged"
-                v-bind:availableFilters="rankTable.availableFilters"
-                v-bind:filter="rankTable.filter"
-                v-bind:ranking="rankTable.ranking"
-                v-bind:resultTotal="rankTable.resultTotal"
-              ></omegaup-rank-table>
-            </div>
-            <div class="col-md-6" v-if="schoolsRank !== null">
-              <omegaup-schools-rank
-                v-bind:page="schoolsRank.page"
-                v-bind:length="schoolsRank.length"
-                v-bind:showHeader="schoolsRank.showHeader"
-                v-bind:totalRows="schoolsRank.totalRows"
-                v-bind:rank="schoolsRank.rank"
-              ></omegaup-schools-rank>
-            </div>
-          </div>
-        </div>
-
         <div class="col-md-4">
           <omegaup-common-social-media
             v-if="enableSocialMediaResources"
@@ -97,26 +96,25 @@ import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
-import common_Welcome from '../common/Welcome.vue';
+import school_Rank from '../schools/Rankv2.vue';
+import user_Rank from '../user/Rank.vue';
+
 import common_SocialMedia from '../common/SocialMedia.vue';
 import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
 import contest_Upcoming from '../contest/Upcoming.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
-import rankTable from '../RankTable.vue';
-import schools_Rank from '../schools/Rank.vue';
 
 @Component({
   components: {
     'omegaup-carousel': homepage_Carousel,
     'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
     'omegaup-school-of-the-month': homepage_SchoolOfTheMonth,
-    'omegaup-common-welcome': common_Welcome,
+    'omegaup-school-rank': school_Rank,
+    'omegaup-user-rank': user_Rank,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
     'omegaup-contest-upcoming': contest_Upcoming,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
-    'omegaup-rank-table': rankTable,
-    'omegaup-schools-rank': schools_Rank,
     highcharts: Chart,
   },
 })
