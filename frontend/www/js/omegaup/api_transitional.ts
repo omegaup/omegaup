@@ -200,8 +200,21 @@ export const Contest = {
   >('/api/contest/adminDetails/'),
   adminList: apiCall<
     messages.ContestAdminListRequest,
+    messages._ContestAdminListServerResponse,
     messages.ContestAdminListResponse
-  >('/api/contest/adminList/'),
+  >('/api/contest/adminList/', x => {
+    x.contests = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.contests);
+    return x;
+  }),
   admins: apiCall<
     messages.ContestAdminsRequest,
     messages.ContestAdminsResponse
@@ -243,9 +256,12 @@ export const Contest = {
         return x;
       }
       return x.map(x => {
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
         x.original_finish_time = ((x: number) => new Date(x * 1000))(
           x.original_finish_time,
         );
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.results);
@@ -261,9 +277,12 @@ export const Contest = {
         return x;
       }
       return x.map(x => {
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
         x.original_finish_time = ((x: number) => new Date(x * 1000))(
           x.original_finish_time,
         );
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.contests);
@@ -279,9 +298,12 @@ export const Contest = {
         return x;
       }
       return x.map(x => {
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
         x.original_finish_time = ((x: number) => new Date(x * 1000))(
           x.original_finish_time,
         );
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.contests);
@@ -969,8 +991,34 @@ export const User = {
   >('/api/user/coderOfTheMonthList/'),
   contestStats: apiCall<
     messages.UserContestStatsRequest,
+    messages._UserContestStatsServerResponse,
     messages.UserContestStatsResponse
-  >('/api/user/contestStats/'),
+  >('/api/user/contestStats/', x => {
+    x.contests = (x => {
+      if (x instanceof Object) {
+        Object.keys(x).forEach(
+          y =>
+            (x[y] = (x => {
+              x.data = (x => {
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                return x;
+              })(x.data);
+              return x;
+            })(x[y])),
+        );
+      }
+      return x;
+    })(x.contests);
+    return x;
+  }),
   create: apiCall<messages.UserCreateRequest, messages.UserCreateResponse>(
     '/api/user/create/',
   ),
