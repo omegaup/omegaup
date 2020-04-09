@@ -196,7 +196,7 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img v-bind:src="gravatarURL51" height="45" /><span
+                <img v-bind:src="gravatarURL51" height="45" class="mr-2" /><span
                   class="username"
                   v-bind:title="currentUsername"
                   >{{ currentUsername }}</span

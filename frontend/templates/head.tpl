@@ -50,9 +50,7 @@
 {if isset($inArena) && $inArena}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
 {else}
-		{if !isset($headerPayload) || !$headerPayload.bootstrap4}
-			<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
-		{/if}
+		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
 		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}" defer></script>
 		<link rel="stylesheet" href="/third_party/css/bootstrap-table.min.css">
