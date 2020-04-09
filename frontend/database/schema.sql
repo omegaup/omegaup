@@ -527,6 +527,7 @@ CREATE TABLE `Problems` (
   `difficulty_histogram` text COMMENT 'Valores del histograma de dificultad del problema.',
   `quality_seal` tinyint(1) NOT NULL DEFAULT '0',
   `show_diff` enum('none','examples','all') NOT NULL DEFAULT 'none' COMMENT 'Determina si el problema es educativo y debe mostrar diferencias en casos de ejemplos, en todos o en ninguno.',
+  `allow_user_add_tags` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Bandera que sirve para indicar si un problema puede permitir que los usuarios agreguen tags.',
   PRIMARY KEY (`problem_id`),
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),

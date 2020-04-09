@@ -59,6 +59,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a ProblemParams instance from the Request values.
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -147,6 +148,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($r['show_diff'])) {
             $params['show_diff'] = strval($r['show_diff']);
+        }
+        if (!is_null($r['allow_user_add_tags'])) {
+            $params['allow_user_add_tags'] = boolval(
+                $r['allow_user_add_tags']
+            );
         }
         return new \OmegaUp\ProblemParams($params, $isRequired);
     }
@@ -305,6 +311,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new problem
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -369,6 +376,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'languages' => $languages,
             'email_clarifications' => $params->emailClarifications,
             'show_diff' => $params->showDiff,
+            'allow_user_add_tags' => $params->allowUserAddTags,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
@@ -944,6 +952,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Update problem contents
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -1218,6 +1227,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'showDiff' => [
                 'alias' => 'show_diff',
             ],
+            'allowUserAddTags' => [
+                'alias' => 'allow_user_add_tags',
+            ],
             'source',
             'order',
             'languages' => [
@@ -1478,6 +1490,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates problem statement only
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -1569,6 +1582,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates problem solution only
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4197,6 +4211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4310,6 +4325,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time

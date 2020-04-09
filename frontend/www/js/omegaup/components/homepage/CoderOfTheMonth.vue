@@ -18,8 +18,10 @@
       <div class="card-text">
         {{ coderOfTheMonth.name }}
       </div>
-      <div class="card-text">
-        {{ coderOfTheMonth.school }}
+      <div class="card-text" v-if="coderOfTheMonth.school">
+        <a v-bind:href="`/schools/profile/${coderOfTheMonth.school_id}/`">
+          {{ coderOfTheMonth.school }}
+        </a>
       </div>
       <div
         class="card-text"

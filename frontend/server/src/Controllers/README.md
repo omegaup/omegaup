@@ -2596,6 +2596,7 @@ Create a new problem
 
 | Name                      | Type     | Description |
 | ------------------------- | -------- | ----------- |
+| `allow_user_add_tags`     | `bool`   |             |
 | `email_clarifications`    | `mixed`  |             |
 | `extra_wall_time`         | `mixed`  |             |
 | `input_limit`             | `mixed`  |             |
@@ -2940,6 +2941,7 @@ Update problem contents
 
 | Name                      | Type     | Description |
 | ------------------------- | -------- | ----------- |
+| `allow_user_add_tags`     | `bool`   |             |
 | `email_clarifications`    | `mixed`  |             |
 | `extra_wall_time`         | `mixed`  |             |
 | `input_limit`             | `mixed`  |             |
@@ -2976,6 +2978,7 @@ Updates problem solution only
 
 | Name                      | Type     | Description |
 | ------------------------- | -------- | ----------- |
+| `allow_user_add_tags`     | `bool`   |             |
 | `email_clarifications`    | `mixed`  |             |
 | `extra_wall_time`         | `mixed`  |             |
 | `input_limit`             | `mixed`  |             |
@@ -3011,6 +3014,7 @@ Updates problem statement only
 
 | Name                      | Type     | Description |
 | ------------------------- | -------- | ----------- |
+| `allow_user_add_tags`     | `bool`   |             |
 | `email_clarifications`    | `mixed`  |             |
 | `extra_wall_time`         | `mixed`  |             |
 | `input_limit`             | `mixed`  |             |
