@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
+    <h5 class="card-header" v-bind:class="`card-header-${category}`">
       {{ category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth }}
     </h5>
     <div class="card-body text-center">
@@ -35,6 +35,17 @@
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+h5.card-header {
+  color: white;
+  background-color: #5588dd;
+
+  &.card-header-female {
+    background-color: #8855dd;
+  }
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
