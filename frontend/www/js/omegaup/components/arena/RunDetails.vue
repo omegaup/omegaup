@@ -11,14 +11,16 @@
               <th>{{ T.wordsGroup }}</th>
               <th>{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
+              <th>{{ T.wordsInput }}</th>
+              <th>{{ T.wordsOutputExpected }}</th>
+              <th>{{ T.wordsOutputObtained }}</th>
               <th colspan="3">{{ T.rankScore }}</th>
-              <th width="1"></th>
             </tr>
           </thead>
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th colspan="2">
+              <th colspan="5">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <span
                     v-bind:class="{
@@ -43,21 +45,32 @@
               <th>{{ element.max_score ? element.max_score : '' }}</th>
             </tr>
             <tr
-              v-for="problem in element.cases"
+              v-for="problem_case in element.cases"
               v-if="groupVisible[element.group]"
             >
               <td></td>
-              <td class="text-center">{{ problem.name }}</td>
-              <td class="text-center">{{ problem.verdict }}</td>
+              <td class="text-center">{{ problem_case.name }}</td>
+              <td class="text-center">{{ problem_case.verdict }}</td>
+              <td class="text-center">
+                {{ data.cases[`${problem_case.name}.in`] }}
+              </td>
+              <td class="text-center">
+                {{ data.cases[`${problem_case.name}.out`] }}
+              </td>
+              <td class="text-center"></td>
               <td class="score">
                 {{
-                  problem.contest_score ? problem.contest_score : problem.score
+                  problem_case.contest_score
+                    ? problem_case.contest_score
+                    : problem_case.score
                 }}
               </td>
               <td class="center" width="10">
-                {{ problem.max_score ? '/' : '' }}
+                {{ problem_case.max_score ? '/' : '' }}
               </td>
-              <td>{{ problem.max_score ? problem.max_score : '' }}</td>
+              <td>
+                {{ problem_case.max_score ? problem_case.max_score : '' }}
+              </td>
             </tr>
           </tbody>
         </table>

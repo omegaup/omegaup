@@ -2311,6 +2311,7 @@ export class Arena {
       guid: data.guid,
       groups: groups,
       language: data.language,
+      cases: data.cases,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

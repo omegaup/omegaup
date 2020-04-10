@@ -1215,6 +1215,8 @@ const translations: { [key: string]: string; } = {
   wordsOther: "(O7h3r)",
   wordsOutOf4: "(%(Score) 0u7 0f 4)",
   wordsOutput: "(Ou7pu7)",
+  wordsOutputExpected: "(Exp3c73d 0u7pu7)",
+  wordsOutputObtained: "(Ob7ain3d 0u7pu7)",
   wordsOverallWallTimeLimit: "(Tim3 1imi7 (707a1))",
   wordsPartial: "(Par7ia1)",
   wordsPenalty: "(P3na17y)",

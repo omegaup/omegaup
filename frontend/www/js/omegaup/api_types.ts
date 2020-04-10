@@ -1705,6 +1705,7 @@ export namespace messages {
   export type RunDetailsRequest = { [key: string]: any };
   export type RunDetailsResponse = {
     admin: boolean;
+    cases: { [key: string]: string };
     compile_error: string;
     details: {
       compile_meta: {

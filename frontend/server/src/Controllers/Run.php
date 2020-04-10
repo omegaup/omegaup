@@ -787,7 +787,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return array{admin: bool, cases?: array<string, string>, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -805,7 +805,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByPK(
             intval($submission->problem_id)
         );
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -858,6 +858,26 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
 
             $response['judged_by'] = strval($run->judged_by);
+        }
+
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        $existingCases = $problemArtifacts->lsTreeRecursive('cases');
+        foreach ($existingCases as $file) {
+            /** @var string $problemContent */
+            $problemContent = json_decode(
+                $problemArtifacts->get($file['path'])
+            );
+            [$_, $filename] = explode('cases/', $file['path']);
+            $response['cases'][$filename] = $problemContent;
+        }
+        $existingExampleCases = $problemArtifacts->lsTreeRecursive('examples');
+        foreach ($existingExampleCases as $file) {
+            /** @var string $problemContent */
+            $problemContent = json_decode(
+                $problemArtifacts->get($file['path'])
+            );
+            [$_, $filename] = explode('examples/', $file['path']);
+            $response['cases'][$filename] = $problemContent;
         }
 
         return $response;
