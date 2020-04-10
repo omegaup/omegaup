@@ -12,42 +12,55 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {
-          page: payload.page,
+          pages: this.pages,
           length: payload.length,
           myView: payload.myView,
           nominations: this.nominations,
-          totalRows: this.totalRows,
+          pagerItems: this.pagerItems,
+        },
+        on: {
+          'go-to-page': pageNumber => {
+            if (pageNumber > 0) {
+              showNominations(pageNumber);
+            }
+          },
         },
       });
     },
     data: {
       nominations: [],
-      totalRows: 0,
+      pagerItems: payload.pagerItems,
     },
     components: {
       'omegaup-qualitynomination-list': qualitynomination_List,
     },
   });
 
-  if (!payload.myView) {
-    API.QualityNomination.list({
-      offset: payload.page,
-      rowcount: payload.length,
-    })
-      .then(data => {
-        nominationsList.totalRows = data.totalRows;
-        nominationsList.nominations = data.nominations;
+  function showNominations(pageNumber) {
+    if (!payload.myView) {
+      API.QualityNomination.list({
+        offset: pageNumber,
+        rowcount: payload.length,
       })
-      .catch(UI.apiError);
-  } else {
-    API.QualityNomination.myList({
-      offset: payload.page,
-      rowcount: payload.length,
-    })
-      .then(data => {
-        nominationsList.totalRows = data.totalRows;
-        nominationsList.nominations = data.nominations;
+        .then(data => {
+          nominationsList.nominations = data.nominations;
+          nominationsList.pagerItems = data.pagerItems;
+          nominationsList.pages = pageNumber;
+        })
+        .catch(UI.apiError);
+    } else {
+      API.QualityNomination.myList({
+        offset: pageNumber,
+        rowcount: payload.length,
       })
-      .catch(UI.apiError);
+        .then(data => {
+          nominationsList.nominations = data.nominations;
+          nominationsList.pagerItems = data.pagerItems;
+          nominationsList.pages = pageNumber;
+        })
+        .catch(UI.apiError);
+    }
   }
+
+  showNominations(1);
 });

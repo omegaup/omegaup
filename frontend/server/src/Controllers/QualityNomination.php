@@ -753,7 +753,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $rowcount
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pagerItems: list<array{class: string, label: string, page: int}>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -780,13 +780,26 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
-        return \OmegaUp\DAO\QualityNominations::getNominations(
+        $response = \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */ null,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types
         );
+
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $response['totalRows'],
+            $rowCount,
+            $offset,
+            5,
+            []
+        );
+
+        return [
+            'nominations' => $response['nominations'],
+            'pagerItems' => $pagerItems,
+        ];
     }
 
     /**
@@ -817,7 +830,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $rowcount
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pagerItems: list<array{class: string, label: string, page: int}>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -842,13 +855,26 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $types = ['promotion', 'demotion'];
         }
 
-        return \OmegaUp\DAO\QualityNominations::getNominations(
+        $response = \OmegaUp\DAO\QualityNominations::getNominations(
             $r->user->user_id,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types
         );
+
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $response['totalRows'],
+            $rowCount,
+            $offset,
+            5,
+            []
+        );
+
+        return [
+            'nominations' => $response['nominations'],
+            'pagerItems' => $pagerItems,
+        ];
     }
 
     /**
@@ -1013,12 +1039,30 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['length']
         );
 
+        $response = \OmegaUp\DAO\QualityNominations::getNominations(
+            /* nominator */ null,
+            /* assignee */ null,
+            $page,
+            $length
+        );
+
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
+            $response['totalRows'],
+            $length,
+            $page ?: 1,
+            '/nomination/',
+            5,
+            []
+        );
+
         return [
             'smartyProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'myView' => false,
+                    'nominations' => $response['nominations'],
+                    'pagerItems' => $pagerItems,
                 ],
             ],
             'template' => 'quality.nomination.list.tpl',
