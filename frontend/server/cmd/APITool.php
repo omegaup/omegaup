@@ -297,7 +297,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys.forEach(y => x[y] = ({$conversionResult->conversionFunction})[x[y]); } return x; }"
+                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -312,7 +312,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys.forEach(y => x[y] = ({$conversionResult->conversionFunction})[x[y]); } return x; }"
+                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;

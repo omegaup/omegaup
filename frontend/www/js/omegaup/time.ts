@@ -152,3 +152,14 @@ export function parseDuration(str: string): number | null {
   }
   return Math.round(duration);
 }
+
+declare global {
+  interface DateConstructor {
+    // This is defined by sugar.js.
+    setLocale(locale: string): void;
+  }
+}
+
+export function setSugarLocale() {
+  Date.setLocale(T.locale);
+}
