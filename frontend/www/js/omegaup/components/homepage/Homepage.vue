@@ -43,7 +43,10 @@
         </div>
       </div>
       <div class="row align-items-center justify-content-around mt-3">
-        <div class="col-xs-10 col-md-6 mb-3 mb-md-0" v-if="coderOfTheMonth">
+        <div
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
+          v-if="rankTable.resultTotal"
+        >
           <omegaup-user-rank
             v-bind:page="rankTable.page"
             v-bind:length="rankTable.length"
