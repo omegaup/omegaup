@@ -1620,7 +1620,7 @@ export namespace messages {
           }[];
         }
       | null[];
-    pagerItems: { class: string; label: string; page: number }[];
+    pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationMyAssignedListRequest = { [key: string]: any };
   export type QualityNominationMyAssignedListResponse = {
@@ -1677,7 +1677,7 @@ export namespace messages {
           }[];
         }
       | null[];
-    pagerItems: { class: string; label: string; page: number }[];
+    pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
   export type QualityNominationResolveResponse = {};
