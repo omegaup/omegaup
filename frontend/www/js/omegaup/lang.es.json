@@ -647,6 +647,7 @@
 	"problemEditEditMarkdown": "Editar Redacci\u00f3n",
 	"problemEditEditProblem": "Editar Problema",
 	"problemEditEmailClarifications": "Recibir preguntas acerca del problema por correo",
+	"problemEditFormAllowUserAddTags": "Permitir agregar tags a los usuarios",
 	"problemEditFormAppearsAsPublic": "\u00bfEl problema ser\u00e1 de acceso p\u00fablico?",
 	"problemEditFormCreateProblem": "Crear problema",
 	"problemEditFormCustom": "Validador personalizado (validator.$lang$)",

@@ -344,7 +344,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem['ratio'] = floatval($row['ratio']);
             $problem['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problemObject,
-                true
+                /*$public=*/true,
+                /*$showUserTags=*/$row['allow_user_add_tags']
             );
             $problems[] = $problem;
         }
@@ -374,7 +375,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getTagsForProblem(
         \OmegaUp\DAO\VO\Problems $problem,
-        bool $public
+        bool $public,
+        bool $showUserTags
     ): array {
         $sql = 'SELECT
             t.name,
@@ -387,6 +389,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             pt.problem_id = ?';
         if ($public) {
             $sql .= ' AND pt.public = 1';
+        }
+        if (!$showUserTags) {
+            $sql .= ' AND pt.source <> \'voted\'';
         }
         $sql .= ';';
 

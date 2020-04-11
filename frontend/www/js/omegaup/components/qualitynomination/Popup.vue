@@ -58,7 +58,7 @@
                 >
               </div>
               <div class="form-group">
-                <label class="control-label">
+                <label class="control-label" v-if="canAddTags">
                   {{ T.qualityFormTags }}
                   <ul class="tag-select">
                     <li
@@ -244,6 +244,7 @@ export default class QualityNominationPopup extends Vue {
   @Prop({ default: false }) dismissed!: boolean;
   @Prop({ default: true }) dismissedBeforeAC!: boolean;
   @Prop({ default: true }) canNominateProblem!: boolean;
+  @Prop({ default: true }) canAddTags!: boolean;
   @Prop({
     default: () => [
       'problemTopic2Sat',
@@ -290,7 +291,7 @@ export default class QualityNominationPopup extends Vue {
     ],
   })
   possibleTags!: string[];
-  @Prop() problemAlias!: boolean;
+  @Prop() problemAlias!: string;
 
   T = T;
   currentView = 'content';
