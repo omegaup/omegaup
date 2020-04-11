@@ -2436,7 +2436,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the best users of the current month
      *
-     * @return null|list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
     public static function getTopCodersOfTheMonth(
         int $rowCount
@@ -2447,7 +2447,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CODERS_OF_THE_MONTH,
             "{$date}-{$rowCount}",
-            /** @return null|list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
+            /** @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
             function () use (
                 $date,
                 $rowCount
@@ -3485,12 +3485,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $category
         );
         $bestCoders = [];
-        if (!is_null($candidates)) {
-            foreach ($candidates as $candidate) {
-                /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
-                unset($candidate['user_id']);
-                $bestCoders[] = $candidate;
-            }
+        foreach ($candidates as $candidate) {
+            /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
+            unset($candidate['user_id']);
+            $bestCoders[] = $candidate;
         }
 
         $response = [

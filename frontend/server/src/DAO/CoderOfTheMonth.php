@@ -19,13 +19,13 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * time period.
      * category.
      *
-     * @return null|list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
+     * @return list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}>
      */
     public static function getCandidatesToCoderOfTheMonth(
         string $time,
         string $category = 'all',
         int $rowCount = 100
-    ): ?array {
+    ): array {
         $sql = "SELECT
             `c`.*,
             `i`.`username`,
@@ -61,14 +61,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         ";
 
         /** @var list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}> */
-        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$time, $category, $rowCount]
         );
-        if (empty($results)) {
-            return null;
-        }
-        return $results;
     }
 
     /**
