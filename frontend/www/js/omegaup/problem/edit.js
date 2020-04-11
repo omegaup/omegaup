@@ -640,6 +640,11 @@ OmegaUp.on('ready', function() {
         (problem.email_clarifications ? '1' : '0') +
         ']',
     ).attr('checked', 1);
+    $(
+      'input[name=allow_user_add_tags][value=' +
+        (problem.allow_user_add_tags ? '1' : '0') +
+        ']',
+    ).attr('checked', 1);
     problemSettings.validator = problem.settings.validator.name;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);

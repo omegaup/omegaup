@@ -290,7 +290,7 @@ export default class QualityNominationPopup extends Vue {
     ],
   })
   possibleTags!: string[];
-  @Prop() problemAlias!: boolean;
+  @Prop() problemAlias!: string;
 
   T = T;
   currentView = 'content';
