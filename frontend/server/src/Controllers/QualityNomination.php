@@ -928,7 +928,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if ($currentUserReviewer) {
                 $response['original_contents']['tags'] = \OmegaUp\DAO\Problems::getTagsForProblem(
                     $problem,
-                    false /* public */
+                    /*$public=*/false,
+                    $problem->allow_user_add_tags
                 );
             }
 

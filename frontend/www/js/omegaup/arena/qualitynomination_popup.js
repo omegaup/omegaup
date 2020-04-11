@@ -24,6 +24,7 @@ OmegaUp.on('ready', function() {
           dismissed: this.dismissed,
           dismissedBeforeAC: this.dismissedBeforeAC,
           canNominateProblem: this.canNominateProblem,
+          problemAlias: this.problemAlias,
         },
         on: {
           submit: function(ev) {
@@ -72,6 +73,7 @@ OmegaUp.on('ready', function() {
       dismissed: qualityPayload.dismissed,
       dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
       canNominateProblem: qualityPayload.can_nominate_problem,
+      problemAlias: qualityPayload.problem_alias,
     },
     components: {
       'qualitynomination-popup': qualitynomination_Popup,

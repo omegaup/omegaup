@@ -2316,6 +2316,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['order'] = $problem->order;
         $response['visibility'] = $problem->visibility;
         $response['email_clarifications'] = $problem->email_clarifications;
+        $response['allow_user_add_tags'] = $problem->allow_user_add_tags;
         $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
@@ -3562,9 +3563,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
+            $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
-                false
+                /*$public=*/false,
+                $problem->allow_user_add_tags
             );
             $addedProblems[] = $problemArray;
         }
@@ -3629,7 +3631,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
-                false
+                /*$public=*/false,
+                $problem->allow_user_add_tags
             );
             $addedProblems[] = $problemArray;
         }
@@ -4346,7 +4349,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
      *
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: non-empty-array<array-key, mixed>}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, ALLOW_TAGS: true, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: non-empty-array<array-key, mixed>}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4384,6 +4387,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'SELECTED_TAGS' => strval($r['selected_tags']),
                         'STATUS_ERROR' => $statusError,
                         'IS_UPDATE' => false,
+                        'ALLOW_TAGS' => true,
                         'payload' => array_merge(
                             [
                                 'timeLimit' => strval($r['time_limit']),
@@ -4427,6 +4431,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
+                'ALLOW_TAGS' => true,
                 'payload' => array_merge(
                     [
                         'timeLimit' => 1000,

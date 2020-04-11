@@ -647,6 +647,7 @@
 	"problemEditEditMarkdown": "Edit statement",
 	"problemEditEditProblem": "Edit problem",
 	"problemEditEmailClarifications": "Receive questions about the problem by email",
+	"problemEditFormAllowUserAddTags": "Allow showing user-suggested tags for this problem",
 	"problemEditFormAppearsAsPublic": "Allow public access to the problem",
 	"problemEditFormCreateProblem": "Create problem",
 	"problemEditFormCustom": "Custom validator (validator.$lang$)",
