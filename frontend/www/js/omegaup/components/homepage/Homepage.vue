@@ -110,22 +110,6 @@
         v-bind:image-to-right="true"
       ></omegaup-section>
     </div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-4">
-          <omegaup-common-social-media
-            v-if="enableSocialMediaResources"
-          ></omegaup-common-social-media>
-          <omegaup-common-recomended-material></omegaup-common-recomended-material>
-          <omegaup-contest-upcoming
-            v-bind:contests="upcomingContests"
-          ></omegaup-contest-upcoming>
-          <div class="panel panel-default">
-            <highcharts v-bind:options="chartOptions"></highcharts>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -141,10 +125,6 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rankv2.vue';
 import user_Rank from '../user/Rank.vue';
-
-import common_SocialMedia from '../common/SocialMedia.vue';
-import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
-import contest_Upcoming from '../contest/Upcoming.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
 
 @Component({
@@ -156,9 +136,6 @@ import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
-    'omegaup-common-social-media': common_SocialMedia,
-    'omegaup-common-recomended-material': common_RecomendedMaterial,
-    'omegaup-contest-upcoming': contest_Upcoming,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
     highcharts: Chart,
   },
@@ -170,9 +147,6 @@ export default class Homepage extends Vue {
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
-  @Prop() enableSocialMediaResources!: boolean;
-  @Prop() upcomingContests!: omegaup.Contest[];
-  @Prop() chartOptions!: Chart;
 
   T = T;
 }
