@@ -1,15 +1,15 @@
 <template>
   <!-- id-lint off -->
   <div
-    class="carousel slide testimonials-carousel"
+    class="carousel slide"
     data-ride="carousel"
     data-interval="8000"
-    id="testimonials"
+    id="testimonials-carousel-display"
   >
     <!-- id-lint off -->
     <ol class="carousel-indicators">
       <li
-        data-target=".testimonials-carousel"
+        data-target="#testimonials-carousel-display"
         v-bind:key="index"
         v-bind:data-slide-to="index"
         v-bind:class="{ active: !index }"
@@ -40,7 +40,7 @@
     </div>
     <a
       class="carousel-control-prev"
-      href="#testimonials"
+      href="#testimonials-carousel-display"
       role="button"
       data-slide="prev"
     >
@@ -49,7 +49,7 @@
     </a>
     <a
       class="carousel-control-next"
-      href="#testimonials"
+      href="#testimonials-carousel-display"
       role="button"
       data-slide="next"
     >
@@ -61,7 +61,7 @@
 
 <style lang="scss" scoped>
 .carousel-inner {
-  min-height: 200px;
+  min-height: 12rem;
 
   .carousel-item {
     blockquote.blockquote {

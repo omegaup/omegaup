@@ -1,14 +1,10 @@
 <template>
   <!-- id-lint off -->
-  <div
-    class="carousel slide main-carousel"
-    data-ride="carousel"
-    id="carousel-display"
-  >
+  <div class="carousel slide" data-ride="carousel" id="carousel-display">
     <!-- id-lint on -->
     <ol class="carousel-indicators">
       <li
-        data-target=".main-carousel"
+        data-target="#carousel-display"
         v-bind:key="index"
         v-bind:data-slide-to="index"
         v-bind:class="{ active: !index }"
