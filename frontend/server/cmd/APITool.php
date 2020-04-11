@@ -493,7 +493,8 @@ class APIGenerator {
                 ] = explode('=', $typeAlias);
                 $conversionResult = $this->typeMapper->convertTypeToTypeScript(
                     \Psalm\Type::parseString($typeExpansion),
-                    $typeAlias
+                    $typeAlias,
+                    [$typeAlias]
                 );
                 if (
                     isset($this->typeMapper->typeAliases[$typeName]) &&
