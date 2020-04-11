@@ -2,6 +2,7 @@
   <input
     class="typeahead form-control"
     ref="input"
+    autocomplete="off"
     v-on:change="onUpdateInput"
     v-bind:placeholder="placeholder"
     v-bind:name="name"
@@ -18,10 +19,10 @@ export default class Autocomplete extends Vue {
   @Prop() value!: string;
   @Prop() placeholder!: string;
   @Prop() name!: string;
-  @Prop() init!: Function;
+  @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {
-    this.init($(this.$el));
+    this.init($(<HTMLElement>this.$el));
   }
 
   @Emit('input')

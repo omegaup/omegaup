@@ -1,6 +1,11 @@
+import Vue from 'vue';
+
 import API from '../api.js';
 import * as api from '../api_transitional';
-import * as UI from '../ui';
+import arena_Runs from '../components/arena/Runs.vue';
+import * as ui from '../ui';
+
+import { runsStore } from './arena_transitional';
 
 export default class ArenaAdmin {
   constructor(arena) {
@@ -10,18 +15,52 @@ export default class ArenaAdmin {
     self.arena.problemsetAdmin = true;
 
     self.setUpPagers();
-    self.arena.runs.attach($('#runs table.runs'));
+    self.runsList = new Vue({
+      el: '#runs table.runs',
+      render: function(createElement) {
+        return createElement('omegaup-arena-runs', {
+          props: {
+            runs: runsStore.state.runs,
+            showContest: true,
+            showDetails: true,
+            showDisqualify: true,
+            showPager: true,
+            showProblem: true,
+            showRejudge: true,
+            showUser: true,
+          },
+          on: {
+            details: run => {
+              window.location.hash += `/show-run:${run.guid}`;
+            },
+            disqualify: run => {
+              api.Run.disqualify({ run_alias: run.guid })
+                .then(data => {
+                  run.type = 'disqualified';
+                  self.arena.updateRunFallback(run.guid);
+                })
+                .catch(ui.ignoreError);
+            },
+            'filter-changed': () => {
+              self.refreshRuns();
+            },
+            rejudge: run => {
+              api.Run.rejudge({ run_alias: run.guid, debug: false })
+                .then(data => {
+                  run.status = 'rejudging';
+                  self.arena.updateRunFallback(run.guid);
+                })
+                .catch(ui.ignoreError);
+            },
+          },
+        });
+      },
+      components: { 'omegaup-arena-runs': arena_Runs },
+    });
   }
 
   setUpPagers() {
     var self = this;
-
-    self.arena.runs.filter_verdict.subscribe(self.refreshRuns.bind(self));
-    self.arena.runs.filter_status.subscribe(self.refreshRuns.bind(self));
-    self.arena.runs.filter_language.subscribe(self.refreshRuns.bind(self));
-    self.arena.runs.filter_problem.subscribe(self.refreshRuns.bind(self));
-    self.arena.runs.filter_username.subscribe(self.refreshRuns.bind(self));
-    self.arena.runs.filter_offset.subscribe(self.refreshRuns.bind(self));
 
     $('.clarifpager .clarifpagerprev').on('click', function() {
       if (self.arena.clarificationsOffset > 0) {
@@ -80,15 +119,16 @@ export default class ArenaAdmin {
 
   refreshRuns() {
     var self = this;
+    const runsListComponent = self.runsList.$children[0];
 
     var options = {
-      offset: self.arena.runs.filter_offset() || 0,
-      rowcount: self.arena.runs.row_count,
-      verdict: self.arena.runs.filter_verdict() || undefined,
-      language: self.arena.runs.filter_language() || undefined,
-      username: self.arena.runs.filter_username() || undefined,
-      problem_alias: self.arena.runs.filter_problem() || undefined,
-      status: self.arena.runs.filter_status() || undefined,
+      offset: runsListComponent.filterOffset * runsListComponent.rowCount,
+      rowcount: runsListComponent.rowCount,
+      verdict: runsListComponent.filterVerdict || undefined,
+      language: runsListComponent.filterLanguage || undefined,
+      username: runsListComponent.filterUsername || undefined,
+      problem_alias: runsListComponent.filterProblem || undefined,
+      status: runsListComponent.filterStatus || undefined,
     };
 
     if (self.arena.options.onlyProblemAlias) {
@@ -96,22 +136,22 @@ export default class ArenaAdmin {
       options.problem_alias = self.arena.options.onlyProblemAlias;
       API.Problem.runs(options)
         .then(self.runsChanged.bind(self))
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
       API.Run.list(options)
         .then(self.runsChanged.bind(self))
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
     } else if (self.arena.options.contestAlias != null) {
       options.contest_alias = self.arena.options.contestAlias;
       API.Contest.runs(options)
         .then(self.runsChanged.bind(self))
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     } else {
       options.course_alias = self.arena.options.courseAlias;
       options.assignment_alias = self.arena.options.assignmentAlias;
       API.Course.runs(options)
         .then(self.runsChanged.bind(self))
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     }
   }
 
@@ -125,7 +165,7 @@ export default class ArenaAdmin {
         rowcount: self.arena.clarificationsRowcount,
       })
         .then(self.arena.clarificationsChange.bind(self.arena))
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     } else {
       self.arena.refreshClarifications();
     }
@@ -134,6 +174,7 @@ export default class ArenaAdmin {
   runsChanged(data) {
     var self = this;
 
+    runsStore.commit('clear');
     for (var i = 0; i < data.runs.length; i++) {
       self.arena.trackRun(data.runs[i]);
     }
