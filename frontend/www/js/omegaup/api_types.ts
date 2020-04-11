@@ -1768,7 +1768,6 @@ export namespace messages {
   };
   export type QualityNominationListRequest = { [key: string]: any };
   export type QualityNominationListResponse = {
-    totalRows: number;
     nominations:
       | {
           author: { name?: string; username: string };
@@ -1794,6 +1793,7 @@ export namespace messages {
           }[];
         }
       | null[];
+    pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationMyAssignedListRequest = { [key: string]: any };
   export type QualityNominationMyAssignedListResponse = {
@@ -1825,7 +1825,6 @@ export namespace messages {
   };
   export type QualityNominationMyListRequest = { [key: string]: any };
   export type QualityNominationMyListResponse = {
-    totalRows: number;
     nominations:
       | {
           author: { name?: string; username: string };
@@ -1851,6 +1850,7 @@ export namespace messages {
           }[];
         }
       | null[];
+    pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
   export type QualityNominationResolveResponse = {};
