@@ -2316,6 +2316,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['order'] = $problem->order;
         $response['visibility'] = $problem->visibility;
         $response['email_clarifications'] = $problem->email_clarifications;
+        $response['allow_user_add_tags'] = $problem->allow_user_add_tags;
         $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
