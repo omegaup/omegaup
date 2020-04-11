@@ -70,6 +70,46 @@
       </div>
     </div>
     <omegaup-testimonials></omegaup-testimonials>
+    <div class="container-lg py-5">
+      <omegaup-section
+        v-bind:title="T.homepageCompeteSectionTitle"
+        v-bind:description="T.homepageCompeteSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/arena/',
+        }"
+        v-bind:image-src="'/media/homepage/contests_section.svg'"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageTrainSectionTitle"
+        v-bind:description="T.homepageTrainSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/problem/',
+        }"
+        v-bind:image-src="'/media/homepage/problems_section.svg'"
+        v-bind:image-to-right="true"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageCreateSectionTitle"
+        v-bind:description="T.homepageCreateSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/problem/new/',
+        }"
+        v-bind:image-src="'/media/homepage/create_section.svg'"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageTeachSectionTitle"
+        v-bind:description="T.homepageTeachSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/course/',
+        }"
+        v-bind:image-src="'/media/homepage/courses_section.svg'"
+        v-bind:image-to-right="true"
+      ></omegaup-section>
+    </div>
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-4">
@@ -98,6 +138,7 @@ import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
+import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rankv2.vue';
 import user_Rank from '../user/Rank.vue';
 
@@ -114,6 +155,7 @@ import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
     'omegaup-school-rank': school_Rank,
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
+    'omegaup-section': homepage_Section,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
     'omegaup-contest-upcoming': contest_Upcoming,
