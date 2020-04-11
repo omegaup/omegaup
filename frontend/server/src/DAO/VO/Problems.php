@@ -39,6 +39,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'difficulty_histogram' => true,
         'quality_seal' => true,
         'show_diff' => true,
+        'allow_user_add_tags' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -172,6 +173,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         if (isset($data['show_diff'])) {
             $this->show_diff = strval(
                 $data['show_diff']
+            );
+        }
+        if (isset($data['allow_user_add_tags'])) {
+            $this->allow_user_add_tags = boolval(
+                $data['allow_user_add_tags']
             );
         }
     }
@@ -338,4 +344,11 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      * @var string
      */
     public $show_diff = 'none';
+
+    /**
+     * Bandera que sirve para indicar si un problema puede permitir que los usuarios agreguen tags.
+     *
+     * @var bool
+     */
+    public $allow_user_add_tags = true;
 }

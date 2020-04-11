@@ -142,7 +142,6 @@ export function problemContestTypeahead(
   problemList: { alias: string; title: string }[],
   cb?: CallbackType<{ alias: string; title: string }>,
 ) {
-  console.log(problemList);
   const substringMatcher = (
     query: string,
     syncResults: (results: { alias: string; title: string }[]) => void,

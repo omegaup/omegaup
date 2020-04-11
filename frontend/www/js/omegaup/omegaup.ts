@@ -135,6 +135,7 @@ export namespace omegaup {
     country?: string;
     state?: string;
     school?: string;
+    school_id?: number;
   }
 
   export interface Commit {
@@ -511,6 +512,8 @@ export namespace omegaup {
 
   export interface SchoolOfTheMonth extends SchoolsRank {
     time?: string;
+    country?: string;
+    state?: string;
   }
 
   export interface SchoolsRank {
@@ -685,14 +688,21 @@ export namespace omegaup {
     }
 
     remoteTime(
-      timestamp: number,
-      options: { server_sync?: boolean } = {},
-    ): Date {
-      options.server_sync =
-        typeof options.server_sync === 'undefined' ? true : options.server_sync;
+        timestamp: number|Date,
+        options: {server_sync?: boolean} = {},
+        ): Date {
+      options.server_sync = typeof options.server_sync === 'undefined' ?
+          true :
+          options.server_sync;
+      if (timestamp instanceof Date) {
+        return new Date(
+            this._realTime(timestamp.getTime()) +
+                (options.server_sync ? this._remoteDeltaTime || 0 : 0),
+        );
+      }
       return new Date(
-        this._realTime(timestamp) +
-          (options.server_sync ? this._remoteDeltaTime || 0 : 0),
+          this._realTime(timestamp) +
+              (options.server_sync ? this._remoteDeltaTime || 0 : 0),
       );
     }
 

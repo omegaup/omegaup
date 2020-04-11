@@ -381,7 +381,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the first school of the previous month or the one selected by
      * the mentor, if it has already been stored.
      *
-     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
+     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null, country: string|null, state: string|null}}
      */
     public static function getSchoolOfTheMonth(string $date = null): array {
         $firstDay = self::getCurrentMonthFirstDay($date);
@@ -418,11 +418,29 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $countryName = null;
+        $stateName = null;
+        $country = \OmegaUp\DAO\Countries::getByPK($school->country_id);
+
+        if (!is_null($country)) {
+            $countryName = $country->name;
+
+            $state = \OmegaUp\DAO\States::getByPK(
+                $country->country_id,
+                $school->state_id
+            );
+            if (!is_null($state)) {
+                $stateName = $state->name;
+            }
+        }
+
         return [
             'schoolinfo' => [
                 'school_id' => intval($school->school_id),
                 'name' => strval($school->name),
                 'country_id' => $school->country_id,
+                'country' => $countryName,
+                'state' => $stateName,
             ],
         ];
     }

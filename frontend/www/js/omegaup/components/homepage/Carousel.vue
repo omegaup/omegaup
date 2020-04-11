@@ -4,7 +4,7 @@
     <!-- id-lint on -->
     <ol class="carousel-indicators">
       <li
-        data-target=".carousel"
+        data-target="#carousel-display"
         v-bind:key="index"
         v-bind:data-slide-to="index"
         v-bind:class="{ active: !index }"
@@ -22,6 +22,7 @@
           v-bind:title="slide.title[T.locale]"
           v-bind:description="slide.description[T.locale]"
           v-bind:image-src="slide.image"
+          v-bind:button="slide.button"
         ></omegaup-homepage-slide>
       </div>
     </div>
@@ -49,8 +50,6 @@
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-$omegaup-primary--darker: #466aaf;
-$omegaup-primary--accent: #0275d8;
 .carousel {
   background: $omegaup-primary--darker;
   color: $white;

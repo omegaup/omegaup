@@ -13,7 +13,13 @@
           schoolOfTheMonth.name
         }}</a>
       </h5>
-      <!-- TODO: agregar más información (nombre del estado, país, total de usuarios...) -->
+      <!-- TODO: agregar más información (logo, total de usuarios...) -->
+      <div
+        class="card-text"
+        v-if="schoolOfTheMonth.state && schoolOfTheMonth.country"
+      >
+        {{ schoolOfTheMonth.state }}, {{ schoolOfTheMonth.country }}
+      </div>
     </div>
     <div class="card-footer">
       <a href="/schoolofthemonth/">{{ T.coderOfTheMonthFullList }}</a>

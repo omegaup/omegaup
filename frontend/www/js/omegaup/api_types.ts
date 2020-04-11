@@ -63,6 +63,145 @@ export namespace types {
       );
     }
 
+    export function ContestListPayload(
+      elementId: string,
+    ): types.ContestListPayload {
+      return (x => {
+        x.contests = (x => {
+          x.current = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.current);
+          x.future = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.future);
+          x.participating = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.participating);
+          x.past = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.past);
+          x.public = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.public);
+          x.recommended_current = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.recommended_current);
+          x.recommended_past = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.recommended_past);
+          return x;
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -109,6 +248,36 @@ export namespace types {
     navbarSection: string;
   }
 
+  export interface ContestListItem {
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    description: string;
+    finish_time: Date;
+    last_updated: Date;
+    original_finish_time: Date;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id: number;
+    start_time: Date;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestListPayload {
+    contests: {
+      current: types.ContestListItem[];
+      future: types.ContestListItem[];
+      participating: types.ContestListItem[];
+      past: types.ContestListItem[];
+      public: types.ContestListItem[];
+      recommended_current: types.ContestListItem[];
+      recommended_past: types.ContestListItem[];
+    };
+    isLogged: boolean;
+    query: string;
+  }
+
   export interface CourseAssignment {
     alias: string;
     assignment_type: string;
@@ -142,6 +311,7 @@ export namespace types {
   }
 
   export interface GraderStatus {
+    status: string;
     broadcaster_sockets: number;
     embedded_runner: boolean;
     queue: {
@@ -193,9 +363,47 @@ export namespace types {
     quality_seal: boolean;
   }
 
+  export interface ProblemsetProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface Progress {
     score: number;
     max_score: number;
+  }
+
+  export interface Run {
+    run_id: number;
+    guid: string;
+    language: string;
+    status: string;
+    verdict: string;
+    runtime: number;
+    penalty: number;
+    memory: number;
+    score: number;
+    contest_score: number;
+    judged_by?: string;
+    time: number;
+    submit_delay: number;
+    type?: string;
+    username: string;
+    alias: string;
+    country_id?: string;
+    contest_alias?: string;
   }
 
   export interface StatsPayload {
@@ -354,15 +562,16 @@ export namespace messages {
     window_length?: number;
   };
   export type ContestAdminListRequest = { [key: string]: any };
+  export type _ContestAdminListServerResponse = any;
   export type ContestAdminListResponse = {
     contests: {
       admission_mode: string;
       alias: string;
-      finish_time: number;
+      finish_time: Date;
       rerun_id: number;
       scoreboard_url: string;
       scoreboard_url_admin: string;
-      start_time: number;
+      start_time: Date;
       title: string;
     }[];
   };
@@ -457,13 +666,13 @@ export namespace messages {
       alias: string;
       contest_id: number;
       description: string;
-      finish_time: number;
-      last_updated: number;
+      finish_time: Date;
+      last_updated: Date;
       original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
       rerun_id: number;
-      start_time: number;
+      start_time: Date;
       title: string;
       window_length?: number;
     }[];
@@ -478,9 +687,9 @@ export namespace messages {
       contest_id: number;
       description: string;
       feedback: string;
-      finish_time: number;
+      finish_time: Date;
       languages?: string;
-      last_updated: number;
+      last_updated: Date;
       original_finish_time: Date;
       partial_score: number;
       penalty: number;
@@ -494,7 +703,7 @@ export namespace messages {
       scoreboard_url: string;
       scoreboard_url_admin: string;
       show_scoreboard_after: number;
-      start_time: number;
+      start_time: Date;
       submissions_gap: number;
       title: string;
       urgent: number;
@@ -511,9 +720,9 @@ export namespace messages {
       contest_id: number;
       description: string;
       feedback: string;
-      finish_time: number;
+      finish_time: Date;
       languages?: string;
-      last_updated: number;
+      last_updated: Date;
       original_finish_time: Date;
       partial_score: number;
       penalty: number;
@@ -527,7 +736,7 @@ export namespace messages {
       scoreboard_url: string;
       scoreboard_url_admin: string;
       show_scoreboard_after: number;
-      start_time: number;
+      start_time: Date;
       submissions_gap: number;
       title: string;
       urgent: number;
@@ -649,28 +858,7 @@ export namespace messages {
   export type ContestRoleRequest = { [key: string]: any };
   export type ContestRoleResponse = { admin: boolean };
   export type ContestRunsRequest = { [key: string]: any };
-  export type ContestRunsResponse = {
-    runs: {
-      run_id: number;
-      guid: string;
-      language: string;
-      status: string;
-      verdict: string;
-      runtime: number;
-      penalty: number;
-      memory: number;
-      score: number;
-      contest_score: number;
-      judged_by?: string;
-      time: number;
-      submit_delay: number;
-      type?: string;
-      username: string;
-      alias: string;
-      country_id?: string;
-      contest_alias?: string;
-    }[];
-  };
+  export type ContestRunsResponse = { runs: types.Run[] };
   export type ContestRunsDiffRequest = { [key: string]: any };
   export type ContestRunsDiffResponse = {
     diff: {
@@ -1463,22 +1651,7 @@ export namespace messages {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ProblemsetProblem[];
     problemset_id?: number;
     requests_user_information: string;
     scoreboard: number;
@@ -1959,15 +2132,16 @@ export namespace messages {
     }[];
   };
   export type UserContestStatsRequest = { [key: string]: any };
+  export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
     contests: {
       [key: string]: {
         data: {
           alias: string;
           title: string;
-          start_time: number;
-          finish_time: number;
-          last_updated: number;
+          start_time: Date;
+          finish_time: Date;
+          last_updated: Date;
         };
         place?: number;
       };

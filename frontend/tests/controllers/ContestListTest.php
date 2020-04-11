@@ -25,8 +25,14 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertNotNull($contestFromResponse);
 
-        $durationFromResponse = $contestFromResponse['finish_time'] - $contestFromResponse['start_time'];
-        $durationFromRequest = $contestData['request']['finish_time'] - $contestData['request']['start_time'];
+        $durationFromResponse = (
+            $contestFromResponse['finish_time']->time -
+            $contestFromResponse['start_time']->time
+        );
+        $durationFromRequest = (
+            $contestData['request']['finish_time'] -
+            $contestData['request']['start_time']
+        );
 
         $this->assertEquals($durationFromRequest, $durationFromResponse);
     }

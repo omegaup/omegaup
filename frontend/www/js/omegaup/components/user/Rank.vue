@@ -1,25 +1,21 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <template v-if="isIndex">
-        <h3 class="panel-title">
-          {{ UI.formatString(T.rankHeader, { count: length }) }}
-        </h3>
-      </template>
-      <template v-else="">
-        <h3 class="panel-title">
-          {{
-            UI.formatString(T.rankRangeHeader, {
+  <div class="card">
+    <h5 class="card-header">
+      {{
+        isIndex
+          ? UI.formatString(T.rankHeader, {
+              count: length,
+            })
+          : UI.formatString(T.rankRangeHeader, {
               lowCount: (page - 1) * length + 1,
               highCount: page * length,
             })
-          }}
-        </h3>
-      </template>
-    </div>
-    <div class="panel-body" v-if="!isIndex">
+      }}
+    </h5>
+    <div class="card-body" v-if="!isIndex">
       <label
         ><omegaup-autocomplete
+          class="form-control"
           v-bind:init="el => typeahead.userTypeahead(el)"
           v-model="searchedUsername"
         ></omegaup-autocomplete
@@ -29,8 +25,9 @@
       </button>
       <template v-if="page &gt; 1">
         <a class="prev" v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-        <span class="delimiter" v-show="shouldShowNextPage">|</span> </template
-      ><a
+        <span class="delimiter" v-show="shouldShowNextPage">|</span>
+      </template>
+      <a
         class="next"
         v-bind:href="nextPageFilter"
         v-show="shouldShowNextPage"
@@ -42,6 +39,7 @@
             {{ T.wordsSelectFilter }}
           </option>
           <option
+            v-bind:key="index"
             v-bind:value="key"
             v-for="(item, key, index) in availableFilters"
           >
@@ -58,43 +56,42 @@
         }}</span>
       </template>
     </div>
-    <table class="table">
+    <table class="table mb-0">
       <thead>
         <tr>
-          <th>#</th>
-          <th colspan="2">{{ T.wordsUser }}</th>
-          <th class="numericColumn">{{ T.rankScore }}</th>
-          <th class="numericColumn" v-if="!isIndex">{{ T.rankSolved }}</th>
+          <th scope="col">#</th>
+          <th scope="col">{{ T.wordsUser }}</th>
+          <th scope="col" class="text-right">{{ T.rankScore }}</th>
+          <th scope="col" class="text-right" v-if="!isIndex">
+            {{ T.rankSolved }}
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="rank in ranking">
-          <td>{{ rank.rank }}</td>
+        <tr v-bind:key="index" v-for="(rank, index) in ranking">
+          <th scope="row">{{ rank.rank }}</th>
           <td>
             <omegaup-countryflag
               v-bind:country="rank.country"
             ></omegaup-countryflag>
-          </td>
-          <td class="forcebreaks forcebreaks-top-5">
             <omegaup-user-username
               v-bind:classname="rank.classname"
               v-bind:linkify="true"
               v-bind:username="rank.username"
-            ></omegaup-user-username
-            ><span v-if="rank.name == null || length == 5">&nbsp;</span>
-            <span v-else=""
+            ></omegaup-user-username>
+            <span v-if="rank.name && length !== 5"
               ><br />
               {{ rank.name }}</span
             >
           </td>
-          <td class="numericColumn">{{ rank.score }}</td>
-          <td class="numericColumn" v-if="!isIndex">
+          <td class="text-right">{{ rank.score }}</td>
+          <td class="text-right" v-if="!isIndex">
             {{ rank.problemsSolvedUser }}
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer">
+    <div class="card-footer">
       <template v-if="isIndex">
         <a href="/rank/">{{ T.rankViewFull }}</a>
       </template>
@@ -118,13 +115,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { OmegaUp } from '../omegaup';
-import T from '../lang';
-import * as UI from '../ui';
-import * as typeahead from '../typeahead';
-import Autocomplete from './Autocomplete.vue';
-import CountryFlag from './CountryFlag.vue';
-import user_Username from './user/Username.vue';
+import { OmegaUp } from '../../omegaup';
+import T from '../../lang';
+import * as UI from '../../ui';
+import * as typeahead from '../../typeahead';
+import Autocomplete from '../Autocomplete.vue';
+import CountryFlag from '../CountryFlag.vue';
+import user_Username from '../user/Username.vue';
 
 interface Rank {
   country: string;
@@ -142,7 +139,7 @@ interface Rank {
     'omegaup-user-username': user_Username,
   },
 })
-export default class RankTable extends Vue {
+export default class UserRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() isIndex!: boolean;
