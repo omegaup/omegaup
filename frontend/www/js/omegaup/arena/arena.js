@@ -1712,7 +1712,6 @@ export class Arena {
               qualityPayload.dismissedBeforeAC;
             self.qualityNominationForm.canNominateProblem =
               qualityPayload.canNominateProblem;
-            self.qualityNominationForm.canAddTags = qualityPayload.canAddTags;
             self.qualityNominationForm.problemAlias =
               qualityPayload.problemAlias;
             return;
@@ -1732,7 +1731,6 @@ export class Arena {
                   dismissed: this.dismissed,
                   dismissedBeforeAC: this.dismissedBeforeAC,
                   canNominateProblem: this.canNominateProblem,
-                  canAddTags: this.canAddTags,
                   problemAlias: this.problemAlias,
                 },
                 on: {
@@ -1783,7 +1781,6 @@ export class Arena {
               dismissed: qualityPayload.dismissed,
               dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
               canNominateProblem: qualityPayload.can_nominate_problem,
-              canAddTags: qualityPayload.allow_user_add_tags,
               problemAlias: qualityPayload.problem_alias,
             },
             components: {

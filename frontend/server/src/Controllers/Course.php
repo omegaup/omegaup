@@ -2854,7 +2854,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                     )
                 )['language'];
                 $nominationStatus['can_nominate_problem'] = !is_null($r->user);
-                $nominationStatus['allow_user_add_tags'] = $problem['allow_user_add_tags'];
             }
             $problem['quality_payload'] = $nominationStatus;
             unset($problem['problem_id']);

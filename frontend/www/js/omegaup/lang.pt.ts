@@ -648,7 +648,7 @@ const translations: { [key: string]: string; } = {
   problemEditEditMarkdown: "Editar reda\u00e7\u00e3o",
   problemEditEditProblem: "Editar Problema",
   problemEditEmailClarifications: "Receba perguntas sobre o problema por e-mail",
-  problemEditFormAllowUserAddTags: "Permitir que o usu\u00e1rio adicione tags",
+  problemEditFormAllowUserAddTags: "Mostrar as tags sugeridas pelos usu\u00e1rios para este problema",
   problemEditFormAppearsAsPublic: "O problema ser\u00e1 acess\u00edvel ao p\u00fablico?",
   problemEditFormCreateProblem: "Criar problema",
   problemEditFormCustom: "Validador Personalizado (validador.$lang$)",

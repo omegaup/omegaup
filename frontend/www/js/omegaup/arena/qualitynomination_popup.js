@@ -24,7 +24,6 @@ OmegaUp.on('ready', function() {
           dismissed: this.dismissed,
           dismissedBeforeAC: this.dismissedBeforeAC,
           canNominateProblem: this.canNominateProblem,
-          canAddTags: this.canAddTags,
           problemAlias: this.problemAlias,
         },
         on: {
@@ -74,7 +73,6 @@ OmegaUp.on('ready', function() {
       dismissed: qualityPayload.dismissed,
       dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
       canNominateProblem: qualityPayload.can_nominate_problem,
-      canAddTags: qualityPayload.allow_user_add_tags,
       problemAlias: qualityPayload.problem_alias,
     },
     components: {
