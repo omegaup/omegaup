@@ -72,6 +72,7 @@
         </div>
       </div>
     </div>
+    <omegaup-testimonials></omegaup-testimonials>
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-4">
@@ -99,6 +100,7 @@ import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
+import homepage_Testimonials from './Testimonials.vue';
 import school_Rank from '../schools/Rankv2.vue';
 import user_Rank from '../user/Rank.vue';
 
@@ -114,6 +116,7 @@ import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
     'omegaup-school-of-the-month': homepage_SchoolOfTheMonth,
     'omegaup-school-rank': school_Rank,
     'omegaup-user-rank': user_Rank,
+    'omegaup-testimonials': homepage_Testimonials,
     'omegaup-common-social-media': common_SocialMedia,
     'omegaup-common-recomended-material': common_RecomendedMaterial,
     'omegaup-contest-upcoming': contest_Upcoming,
