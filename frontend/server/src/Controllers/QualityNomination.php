@@ -792,13 +792,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $response['totalRows'],
             $rowCount,
             $offset,
-            5,
-            []
+            /*$adjacent=*/5,
+            /*$params=*/[]
         );
 
         return [
             'nominations' => $response['nominations'],
-            'pagerItems' => $pagerItems,
+            'pager_items' => $pagerItems,
         ];
     }
 
@@ -867,13 +867,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $response['totalRows'],
             $rowCount,
             $offset,
-            5,
-            []
+            /*$adjacent=*/5,
+            /*$params=*/[]
         );
 
         return [
             'nominations' => $response['nominations'],
-            'pagerItems' => $pagerItems,
+            'pager_items' => $pagerItems,
         ];
     }
 
@@ -1051,8 +1051,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $length,
             $page ?: 1,
             '/nomination/',
-            5,
-            []
+            /*$adjacent=*/5,
+            /*$params=*/[]
         );
 
         return [
@@ -1061,8 +1061,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'page' => $page,
                     'length' => $length,
                     'myView' => false,
-                    'nominations' => $response['nominations'],
-                    'pagerItems' => $pagerItems,
                 ],
             ],
             'template' => 'quality.nomination.list.tpl',

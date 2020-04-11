@@ -19,7 +19,7 @@ OmegaUp.on('ready', function() {
           pagerItems: this.pagerItems,
         },
         on: {
-          'go-to-page': pageNumber => {
+          goToPage: pageNumber => {
             if (pageNumber > 0) {
               showNominations(pageNumber);
             }
@@ -29,7 +29,6 @@ OmegaUp.on('ready', function() {
     },
     data: {
       nominations: [],
-      pagerItems: payload.pagerItems,
     },
     components: {
       'omegaup-qualitynomination-list': qualitynomination_List,
@@ -44,7 +43,7 @@ OmegaUp.on('ready', function() {
       })
         .then(data => {
           nominationsList.nominations = data.nominations;
-          nominationsList.pagerItems = data.pagerItems;
+          nominationsList.pagerItems = data.pager_items;
           nominationsList.pages = pageNumber;
         })
         .catch(UI.apiError);
@@ -55,7 +54,7 @@ OmegaUp.on('ready', function() {
       })
         .then(data => {
           nominationsList.nominations = data.nominations;
-          nominationsList.pagerItems = data.pagerItems;
+          nominationsList.pagerItems = data.pager_items;
           nominationsList.pages = pageNumber;
         })
         .catch(UI.apiError);
