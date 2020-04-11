@@ -8,6 +8,7 @@
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
+ * @psalm-type Run=array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -3818,7 +3819,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
      *
-     * @return array{runs: list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>}
+     * @return array{runs: list<Run>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Authenticate request

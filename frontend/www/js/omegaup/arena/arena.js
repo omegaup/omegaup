@@ -7,6 +7,7 @@ import notification_Clarifications from '../components/notification/Clarificatio
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
+import arena_Runs from '../components/arena/Runs.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
@@ -19,6 +20,8 @@ import * as typeahead from '../typeahead';
 import Vue from 'vue';
 import * as ko from 'knockout';
 import * as secureBindingsProvider from 'knockout-secure-binding';
+
+import { runsStore } from './arena_transitional';
 
 export { ArenaAdmin };
 
@@ -2320,6 +2323,7 @@ export class Arena {
 
   trackRun(run) {
     let self = this;
+    runsStore.commit('addRun', run);
     self.runs.trackRun(run);
     if (run.username == OmegaUp.username) {
       self.myRuns.trackRun(run);
