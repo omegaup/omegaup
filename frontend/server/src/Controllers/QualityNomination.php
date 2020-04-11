@@ -1039,22 +1039,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['length']
         );
 
-        $response = \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */ null,
-            /* assignee */ null,
-            $page,
-            $length
-        );
-
-        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
-            $response['totalRows'],
-            $length,
-            $page ?: 1,
-            '/nomination/',
-            /*$adjacent=*/5,
-            /*$params=*/[]
-        );
-
         return [
             'smartyProperties' => [
                 'payload' => [
