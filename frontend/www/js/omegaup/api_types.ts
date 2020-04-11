@@ -311,6 +311,7 @@ export namespace types {
   }
 
   export interface GraderStatus {
+    status: string;
     broadcaster_sockets: number;
     embedded_runner: boolean;
     queue: {
@@ -362,9 +363,47 @@ export namespace types {
     quality_seal: boolean;
   }
 
+  export interface ProblemsetProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface Progress {
     score: number;
     max_score: number;
+  }
+
+  export interface Run {
+    run_id: number;
+    guid: string;
+    language: string;
+    status: string;
+    verdict: string;
+    runtime: number;
+    penalty: number;
+    memory: number;
+    score: number;
+    contest_score: number;
+    judged_by?: string;
+    time: number;
+    submit_delay: number;
+    type?: string;
+    username: string;
+    alias: string;
+    country_id?: string;
+    contest_alias?: string;
   }
 
   export interface StatsPayload {
@@ -819,28 +858,7 @@ export namespace messages {
   export type ContestRoleRequest = { [key: string]: any };
   export type ContestRoleResponse = { admin: boolean };
   export type ContestRunsRequest = { [key: string]: any };
-  export type ContestRunsResponse = {
-    runs: {
-      run_id: number;
-      guid: string;
-      language: string;
-      status: string;
-      verdict: string;
-      runtime: number;
-      penalty: number;
-      memory: number;
-      score: number;
-      contest_score: number;
-      judged_by?: string;
-      time: number;
-      submit_delay: number;
-      type?: string;
-      username: string;
-      alias: string;
-      country_id?: string;
-      contest_alias?: string;
-    }[];
-  };
+  export type ContestRunsResponse = { runs: types.Run[] };
   export type ContestRunsDiffRequest = { [key: string]: any };
   export type ContestRunsDiffResponse = {
     diff: {
@@ -1633,22 +1651,7 @@ export namespace messages {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ProblemsetProblem[];
     problemset_id?: number;
     requests_user_information: string;
     scoreboard: number;

@@ -1118,9 +1118,9 @@ Returns all runs for a contest
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                              |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ run_id: number; guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: number; submit_delay: number; type: string; username: string; alias: string; country_id: string; contest_alias: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/contest/runsDiff/`
 
@@ -3099,40 +3099,40 @@ and the number of solutions already seen
 
 ### Returns
 
-| Name                        | Type                                                                                                                                                                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`                     | `boolean`                                                                                                                                                                                                                                                   |
-| `admission_mode`            | `string`                                                                                                                                                                                                                                                    |
-| `alias`                     | `string`                                                                                                                                                                                                                                                    |
-| `assignment_type`           | `string`                                                                                                                                                                                                                                                    |
-| `contest_alias`             | `string`                                                                                                                                                                                                                                                    |
-| `description`               | `string`                                                                                                                                                                                                                                                    |
-| `director`                  | `string|dao.Identities`                                                                                                                                                                                                                                     |
-| `exists`                    | `boolean`                                                                                                                                                                                                                                                   |
-| `feedback`                  | `string`                                                                                                                                                                                                                                                    |
-| `finish_time`               | `number`                                                                                                                                                                                                                                                    |
-| `languages`                 | `string[]`                                                                                                                                                                                                                                                  |
-| `name`                      | `string`                                                                                                                                                                                                                                                    |
-| `needs_basic_information`   | `boolean`                                                                                                                                                                                                                                                   |
-| `opened`                    | `boolean`                                                                                                                                                                                                                                                   |
-| `original_contest_alias`    | `string`                                                                                                                                                                                                                                                    |
-| `original_problemset_id`    | `number`                                                                                                                                                                                                                                                    |
-| `partial_score`             | `boolean`                                                                                                                                                                                                                                                   |
-| `penalty`                   | `number`                                                                                                                                                                                                                                                    |
-| `penalty_calc_policy`       | `string`                                                                                                                                                                                                                                                    |
-| `penalty_type`              | `string`                                                                                                                                                                                                                                                    |
-| `points_decay_factor`       | `number`                                                                                                                                                                                                                                                    |
-| `problems`                  | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; problem_id: number; submissions: number; title: string; version: string; visibility: number; visits: number; }[]` |
-| `problemset_id`             | `number`                                                                                                                                                                                                                                                    |
-| `requests_user_information` | `string`                                                                                                                                                                                                                                                    |
-| `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
-| `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
-| `start_time`                | `number`                                                                                                                                                                                                                                                    |
-| `submission_deadline`       | `number`                                                                                                                                                                                                                                                    |
-| `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
-| `title`                     | `string`                                                                                                                                                                                                                                                    |
-| `users`                     | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]`                                                                                                                                    |
-| `window_length`             | `number`                                                                                                                                                                                                                                                    |
+| Name                        | Type                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `admin`                     | `boolean`                                                                                                                |
+| `admission_mode`            | `string`                                                                                                                 |
+| `alias`                     | `string`                                                                                                                 |
+| `assignment_type`           | `string`                                                                                                                 |
+| `contest_alias`             | `string`                                                                                                                 |
+| `description`               | `string`                                                                                                                 |
+| `director`                  | `string|dao.Identities`                                                                                                  |
+| `exists`                    | `boolean`                                                                                                                |
+| `feedback`                  | `string`                                                                                                                 |
+| `finish_time`               | `number`                                                                                                                 |
+| `languages`                 | `string[]`                                                                                                               |
+| `name`                      | `string`                                                                                                                 |
+| `needs_basic_information`   | `boolean`                                                                                                                |
+| `opened`                    | `boolean`                                                                                                                |
+| `original_contest_alias`    | `string`                                                                                                                 |
+| `original_problemset_id`    | `number`                                                                                                                 |
+| `partial_score`             | `boolean`                                                                                                                |
+| `penalty`                   | `number`                                                                                                                 |
+| `penalty_calc_policy`       | `string`                                                                                                                 |
+| `penalty_type`              | `string`                                                                                                                 |
+| `points_decay_factor`       | `number`                                                                                                                 |
+| `problems`                  | `types.ProblemsetProblem[]`                                                                                              |
+| `problemset_id`             | `number`                                                                                                                 |
+| `requests_user_information` | `string`                                                                                                                 |
+| `scoreboard`                | `number`                                                                                                                 |
+| `show_scoreboard_after`     | `boolean`                                                                                                                |
+| `start_time`                | `number`                                                                                                                 |
+| `submission_deadline`       | `number`                                                                                                                 |
+| `submissions_gap`           | `number`                                                                                                                 |
+| `title`                     | `string`                                                                                                                 |
+| `users`                     | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]` |
+| `window_length`             | `number`                                                                                                                 |
 
 ## `/api/problemset/scoreboard/`
 
