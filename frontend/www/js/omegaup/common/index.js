@@ -8,15 +8,16 @@ OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let coderOfTheMonthData = null;
   const ranking = [];
-  for (const user of payload.rankTable.rank) {
-    ranking.add({
-      rank: user.ranking,
-      country: user.country_id,
-      username: user.username,
-      classname: user.classname,
-      name: user.name,
-      score: user.score,
-      problemsSolvedUser: 0,
+  if (payload.userRank) {
+    payload.userRank.forEach((user, index) => {
+      ranking.add({
+        rank: index + 1,
+        country: user.country_id,
+        username: user.username,
+        classname: user.classname,
+        score: user.score,
+        problems_solved: user.problems_solved,
+      });
     });
   }
   const runsChart = payload.runsChartPayload;
@@ -53,7 +54,7 @@ OmegaUp.on('ready', function() {
         availableFilters: [],
         filter: '',
         ranking: ranking,
-        resultTotal: payload.rankTable.total,
+        resultTotal: ranking.length,
       },
       schoolsRank: {
         page: 1,
