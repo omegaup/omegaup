@@ -21,9 +21,14 @@ import Vue from 'vue';
 import * as ko from 'knockout';
 import * as secureBindingsProvider from 'knockout-secure-binding';
 
-import { runsStore } from './arena_transitional';
+import {
+  runsStore,
+  EphemeralGrader,
+  EventsSocket,
+  GetOptionsFromLocation,
+} from './arena_transitional';
 
-export { ArenaAdmin };
+export { ArenaAdmin, GetOptionsFromLocation };
 
 // TODO(#3456): Remove this once Knockout is gone.
 OmegaUp.on('ready', function() {
@@ -67,189 +72,6 @@ let ScoreboardColors = [
   '#8144D6',
   '#CD35D3',
 ];
-
-export function GetOptionsFromLocation(arenaLocation) {
-  let options = {
-    isLockdownMode: false,
-    isInterview: false,
-    isPractice: false,
-    isOnlyProblem: false,
-    disableClarifications: false,
-    disableSockets: false,
-    contestAlias: null,
-    scoreboardToken: null,
-    shouldShowFirstAssociatedIdentityRunWarning: false,
-    payload: {},
-  };
-
-  if ($('body').hasClass('lockdown')) {
-    options.isLockdownMode = true;
-    window.onbeforeunload = function(e) {
-      let dialogText = T.lockdownMessageWarning;
-      e.returnValue = dialogText;
-      return e.returnValue;
-    };
-  }
-
-  if (arenaLocation.pathname.indexOf('/practice') !== -1) {
-    options.isPractice = true;
-  }
-
-  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
-    options.isOnlyProblem = true;
-    options.onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(
-      arenaLocation.pathname,
-    )[1];
-  } else {
-    let match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
-    if (match) {
-      options.contestAlias = match[1];
-    }
-  }
-
-  if (arenaLocation.search.indexOf('ws=off') !== -1) {
-    options.disableSockets = true;
-  }
-  const elementPayload = document.getElementById('payload');
-  if (elementPayload !== null) {
-    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload !== null) {
-      options.shouldShowFirstAssociatedIdentityRunWarning =
-        payload.shouldShowFirstAssociatedIdentityRunWarning || false;
-      options.preferredLanguage = payload.preferred_language || null;
-      options.payload = payload;
-    }
-  }
-  return options;
-}
-
-class EventsSocket {
-  constructor(uri, arena) {
-    let self = this;
-
-    self.uri = uri;
-    self.arena = arena;
-    self.socket = null;
-    self.socketKeepalive = null;
-    self.promise = new Promise((accept, reject) => {
-      self.promiseAccept = accept;
-      self.promiseReject = reject;
-    });
-    self.retries = 10;
-  }
-
-  connect() {
-    let self = this;
-
-    self.shouldRetry = false;
-    try {
-      self.socket = new WebSocket(self.uri, 'com.omegaup.events');
-    } catch (e) {
-      self.onclose(e);
-      return;
-    }
-
-    self.socket.onmessage = self.onmessage.bind(self);
-    self.socket.onopen = self.onopen.bind(self);
-    self.socket.onclose = self.onclose.bind(self);
-
-    return self.promise;
-  }
-
-  onmessage(message) {
-    let self = this;
-    let data = JSON.parse(message.data);
-
-    if (data.message == '/run/update/') {
-      data.run.time = OmegaUp.remoteTime(data.run.time * 1000);
-      self.arena.updateRun(data.run);
-    } else if (data.message == '/clarification/update/') {
-      if (!self.arena.options.disableClarifications) {
-        data.clarification.time = OmegaUp.remoteTime(
-          data.clarification.time * 1000,
-        );
-        self.arena.updateClarification(data.clarification);
-      }
-    } else if (data.message == '/scoreboard/update/') {
-      if (self.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (self.arena.options.originalContestAlias == null) return;
-        self.arena.virtualRankingChange(data.scoreboard);
-        return;
-      }
-      self.arena.rankingChange(data.scoreboard);
-    }
-  }
-
-  onopen() {
-    let self = this;
-    self.shouldRetry = true;
-    self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
-    self.socketKeepalive = setInterval(function() {
-      self.socket.send('"ping"');
-    }, 30000);
-  }
-
-  onclose(e) {
-    let self = this;
-    self.socket = null;
-    if (self.socketKeepalive) {
-      clearInterval(self.socketKeepalive);
-      self.socketKepalive = null;
-    }
-    if (self.shouldRetry && self.retries > 0) {
-      self.retries--;
-      self.arena.elements.socketStatus.html('↻').css('color', '#888');
-      setTimeout(self.connect.bind(self), Math.random() * 15000);
-      return;
-    }
-
-    self.arena.elements.socketStatus.html('✗').css('color', '#800');
-    self.promiseReject(e);
-  }
-}
-class EphemeralGrader {
-  constructor() {
-    let self = this;
-
-    self.ephemeralEmbeddedGraderElement = document.getElementById(
-      'ephemeral-embedded-grader',
-    );
-    self.messageQueue = [];
-    self.loaded = false;
-
-    if (!self.ephemeralEmbeddedGraderElement) return;
-
-    self.ephemeralEmbeddedGraderElement.onload = () => {
-      self.loaded = true;
-      while (self.messageQueue.length > 0) {
-        self._sendInternal(self.messageQueue.shift());
-      }
-    };
-  }
-
-  send(method, ...params) {
-    let self = this;
-    let message = {
-      method: method,
-      params: params,
-    };
-
-    if (!self.loaded) {
-      self.messageQueue.push(message);
-      return;
-    }
-    self._sendInternal(message);
-  }
-
-  _sendInternal(message) {
-    let self = this;
-
-    self.ephemeralEmbeddedGraderElement.contentWindow.postMessage(
-      message,
-      window.location.origin + '/grader/ephemeral/embedded/',
-    );
-  }
-}
 
 export class Arena {
   constructor(options) {
