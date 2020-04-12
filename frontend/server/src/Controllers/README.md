@@ -658,9 +658,9 @@ Get clarifications of a contest
 
 ### Returns
 
-| Name             | Type                                                                                                                                                       |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `clarifications` | `{ answer: string; author: string; clarification_id: number; message: string; problem_alias: string; public: boolean; receiver: string; time: number; }[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/contest/clone/`
 
@@ -3152,14 +3152,9 @@ and the number of solutions already seen
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `finish_time` | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place: number; problems: { alias: string; penalty: number; percent: number; place: number; points: number; run_details: { cases: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `time`        | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+```typescript
+types.Scoreboard;
+```
 
 ## `/api/problemset/scoreboardEvents/`
 

@@ -234,6 +234,17 @@ export namespace types {
     badge: types.Badge;
   }
 
+  export interface Clarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: number;
+  }
+
   export interface CoderOfTheMonth {
     category: string;
     classname: string;
@@ -423,6 +434,50 @@ export namespace types {
     contest_alias?: string;
   }
 
+  export interface Scoreboard {
+    finish_time?: number;
+    problems: { alias: string; order: number }[];
+    ranking: types.ScoreboardRankingEntry[];
+    start_time: number;
+    time: number;
+    title: string;
+  }
+
+  export interface ScoreboardRankingEntry {
+    country?: string;
+    is_invited: boolean;
+    name?: string;
+    place: number;
+    problems: {
+      alias: string;
+      penalty: number;
+      percent: number;
+      place: number;
+      points: number;
+      run_details: {
+        cases: {
+          contest_score: number;
+          max_score: number;
+          meta: { status: string };
+          name?: string;
+          out_diff: string;
+          score: number;
+          verdict: string;
+        }[];
+        details: {
+          groups: {
+            cases: {
+              meta: { memory: number; time: number; wall_time: number };
+            }[];
+          }[];
+        };
+      };
+      runs: number;
+    }[];
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
   export interface StatsPayload {
     alias: string;
     entity_type: string;
@@ -601,16 +656,7 @@ export namespace messages {
   export type ContestArbitrateRequestResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
   export type ContestClarificationsResponse = {
-    clarifications: {
-      answer?: string;
-      author: string;
-      clarification_id: number;
-      message: string;
-      problem_alias: string;
-      public: boolean;
-      receiver?: string;
-      time: number;
-    }[];
+    clarifications: types.Clarification[];
   };
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
@@ -1688,47 +1734,7 @@ export namespace messages {
     window_length?: number;
   };
   export type ProblemsetScoreboardRequest = { [key: string]: any };
-  export type ProblemsetScoreboardResponse = {
-    finish_time?: number;
-    problems: { alias: string; order: number }[];
-    ranking: {
-      country?: string;
-      is_invited: boolean;
-      name?: string;
-      place: number;
-      problems: {
-        alias: string;
-        penalty: number;
-        percent: number;
-        place: number;
-        points: number;
-        run_details: {
-          cases: {
-            contest_score: number;
-            max_score: number;
-            meta: { status: string };
-            name?: string;
-            out_diff: string;
-            score: number;
-            verdict: string;
-          }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
-        };
-        runs: number;
-      }[];
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
-    start_time: number;
-    time: number;
-    title: string;
-  };
+  export type ProblemsetScoreboardResponse = types.Scoreboard;
   export type ProblemsetScoreboardEventsRequest = { [key: string]: any };
   export type ProblemsetScoreboardEventsResponse = {
     events: {
