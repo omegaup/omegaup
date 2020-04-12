@@ -71,14 +71,14 @@ def test_create_problem(driver):
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
-        runs_before_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_before_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_after_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 

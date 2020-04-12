@@ -62,7 +62,7 @@ def test_user_ranking_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'button.details'))).click()
+                 'button[data-run-details]'))).click()
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
@@ -165,7 +165,7 @@ def test_create_identities_for_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'button.details'))).click()
+                 'button[data-run-details]'))).click()
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url

@@ -69,6 +69,31 @@ export const runsStore = new Vuex.Store<RunsState>({
   },
 });
 
+export const myRunsStore = new Vuex.Store<RunsState>({
+  state: {
+    runs: [],
+    index: {},
+  },
+  mutations: {
+    addRun(state, run: types.Run) {
+      if (state.index.hasOwnProperty(run.guid)) {
+        Vue.set(
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
+        return;
+      }
+      Vue.set(state.index, run.guid, state.runs.length);
+      state.runs.push(run);
+    },
+    clear(state) {
+      state.runs.splice(0);
+      state.index = {};
+    },
+  },
+});
+
 export function GetOptionsFromLocation(arenaLocation: URL): ArenaOptions {
   const options: ArenaOptions = {
     isLockdownMode: false,

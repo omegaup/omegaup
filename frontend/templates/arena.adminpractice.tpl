@@ -3,7 +3,7 @@
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>
 			<div id="runs">
-{include file='arena.runs.tpl' show_pager=true show_user=true show_problem=true show_rejudge=true show_details=true show_contest=true inline}
+				<table class="runs"></table>
 			</div>
 		</div>
 		<div id="overlay">

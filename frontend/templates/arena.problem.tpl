@@ -74,7 +74,7 @@
         <div id="qualitynomination-popup"></div>
         {js_include entrypoint="qualitynomination_popup"}
       </div>
-      {include file='arena.runs.tpl' show_submit=true show_details=true inline}
+      <table class="runs"></table>
       {if isset($histograms)}
         <script type="text/json" id="histograms">{$histograms|json_encode}</script>
       {else}
@@ -107,7 +107,7 @@
   </div>
   {if $problem_admin}
     <div id="runs" class="tab">
-      {include file='arena.runs.tpl' show_pager=true show_user=true show_rejudge=true show_details=true inline}
+      <table class="runs"></table>
     </div>
   {/if}
   {include file='arena.clarification_list.tpl' contest=false inline}
