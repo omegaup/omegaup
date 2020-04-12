@@ -7,19 +7,14 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let coderOfTheMonthData = null;
-  const ranking = [];
-  if (payload.userRank) {
-    payload.userRank.forEach((user, index) => {
-      ranking.add({
-        rank: index + 1,
-        country: user.country_id,
-        username: user.username,
-        classname: user.classname,
-        score: user.score,
-        problems_solved: user.problems_solved,
-      });
-    });
-  }
+  const ranking = payload.userRank.map((user, index) => ({
+    rank: index + 1,
+    country: user.country_id,
+    username: user.username,
+    classname: user.classname,
+    score: user.score,
+    problems_solved: user.problems_solved,
+  }));
   const runsChart = payload.runsChartPayload;
   const minY = runsChart.total.length === 0 ? 0 : runsChart.total[0] / 2.0;
   if (payload.coderOfTheMonthData !== null) {

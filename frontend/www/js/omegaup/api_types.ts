@@ -234,6 +234,23 @@ export namespace types {
     badge: types.Badge;
   }
 
+  export interface CoderOfTheMonth {
+    category: string;
+    classname: string;
+    coder_of_the_month_id: number;
+    country_id: string;
+    description?: string;
+    interview_url?: string;
+    problems_solved: number;
+    ranking: number;
+    school_id?: number;
+    score: number;
+    selected_by?: number;
+    time: string;
+    user_id: number;
+    username: string;
+  }
+
   export interface CommonPayload {
     omegaUpLockDown: boolean;
     bootstrap4: boolean;
