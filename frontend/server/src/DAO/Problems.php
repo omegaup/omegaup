@@ -37,11 +37,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     BIT_AND(pt.public) as public
                 FROM
                     Problems_Tags pt
+                INNER JOIN
+                    Problems pp
+                ON
+                    pp.problem_id = pt.problem_id
                 WHERE pt.tag_id IN (
                     SELECT t.tag_id
                     FROM Tags t
                     WHERE t.name in ($placeholders)
                 )
+                AND (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
                 GROUP BY
                     pt.problem_id
                 {$havingClause}
@@ -344,7 +349,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem['ratio'] = floatval($row['ratio']);
             $problem['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problemObject,
-                true
+                /*$public=*/true,
+                /*$showUserTags=*/$row['allow_user_add_tags']
             );
             $problems[] = $problem;
         }
@@ -374,7 +380,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getTagsForProblem(
         \OmegaUp\DAO\VO\Problems $problem,
-        bool $public
+        bool $public,
+        bool $showUserTags
     ): array {
         $sql = 'SELECT
             t.name,
@@ -387,6 +394,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             pt.problem_id = ?';
         if ($public) {
             $sql .= ' AND pt.public = 1';
+        }
+        if (!$showUserTags) {
+            $sql .= ' AND pt.source <> \'voted\'';
         }
         $sql .= ';';
 

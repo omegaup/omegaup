@@ -15,7 +15,7 @@
     <div class="container-lg py-5">
       <div class="row align-items-center justify-content-around">
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonthFemale"
         >
           <omegaup-coder-of-the-month
@@ -24,7 +24,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonth"
         >
           <omegaup-coder-of-the-month
@@ -33,7 +33,7 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-md-6 col-lg mb-3 mb-lg-0 customized-card"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="schoolOfTheMonth"
         >
           <omegaup-school-of-the-month
@@ -42,49 +42,76 @@
           </omegaup-school-of-the-month>
         </div>
       </div>
-    </div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-8">
-          <omegaup-common-welcome></omegaup-common-welcome>
-          <div class="row">
-            <div class="col-md-6">
-              <omegaup-rank-table
-                v-bind:page="rankTable.page"
-                v-bind:length="rankTable.length"
-                v-bind:isIndex="rankTable.isIndex"
-                v-bind:isLogged="rankTable.isLogged"
-                v-bind:availableFilters="rankTable.availableFilters"
-                v-bind:filter="rankTable.filter"
-                v-bind:ranking="rankTable.ranking"
-                v-bind:resultTotal="rankTable.resultTotal"
-              ></omegaup-rank-table>
-            </div>
-            <div class="col-md-6" v-if="schoolsRank !== null">
-              <omegaup-schools-rank
-                v-bind:page="schoolsRank.page"
-                v-bind:length="schoolsRank.length"
-                v-bind:showHeader="schoolsRank.showHeader"
-                v-bind:totalRows="schoolsRank.totalRows"
-                v-bind:rank="schoolsRank.rank"
-              ></omegaup-schools-rank>
-            </div>
-          </div>
+      <div class="row align-items-center justify-content-around mt-3">
+        <div
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
+          v-if="rankTable.resultTotal"
+        >
+          <omegaup-user-rank
+            v-bind:page="rankTable.page"
+            v-bind:length="rankTable.length"
+            v-bind:isIndex="rankTable.isIndex"
+            v-bind:isLogged="rankTable.isLogged"
+            v-bind:availableFilters="rankTable.availableFilters"
+            v-bind:filter="rankTable.filter"
+            v-bind:ranking="rankTable.ranking"
+            v-bind:resultTotal="rankTable.resultTotal"
+          ></omegaup-user-rank>
         </div>
-
-        <div class="col-md-4">
-          <omegaup-common-social-media
-            v-if="enableSocialMediaResources"
-          ></omegaup-common-social-media>
-          <omegaup-common-recomended-material></omegaup-common-recomended-material>
-          <omegaup-contest-upcoming
-            v-bind:contests="upcomingContests"
-          ></omegaup-contest-upcoming>
-          <div class="panel panel-default">
-            <highcharts v-bind:options="chartOptions"></highcharts>
-          </div>
+        <div
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
+          v-if="schoolsRank !== null"
+        >
+          <omegaup-school-rank
+            v-bind:page="schoolsRank.page"
+            v-bind:length="schoolsRank.length"
+            v-bind:showHeader="schoolsRank.showHeader"
+            v-bind:totalRows="schoolsRank.totalRows"
+            v-bind:rank="schoolsRank.rank"
+          ></omegaup-school-rank>
         </div>
       </div>
+    </div>
+    <omegaup-testimonials></omegaup-testimonials>
+    <div class="container-lg py-5">
+      <omegaup-section
+        v-bind:title="T.homepageCompeteSectionTitle"
+        v-bind:description="T.homepageCompeteSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/arena/',
+        }"
+        v-bind:image-src="'/media/homepage/contests_section.svg'"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageTrainSectionTitle"
+        v-bind:description="T.homepageTrainSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/problem/',
+        }"
+        v-bind:image-src="'/media/homepage/problems_section.svg'"
+        v-bind:image-to-right="true"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageCreateSectionTitle"
+        v-bind:description="T.homepageCreateSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/problem/new/',
+        }"
+        v-bind:image-src="'/media/homepage/create_section.svg'"
+      ></omegaup-section>
+      <omegaup-section
+        v-bind:title="T.homepageTeachSectionTitle"
+        v-bind:description="T.homepageTeachSectionDescription"
+        v-bind:button="{
+          text: T.buttonMoreInformation,
+          href: '/course/',
+        }"
+        v-bind:image-src="'/media/homepage/courses_section.svg'"
+        v-bind:image-to-right="true"
+      ></omegaup-section>
     </div>
   </div>
 </template>
@@ -97,26 +124,22 @@ import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
-import common_Welcome from '../common/Welcome.vue';
-import common_SocialMedia from '../common/SocialMedia.vue';
-import common_RecomendedMaterial from '../common/RecomendedMaterial.vue';
-import contest_Upcoming from '../contest/Upcoming.vue';
+import homepage_Testimonials from './Testimonials.vue';
+import homepage_Section from './Section.vue';
+import school_Rank from '../schools/Rankv2.vue';
+import user_Rank from '../user/Rank.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
-import rankTable from '../RankTable.vue';
-import schools_Rank from '../schools/Rank.vue';
 
 @Component({
   components: {
     'omegaup-carousel': homepage_Carousel,
     'omegaup-coder-of-the-month': homepage_CoderOfTheMonth,
     'omegaup-school-of-the-month': homepage_SchoolOfTheMonth,
-    'omegaup-common-welcome': common_Welcome,
-    'omegaup-common-social-media': common_SocialMedia,
-    'omegaup-common-recomended-material': common_RecomendedMaterial,
-    'omegaup-contest-upcoming': contest_Upcoming,
+    'omegaup-school-rank': school_Rank,
+    'omegaup-user-rank': user_Rank,
+    'omegaup-testimonials': homepage_Testimonials,
+    'omegaup-section': homepage_Section,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
-    'omegaup-rank-table': rankTable,
-    'omegaup-schools-rank': schools_Rank,
     highcharts: Chart,
   },
 })
@@ -127,9 +150,6 @@ export default class Homepage extends Vue {
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
-  @Prop() enableSocialMediaResources!: boolean;
-  @Prop() upcomingContests!: omegaup.Contest[];
-  @Prop() chartOptions!: Chart;
 
   T = T;
 }

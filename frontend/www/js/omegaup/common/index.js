@@ -7,18 +7,14 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let coderOfTheMonthData = null;
-  const ranking = [];
-  for (const user of payload.rankTable.rank) {
-    ranking.add({
-      rank: user.ranking,
-      country: user.country_id,
-      username: user.username,
-      classname: user.classname,
-      name: user.name,
-      score: user.score,
-      problemsSolvedUser: 0,
-    });
-  }
+  const ranking = payload.userRank.map((user, index) => ({
+    rank: index + 1,
+    country: user.country_id,
+    username: user.username,
+    classname: user.classname,
+    score: user.score,
+    problems_solved: user.problems_solved,
+  }));
   const runsChart = payload.runsChartPayload;
   const minY = runsChart.total.length === 0 ? 0 : runsChart.total[0] / 2.0;
   if (payload.coderOfTheMonthData !== null) {
@@ -53,7 +49,7 @@ OmegaUp.on('ready', function() {
         availableFilters: [],
         filter: '',
         ranking: ranking,
-        resultTotal: payload.rankTable.total,
+        resultTotal: ranking.length,
       },
       schoolsRank: {
         page: 1,

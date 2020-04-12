@@ -196,7 +196,7 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img v-bind:src="gravatarURL51" height="45" /><span
+                <img v-bind:src="gravatarURL51" height="45" class="mr-2" /><span
                   class="username"
                   v-bind:title="currentUsername"
                   >{{ currentUsername }}</span
@@ -257,6 +257,10 @@ nav.navbar {
   .navbar-brand {
     background-color: $white;
     background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
+  }
+
+  a.dropdown-item {
+    color: black;
   }
 }
 </style>

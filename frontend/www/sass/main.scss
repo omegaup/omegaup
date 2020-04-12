@@ -1,9 +1,9 @@
 // BASE - Base Variable file along with starting point Mixins and Placeholders
 @import 'base/_variables.scss';
-@import 'base/_common.scss';
-
-@import 'base/sizes.scss';
 @import 'base/colors';
+@import 'base/sizes.scss';
+
+@import 'base/_common.scss';
 
 // COMPONENTS - Re-usable site elements
 @import 'components/_buttons.scss';

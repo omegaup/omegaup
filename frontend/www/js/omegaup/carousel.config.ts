@@ -9,47 +9,61 @@ const carouselConfig: {
     en: string;
     es: string;
     pt: string;
-  }
+  };
+  button?: {
+    text: {
+      en: string;
+      es: string;
+      pt: string;
+    };
+    href: string;
+  };
 }[] = [
   {
-    "image": "/media/homepage/carousel_slide_1.svg",
-    "title": {
-        "en": "Welcome",
-        "es": "Bienvenido",
-        "pt": "Bem-vindo"
+    image: '/media/homepage/carousel_slide_1.svg',
+    title: {
+      en: 'Welcome to omegaUp',
+      es: 'Bienvenido a omegaUp',
+      pt: 'Bem-vindo a omegaUp',
     },
-    "description": {
-        "en": "omegaUp is an open source platform for learning and improving your Computer Science skills through coding challenges with a fun and competitive approach",
-        "es": "omegaUp es una plataforma de código abierto para aprender y mejorar tus habilidades en Ciencias de la Computación a través de retos y competencias",
-        "pt": "omegaUp é uma plataforma de código aberto para aprender e aprimorar suas habilidades em Ciência da Computação por meio de desafios de codificação com uma abordagem divertida e competitiva"
-    }
+    description: {
+      en: 'Is this the first time you use omegaUp?',
+      es: '¿Es la primera vez que usas omegaUp?',
+      pt: 'Esta é a primeira vez que você usa o omegaUp?',
+    },
+    button: {
+      text: {
+        en: 'See the tutorial',
+        es: 'Ve el tutorial',
+        pt: 'Veja o tutorial',
+      },
+      href: 'https://blog.omegaup.com/category/omegaup/omegaup-101/',
+    },
   },
   {
-    "image": "/media/homepage/carousel_slide_2.svg",
-    "title": {
-        "en": "omegaUp Schools",
-        "es": "Escuelas en omegaUp",
-        "pt": "Escolas em omegaUp"
+    image: '/media/homepage/carousel_slide_2.svg',
+    title: {
+      en: 'Introductory Course to C++',
+      es: 'Curso de Introducción a C++',
+      pt: 'Curso Introdutório ao C++',
     },
-    "description": {
-        "en": "Create your own courses with homework and exams and teach your students algorithmic thinking while having fun using omegaUp",
-        "es": "Crea tus propios cursos con tareas y exámenes y enseña a tus estudiantes pensamiento algorítmico mientras se divierten utilizando omegaUp",
-        "pt": "Crie seus próprios cursos com trabalhos de casa e exames e ensine aos alunos o pensamento algorítmico enquanto se diverte usando o omegaUp"
-    }
+    description: {
+      en:
+        'Would you like to learn to program? Join the Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+      es:
+        '¿Te gustaría aprender a programar? Apúntate al curso de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+      pt:
+        'Deseja aprender a programar? Participe do curso Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+    },
+    button: {
+      text: {
+        en: 'Enter here',
+        es: 'Ingresa aquí',
+        pt: 'Entre aqui',
+      },
+      href: '/course/introduccion_a_cpp/',
+    },
   },
-  {
-    "image": "/media/homepage/carousel_slide_3.svg",
-    "title": {
-        "en": "Mentors",
-        "es": "Mentores",
-        "pt": "Mentores"
-    },
-    "description": {
-        "en": "Create your own courses with homework and exams and teach your students algorithmic thinking while having fun using omegaUp",
-        "es": "omegaUp ofrece a los coders del mes la posibilidad de recibir mentoría personalizada de ingenieros de software voluntarios con experiencia internacional que laboran en las principales empresas de tecnología del mundo",
-        "pt": "omegaUp oferece aos codificadores do mês a oportunidade de receber orientação personalizada de engenheiros de software voluntários com experiência internacional que trabalham nas principais empresas de tecnologia do mundo"
-    }
-  }
 ];
 
 export default carouselConfig;

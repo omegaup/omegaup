@@ -20,14 +20,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 Contests.problemset_id,
                                 Contests.title,
                                 Contests.description,
-                                Contests.finish_time as original_finish_time,
-                                UNIX_TIMESTAMP(Contests.start_time) as start_time,
-                                UNIX_TIMESTAMP(Contests.finish_time) as finish_time,
+                                Contests.finish_time AS original_finish_time,
+                                Contests.start_time,
+                                Contests.finish_time,
                                 Contests.admission_mode,
                                 Contests.alias,
                                 Contests.recommended,
                                 Contests.window_length,
-                                UNIX_TIMESTAMP(Contests.last_updated) as last_updated,
+                                Contests.last_updated,
                                 Contests.rerun_id
                                 ';
 
@@ -136,7 +136,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int, scoreboard_url_admin: string}>
+     * @return list<array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, scoreboard_url_admin: string}>
      */
     public static function getContestsParticipated(int $identityId) {
         $sql = '
@@ -144,9 +144,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 c.contest_id,
                 c.alias,
                 c.title,
-                UNIX_TIMESTAMP(c.start_time) AS start_time,
-                UNIX_TIMESTAMP(c.finish_time) AS finish_time,
-                UNIX_TIMESTAMP(c.last_updated) AS last_updated,
+                c.start_time,
+                c.finish_time,
+                c.last_updated,
                 p.scoreboard_url_admin
             FROM
                 Contests c
@@ -169,7 +169,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ORDER BY
                 contest_id DESC;';
 
-        /** @var list<array{alias: string, contest_id: int, finish_time: int, last_updated: int, scoreboard_url_admin: string, start_time: int, title: string}> */
+        /** @var list<array{alias: string, contest_id: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
@@ -185,7 +185,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns all contests that an identity can manage.
      *
-     * @return list<array{admission_mode: string, alias: string, finish_time: int, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string}>
+     * @return list<array{admission_mode: string, alias: string, finish_time: \OmegaUp\Timestamp, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string}>
      */
     final public static function getAllContestsAdminedByIdentity(
         int $identityId,
@@ -197,8 +197,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             SELECT
                 c.title,
                 c.alias,
-                UNIX_TIMESTAMP (c.start_time) as start_time,
-                UNIX_TIMESTAMP (c.finish_time) as finish_time,
+                c.start_time,
+                c.finish_time,
                 c.admission_mode,
                 c.rerun_id,
                 ps.scoreboard_url,
@@ -239,14 +239,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $pageSize,
         ];
 
-        /** @var list<array{admission_mode: string, alias: string, finish_time: int, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string}> */
+        /** @var list<array{admission_mode: string, alias: string, finish_time: \OmegaUp\Timestamp, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Get relevant columns of all contests, including scoreboard_url columns
      *
-     * @return list<array{title: string, alias: string, start_time: int, finish_time: int, admission_mode: string, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{title: string, alias: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, admission_mode: string, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     final public static function getAllContestsWithScoreboard(
         ?int $page = 1,
@@ -258,8 +258,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             SELECT
                 c.title,
                 c.alias,
-                UNIX_TIMESTAMP (c.start_time) as start_time,
-                UNIX_TIMESTAMP (c.finish_time) as finish_time,
+                c.start_time,
+                c.finish_time,
                 c.admission_mode,
                 c.rerun_id,
                 ps.scoreboard_url,
@@ -281,14 +281,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             );
         }
 
-        /** @var list<array{title: string, alias: string, start_time: int, finish_time: int, admission_mode: string, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string}> */
+        /** @var list<array{title: string, alias: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, admission_mode: string, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
      * Returns all contests owned by a user.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllContestsOwnedByUser(
         int $identityId,
@@ -321,14 +321,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             intval($pageSize),
         ];
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Returns all contests where a user is participating in.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getContestsParticipating(
         int $identityId,
@@ -412,14 +412,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Returns all recent public contests.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getRecentPublicContests(
         int $user_id,
@@ -463,7 +463,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -487,7 +487,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * UNION
      * Todos los concursos públicos.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllContestsForIdentity(
         int $identityId,
@@ -671,12 +671,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllPublicContests(
         int $pagina = 1,
@@ -721,11 +721,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
-    /** @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}>
+    /** @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllContests(
         int $pagina = 1,
@@ -766,7 +766,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: int, last_updated: int, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: int, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

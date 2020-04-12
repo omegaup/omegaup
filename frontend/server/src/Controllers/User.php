@@ -9,6 +9,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
+ * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1769,7 +1770,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *
-     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int}, place: int|null}>}
+     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}>}
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1784,7 +1785,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        /** @var array<string, array{data: array{alias: string, title: string, start_time: int, finish_time: int, last_updated: int}, place: int|null}> */
+        /** @var array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}> */
         $contests = [];
 
         foreach ($contestsParticipated as &$contest) {
@@ -2431,6 +2432,35 @@ class User extends \OmegaUp\Controllers\Controller {
             'name' => strval($identity->name),
             'problems_solved' => $userRank->problems_solved_count,
         ];
+    }
+
+    /**
+     * Gets the best users of the current month
+     *
+     * @return list<CoderOfTheMonth>
+     */
+    public static function getTopCodersOfTheMonth(
+        int $rowCount
+    ): array {
+        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
+        $firstDayOfNextMonth = $currentDate->modify('first day of next month');
+        $date = $firstDayOfNextMonth->format('Y-m-d');
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::CODERS_OF_THE_MONTH,
+            "{$date}-{$rowCount}",
+            /** @return list<CoderOfTheMonth> */
+            function () use (
+                $date,
+                $rowCount
+            ): array {
+                return \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
+                    $date,
+                    'all',
+                    $rowCount
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
     }
 
     /**
@@ -3344,7 +3374,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $date
      *
-     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{all: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, female: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: true, rankTable: array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, name: string, school_id: int}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, template: string}
+     * @return array{smartyProperties: array{payload: array{coderOfTheMonthData: array{all: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null, female: array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, userRank: list<CoderOfTheMonth>, runsChartPayload: array{date: list<string>, total: list<int>}, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}}, supportsBootstrap4: bool, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3394,10 +3424,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         )['coderinfo']
                     ],
                     'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
-                    'rankTable' => self::getRankByProblemsSolved(
-                        $r->identity,
-                        /*$filter=*/ '',
-                        /*$offset=*/ 1,
+                    'userRank' => self::getTopCodersOfTheMonth(
                         $rowCount
                     ),
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
@@ -3459,12 +3486,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $category
         );
         $bestCoders = [];
-        if (!is_null($candidates)) {
-            foreach ($candidates as $candidate) {
-                /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
-                unset($candidate['user_id']);
-                $bestCoders[] = $candidate;
-            }
+        foreach ($candidates as $candidate) {
+            /** @psalm-suppress InvalidArrayOffset Even though $candidate does have this index, psalm cannot see it :/ */
+            unset($candidate['user_id']);
+            $bestCoders[] = $candidate;
         }
 
         $response = [
