@@ -127,13 +127,27 @@
         <th v-if="showDetails">{{ T.wordsDetails }}</th>
       </tr>
     </thead>
-    <tfoot v-if="showSubmit">
+    <tfoot v-if="problemAlias != null">
       <tr>
         <td colspan="9">
-          <a href="#problems/new-run">{{ T.wordsNewSubmissions }}</a>
-        </td>
-        <td colspan="9">
-          <a>{{ T.arenaContestEndedUsePractice }}</a>
+          <a
+            v-bind:href="`/arena/${contestAlias}/practice/`"
+            v-if="isContestFinished"
+            >{{ T.arenaContestEndedUsePractice }}</a
+          >
+          <a
+            v-bind:href="
+              isProblemsetOpened
+                ? `#problems/${problemAlias}/new-run`
+                : `/arena/${contestAlias}/`
+            "
+            v-else=""
+            >{{
+              isProblemsetOpened
+                ? T.wordsNewSubmissions
+                : T.arenaContestNotOpened
+            }}</a
+          >
         </td>
       </tr>
     </tfoot>
@@ -141,9 +155,9 @@
       <tr>
         <td>{{ time.formatTimestamp(run.time) }}</td>
         <td>
-          <acronym v-bind:title="run.guid">{{
-            run.guid.substring(0, 8)
-          }}</acronym>
+          <acronym v-bind:title="run.guid">
+            <tt>{{ run.guid.substring(0, 8) }}</tt>
+          </acronym>
         </td>
         <td v-if="showUser">{{ run.username }}</td>
         <td v-if="showContest">
@@ -157,7 +171,10 @@
         <td v-if="showProblem">
           <a v-bind:href="`/arena/problem/${run.alias}/`">{{ run.alias }}</a>
         </td>
-        <td v-bind:style="{ backgroundColor: statusColor(run) }">
+        <td
+          v-bind:style="{ backgroundColor: statusColor(run) }"
+          data-run-status
+        >
           <span>{{ status(run) }}</span>
           <button
             type="button"
@@ -194,7 +211,8 @@
         <td v-if="showDetails">
           <button
             type="button"
-            class="glyphicon glyphicon-zoom-in"
+            data-run-details
+            class="details glyphicon glyphicon-zoom-in"
             v-on:click="$emit('details', run)"
           ></button>
         </td>
@@ -224,6 +242,8 @@ declare global {
   },
 })
 export default class Runs extends Vue {
+  @Prop({ default: false }) isContestFinished!: boolean;
+  @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
   @Prop({ default: false }) showDetails!: boolean;
   @Prop({ default: false }) showDisqualify!: boolean;
@@ -231,8 +251,9 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showPoints!: boolean;
   @Prop({ default: false }) showProblem!: boolean;
   @Prop({ default: false }) showRejudge!: boolean;
-  @Prop({ default: false }) showSubmit!: boolean;
   @Prop({ default: false }) showUser!: boolean;
+  @Prop({ default: null }) contestAlias!: string | null;
+  @Prop({ default: null }) problemAlias!: string | null;
   @Prop({ default: null }) problemsetProblems!: {
     [alias: string]: types.ProblemsetProblem;
   } | null;
@@ -419,6 +440,15 @@ export default class Runs extends Vue {
       this.filterUsername = '';
     } else {
       this.filterUsername = newValue;
+    }
+  }
+
+  @Watch('problemAlias')
+  onProblemAliasChanged(newValue: string | null, oldValue: string | null) {
+    if (!newValue) {
+      this.filterProblem = '';
+    } else {
+      this.filterProblem = newValue;
     }
   }
 
