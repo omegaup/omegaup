@@ -139,7 +139,7 @@
     </tfoot>
     <tbody v-for="run in filteredRuns">
       <tr>
-        <td>{{ time.formatDateTimeLocal(run.time) }}</td>
+        <td>{{ time.formatTimestamp(run.time) }}</td>
         <td>
           <acronym v-bind:title="run.guid">{{
             run.guid.substring(0, 8)

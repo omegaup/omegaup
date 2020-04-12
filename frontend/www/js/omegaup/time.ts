@@ -1,6 +1,6 @@
-import T from './lang';
-
 import * as moment from 'moment';
+
+import T from './lang';
 
 let momentInitialized: boolean = false;
 
@@ -68,7 +68,8 @@ export function formatDateLocal(date: Date): string {
 
 export function parseDateLocal(dateString: string): Date {
   // The expected format is yyyy-MM-dd in the local timezone. Date.parse()
-  // will use UTC if given a timestamp with that format, instead of the local timezone.
+  // will use UTC if given a timestamp with that format, instead of the local
+  // timezone.
   const result = new Date();
   const matches = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
   if (matches !== null) {
@@ -121,6 +122,15 @@ export function formatDateTime(date: Date): string {
 
 export function formatDate(date: Date): string {
   return date.toLocaleDateString(T.locale);
+}
+
+export function formatTimestamp(date: Date): string {
+  return `${formatDateLocal(date)} ${String(date.getHours()).padStart(
+    2,
+    '0',
+  )}:${String(date.getMinutes()).padStart(2, '0')}:${String(
+    date.getSeconds(),
+  ).padStart(2, '0')}`;
 }
 
 export function parseDuration(str: string): number | null {
