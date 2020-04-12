@@ -6,21 +6,20 @@ import Vue from 'vue';
 import arena_ContestList from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', () => {
-	time.setSugarLocale();
-  const payload =
-      types.payloadParsers.ContestListPayload('arena-contest-list-payload');
+  time.setSugarLocale();
+  const payload = types.payloadParsers.ContestListPayload(
+    'arena-contest-list-payload',
+  );
   for (const contestList of Object.values(payload.contests)) {
     if (!contestList) {
       // The `participating` entry could be undefined.
       continue;
     }
-    contestList.forEach(
-        (contest: types.ContestListItem) => {
-          contest.finish_time = OmegaUp.remoteTime(contest.finish_time);
-          contest.last_updated = OmegaUp.remoteTime(contest.last_updated);
-          contest.start_time = OmegaUp.remoteTime(contest.start_time);
-        },
-    );
+    contestList.forEach((contest: types.ContestListItem) => {
+      contest.finish_time = OmegaUp.remoteTime(contest.finish_time);
+      contest.last_updated = OmegaUp.remoteTime(contest.last_updated);
+      contest.start_time = OmegaUp.remoteTime(contest.start_time);
+    });
   }
   const contestList = new Vue({
     el: '#arena-contest-list',

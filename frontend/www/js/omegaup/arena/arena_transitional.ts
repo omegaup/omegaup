@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import Vuex, {StoreOptions} from 'vuex';
-import {types} from '../api_types';
+import Vuex, { StoreOptions } from 'vuex';
+import { types } from '../api_types';
 
 Vue.use(Vuex);
 
@@ -21,8 +21,10 @@ export const runsStore = new Vuex.Store<RunsState>({
     addRun(state, run: types.Run) {
       if (state.index.hasOwnProperty(run.guid)) {
         Vue.set(
-            state.runs, state.index[run.guid],
-            Object.assign({}, state.runs[state.index[run.guid]], run));
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
         return;
       }
       Vue.set(state.index, run.guid, state.runs.length);

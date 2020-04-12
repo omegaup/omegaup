@@ -10,15 +10,16 @@ declare global {
 }
 
 (() => {
-  const payload =
-      JSON.parse((<HTMLElement>document.getElementById('payload')).innerText);
-  const markdownConverter = markdown.markdownConverter({preview: true});
+  const payload = JSON.parse(
+    (<HTMLElement>document.getElementById('payload')).innerText,
+  );
+  const markdownConverter = markdown.markdownConverter({ preview: true });
 
   const statement = <HTMLElement>document.querySelector('div.statement');
   statement.innerHTML = markdownConverter.makeHtmlWithImages(
-      payload.statement.markdown,
-      payload.statement.images,
-      payload.settings,
+    payload.statement.markdown,
+    payload.statement.images,
+    payload.settings,
   );
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
 })();

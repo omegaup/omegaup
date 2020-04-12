@@ -46,6 +46,15 @@
 				".*js/omegaup/lang\\..*"
 			]
 		},
+		"typescript": {
+			"whitelist": [
+				"frontend/www/.*\\.ts$"
+			],
+			"blacklist": [
+				".*third_party.*",
+				".*js/omegaup/lang\\..*"
+			]
+		},
 		"vue": {
 			"extra_js_linters": [
 				"yarn run refactor"
