@@ -2441,7 +2441,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getTopCodersOfTheMonth(
         int $rowCount
-    ): ?array {
+    ): array {
         $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
         $firstDayOfNextMonth = $currentDate->modify('first day of next month');
         $date = $firstDayOfNextMonth->format('Y-m-d');
