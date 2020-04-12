@@ -10,17 +10,18 @@ declare global {
 }
 
 (() => {
-  const markdownConverter = markdown.markdownConverter({preview: true});
+  const markdownConverter = markdown.markdownConverter({ preview: true });
 
   document.querySelectorAll('div.problem').forEach(problem => {
     const output = <HTMLElement>problem.querySelector('div.statement');
     const payload = JSON.parse(
-        (<HTMLElement>problem.querySelector('script.payload')).innerText);
+      (<HTMLElement>problem.querySelector('script.payload')).innerText,
+    );
 
     output.innerHTML = markdownConverter.makeHtmlWithImages(
-        payload.statement.markdown,
-        payload.statement.images,
-        payload.settings,
+      payload.statement.markdown,
+      payload.statement.images,
+      payload.settings,
     );
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, output]);
   });

@@ -1,4 +1,4 @@
-declare module "vue-slider-component" {
+declare module 'vue-slider-component' {
   import Vue from 'vue';
-  export default class VueSlider extends Vue { }
+  export default class VueSlider extends Vue {}
 }

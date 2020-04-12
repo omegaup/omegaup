@@ -1,5 +1,5 @@
-declare module "vue-js-toggle-button" {
+declare module 'vue-js-toggle-button' {
   import Vue from 'vue';
-  class ToggleButton extends Vue { }
-  export { ToggleButton }
+  class ToggleButton extends Vue {}
+  export { ToggleButton };
 }
