@@ -39,7 +39,9 @@ OmegaUp.on('ready', () => {
     },
     data: {
       coderOfTheMonth: coderOfTheMonthData ? coderOfTheMonthData.all : null,
-      coderOfTheMonthFemale: coderOfTheMonthData ? coderOfTheMonthData.female : null,
+      coderOfTheMonthFemale: coderOfTheMonthData
+        ? coderOfTheMonthData.female
+        : null,
       currentUserInfo: payload.currentUserInfo,
       rankTable: {
         page: 1,
