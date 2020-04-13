@@ -327,7 +327,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
                 'school_id' => 1231,
-                'category' => $category,
             ]));
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'schoolNotFound');
@@ -336,7 +335,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Now run api with valid school_id
         $result = \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
             'school_id' => $school->school_id,
-            'category' => $category,
         ]));
         // Get all usernames and verify that only identity1 username
         // and identity2 username are part of results

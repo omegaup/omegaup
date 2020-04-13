@@ -169,7 +169,6 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $school_id
      *
      * @param \OmegaUp\Request $r
@@ -179,20 +178,13 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['category'],
-            'category',
-            \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
-        );
-        $category = $r['category'] ?? 'all';
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
         return [
             'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
-                intval($school->school_id),
-                $category
+                intval($school->school_id)
             )
         ];
     }
@@ -389,7 +381,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Returns the first school of the previous month or the one selected by
      * the mentor, if it has already been stored.
      *
-     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null}}
+     * @return array{schoolinfo: null|array{school_id: int, name: string, country_id: string|null, country: string|null, state: string|null}}
      */
     public static function getSchoolOfTheMonth(string $date = null): array {
         $firstDay = self::getCurrentMonthFirstDay($date);
@@ -426,11 +418,29 @@ class School extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $countryName = null;
+        $stateName = null;
+        $country = \OmegaUp\DAO\Countries::getByPK($school->country_id);
+
+        if (!is_null($country)) {
+            $countryName = $country->name;
+
+            $state = \OmegaUp\DAO\States::getByPK(
+                $country->country_id,
+                $school->state_id
+            );
+            if (!is_null($state)) {
+                $stateName = $state->name;
+            }
+        }
+
         return [
             'schoolinfo' => [
                 'school_id' => intval($school->school_id),
                 'name' => strval($school->name),
                 'country_id' => $school->country_id,
+                'country' => $countryName,
+                'state' => $stateName,
             ],
         ];
     }

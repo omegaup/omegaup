@@ -1,4 +1,4 @@
-declare module "@voerro/vue-tagsinput" {
+declare module '@voerro/vue-tagsinput' {
   import Vue from 'vue';
-  export default class VoerroTagsInput extends Vue { }
+  export default class VoerroTagsInput extends Vue {}
 }

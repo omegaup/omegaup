@@ -7,6 +7,15 @@
  */
 
 class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+
+        // Get File Uploader Mock and tell Omegaup API to use it
+        \OmegaUp\FileHandler::setFileUploaderForTesting(
+            $this->createFileUploaderMock()
+        );
+    }
+
     /**
      * Basic test for creating a problem
      */
@@ -19,11 +28,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -93,11 +97,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
@@ -135,11 +134,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -179,11 +173,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
@@ -205,11 +194,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that sends incomplete requests
      */
     public function testRequiredParameters() {
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Array of valid keys
         $valid_keys = [
             'title',
@@ -246,11 +230,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that sends invalid languages.
      */
     public function testInvalidLanguage() {
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         foreach (['abc', 'c,cpp,cows', 'java,coffee,espresso'] as $languages) {
             // Get the problem data
             $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
@@ -287,11 +266,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -350,11 +324,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
@@ -396,11 +365,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -474,11 +438,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
@@ -533,11 +492,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ]
         );
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
 
@@ -576,11 +530,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             ['tagname' => 'geometry', 'public' => false],
         ]);
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         try {
             // Call the API
             $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -604,11 +553,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         try {
@@ -637,11 +581,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
 
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         // Call the API
         try {
             \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -668,11 +607,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-
-        // Get File Uploader Mock and tell Omegaup API to use it
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
 
         // Call the API
         $response = \OmegaUp\Controllers\Problem::apiCreate($r);
@@ -802,13 +736,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             32
         );
 
-        /** @var array<string, array{tmp_name: string}> $_FILES */
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip';
-
-        \OmegaUp\FileHandler::setFileUploaderForTesting(
-            $this->createFileUploaderMock()
-        );
-
         \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => $title,
@@ -847,5 +774,82 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemSettings->Limits->OverallWallTimeLimit
             );
         }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with valid show_diff values.
+     *
+     * @return list<list<string>>
+     */
+    public function showDiffValueProvider(): array {
+        return [
+            ['none'],
+            ['examples'],
+            ['all'],
+        ];
+    }
+
+    /**
+     * @dataProvider showDiffValueProvider
+     */
+    public function testCreateProblemWithValidShowDiffValues(
+        string $showDiffValue
+    ) {
+        [
+            'problem' => $problem,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => $showDiffValue,
+            ])
+        );
+
+        $this->assertEquals($showDiffValue, $problem->show_diff);
+    }
+
+    public function testCreateProblemWithInvalidShowDiffValue() {
+        try {
+            [
+                'problem' => $problem,
+            ] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'show_diff' => 'invalid',
+                ])
+            );
+            $this->fail('Exception was expected.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with allow_user_add_tags values.
+     *
+     * @return list<list<string>>
+     */
+    public function allowUserAddTagsValueProvider(): array {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    /**
+     * @dataProvider allowUserAddTagsValueProvider
+     */
+    public function testCreateProblemWithAllowUserAddTagsValues(
+        bool $allowUserAddTagsValue
+    ) {
+        [
+            'problem' => $problem,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'allow_user_add_tags' => $allowUserAddTagsValue,
+            ])
+        );
+
+        $this->assertEquals(
+            $allowUserAddTagsValue,
+            $problem->allow_user_add_tags
+        );
     }
 }

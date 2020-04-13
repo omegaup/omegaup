@@ -46,14 +46,16 @@ def test_js_errors(driver):
     with util.assert_no_js_errors(driver):
         driver.browser.execute_script('console.log("foo");')
 
-    with util.assert_js_errors(driver, expected_messages=('bar', )):
-        driver.browser.execute_script('console.error("bar");')
+    if driver.browser_name != 'firefox':
+        # Firefox does not support this.
+        with util.assert_js_errors(driver, expected_messages=('bar', )):
+            driver.browser.execute_script('console.error("bar");')
 
-    with util.assert_no_js_errors(driver):
-        # Within an asset_js_error() context manager, messages should not be
-        # bubbled up.
-        with util.assert_js_errors(driver, expected_messages=('baz', )):
-            driver.browser.execute_script('console.error("baz");')
+        with util.assert_no_js_errors(driver):
+            # Within an asset_js_error() context manager, messages should not
+            # be bubbled up.
+            with util.assert_js_errors(driver, expected_messages=('baz', )):
+                driver.browser.execute_script('console.error("baz");')
 
 
 @util.no_javascript_errors()
@@ -69,14 +71,14 @@ def test_create_problem(driver):
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
-        runs_before_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_before_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_after_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 

@@ -52,7 +52,9 @@ abstract class Problems {
                 `quality` = ?,
                 `quality_histogram` = ?,
                 `difficulty_histogram` = ?,
-                `quality_seal` = ?
+                `quality_seal` = ?,
+                `show_diff` = ?,
+                `allow_user_add_tags` = ?
             WHERE
                 (
                     `problem_id` = ?
@@ -93,6 +95,8 @@ abstract class Problems {
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
             intval($Problems->quality_seal),
+            $Problems->show_diff,
+            intval($Problems->allow_user_add_tags),
             intval($Problems->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -135,7 +139,9 @@ abstract class Problems {
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
                 `Problems`.`difficulty_histogram`,
-                `Problems`.`quality_seal`
+                `Problems`.`quality_seal`,
+                `Problems`.`show_diff`,
+                `Problems`.`allow_user_add_tags`
             FROM
                 `Problems`
             WHERE
@@ -238,7 +244,9 @@ abstract class Problems {
                 `Problems`.`quality`,
                 `Problems`.`quality_histogram`,
                 `Problems`.`difficulty_histogram`,
-                `Problems`.`quality_seal`
+                `Problems`.`quality_seal`,
+                `Problems`.`show_diff`,
+                `Problems`.`allow_user_add_tags`
             FROM
                 `Problems`
         ';
@@ -309,8 +317,12 @@ abstract class Problems {
                     `quality`,
                     `quality_histogram`,
                     `difficulty_histogram`,
-                    `quality_seal`
+                    `quality_seal`,
+                    `show_diff`,
+                    `allow_user_add_tags`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -369,6 +381,8 @@ abstract class Problems {
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
             intval($Problems->quality_seal),
+            $Problems->show_diff,
+            intval($Problems->allow_user_add_tags),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

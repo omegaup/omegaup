@@ -38,6 +38,8 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'quality_histogram' => true,
         'difficulty_histogram' => true,
         'quality_seal' => true,
+        'show_diff' => true,
+        'allow_user_add_tags' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -166,6 +168,16 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         if (isset($data['quality_seal'])) {
             $this->quality_seal = boolval(
                 $data['quality_seal']
+            );
+        }
+        if (isset($data['show_diff'])) {
+            $this->show_diff = strval(
+                $data['show_diff']
+            );
+        }
+        if (isset($data['allow_user_add_tags'])) {
+            $this->allow_user_add_tags = boolval(
+                $data['allow_user_add_tags']
             );
         }
     }
@@ -325,4 +337,18 @@ class Problems extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $quality_seal = false;
+
+    /**
+     * Determina si el problema es educativo y debe mostrar diferencias en casos de ejemplos, en todos o en ninguno.
+     *
+     * @var string
+     */
+    public $show_diff = 'none';
+
+    /**
+     * Bandera que sirve para indicar si un problema puede permitir que los usuarios agreguen tags.
+     *
+     * @var bool
+     */
+    public $allow_user_add_tags = true;
 }

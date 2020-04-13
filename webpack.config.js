@@ -27,7 +27,7 @@ let config = [
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
-      arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.js',
+      arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
       badge_details: './frontend/www/js/omegaup/badge/details.ts',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
@@ -40,6 +40,7 @@ let config = [
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
         './frontend/www/js/omegaup/contest/list_participant.js',
+      contest_print: './frontend/www/js/omegaup/contest/print.ts',
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:
         './frontend/www/js/omegaup/contest/scoreboardmerge.js',
@@ -61,6 +62,7 @@ let config = [
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
+      problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       problem_settings: './frontend/www/js/omegaup/problem/settings.js',
       qualitynomination_popup:

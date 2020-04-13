@@ -59,6 +59,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a ProblemParams instance from the Request values.
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -68,6 +69,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -143,6 +145,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         if (!is_null($r['visibility'])) {
             $params['visibility'] = intval($r['visibility']);
+        }
+        if (!is_null($r['show_diff'])) {
+            $params['show_diff'] = strval($r['show_diff']);
+        }
+        if (!is_null($r['allow_user_add_tags'])) {
+            $params['allow_user_add_tags'] = boolval(
+                $r['allow_user_add_tags']
+            );
         }
         return new \OmegaUp\ProblemParams($params, $isRequired);
     }
@@ -301,6 +311,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new problem
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -310,6 +321,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -363,6 +375,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'alias' => $params->problemAlias,
             'languages' => $languages,
             'email_clarifications' => $params->emailClarifications,
+            'show_diff' => $params->showDiff,
+            'allow_user_add_tags' => $params->allowUserAddTags,
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
@@ -938,6 +952,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Update problem contents
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -949,6 +964,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -976,7 +992,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             $problemParams,
-            strval($r['message']),
+            $r['message'],
             $problemParams->updatePublished,
             boolval($r['redirect'])
         );
@@ -1207,6 +1223,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'emailClarifications' => [
                 'alias' => 'email_clarifications',
+            ],
+            'showDiff' => [
+                'alias' => 'show_diff',
+            ],
+            'allowUserAddTags' => [
+                'alias' => 'allow_user_add_tags',
             ],
             'source',
             'order',
@@ -1468,6 +1490,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates problem statement only
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -1479,6 +1502,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $statement
      * @omegaup-request-param mixed $time_limit
@@ -1558,6 +1582,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates problem solution only
      *
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -1569,6 +1594,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $solution
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
@@ -2290,6 +2316,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['order'] = $problem->order;
         $response['visibility'] = $problem->visibility;
         $response['email_clarifications'] = $problem->email_clarifications;
+        $response['allow_user_add_tags'] = $problem->allow_user_add_tags;
         $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
@@ -3536,9 +3563,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
+            $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
-                false
+                /*$public=*/false,
+                $problem->allow_user_add_tags
             );
             $addedProblems[] = $problemArray;
         }
@@ -3603,7 +3631,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
-                false
+                /*$public=*/false,
+                $problem->allow_user_add_tags
             );
             $addedProblems[] = $problemArray;
         }
@@ -4185,6 +4214,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4198,6 +4228,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $statement-language
      * @omegaup-request-param mixed $time_limit
@@ -4208,7 +4239,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $visibility
      * @omegaup-request-param mixed $wmd-input-statement
      *
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, LOAD_PAGEDOWN: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
+     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4225,7 +4256,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
-                'LOAD_PAGEDOWN' => true,
                 'STATUS_SUCCESS' => '',
                 'payload' => self::getCommonPayloadForSmarty(),
             ];
@@ -4253,7 +4283,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 return [
                     'IS_UPDATE' => true,
                     'LOAD_MATHJAX' => true,
-                    'LOAD_PAGEDOWN' => true,
                     'STATUS_ERROR' => $statusError,
                     'payload' => self::getCommonPayloadForSmarty(),
                 ];
@@ -4291,7 +4320,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'IS_UPDATE' => true,
             'LOAD_MATHJAX' => true,
-            'LOAD_PAGEDOWN' => true,
             'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
                 'problemEditUpdatedSuccessfully'
             ),
@@ -4300,6 +4328,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param bool $allow_user_add_tags
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
@@ -4311,6 +4340,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
@@ -4319,7 +4349,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
      *
-     * @return array{smartyProperties: array{ALIAS: string, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: non-empty-array<array-key, mixed>}, template: string}
+     * @return array{smartyProperties: array{ALIAS: string, ALLOW_TAGS: true, EMAIL_CLARIFICATIONS: string, IS_UPDATE: false, LANGUAGES: string, SELECTED_TAGS: string, SOURCE: string, STATUS_ERROR: string, TITLE: string, VALIDATOR?: string, VISIBILITY: string, payload: non-empty-array<array-key, mixed>}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4357,6 +4387,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'SELECTED_TAGS' => strval($r['selected_tags']),
                         'STATUS_ERROR' => $statusError,
                         'IS_UPDATE' => false,
+                        'ALLOW_TAGS' => true,
                         'payload' => array_merge(
                             [
                                 'timeLimit' => strval($r['time_limit']),
@@ -4400,6 +4431,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'SELECTED_TAGS' => '',
                 'IS_UPDATE' => false,
+                'ALLOW_TAGS' => true,
                 'payload' => array_merge(
                     [
                         'timeLimit' => 1000,

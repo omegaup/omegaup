@@ -1,17 +1,25 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
-import * as UI from '../ui';
+import * as time from '../time';
+import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
 import arena_ContestList from '../components/arena/ContestList.vue';
 
-OmegaUp.on('ready', function() {
-  Date.setLocale(T.locale);
-  const payload = JSON.parse(document.getElementById('payload').innerText);
-  for (const [timeType, contests] of Object.entries(payload.contests)) {
-    payload[timeType] = contests.forEach(contest =>
-      OmegaUp.convertTimes(contest),
-    );
+OmegaUp.on('ready', () => {
+  time.setSugarLocale();
+  const payload = types.payloadParsers.ContestListPayload(
+    'arena-contest-list-payload',
+  );
+  for (const contestList of Object.values(payload.contests)) {
+    if (!contestList) {
+      // The `participating` entry could be undefined.
+      continue;
+    }
+    contestList.forEach((contest: types.ContestListItem) => {
+      contest.finish_time = OmegaUp.remoteTime(contest.finish_time);
+      contest.last_updated = OmegaUp.remoteTime(contest.last_updated);
+      contest.start_time = OmegaUp.remoteTime(contest.start_time);
+    });
   }
   const contestList = new Vue({
     el: '#arena-contest-list',

@@ -351,7 +351,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'button.details'))).click()
+             'button[data-run-details]'))).click()
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
 

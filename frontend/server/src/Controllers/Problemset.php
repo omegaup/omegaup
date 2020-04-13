@@ -1,7 +1,12 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
+/**
+ * @psalm-type ProblemsetProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter?: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ScoreboardRankingEntry=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time?: int|null, problems?: list<array{alias: string, order: int}>, ranking?: list<ScoreboardRankingEntry>, start_time?: int, time?: int, title?: string}
+ */
 class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -100,7 +105,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $tokens
      * @omegaup-request-param mixed $username
      *
-     * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, description?: null|string, director?: \OmegaUp\DAO\VO\Identities|null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: null|string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter?: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
+     * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, description?: null|string, director?: \OmegaUp\DAO\VO\Identities|null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: null|string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [
@@ -143,7 +148,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
      *
-     * @return array{finish_time?: int|null, problems?: list<array{alias: string, order: int}>, ranking?: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time?: int, time?: int, title?: string}
+     * @return Scoreboard
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [

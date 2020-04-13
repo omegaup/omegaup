@@ -8,6 +8,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      */
     const REVIEWERS_PER_NOMINATION = 2;
 
+    // Number of rows shown in nominations list
+    const PAGE_SIZE = 100;
+
     const ALLOWED_TAGS = [
         'problemTopic2Sat',
         'problemTopicArrays',
@@ -699,7 +702,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('page_size', null, null, false);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $pageSize = is_null($r['page_size']) ? 100 : intval($r['page_size']);
+        $pageSize = is_null(
+            $r['page_size']
+        ) ? self::PAGE_SIZE : intval(
+            $r['page_size']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -746,7 +753,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $rowcount
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -760,7 +767,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+        $rowCount = is_null(
+            $r['rowcount']
+        ) ? self::PAGE_SIZE : intval(
+            $r['rowcount']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
         \OmegaUp\Validators::validateValidSubset(
@@ -769,13 +780,26 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
-        return \OmegaUp\DAO\QualityNominations::getNominations(
+        $response = \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */ null,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types
         );
+
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $response['totalRows'],
+            $rowCount,
+            $offset,
+            /*$adjacent=*/5,
+            /*$params=*/[]
+        );
+
+        return [
+            'nominations' => $response['nominations'],
+            'pager_items' => $pagerItems,
+        ];
     }
 
     /**
@@ -806,7 +830,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $rowcount
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -819,7 +843,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('rowcount', null, null, false);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
+        $rowCount = is_null(
+            $r['rowcount']
+        ) ? self::PAGE_SIZE : intval(
+            $r['rowcount']
+        );
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -827,13 +855,26 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $types = ['promotion', 'demotion'];
         }
 
-        return \OmegaUp\DAO\QualityNominations::getNominations(
+        $response = \OmegaUp\DAO\QualityNominations::getNominations(
             $r->user->user_id,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types
         );
+
+        $pagerItems = \OmegaUp\Pager::paginate(
+            $response['totalRows'],
+            $rowCount,
+            $offset,
+            /*$adjacent=*/5,
+            /*$params=*/[]
+        );
+
+        return [
+            'nominations' => $response['nominations'],
+            'pager_items' => $pagerItems,
+        ];
     }
 
     /**
@@ -913,7 +954,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if ($currentUserReviewer) {
                 $response['original_contents']['tags'] = \OmegaUp\DAO\Problems::getTagsForProblem(
                     $problem,
-                    false /* public */
+                    /*$public=*/false,
+                    $problem->allow_user_add_tags
                 );
             }
 
@@ -992,7 +1034,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::validateMemberOfReviewerGroup($r);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $length = is_null(
+            $r['length']
+        ) ? self::PAGE_SIZE : intval(
+            $r['length']
+        );
 
         return [
             'smartyProperties' => [
@@ -1025,7 +1071,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('length', null, null, false);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $length = is_null(
+            $r['length']
+        ) ? self::PAGE_SIZE : intval(
+            $r['length']
+        );
 
         return [
             'smartyProperties' => [

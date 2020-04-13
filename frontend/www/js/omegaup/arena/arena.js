@@ -1,56 +1,35 @@
-import { OmegaUp } from '../omegaup';
-import T from '../lang';
+import Vue from 'vue';
+
 import API from '../api.js';
 import * as api from '../api_transitional';
-import ArenaAdmin from './admin_arena.js';
-import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
-import arena_Scoreboard from '../components/arena/Scoreboard.vue';
-import arena_RunDetails from '../components/arena/RunDetails.vue';
-import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_RunDetails from '../components/arena/RunDetails.vue';
+import arena_Runs from '../components/arena/Runs.vue';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
+import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import T from '../lang';
 import * as markdown from '../markdown';
-import * as ui from '../ui';
+import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
-import Vue from 'vue';
-import * as ko from 'knockout';
-import * as secureBindingsProvider from 'knockout-secure-binding';
+import * as ui from '../ui';
 
-export { ArenaAdmin };
+import ArenaAdmin from './admin_arena.js';
+import {
+  EphemeralGrader,
+  EventsSocket,
+  GetOptionsFromLocation,
+  myRunsStore,
+  runsStore,
+} from './arena_transitional';
 
-// TODO(#3456): Remove this once Knockout is gone.
-OmegaUp.on('ready', function() {
-  // ko.secureBindingsProvider.nodeHasBindings() has a bug in which if
-  // there happens to be a comment with no content (like `<!---->`), it
-  // tries to call .trim() on undefined, and crashes.
-  secureBindingsProvider.prototype.nodeHasBindings = function(node) {
-    if (node.nodeType === node.ELEMENT_NODE) {
-      return (
-        node.getAttribute(this.attribute) ||
-        (ko.components && ko.components.getComponentNameForNode(node))
-      );
-    }
-    if (node.nodeType === node.COMMENT_NODE) {
-      if (this.noVirtualElements) {
-        return false;
-      }
-      // Ensures that `value` is not undefined.
-      let value = '' + node.nodeValue || node.text;
-      if (!value) {
-        return false;
-      }
-      // See also: knockout/src/virtualElements.js
-      return value.trim().indexOf('ko ') === 0;
-    }
-  };
-  ko.bindingProvider.instance = new secureBindingsProvider({
-    attribute: 'data-bind',
-  });
-});
+export { ArenaAdmin, GetOptionsFromLocation };
 
 let ScoreboardColors = [
   '#FB3F51',
@@ -65,187 +44,18 @@ let ScoreboardColors = [
   '#CD35D3',
 ];
 
-export function GetOptionsFromLocation(arenaLocation) {
-  let options = {
-    isLockdownMode: false,
-    isInterview: false,
-    isPractice: false,
-    isOnlyProblem: false,
-    disableClarifications: false,
-    disableSockets: false,
-    contestAlias: null,
-    scoreboardToken: null,
-    shouldShowFirstAssociatedIdentityRunWarning: false,
-    payload: {},
-  };
-
-  if ($('body').hasClass('lockdown')) {
-    options.isLockdownMode = true;
-    window.onbeforeunload = function(e) {
-      let dialogText = T.lockdownMessageWarning;
-      e.returnValue = dialogText;
-      return e.returnValue;
-    };
-  }
-
-  if (arenaLocation.pathname.indexOf('/practice') !== -1) {
-    options.isPractice = true;
-  }
-
-  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
-    options.isOnlyProblem = true;
-    options.onlyProblemAlias = /\/arena\/problem\/([^\/]+)\/?/.exec(
-      arenaLocation.pathname,
-    )[1];
-  } else {
-    let match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
-    if (match) {
-      options.contestAlias = match[1];
+function getMaxScore(runs, alias, previousScore) {
+  let maxScore = previousScore;
+  for (let run of runs) {
+    if (alias != run.alias) {
+      continue;
+    }
+    let score = run.contest_score;
+    if (score > maxScore) {
+      maxScore = score;
     }
   }
-
-  if (arenaLocation.search.indexOf('ws=off') !== -1) {
-    options.disableSockets = true;
-  }
-  const elementPayload = document.getElementById('payload');
-  if (elementPayload !== null) {
-    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload !== null) {
-      options.shouldShowFirstAssociatedIdentityRunWarning =
-        payload.shouldShowFirstAssociatedIdentityRunWarning || false;
-      options.preferredLanguage = payload.preferred_language || null;
-      options.payload = payload;
-    }
-  }
-  return options;
-}
-
-class EventsSocket {
-  constructor(uri, arena) {
-    let self = this;
-
-    self.uri = uri;
-    self.arena = arena;
-    self.socket = null;
-    self.socketKeepalive = null;
-    self.promise = new Promise((accept, reject) => {
-      self.promiseAccept = accept;
-      self.promiseReject = reject;
-    });
-    self.retries = 10;
-  }
-
-  connect() {
-    let self = this;
-
-    self.shouldRetry = false;
-    try {
-      self.socket = new WebSocket(self.uri, 'com.omegaup.events');
-    } catch (e) {
-      self.onclose(e);
-      return;
-    }
-
-    self.socket.onmessage = self.onmessage.bind(self);
-    self.socket.onopen = self.onopen.bind(self);
-    self.socket.onclose = self.onclose.bind(self);
-
-    return self.promise;
-  }
-
-  onmessage(message) {
-    let self = this;
-    let data = JSON.parse(message.data);
-
-    if (data.message == '/run/update/') {
-      data.run.time = OmegaUp.remoteTime(data.run.time * 1000);
-      self.arena.updateRun(data.run);
-    } else if (data.message == '/clarification/update/') {
-      if (!self.arena.options.disableClarifications) {
-        data.clarification.time = OmegaUp.remoteTime(
-          data.clarification.time * 1000,
-        );
-        self.arena.updateClarification(data.clarification);
-      }
-    } else if (data.message == '/scoreboard/update/') {
-      if (self.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (self.arena.options.originalContestAlias == null) return;
-        self.arena.virtualRankingChange(data.scoreboard);
-        return;
-      }
-      self.arena.rankingChange(data.scoreboard);
-    }
-  }
-
-  onopen() {
-    let self = this;
-    self.shouldRetry = true;
-    self.arena.elements.socketStatus.html('&bull;').css('color', '#080');
-    self.socketKeepalive = setInterval(function() {
-      self.socket.send('"ping"');
-    }, 30000);
-  }
-
-  onclose(e) {
-    let self = this;
-    self.socket = null;
-    if (self.socketKeepalive) {
-      clearInterval(self.socketKeepalive);
-      self.socketKepalive = null;
-    }
-    if (self.shouldRetry && self.retries > 0) {
-      self.retries--;
-      self.arena.elements.socketStatus.html('↻').css('color', '#888');
-      setTimeout(self.connect.bind(self), Math.random() * 15000);
-      return;
-    }
-
-    self.arena.elements.socketStatus.html('✗').css('color', '#800');
-    self.promiseReject(e);
-  }
-}
-class EphemeralGrader {
-  constructor() {
-    let self = this;
-
-    self.ephemeralEmbeddedGraderElement = document.getElementById(
-      'ephemeral-embedded-grader',
-    );
-    self.messageQueue = [];
-    self.loaded = false;
-
-    if (!self.ephemeralEmbeddedGraderElement) return;
-
-    self.ephemeralEmbeddedGraderElement.onload = () => {
-      self.loaded = true;
-      while (self.messageQueue.length > 0) {
-        self._sendInternal(self.messageQueue.shift());
-      }
-    };
-  }
-
-  send(method, ...params) {
-    let self = this;
-    let message = {
-      method: method,
-      params: params,
-    };
-
-    if (!self.loaded) {
-      self.messageQueue.push(message);
-      return;
-    }
-    self._sendInternal(message);
-  }
-
-  _sendInternal(message) {
-    let self = this;
-
-    self.ephemeralEmbeddedGraderElement.contentWindow.postMessage(
-      message,
-      window.location.origin + '/grader/ephemeral/embedded/',
-    );
-  }
+  return maxScore;
 }
 
 export class Arena {
@@ -270,9 +80,39 @@ export class Arena {
     self.submissionDeadline = null;
 
     // All runs in self contest/problem.
-    self.runs = new RunView(self);
-    self.myRuns = new RunView(self);
-    self.myRuns.filter_username(OmegaUp.username);
+    self.myRunsList = new Vue({
+      render: function(createElement) {
+        return createElement('omegaup-arena-runs', {
+          props: {
+            contestAlias: options.contestAlias,
+            isContestFinished:
+              this.isContestFinished &&
+              !options.isPractice &&
+              !options.isOnlyProblem,
+            isProblemsetOpened: this.isProblemsetOpened,
+            problemAlias: this.problemAlias,
+            runs: myRunsStore.state.runs,
+            showDetails: true,
+            showPoints: !options.isPractice && !options.isOnlyProblem,
+          },
+          on: {
+            details: run => {
+              window.location.hash += `/show-run:${run.guid}`;
+            },
+          },
+        });
+      },
+      data: {
+        isContestFinished: false,
+        isProblemsetOpened: false,
+        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
+      },
+      components: { 'omegaup-arena-runs': arena_Runs },
+    });
+    const myRunsListElement = document.querySelector('#problem table.runs');
+    if (myRunsListElement) {
+      self.myRunsList.$mount(myRunsListElement);
+    }
 
     // The guid of any run that is pending.
     self.pendingRuns = {};
@@ -382,7 +222,7 @@ export class Arena {
 
     // If we have admin powers in self contest.
     self.problemsetAdmin = false;
-    self.problemsetOpened = true;
+    self.myRunsList.isProblemsetOpened = true;
     self.answeredClarifications = 0;
     self.clarificationsOffset = 0;
     self.clarificationsRowcount = 20;
@@ -509,16 +349,33 @@ export class Arena {
     self.bindGlobalHandlers();
 
     // Contest summary view model
-    self.summaryView = {
-      title: ko.observable(),
-      description: ko.observable(),
-      windowLength: ko.observable(),
-      contestOrganizer: ko.observable(),
-      startTime: ko.observable(),
-      finishTime: ko.observable(),
-      scoreboardCutoff: ko.observable(),
-      attached: false,
-    };
+    self.summaryView = new Vue({
+      render: function(createElement) {
+        return createElement('omegaup-arena-contestsummary', {
+          props: {
+            contest: this.contest,
+            showRanking: !self.options.isPractice,
+          },
+        });
+      },
+      data: {
+        contest: {
+          start_time: new Date(),
+          finish_time: null,
+          window_length: 0,
+          rerun_id: 0,
+          title: '',
+          director: '',
+        },
+      },
+      components: {
+        'omegaup-arena-contestsummary': arena_ContestSummary,
+      },
+    });
+    const summaryElement = document.getElementById('summary');
+    if (summaryElement) {
+      self.summaryView.$mount(summaryElement);
+    }
 
     // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
@@ -794,13 +651,8 @@ export class Arena {
     let self = this;
     self.currentProblemset = problemset;
     self.problemsetAdmin = problemset.admin;
-    self.problemsetOpened =
+    self.myRunsList.isProblemsetOpened =
       !problemset.hasOwnProperty('opened') || problemset.opened;
-    if (!self.problemsetOpened) {
-      $('#new-run a')
-        .attr('href', `/arena/${self.options.contestAlias}/`)
-        .text(T.arenaContestNotOpened);
-    }
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
@@ -839,13 +691,8 @@ export class Arena {
           ui.warning(
             `<a href="/arena/${self.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
           );
-          $('#new-run-practice-msg').show();
-          $('#new-run-practice-msg a').prop(
-            'href',
-            `/arena/${self.options.contestAlias}/practice/`,
-          );
+          self.myRunsList.isContestFinished = true;
         }
-        $('#new-run').hide();
       }
     } else {
       clock = time.formatDelta(countdownTime.getTime() - now);
@@ -1634,7 +1481,6 @@ export class Arena {
         );
         $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
         self.renderProblem(problem);
-        self.myRuns.attach($('#problem .runs'));
         let karel_langs = ['kp', 'kj'];
         if (
           karel_langs.every(function(x) {
@@ -1674,12 +1520,6 @@ export class Arena {
         } else {
           $('#problem .problemsetter').hide();
         }
-        if (self.problemsetOpened) {
-          $('#problem .runs tfoot td a').attr(
-            'href',
-            `#problems/${problem.alias}/new-run`,
-          );
-        }
 
         $('#problem tbody.added').remove();
 
@@ -1689,7 +1529,7 @@ export class Arena {
               self.trackRun(run);
             }
           }
-          self.myRuns.filter_problem(problem.alias);
+          self.myRunsList.problemAlias = problem.alias;
         }
 
         function showQualityNominationPopup() {
@@ -1815,7 +1655,7 @@ export class Arena {
             $.extend(problemset, {
               problem_alias: problem.alias,
               prevent_problemset_open:
-                self.problemsetAdmin && !self.problemsetOpened,
+                self.problemsetAdmin && !self.myRunsList.isProblemsetOpened,
             }),
           )
             .then(function(problem_ext) {
@@ -2202,41 +2042,7 @@ export class Arena {
   }
 
   updateSummary(contest) {
-    let self = this;
-    if (!self.summaryView.attached) {
-      let summary = $('#summary');
-      ko.applyBindings(self.summaryView, summary[0]);
-      self.summaryView.attached = true;
-    }
-    self.summaryView.title(ui.contestTitle(contest));
-    self.summaryView.description(contest.description);
-    let duration = null;
-    if (contest.finish_time) {
-      duration = contest.finish_time.getTime() - contest.start_time.getTime();
-    }
-    self.summaryView.windowLength(
-      duration
-        ? time.formatDelta(contest.window_length * 60000 || duration)
-        : T.wordsUnlimitedDuration,
-    );
-    self.summaryView.contestOrganizer(contest.director);
-    self.summaryView.startTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
-    );
-    self.summaryView.finishTime(
-      contest.finish_time
-        ? Highcharts.dateFormat(
-            '%Y-%m-%d %H:%M:%S',
-            contest.finish_time.getTime(),
-          )
-        : T.wordsUnlimitedDuration,
-    );
-    self.summaryView.scoreboardCutoff(
-      Highcharts.dateFormat(
-        '%Y-%m-%d %H:%M:%S',
-        contest.start_time.getTime() + (duration * contest.scoreboard) / 100,
-      ),
-    );
+    this.summaryView.contest = contest;
   }
 
   displayRunDetails(guid, data) {
@@ -2317,9 +2123,9 @@ export class Arena {
 
   trackRun(run) {
     let self = this;
-    self.runs.trackRun(run);
+    runsStore.commit('addRun', run);
     if (run.username == OmegaUp.username) {
-      self.myRuns.trackRun(run);
+      myRunsStore.commit('addRun', run);
       if (typeof self.problems[run.alias] != 'undefined') {
         self.updateProblemScore(run.alias, self.problems[run.alias].points, 0);
       }
@@ -2340,7 +2146,8 @@ export class Arena {
             ranking.problems = rank.problems.map(problem => {
               let problemRanking = problem;
               if (problemRanking.alias == alias) {
-                let maxScore = self.myRuns.getMaxScore(
+                let maxScore = getMaxScore(
+                  myRunsStore.state.runs,
                   problemRanking.alias,
                   previousScore,
                 );
@@ -2361,408 +2168,12 @@ export class Arena {
       const currentProblem = self.elements.navBar.problems.find(
         problem => problem.alias === alias,
       );
-      currentProblem.bestScore = self.myRuns.getMaxScore(alias, previousScore);
+      currentProblem.bestScore = getMaxScore(
+        myRunsStore.state.runs,
+        alias,
+        previousScore,
+      );
       currentProblem.maxScore = maxScore || '0';
     }
-  }
-}
-class RunView {
-  constructor(arena) {
-    let self = this;
-    self.arena = arena;
-    self.row_count = 100;
-    self.filter_verdict = ko.observable();
-    self.filter_status = ko.observable();
-    self.filter_language = ko.observable();
-    self.filter_problem = ko.observable();
-    self.filter_username = ko.observable();
-    self.filter_offset = ko.observable(0);
-    self.runs = ko.observableArray().extend({ deferred: true });
-    self.filtered_runs = ko
-      .pureComputed(function() {
-        let cached_verdict = self.filter_verdict();
-        let cached_status = self.filter_status();
-        let cached_language = self.filter_language();
-        let cached_problem = self.filter_problem();
-        let cached_username = self.filter_username();
-        if (
-          !cached_verdict &&
-          !cached_status &&
-          !cached_language &&
-          !cached_problem &&
-          !cached_username
-        ) {
-          return self.runs();
-        }
-        return self.runs().filter(function(val) {
-          if (cached_verdict && cached_verdict != val.verdict()) {
-            return false;
-          }
-          if (cached_status && cached_status != val.status()) {
-            return false;
-          }
-          if (cached_language && cached_language != val.language()) {
-            return false;
-          }
-          if (cached_problem && cached_problem != val.alias()) {
-            return false;
-          }
-          if (cached_username && cached_username != val.username()) {
-            return false;
-          }
-          return true;
-        });
-      }, self)
-      .extend({ deferred: true });
-    self.sorted_runs = ko
-      .pureComputed(function() {
-        return self.filtered_runs().sort(function(a, b) {
-          if (a.time().getTime() == b.time().getTime()) {
-            return a.guid == b.guid ? 0 : a.guid < b.guid ? -1 : 1;
-          }
-          // Newest runs appear on top.
-          return b.time().getTime() - a.time().getTime();
-        });
-      }, self)
-      .extend({ deferred: true });
-    self.display_runs = ko
-      .pureComputed(function() {
-        let offset = self.filter_offset();
-        return self.sorted_runs().slice(offset, offset + self.row_count);
-      }, self)
-      .extend({ deferred: true });
-    self.observableRunsIndex = {};
-    self.attached = false;
-  }
-
-  getMaxScore(alias, previousScore) {
-    let self = this;
-    let runs = self.runs();
-    let maxScore = previousScore;
-    for (let run of runs) {
-      if (alias != run.alias()) {
-        continue;
-      }
-      let score = run.contest_score();
-      if (score > maxScore) {
-        maxScore = score;
-      }
-    }
-    return maxScore;
-  }
-
-  attach(elm) {
-    let self = this;
-
-    if (self.attached) return;
-
-    $('.runspager .runspagerprev', elm).on('click', function() {
-      if (self.filter_offset() < self.row_count) {
-        self.filter_offset(0);
-      } else {
-        self.filter_offset(self.filter_offset() - self.row_count);
-      }
-    });
-
-    $('.runspager .runspagernext', elm).on('click', function() {
-      self.filter_offset(self.filter_offset() + self.row_count);
-    });
-
-    typeahead.userTypeahead($('.runsusername', elm), function(event, item) {
-      self.filter_username(item.value);
-    });
-
-    $('.runsusername-clear', elm).on('click', function() {
-      $('.runsusername', elm).val('');
-      self.filter_username('');
-    });
-
-    if (Object.values(self.arena.problems).length > 0) {
-      typeahead.problemContestTypeahead(
-        $('.runsproblem', elm),
-        Object.values(self.arena.problems),
-        function(event, item) {
-          self.filter_problem(item.alias);
-        },
-      );
-    } else {
-      typeahead.problemTypeahead($('.runsproblem', elm), function(event, item) {
-        self.filter_problem(item.alias);
-      });
-    }
-
-    $('.runsproblem-clear', elm).on('click', function() {
-      $('.runsproblem', elm).val('');
-      self.filter_problem('');
-    });
-
-    if (elm[0] && !ko.dataFor(elm[0])) ko.applyBindings(self, elm[0]);
-    self.attached = true;
-  }
-
-  trackRun(run) {
-    let self = this;
-    if (!self.observableRunsIndex[run.guid]) {
-      self.observableRunsIndex[run.guid] = new ObservableRun(self.arena, run);
-      self.runs.push(self.observableRunsIndex[run.guid]);
-    } else {
-      self.observableRunsIndex[run.guid].update(run);
-    }
-  }
-
-  clear(run) {
-    let self = this;
-
-    self.runs.removeAll();
-    self.observableRunsIndex = {};
-  }
-}
-class ObservableRun {
-  constructor(arena, run) {
-    let self = this;
-
-    self.arena = arena;
-    self.guid = run.guid;
-    self.short_guid = run.guid.substring(0, 8);
-
-    self.alias = ko.observable(run.alias);
-    self.contest_alias = ko.observable(run.contest_alias);
-    self.problemset_id = ko.observable(run.problemset_id);
-    self.contest_score = ko.observable(run.contest_score);
-    self.country_id = ko.observable(run.country_id);
-    self.judged_by = ko.observable(run.judged_by);
-    self.language = ko.observable(run.language);
-    self.memory = ko.observable(run.memory);
-    self.penalty = ko.observable(run.penalty);
-    self.run_id = ko.observable(run.run_id);
-    self.runtime = ko.observable(run.runtime);
-    self.score = ko.observable(run.score);
-    self.status = ko.observable(run.status);
-    self.type = ko.observable(run.type);
-    self.submit_delay = ko.observable(run.submit_delay);
-    self.time = ko.observable(run.time);
-    self.username = ko.observable(run.username);
-    self.verdict = ko.observable(run.verdict);
-
-    self.user_html = ko.pureComputed(self.$user_html, self);
-    self.problem_url = ko.pureComputed(self.$problem_url, self);
-    self.time_text = ko.pureComputed(self.$time_text, self);
-    self.runtime_text = ko.pureComputed(self.$runtime_text, self);
-    self.memory_text = ko.pureComputed(self.$memory_text, self);
-    self.status_text = ko.pureComputed(self.$status_text, self);
-    self.status_help = ko.pureComputed(self.$status_help, self);
-    self.status_color = ko.pureComputed(self.$status_color, self);
-    self.penalty_text = ko.pureComputed(self.$penalty_text, self);
-    self.points = ko.pureComputed(self.$points, self);
-    self.percentage = ko.pureComputed(self.$percentage, self);
-    self.contest_alias_url = ko.pureComputed(self.$contest_alias_url, self);
-  }
-
-  update(run) {
-    let self = this;
-    for (let p in run) {
-      if (
-        !run.hasOwnProperty(p) ||
-        !self.hasOwnProperty(p) ||
-        !(self[p] instanceof Function)
-      ) {
-        continue;
-      }
-      if (self[p]() != run[p]) {
-        self[p](run[p]);
-      }
-    }
-  }
-
-  showVerdictHelp(elm, ev) {
-    let self = this;
-    $(ev.target).popover('show');
-  }
-
-  $problem_url() {
-    let self = this;
-    return `/arena/problem/${self.alias()}/`;
-  }
-
-  $contest_alias_url() {
-    let self = this;
-    return self.contest_alias() === null
-      ? ''
-      : `/arena/${self.contest_alias()}/`;
-  }
-
-  $user_html() {
-    let self = this;
-    return ui.getProfileLink(self.username()) + ui.getFlag(self.country_id());
-  }
-
-  $time_text() {
-    let self = this;
-    return Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', self.time().getTime());
-  }
-
-  $runtime_text() {
-    let self = this;
-    if (
-      self.status() == 'ready' &&
-      self.verdict() != 'JE' &&
-      self.verdict() != 'VE' &&
-      self.verdict() != 'CE'
-    ) {
-      let prefix = '';
-      if (self.verdict() == 'TLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(parseFloat(self.runtime() || '0') / 1000).toFixed(
-        2,
-      )} s`;
-    } else {
-      return '—';
-    }
-  }
-
-  $memory_text() {
-    let self = this;
-    if (
-      self.status() == 'ready' &&
-      self.verdict() != 'JE' &&
-      self.verdict() != 'VE' &&
-      self.verdict() != 'CE'
-    ) {
-      let prefix = '';
-      if (self.verdict() == 'MLE') {
-        prefix = '>';
-      }
-      return `${prefix}${(parseFloat(self.memory()) / (1024 * 1024)).toFixed(
-        2,
-      )} MB`;
-    } else {
-      return '—';
-    }
-  }
-
-  $penalty_text() {
-    let self = this;
-
-    if (
-      self.status() == 'ready' &&
-      self.verdict() != 'JE' &&
-      self.verdict() != 'VE' &&
-      self.verdict() != 'CE'
-    ) {
-      return self.penalty();
-    } else {
-      return '—';
-    }
-  }
-
-  $status_text() {
-    let self = this;
-    if (self.type() == 'disqualified') return T['wordsDisqualified'];
-
-    return self.status() == 'ready'
-      ? T[`verdict${self.verdict()}`]
-      : self.status();
-  }
-
-  $status_help() {
-    let self = this;
-
-    if (self.status() != 'ready' || self.verdict() == 'AC') {
-      return null;
-    }
-
-    if (self.language() == 'kj' || self.language() == 'kp') {
-      if (self.verdict() == 'RTE' || self.verdict() == 'RE') {
-        return T.verdictHelpKarelRTE;
-      } else if (self.verdict() == 'TLE' || self.verdict() == 'TO') {
-        return T.verdictHelpKarelTLE;
-      }
-    }
-    if (self.type() == 'disqualified') return T.verdictHelpDisqualified;
-
-    return T[`verdictHelp${self.verdict()}`];
-  }
-
-  $status_color() {
-    let self = this;
-
-    if (self.status() != 'ready') return '';
-
-    if (self.type() == 'disqualified') return '#F00';
-
-    if (self.verdict() == 'AC') {
-      return '#CF6';
-    } else if (self.verdict() == 'CE') {
-      return '#F90';
-    } else if (self.verdict() == 'JE' || self.verdict() == 'VE') {
-      return '#F00';
-    } else {
-      return '';
-    }
-  }
-
-  $points() {
-    let self = this;
-    if (
-      self.contest_score() != null &&
-      self.status() == 'ready' &&
-      self.verdict() != 'JE' &&
-      self.verdict() != 'VE' &&
-      self.verdict() != 'CE'
-    ) {
-      return parseFloat(self.contest_score() || '0').toFixed(2);
-    } else {
-      return '—';
-    }
-  }
-
-  $percentage() {
-    let self = this;
-    if (
-      self.status() == 'ready' &&
-      self.verdict() != 'JE' &&
-      self.verdict() != 'VE' &&
-      self.verdict() != 'CE'
-    ) {
-      return `${(parseFloat(self.score() || '0') * 100).toFixed(2)}%`;
-    } else {
-      return '—';
-    }
-  }
-
-  details() {
-    let self = this;
-    window.location.hash += `/show-run:${self.guid}`;
-  }
-
-  rejudge() {
-    let self = this;
-    API.Run.rejudge({ run_alias: self.guid, debug: false })
-      .then(function(data) {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      })
-      .catch(ui.ignoreError);
-  }
-
-  disqualify() {
-    let self = this;
-    API.Run.disqualify({ run_alias: self.guid })
-      .then(function(data) {
-        self.type('disqualifed');
-        self.arena.updateRunFallback(self.guid);
-      })
-      .catch(ui.ignoreError);
-  }
-
-  debug_rejudge() {
-    let self = this;
-    API.Run.rejudge({ run_alias: self.guid, debug: true })
-      .then(function(data) {
-        self.status('rejudging');
-        self.arena.updateRunFallback(self.guid);
-      })
-      .catch(ui.ignoreError);
   }
 }

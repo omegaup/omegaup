@@ -40,27 +40,35 @@
 			{js_include entrypoint="problem_settings"}
 			{/if}
 			<div class="row">
-				<div class="form-group  col-md-6" id="source-group">
-					<label class="control-label" for="source">{#wordsSource#}</label>
-					<input id='source' name='source' value='{if $IS_UPDATE eq false}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
+				<div class="form-group  col-md-4" id="source-group">
+					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
+					<div class="form-control">
+						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS ne 0}checked="checked"{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="er1" name="email_clarifications" value="0" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS eq 0}checked="checked"{/if}>{#wordsNo#}</label>
+					</div>
 				</div>
 
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-4">
 					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq false && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq false && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
+
+				<div class="form-group col-md-4">
+					<label for="visibility">{#problemEditFormAllowUserAddTags#}</label>
+					<div class="form-control">
+						<label class="radio-inline"><input type="radio" id="t2" name="allow_user_add_tags" value="1" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 1}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="t1" name="allow_user_add_tags" value="0" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 0}checked=checked{/if}>{#wordsNo#}</label>
+					</div>
+				</div>
 			</div>
 
 			<div class="row">
 				<div class="form-group  col-md-6">
-					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
-					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS ne 0}checked="checked"{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="er1" name="email_clarifications" value="0" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS eq 0}checked="checked"{/if}>{#wordsNo#}</label>
-					</div>
+					<label class="control-label" for="source">{#problemEditSource#}</label>
+					<input id='source' name='source' value='{if $IS_UPDATE eq false}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
 				</div>
 
 				<div class="form-group col-md-6" id="problem-contents-group">
@@ -80,7 +88,7 @@
 						<div class="tag-list pull-left"></div>
 					</div>
 					<div class="form-group">
-						<label for="tag-public">{#wordsPublic#}</label>
+						<label for="tag-public">{#problemEditTagPublic#}</label>
 						<select id="tag-public" class="form-control">
 							<option value="false" selected="selected">{#wordsNo#}</option>
 							<option value="true">{#wordsYes#}</option>

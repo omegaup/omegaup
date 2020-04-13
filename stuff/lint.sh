@@ -33,4 +33,4 @@ exec /usr/bin/docker run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200221 $ARGS
+	omegaup/hook_tools:20200412 $ARGS

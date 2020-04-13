@@ -40,6 +40,16 @@ describe('omegaup.Time', function() {
     });
   });
 
+  describe('formatTimestamp', function() {
+    const expectedValue = '2010-01-01 11:22:33';
+
+    it('Should format timestamps correctly', function() {
+      expect(
+        omegaup.Time.formatTimestamp(new Date('2010-01-01 11:22:33')),
+      ).toEqual(expectedValue);
+    });
+  });
+
   describe('parseDuration', function() {
     it('Should handle valid inputs', function() {
       expect(omegaup.Time.parseDuration('0')).toEqual(0);
