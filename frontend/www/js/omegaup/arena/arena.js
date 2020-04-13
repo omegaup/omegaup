@@ -1,65 +1,35 @@
-import { OmegaUp } from '../omegaup';
-import T from '../lang';
+import Vue from 'vue';
+
 import API from '../api.js';
 import * as api from '../api_transitional';
-import ArenaAdmin from './admin_arena.js';
-import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
-import arena_Scoreboard from '../components/arena/Scoreboard.vue';
-import arena_RunDetails from '../components/arena/RunDetails.vue';
-import arena_Runs from '../components/arena/Runs.vue';
-import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
+import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
+import arena_RunDetails from '../components/arena/RunDetails.vue';
+import arena_Runs from '../components/arena/Runs.vue';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
+import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
+import T from '../lang';
 import * as markdown from '../markdown';
-import * as ui from '../ui';
+import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
-import Vue from 'vue';
-import * as ko from 'knockout';
-import * as secureBindingsProvider from 'knockout-secure-binding';
+import * as ui from '../ui';
 
+import ArenaAdmin from './admin_arena.js';
 import {
-  runsStore,
-  myRunsStore,
   EphemeralGrader,
   EventsSocket,
   GetOptionsFromLocation,
+  myRunsStore,
+  runsStore,
 } from './arena_transitional';
 
 export { ArenaAdmin, GetOptionsFromLocation };
-
-// TODO(#3456): Remove this once Knockout is gone.
-OmegaUp.on('ready', function() {
-  // ko.secureBindingsProvider.nodeHasBindings() has a bug in which if
-  // there happens to be a comment with no content (like `<!---->`), it
-  // tries to call .trim() on undefined, and crashes.
-  secureBindingsProvider.prototype.nodeHasBindings = function(node) {
-    if (node.nodeType === node.ELEMENT_NODE) {
-      return (
-        node.getAttribute(this.attribute) ||
-        (ko.components && ko.components.getComponentNameForNode(node))
-      );
-    }
-    if (node.nodeType === node.COMMENT_NODE) {
-      if (this.noVirtualElements) {
-        return false;
-      }
-      // Ensures that `value` is not undefined.
-      let value = '' + node.nodeValue || node.text;
-      if (!value) {
-        return false;
-      }
-      // See also: knockout/src/virtualElements.js
-      return value.trim().indexOf('ko ') === 0;
-    }
-  };
-  ko.bindingProvider.instance = new secureBindingsProvider({
-    attribute: 'data-bind',
-  });
-});
 
 let ScoreboardColors = [
   '#FB3F51',
@@ -379,16 +349,33 @@ export class Arena {
     self.bindGlobalHandlers();
 
     // Contest summary view model
-    self.summaryView = {
-      title: ko.observable(),
-      description: ko.observable(),
-      windowLength: ko.observable(),
-      contestOrganizer: ko.observable(),
-      startTime: ko.observable(),
-      finishTime: ko.observable(),
-      scoreboardCutoff: ko.observable(),
-      attached: false,
-    };
+    self.summaryView = new Vue({
+      render: function(createElement) {
+        return createElement('omegaup-arena-contestsummary', {
+          props: {
+            contest: this.contest,
+            showRanking: !self.options.isPractice,
+          },
+        });
+      },
+      data: {
+        contest: {
+          start_time: new Date(),
+          finish_time: null,
+          window_length: 0,
+          rerun_id: 0,
+          title: '',
+          director: '',
+        },
+      },
+      components: {
+        'omegaup-arena-contestsummary': arena_ContestSummary,
+      },
+    });
+    const summaryElement = document.getElementById('summary');
+    if (summaryElement) {
+      self.summaryView.$mount(summaryElement);
+    }
 
     // The interval of time that submissions button will be disabled
     self.submissionGapInterval = 0;
@@ -2055,41 +2042,7 @@ export class Arena {
   }
 
   updateSummary(contest) {
-    let self = this;
-    if (!self.summaryView.attached) {
-      let summary = $('#summary');
-      ko.applyBindings(self.summaryView, summary[0]);
-      self.summaryView.attached = true;
-    }
-    self.summaryView.title(ui.contestTitle(contest));
-    self.summaryView.description(contest.description);
-    let duration = null;
-    if (contest.finish_time) {
-      duration = contest.finish_time.getTime() - contest.start_time.getTime();
-    }
-    self.summaryView.windowLength(
-      duration
-        ? time.formatDelta(contest.window_length * 60000 || duration)
-        : T.wordsUnlimitedDuration,
-    );
-    self.summaryView.contestOrganizer(contest.director);
-    self.summaryView.startTime(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', contest.start_time.getTime()),
-    );
-    self.summaryView.finishTime(
-      contest.finish_time
-        ? Highcharts.dateFormat(
-            '%Y-%m-%d %H:%M:%S',
-            contest.finish_time.getTime(),
-          )
-        : T.wordsUnlimitedDuration,
-    );
-    self.summaryView.scoreboardCutoff(
-      Highcharts.dateFormat(
-        '%Y-%m-%d %H:%M:%S',
-        contest.start_time.getTime() + (duration * contest.scoreboard) / 100,
-      ),
-    );
+    this.summaryView.contest = contest;
   }
 
   displayRunDetails(guid, data) {
