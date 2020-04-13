@@ -17,7 +17,7 @@
 </div>
 
 <div class="panel panel-primary">
-{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true inline}
+  <table class="runs"></table>
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/omegaup/arena/arena.js"}" defer></script>

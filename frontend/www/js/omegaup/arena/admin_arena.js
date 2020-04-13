@@ -21,11 +21,11 @@ export default class ArenaAdmin {
         return createElement('omegaup-arena-runs', {
           props: {
             runs: runsStore.state.runs,
-            showContest: true,
+            showContest: self.arena.options.contestAlias == 'admin',
+            showProblem: !arena.options.isOnlyProblem,
             showDetails: true,
             showDisqualify: true,
             showPager: true,
-            showProblem: true,
             showRejudge: true,
             showUser: true,
           },

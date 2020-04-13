@@ -9,9 +9,6 @@ omegaup.OmegaUp.on('ready', function() {
   function onlyProblemLoaded(problem) {
     arenaInstance.renderProblem(problem);
 
-    arenaInstance.myRuns.filter_problem(problem.alias);
-    arenaInstance.myRuns.attach($('#problem .runs'));
-
     for (var i = 0; i < problem.solvers.length; i++) {
       var solver = problem.solvers[i];
       var prob = $('.solver-list .template')
@@ -59,10 +56,9 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   function onlyProblemUpdateRuns(runs, score_column, multiplier) {
-    $('#problem tbody.added').remove();
     for (var idx in runs) {
       if (!runs.hasOwnProperty(idx)) continue;
-      arenaInstance.myRuns.trackRun(runs[idx]);
+      arenaInstance.trackRun(runs[idx]);
     }
   }
 

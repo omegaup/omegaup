@@ -96,16 +96,12 @@
 {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
 					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
 {/if}
-{if $showPoints}
-{include file='arena.runs.tpl' show_points=true show_submit=true show_details=true inline}
-{else}
-{include file='arena.runs.tpl' show_submit=true show_details=true inline}
-{/if}
+					<table class="runs"></table>
 				</div>
 			</div>
 {if $admin}
 			<div id="runs" class="tab">
-{include file='arena.runs.tpl' show_pager=true show_points=true show_user=true show_problem=true show_rejudge=true show_details=true show_disqualify=true inline}
+				<table class="runs"></table>
 			</div>
 {/if}
 {if $showRanking}
