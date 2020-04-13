@@ -102,7 +102,6 @@ export default class Index extends Vue {
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
   @Prop() enableSocialMediaResources!: boolean;
   @Prop() upcomingContests!: omegaup.Contest[];
-  @Prop() chartOptions!: Chart;
 
   T = T;
 }

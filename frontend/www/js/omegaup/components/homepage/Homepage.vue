@@ -118,7 +118,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { Chart } from 'highcharts-vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
@@ -140,7 +139,6 @@ import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
     'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
-    highcharts: Chart,
   },
 })
 export default class Homepage extends Vue {
