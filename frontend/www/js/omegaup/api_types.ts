@@ -358,8 +358,8 @@ export namespace types {
 
   export interface IndexPayload {
     coderOfTheMonthData: {
-      all?: types.ProfileImpl;
-      female?: types.ProfileImpl;
+      all?: types.UserProfile;
+      female?: types.UserProfile;
     };
     currentUserInfo: { username: string };
     enableSocialMediaResources: boolean;
@@ -440,29 +440,6 @@ export namespace types {
     version: string;
     visibility: number;
     visits: number;
-  }
-
-  export interface ProfileImpl {
-    birth_date?: number;
-    classname: string;
-    country: string;
-    country_id?: string;
-    email?: string;
-    gender?: string;
-    graduation_date?: number;
-    gravatar_92: string;
-    hide_problem_tags?: boolean;
-    is_private: boolean;
-    locale: string;
-    name?: string;
-    preferred_language?: string;
-    scholar_degree?: string;
-    school?: string;
-    school_id?: number;
-    state?: string;
-    state_id?: string;
-    username?: string;
-    verified: boolean;
   }
 
   export interface Progress {
@@ -552,6 +529,29 @@ export namespace types {
   export interface UserListItem {
     label: string;
     value: string;
+  }
+
+  export interface UserProfile {
+    birth_date?: number;
+    classname: string;
+    country: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: number;
+    gravatar_92: string;
+    hide_problem_tags?: boolean;
+    is_private: boolean;
+    locale: string;
+    name?: string;
+    preferred_language?: string;
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified: boolean;
   }
 
   export interface UserRankTablePayload {

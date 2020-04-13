@@ -7,11 +7,11 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
- * @psalm-type ProfileImpl=array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+ * @psalm-type UserProfile=array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
- * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: ProfileImpl|null, female: ProfileImpl|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}
+ * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1273,7 +1273,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the user given
      *
-     * @return ProfileImpl
+     * @return UserProfile
      */
     public static function getProfileImpl(
         \OmegaUp\DAO\VO\Users $user,
@@ -1513,16 +1513,16 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        return self::getCodersOfTheMonth(
+        return self::getCoderOfTheMonth(
             self::getCurrentMonthFirstDay($r['date']),
             $r['category'] ?? 'all'
         );
     }
 
     /**
-     * @return array{coderinfo: ProfileImpl|null}
+     * @return array{coderinfo: UserProfile|null}
      */
-    private static function getCodersOfTheMonth(
+    private static function getCoderOfTheMonth(
         string $firstDay,
         string $category = 'all'
     ): array {
@@ -3416,11 +3416,11 @@ class User extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'coderOfTheMonthData' => [
-                        'all' => self::getCodersOfTheMonth(
+                        'all' => self::getCoderOfTheMonth(
                             $firstDay,
                             'all'
                         )['coderinfo'],
-                        'female' => self::getCodersOfTheMonth(
+                        'female' => self::getCoderOfTheMonth(
                             $firstDay,
                             'female'
                         )['coderinfo']
