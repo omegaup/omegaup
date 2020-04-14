@@ -450,7 +450,7 @@ def enter_contest(driver, contest_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS, 'a[data-nav-arena]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-arena]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(
