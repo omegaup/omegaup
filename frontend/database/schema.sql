@@ -754,7 +754,7 @@ CREATE TABLE `QualityNominations` (
   `nomination` enum('suggestion','quality_tag','promotion','demotion','dismissal') NOT NULL DEFAULT 'suggestion' COMMENT 'El tipo de nominación',
   `contents` text NOT NULL COMMENT 'Un blob json con el contenido de la nominación',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de esta nominación',
-  `status` enum('open','approved','denied') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
+  `status` enum('open','approved','denied','warning') NOT NULL DEFAULT 'open' COMMENT 'El estado de la nominación',
   PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
