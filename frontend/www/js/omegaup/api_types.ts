@@ -202,6 +202,12 @@ export namespace types {
       );
     }
 
+    export function IndexPayload(elementId: string): types.IndexPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -350,6 +356,34 @@ export namespace types {
     };
   }
 
+  export interface IndexPayload {
+    coderOfTheMonthData: {
+      all?: types.UserProfile;
+      female?: types.UserProfile;
+    };
+    currentUserInfo: { username: string };
+    enableSocialMediaResources: boolean;
+    userRank: types.CoderOfTheMonth[];
+    schoolOfTheMonthData?: {
+      country_id?: string;
+      country?: string;
+      name: string;
+      school_id: number;
+      state?: string;
+    };
+    schoolRank: {
+      name: string;
+      ranking: number;
+      school_id: number;
+      school_of_the_month_id: number;
+      score: number;
+    }[];
+    upcomingContests: {
+      number_of_results: number;
+      results: { alias: string; title: string }[];
+    };
+  }
+
   export interface Notification {
     contents: types.NotificationContents;
     notification_id: number;
@@ -495,6 +529,29 @@ export namespace types {
   export interface UserListItem {
     label: string;
     value: string;
+  }
+
+  export interface UserProfile {
+    birth_date?: number;
+    classname: string;
+    country: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: number;
+    gravatar_92: string;
+    hide_problem_tags?: boolean;
+    is_private: boolean;
+    locale: string;
+    name?: string;
+    preferred_language?: string;
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified: boolean;
   }
 
   export interface UserRankTablePayload {
