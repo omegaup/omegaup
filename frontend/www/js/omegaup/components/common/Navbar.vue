@@ -27,7 +27,7 @@
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: navbarSection === 'contests' }"
-            v-if="isLoggedIn && isMainUserIdentity"
+            v-if="isLoggedIn"
           >
             <a
               class="dropdown-toggle"
