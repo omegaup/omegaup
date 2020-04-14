@@ -63,9 +63,6 @@ def test_create_group_with_identities_and_restrictions(driver):
                 'a[href="%s"]' % absent_href), (
                     '%s item is visible!' % absent_href)
 
-        # Contests menu
-        assert not navbar.find_elements_by_css_selector('li.nav-contests a')
-
         # Courses list
         with driver.page_transition():
             driver.wait.until(
