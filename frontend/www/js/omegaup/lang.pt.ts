@@ -1313,6 +1313,7 @@ const translations: { [key: string]: string; } = {
   wordsVerdictsOf: "Veredictos de %(alias)",
   wordsVeryEasy: "Muito f\u00e1cil",
   wordsWallTimeInSeconds: "Tempo-real (Seg)",
+  wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
   youMustOpenBeforeSubmit: "Voc\u00ea deve abrir o problema antes de tentar apresentar uma solu\u00e7\u00e3o.",
 };

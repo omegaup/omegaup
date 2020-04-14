@@ -518,7 +518,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
             'status',
-            ['open', 'approved', 'denied']
+            ['open', 'approved', 'denied', 'warning']
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['rationale'],
@@ -566,6 +566,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                 } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING) {
+                    // If warning is reverted, problem will become private.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING) {
+                    // If warning is reverted, problem will become public.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
@@ -575,6 +581,27 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING) {
+                    // If warning is reverted to banned, problem will become private.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING) {
+                    // If warning is reverted to banned, problem will become public.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+                }
+                break;
+            case 'warning':
+                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
+                    // If private is reverted to warning, problem will become private.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
+                    // If public is reverted to warning, problem will become public.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
+                    // If banning is reverted to warning, problem will become private.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
+                    // If banning is reverted to warning, problem will become public.
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
                 }
                 break;
             case 'open':

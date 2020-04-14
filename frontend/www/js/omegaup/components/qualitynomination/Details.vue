@@ -88,16 +88,23 @@
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution(true)"
+              v-on:click="markResolution('approved')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution(false)"
+              v-on:click="markResolution('denied')"
             >
               {{ T.wordsKeepProblem }}
+            </button>
+            <button
+              class="btn btn-warning"
+              v-bind:disabled="!rationale"
+              v-on:click="markResolution('warning')"
+            >
+              {{ T.wordsWarningProblem }}
             </button>
           </div>
         </div>
@@ -140,8 +147,8 @@ export default class QualityNominationDetails extends Vue {
     return `/arena/problem/${alias}/`;
   }
 
-  markResolution(banProblem: boolean): void {
-    this.$emit('mark-resolution', this, banProblem);
+  markResolution(newStatus: string): void {
+    this.$emit('mark-resolution', this, newStatus);
   }
 }
 </script>
