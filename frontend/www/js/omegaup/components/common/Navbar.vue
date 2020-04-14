@@ -26,11 +26,14 @@
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
           <li
             class="dropdown nav-contests"
-            data-nav-contests
             v-bind:class="{ active: navbarSection === 'contests' }"
             v-if="isLoggedIn && isMainUserIdentity"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-contests
+              href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
