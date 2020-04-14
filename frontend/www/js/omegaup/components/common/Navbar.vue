@@ -40,24 +40,29 @@
               <li>
                 <a href="/arena/" data-nav-arena>{{ T.navAllContests }}</a>
               </li>
-              <li>
-                <a href="/contest/new/" data-nav-create-contest>{{
-                  T.contestsCreateNew
-                }}</a>
-              </li>
-              <!-- TODO: Esto debe irse a la otra pestaña -->
-              <li>
-                <a href="/contest/mine/" data-nav-my-contests>{{
-                  T.navMyContests
-                }}</a>
-              </li>
-              <li>
-                <a href="/group/" data-nav-my-groups>{{ T.navMyGroups }}</a>
-              </li>
-              <!-- TODO: hasta aquí -->
-              <li>
-                <a href="/scoreboardmerge/">{{ T.contestsJoinScoreboards }}</a>
-              </li>
+
+              <template v-if="isMainUserIdentity">
+                <li>
+                  <a href="/contest/new/" data-nav-create-contest>{{
+                    T.contestsCreateNew
+                  }}</a>
+                </li>
+                <!-- TODO: Esto debe irse a la otra pestaña -->
+                <li>
+                  <a href="/contest/mine/" data-nav-my-contests>{{
+                    T.navMyContests
+                  }}</a>
+                </li>
+                <li>
+                  <a href="/group/" data-nav-my-groups>{{ T.navMyGroups }}</a>
+                </li>
+                <!-- TODO: hasta aquí -->
+                <li>
+                  <a href="/scoreboardmerge/">{{
+                    T.contestsJoinScoreboards
+                  }}</a>
+                </li>
+              </template>
             </ul>
           </li>
           <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
