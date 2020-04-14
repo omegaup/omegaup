@@ -1901,7 +1901,7 @@ export namespace messages {
   export type RunDetailsRequest = { [key: string]: any };
   export type RunDetailsResponse = {
     admin: boolean;
-    cases: { [key: string]: string };
+    cases: { [key: string]: { [key: string]: string } };
     compile_error: string;
     details: {
       compile_meta: {

@@ -787,7 +787,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, cases?: array<string, string>, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
+     * @return array{admin: bool, cases?: array<string, array<string, string>>, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -882,11 +882,15 @@ class Run extends \OmegaUp\Controllers\Controller {
         return $response;
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     private static function getProblemCases(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $casesType
     ): array {
         $existingCases = $problemArtifacts->lsTreeRecursive($casesType);
+        $response = [];
         foreach ($existingCases as $file) {
             /** @var string $problemContent */
             $problemContent = json_decode(
