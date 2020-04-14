@@ -868,7 +868,6 @@ const translations: { [key: string]: string; } = {
   reportProblemFormQuestion: "(Why d0 y0u wan7 70 r3p0r7 7hi5 pr0b13m?)",
   reportProblemFormSpam: "(I5 Spam.)",
   reportProblemFormThanksForReview: "(Thank5 f0r y0ur r3p0r7!)",
-  reportProblemFormTitle: "(R3p0r7)",
   requestDate: "(Da73 0f r3qu357)",
   resendInterviewEmail: "(R3-53nd 3mai1)",
   reviewerNomination: "(Qua1ify pr0b13m a5 r3vi3w3r)",

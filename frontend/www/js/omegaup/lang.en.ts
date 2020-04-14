@@ -868,7 +868,6 @@ const translations: { [key: string]: string; } = {
   reportProblemFormQuestion: "Why do you want to report this problem?",
   reportProblemFormSpam: "Is Spam.",
   reportProblemFormThanksForReview: "Thanks for your report!",
-  reportProblemFormTitle: "Report",
   requestDate: "Date of request",
   resendInterviewEmail: "Re-send email",
   reviewerNomination: "Qualify problem as reviewer",
