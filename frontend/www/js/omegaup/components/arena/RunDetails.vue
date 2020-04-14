@@ -55,25 +55,13 @@
               <td class="text-center">{{ problem_case.verdict }}</td>
               <template v-if="data.show_diff !== 'none'">
                 <td class="text-center">
-                  {{
-                    data.cases[problem_case.name]
-                      ? data.cases[problem_case.name].in
-                      : '-'
-                  }}
+                  {{ showDataCase(data.cases, problem_case.name, 'in') }}
                 </td>
                 <td class="text-center">
-                  {{
-                    data.cases[problem_case.name]
-                      ? data.cases[problem_case.name].out
-                      : '-'
-                  }}
+                  {{ showDataCase(data.cases, problem_case.name, 'out') }}
                 </td>
                 <td class="text-center">
-                  {{
-                    data.cases[problem_case.name]
-                      ? data.cases[problem_case.name].output
-                      : '-'
-                  }}
+                  {{ showDataCase(data.cases, problem_case.name, 'output') }}
                 </td>
               </template>
               <td class="score">
@@ -242,7 +230,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 
@@ -256,7 +244,7 @@ interface GroupVisibility {
   },
 })
 export default class ArenaRunDetails extends Vue {
-  @Prop() data!: omegaup.RunDetails;
+  @Prop() data!: types.RunDetails;
 
   T = T;
   groupVisible: GroupVisibility = {};
@@ -264,6 +252,14 @@ export default class ArenaRunDetails extends Vue {
   toggle(group: string): void {
     const visible = this.groupVisible[group];
     this.$set(this.groupVisible, group, !visible);
+  }
+
+  showDataCase(
+    cases: types.ProblemCases,
+    caseName: string,
+    caseType: string,
+  ): string {
+    return cases[caseName] ? cases[caseName][caseType] : '-';
   }
 }
 </script>

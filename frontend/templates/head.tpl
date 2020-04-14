@@ -31,8 +31,8 @@
 		<script type="text/javascript" src="{$jsfile}" defer></script>
 {/if}
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
-		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>
-		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
+		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>

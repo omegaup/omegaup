@@ -6,6 +6,8 @@
  * RunController
  *
  * @author joemmanuel
+ * @psalm-type ProblemCases=array<string, array<string, string>>
+ * @psalm-type RunDetails=array{admin: bool, cases?: ProblemCases, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -787,7 +789,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, cases?: array<string, array<string, string>>, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
+     * @return RunDetails
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -883,7 +885,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @return ProblemCases
      */
     private static function getProblemCases(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
@@ -988,7 +990,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
-     * @omegaup-request-param mixed $run_alias
+     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param bool $show_diff
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
@@ -998,6 +1001,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         // Get the user who is calling this API
         $r->ensureIdentity();
+        $r->ensureBool('show_diff', /*$required=*/false);
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['run_alias'],
@@ -1007,7 +1011,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $r['run_alias'],
                 $r->identity,
-                /*passthru=*/true
+                /*$passthru=*/true,
+                isset($r['show_diff']) ? boolval($r['show_diff']) : false
             )
         ) {
             http_response_code(404);
@@ -1021,7 +1026,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $passthru
+        bool $passthru,
+        bool $showDiff = false
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
@@ -1040,6 +1046,21 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+            && !$showDiff
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        if (
+            $showDiff
+            && $problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS
+        ) {
+            return;
         }
 
         if ($passthru) {
