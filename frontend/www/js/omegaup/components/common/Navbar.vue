@@ -26,6 +26,7 @@
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
           <li
             class="dropdown nav-contests"
+            data-nav-contests
             v-bind:class="{ active: navbarSection === 'contests' }"
             v-if="isLoggedIn && isMainUserIdentity"
           >
