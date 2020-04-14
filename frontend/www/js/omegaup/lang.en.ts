@@ -1261,7 +1261,7 @@ const translations: { [key: string]: string; } = {
   wordsReadAgain: "Read again",
   wordsRegistration: "Registration/open",
   wordsRejudge: "Rejudge",
-  wordsReportProblem: "Report problem.",
+  wordsReportProblem: "Report problem",
   wordsRequired: "Required",
   wordsReset: "omegaUp: Reset password.",
   wordsResetMessage: "Click the following link to reset your password: <a href=\"[link]\">[link]</a><br><br>If you didn't request this operation please do not click the link and make sure your account is safe.",
