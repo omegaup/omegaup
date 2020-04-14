@@ -98,7 +98,7 @@ class OmegaUpTest:
   def create_contest(self):
     # Navigate to create contest
     nav_link = self.driver.find_element_by_css_selector(
-      '[data-nav-create-contest]')
+      'a[data-nav-create-contest]')
     assert nav_link
     nav_link.click()
 
@@ -119,7 +119,7 @@ class OmegaUpTest:
     problem_element.submit()
 
   def go_to_contest(self):
-    self.driver.find_element_by_css_selector('[data-nav-arena]').click()
+    self.driver.find_element_by_css_selector('a[data-nav-arena]').click()
     self.driver.find_element_by_link_text(self.contest_alias).click()
 
   def open_contest(self):
