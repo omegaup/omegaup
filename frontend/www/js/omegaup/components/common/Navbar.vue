@@ -24,9 +24,6 @@
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
-          <li v-bind:class="{ active: navbarSection === 'arena' }">
-            <a href="/arena/">{{ T.navArena }}</a>
-          </li>
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: navbarSection === 'contests' }"
@@ -37,18 +34,30 @@
             ></a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/contest/new/">{{ T.contestsCreateNew }}</a>
+                <a href="/arena/" data-nav-arena>{{ T.navAllContests }}</a>
               </li>
               <li>
-                <a href="/contest/mine/">{{ T.navMyContests }}</a>
+                <a href="/contest/new/" data-nav-create-contest>{{
+                  T.contestsCreateNew
+                }}</a>
+              </li>
+              <!-- TODO: Esto debe irse a la otra pestaña -->
+              <li>
+                <a href="/contest/mine/" data-nav-my-contests>{{
+                  T.navMyContests
+                }}</a>
               </li>
               <li>
-                <a href="/group/">{{ T.navMyGroups }}</a>
+                <a href="/group/" data-nav-my-groups>{{ T.navMyGroups }}</a>
               </li>
+              <!-- TODO: hasta aquí -->
               <li>
                 <a href="/scoreboardmerge/">{{ T.contestsJoinScoreboards }}</a>
               </li>
             </ul>
+          </li>
+          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
+            <a href="/arena/" data-nav-arena>{{ T.wordsContests }}</a>
           </li>
           <li
             class="dropdown nav-problems"

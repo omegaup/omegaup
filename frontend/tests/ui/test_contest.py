@@ -46,18 +46,10 @@ def test_create_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//div[@id="root"]//li[contains(concat(" ", '
-                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
-
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//div[@id="root"]//li[contains(concat(" ", '
-                      'normalize-space(@class), " "), " nav-contests "'
-                      ')]//a[@href = "/contest/mine/"]')))).click()
+                    (By.CSS_SELECTOR, '[data-nav-my-contests]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -117,42 +109,26 @@ def test_user_ranking_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//div[@id="root"]//li[contains(concat(" ", '
-                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//div[@id="root"]//li[contains(concat(" ", '
-                      'normalize-space(@class), " "), " nav-contests "'
-                      ')]//a[@href = "/contest/mine/"]')))).click()
+                    (By.CSS_SELECTOR, '[data-nav-my-contests]'))).click()
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Public')
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//div[@id="root"]//li[contains(concat(" ", '
-                 'normalize-space(@class), " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//div[@id="root"]//li[contains(concat(" ", '
-                      'normalize-space(@class), " "), " nav-contests "'
-                      ')]//a[@href = "/contest/mine/"]')))).click()
+                    (By.CSS_SELECTOR, '[data-nav-my-contests]'))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Admin')
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, '//a[@href = "/arena/"]'))).click()
+                    (By.CSS_SELECTOR, '[data-nav-arena]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -360,18 +336,10 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 def create_contest(driver, contest_alias, scoreboard_time_percent=100):
     '''Creates a new contest.'''
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[@id="root"]//li[contains(concat(" ", '
-             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//div[@id="root"]//li[contains(concat(" ", '
-                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
-                  '= "/contest/new/"]')))).click()
+                (By.CSS_SELECTOR, '[data-nav-create-contest]'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -463,7 +431,7 @@ def enter_contest(driver, contest_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/arena/"]'))).click()
+                (By.CSS, '[data-nav-arena]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

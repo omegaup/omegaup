@@ -501,6 +501,7 @@ const translations: { [key: string]: string; } = {
   myproblemsListCreateProblem: "Crear un problema",
   myproblemsListMyProblems: "Mis Problemas",
   nativeSignupDisabled: "El registro directo ha sido temporalmente deshabilitado. Por favor reg\u00edstrate v\u00eda Google o Facebook.",
+  navAllContests: "Todos los Concursos",
   navArena: "Arena",
   navBlog: "Blog",
   navContests: "Contests",

@@ -344,18 +344,10 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
 def create_group(driver, group_title, description):
     ''' Creates a group as an admin and returns a generated group alias. '''
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[@id="root"]//li[contains(concat(" ", '
-             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//div[@id="root"]//li[contains(concat(" ", '
-                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
-                  '= "/group/"]')))).click()
+                (By.CSS_SELECTOR, 'data-nav-my-groups'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -386,18 +378,10 @@ def create_group(driver, group_title, description):
 def add_identities_group(driver, group_alias):
     '''Upload csv and add identities into the group'''
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[@id="root"]//li[contains(concat(" ", '
-             'normalize-space(@class), " "), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//div[@id="root"]//li[contains(concat(" ", '
-                  'normalize-space(@class), " "), " nav-contests ")]//a[@href '
-                  '= "/group/"]')))).click()
+                (By.CSS_SELECTOR, 'data-nav-my-groups'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
