@@ -11,9 +11,11 @@
               <th>{{ T.wordsGroup }}</th>
               <th>{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <th>{{ T.wordsInput }}</th>
-              <th>{{ T.wordsOutputExpected }}</th>
-              <th>{{ T.wordsOutputObtained }}</th>
+              <template v-if="data.show_diff !== 'none'">
+                <th>{{ T.wordsInput }}</th>
+                <th>{{ T.wordsOutputExpected }}</th>
+                <th>{{ T.wordsOutputObtained }}</th>
+              </template>
               <th colspan="3">{{ T.rankScore }}</th>
             </tr>
           </thead>
@@ -51,13 +53,29 @@
               <td></td>
               <td class="text-center">{{ problem_case.name }}</td>
               <td class="text-center">{{ problem_case.verdict }}</td>
-              <td class="text-center">
-                {{ data.cases[`${problem_case.name}.in`] }}
-              </td>
-              <td class="text-center">
-                {{ data.cases[`${problem_case.name}.out`] }}
-              </td>
-              <td class="text-center"></td>
+              <template v-if="data.show_diff !== 'none'">
+                <td class="text-center">
+                  {{
+                    data.cases[problem_case.name]
+                      ? data.cases[problem_case.name].in
+                      : '-'
+                  }}
+                </td>
+                <td class="text-center">
+                  {{
+                    data.cases[problem_case.name]
+                      ? data.cases[problem_case.name].out
+                      : '-'
+                  }}
+                </td>
+                <td class="text-center">
+                  {{
+                    data.cases[problem_case.name]
+                      ? data.cases[problem_case.name].output
+                      : '-'
+                  }}
+                </td>
+              </template>
               <td class="score">
                 {{
                   problem_case.contest_score

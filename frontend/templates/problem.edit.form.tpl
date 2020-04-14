@@ -40,7 +40,7 @@
 			{js_include entrypoint="problem_settings"}
 			{/if}
 			<div class="row">
-				<div class="form-group  col-md-4" id="source-group">
+				<div class="form-group  col-md-6" id="source-group">
 					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS ne 0}checked="checked"{/if}>{#wordsYes#}</label>
@@ -48,20 +48,31 @@
 					</div>
 				</div>
 
-				<div class="form-group col-md-4">
+				<div class="form-group col-md-6">
 					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq false && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq false && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
+			</div>
 
-				<div class="form-group col-md-4">
+			<div class="row">
+				<div class="form-group col-md-6">
 					<label for="visibility">{#problemEditFormAllowUserAddTags#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="t2" name="allow_user_add_tags" value="1" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 1}checked=checked{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="t1" name="allow_user_add_tags" value="0" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
+				</div>
+
+				<div class="form-group col-md-6">
+					<label>{{#wordsShowCasesDiff#}}</label>
+					<select name="show_diff" class="form-control">
+						<option value="none">{#problemVersionDiffModeNone#}</option>
+						<option value="examples">{#wordsOnlyExamples#}</option>
+						<option value="all">{#wordsAll#}</option>
+					</select>
 				</div>
 			</div>
 

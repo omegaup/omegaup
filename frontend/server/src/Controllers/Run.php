@@ -860,26 +860,46 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['judged_by'] = strval($run->judged_by);
         }
 
+        if ($problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS) {
+            $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
+            return $response;
+        }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
-        $existingCases = $problemArtifacts->lsTreeRecursive('cases');
+        if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
+            $response['cases'] = self::getProblemCases(
+                $problemArtifacts,
+                'cases'
+            );
+            return $response;
+        }
+        $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ONLY_EXAMPLE_DIFF;
+        $response['cases'] = self::getProblemCases(
+            $problemArtifacts,
+            'examples'
+        );
+
+        return $response;
+    }
+
+    private static function getProblemCases(
+        \OmegaUp\ProblemArtifacts $problemArtifacts,
+        string $casesType
+    ): array {
+        $existingCases = $problemArtifacts->lsTreeRecursive($casesType);
         foreach ($existingCases as $file) {
             /** @var string $problemContent */
             $problemContent = json_decode(
                 $problemArtifacts->get($file['path'])
             );
-            [$_, $filename] = explode('cases/', $file['path']);
-            $response['cases'][$filename] = $problemContent;
+            [$_, $filename] = explode("{$casesType}/", $file['path']);
+            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            $basename = basename($filename, ".{$extension}");
+            if (!isset($response[$basename])) {
+                $response[$basename] = [];
+            }
+            $response[$basename][$extension] = $problemContent;
         }
-        $existingExampleCases = $problemArtifacts->lsTreeRecursive('examples');
-        foreach ($existingExampleCases as $file) {
-            /** @var string $problemContent */
-            $problemContent = json_decode(
-                $problemArtifacts->get($file['path'])
-            );
-            [$_, $filename] = explode('examples/', $file['path']);
-            $response['cases'][$filename] = $problemContent;
-        }
-
         return $response;
     }
 
@@ -1016,12 +1036,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
         }
 
         if ($passthru) {

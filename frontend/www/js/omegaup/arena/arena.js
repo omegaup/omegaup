@@ -19,6 +19,7 @@ import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
+import JSZip from 'jszip';
 
 import ArenaAdmin from './admin_arena.js';
 import {
@@ -1777,9 +1778,62 @@ export class Arena {
     if (showRunMatch) {
       $('#overlay form').hide();
       $('#overlay').show();
-      API.Run.details({ run_alias: showRunMatch[1] })
-        .then(function(data) {
-          self.displayRunDetails(showRunMatch[1], data);
+      const guid = showRunMatch[1];
+      API.Run.details({ run_alias: guid })
+        .then(data => {
+          if (data.show_diff === 'none') {
+            self.displayRunDetails(guid, data);
+            return;
+          } else {
+            fetch(`/api/run/download/run_alias/${guid}/`)
+              .then(response => {
+                if (response.status === 200 || response.status === 0) {
+                  return Promise.resolve(response.blob());
+                } else {
+                  return Promise.reject(new Error(response.statusText));
+                }
+              })
+              .then(JSZip.loadAsync)
+              .then(zip => {
+                const result = { cases: [], promises: [] };
+                zip.forEach((relativePath, zipEntry) => {
+                  if (
+                    relativePath.split('.').pop() === 'out' &&
+                    relativePath.indexOf('/') === -1
+                  ) {
+                    if (
+                      data.show_diff === 'examples' &&
+                      relativePath.indexOf('sample') === -1
+                    ) {
+                      return;
+                    }
+                    const pos = relativePath.lastIndexOf('.');
+                    const basename = relativePath.substring(0, pos);
+                    result.cases.push(basename);
+                    result.promises.push(
+                      zip.file(zipEntry.name).async('string'),
+                    );
+                  }
+                });
+                return result;
+              })
+              .then(
+                function success(response) {
+                  response.promises.forEach((promise, index) => {
+                    promise
+                      .then(output => {
+                        data.cases[response.cases[index]].output = output;
+                      })
+                      .catch(UI.apiError);
+                  });
+                  self.displayRunDetails(guid, data);
+                },
+                function error(e) {
+                  console.error(e);
+                },
+              )
+              .catch(UI.apiError);
+          }
         })
         .catch(ui.apiError);
     }
@@ -2118,6 +2172,7 @@ export class Arena {
       groups: groups,
       language: data.language,
       cases: data.cases,
+      show_diff: data.show_diff,
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

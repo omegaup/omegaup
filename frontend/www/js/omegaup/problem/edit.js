@@ -645,6 +645,7 @@ OmegaUp.on('ready', function() {
         (problem.allow_user_add_tags ? '1' : '0') +
         ']',
     ).attr('checked', 1);
+    $('select[name=show_diff]').val(problem.show_diff);
     problemSettings.validator = problem.settings.validator.name;
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
