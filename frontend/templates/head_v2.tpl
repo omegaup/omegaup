@@ -41,7 +41,7 @@
   <script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
   <script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
 
-  <!-- Bootstrap 4 by default -->
+  <!-- Bootstrap 4 -->
   <link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
   <script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
