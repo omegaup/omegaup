@@ -25,7 +25,7 @@
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
           <li
-            class="dropdown nav-contests"
+            class="dropdown"
             v-bind:class="{ active: navbarSection === 'contests' }"
             v-if="isLoggedIn && isMainUserIdentity"
           >
