@@ -24,9 +24,8 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th class="text-center">{{ T.qualityNominationType }}</th>
           <th>{{ T.wordsAlias }}</th>
-          <th>{{ T.wordsNominator }}</th>
+          <th v-if="!myView">{{ T.wordsNominator }}</th>
           <th>{{ T.wordsAuthor }}</th>
           <th>{{ T.wordsSubmissionDate }}</th>
           <th class="text-center">{{ T.wordsStatus }}</th>
@@ -35,13 +34,12 @@
       </thead>
       <tbody>
         <tr v-for="nomination in visibleNominations">
-          <td class="text-center">{{ nomination.nomination }}</td>
           <td>
             <a v-bind:href="problemUrl(nomination.problem.alias)">{{
               nomination.problem.title
             }}</a>
           </td>
-          <td>
+          <td v-if="!myView">
             <a v-bind:href="userUrl(nomination.nominator.username)">{{
               nomination.nominator.username
             }}</a>
