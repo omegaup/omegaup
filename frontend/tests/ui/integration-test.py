@@ -98,7 +98,7 @@ class OmegaUpTest:
   def create_contest(self):
     # Navigate to create contest
     nav_contests = self.driver.find_element_by_css_selector(
-      '[data-nav-contests]')
+      'li[data-nav-contests]')
     nav_contests.click()
     nav_link = self.driver.find_element_by_css_selector(
       'a[data-nav-create-contest]')
