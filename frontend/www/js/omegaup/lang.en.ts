@@ -501,6 +501,7 @@ const translations: { [key: string]: string; } = {
   myproblemsListCreateProblem: "Create a problem",
   myproblemsListMyProblems: "My Problems",
   nativeSignupDisabled: "Direct signup has been temporarily disabled. Please sign up through Google or Facebook.",
+  navAllContests: "All Contests",
   navArena: "Arena",
   navBlog: "Blog",
   navContests: "Contests",

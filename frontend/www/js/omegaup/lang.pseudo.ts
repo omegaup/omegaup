@@ -501,6 +501,7 @@ const translations: { [key: string]: string; } = {
   myproblemsListCreateProblem: "(Cr3a73 a pr0b13m)",
   myproblemsListMyProblems: "(My Pr0b13m5)",
   nativeSignupDisabled: "(Dir3c7 5ignup ha5 b33n 73mp0rari1y di5ab13d. P13a53 5ign up 7hr0ugh G00g13 0r Fac3b00k.)",
+  navAllContests: "(A11 C0n73575)",
   navArena: "(Ar3na)",
   navBlog: "(B10g)",
   navContests: "(C0n73575)",
