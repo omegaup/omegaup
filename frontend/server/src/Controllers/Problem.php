@@ -4239,7 +4239,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $visibility
      * @omegaup-request-param mixed $wmd-input-statement
      *
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
+     * @return array{smartyProperties: array{IS_UPDATE: bool, LOAD_MATHJAX: bool, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}, template: string}
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4252,12 +4252,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r,
             /*$isRequired=*/ false
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemParams->problemAlias
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
         if (!isset($r['request'])) {
             return [
-                'IS_UPDATE' => true,
-                'LOAD_MATHJAX' => true,
-                'STATUS_SUCCESS' => '',
-                'payload' => self::getCommonPayloadForSmarty(),
+                'smartyProperties' => [
+                    'IS_UPDATE' => true,
+                    'LOAD_MATHJAX' => true,
+                    'STATUS_SUCCESS' => '',
+                    'ALLOW_TAGS' => $problem->allow_user_add_tags,
+                    'payload' => self::getCommonPayloadForSmarty(),
+                ],
+                'template' => 'problem.edit.tpl'
             ];
         }
         // Validate commit message.
@@ -4281,10 +4293,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $statusError = $response['error'];
                 }
                 return [
-                    'IS_UPDATE' => true,
-                    'LOAD_MATHJAX' => true,
-                    'STATUS_ERROR' => $statusError,
-                    'payload' => self::getCommonPayloadForSmarty(),
+                    'smartyProperties' => [
+                        'IS_UPDATE' => true,
+                        'LOAD_MATHJAX' => true,
+                        'STATUS_ERROR' => $statusError,
+                        'ALLOW_TAGS' => $problem->allow_user_add_tags,
+                        'payload' => self::getCommonPayloadForSmarty(),
+                    ],
+                    'template' => 'problem.edit.tpl',
                 ];
             }
         } elseif ($r['request'] === 'markdown') {
@@ -4318,12 +4334,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'IS_UPDATE' => true,
-            'LOAD_MATHJAX' => true,
-            'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
-                'problemEditUpdatedSuccessfully'
-            ),
-            'payload' => self::getCommonPayloadForSmarty(),
+            'smartyProperties' => [
+                'IS_UPDATE' => true,
+                'LOAD_MATHJAX' => true,
+                'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
+                    'problemEditUpdatedSuccessfully'
+                ),
+                'ALLOW_TAGS' => $problem->allow_user_add_tags,
+                'payload' => self::getCommonPayloadForSmarty(),
+            ],
+            'template' => 'problem.edit.tpl',
         ];
     }
 

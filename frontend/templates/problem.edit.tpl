@@ -172,7 +172,14 @@
             </select>
           </div>
 
-          <button class="btn btn-primary" type='submit'>{#wordsAddTag#}</button>
+          <div class="form-group">
+            <button class="btn btn-primary" type='submit'>{#wordsAddTag#}</button>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="allow_user_add_tags" name="allow_user_add_tags" {if $ALLOW_TAGS eq 1}checked="checked"{/if}/> {#problemEditFormAllowUserAddTags#}
+            </label>
+          </div>
         </form>
       </div>
 

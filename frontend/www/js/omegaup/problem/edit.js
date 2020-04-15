@@ -107,7 +107,7 @@ OmegaUp.on('ready', function() {
           public: isPublic,
         })
           .then(function(response) {
-            ui.success('Tag successfully added!');
+            ui.success(T.tagAdded);
             $('div.post.footer').show();
 
             refreshProblemTags();
@@ -495,7 +495,7 @@ OmegaUp.on('ready', function() {
       public: isPublic,
     })
       .then(function(response) {
-        ui.success('Tag successfully added!');
+        ui.success(T.tagAdded);
         $('div.post.footer').show();
 
         refreshProblemTags();
@@ -538,7 +538,7 @@ OmegaUp.on('ready', function() {
                         name: tagname,
                       })
                         .then(function(response) {
-                          ui.success('Tag successfully removed!');
+                          ui.success(T.tagRemoved);
                           $('div.post.footer').show();
                           var tr = e.target.parentElement.parentElement;
                           $('#tags .tag-list').append(
@@ -588,7 +588,22 @@ OmegaUp.on('ready', function() {
       problem_alias: problemAlias,
       statement_type: 'markdown',
     })
-      .then(problemCallback)
+      .then(function(problem) {
+        $('#allow_user_add_tags').on('change', () => {
+          const isChecked = $(this).is(':checked');
+          API.Problem.update({
+            problem_alias: problemAlias,
+            title: problem.title,
+            allow_user_add_tags: isChecked,
+            message: `${T.problemEditFormAllowUserAddTags}: ${isChecked}`,
+          })
+            .then(() => {
+              ui.success(T.problemEditUpdatedSuccessfully);
+            })
+            .catch(T.apiError);
+        });
+        problemCallback(problem);
+      })
       .catch(ui.apiError);
   }
 
