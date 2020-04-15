@@ -38,23 +38,27 @@
             ></a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/arena/" data-nav-arena>{{ T.navAllContests }}</a>
+                <a href="/arena/" data-nav-contests-arena>{{
+                  T.navAllContests
+                }}</a>
               </li>
 
               <template v-if="isMainUserIdentity">
                 <li>
-                  <a href="/contest/new/" data-nav-create-contest>{{
+                  <a href="/contest/new/" data-nav-contests-create>{{
                     T.contestsCreateNew
                   }}</a>
                 </li>
                 <!-- TODO: Esto debe irse a la otra pestaña -->
                 <li>
-                  <a href="/contest/mine/" data-nav-my-contests>{{
+                  <a href="/contest/mine/" data-nav-contests-mine>{{
                     T.navMyContests
                   }}</a>
                 </li>
                 <li>
-                  <a href="/group/" data-nav-my-groups>{{ T.navMyGroups }}</a>
+                  <a href="/group/" data-nav-contests-my-groups>{{
+                    T.navMyGroups
+                  }}</a>
                 </li>
                 <!-- TODO: hasta aquí -->
                 <li>
@@ -66,7 +70,7 @@
             </ul>
           </li>
           <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
-            <a href="/arena/" data-nav-arena>{{ T.wordsContests }}</a>
+            <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
             class="dropdown nav-problems"
