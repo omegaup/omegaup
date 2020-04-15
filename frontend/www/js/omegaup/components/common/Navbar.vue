@@ -69,50 +69,48 @@
             <a href="/arena/" data-nav-arena>{{ T.wordsContests }}</a>
           </li>
           <li
-            class="dropdown nav-problems"
-            v-bind:class="{ active: navbarSection === 'problems' }"
-            v-if="isLoggedIn && isMainUserIdentity"
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
-              ><span>{{ T.wordsProblems }}</span> <span class="caret"></span
-            ></a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/problem/new/">{{ T.myproblemsListCreateProblem }}</a>
-              </li>
-              <li>
-                <a href="/problem/mine/">{{ T.navMyProblems }}</a>
-              </li>
-              <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
-              </li>
-              <li>
-                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
-              </li>
-              <li>
-                <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
-              </li>
-              <li v-show="isReviewer">
-                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
-              </li>
-            </ul>
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
             v-bind:class="{ active: navbarSection === 'problems' }"
-            v-else=""
           >
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span>{{ T.wordsProblems }}</span>
-              <span class="caret"></span>
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-problems
+              href="#"
+            >
+              <span>{{ T.wordsProblems }}</span> <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
+                <a href="/problem/" data-nav-all-problems>{{
+                  T.navAllProblems
+                }}</a>
+              </li>
+              <li v-if="isLoggedIn && isMainUserIdentity">
+                <a href="/problem/new/" data-nav-create-problem>{{
+                  T.myproblemsListCreateProblem
+                }}</a>
               </li>
               <li>
                 <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
               </li>
+              <li v-if="isReviewer">
+                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
+              </li>
+              <!-- TODO: Esto tiene que ir el nuevo tab -->
+              <li>
+                <a href="/problem/mine/">{{ T.navMyProblems }}</a>
+              </li>
+              <li>
+                <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
+              </li>
+              <!-- TODO: hasta aquí -->
             </ul>
           </li>
           <li
@@ -130,19 +128,40 @@
               <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
               </li>
+              <li>
+                <a href="/coderofthemonth/">{{ T.navCoderOfTheMonth }}</a>
+              </li>
+              <li>
+                <a href="/coderofthemonth/female/">{{
+                  T.navCoderOfTheMonthFemale
+                }}</a>
+              </li>
+              <li>
+                <a href="/schoolofthemonth/">{{ T.navSchoolOfTheMonth }}</a>
+              </li>
             </ul>
           </li>
-          <li
-            class="nav-courses"
-            v-bind:class="{ active: navbarSection === 'courses' }"
-          >
-            <a href="/schools/">{{ T.navCourses }}</a>
-          </li>
-          <li>
-            <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
-          </li>
-          <li>
-            <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{ T.navHelp }}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+                  >{{ T.navTutorials }}</a
+                >
+              </li>
+              <li>
+                <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
+              </li>
+              <li>
+                <a href="https://omegaup.com/preguntas/">{{
+                  T.navQuestions
+                }}</a>
+              </li>
+            </ul>
           </li>
         </ul>
         <ul class="nav navbar-nav" v-else=""></ul>
