@@ -136,7 +136,7 @@
 
       .footer-logo,
       .slogan {
-        margin-top: -40px;
+        margin-top: -2.5rem;
       }
 
       .slogan {
@@ -145,6 +145,7 @@
     }
 
     .footer-list-section {
+      // On small sizes, this will work as an inline grid (not 100% width)
       @media only screen and (max-width: 767px) {
         display: inline-grid;
       }
