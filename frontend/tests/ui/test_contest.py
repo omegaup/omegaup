@@ -53,7 +53,7 @@ def test_create_contest(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-my-contests]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -119,7 +119,7 @@ def test_user_ranking_contest(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-my-contests]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
@@ -131,7 +131,7 @@ def test_user_ranking_contest(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-my-contests]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Admin')
 
@@ -141,7 +141,7 @@ def test_user_ranking_contest(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-arena]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -355,7 +355,7 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-create-contest]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-contests-create]'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -450,7 +450,7 @@ def enter_contest(driver, contest_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-arena]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

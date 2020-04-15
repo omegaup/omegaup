@@ -350,7 +350,7 @@ def create_group(driver, group_title, description):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-my-groups]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-contests-my-groups]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -387,7 +387,7 @@ def add_identities_group(driver, group_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-my-groups]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-contests-my-groups]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
