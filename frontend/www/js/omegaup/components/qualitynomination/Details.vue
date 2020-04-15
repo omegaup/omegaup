@@ -88,14 +88,14 @@
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('approved')"
+              v-on:click="markResolution('resolved')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('denied')"
+              v-on:click="markResolution('banned')"
             >
               {{ T.wordsKeepProblem }}
             </button>
