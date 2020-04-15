@@ -62,7 +62,7 @@ class OmegaUpTest:
       'a[data-nav-problems]')
     nav_problems.click()
     nav_link = self.driver.find_element_by_css_selector(
-      'a[data-nav-create-problem]')
+      'a[data-nav-problems-create]')
     assert nav_link
     nav_link.click()
 

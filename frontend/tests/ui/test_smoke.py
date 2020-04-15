@@ -131,7 +131,7 @@ def prepare_run(driver, problem_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'a[data-nav-all-problems]'))).click()
+                 'a[data-nav-problems-all]'))).click()
 
     search_box_element = driver.wait.until(
         EC.visibility_of_element_located(
@@ -161,7 +161,7 @@ def create_problem(driver, problem_alias):
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR,
-                     'a[data-nav-create-problem]'))).click()
+                     'a[data-nav-problems-create]'))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(

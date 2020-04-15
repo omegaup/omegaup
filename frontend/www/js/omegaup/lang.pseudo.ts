@@ -506,7 +506,7 @@ const translations: { [key: string]: string; } = {
   navArena: "(Ar3na)",
   navBlog: "(B10g)",
   navCoderOfTheMonth: "(C0d3r 0f 7h3 M0n7h)",
-  navCoderOfTheMonthFemale: "(C0d3r 0f 7h3 M0n7h F3ma13)",
+  navCoderOfTheMonthFemale: "(F3ma13 C0d3r 0f 7h3 M0n7h)",
   navContests: "(C0n73575)",
   navCourses: "(C0ur535)",
   navDevelopers: "(D3v310p3r5)",

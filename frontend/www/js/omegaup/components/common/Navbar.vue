@@ -92,13 +92,13 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/" data-nav-all-problems>{{
+                <a href="/problem/" data-nav-problems-all>{{
                   T.navAllProblems
                 }}</a>
               </li>
               <template v-if="isLoggedIn && isMainUserIdentity">
                 <li>
-                  <a href="/problem/new/" data-nav-create-problem>{{
+                  <a href="/problem/new/" data-nav-problems-create>{{
                     T.myproblemsListCreateProblem
                   }}</a>
                 </li>

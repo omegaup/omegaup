@@ -506,7 +506,7 @@ const translations: { [key: string]: string; } = {
   navArena: "Arena",
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder of the Month",
-  navCoderOfTheMonthFemale: "Coder of the Month Female",
+  navCoderOfTheMonthFemale: "Female Coder of the Month",
   navContests: "Contests",
   navCourses: "Courses",
   navDevelopers: "Developers",
