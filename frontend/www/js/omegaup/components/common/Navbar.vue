@@ -92,25 +92,27 @@
                   T.navAllProblems
                 }}</a>
               </li>
-              <li v-if="isLoggedIn && isMainUserIdentity">
-                <a href="/problem/new/" data-nav-create-problem>{{
-                  T.myproblemsListCreateProblem
-                }}</a>
-              </li>
+              <template v-if="isLoggedIn && isMainUserIdentity">
+                <li>
+                  <a href="/problem/new/" data-nav-create-problem>{{
+                    T.myproblemsListCreateProblem
+                  }}</a>
+                </li>
+                <!-- TODO: Esto tiene que ir el nuevo tab -->
+                <li>
+                  <a href="/problem/mine/">{{ T.navMyProblems }}</a>
+                </li>
+                <li>
+                  <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
+                </li>
+                <!-- TODO: hasta aquí -->
+              </template>
               <li>
                 <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
               </li>
               <li v-if="isReviewer">
                 <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
               </li>
-              <!-- TODO: Esto tiene que ir el nuevo tab -->
-              <li>
-                <a href="/problem/mine/">{{ T.navMyProblems }}</a>
-              </li>
-              <li>
-                <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
-              </li>
-              <!-- TODO: hasta aquí -->
             </ul>
           </li>
           <li
