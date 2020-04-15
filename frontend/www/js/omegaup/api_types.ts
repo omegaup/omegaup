@@ -2063,6 +2063,7 @@ export namespace messages {
     source: string;
   };
   export type RunStatusRequest = { [key: string]: any };
+  export type _RunStatusServerResponse = any;
   export type RunStatusResponse = {
     contest_score?: number;
     memory: number;
@@ -2070,7 +2071,7 @@ export namespace messages {
     runtime: number;
     score: number;
     submit_delay: number;
-    time: number;
+    time: Date;
   };
 
   // School

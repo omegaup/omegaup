@@ -586,7 +586,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: int}
+     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp}
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -621,7 +621,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
-        $filtered['time'] = intval($filtered['time']);
+        $filtered['time'] = new \OmegaUp\Timestamp(intval($filtered['time']));
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
         $filtered['penalty'] = intval($filtered['penalty']);

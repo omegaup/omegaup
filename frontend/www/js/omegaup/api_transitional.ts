@@ -888,9 +888,14 @@ export const Run = {
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),
-  status: apiCall<messages.RunStatusRequest, messages.RunStatusResponse>(
-    '/api/run/status/',
-  ),
+  status: apiCall<
+    messages.RunStatusRequest,
+    messages._RunStatusServerResponse,
+    messages.RunStatusResponse
+  >('/api/run/status/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
 };
 
 export const School = {

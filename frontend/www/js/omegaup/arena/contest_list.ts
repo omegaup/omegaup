@@ -16,9 +16,9 @@ OmegaUp.on('ready', () => {
       continue;
     }
     contestList.forEach((contest: types.ContestListItem) => {
-      contest.finish_time = OmegaUp.remoteTime(contest.finish_time);
-      contest.last_updated = OmegaUp.remoteTime(contest.last_updated);
-      contest.start_time = OmegaUp.remoteTime(contest.start_time);
+      contest.finish_time = time.remoteDate(contest.finish_time);
+      contest.last_updated = time.remoteDate(contest.last_updated);
+      contest.start_time = time.remoteDate(contest.start_time);
     });
   }
   const contestList = new Vue({
