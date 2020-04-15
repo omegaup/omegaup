@@ -1,9 +1,10 @@
 import common_Footer from '../components/common/Footer.vue';
 import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.CommonPayload('payload');
   let isLoggedIn = false;
   let omegaUpLockDown = false;
   if (
@@ -13,6 +14,7 @@ OmegaUp.on('ready', function() {
     isLoggedIn = payload.isLoggedIn;
     omegaUpLockDown = payload.omegaUpLockDown;
   }
+
   const commonFooter = new Vue({
     el: '#common-footer',
     render: function(createElement) {
