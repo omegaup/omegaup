@@ -59,15 +59,10 @@ class OmegaUpTest:
 
   def create_problem(self):
     nav_problems = self.driver.find_element_by_css_selector(
-      '#root .nav-problems')
+      'a[data-nav-problems]')
     nav_problems.click()
-    nav_links = self.driver.find_elements_by_css_selector(
-      '#root .nav-problems a')
-    nav_link = None
-    for link in nav_links:
-      if link.get_attribute('innerText') == 'Create a problem':
-        nav_link = link
-        break
+    nav_link = self.driver.find_element_by_css_selector(
+      'a[data-nav-problems-create]')
     assert nav_link
     nav_link.click()
 
