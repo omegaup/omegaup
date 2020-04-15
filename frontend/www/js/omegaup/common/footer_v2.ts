@@ -1,4 +1,4 @@
-import common_Footer from '../components/common/Footer.vue';
+import Footer from '../components/common/Footerv2.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
@@ -30,7 +30,7 @@ OmegaUp.on('ready', () => {
       omegaUpLockDown: omegaUpLockDown,
     },
     components: {
-      'omegaup-common-footer': common_Footer,
+      'omegaup-common-footer': Footer,
     },
   });
 });
