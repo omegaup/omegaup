@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import T from './lang';
 
 let momentInitialized: boolean = false;
+let remoteDeltaTime: number = 0;
 
 export function formatDelta(delta: number): string {
   if (!momentInitialized) {
@@ -172,4 +173,67 @@ declare global {
 
 export function setSugarLocale() {
   Date.setLocale(T.locale);
+}
+
+/**
+ * Sets the delta (in milliseconds) between the local and remote clock sources.
+ *
+ * @param delta - The delta (in milliseconds) between the local and remote
+ * clock sources.
+ */
+export function _setRemoteDeltaTime(delta: number): void {
+  remoteDeltaTime = delta;
+}
+
+/**
+ * Converts a timestamp from the server clock source to the local clock source.
+ *
+ * @param date - The timestamp (in milliseconds) with the server clock source.
+ * @returns The same date, with the local clock source.
+ */
+export function remoteTime(timestamp: number): Date {
+  return new Date(timestamp + remoteDeltaTime);
+}
+
+/**
+ * Converts a date from the server clock source to the local clock source.
+ *
+ * @param date - The date with the server clock source.
+ * @returns The same date, with the local clock source.
+ */
+export function remoteDate(date: Date): Date {
+  return remoteTime(date.getTime());
+}
+
+/**
+ * Recursively converts all Date objects to local time.
+ *
+ * This method traverses an Object hierarchy and converts Date objects that use
+ * the server clock source into Date objects that use the local clock source.
+ *
+ * @param value - The value that will be converted.
+ * @returns The same object with all its Date objects converted from remote to
+ * local time.
+ */
+export function remoteTimeAdapter<T>(value: T): T {
+  if (value instanceof Date) {
+    return <T>(remoteDate(value) as unknown);
+  }
+
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; ++i) {
+      if (typeof value[i] !== 'object') {
+        continue;
+      }
+      value[i] = remoteTimeAdapter(value[i]);
+    }
+  } else if (typeof value === 'object') {
+    for (const p in value) {
+      if (!(<any>value).hasOwnProperty(p) || typeof value[p] !== 'object') {
+        continue;
+      }
+      value[p] = remoteTimeAdapter(value[p]);
+    }
+  }
+  return value;
 }

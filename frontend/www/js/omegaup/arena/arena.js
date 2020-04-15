@@ -704,7 +704,8 @@ export class Arena {
     let self = this;
     if (self.socket != null) return;
     setTimeout(function() {
-      API.Run.status({ run_alias: guid })
+      api.Run.status({ run_alias: guid })
+        .then(time.remoteTimeAdapter)
         .then(self.updateRun.bind(self))
         .catch(ui.ignoreError);
     }, 5000);

@@ -3596,7 +3596,7 @@ Get basic details of a run
 | `runtime`       | `number` |
 | `score`         | `number` |
 | `submit_delay`  | `number` |
-| `time`          | `number` |
+| `time`          | `Date`   |
 
 # School
 
