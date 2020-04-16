@@ -248,7 +248,7 @@ export namespace types {
     problem_alias: string;
     public: boolean;
     receiver?: string;
-    time: number;
+    time: Date;
   }
 
   export interface CoderOfTheMonth {
@@ -712,6 +712,7 @@ export namespace messages {
   export type ContestArbitrateRequestRequest = { [key: string]: any };
   export type ContestArbitrateRequestResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
+  export type _ContestClarificationsServerResponse = any;
   export type ContestClarificationsResponse = {
     clarifications: types.Clarification[];
   };

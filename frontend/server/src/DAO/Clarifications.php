@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
-     * @return list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: int}>
+     * @return list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}>
      */
     final public static function GetProblemsetClarifications(
         int $problemset_id,
@@ -31,7 +31,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                   r.username `receiver`,
                   c.message,
                   c.answer,
-                  UNIX_TIMESTAMP(c.time) `time`,
+                  c.`time`,
                   c.public
                 FROM
                   `Clarifications` c
@@ -58,7 +58,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: int}> */
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 

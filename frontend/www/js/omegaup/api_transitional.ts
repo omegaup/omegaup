@@ -225,8 +225,20 @@ export const Contest = {
   >('/api/contest/arbitrateRequest/'),
   clarifications: apiCall<
     messages.ContestClarificationsRequest,
+    messages._ContestClarificationsServerResponse,
     messages.ContestClarificationsResponse
-  >('/api/contest/clarifications/'),
+  >('/api/contest/clarifications/', x => {
+    x.clarifications = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   clone: apiCall<messages.ContestCloneRequest, messages.ContestCloneResponse>(
     '/api/contest/clone/',
   ),
