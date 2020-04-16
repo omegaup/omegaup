@@ -146,7 +146,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemsCountWithPublicProblem() {
         // Create public problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1
+            'visibility' => 2
         ]));
         $user = $problemData['authorUser'];
 

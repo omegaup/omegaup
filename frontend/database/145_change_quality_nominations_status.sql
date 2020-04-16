@@ -94,3 +94,11 @@ SET
     `visibility` = '3'
 WHERE
     `visibility` = '2';
+
+/*PUBLIC from 1 to 2*/
+UPDATE
+    `Problems`
+SET
+    `visibility` = '2'
+WHERE
+    `visibility` = '1';

@@ -9,8 +9,8 @@ class ProblemParams {
     const VISIBILITY_PUBLIC_BANNED = -2; // Problem that was public before it was banned
     const VISIBILITY_PRIVATE_WARNING = -1; // Problem that was private before it was warning
     const VISIBILITY_PRIVATE = 0;
-    const VISIBILITY_PUBLIC = 1;
-    const VISIBILITY_PUBLIC_WARNING = 2; // Problem that was public before it was warning
+    const VISIBILITY_PUBLIC_WARNING = 1; // Problem that was public before it was warning
+    const VISIBILITY_PUBLIC = 2;
     const VISIBILITY_PROMOTED = 3;
 
     // Do not update the published branch.
