@@ -2,15 +2,6 @@ import * as types from './types.ts';
 import { OmegaUp } from './omegaup';
 import * as api from './api_transitional';
 
-function _convertRuntimes(data) {
-  if (data.runs) {
-    for (var i = 0; i < data.runs.length; i++) {
-      data.runs[i].time = OmegaUp.remoteTime(data.runs[i].time * 1000);
-    }
-  }
-  return data;
-}
-
 function _normalizeContestFields(contest) {
   OmegaUp.convertTimes(contest);
   contest.submissions_gap = parseInt(contest.submissions_gap);
@@ -68,13 +59,7 @@ export default {
 
     arbitrateRequest: api.Contest.arbitrateRequest,
 
-    clarifications: api.apiCall('/api/contest/clarifications/', function(data) {
-      for (var idx in data.clarifications) {
-        var clarification = data.clarifications[idx];
-        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
-      }
-      return data;
-    }),
+    clarifications: api.Contest.clarifications,
 
     contestants: api.Contest.contestants,
 
