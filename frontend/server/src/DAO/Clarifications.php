@@ -63,7 +63,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     }
 
     /**
-     * @return list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: int, answer: null|string, public: bool}>
+     * @return list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>
      */
     final public static function GetProblemClarifications(
         int $problemId,
@@ -81,7 +81,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                     i.username AS author,
                     c.message,
                     c.answer,
-                    UNIX_TIMESTAMP(c.time) AS `time`,
+                    c.`time`,
                     c.public
                 FROM
                     Clarifications c
@@ -95,7 +95,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                     con.alias AS contest_alias,
                     NULL AS author,
                     c.message,
-                    UNIX_TIMESTAMP(c.time) AS `time`,
+                    c.`time`,
                     c.answer,
                     c.public
                 FROM Clarifications c
@@ -121,7 +121,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: int, answer: null|string, public: bool}> */
+        /** @var list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 }

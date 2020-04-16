@@ -1628,7 +1628,8 @@ export class Arena {
         }
 
         if (self.options.isPractice || self.options.isOnlyProblem) {
-          API.Problem.runs({ problem_alias: problem.alias })
+          api.Problem.runs({ problem_alias: problem.alias })
+            .then(time.remoteTimeAdapter)
             .then(function(data) {
               updateRuns(data.runs);
             })
