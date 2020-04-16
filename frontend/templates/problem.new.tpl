@@ -1,6 +1,7 @@
 {include file='redirect.tpl' inline}
 {include file='head.tpl' navbarSection='problems' headerPayload=$headerPayload htmlTitle="{#omegaupTitleProblemNew#}" inline}
-{include file='problem.edit.form.tpl' new='true' tags=$SELECTED_TAGS|json_encode inline}
-<span id="form-data" data-name="problems"></span>
-<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
+
+<div id="problem-new"></div>
+<script type="text/json" id="payload">{$payload|json_encode}</script>
+{js_include entrypoint="problem_new"}
 {include file='footer.tpl' inline}
