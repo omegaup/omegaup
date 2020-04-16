@@ -48,12 +48,12 @@ def test_create_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-user-contests]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -115,11 +115,11 @@ def test_user_ranking_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-user-contests]'))).click()
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
@@ -127,11 +127,11 @@ def test_user_ranking_contest(driver):
 
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'a[data-nav-contests-mine]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-user-contests]'))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Admin')
 
