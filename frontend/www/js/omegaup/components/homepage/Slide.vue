@@ -28,8 +28,12 @@
     height: 500px;
   }
 
+  h2 {
+    font-size: 2.4rem;
+  }
+
   p {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 }
 </style>

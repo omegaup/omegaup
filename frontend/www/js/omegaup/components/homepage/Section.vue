@@ -31,8 +31,9 @@ h3.display-4 {
   font-weight: normal;
 }
 
-p.section-description {
-  font-size: 1.15rem;
+p.section-description,
+a.section-link {
+  font-size: 1.3rem;
 }
 
 img.img-fluid {
