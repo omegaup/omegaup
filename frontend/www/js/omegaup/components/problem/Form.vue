@@ -98,7 +98,8 @@
               <label class="radio-inline">
                 <input
                   type="radio"
-                  name="visibility"
+                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
+                  v-bind:disabled="data.isBannedOrPromoted"
                   v-bind:value="1"
                   v-model="visibility"
                 />
@@ -107,7 +108,8 @@
               <label class="radio-inline">
                 <input
                   type="radio"
-                  name="visibility"
+                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
+                  v-bind:disabled="data.isBannedOrPromoted"
                   v-bind:value="0"
                   v-model="visibility"
                 />

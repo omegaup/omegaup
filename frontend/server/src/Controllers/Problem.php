@@ -93,7 +93,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias' => $r['problem_alias'],
         ];
         if (!is_null($r['email_clarifications'])) {
-            $r->ensureBool('email_clarifications');
+            $r->ensureBool('email_clarifications', false);
             $params['email_clarifications'] = boolval(
                 $r['email_clarifications']
             );
@@ -152,7 +152,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params['show_diff'] = strval($r['show_diff']);
         }
         if (!is_null($r['allow_user_add_tags'])) {
-            $r->ensureBool('allow_user_add_tags');
+            $r->ensureBool('allow_user_add_tags', false);
             $params['allow_user_add_tags'] = boolval(
                 $r['allow_user_add_tags']
             );
