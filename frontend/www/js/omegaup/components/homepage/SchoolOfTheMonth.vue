@@ -3,7 +3,9 @@
     <h5 class="card-header">
       {{ T.schoolOfTheMonth }}
     </h5>
-    <div class="card-body text-center d-flex flex-column justify-content-center">
+    <div
+      class="card-body text-center d-flex flex-column justify-content-center"
+    >
       <h5 class="card-title">
         <omegaup-countryflag
           v-bind:country="schoolOfTheMonth.country_id"
