@@ -8,6 +8,7 @@
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<array{public: bool, tagname: string}>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4354,13 +4355,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
      *
-     * @return array{smartyProperties: array{payload: array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemFormPayload}, template: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
         $tags = [];
+        $selectedTags = null;
 
         /* @var list<array{name: string}> $tag*/
         foreach (\OmegaUp\DAO\Tags::findByName('') as $tag) {
@@ -4369,12 +4371,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
+            $problemParams = self::convertRequestToProblemParams($r);
             try {
-                self::createProblem(
-                    $r->user,
-                    $r->identity,
-                    self::convertRequestToProblemParams($r)
-                );
+                self::createProblem($r->user, $r->identity, $problemParams);
                 header("Location: /problem/{$r['problem_alias']}/edit/");
                 die();
             } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -4384,6 +4383,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $statusError = '{error}';
                 } else {
                     $statusError = $response['error'];
+                }
+                if (!is_null($problemParams->selectedTagsAsJSON)) {
+                    /** @var list<array{tagname: string, public: bool}> */
+                    $selectedTags = json_decode(
+                        $problemParams->selectedTagsAsJSON,
+                        /*$assoc=*/true
+                    );
                 }
                 return [
                     'smartyProperties' => [
@@ -4397,7 +4403,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'source' => strval($r['source']),
                                 'visibility' => intval($r['visibility']),
                                 'statusError' => $statusError,
-                                'selectedTags' => strval($r['selected_tags']),
+                                'selectedTags' => $selectedTags,
                                 'isUpdate' => false,
                                 'allowUserAddTags' => true,
                                 'timeLimit' => strval($r['time_limit']),
@@ -4438,7 +4444,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'source' => '',
                         'visibility' => 0,
                         'statusError' => '',
-                        'selectedTags' => '[]',
+                        'selectedTags' => null,
                         'isUpdate' => false,
                         'allowUserAddTags' => true,
                         'timeLimit' => 1000,

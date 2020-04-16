@@ -1,6 +1,6 @@
 <template>
   <div class="panel panel-primary problem-form">
-    <div class="panel-heading" v-if="!isUpdate">
+    <div class="panel-heading" v-if="!data.isUpdate">
       <h3 class="panel-title">
         {{ T.problemNew }}
       </h3>
@@ -18,18 +18,10 @@
     <div class="panel-body">
       <form
         method="POST"
-        v-bind:action="requestURI"
         class="form"
         enctype="multipart/form-data"
         v-on:submit="onSubmit"
       >
-        <input
-          type="hidden"
-          name="problem_alias"
-          v-bind:value="problemAlias"
-          v-if="isUpdate"
-        />
-
         <div class="row">
           <div
             class="form-group  col-md-6"
@@ -56,7 +48,7 @@
               ref="alias"
               type="text"
               class="form-control"
-              v-bind:disabled="isUpdate"
+              v-bind:disabled="data.isUpdate"
             />
           </div>
         </div>
@@ -71,8 +63,8 @@
           v-bind:initialLanguage="languages"
           v-bind:overallWallTimeLimit="overallWallTimeLimit"
           v-bind:validatorTimeLimit="validatorTimeLimit"
-          v-bind:validLanguages="validLanguages"
-          v-bind:validatorTypes="validatorTypes"
+          v-bind:validLanguages="data.validLanguages"
+          v-bind:validatorTypes="data.validatorTypes"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -180,7 +172,7 @@
           </div>
         </div>
 
-        <div class="panel panel-primary" v-if="!isUpdate">
+        <div class="panel panel-primary" v-if="!data.isUpdate">
           <div class="panel-body">
             <div class="form-group">
               <label>{{ T.wordsTags }}</label>
@@ -192,7 +184,7 @@
                   href="#tags"
                   v-bind:data-key="tag.name"
                   v-for="tag in tags"
-                  v-on:click="onAddTag(tag.name)"
+                  v-on:click="onAddTag(tag.name, public)"
                 >
                   {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
                 </a>
@@ -232,7 +224,7 @@
                   </a>
                 </td>
                 <td class="is_public">
-                  {{ public ? T.wordsYes : T.wordsNo }}
+                  {{ selectedTag.public ? T.wordsYes : T.wordsNo }}
                 </td>
                 <td>
                   <button
@@ -292,6 +284,7 @@ import problem_Settings from './Settings.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import latinize from 'latinize';
+import { types } from '../../api_types';
 
 interface SelectedTag {
   tagname: string;
@@ -308,49 +301,27 @@ interface Tag {
   },
 })
 export default class ProblemForm extends Vue {
-  @Prop() isUpdate!: boolean;
-  @Prop() requestURI!: string;
-  @Prop() problemAlias!: string;
-  @Prop() initialTitle!: string;
-  @Prop() initialAlias!: string;
-  @Prop() initialTimeLimit!: string;
-  @Prop() initialExtraWallTime!: number;
-  @Prop() initialMemoryLimit!: number;
-  @Prop() initialOutputLimit!: number;
-  @Prop() initialInputLimit!: number;
-  @Prop() initialOverallWallTimeLimit!: number;
-  @Prop() initialValidatorTimeLimit!: number;
-  @Prop() validLanguages!: Array<string>;
-  @Prop() validatorTypes!: Array<string>;
-  @Prop() initialEmailClarifications!: boolean;
-  @Prop() initialVisibility!: number;
-  @Prop() initialAllowUserAddTags!: boolean;
-  @Prop() initialSource!: string;
-  @Prop() initialValidator!: string;
-  @Prop() initialLanguages!: string;
-  @Prop() initialMessage!: string;
-  @Prop() initialTags!: Tag[];
-  @Prop() initialSelectedTags!: SelectedTag[];
+  @Prop() data!: types.ProblemFormPayload;
 
   T = T;
-  title = this.initialTitle;
-  alias = this.initialAlias;
-  timeLimit = this.initialTimeLimit;
-  extraWallTime = this.initialExtraWallTime;
-  memoryLimit = this.initialMemoryLimit;
-  outputLimit = this.initialOutputLimit;
-  inputLimit = this.initialInputLimit;
-  overallWallTimeLimit = this.initialOverallWallTimeLimit;
-  validatorTimeLimit = this.initialValidatorTimeLimit;
-  emailClarifications = this.initialEmailClarifications;
-  visibility = this.initialVisibility;
-  allowUserAddTags = this.initialAllowUserAddTags;
-  source = this.initialSource;
-  validator = this.initialValidator;
-  languages = this.initialLanguages;
-  tags = this.initialTags;
-  selectedTags = this.initialSelectedTags;
-  message = this.initialMessage;
+  title = this.data.title;
+  alias = this.data.alias;
+  timeLimit = this.data.timeLimit;
+  extraWallTime = this.data.extraWallTime;
+  memoryLimit = this.data.memoryLimit;
+  outputLimit = this.data.outputLimit;
+  inputLimit = this.data.inputLimit;
+  overallWallTimeLimit = this.data.overallWallTimeLimit;
+  validatorTimeLimit = this.data.validatorTimeLimit;
+  emailClarifications = this.data.emailClarifications;
+  visibility = this.data.visibility;
+  allowUserAddTags = this.data.allowUserAddTags;
+  source = this.data.source;
+  validator = this.data.validator;
+  languages = this.data.languages;
+  tags = this.data.tags;
+  selectedTags = this.data.selectedTags || [];
+  message = this.data.message;
   hasFile = false;
   public = false;
   errors: string[] = [];
@@ -360,7 +331,7 @@ export default class ProblemForm extends Vue {
   }
 
   get buttonText(): string {
-    if (this.isUpdate) {
+    if (this.data.isUpdate) {
       return T.problemEditFormUpdateProblem;
     }
     return T.problemEditFormCreateProblem;
@@ -372,7 +343,7 @@ export default class ProblemForm extends Vue {
 
   onSubmit(e: Event): void {
     this.errors = [];
-    if (this.isUpdate && this.message) {
+    if (this.data.isUpdate && this.message) {
       return;
     }
     if (this.title && this.alias && this.source && this.hasFile) {
@@ -391,7 +362,7 @@ export default class ProblemForm extends Vue {
     if (!this.hasFile) {
       this.errors.push('file');
     }
-    if (this.isUpdate && !this.message) {
+    if (this.data.isUpdate && !this.message) {
       this.errors.push('message');
     }
     e.preventDefault();
@@ -404,8 +375,8 @@ export default class ProblemForm extends Vue {
     }
   }
 
-  onAddTag(tagname: string): boolean {
-    this.selectedTags.push({ tagname: tagname, public: this.public });
+  onAddTag(tagname: string, isPublic: boolean): boolean {
+    this.selectedTags.push({ tagname: tagname, public: isPublic });
     this.tags = this.tags.filter((val, index, arr) => val.name !== tagname);
     return false; // Prevent refresh
   }
