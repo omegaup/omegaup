@@ -1,13 +1,14 @@
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
+import T from '../lang';
 import Vue from 'vue';
 import problem_New from '../components/problem/Form.vue';
-import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
-import T from '../lang';
-import API from '../api.js';
+import * as api from '../api_transitional';
 
-OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
-  let problemNew = new Vue({
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.ProblemFormPayload('payload');
+  const problemNew = new Vue({
     el: '#problem-new',
     render: function(createElement) {
       return createElement('omegaup-problem-new', {
@@ -15,11 +16,11 @@ OmegaUp.on('ready', function() {
           data: this.data,
         },
         on: {
-          'alias-in-use': alias => {
-            API.Problem.details({ problem_alias: alias })
+          'alias-in-use': (alias: string): void => {
+            api.Problem.details({ problem_alias: alias })
               .then(data => {
                 if (!data.exists) {
-                  ui.dismissNotifications();
+                  ui.dismissNotifications(10);
                   return;
                 }
                 ui.error(

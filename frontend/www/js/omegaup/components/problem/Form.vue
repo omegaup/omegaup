@@ -286,15 +286,6 @@ import * as ui from '../../ui';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 
-interface SelectedTag {
-  tagname: string;
-  public: boolean;
-}
-
-interface Tag {
-  name: string;
-}
-
 @Component({
   components: {
     'omegaup-problem-settings': problem_Settings,
