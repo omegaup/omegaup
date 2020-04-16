@@ -248,7 +248,7 @@ export namespace types {
     problem_alias: string;
     public: boolean;
     receiver?: string;
-    time: number;
+    time: Date;
   }
 
   export interface CoderOfTheMonth {
@@ -459,7 +459,7 @@ export namespace types {
     score: number;
     contest_score: number;
     judged_by?: string;
-    time: number;
+    time: Date;
     submit_delay: number;
     type?: string;
     username: string;
@@ -712,6 +712,7 @@ export namespace messages {
   export type ContestArbitrateRequestRequest = { [key: string]: any };
   export type ContestArbitrateRequestResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
+  export type _ContestClarificationsServerResponse = any;
   export type ContestClarificationsResponse = {
     clarifications: types.Clarification[];
   };
@@ -978,6 +979,7 @@ export namespace messages {
   export type ContestRoleRequest = { [key: string]: any };
   export type ContestRoleResponse = { admin: boolean };
   export type ContestRunsRequest = { [key: string]: any };
+  export type _ContestRunsServerResponse = any;
   export type ContestRunsResponse = { runs: types.Run[] };
   export type ContestRunsDiffRequest = { [key: string]: any };
   export type ContestRunsDiffResponse = {
@@ -1314,6 +1316,7 @@ export namespace messages {
     }[];
   };
   export type CourseRunsRequest = { [key: string]: any };
+  export type _CourseRunsServerResponse = any;
   export type CourseRunsResponse = {
     runs: {
       run_id: number;
@@ -1327,7 +1330,7 @@ export namespace messages {
       score: number;
       contest_score: number;
       judged_by?: string;
-      time: number;
+      time: Date;
       submit_delay: number;
       type?: string;
       username: string;
@@ -1337,6 +1340,7 @@ export namespace messages {
     }[];
   };
   export type CourseStudentProgressRequest = { [key: string]: any };
+  export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
     problems: {
       accepted: number;
@@ -1363,7 +1367,7 @@ export namespace messages {
         memory: number;
         score: number;
         contest_score?: number;
-        time: number;
+        time: Date;
         submit_delay: number;
       }[];
     }[];
@@ -1566,13 +1570,14 @@ export namespace messages {
   export type ProblemBestScoreRequest = { [key: string]: any };
   export type ProblemBestScoreResponse = { score: number };
   export type ProblemClarificationsRequest = { [key: string]: any };
+  export type _ProblemClarificationsServerResponse = any;
   export type ProblemClarificationsResponse = {
     clarifications: {
       clarification_id: number;
       contest_alias: string;
       author?: string;
       message: string;
-      time: number;
+      time: Date;
       answer?: string;
       public: boolean;
     }[];
@@ -1582,6 +1587,7 @@ export namespace messages {
   export type ProblemDeleteRequest = { [key: string]: any };
   export type ProblemDeleteResponse = {};
   export type ProblemDetailsRequest = { [key: string]: any };
+  export type _ProblemDetailsServerResponse = any;
   export type ProblemDetailsResponse = {
     accepted: number;
     admin: boolean;
@@ -1609,7 +1615,7 @@ export namespace messages {
       score: number;
       status: string;
       submit_delay: number;
-      time: number;
+      time: Date;
       username: string;
       verdict: string;
     }[];
@@ -1661,6 +1667,7 @@ export namespace messages {
   export type ProblemRemoveTagRequest = { [key: string]: any };
   export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
+  export type _ProblemRunsServerResponse = any;
   export type ProblemRunsResponse = {
     runs: {
       guid: string;
@@ -1672,7 +1679,7 @@ export namespace messages {
       memory: number;
       score: number;
       contest_score?: number;
-      time: number;
+      time: Date;
       submit_delay: number;
       alias: string;
       username: string;
@@ -2001,6 +2008,7 @@ export namespace messages {
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
+  export type _RunListServerResponse = any;
   export type RunListResponse = {
     runs: {
       alias: string;
@@ -2016,7 +2024,7 @@ export namespace messages {
       runtime: number;
       score: number;
       submit_delay: number;
-      time: number;
+      time: Date;
       type?: string;
       username: string;
       verdict: string;
@@ -2063,6 +2071,7 @@ export namespace messages {
     source: string;
   };
   export type RunStatusRequest = { [key: string]: any };
+  export type _RunStatusServerResponse = any;
   export type RunStatusResponse = {
     contest_score?: number;
     memory: number;
@@ -2070,7 +2079,7 @@ export namespace messages {
     runtime: number;
     score: number;
     submit_delay: number;
-    time: number;
+    time: Date;
   };
 
   // School

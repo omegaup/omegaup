@@ -225,8 +225,20 @@ export const Contest = {
   >('/api/contest/arbitrateRequest/'),
   clarifications: apiCall<
     messages.ContestClarificationsRequest,
+    messages._ContestClarificationsServerResponse,
     messages.ContestClarificationsResponse
-  >('/api/contest/clarifications/'),
+  >('/api/contest/clarifications/', x => {
+    x.clarifications = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   clone: apiCall<messages.ContestCloneRequest, messages.ContestCloneResponse>(
     '/api/contest/clone/',
   ),
@@ -369,9 +381,22 @@ export const Contest = {
   role: apiCall<messages.ContestRoleRequest, messages.ContestRoleResponse>(
     '/api/contest/role/',
   ),
-  runs: apiCall<messages.ContestRunsRequest, messages.ContestRunsResponse>(
-    '/api/contest/runs/',
-  ),
+  runs: apiCall<
+    messages.ContestRunsRequest,
+    messages._ContestRunsServerResponse,
+    messages.ContestRunsResponse
+  >('/api/contest/runs/', x => {
+    x.runs = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   runsDiff: apiCall<
     messages.ContestRunsDiffRequest,
     messages.ContestRunsDiffResponse
@@ -536,13 +561,46 @@ export const Course = {
     })(x.users);
     return x;
   }),
-  runs: apiCall<messages.CourseRunsRequest, messages.CourseRunsResponse>(
-    '/api/course/runs/',
-  ),
+  runs: apiCall<
+    messages.CourseRunsRequest,
+    messages._CourseRunsServerResponse,
+    messages.CourseRunsResponse
+  >('/api/course/runs/', x => {
+    x.runs = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   studentProgress: apiCall<
     messages.CourseStudentProgressRequest,
+    messages._CourseStudentProgressServerResponse,
     messages.CourseStudentProgressResponse
-  >('/api/course/studentProgress/'),
+  >('/api/course/studentProgress/', x => {
+    x.problems = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.runs = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.runs);
+        return x;
+      });
+    })(x.problems);
+    return x;
+  }),
   update: apiCall<messages.CourseUpdateRequest, messages.CourseUpdateResponse>(
     '/api/course/update/',
   ),
@@ -714,8 +772,20 @@ export const Problem = {
   >('/api/problem/bestScore/'),
   clarifications: apiCall<
     messages.ProblemClarificationsRequest,
+    messages._ProblemClarificationsServerResponse,
     messages.ProblemClarificationsResponse
-  >('/api/problem/clarifications/'),
+  >('/api/problem/clarifications/', x => {
+    x.clarifications = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   create: apiCall<
     messages.ProblemCreateRequest,
     messages.ProblemCreateResponse
@@ -726,8 +796,20 @@ export const Problem = {
   >('/api/problem/delete/'),
   details: apiCall<
     messages.ProblemDetailsRequest,
+    messages._ProblemDetailsServerResponse,
     messages.ProblemDetailsResponse
-  >('/api/problem/details/'),
+  >('/api/problem/details/', x => {
+    x.runs = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
     '/api/problem/list/',
   ),
@@ -751,9 +833,22 @@ export const Problem = {
     messages.ProblemRemoveTagRequest,
     messages.ProblemRemoveTagResponse
   >('/api/problem/removeTag/'),
-  runs: apiCall<messages.ProblemRunsRequest, messages.ProblemRunsResponse>(
-    '/api/problem/runs/',
-  ),
+  runs: apiCall<
+    messages.ProblemRunsRequest,
+    messages._ProblemRunsServerResponse,
+    messages.ProblemRunsResponse
+  >('/api/problem/runs/', x => {
+    x.runs = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   runsDiff: apiCall<
     messages.ProblemRunsDiffRequest,
     messages.ProblemRunsDiffResponse
@@ -879,18 +974,36 @@ export const Run = {
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
-  list: apiCall<messages.RunListRequest, messages.RunListResponse>(
-    '/api/run/list/',
-  ),
+  list: apiCall<
+    messages.RunListRequest,
+    messages._RunListServerResponse,
+    messages.RunListResponse
+  >('/api/run/list/', x => {
+    x.runs = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.runs);
+    return x;
+  }),
   rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
     '/api/run/rejudge/',
   ),
   source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
     '/api/run/source/',
   ),
-  status: apiCall<messages.RunStatusRequest, messages.RunStatusResponse>(
-    '/api/run/status/',
-  ),
+  status: apiCall<
+    messages.RunStatusRequest,
+    messages._RunStatusServerResponse,
+    messages.RunStatusResponse
+  >('/api/run/status/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
 };
 
 export const School = {

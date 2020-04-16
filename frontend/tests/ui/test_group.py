@@ -24,12 +24,14 @@ def test_create_group_with_identities_and_restrictions(driver):
     with driver.login_admin():
         navbar = driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'ul.nav:first-child')))
+                (By.CSS_SELECTOR, '.navbar-nav:first-child')))
 
-        navbar.find_element_by_css_selector('li.nav-problems a').click()
+        navbar.find_element_by_css_selector(
+            'li.nav-problems a.dropdown-toggle').click()
         problems_dropdown = driver.wait.until(
             EC.visibility_of(
-                navbar.find_element_by_css_selector('li.nav-problems ul')))
+                navbar.find_element_by_css_selector(
+                    'li.nav-problems .dropdown-menu')))
         # Problems menu
         for present_href in ['/problem/', '/submissions/', '/problem/new/',
                              '/problem/mine/', '/nomination/mine/']:
@@ -46,13 +48,15 @@ def test_create_group_with_identities_and_restrictions(driver):
     with driver.login(identity.username, identity.password):
         navbar = driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, 'ul.nav:first-child')))
+                (By.CSS_SELECTOR, '.navbar-nav:first-child')))
 
         # Problems menu
-        navbar.find_element_by_css_selector('li.nav-problems a').click()
+        navbar.find_element_by_css_selector(
+            'li.nav-problems a.dropdown-toggle').click()
         problems_dropdown = driver.wait.until(
             EC.visibility_of(
-                navbar.find_element_by_css_selector('li.nav-problems ul')))
+                navbar.find_element_by_css_selector(
+                    'li.nav-problems .dropdown-menu')))
         for present_href in ['/problem/', '/submissions/']:
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
@@ -63,8 +67,21 @@ def test_create_group_with_identities_and_restrictions(driver):
                 'a[href="%s"]' % absent_href), (
                     '%s item is visible!' % absent_href)
 
-        # Contests menu
-        assert not navbar.find_elements_by_css_selector('li.nav-contests a')
+        navbar.find_element_by_css_selector(
+            'li.nav-contests a.dropdown-toggle').click()
+        contests_dropdown = driver.wait.until(
+            EC.visibility_of(
+                navbar.find_element_by_css_selector(
+                    'li.nav-contests .dropdown-menu')))
+        for present_href in ['/arena/']:
+            assert contests_dropdown.find_elements_by_css_selector(
+                'a[href="%s"]' % present_href), (
+                    '%s item is not present!' % present_href)
+        for absent_href in ['/contest/new/', '/contest/mine/', '/group/',
+                            '/scoreboardmerge/']:
+            assert not contests_dropdown.find_elements_by_css_selector(
+                'a[href="%s"]' % absent_href), (
+                    '%s item is visible!' % absent_href)
 
         # Courses list
         with driver.page_transition():

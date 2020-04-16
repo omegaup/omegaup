@@ -1,7 +1,6 @@
 import common_Index from '../components/common/Index.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {

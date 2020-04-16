@@ -1,6 +1,6 @@
 import course_ViewStudent from '../components/course/ViewStudent.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api_transitional';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
         on: {
           update: function(student, assignment) {
             if (assignment == null) return;
-            API.Course.studentProgress({
+            api.Course.studentProgress({
               course_alias: payload.course.alias,
               assignment_alias: assignment.alias,
               usernameOrEmail: student.username,

@@ -24,76 +24,98 @@
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
-          <li v-bind:class="{ active: navbarSection === 'arena' }">
-            <a href="/arena/">{{ T.navArena }}</a>
-          </li>
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: navbarSection === 'contests' }"
-            v-if="isLoggedIn && isMainUserIdentity"
+            v-if="isLoggedIn"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-contests
+              href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/contest/new/">{{ T.contestsCreateNew }}</a>
+                <a href="/arena/" data-nav-contests-arena>{{
+                  T.navAllContests
+                }}</a>
               </li>
-              <li>
-                <a href="/contest/mine/">{{ T.navMyContests }}</a>
-              </li>
-              <li>
-                <a href="/group/">{{ T.navMyGroups }}</a>
-              </li>
-              <li>
-                <a href="/scoreboardmerge/">{{ T.contestsJoinScoreboards }}</a>
-              </li>
+
+              <template v-if="isMainUserIdentity">
+                <li>
+                  <a href="/contest/new/" data-nav-contests-create>{{
+                    T.contestsCreateNew
+                  }}</a>
+                </li>
+                <!-- TODO: Esto debe irse a la otra pestaña -->
+                <li>
+                  <a href="/contest/mine/" data-nav-contests-mine>{{
+                    T.navMyContests
+                  }}</a>
+                </li>
+                <li>
+                  <a href="/group/" data-nav-contests-my-groups>{{
+                    T.navMyGroups
+                  }}</a>
+                </li>
+                <!-- TODO: hasta aquí -->
+                <li>
+                  <a href="/scoreboardmerge/">{{
+                    T.contestsJoinScoreboards
+                  }}</a>
+                </li>
+              </template>
             </ul>
+          </li>
+          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
+            <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
+          </li>
+          <li
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
+          >
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
             v-bind:class="{ active: navbarSection === 'problems' }"
-            v-if="isLoggedIn && isMainUserIdentity"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
-              ><span>{{ T.wordsProblems }}</span> <span class="caret"></span
-            ></a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/problem/new/">{{ T.myproblemsListCreateProblem }}</a>
-              </li>
-              <li>
-                <a href="/problem/mine/">{{ T.navMyProblems }}</a>
-              </li>
-              <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
-              </li>
-              <li>
-                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
-              </li>
-              <li>
-                <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
-              </li>
-              <li v-show="isReviewer">
-                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
-              </li>
-            </ul>
-          </li>
-          <li
-            class="dropdown nav-problems"
-            v-bind:class="{ active: navbarSection === 'problems' }"
-            v-else=""
-          >
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span>{{ T.wordsProblems }}</span>
-              <span class="caret"></span>
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-problems
+              href="#"
+            >
+              <span>{{ T.wordsProblems }}</span> <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
+                <a href="/problem/" data-nav-problems-all>{{
+                  T.navAllProblems
+                }}</a>
               </li>
+              <template v-if="isLoggedIn && isMainUserIdentity">
+                <li>
+                  <a href="/problem/new/" data-nav-problems-create>{{
+                    T.myproblemsListCreateProblem
+                  }}</a>
+                </li>
+                <!-- TODO: Esto tiene que ir el nuevo tab -->
+                <li>
+                  <a href="/problem/mine/">{{ T.navMyProblems }}</a>
+                </li>
+                <li>
+                  <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
+                </li>
+                <!-- TODO: hasta aquí -->
+              </template>
               <li>
                 <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
+              </li>
+              <li v-if="isReviewer">
+                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
               </li>
             </ul>
           </li>
@@ -112,19 +134,40 @@
               <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
               </li>
+              <li>
+                <a href="/coderofthemonth/">{{ T.navCoderOfTheMonth }}</a>
+              </li>
+              <li>
+                <a href="/coderofthemonth/female/">{{
+                  T.navCoderOfTheMonthFemale
+                }}</a>
+              </li>
+              <li>
+                <a href="/schoolofthemonth/">{{ T.navSchoolOfTheMonth }}</a>
+              </li>
             </ul>
           </li>
-          <li
-            class="nav-courses"
-            v-bind:class="{ active: navbarSection === 'courses' }"
-          >
-            <a href="/schools/">{{ T.navCourses }}</a>
-          </li>
-          <li>
-            <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
-          </li>
-          <li>
-            <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{ T.navHelp }}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+                  >{{ T.navTutorials }}</a
+                >
+              </li>
+              <li>
+                <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
+              </li>
+              <li>
+                <a href="https://omegaup.com/preguntas/">{{
+                  T.navQuestions
+                }}</a>
+              </li>
+            </ul>
           </li>
         </ul>
         <ul class="nav navbar-nav" v-else=""></ul>

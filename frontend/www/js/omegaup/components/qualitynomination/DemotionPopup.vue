@@ -6,9 +6,6 @@
     <form class="panel panel-default popup" v-show="showReportDialog">
       <template v-if="currentView == 'question'">
         <button class="close" type="button" v-on:click="onHide">×</button>
-        <div class="title-text">
-          {{ T.reportProblemFormTitle }}
-        </div>
         <div class="form-group">
           <div class="question-text">
             {{ T.reportProblemFormQuestion }}
