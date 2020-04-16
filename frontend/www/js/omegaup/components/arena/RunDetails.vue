@@ -2,7 +2,7 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases" v-if="data.groups">
+      <div class="cases" v-if="data.groups && data.feedback !== 'no'">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
@@ -11,7 +11,9 @@
               <th>{{ T.wordsGroup }}</th>
               <th>{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <th colspan="3">{{ T.rankScore }}</th>
+              <th colspan="3" v-if="data.feedback === 'yes'">
+                {{ T.rankScore }}
+              </th>
               <th width="1"></th>
             </tr>
           </thead>
@@ -32,15 +34,19 @@
                   </span>
                 </div>
               </th>
-              <th class="score">
-                {{
-                  element.contest_score ? element.contest_score : element.score
-                }}
-              </th>
-              <th class="center" width="10">
-                {{ element.max_score ? '/' : '' }}
-              </th>
-              <th>{{ element.max_score ? element.max_score : '' }}</th>
+              <template v-if="data.feedback === 'yes'">
+                <th class="score">
+                  {{
+                    element.contest_score
+                      ? element.contest_score
+                      : element.score
+                  }}
+                </th>
+                <th class="center" width="10">
+                  {{ element.max_score ? '/' : '' }}
+                </th>
+                <th>{{ element.max_score ? element.max_score : '' }}</th>
+              </template>
             </tr>
             <tr
               v-for="problem in element.cases"
@@ -49,15 +55,19 @@
               <td></td>
               <td class="text-center">{{ problem.name }}</td>
               <td class="text-center">{{ problem.verdict }}</td>
-              <td class="score">
-                {{
-                  problem.contest_score ? problem.contest_score : problem.score
-                }}
-              </td>
-              <td class="center" width="10">
-                {{ problem.max_score ? '/' : '' }}
-              </td>
-              <td>{{ problem.max_score ? problem.max_score : '' }}</td>
+              <template v-if="data.feedback === 'yes'">
+                <td class="score">
+                  {{
+                    problem.contest_score
+                      ? problem.contest_score
+                      : problem.score
+                  }}
+                </td>
+                <td class="center" width="10">
+                  {{ problem.max_score ? '/' : '' }}
+                </td>
+                <td>{{ problem.max_score ? problem.max_score : '' }}</td>
+              </template>
             </tr>
           </tbody>
         </table>

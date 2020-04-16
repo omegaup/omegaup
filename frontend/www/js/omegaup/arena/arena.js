@@ -2120,6 +2120,9 @@ export class Arena {
       guid: data.guid,
       groups: groups,
       language: data.language,
+      feedback: self.options.contestAlias
+        ? self.currentProblemset.feedback
+        : 'yes',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }
