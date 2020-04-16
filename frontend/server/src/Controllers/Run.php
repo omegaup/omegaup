@@ -1300,7 +1300,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
      *
-     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1351,7 +1351,6 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $result = [];
         foreach ($runs as $run) {
-            $run['time'] = intval($run['time']);
             $run['score'] = round(floatval($run['score']), 4);
             if (!is_null($run['contest_score'])) {
                 $run['contest_score'] = round(

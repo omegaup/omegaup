@@ -125,7 +125,7 @@ export default {
 
     requests: api.Contest.requests,
 
-    runs: api.apiCall('/api/contest/runs/', _convertRuntimes),
+    runs: api.Contest.runs,
 
     runsDiff: api.Contest.runsDiff,
 
@@ -286,18 +286,9 @@ export default {
 
     requests: api.Course.requests,
 
-    runs: api.apiCall('/api/course/runs/', _convertRuntimes),
+    runs: api.Course.runs,
 
-    studentProgress: api.apiCall('/api/course/studentProgress/', function(
-      result,
-    ) {
-      for (var problem of result.problems) {
-        for (var run of problem.runs) {
-          run.time = OmegaUp.remoteTime(run.time * 1000);
-        }
-      }
-      return result;
-    }),
+    studentProgress: api.Course.studentProgress,
 
     update: api.Course.update,
 
@@ -320,61 +311,7 @@ export default {
 
   Notification: api.Notification,
 
-  Problem: {
-    addAdmin: api.Problem.addAdmin,
-
-    addGroupAdmin: api.Problem.addGroupAdmin,
-
-    addTag: api.Problem.addTag,
-
-    adminList: api.Problem.adminList,
-
-    admins: api.Problem.admins,
-
-    clarifications: api.apiCall('/api/problem/clarifications/', function(data) {
-      for (var idx in data.clarifications) {
-        var clarification = data.clarifications[idx];
-        clarification.time = OmegaUp.remoteTime(clarification.time * 1000);
-      }
-      return data;
-    }),
-
-    delete: api.Problem.delete,
-
-    details: api.apiCall('/api/problem/details/', _convertRuntimes),
-
-    list: api.Problem.list,
-
-    myList: api.Problem.myList,
-
-    rejudge: api.Problem.rejudge,
-
-    removeAdmin: api.Problem.removeAdmin,
-
-    removeGroupAdmin: api.Problem.removeGroupAdmin,
-
-    removeTag: api.Problem.removeTag,
-
-    runs: api.apiCall('/api/problem/runs/', _convertRuntimes),
-
-    runsDiff: api.Problem.runsDiff,
-
-    selectVersion: api.Problem.selectVersion,
-
-    solution: api.Problem.solution,
-
-    stats: api.Problem.stats,
-
-    tags: api.Problem.tags,
-
-    update: api.Problem.update,
-
-    updateStatement: api.Problem.updateStatement,
-
-    updateSolution: api.Problem.updateSolution,
-
-    versions: api.Problem.versions,
-  },
+  Problem: api.Problem,
 
   ProblemForfeited: api.ProblemForfeited,
 
@@ -404,24 +341,7 @@ export default {
 
   Reset: api.Reset,
 
-  Run: {
-    counts: api.Run.counts,
-
-    create: api.Run.create,
-
-    details: api.Run.details,
-
-    list: api.apiCall('/api/run/list/', _convertRuntimes),
-
-    rejudge: api.Run.rejudge,
-
-    disqualify: api.Run.disqualify,
-
-    status: api.apiCall('/api/run/status/', function(data) {
-      data.time = omegaup.OmegaUp.remoteTime(data.time * 1000);
-      return data;
-    }),
-  },
+  Run: api.Run,
 
   School: {
     create: api.School.create,

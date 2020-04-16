@@ -1,6 +1,5 @@
 import Vue from 'vue';
 
-import API from '../api.js';
 import * as api from '../api_transitional';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
@@ -134,22 +133,26 @@ export default class ArenaAdmin {
     if (self.arena.options.onlyProblemAlias) {
       options.show_all = true;
       options.problem_alias = self.arena.options.onlyProblemAlias;
-      API.Problem.runs(options)
+      api.Problem.runs(options)
+        .then(time.remoteTimeAdapter)
         .then(self.runsChanged.bind(self))
         .catch(ui.apiError);
     } else if (self.arena.options.contestAlias === 'admin') {
-      API.Run.list(options)
+      api.Run.list(options)
+        .then(time.remoteTimeAdapter)
         .then(self.runsChanged.bind(self))
         .catch(ui.ignoreError);
     } else if (self.arena.options.contestAlias != null) {
       options.contest_alias = self.arena.options.contestAlias;
-      API.Contest.runs(options)
+      api.Contest.runs(options)
+        .then(time.remoteTimeAdapter)
         .then(self.runsChanged.bind(self))
         .catch(ui.apiError);
     } else {
       options.course_alias = self.arena.options.courseAlias;
       options.assignment_alias = self.arena.options.assignmentAlias;
-      API.Course.runs(options)
+      api.Course.runs(options)
+        .then(time.remoteTimeAdapter)
         .then(self.runsChanged.bind(self))
         .catch(ui.apiError);
     }
@@ -159,11 +162,12 @@ export default class ArenaAdmin {
     var self = this;
 
     if (self.arena.options.onlyProblemAlias) {
-      API.Problem.clarifications({
+      api.Problem.clarifications({
         problem_alias: self.arena.options.onlyProblemAlias,
         offset: self.arena.clarificationsOffset,
         rowcount: self.arena.clarificationsRowcount,
       })
+        .then(time.remoteTimeAdapter)
         .then(self.arena.clarificationsChange.bind(self.arena))
         .catch(ui.apiError);
     } else {
