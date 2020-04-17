@@ -33,8 +33,8 @@ def test_create_group_with_identities_and_restrictions(driver):
                 navbar.find_element_by_css_selector(
                     'li.nav-problems .dropdown-menu')))
         # Problems menu
-        for present_href in ['/problem/', '/submissions/', '/problem/new/',
-                             '/problem/mine/', '/nomination/mine/']:
+        for present_href in ['/problem/', '/submissions/',
+                             '/problem/new/']:
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
                     '%s item is not present!' % present_href)
@@ -61,8 +61,7 @@ def test_create_group_with_identities_and_restrictions(driver):
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
                     '%s item is not present!' % present_href)
-        for absent_href in ['/problem/new/', '/problem/mine/',
-                            '/nomination/mine/']:
+        for absent_href in ['/problem/new/']:
             assert not problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % absent_href), (
                     '%s item is visible!' % absent_href)
@@ -77,8 +76,7 @@ def test_create_group_with_identities_and_restrictions(driver):
             assert contests_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
                     '%s item is not present!' % present_href)
-        for absent_href in ['/contest/new/', '/contest/mine/', '/group/',
-                            '/scoreboardmerge/']:
+        for absent_href in ['/contest/new/', '/scoreboardmerge/']:
             assert not contests_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % absent_href), (
                     '%s item is visible!' % absent_href)
@@ -91,9 +89,8 @@ def test_create_group_with_identities_and_restrictions(driver):
         assert not driver.browser.find_elements_by_css_selector(
             'a[href="/course/new/"]')
 
-        inaccessible_paths = ['/problem/new/', '/problem/mine/',
-                              '/nomination/mine/', '/contest/new/',
-                              '/contest/mine/', '/group/', '/course/new/']
+        inaccessible_paths = ['/problem/new/', '/contest/new/',
+                              '/course/new/']
         for inaccessible_path in inaccessible_paths:
             # Not using assert_js_errors() since this only produces JS errors
             # with chromedriver, not with saucelabs/Travis.
