@@ -30,9 +30,11 @@
 </template>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 h5.card-header {
-  color: white;
-  background-color: #dd5588;
+  color: $omegaup-white;
+  background-color: $omegaup-pink;
 }
 </style>
 
