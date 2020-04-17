@@ -186,7 +186,7 @@
                   href="#tags"
                   v-bind:data-key="tag.name"
                   v-for="tag in tags"
-                  v-on:click="onAddTag(tag.name, public)"
+                  v-on:click.prevent="onAddTag(tag.name, public)"
                 >
                   {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
                 </a>
@@ -363,15 +363,12 @@ export default class ProblemForm extends Vue {
 
   onUploadFile(ev: InputEvent): void {
     const uploadedFile = <HTMLInputElement>ev.target;
-    if (uploadedFile) {
-      this.hasFile = true;
-    }
+    this.hasFile = uploadedFile.files !== null;
   }
 
-  onAddTag(tagname: string, isPublic: boolean): boolean {
+  onAddTag(tagname: string, isPublic: boolean): void {
     this.selectedTags.push({ tagname: tagname, public: isPublic });
     this.tags = this.tags.filter((val, index, arr) => val.name !== tagname);
-    return false; // Prevent refresh
   }
 
   onRemoveTag(tagname: string): void {

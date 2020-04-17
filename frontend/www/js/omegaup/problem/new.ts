@@ -8,19 +8,22 @@ import * as api from '../api_transitional';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload('payload');
+  if (payload.statusError) {
+    ui.error(payload.statusError);
+  }
   const problemNew = new Vue({
     el: '#problem-new',
     render: function(createElement) {
       return createElement('omegaup-problem-new', {
         props: {
-          data: this.data,
+          data: payload,
         },
         on: {
           'alias-in-use': (alias: string): void => {
             api.Problem.details({ problem_alias: alias })
               .then(data => {
                 if (!data.exists) {
-                  ui.dismissNotifications(10);
+                  ui.dismissNotifications();
                   return;
                 }
                 ui.error(
@@ -33,9 +36,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      data: payload,
     },
     components: {
       'omegaup-problem-new': problem_New,
