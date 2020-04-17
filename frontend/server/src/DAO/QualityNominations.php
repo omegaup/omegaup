@@ -267,7 +267,6 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         bool $onlyOpen = false
     ): array {
         $offset = ($page - 1) * $rowcount;
-        error_log($onlyOpen);
         $sqlFrom = '
             FROM
                 QualityNominations qn
@@ -360,7 +359,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params[] = $rowcount;
 
         $nominations = [];
-        /** @var array{alias: string, author_name: null|string, author_username: string,contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
+        /** @var array{alias: string, author_name: null|string, author_username: string, contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 "${sql}{$sqlFrom}{$sqlOrder}{$sqlLimit}",
