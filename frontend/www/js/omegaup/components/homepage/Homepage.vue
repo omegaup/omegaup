@@ -42,7 +42,7 @@
           </omegaup-school-of-the-month>
         </div>
       </div>
-      <div class="row align-items-stretch justify-content-around mt-3">
+      <div class="row align-items-stretch justify-content-around mt-4">
         <div
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
           v-if="rankTable.resultTotal"
@@ -78,7 +78,7 @@
         v-bind:title="T.homepageCompeteSectionTitle"
         v-bind:description="T.homepageCompeteSectionDescription"
         v-bind:button="{
-          text: T.buttonMoreInformation,
+          text: T.buttonGoToProblems,
           href: '/arena/',
         }"
         v-bind:image-src="'/media/homepage/contests_section.svg'"
@@ -87,7 +87,7 @@
         v-bind:title="T.homepageTrainSectionTitle"
         v-bind:description="T.homepageTrainSectionDescription"
         v-bind:button="{
-          text: T.buttonMoreInformation,
+          text: T.buttonGoToProblems,
           href: '/problem/',
         }"
         v-bind:image-src="'/media/homepage/problems_section.svg'"
@@ -97,7 +97,7 @@
         v-bind:title="T.homepageCreateSectionTitle"
         v-bind:description="T.homepageCreateSectionDescription"
         v-bind:button="{
-          text: T.buttonMoreInformation,
+          text: T.buttonGoToCreateProblem,
           href: '/problem/new/',
         }"
         v-bind:image-src="'/media/homepage/create_section.svg'"
@@ -106,7 +106,7 @@
         v-bind:title="T.homepageTeachSectionTitle"
         v-bind:description="T.homepageTeachSectionDescription"
         v-bind:button="{
-          text: T.buttonMoreInformation,
+          text: T.buttonGoToCourses,
           href: '/course/',
         }"
         v-bind:image-src="'/media/homepage/courses_section.svg'"
