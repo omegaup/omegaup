@@ -61,7 +61,7 @@ let config = [
       notification_list: './frontend/www/js/omegaup/notification/list.js',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
-      problem_list: './frontend/www/js/omegaup/problem/list.js',
+      problem_list: './frontend/www/js/omegaup/problem/list.ts',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
       problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
