@@ -16,7 +16,11 @@
       </a>
       <div class="pull-right" v-if="!myView">
         <label>
-          <input type="checkbox" v-model="showAll" />
+          <input
+            type="checkbox"
+            v-model="showAll"
+            v-on:click="$emit('goToPage', pages, !showAll)"
+          />
           {{ T.qualityNominationShowAll }}
         </label>
       </div>
@@ -28,12 +32,13 @@
           <th v-if="!myView">{{ T.wordsNominator }}</th>
           <th>{{ T.wordsAuthor }}</th>
           <th>{{ T.wordsSubmissionDate }}</th>
+          <th v-if="!myView">{{ T.wordsReason }}</th>
           <th class="text-center">{{ T.wordsStatus }}</th>
           <th><!-- view button --></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="nomination in visibleNominations">
+        <tr v-for="nomination in nominations">
           <td>
             <a v-bind:href="problemUrl(nomination.problem.alias)">{{
               nomination.problem.title
@@ -50,6 +55,7 @@
             }}</a>
           </td>
           <td>{{ nomination.time.format('long') }}</td>
+          <td v-if="!myView">{{ nomination.contents.reason }}</td>
           <td class="text-center">{{ nomination.status }}</td>
           <td>
             <a
@@ -64,7 +70,7 @@
     </table>
     <omegaup-common-paginator
       v-bind:pager-items="pagerItems"
-      v-on:page-changed="page => $emit('goToPage', page)"
+      v-on:page-changed="page => $emit('goToPage', page, this.showAll)"
     ></omegaup-common-paginator>
   </div>
 </template>
@@ -92,15 +98,6 @@ export default class QualityNominationList extends Vue {
   showAll = true;
   T = T;
   UI = UI;
-
-  get visibleNominations(): omegaup.Nomination[] {
-    if (this.showAll) {
-      return this.nominations;
-    }
-    return this.nominations.filter((nomination: omegaup.Nomination) => {
-      return nomination.status === 'open';
-    });
-  }
 
   problemUrl(problemAlias: string): string {
     return `/arena/problem/${problemAlias}/`;

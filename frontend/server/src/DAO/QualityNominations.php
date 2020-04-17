@@ -263,10 +263,11 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         ?int $asigneeUserId,
         int $page,
         int $rowcount,
-        array $types = ['demotion', 'promotion']
+        array $types = ['demotion', 'promotion'],
+        bool $onlyOpen = false
     ): array {
         $offset = ($page - 1) * $rowcount;
-
+        error_log($onlyOpen);
         $sqlFrom = '
             FROM
                 QualityNominations qn
@@ -300,7 +301,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 p.alias,
                 p.title,
                 authorIdentity.username as author_username,
-                authorIdentity.name as author_name
+                authorIdentity.name as author_name,
+                qn.contents
         ';
 
         $params = [];
@@ -340,8 +342,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         if (!empty($conditions)) {
             $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
         }
+        //error_log($onlyOpen.'---2');
+        if ($onlyOpen) {
+            $sqlFrom .= " AND qn.status = 'open' ";
+        }
 
-        $sqlOrder = ' ORDER BY qn.qualitynomination_id';
+        $sqlOrder = ' ORDER BY p.alias asc, time desc';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */
@@ -354,7 +360,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params[] = $rowcount;
 
         $nominations = [];
-        /** @var array{alias: string, author_name: null|string, author_username: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
+        /** @var array{alias: string, author_name: null|string, author_username: string,contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 "${sql}{$sqlFrom}{$sqlOrder}{$sqlLimit}",

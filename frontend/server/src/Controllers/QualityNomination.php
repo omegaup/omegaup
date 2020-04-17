@@ -764,6 +764,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
+        $r->ensureBool('onlyopen', false);
+        ;
         self::validateMemberOfReviewerGroup($r);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
@@ -785,7 +787,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             /* assignee */ null,
             $offset,
             $rowCount,
-            $types
+            $types,
+            boolval($r['onlyopen'])
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
