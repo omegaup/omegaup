@@ -13,7 +13,7 @@
     <!-- TODO: esto debe ser acomodado al final de toda la migración -->
     <omegaup-carousel></omegaup-carousel>
     <div class="container-lg py-5">
-      <div class="row align-items-center justify-content-around">
+      <div class="row align-items-stretch justify-content-around">
         <div
           class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonthFemale"
@@ -42,7 +42,7 @@
           </omegaup-school-of-the-month>
         </div>
       </div>
-      <div class="row align-items-center justify-content-around mt-3">
+      <div class="row align-items-stretch justify-content-around mt-3">
         <div
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
           v-if="rankTable.resultTotal"
