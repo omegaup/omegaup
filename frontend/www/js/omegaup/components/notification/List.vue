@@ -1,62 +1,65 @@
 <template>
-  <li class="dropdown hide">
+  <li class="nav-item dropdown d-none d-lg-flex align-items-center">
     <a
-      aria-expanded="true"
+      aria-expanded="false"
       aria-haspopup="true"
-      class="notification-btn dropdown-toggle"
+      class="nav-link dropdown-toggle px-2 notification-toggle"
       data-toggle="dropdown"
       href="#"
       role="button"
-      ><span class="glyphicon glyphicon-bell"></span>
+    >
+      <font-awesome-icon v-bind:icon="['fas', 'bell']" />
       <span
-        class="label label-danger count-label"
-        v-show="!!notifications.length"
+        class="badge badge-danger count-badge"
+        v-show="true || !!notifications.length"
         >{{ notifications.length }}</span
       ></a
     >
-    <ul class="dropdown-menu notification-dropdown">
-      <li class="text-center" v-if="notifications.length === 0">
-        {{ T.notificationsNoNewNotifications }}
-      </li>
-      <li v-else="">
-        <a role="button" v-on:click="$emit('read', notifications)"
-          >{{ T.notificationsMarkAllAsRead }} ✔️</a
+    <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+      <form>
+        <!-- Trick to avoid closing on click -->
+        <div class="text-center" v-if="notifications.length === 0">
+          {{ T.notificationsNoNewNotifications }}
+        </div>
+        <a
+          v-else=""
+          class="dropdown-item"
+          href="#"
+          v-on:click="$emit('read', notifications)"
         >
-      </li>
-      <transition-group name="list"
-        ><omegaup-notification
-          v-bind:key="notification.notification_id"
-          v-bind:notification="notification"
-          v-for="notification in notifications"
-          v-on:remove="$emit('read', [notification])"
-        ></omegaup-notification
-      ></transition-group>
-    </ul>
+          {{ T.notificationsMarkAllAsRead }} ✔️
+        </a>
+        <transition-group name="list"
+          ><omegaup-notification
+            v-bind:key="notification.notification_id"
+            v-bind:notification="notification"
+            v-for="notification in notifications"
+            v-on:remove="$emit('read', [notification])"
+          ></omegaup-notification
+        ></transition-group>
+      </form>
+    </div>
   </li>
 </template>
 
 <style>
-.nav > li > a.notification-btn {
-  padding: 12px 4px 0 0;
+.notification-toggle {
+  font-size: 1.4rem;
+  position: relative;
 }
 
-.glyphicon-bell {
-  font-size: 20px;
-  display: block;
-}
-
-.count-label {
+.count-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0.9rem;
+  font-size: 0.75rem;
   display: block;
 }
 
 .notification-dropdown {
-  width: 500px;
+  width: 550px;
   max-height: 600px;
   overflow-y: auto;
-}
-
-.dropdown-item {
-  padding: 3px 20px;
 }
 
 /* Transitions */
@@ -77,8 +80,14 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import Notification from './Notification.vue';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faBell);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-notification': Notification,
   },
 })

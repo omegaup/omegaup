@@ -183,10 +183,11 @@
               v-bind:initialClarifications="initialClarifications"
               v-if="inContest"
             ></omegaup-notifications-clarifications>
+            -->
             <omegaup-notification-list
               v-bind:notifications="notifications"
+              v-on:read="readNotifications"
             ></omegaup-notification-list>
-            -->
             <li class="nav-item dropdown nav-user">
               <a
                 class="nav-link px-2 dropdown-toggle nav-user-link"
@@ -220,7 +221,6 @@
                   <font-awesome-icon v-bind:icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
                 </a>
-                <!-- TODO: Hacer que los estilos se ajusten a bootstrap4 -->
                 <omegaup-common-grader-status
                   v-bind:status="errorMessage !== null ? 'down' : 'ok'"
                   v-bind:error="errorMessage"
@@ -300,12 +300,12 @@ export default class Navbar extends Vue {
   @Prop() isMainUserIdentity!: boolean;
   @Prop() lockDownImage!: string;
   @Prop() navbarSection!: string;
+  @Prop() notifications!: types.Notification[];
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
   @Prop() initialClarifications!: omegaup.Clarification[];
 
-  notifications: types.Notification[] = [];
   clarifications: omegaup.Clarification[] = this.initialClarifications;
   T = T;
 
@@ -315,6 +315,10 @@ export default class Navbar extends Vue {
 
   get showNavbar(): boolean {
     return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
+  }
+
+  readNotifications(notifications: types.Notification[]): void {
+    this.$emit('read-notifications', notifications);
   }
 }
 </script>
