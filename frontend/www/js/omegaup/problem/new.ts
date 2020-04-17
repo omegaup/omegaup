@@ -7,7 +7,9 @@ import * as ui from '../ui';
 import * as api from '../api_transitional';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemFormPayload('payload');
+  const payload = types.payloadParsers.ProblemFormPayload(
+    'problem-new-payload',
+  );
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
