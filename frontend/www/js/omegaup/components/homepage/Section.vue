@@ -11,7 +11,7 @@
       class="col-md-6 mt-2 mt-md-0"
       v-bind:class="{ 'order-md-1': imageToRight }"
     >
-      <p>{{ description }}</p>
+      <p class="section-description">{{ description }}</p>
       <a
         v-if="button"
         class="btn btn-primary section-link mb-3"
@@ -29,6 +29,11 @@
 h3.display-4 {
   color: $omegaup-primary--darker;
   font-weight: normal;
+}
+
+p.section-description,
+a.section-link {
+  font-size: 1.3rem;
 }
 
 img.img-fluid {
