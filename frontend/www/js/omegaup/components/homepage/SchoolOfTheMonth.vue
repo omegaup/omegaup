@@ -29,6 +29,15 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+h5.card-header {
+  color: $omegaup-white;
+  background-color: $omegaup-pink;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
