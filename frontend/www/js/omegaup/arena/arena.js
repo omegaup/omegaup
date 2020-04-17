@@ -1781,7 +1781,10 @@ export class Arena {
       const guid = showRunMatch[1];
       API.Run.details({ run_alias: guid })
         .then(data => {
-          if (data.show_diff === 'none' || self.options.contestAlias) {
+          if (
+            data.show_diff === 'none' ||
+            (self.options.contestAlias && self.options.contestAlias !== 'admin')
+          ) {
             self.displayRunDetails(guid, data);
             return;
           } else {
@@ -2172,7 +2175,10 @@ export class Arena {
       groups: groups,
       language: data.language,
       cases: data.cases,
-      show_diff: self.options.contestAlias ? 'none' : data.show_diff,
+      show_diff:
+        !self.options.contestAlias || self.options.contestAlias === 'admin'
+          ? data.show_diff
+          : 'none',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

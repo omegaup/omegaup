@@ -15,6 +15,7 @@
                 <th>{{ T.wordsInput }}</th>
                 <th>{{ T.wordsOutputExpected }}</th>
                 <th>{{ T.wordsOutputObtained }}</th>
+                <th>{{ T.wordsDifference }}</th>
               </template>
               <th colspan="3">{{ T.rankScore }}</th>
             </tr>
@@ -22,7 +23,7 @@
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th colspan="5">
+              <th colspan="6">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <span
                     v-bind:class="{
@@ -63,6 +64,10 @@
                 <td class="text-center">
                   {{ showDataCase(data.cases, problem_case.name, 'output') }}
                 </td>
+                <td
+                  class="text-center diff"
+                  v-html="showDiff(data.cases, problem_case.name)"
+                ></td>
               </template>
               <td class="score">
                 {{
@@ -206,6 +211,15 @@
     .submit-run {
       width: 100%;
     }
+    .diff {
+      font-weight: bold;
+      .red {
+        color: #f00;
+      }
+      .green {
+        color: #0f0;
+      }
+    }
   }
   input[type='submit'] {
     font-size: 110%;
@@ -233,6 +247,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import diff from 'fast-diff';
 
 interface GroupVisibility {
   [name: string]: boolean;
@@ -260,6 +275,27 @@ export default class ArenaRunDetails extends Vue {
     caseType: string,
   ): string {
     return cases[caseName] ? cases[caseName][caseType] : '-';
+  }
+
+  showDiff(cases: types.ProblemCases, caseName: string): string {
+    if (!cases[caseName]) {
+      return '-';
+    }
+    const result = diff(`${cases[caseName].out}`, `${cases[caseName].output}`);
+    let span = '';
+    result.forEach(diff => {
+      if (diff[0] === -1) {
+        span += `<span class="green">${diff[1]}</span>`;
+      }
+      if (diff[0] === 0) {
+        span += `<span>${diff[1]}</span>`;
+      }
+      if (diff[0] === 1) {
+        span += `<span class="red">${diff[1]}</span>`;
+      }
+    });
+
+    return span;
   }
 }
 </script>
