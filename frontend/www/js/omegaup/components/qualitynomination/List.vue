@@ -19,7 +19,7 @@
           <input
             type="checkbox"
             v-model="showAll"
-            v-on:click="$emit('goToPage', pages, !showAll)"
+            v-on:click="$emit('goToPage', 1, !showAll)"
           />
           {{ T.qualityNominationShowAll }}
         </label>
