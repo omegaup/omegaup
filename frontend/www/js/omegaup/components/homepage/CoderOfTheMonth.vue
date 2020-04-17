@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card h-100">
     <h5 class="card-header" v-bind:class="`card-header-${category}`">
       {{ category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth }}
     </h5>

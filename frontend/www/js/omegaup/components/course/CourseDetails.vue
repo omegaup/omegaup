@@ -192,7 +192,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { OmegaUp, omegaup } from '../../omegaup';
+import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
@@ -205,7 +205,6 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
-  OmegaUp = OmegaUp;
 
   get filteredHomeworks(): omegaup.Assignment[] {
     return this.course.assignments.filter(
@@ -226,7 +225,7 @@ export default class CourseDetails extends Vue {
   }
 
   getFormattedTime(timestamp: number): string {
-    return time.formatDateTime(OmegaUp.remoteTime(timestamp * 1000));
+    return time.formatDateTime(time.remoteTime(timestamp * 1000));
   }
 }
 </script>

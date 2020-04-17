@@ -1,6 +1,7 @@
 import * as ui from './ui';
 import * as api from './api_transitional';
 import * as errors from './errors';
+import * as time from './time';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -623,8 +624,6 @@ export namespace omegaup {
 
     _documentReady: boolean = false;
     _initialized: boolean = false;
-    _remoteDeltaTime?: number = undefined;
-    _deltaTimeForTesting: number = 0;
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
         () => {
@@ -648,7 +647,7 @@ export namespace omegaup {
         return;
       }
       this._initialized = true;
-      const t0 = this._realTime();
+      const t0 = Date.now();
       api.Session.currentSession()
         .then((data: { [name: string]: any }) => {
           if (data.session.valid) {
@@ -657,7 +656,7 @@ export namespace omegaup {
             this.identity = data.session.identity;
             this.email = data.session.email;
           }
-          this._remoteDeltaTime = t0 - data.time * 1000;
+          time._setRemoteDeltaTime(t0 - data.time * 1000);
 
           this.ready = true;
           if (this._documentReady) {
@@ -680,49 +679,31 @@ export namespace omegaup {
       }
     }
 
-    _realTime(timestamp?: number): number {
-      if (typeof timestamp !== 'undefined') {
-        return timestamp + this._deltaTimeForTesting;
-      }
-      return Date.now() + this._deltaTimeForTesting;
-    }
-
-    remoteTime(
-      timestamp: number | Date,
-      options: { server_sync?: boolean } = {},
-    ): Date {
-      options.server_sync =
-        typeof options.server_sync === 'undefined' ? true : options.server_sync;
+    remoteTime(timestamp: number | Date): Date {
       if (timestamp instanceof Date) {
-        return new Date(
-          this._realTime(timestamp.getTime()) +
-            (options.server_sync ? this._remoteDeltaTime || 0 : 0),
-        );
+        return time.remoteDate(timestamp);
       }
-      return new Date(
-        this._realTime(timestamp) +
-          (options.server_sync ? this._remoteDeltaTime || 0 : 0),
-      );
+      return time.remoteTime(timestamp);
     }
 
     convertTimes(item: { [key: string]: any }): any {
       if (item.hasOwnProperty('time')) {
-        item.time = this.remoteTime(item.time * 1000);
+        item.time = time.remoteTime(item.time * 1000);
       }
       if (item.hasOwnProperty('end_time')) {
-        item.end_time = this.remoteTime(item.end_time * 1000);
+        item.end_time = time.remoteTime(item.end_time * 1000);
       }
       if (item.hasOwnProperty('start_time')) {
-        item.start_time = this.remoteTime(item.start_time * 1000);
+        item.start_time = time.remoteTime(item.start_time * 1000);
       }
       if (item.hasOwnProperty('finish_time')) {
-        item.finish_time = this.remoteTime(item.finish_time * 1000);
+        item.finish_time = time.remoteTime(item.finish_time * 1000);
       }
       if (item.hasOwnProperty('last_updated')) {
-        item.last_updated = this.remoteTime(item.last_updated * 1000);
+        item.last_updated = time.remoteTime(item.last_updated * 1000);
       }
       if (item.hasOwnProperty('submission_deadline')) {
-        item.submission_deadline = this.remoteTime(
+        item.submission_deadline = time.remoteTime(
           item.submission_deadline * 1000,
         );
       }
