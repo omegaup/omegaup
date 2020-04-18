@@ -61,6 +61,7 @@
     "@babel/plugin-transform-async-to-generator": "^7.2.0",
     "@babel/polyfill": "^7.2.5",
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@types/latinize": "^0.2.15",

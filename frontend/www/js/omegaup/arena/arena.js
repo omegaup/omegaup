@@ -1,6 +1,5 @@
 import Vue from 'vue';
 
-import API from '../api.js';
 import * as api from '../api_transitional';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
@@ -186,7 +185,7 @@ export class Arena {
       });
 
       if (self.options.payload.isAdmin) {
-        API.Notification.myList({})
+        api.Notification.myList({})
           .then(data => {
             self.commonNavbar.notifications = data.notifications;
           })
@@ -1115,11 +1114,12 @@ export class Arena {
 
   refreshClarifications() {
     let self = this;
-    API.Contest.clarifications({
+    api.Contest.clarifications({
       contest_alias: self.options.contestAlias,
       offset: self.clarificationsOffset,
       rowcount: self.clarificationsRowcount,
     })
+      .then(time.remoteTimeAdapter)
       .then(self.clarificationsChange.bind(self))
       .catch(ui.ignoreError);
   }
@@ -1583,7 +1583,7 @@ export class Arena {
                       quality:
                         ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
                     };
-                    API.QualityNomination.create({
+                    api.QualityNomination.create({
                       problem_alias: qualityPayload.problem_alias,
                       nomination: 'suggestion',
                       contents: JSON.stringify(contents),
@@ -1597,7 +1597,7 @@ export class Arena {
                     const contents = {
                       before_ac: !ev.solved && ev.tried,
                     };
-                    API.QualityNomination.create({
+                    api.QualityNomination.create({
                       problem_alias: qualityPayload.problem_alias,
                       nomination: 'dismissal',
                       contents: JSON.stringify(contents),
@@ -1628,7 +1628,8 @@ export class Arena {
         }
 
         if (self.options.isPractice || self.options.isOnlyProblem) {
-          API.Problem.runs({ problem_alias: problem.alias })
+          api.Problem.runs({ problem_alias: problem.alias })
+            .then(time.remoteTimeAdapter)
             .then(function(data) {
               updateRuns(data.runs);
             })
@@ -1652,7 +1653,7 @@ export class Arena {
           update(problem);
         } else {
           let problemset = self.computeProblemsetArg();
-          API.Problem.details(
+          api.Problem.details(
             $.extend(problemset, {
               problem_alias: problem.alias,
               prevent_problemset_open:
@@ -1778,7 +1779,8 @@ export class Arena {
     if (showRunMatch) {
       $('#overlay form').hide();
       $('#overlay').show();
-      API.Run.details({ run_alias: showRunMatch[1] })
+      api.Run.details({ run_alias: showRunMatch[1] })
+        .then(time.remoteTimeAdapter)
         .then(function(data) {
           self.displayRunDetails(showRunMatch[1], data);
         })
@@ -2001,7 +2003,7 @@ export class Arena {
     let lang = self.elements.submitForm.language.val();
 
     $('input', self.elements.submitForm).attr('disabled', 'disabled');
-    API.Run.create(
+    api.Run.create(
       $.extend(problemset, {
         problem_alias: self.currentProblem.alias,
         language: lang,
