@@ -548,11 +548,6 @@ padding-right: 5px;
 	padding-left: 2em;
 }
 
-#problem-form .languages {
-	padding: 0;
-	width: 100%;
-}
-
 th.contains-long-desc{ min-width:369px; }
 
 table.problem-list td {

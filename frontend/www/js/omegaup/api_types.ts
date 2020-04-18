@@ -208,6 +208,14 @@ export namespace types {
       );
     }
 
+    export function ProblemFormPayload(
+      elementId: string,
+    ): types.ProblemFormPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemListPayload(
       elementId: string,
     ): types.ProblemListPayload {
@@ -416,6 +424,31 @@ export namespace types {
     submissions: number;
     accepted: number;
     difficulty: number;
+  }
+
+  export interface ProblemFormPayload {
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number | string;
+    inputLimit: number | string;
+    isUpdate: boolean;
+    languages: string;
+    memoryLimit: number | string;
+    message: string;
+    outputLimit: number | string;
+    overallWallTimeLimit: number | string;
+    selectedTags?: { public: boolean; tagname: string }[];
+    source: string;
+    statusError: string;
+    tags: { name?: string }[];
+    timeLimit: number | string;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | string;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
   }
 
   export interface ProblemListItem {

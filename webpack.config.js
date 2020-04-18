@@ -64,6 +64,7 @@ let config = [
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.ts',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
+      problem_new: './frontend/www/js/omegaup/problem/new.ts',
       problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       problem_settings: './frontend/www/js/omegaup/problem/settings.js',
