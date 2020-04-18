@@ -16,8 +16,12 @@
       ></a
     >
     <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+      <!--
+        Trick to avoid closing on click
+        The form element makes click events work inside dropdown on items that are not nav-link.
+        TODO: Try another way to allow this behaviour.
+      -->
       <form>
-        <!-- Trick to avoid closing on click -->
         <div class="text-center" v-if="notifications.length === 0">
           {{ T.notificationsNoNewNotifications }}
         </div>
