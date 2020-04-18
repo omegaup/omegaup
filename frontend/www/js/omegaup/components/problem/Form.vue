@@ -395,7 +395,7 @@ export default class ProblemForm extends Vue {
 
   @Watch('alias')
   onValueChanged(newValue: string): void {
-    this.$emit('alias-in-use', newValue);
+    this.$emit('alias-changed', newValue);
   }
 }
 </script>

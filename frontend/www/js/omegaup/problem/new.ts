@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
           data: payload,
         },
         on: {
-          'alias-in-use': (alias: string): void => {
+          'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias })
               .then(data => {
                 if (!data.exists) {
