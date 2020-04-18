@@ -1,4 +1,3 @@
-import common_Navbar from '../components/common/Navbar.vue';
 import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as api from '../api_transitional';
@@ -14,47 +13,56 @@ OmegaUp.on('ready', () => {
     render: function(createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
-          omegaUpLockDown: this.omegaUpLockDown,
-          inContest: this.inContest,
-          isLoggedIn: this.isLoggedIn,
-          isReviewer: this.isReviewer,
-          gravatarURL51: this.gravatarURL51,
-          currentUsername: this.currentUsername,
-          isAdmin: this.isAdmin,
-          isMainUserIdentity: this.isMainUserIdentity,
-          lockDownImage: this.lockDownImage,
-          navbarSection: this.navbarSection,
+          omegaUpLockDown: payload.omegaUpLockDown,
+          inContest: payload.inContest,
+          isLoggedIn: payload.isLoggedIn,
+          isReviewer: payload.isReviewer,
+          gravatarURL51: payload.gravatarURL51,
+          currentUsername: payload.currentUsername,
+          isAdmin: payload.isAdmin,
+          isMainUserIdentity: payload.isMainUserIdentity,
+          lockDownImage: payload.lockDownImage,
+          navbarSection: payload.navbarSection,
+          notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
-          initialClarifications: this.initialClarifications,
+          initialClarifications: [],
+        },
+        on: {
+          'read-notifications': (notifications: types.Notification[]) => {
+            api.Notification.readNotifications({
+              notifications: notifications.map(
+                notification => notification.notification_id,
+              ),
+            })
+              .then(() => api.Notification.myList())
+              .then(data => {
+                commonNavbar.notifications = data.notifications;
+              })
+              .catch(UI.apiError);
+          },
         },
       });
     },
     data: {
-      omegaUpLockDown: payload.omegaUpLockDown,
-      inContest: payload.inContest,
-      isLoggedIn: payload.isLoggedIn,
-      isReviewer: payload.isReviewer,
-      gravatarURL51: payload.gravatarURL51,
-      currentUsername: payload.currentUsername,
-      isAdmin: payload.isAdmin,
-      isMainUserIdentity: payload.isMainUserIdentity,
-      lockDownImage: payload.lockDownImage,
-      navbarSection: payload.navbarSection,
+      notifications: <types.Notification[]>[],
       graderInfo: <types.GraderStatus | null>null,
       graderQueueLength: -1,
       errorMessage: <string | null>null,
-      initialClarifications: [],
     },
     components: {
-      'omegaup-common-navbar': payload.bootstrap4
-        ? common_NavbarV2
-        : common_Navbar,
+      'omegaup-common-navbar': common_NavbarV2,
     },
   });
 
   if (payload.isAdmin) {
+    api.Notification.myList()
+      .then(data => {
+        commonNavbar.notifications = data.notifications;
+      })
+      .catch(UI.apiError);
+
     const updateGraderStatus = () => {
       api.Grader.status()
         .then(stats => {

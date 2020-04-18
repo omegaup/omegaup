@@ -2,7 +2,7 @@
 <html lang="{#locale#}" class="h-100">
   {include file='head_v2.tpl' htmlTitle="{#omegaupTitleIndex#}" inline}
   <body class="d-flex flex-column h-100 pt-5">
-    {include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+    {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
 	  <main role="main">
       {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
