@@ -11,7 +11,7 @@
       <font-awesome-icon v-bind:icon="['fas', 'bell']" />
       <span
         class="badge badge-danger count-badge"
-        v-show="true || !!notifications.length"
+        v-show="!!notifications.length"
         >{{ notifications.length }}</span
       ></a
     >
@@ -57,7 +57,7 @@
 }
 
 .notification-dropdown {
-  width: 550px;
+  width: 35rem;
   max-height: 600px;
   overflow-y: auto;
 }
