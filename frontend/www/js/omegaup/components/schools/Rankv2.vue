@@ -39,7 +39,7 @@
           <th scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td class="school-name">
+          <td class="text-truncate">
             <omegaup-countryflag
               v-bind:country="school.country_id"
             ></omegaup-countryflag>
@@ -75,12 +75,11 @@
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-// TODO: Another solution should  be taken in the future.
-.school-name {
+// FIXME: This prevents wrapping a table cell when the name of the school is too long.
+// So, both tables (users rank and the current one) are perfectly aligned.
+// Another solution should  be taken in the future.
+.text-truncate {
   max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>
 
