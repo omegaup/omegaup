@@ -23,10 +23,25 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: this.isMainUserIdentity,
           lockDownImage: this.lockDownImage,
           navbarSection: this.navbarSection,
+          notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           initialClarifications: this.initialClarifications,
+        },
+        on: {
+          'read-notifications': (notifications: types.Notification[]) => {
+            api.Notification.readNotifications({
+              notifications: notifications.map(
+                notification => notification.notification_id,
+              ),
+            })
+              .then(() => api.Notification.myList())
+              .then(data => {
+                commonNavbar.notifications = data.notifications;
+              })
+              .catch(UI.apiError);
+          },
         },
       });
     },

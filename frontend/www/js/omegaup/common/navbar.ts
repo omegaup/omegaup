@@ -24,25 +24,10 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: this.isMainUserIdentity,
           lockDownImage: this.lockDownImage,
           navbarSection: this.navbarSection,
-          notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           initialClarifications: this.initialClarifications,
-        },
-        on: {
-          'read-notifications': (notifications: types.Notification[]) => {
-            api.Notification.readNotifications({
-              notifications: notifications.map(
-                notification => notification.notification_id,
-              ),
-            })
-              .then(() => api.Notification.myList())
-              .then(data => {
-                commonNavbar.notifications = data.notifications;
-              })
-              .catch(UI.apiError);
-          },
         },
       });
     },
@@ -57,7 +42,6 @@ OmegaUp.on('ready', () => {
       isMainUserIdentity: payload.isMainUserIdentity,
       lockDownImage: payload.lockDownImage,
       navbarSection: payload.navbarSection,
-      notifications: <types.Notification[]>[],
       graderInfo: <types.GraderStatus | null>null,
       graderQueueLength: -1,
       errorMessage: <string | null>null,
@@ -71,12 +55,6 @@ OmegaUp.on('ready', () => {
   });
 
   if (payload.isAdmin) {
-    api.Notification.myList()
-      .then(data => {
-        commonNavbar.notifications = data.notifications;
-      })
-      .catch(UI.apiError);
-
     const updateGraderStatus = () => {
       api.Grader.status()
         .then(stats => {
