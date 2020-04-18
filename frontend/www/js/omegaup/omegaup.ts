@@ -499,7 +499,7 @@ export namespace omegaup {
     admin?: boolean;
     compile_error?: string;
     details?: Details;
-    submission_feedback?: SubmissionFeedback;
+    feedback?: SubmissionFeedback;
     groups?: DetailsGroup[];
     guid: string;
     judged_by: string;

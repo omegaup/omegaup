@@ -2,7 +2,7 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases" v-if="data.groups && data.feedback === 'details'">
+      <div class="cases" v-if="data.groups && data.feedback === 'detailed'">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
@@ -51,19 +51,15 @@
               <td></td>
               <td class="text-center">{{ problem.name }}</td>
               <td class="text-center">{{ problem.verdict }}</td>
-              <template v-if="data.feedback === 'detailed'">
-                <td class="score">
-                  {{
-                    problem.contest_score
-                      ? problem.contest_score
-                      : problem.score
-                  }}
-                </td>
-                <td class="center" width="10">
-                  {{ problem.max_score ? '/' : '' }}
-                </td>
-                <td>{{ problem.max_score ? problem.max_score : '' }}</td>
-              </template>
+              <td class="score">
+                {{
+                  problem.contest_score ? problem.contest_score : problem.score
+                }}
+              </td>
+              <td class="center" width="10">
+                {{ problem.max_score ? '/' : '' }}
+              </td>
+              <td>{{ problem.max_score ? problem.max_score : '' }}</td>
             </tr>
           </tbody>
         </table>
