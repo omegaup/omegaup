@@ -2,11 +2,12 @@
   <div>
     <omegaup-coder-of-the-month-notice
       v-if="
-        currentUserInfo &&
-          ((coderOfTheMonth &&
-            coderOfTheMonth.username == currentUserInfo.username) ||
-            (coderOfTheMonthFemale &&
-              coderOfTheMonthFemale.username == currentUserInfo.username))
+        true ||
+          (currentUserInfo &&
+            ((coderOfTheMonth &&
+              coderOfTheMonth.username == currentUserInfo.username) ||
+              (coderOfTheMonthFemale &&
+                coderOfTheMonthFemale.username == currentUserInfo.username)))
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
@@ -127,7 +128,7 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rankv2.vue';
 import user_Rank from '../user/Rank.vue';
-import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
+import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
 
 @Component({
   components: {
