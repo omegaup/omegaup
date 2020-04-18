@@ -11,7 +11,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
- * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, enableSocialMediaResources: bool, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, upcomingContests: array{number_of_results: int, results: list<array{alias: string, title: string}>}}
+ * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3396,22 +3396,6 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $category = $r['category'] ?? 'all';
 
-        $contests = \OmegaUp\Controllers\Contest::getContestList(
-            $r->identity,
-            /*$query=*/ null,
-            /*$page=*/ 1,
-            /*$pageSize=*/ 20,
-            /*$activeContests=*/ \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-            /*$recommended=*/ \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-        );
-        $addedContests = [];
-        foreach ($contests as $key => $contestInfo) {
-            $addedContests[] = [
-                'alias' => $contestInfo['alias'],
-                'title' => $contestInfo['title'],
-            ];
-        }
-
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -3435,11 +3419,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     'currentUserInfo' => !is_null($r->identity) ? [
                         'username' => $r->identity->username,
                     ] : [],
-                    'enableSocialMediaResources' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
-                    'upcomingContests' => [
-                        'number_of_results' => count($addedContests),
-                        'results' => $addedContests,
-                    ],
                 ],
             ],
             'supportsBootstrap4' => true,
