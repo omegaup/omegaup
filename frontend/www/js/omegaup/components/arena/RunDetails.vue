@@ -2,7 +2,7 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases" v-if="data.groups && data.feedback !== 'no'">
+      <div class="cases" v-if="data.groups && data.feedback === 'details'">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
@@ -11,7 +11,7 @@
               <th>{{ T.wordsGroup }}</th>
               <th>{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <th colspan="3" v-if="data.feedback === 'yes'">
+              <th colspan="3">
                 {{ T.rankScore }}
               </th>
               <th width="1"></th>
@@ -34,19 +34,15 @@
                   </span>
                 </div>
               </th>
-              <template v-if="data.feedback === 'yes'">
-                <th class="score">
-                  {{
-                    element.contest_score
-                      ? element.contest_score
-                      : element.score
-                  }}
-                </th>
-                <th class="center" width="10">
-                  {{ element.max_score ? '/' : '' }}
-                </th>
-                <th>{{ element.max_score ? element.max_score : '' }}</th>
-              </template>
+              <th class="score">
+                {{
+                  element.contest_score ? element.contest_score : element.score
+                }}
+              </th>
+              <th class="center" width="10">
+                {{ element.max_score ? '/' : '' }}
+              </th>
+              <th>{{ element.max_score ? element.max_score : '' }}</th>
             </tr>
             <tr
               v-for="problem in element.cases"
@@ -55,7 +51,7 @@
               <td></td>
               <td class="text-center">{{ problem.name }}</td>
               <td class="text-center">{{ problem.verdict }}</td>
-              <template v-if="data.feedback === 'yes'">
+              <template v-if="data.feedback === 'detailed'">
                 <td class="score">
                   {{
                     problem.contest_score
@@ -71,6 +67,10 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-else-if="data.groups && data.feedback === 'summary'">
+        <h3>{{ T.wordsFeedback }}</h3>
+        <div v-html="getFeedback(data.groups)"></div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a
@@ -107,7 +107,7 @@
           <li>
             <a
               class="output"
-              v-bind:href="'/api/run/download/run_alias/' + data.guid + '/'"
+              v-bind:href="`/api/run/download/run_alias/${data.guid}/`"
               v-if="data.problem_admin"
               >{{ T.wordsDownloadOutput }}</a
             >
@@ -116,7 +116,7 @@
             <a
               class="details"
               v-bind:href="
-                '/api/run/download/run_alias/' + data.guid + '/complete/true/'
+                `/api/run/download/run_alias/${data.guid}/complete/true/`
               "
               v-if="data.problem_admin"
               >{{ T.wordsDownloadDetails }}</a
@@ -224,6 +224,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import * as ui from '../../ui';
 
 interface GroupVisibility {
   [name: string]: boolean;
@@ -243,6 +244,46 @@ export default class ArenaRunDetails extends Vue {
   toggle(group: string): void {
     const visible = this.groupVisible[group];
     this.$set(this.groupVisible, group, !visible);
+  }
+
+  getFeedback(groups: omegaup.DetailsGroup[]): string {
+    const verdictMap = [
+      'AC',
+      'PA',
+      'PE',
+      'WA',
+      'TLE',
+      'OLE',
+      'MLE',
+      'RTE',
+      'RFE',
+      'CE',
+      'JE',
+    ];
+    const verdict: string[] = [];
+    const verdictWeight: number[] = [];
+    groups.forEach((group: omegaup.DetailsGroup) => {
+      if (group.group === 'sample') {
+        return;
+      }
+      group.cases.forEach((runCase: omegaup.Case) => {
+        verdict.push(runCase.verdict);
+        verdictWeight.push(verdictMap.indexOf(runCase.verdict));
+      });
+    });
+
+    const acPercentage =
+      (verdict.reduce((n: number, verdict: string) => {
+        return n + (verdict === 'AC' ? 1 : 0);
+      }, 0) /
+        verdict.length) *
+      100;
+    const worstSubmissionVerdictIndex = Math.max(...verdictWeight);
+
+    return ui.formatString(T.feedbackSubmissionContestSummary, {
+      pctAC: acPercentage,
+      worstSubmissionVerdict: verdictMap[worstSubmissionVerdictIndex],
+    });
   }
 }
 </script>

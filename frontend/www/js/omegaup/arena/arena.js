@@ -2122,7 +2122,7 @@ export class Arena {
       language: data.language,
       feedback: self.options.contestAlias
         ? self.currentProblemset.feedback
-        : 'yes',
+        : 'detailed',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

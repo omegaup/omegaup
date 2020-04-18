@@ -1,7 +1,42 @@
--- Alter Contests table
+-- Add new column
 
 ALTER TABLE
   `Contests`
-MODIFY COLUMN
-  `feedback` enum('no','yes','partial') NOT NULL DEFAULT 'yes'
-    COMMENT 'Indica el detalle de la información que se mostrará en los detalles para determinado envío. "yes" muestra todos los detalles de los veredictos. "partial" muestra los detalles sin el score para cada veredicto. "no" oculta toda la información de veredictos';
+ADD COLUMN
+  `submission_feedback` enum('none','summary','detailed') NOT NULL DEFAULT 'none'
+    COMMENT 'Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.'
+    AFTER `feedback`;
+
+UPDATE
+  `Contests`
+SET
+  `submission_feedback` = 'summary'
+WHERE
+  `feedback` = 'yes';
+
+UPDATE
+  `Contests`
+SET
+  `submission_feedback` = 'detailed'
+WHERE
+  `feedback` = 'partial';
+
+ALTER TABLE
+  `Contests`
+DROP COLUMN `feedback`;
+
+ALTER TABLE
+  `Contests`
+ADD COLUMN
+  `feedback` enum('none','summary','detailed') NOT NULL DEFAULT 'none'
+    COMMENT 'Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.'
+    AFTER `submission_feedback`;
+
+UPDATE
+  `Contests`
+SET
+  `feedback` = `submission_feedback`;
+
+ALTER TABLE
+  `Contests`
+DROP COLUMN `submission_feedback`;

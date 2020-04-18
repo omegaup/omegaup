@@ -1863,7 +1863,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['feedback'],
             'feedback',
-            ['no', 'yes', 'partial'],
+            ['none', 'summary', 'detailed'],
             $isRequired
         );
         \OmegaUp\Validators::validateOptionalInEnum(

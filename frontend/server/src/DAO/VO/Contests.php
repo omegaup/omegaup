@@ -309,11 +309,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     public $submissions_gap = 60;
 
     /**
-     * Indica el detalle de la información que se mostrará en los detalles para determinado envío. "yes" muestra todos los detalles de los veredictos. "partial" muestra los detalles sin el score para cada veredicto. "no" oculta toda la información de veredictos
+     * Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.
      *
      * @var string
      */
-    public $feedback = 'yes';
+    public $feedback = 'none';
 
     /**
      * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted

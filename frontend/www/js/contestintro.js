@@ -228,9 +228,9 @@ omegaup.OmegaUp.on('ready', function() {
         $('.contest #penalty').hide();
       }
       var feedbackTypes = {
-        yes: omegaup.T.contestNewFormImmediateFeedbackDesc,
+        detailed: omegaup.T.contestNewFormImmediateFeedbackDesc,
         no: '',
-        partial: omegaup.T.contestNewFormImmediatePartialFeedbackDesc,
+        summary: omegaup.T.contestNewFormImmediatePartialFeedbackDesc,
       };
       $('.contest #feedback').text(feedbackTypes[contest.feedback]);
       if (contest.points_decay_factor != 0) {

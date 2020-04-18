@@ -129,7 +129,7 @@ class Contest {
             'points_decay_factor' => '0.02',
             'partial_score' => '0',
             'submissions_gap' => '60',
-            'feedback' => 'yes',
+            'feedback' => 'detailed',
             'penalty' => 100,
             'scoreboard' => 100,
             'penalty_type' => 'contest_start',
