@@ -2,8 +2,15 @@
   <div class="notice py-3">
     <div class="container-lg">
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        {{
+          UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername })
+        }}
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

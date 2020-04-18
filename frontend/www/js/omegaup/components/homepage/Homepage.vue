@@ -2,12 +2,11 @@
   <div>
     <omegaup-coder-of-the-month-notice
       v-if="
-        true ||
-          (currentUserInfo &&
-            ((coderOfTheMonth &&
-              coderOfTheMonth.username == currentUserInfo.username) ||
-              (coderOfTheMonthFemale &&
-                coderOfTheMonthFemale.username == currentUserInfo.username)))
+        currentUserInfo &&
+          ((coderOfTheMonth &&
+            coderOfTheMonth.username == currentUserInfo.username) ||
+            (coderOfTheMonthFemale &&
+              coderOfTheMonthFemale.username == currentUserInfo.username))
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
