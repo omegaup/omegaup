@@ -165,6 +165,6 @@ export default class SchoolOfTheMonth extends Vue {
   @Prop() schoolIsSelected!: boolean;
 
   T = T;
-  selectedTab = 'candidatesToSchoolOfTheMonth';
+  selectedTab = 'schoolsOfPreviousMonths';
 }
 </script>

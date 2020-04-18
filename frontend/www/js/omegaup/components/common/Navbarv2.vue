@@ -249,7 +249,7 @@
   </header>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 nav.navbar {
   background-color: $header-primary-color;
