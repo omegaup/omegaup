@@ -8,6 +8,7 @@
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
+ * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4079,7 +4080,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param mixed $some_tags
      *
-     * @return array{smartyProperties: array{payload: array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tags: list<string>}}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemListPayload}, template: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -4150,6 +4151,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params
         );
 
+        $tagData = [];
+
+        foreach (\OmegaUp\DAO\Tags::getAll() as $tag) {
+            $tagData[] = ['name' => $tag->name];
+        }
+
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -4168,6 +4175,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
                     'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
                     'tags' => $tags,
+                    'tagData' => $tagData,
                 ],
             ],
             'template' => 'problems.tpl',

@@ -208,6 +208,14 @@ export namespace types {
       );
     }
 
+    export function ProblemListPayload(
+      elementId: string,
+    ): types.ProblemListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -423,6 +431,22 @@ export namespace types {
     title: string;
     visibility: number;
     quality_seal: boolean;
+  }
+
+  export interface ProblemListPayload {
+    currentTags: string[];
+    loggedIn: boolean;
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    keyword: string;
+    language: string;
+    mode: string;
+    column: string;
+    languages: string[];
+    columns: string[];
+    modes: string[];
+    tagData: { name?: string }[];
+    tags: string[];
   }
 
   export interface ProblemsetProblem {
