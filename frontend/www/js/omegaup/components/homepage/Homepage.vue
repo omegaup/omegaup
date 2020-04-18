@@ -10,7 +10,6 @@
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
-    <!-- TODO: esto debe ser acomodado al final de toda la migración -->
     <omegaup-carousel></omegaup-carousel>
     <div class="container-lg py-5">
       <div class="row align-items-stretch justify-content-around">
