@@ -224,6 +224,14 @@ export namespace types {
       );
     }
 
+    export function ProblemTagsPayload(
+      elementId: string,
+    ): types.ProblemTagsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -237,6 +245,10 @@ export namespace types {
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
+  }
+
+  export interface AddTagResponse {
+    name: string;
   }
 
   export interface AssignmentProgress {
@@ -438,7 +450,7 @@ export namespace types {
     message: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
-    selectedTags?: { public: boolean; tagname: string }[];
+    selectedTags?: types.SelectedTag[];
     source: string;
     statusError: string;
     tags: { name?: string }[];
@@ -482,6 +494,12 @@ export namespace types {
     tags: string[];
   }
 
+  export interface ProblemTagsPayload {
+    alias: string;
+    selectedTags: types.SelectedTag[];
+    tags: { name?: string }[];
+  }
+
   export interface ProblemsetProblem {
     accepted: number;
     alias: string;
@@ -502,6 +520,10 @@ export namespace types {
   export interface Progress {
     score: number;
     max_score: number;
+  }
+
+  export interface RemoveTagResponse {
+    status: string;
   }
 
   export interface Run {
@@ -567,6 +589,11 @@ export namespace types {
     }[];
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface SelectedTag {
+    public: boolean;
+    tagname: string;
   }
 
   export interface StatsPayload {
@@ -1613,7 +1640,7 @@ export namespace messages {
   export type ProblemAddGroupAdminRequest = { [key: string]: any };
   export type ProblemAddGroupAdminResponse = {};
   export type ProblemAddTagRequest = { [key: string]: any };
-  export type ProblemAddTagResponse = { name: string };
+  export type ProblemAddTagResponse = types.AddTagResponse;
   export type ProblemAdminListRequest = { [key: string]: any };
   export type ProblemAdminListResponse = {
     pagerItems: types.PageItem[];
@@ -1722,7 +1749,7 @@ export namespace messages {
   export type ProblemRemoveGroupAdminRequest = { [key: string]: any };
   export type ProblemRemoveGroupAdminResponse = {};
   export type ProblemRemoveTagRequest = { [key: string]: any };
-  export type ProblemRemoveTagResponse = {};
+  export type ProblemRemoveTagResponse = types.RemoveTagResponse;
   export type ProblemRunsRequest = { [key: string]: any };
   export type _ProblemRunsServerResponse = any;
   export type ProblemRunsResponse = {

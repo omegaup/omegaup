@@ -154,39 +154,9 @@
   </div>
 
   <div class="tab-pane" id="tags">
-    <div class="panel panel-primary">
-      <div class="panel-body">
-        <form class="form">
-          <div class="form-group">
-            <label for="tag-name">{#wordsTags#}</label>
-            <input id="tag-name" name="tag_name" value="" type="text" size="20" class="form-control" autocomplete="off" />
-          </div>
-          <div class="form-group">
-            <div class="tag-list pull-left"></div>
-          </div>
-          <div class="form-group">
-            <label for="tag-public">{#problemEditTagPublic#}</label>
-            <select id="tag-public" name="tag_public" class="form-control">
-              <option value="0" selected="selected">{#wordsNo#}</option>
-              <option value="1">{#wordsYes#}</option>
-            </select>
-          </div>
-
-          <button class="btn btn-primary" type='submit'>{#wordsAddTag#}</button>
-        </form>
-      </div>
-
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{#contestEditTagName#}</th>
-            <th>{#contestEditTagPublic#}</th>
-            <th>{#contestEditTagDelete#}</th>
-          </tr>
-        </thead>
-        <tbody id="problem-tags"></tbody>
-      </table>
-    </div>
+    <div id="problem-tags"></div>
+    <script type="text/json" id="problem-tags-payload">{$problemTagsPayload|json_encode}</script>
+    {js_include entrypoint="problem_tags"}
   </div>
 
   <div class="tab-pane" id="download">

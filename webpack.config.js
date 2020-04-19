@@ -68,6 +68,7 @@ let config = [
       problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       problem_settings: './frontend/www/js/omegaup/problem/settings.js',
+      problem_tags: './frontend/www/js/omegaup/problem/tags.ts',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:
