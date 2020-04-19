@@ -134,7 +134,7 @@ export function ignoreError(response: {
   payload?: any;
 }): void {}
 
-export function dismissNotifications(originalStatusCounter: number): void {
+export function dismissNotifications(originalStatusCounter?: number): void {
   const statusElement = $('#status');
   let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
   if (

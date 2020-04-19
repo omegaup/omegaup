@@ -65,7 +65,7 @@
 
   .carousel-item {
     blockquote.blockquote {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       line-height: 1.15;
 
       footer {
