@@ -193,15 +193,15 @@ export default class ProblemList extends Vue {
   ];
 
   iconClassForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility >= 2) return 'omegaup-quality-badge';
-    else if (visibility < 0) return 'glyphicon-ban-circle';
+    if (qualitySeal || visibility == 3) return 'omegaup-quality-badge';
+    else if (visibility <= -2) return 'glyphicon-ban-circle';
     else if (visibility == 0) return 'glyphicon-eye-close';
     return '';
   }
 
   iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility >= 2) return T.wordsHighQualityProblem;
-    else if (visibility < 0) return T.wordsBannedProblem;
+    if (qualitySeal || visibility == 3) return T.wordsHighQualityProblem;
+    else if (visibility <= -3) return T.wordsBannedProblem;
     else if (visibility == 0) return T.wordsPrivate;
     return '';
   }
