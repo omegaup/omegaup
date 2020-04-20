@@ -37,7 +37,7 @@ OmegaUp.on('ready', () => {
               problem_alias: alias,
               name: tagname,
             })
-              .then((response: types.RemoveTagResponse) => {
+              .then(response => {
                 ui.success(T.tagRemoved);
               })
               .catch(ui.apiError);
