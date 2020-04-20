@@ -59,7 +59,7 @@
         </div>
         <div
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
-          v-if="schoolsRank !== null"
+          v-if="schoolsRank.totalRows"
         >
           <omegaup-school-rank
             v-bind:page="schoolsRank.page"

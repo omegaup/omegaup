@@ -224,6 +224,7 @@
                 <template v-show="!omegaUpLockDown && !inContest">
                   <a
                     class="dropdown-item"
+                    data-nav-profile
                     href="/profile/"
                     v-show="!omegaUpLockDown && !inContest"
                   >
