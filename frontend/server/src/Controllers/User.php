@@ -3376,7 +3376,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $date
      *
-     * @return array{smartyProperties: array{payload: IndexPayload}, supportsBootstrap4: bool, template: string}
+     * @return array{smartyProperties: array{payload: IndexPayload}, template: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3421,7 +3421,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] : [],
                 ],
             ],
-            'supportsBootstrap4' => true,
             'template' => 'index.tpl',
         ];
     }
