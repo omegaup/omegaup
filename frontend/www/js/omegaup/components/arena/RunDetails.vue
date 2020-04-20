@@ -64,9 +64,9 @@
           </tbody>
         </table>
       </div>
-      <div v-else-if="data.groups && data.feedback === 'summary'">
+      <div v-else-if="data.feedback === 'summary'">
         <h3>{{ T.wordsFeedback }}</h3>
-        <div v-html="getFeedback(data.groups)"></div>
+        <div v-html="data.feedback_summary"></div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a
@@ -240,46 +240,6 @@ export default class ArenaRunDetails extends Vue {
   toggle(group: string): void {
     const visible = this.groupVisible[group];
     this.$set(this.groupVisible, group, !visible);
-  }
-
-  getFeedback(groups: omegaup.DetailsGroup[]): string {
-    const verdictMap = [
-      'AC',
-      'PA',
-      'PE',
-      'WA',
-      'TLE',
-      'OLE',
-      'MLE',
-      'RTE',
-      'RFE',
-      'CE',
-      'JE',
-    ];
-    const verdict: string[] = [];
-    const verdictWeight: number[] = [];
-    groups.forEach((group: omegaup.DetailsGroup) => {
-      if (group.group === 'sample') {
-        return;
-      }
-      group.cases.forEach((runCase: omegaup.Case) => {
-        verdict.push(runCase.verdict);
-        verdictWeight.push(verdictMap.indexOf(runCase.verdict));
-      });
-    });
-
-    const acPercentage =
-      (verdict.reduce((n: number, verdict: string) => {
-        return n + (verdict === 'AC' ? 1 : 0);
-      }, 0) /
-        verdict.length) *
-      100;
-    const worstSubmissionVerdictIndex = Math.max(...verdictWeight);
-
-    return ui.formatString(T.feedbackSubmissionContestSummary, {
-      pctAC: acPercentage,
-      worstSubmissionVerdict: verdictMap[worstSubmissionVerdictIndex],
-    });
   }
 }
 </script>

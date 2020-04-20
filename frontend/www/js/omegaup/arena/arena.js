@@ -2123,6 +2123,11 @@ export class Arena {
       feedback: self.options.contestAlias
         ? self.currentProblemset.feedback
         : 'detailed',
+      feedback_summary:
+        self.options.contestAlias &&
+        self.currentProblemset.feedback === 'summary'
+          ? data.details.feedback_summary
+          : '',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

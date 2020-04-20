@@ -802,9 +802,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             'submission' => $submission,
         ] = self::validateDetailsRequest($r['run_alias']);
 
-        $problem = \OmegaUp\DAO\Problems::getByPK(
-            intval($submission->problem_id)
+        $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $submission->problemset_id
         );
+        $contest = null;
+        if (!is_null($problemset->contest_id)) {
+            $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
+        }
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -829,26 +834,50 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
         ];
+        $sholudShowRunDetails = self::sholudShowRunDetails(
+            $r->identity->identity_id,
+            $problem,
+            $problemset,
+            $contest
+        );
 
         // Get the details, compile error, logs, etc.
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
-            /*$showDetails=*/(
-                $response['admin'] ||
-                \OmegaUp\DAO\Problems::isProblemSolved(
-                    $problem,
-                    intval(
-                        $r->identity->identity_id
-                    )
-                )
-            )
+            $response['admin'] || $sholudShowRunDetails
         );
         $response['source'] = $details['source'];
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];
         }
         if (isset($details['details'])) {
+            if (!is_null($contest) && $contest->feedback !== 'detailed') {
+                if ($contest->feedback === 'summary') {
+                    $verdictMap = array_flip(self::VERDICTS);
+                    $index = 0;
+                    foreach ($details['details']['groups'] as $group) {
+                        foreach ($group['cases'] as $case) {
+                            if ($verdictMap[$case['verdict']] < $index) {
+                                continue;
+                            }
+                            $index = $verdictMap[$case['verdict']];
+                        }
+                    }
+                    $worstVerdict = \OmegaUp\Controllers\Run::VERDICTS[$index];
+                    $details['details']['feedback_summary'] = \OmegaUp\ApiUtils::formatString(
+                        \OmegaUp\Translations::getInstance()->get(
+                            'feedbackSubmissionContestSummary'
+                        )
+                            ?: 'feedbackSubmissionContestSummary',
+                        [
+                            'worstSubmissionVerdict' => strval($worstVerdict),
+                            'points' => strval($run->contest_score),
+                        ]
+                    );
+                }
+                unset($details['details']['groups']);
+            }
             $response['details'] = $details['details'];
         }
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
@@ -902,6 +931,24 @@ class Run extends \OmegaUp\Controllers\Controller {
             $run,
             false
         );
+    }
+
+    private static function sholudShowRunDetails(
+        int $identityId,
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?\OmegaUp\DAO\VO\Problemsets $problemset,
+        ?\Omegaup\DAO\VO\Contests $contest
+    ): bool {
+        if (is_null($problemset) || is_null($problemset->contest_id)) {
+            return \OmegaUp\DAO\Problems::isProblemSolved(
+                $problem,
+                $identityId
+            );
+        }
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        return $contest->feedback !== 'none';
     }
 
     /**
