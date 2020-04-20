@@ -171,12 +171,14 @@ class UITools {
         $payload = [],
         bool $inContest = false,
         bool $supportsBootstrap4 = false,
+        bool $forceBootstrap4 = false,
         string $navbarSection = ''
     ): void {
         $headerPayload = self::getCommonPayload(
             $smarty,
             $inContest,
             $supportsBootstrap4,
+            $forceBootstrap4,
             $navbarSection
         );
         $smarty->assign('payload', $payload + $headerPayload);
@@ -186,6 +188,8 @@ class UITools {
     /**
      * Returns whether Bootstrap 4 will be used. This is only true if either:
      *
+     * - The controller forces the use of bootstrap4. This means that it does
+     *   not support bootstrap3 anymore.
      * - The user explicitly requests bootstrap4 to be used regardless of
      *   underlying support by the components by passing the request parameter
      *   bootstrap4=force.
@@ -193,8 +197,12 @@ class UITools {
      *   by passing the request parameter bootstrap4=true.
      */
     private static function useBootstrap4(
-        bool $supportsBootstrap4
+        bool $supportsBootstrap4,
+        bool $forceBootstrap4
     ): bool {
+        if ($forceBootstrap4) {
+            return true;
+        }
         if (!isset($_REQUEST['bootstrap4'])) {
             return false;
         }
@@ -216,6 +224,7 @@ class UITools {
         \Smarty $smarty,
         bool $inContest = false,
         bool $supportsBootstrap4 = false,
+        bool $forceBootstrap4 = false,
         string $navbarSection = ''
     ) {
         [
@@ -226,7 +235,10 @@ class UITools {
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
-            'bootstrap4' => self::useBootstrap4($supportsBootstrap4),
+            'bootstrap4' => self::useBootstrap4(
+                $supportsBootstrap4,
+                $forceBootstrap4
+            ),
             'inContest' => $inContest,
             'isLoggedIn' => !is_null($identity),
             'isReviewer' => (
@@ -252,7 +264,7 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, supportsBootstrap4?: bool, forceBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -261,6 +273,7 @@ class UITools {
             $smartyProperties = $response['smartyProperties'];
             $template = $response['template'];
             $supportsBootstrap4 = $response['supportsBootstrap4'] ?? false;
+            $forceBootstrap4 = $response['forceBootstrap4'] ?? false;
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
@@ -279,6 +292,7 @@ class UITools {
             $payload,
             $inContest,
             $supportsBootstrap4,
+            $forceBootstrap4,
             $navbarSection
         );
 
