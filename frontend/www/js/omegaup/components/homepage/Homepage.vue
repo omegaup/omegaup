@@ -10,7 +10,6 @@
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
-    <!-- TODO: esto debe ser acomodado al final de toda la migración -->
     <omegaup-carousel></omegaup-carousel>
     <div class="container-lg py-5">
       <div class="row align-items-stretch justify-content-around">
@@ -60,7 +59,7 @@
         </div>
         <div
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
-          v-if="schoolsRank !== null"
+          v-if="schoolsRank.totalRows"
         >
           <omegaup-school-rank
             v-bind:page="schoolsRank.page"
@@ -127,7 +126,7 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rankv2.vue';
 import user_Rank from '../user/Rank.vue';
-import coderofthemonth_Notice from '../coderofthemonth/Notice.vue';
+import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
 
 @Component({
   components: {

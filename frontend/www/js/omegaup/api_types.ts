@@ -386,7 +386,6 @@ export namespace types {
       female?: types.UserProfile;
     };
     currentUserInfo: { username: string };
-    enableSocialMediaResources: boolean;
     userRank: types.CoderOfTheMonth[];
     schoolOfTheMonthData?: {
       country_id?: string;
@@ -402,10 +401,6 @@ export namespace types {
       school_of_the_month_id: number;
       score: number;
     }[];
-    upcomingContests: {
-      number_of_results: number;
-      results: { alias: string; title: string }[];
-    };
   }
 
   export interface Notification {

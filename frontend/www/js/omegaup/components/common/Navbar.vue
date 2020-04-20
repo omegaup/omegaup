@@ -183,7 +183,7 @@
             <ul class="dropdown-menu">
               <template v-show="!omegaUpLockDown && !inContest">
                 <li>
-                  <a href="/profile/"
+                  <a href="/profile/" data-nav-profile
                     ><span class="glyphicon glyphicon-user"></span>
                     {{ T.navViewProfile }}</a
                   >
