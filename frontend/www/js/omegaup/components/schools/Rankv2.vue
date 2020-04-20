@@ -3,7 +3,7 @@
     <h5 class="card-header">
       {{
         showHeader
-          ? UI.formatString(T.schoolRankHeader, {
+          ? UI.formatString(T.schoolRankOfTheMonthHeader, {
               count: rank ? rank.length : 0,
             })
           : UI.formatString(T.schoolRankRangeHeader, {
@@ -39,7 +39,7 @@
           <th scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
-          <td>
+          <td class="text-truncate">
             <omegaup-countryflag
               v-bind:country="school.country_id"
             ></omegaup-countryflag>
@@ -54,7 +54,7 @@
       </tbody>
     </table>
     <div class="card-footer" v-if="showHeader">
-      <a href="/schoolofthemonth/">{{ T.rankViewFull }}</a>
+      <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
     <div class="card-footer" v-else-if="showControls">
       <template v-if="page > 1">
@@ -72,6 +72,16 @@
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+// FIXME: This prevents wrapping a table cell when the name of the school is too long.
+// So, both tables (users rank and the current one) are perfectly aligned.
+// Another solution should  be taken in the future.
+.text-truncate {
+  max-width: 250px;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';

@@ -753,6 +753,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/latinize@^0.2.15":
+  version "0.2.15"
+  resolved "https://registry.yarnpkg.com/@types/latinize/-/latinize-0.2.15.tgz#a1718e53c5d6a37a554cbe4209e4ab15adc975f9"
+  integrity sha1-oXGOU8XWo3pVTL5CCeSrFa3Jdfk=
+
 "@types/minimatch@*":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
@@ -3903,6 +3908,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
+
+latinize@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/latinize/-/latinize-0.4.1.tgz#1b82d6e0687f2722dfdf67a19302fc345a772738"
+  integrity sha512-A4miz97dNF+EbNgQdayPAEtud5eRpCGPwJy7JQFD1hBQcOzOgBS4m721zoREuPqpz1yKm8hYT2ANlh7pirapsA==
 
 lcid@^1.0.0:
   version "1.0.0"

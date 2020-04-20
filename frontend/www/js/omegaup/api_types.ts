@@ -208,6 +208,22 @@ export namespace types {
       );
     }
 
+    export function ProblemFormPayload(
+      elementId: string,
+    ): types.ProblemFormPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function ProblemListPayload(
+      elementId: string,
+    ): types.ProblemListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -362,7 +378,6 @@ export namespace types {
       female?: types.UserProfile;
     };
     currentUserInfo: { username: string };
-    enableSocialMediaResources: boolean;
     userRank: types.CoderOfTheMonth[];
     schoolOfTheMonthData?: {
       country_id?: string;
@@ -378,10 +393,6 @@ export namespace types {
       school_of_the_month_id: number;
       score: number;
     }[];
-    upcomingContests: {
-      number_of_results: number;
-      results: { alias: string; title: string }[];
-    };
   }
 
   export interface Notification {
@@ -410,6 +421,31 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemFormPayload {
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number | string;
+    inputLimit: number | string;
+    isUpdate: boolean;
+    languages: string;
+    memoryLimit: number | string;
+    message: string;
+    outputLimit: number | string;
+    overallWallTimeLimit: number | string;
+    selectedTags?: { public: boolean; tagname: string }[];
+    source: string;
+    statusError: string;
+    tags: { name?: string }[];
+    timeLimit: number | string;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | string;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+  }
+
   export interface ProblemListItem {
     alias: string;
     difficulty?: number;
@@ -423,6 +459,22 @@ export namespace types {
     title: string;
     visibility: number;
     quality_seal: boolean;
+  }
+
+  export interface ProblemListPayload {
+    currentTags: string[];
+    loggedIn: boolean;
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    keyword: string;
+    language: string;
+    mode: string;
+    column: string;
+    languages: string[];
+    columns: string[];
+    modes: string[];
+    tagData: { name?: string }[];
+    tags: string[];
   }
 
   export interface ProblemsetProblem {
