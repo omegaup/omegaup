@@ -24,76 +24,76 @@
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
         <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
-          <li v-bind:class="{ active: navbarSection === 'arena' }">
-            <a href="/arena/">{{ T.navArena }}</a>
-          </li>
           <li
             class="dropdown nav-contests"
             v-bind:class="{ active: navbarSection === 'contests' }"
-            v-if="isLoggedIn && isMainUserIdentity"
+            v-if="isLoggedIn"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-contests
+              href="#"
               ><span>{{ T.wordsContests }}</span> <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/contest/new/">{{ T.contestsCreateNew }}</a>
+                <a href="/arena/" data-nav-contests-arena>{{
+                  T.navAllContests
+                }}</a>
               </li>
-              <li>
-                <a href="/contest/mine/">{{ T.navMyContests }}</a>
-              </li>
-              <li>
-                <a href="/group/">{{ T.navMyGroups }}</a>
-              </li>
-              <li>
-                <a href="/scoreboardmerge/">{{ T.contestsJoinScoreboards }}</a>
-              </li>
+
+              <template v-if="isMainUserIdentity">
+                <li>
+                  <a href="/contest/new/" data-nav-contests-create>{{
+                    T.contestsCreateNew
+                  }}</a>
+                </li>
+                <li>
+                  <a href="/scoreboardmerge/">{{
+                    T.contestsJoinScoreboards
+                  }}</a>
+                </li>
+              </template>
             </ul>
+          </li>
+          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
+            <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
+          </li>
+          <li
+            class="nav-courses"
+            v-bind:class="{ active: navbarSection === 'courses' }"
+          >
+            <a href="/schools/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
             v-bind:class="{ active: navbarSection === 'problems' }"
-            v-if="isLoggedIn && isMainUserIdentity"
           >
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
-              ><span>{{ T.wordsProblems }}</span> <span class="caret"></span
-            ></a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="/problem/new/">{{ T.myproblemsListCreateProblem }}</a>
-              </li>
-              <li>
-                <a href="/problem/mine/">{{ T.navMyProblems }}</a>
-              </li>
-              <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
-              </li>
-              <li>
-                <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
-              </li>
-              <li>
-                <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
-              </li>
-              <li v-show="isReviewer">
-                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
-              </li>
-            </ul>
-          </li>
-          <li
-            class="dropdown nav-problems"
-            v-bind:class="{ active: navbarSection === 'problems' }"
-            v-else=""
-          >
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span>{{ T.wordsProblems }}</span>
-              <span class="caret"></span>
+            <a
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              data-nav-problems
+              href="#"
+            >
+              <span>{{ T.wordsProblems }}</span> <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/">{{ T.wordsProblems }}</a>
+                <a href="/problem/" data-nav-problems-all>{{
+                  T.navAllProblems
+                }}</a>
+              </li>
+              <li v-if="isLoggedIn && isMainUserIdentity">
+                <a href="/problem/new/" data-nav-problems-create>{{
+                  T.myproblemsListCreateProblem
+                }}</a>
               </li>
               <li>
                 <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
+              </li>
+              <li v-if="isReviewer">
+                <a href="/nomination/">{{ T.navQualityNominationQueue }}</a>
               </li>
             </ul>
           </li>
@@ -112,19 +112,40 @@
               <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
               </li>
+              <li>
+                <a href="/coderofthemonth/">{{ T.navCoderOfTheMonth }}</a>
+              </li>
+              <li>
+                <a href="/coderofthemonth/female/">{{
+                  T.navCoderOfTheMonthFemale
+                }}</a>
+              </li>
+              <li>
+                <a href="/schoolofthemonth/">{{ T.navSchoolOfTheMonth }}</a>
+              </li>
             </ul>
           </li>
-          <li
-            class="nav-courses"
-            v-bind:class="{ active: navbarSection === 'courses' }"
-          >
-            <a href="/schools/">{{ T.navCourses }}</a>
-          </li>
-          <li>
-            <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
-          </li>
-          <li>
-            <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{ T.navHelp }}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+                  >{{ T.navTutorials }}</a
+                >
+              </li>
+              <li>
+                <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
+              </li>
+              <li>
+                <a href="https://omegaup.com/preguntas/">{{
+                  T.navQuestions
+                }}</a>
+              </li>
+            </ul>
           </li>
         </ul>
         <ul class="nav navbar-nav" v-else=""></ul>
@@ -139,9 +160,6 @@
             v-bind:initialClarifications="initialClarifications"
             v-if="inContest"
           ></omegaup-notifications-clarifications>
-          <omegaup-notification-list
-            v-bind:notifications="notifications"
-          ></omegaup-notification-list>
           <li
             class="dropdown nav-user"
             v-bind:class="{ active: navbarSection === 'users' }"
@@ -149,6 +167,7 @@
             <a
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
+              data-nav-user
               href="#"
               ><img v-bind:src="gravatarURL51"/>
               <span class="username" v-bind:title="currentUsername">{{
@@ -161,13 +180,29 @@
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
-            <ul class="dropdown-menu" v-if="showNavbar">
-              <li v-show="!omegaUpLockDown && !inContest">
-                <a href="/profile/"
-                  ><span class="glyphicon glyphicon-user"></span>
-                  {{ T.navViewProfile }}</a
-                >
-              </li>
+            <ul class="dropdown-menu">
+              <template v-show="!omegaUpLockDown && !inContest">
+                <li>
+                  <a href="/profile/"
+                    ><span class="glyphicon glyphicon-user"></span>
+                    {{ T.navViewProfile }}</a
+                  >
+                </li>
+                <li>
+                  <a href="/problem/mine/">{{ T.navMyProblems }}</a>
+                </li>
+                <li>
+                  <a href="/contest/mine/" data-nav-user-contests>{{
+                    T.navMyContests
+                  }}</a>
+                </li>
+                <li>
+                  <a href="/group/" data-nav-user-groups>{{ T.navMyGroups }}</a>
+                </li>
+                <li>
+                  <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
+                </li>
+              </template>
               <li>
                 <a href="/logout/"
                   ><span class="glyphicon glyphicon-log-out"></span>
@@ -179,20 +214,6 @@
                 v-bind:error="errorMessage"
                 v-bind:graderInfo="graderInfo"
               ></omegaup-common-grader-status>
-            </ul>
-            <ul class="dropdown-menu" v-else="">
-              <li v-show="!omegaUpLockDown && !inContest">
-                <a href="/profile/"
-                  ><span class="glyphicon glyphicon-user"></span>
-                  {{ T.navViewProfile }}</a
-                >
-              </li>
-              <li>
-                <a href="/logout/"
-                  ><span class="glyphicon glyphicon-log-out"></span>
-                  {{ T.navLogOut }}</a
-                >
-              </li>
             </ul>
           </li>
         </ul>
@@ -390,14 +411,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 
 @Component({
   components: {
-    'omegaup-notification-list': notifications_List,
     'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
@@ -425,10 +444,6 @@ export default class Navbar extends Vue {
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
-  }
-
-  get showNavbar(): boolean {
-    return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
   }
 }
 </script>

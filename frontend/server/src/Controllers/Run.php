@@ -586,7 +586,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: int}
+     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp}
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -621,7 +621,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
-        $filtered['time'] = intval($filtered['time']);
+        $filtered['time'] = new \OmegaUp\Timestamp(intval($filtered['time']));
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
         $filtered['penalty'] = intval($filtered['penalty']);
@@ -1228,37 +1228,6 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get total of runs have been submitted last 3 months.
-     *
-     * @return array{date: list<string>, total: list<int>}
-     */
-    public static function getCounts() {
-        return \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::RUN_TOTAL_COUNTS,
-            '',
-            function () {
-                $result = [];
-                $result['date'] = [];
-                $result['total'] = [];
-                $runCounts = \OmegaUp\DAO\RunCounts::getAll(
-                    1,
-                    90,
-                    'date',
-                    'DESC'
-                );
-
-                foreach ($runCounts as $runCount) {
-                    $result['date'][] = strval($runCount->date);
-                    $result['total'][] = intval($runCount->total);
-                }
-
-                return $result;
-            },
-            24 * 60 * 60 /*expire in 1 day*/
-        );
-    }
-
-    /**
      * Validator for List API
      *
      * @omegaup-request-param mixed $problem_alias
@@ -1331,7 +1300,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
      *
-     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: int, type: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1382,7 +1351,6 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $result = [];
         foreach ($runs as $run) {
-            $run['time'] = intval($run['time']);
             $run['score'] = round(floatval($run['score']), 4);
             if (!is_null($run['contest_score'])) {
                 $run['contest_score'] = round(

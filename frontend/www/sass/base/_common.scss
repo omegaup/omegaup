@@ -64,5 +64,6 @@ a {
   transition: color 0.1 ease;
   &:hover {
     color: $omegaup-links--hover;
+    text-decoration: none;
   }
 }

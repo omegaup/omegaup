@@ -101,4 +101,56 @@ describe('omegaup.Time', function() {
       expect(omegaup.Time.toDDHHMM(2500000)).toEqual('28d 22h 26m');
     });
   });
+
+  describe('remoteTimeAdapter', function() {
+    beforeAll(function() {
+      omegaup.Time._setRemoteDeltaTime(1);
+    });
+
+    it('Should handle Dates', function() {
+      expect(omegaup.Time.remoteTimeAdapter(new Date(0))).toEqual(new Date(1));
+    });
+
+    it('Should handle arrays', function() {
+      expect(omegaup.Time.remoteTimeAdapter([new Date(0)])).toEqual([
+        new Date(1),
+      ]);
+    });
+
+    it('Should handle primitives', function() {
+      expect(omegaup.Time.remoteTimeAdapter(1)).toEqual(1);
+    });
+
+    it('Should handle objects', function() {
+      expect(
+        omegaup.Time.remoteTimeAdapter({
+          time: new Date(0),
+          status: 'ok',
+        }),
+      ).toEqual({
+        time: new Date(1),
+        status: 'ok',
+      });
+    });
+
+    it('Should handle complex objects', function() {
+      expect(
+        omegaup.Time.remoteTimeAdapter({
+          contests: [
+            {
+              time: new Date(0),
+            },
+          ],
+          status: 'ok',
+        }),
+      ).toEqual({
+        contests: [
+          {
+            time: new Date(1),
+          },
+        ],
+        status: 'ok',
+      });
+    });
+  });
 });
