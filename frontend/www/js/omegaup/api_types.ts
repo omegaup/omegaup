@@ -224,6 +224,14 @@ export namespace types {
       );
     }
 
+    export function ProblemTagsPayload(
+      elementId: string,
+    ): types.ProblemTagsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -433,7 +441,7 @@ export namespace types {
     message: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
-    selectedTags?: { public: boolean; tagname: string }[];
+    selectedTags?: types.SelectedTag[];
     source: string;
     statusError: string;
     tags: { name?: string }[];
@@ -475,6 +483,12 @@ export namespace types {
     modes: string[];
     tagData: { name?: string }[];
     tags: string[];
+  }
+
+  export interface ProblemTagsPayload {
+    alias: string;
+    selectedTags: types.SelectedTag[];
+    tags: { name?: string }[];
   }
 
   export interface ProblemsetProblem {
@@ -562,6 +576,11 @@ export namespace types {
     }[];
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface SelectedTag {
+    public: boolean;
+    tagname: string;
   }
 
   export interface StatsPayload {

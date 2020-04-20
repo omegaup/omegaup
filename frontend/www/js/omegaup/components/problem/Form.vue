@@ -174,79 +174,12 @@
           </div>
         </div>
 
-        <div class="panel panel-primary" v-if="!data.isUpdate">
-          <div class="panel-body">
-            <div class="form-group">
-              <label>{{ T.wordsTags }}</label>
-            </div>
-            <div class="form-group">
-              <div class="tag-list pull-left">
-                <a
-                  class="tag pull-left"
-                  href="#tags"
-                  v-bind:data-key="tag.name"
-                  v-for="tag in tags"
-                  v-on:click.prevent="onAddTag(tag.name, public)"
-                >
-                  {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
-                </a>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>{{ T.problemEditTagPublic }}</label>
-              <select class="form-control" v-model="public">
-                <option v-bind:value="false" selected="selected">
-                  {{ T.wordsNo }}
-                </option>
-                <option v-bind:value="true">{{ T.wordsYes }}</option>
-              </select>
-            </div>
-          </div>
-
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>{{ T.contestEditTagName }}</th>
-                <th>{{ T.contestEditTagPublic }}</th>
-                <th>{{ T.contestEditTagDelete }}</th>
-              </tr>
-            </thead>
-            <tbody class="problem-tags">
-              <tr v-for="selectedTag in selectedTags">
-                <td class="tag-name">
-                  <a
-                    v-bind:data-key="selectedTag.tagname"
-                    v-bind:href="`/problem/?tag[]=${selectedTag.tagname}`"
-                  >
-                    {{
-                      T.hasOwnProperty(selectedTag.tagname)
-                        ? T[selectedTag.tagname]
-                        : selectedTag.tagname
-                    }}
-                  </a>
-                </td>
-                <td class="is_public">
-                  {{ selectedTag.public ? T.wordsYes : T.wordsNo }}
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="close"
-                    v-on:click="onRemoveTag(selectedTag.tagname)"
-                  >
-                    &times;
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <input
-            type="hidden"
-            name="selected_tags"
-            v-bind:value="selectedTagsList"
-          />
-        </div>
-
+        <omegaup-problem-tags
+          v-bind:initialTags="data.tags"
+          v-bind:initialSelectedTags="data.selectedTags || []"
+          v-bind:alias="data.alias"
+          v-if="!data.isUpdate"
+        ></omegaup-problem-tags>
         <div class="row" v-else="">
           <div
             class="form-group  col-md-12"
@@ -283,6 +216,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
+import problem_Tags from './Tags.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import latinize from 'latinize';
@@ -291,6 +225,7 @@ import { types } from '../../api_types';
 @Component({
   components: {
     'omegaup-problem-settings': problem_Settings,
+    'omegaup-problem-tags': problem_Tags,
   },
 })
 export default class ProblemForm extends Vue {

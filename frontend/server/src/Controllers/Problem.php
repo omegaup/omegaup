@@ -8,7 +8,9 @@
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<array{public: bool, tagname: string}>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
+ * @psalm-type SelectedTag=array{public: bool, tagname: string}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
+ * @psalm-type ProblemTagsPayload=array{alias: string, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
@@ -4253,7 +4255,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $visibility
      * @omegaup-request-param mixed $wmd-input-statement
      *
-     * @return array{IS_UPDATE: bool, LOAD_MATHJAX: bool, payload: array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>}, STATUS_ERROR?: string, STATUS_SUCCESS?: null|string}
+     * @return array{smartyProperties: array{IS_UPDATE: bool, LOAD_MATHJAX: bool, payload: array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>}, problemTagsPayload: ProblemTagsPayload, STATUS_ERROR?: string, STATUS_SUCCESS: null|string}, template: string}
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4261,18 +4263,59 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         // HACK to prevent fails in validateCreateOrUpdate
         $r['problem_alias'] = strval($r['problem']);
+        \OmegaUp\Validators::validateValidAlias(
+            $r['problem_alias'],
+            'problem_alias'
+        );
 
         $problemParams = self::convertRequestToProblemParams(
             $r,
             /*$isRequired=*/ false
         );
-        if (!isset($r['request'])) {
-            return [
+        $tags = [];
+        $selectedTags = [];
+        $allTags = \OmegaUp\DAO\Tags::getAll();
+        // TODO: Change this list when the final list be defined
+        $filteredTags = array_slice($allTags, 0, 100);
+        $tagnames = array_column($filteredTags, 'name');
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemSelectedTags = \OmegaUp\DAO\ProblemsTags::getProblemTags(
+            $problem,
+            !\OmegaUp\Authorization::canEditProblem($r->identity, $problem)
+        );
+        foreach ($problemSelectedTags as $selectedTag) {
+            $key = array_search($selectedTag['name'], $tagnames);
+            unset($filteredTags[$key]);
+            $selectedTags[] = [
+                'tagname' => $selectedTag['name'],
+                'public' => $selectedTag['public'],
+            ];
+        }
+        foreach ($filteredTags as $tag) {
+            $tags[] = ['name' => $tag->name];
+        }
+        $result = [
+            'smartyProperties' => [
                 'IS_UPDATE' => true,
                 'LOAD_MATHJAX' => true,
                 'STATUS_SUCCESS' => '',
                 'payload' => self::getCommonPayloadForSmarty(),
-            ];
+                'problemTagsPayload' => [
+                    'alias' => $problem->alias,
+                    'tags' => $tags,
+                    'selectedTags' => $selectedTags,
+                ],
+            ],
+            'template' => 'problem.edit.tpl',
+        ];
+        if (!isset($r['request'])) {
+            return $result;
         }
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
@@ -4294,12 +4337,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 } else {
                     $statusError = $response['error'];
                 }
-                return [
-                    'IS_UPDATE' => true,
-                    'LOAD_MATHJAX' => true,
-                    'STATUS_ERROR' => $statusError,
-                    'payload' => self::getCommonPayloadForSmarty(),
-                ];
+                $result['smartyProperties']['STATUS_ERROR'] = $statusError;
+                return $result;
             }
         } elseif ($r['request'] === 'markdown') {
             [
@@ -4330,15 +4369,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problemParams->updatePublished
             );
         }
-
-        return [
-            'IS_UPDATE' => true,
-            'LOAD_MATHJAX' => true,
-            'STATUS_SUCCESS' => \OmegaUp\Translations::getInstance()->get(
-                'problemEditUpdatedSuccessfully'
-            ),
-            'payload' => self::getCommonPayloadForSmarty(),
-        ];
+        $result['smartyProperties']['STATUS_SUCCESS'] = \OmegaUp\Translations::getInstance()->get(
+            'problemEditUpdatedSuccessfully'
+        );
+        return $result;
     }
 
     /**
@@ -4372,7 +4406,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = [];
         $selectedTags = null;
 
-        foreach (\OmegaUp\DAO\Tags::getAll() as $tag) {
+        $allTags = \OmegaUp\DAO\Tags::getAll();
+        // TODO: Change this list when the final list be defined
+        $filteredTags = array_slice($allTags, 0, 100);
+        foreach ($filteredTags as $tag) {
             $tags[] = ['name' => $tag->name];
         }
         if (isset($r['request']) && ($r['request'] === 'submit')) {
