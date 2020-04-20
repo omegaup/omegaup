@@ -42,7 +42,7 @@ OmegaUp.on('ready', () => {
             length: 5,
             showHeader: true,
             rank: payload.schoolRank,
-            totalRows: 5,
+            totalRows: payload.schoolRank.length,
           },
           schoolOfTheMonth: payload.schoolOfTheMonthData,
         },

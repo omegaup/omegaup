@@ -214,7 +214,11 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
     with driver.login(driver.user_username, 'user'):
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, '.navbar-brand'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         contest_url = '/arena/%s' % alias
         with driver.page_transition():
