@@ -97,13 +97,13 @@ import { types } from '../../api_types';
 @Component
 export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
-  @Prop() initialSelectedTags!: types.SelectedTag[];
+  @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
   @Prop() alias!: string;
   @Prop({ default: false }) canAddNewTags!: boolean;
 
   T = T;
   tags = this.initialTags;
-  selectedTags = this.initialSelectedTags || [];
+  selectedTags = this.initialSelectedTags;
   public = false;
   tagname = '';
 
@@ -113,7 +113,7 @@ export default class ProblemTags extends Vue {
 
   onAddTag(tagname: string, isPublic: boolean): void {
     this.selectedTags.push({ tagname: tagname, public: isPublic });
-    this.tags = this.tags.filter((val, index, arr) => val.name !== tagname);
+    this.tags = this.tags.filter(val => val.name !== tagname);
     if (this.canAddNewTags) {
       this.$emit('add-tag', this.alias, tagname, isPublic);
     }
@@ -122,7 +122,7 @@ export default class ProblemTags extends Vue {
   onRemoveTag(tagname: string): void {
     this.tags.push({ name: tagname });
     this.selectedTags = this.selectedTags.filter(
-      (val, index, arr) => val.tagname !== tagname,
+      val => val.tagname !== tagname,
     );
     if (this.canAddNewTags) {
       this.$emit('remove-tag', this.alias, tagname);

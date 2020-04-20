@@ -2499,9 +2499,9 @@ Adds a tag to a problem
 
 ### Returns
 
-```typescript
-types.AddTagResponse;
-```
+| Name   | Type     |
+| ------ | -------- |
+| `name` | `string` |
 
 ## `/api/problem/adminList/`
 
@@ -2803,9 +2803,7 @@ Removes a tag from a contest
 
 ### Returns
 
-```typescript
-types.RemoveTagResponse;
-```
+_Nothing_
 
 ## `/api/problem/runs/`
 

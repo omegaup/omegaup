@@ -247,10 +247,6 @@ export namespace types {
     }
   }
 
-  export interface AddTagResponse {
-    name: string;
-  }
-
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -520,10 +516,6 @@ export namespace types {
   export interface Progress {
     score: number;
     max_score: number;
-  }
-
-  export interface RemoveTagResponse {
-    status: string;
   }
 
   export interface Run {
@@ -1640,7 +1632,7 @@ export namespace messages {
   export type ProblemAddGroupAdminRequest = { [key: string]: any };
   export type ProblemAddGroupAdminResponse = {};
   export type ProblemAddTagRequest = { [key: string]: any };
-  export type ProblemAddTagResponse = types.AddTagResponse;
+  export type ProblemAddTagResponse = { name: string };
   export type ProblemAdminListRequest = { [key: string]: any };
   export type ProblemAdminListResponse = {
     pagerItems: types.PageItem[];
@@ -1749,7 +1741,7 @@ export namespace messages {
   export type ProblemRemoveGroupAdminRequest = { [key: string]: any };
   export type ProblemRemoveGroupAdminResponse = {};
   export type ProblemRemoveTagRequest = { [key: string]: any };
-  export type ProblemRemoveTagResponse = types.RemoveTagResponse;
+  export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
   export type _ProblemRunsServerResponse = any;
   export type ProblemRunsResponse = {

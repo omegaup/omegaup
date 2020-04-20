@@ -176,7 +176,7 @@
 
         <omegaup-problem-tags
           v-bind:initialTags="data.tags"
-          v-bind:initialSelectedTags="data.selectedTags"
+          v-bind:initialSelectedTags="data.selectedTags || []"
           v-bind:alias="data.alias"
           v-if="!data.isUpdate"
         ></omegaup-problem-tags>

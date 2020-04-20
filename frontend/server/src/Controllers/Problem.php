@@ -5,8 +5,6 @@
 /**
  * ProblemsController
  *
- * @psalm-type AddTagResponse=array{name: string}
- * @psalm-type RemoveTagResponse=array{status: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
@@ -562,7 +560,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return AddTagResponse
+     * @return array{name: string}
      */
     public static function apiAddTag(\OmegaUp\Request $r): array {
         // Check problem_alias
@@ -738,7 +736,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return RemoveTagResponse
+     * @return array{status: string}
      */
     public static function apiRemoveTag(\OmegaUp\Request $r): array {
         // Authenticate logged user
@@ -4277,7 +4275,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = [];
         $selectedTags = [];
         $allTags = \OmegaUp\DAO\Tags::getAll();
-        $tagnames = array_column($allTags, 'name');
+        // TODO: Change this list when the final list be defined
+        $filteredTags = array_slice($allTags, 0, 100);
+        $tagnames = array_column($filteredTags, 'name');
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem) || is_null($problem->alias)) {
@@ -4291,13 +4291,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         foreach ($problemSelectedTags as $selectedTag) {
             $key = array_search($selectedTag['name'], $tagnames);
-            unset($allTags[$key]);
+            unset($filteredTags[$key]);
             $selectedTags[] = [
                 'tagname' => $selectedTag['name'],
                 'public' => $selectedTag['public'],
             ];
         }
-        foreach ($allTags as $tag) {
+        foreach ($filteredTags as $tag) {
             $tags[] = ['name' => $tag->name];
         }
         $result = [
@@ -4406,7 +4406,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = [];
         $selectedTags = null;
 
-        foreach (\OmegaUp\DAO\Tags::getAll() as $tag) {
+        $allTags = \OmegaUp\DAO\Tags::getAll();
+        // TODO: Change this list when the final list be defined
+        $filteredTags = array_slice($allTags, 0, 100);
+        foreach ($filteredTags as $tag) {
             $tags[] = ['name' => $tag->name];
         }
         if (isset($r['request']) && ($r['request'] === 'submit')) {

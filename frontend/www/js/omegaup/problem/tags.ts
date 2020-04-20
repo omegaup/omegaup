@@ -3,14 +3,14 @@ import problem_Tags from '../components/problem/Tags.vue';
 import { OmegaUp } from '../omegaup.js';
 import { types } from '../api_types';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api_transitional';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemTagsPayload(
     'problem-tags-payload',
   );
-  const problemsList = new Vue({
+  const problemTags = new Vue({
     el: '#problem-tags',
     render: function(createElement) {
       return createElement('omegaup-problem-tags', {
@@ -22,18 +22,18 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'add-tag': (alias: string, tagname: string, isPublic: boolean) => {
-            API.Problem.addTag({
+            api.Problem.addTag({
               problem_alias: alias,
               name: tagname,
               public: isPublic,
             })
-              .then((response: types.AddTagResponse) => {
+              .then(response => {
                 ui.success(T.tagAdded);
               })
               .catch(ui.apiError);
           },
           'remove-tag': (alias: string, tagname: string) => {
-            API.Problem.removeTag({
+            api.Problem.removeTag({
               problem_alias: alias,
               name: tagname,
             })
