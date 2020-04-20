@@ -2034,6 +2034,7 @@ export namespace messages {
         };
       };
       contest_score: number;
+      feedback_summary: string;
       groups: {
         cases: {
           contest_score: number;

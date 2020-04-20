@@ -787,7 +787,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, feedback_summary?: string, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -801,13 +801,19 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run' => $run,
             'submission' => $submission,
         ] = self::validateDetailsRequest($r['run_alias']);
+        if (is_null($submission->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
 
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $submission->problemset_id
-        );
+        $problemset = null;
         $contest = null;
-        if (!is_null($problemset->contest_id)) {
+        if (!is_null($submission->problemset_id)) {
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                $submission->problemset_id
+            );
+        }
+        if (!is_null($problemset) && !is_null($problemset->contest_id)) {
             $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
         }
         if (is_null($problem)) {
@@ -834,7 +840,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
         ];
-        $sholudShowRunDetails = self::sholudShowRunDetails(
+        $shouldShowRunDetails = self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,
             $problemset,
@@ -845,25 +851,26 @@ class Run extends \OmegaUp\Controllers\Controller {
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
-            $response['admin'] || $sholudShowRunDetails
+            $response['admin'] || $shouldShowRunDetails
         );
         $response['source'] = $details['source'];
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (isset($details['details'])) {
+        if (
+            isset($details['details']) &&
+            isset($details['details']['groups'])
+        ) {
             if (!is_null($contest) && $contest->feedback !== 'detailed') {
                 if ($contest->feedback === 'summary') {
                     $verdictMap = array_flip(self::VERDICTS);
-                    $index = 0;
+                    $verdictWeight = [];
                     foreach ($details['details']['groups'] as $group) {
                         foreach ($group['cases'] as $case) {
-                            if ($verdictMap[$case['verdict']] < $index) {
-                                continue;
-                            }
-                            $index = $verdictMap[$case['verdict']];
+                            $verdictWeight[] = $verdictMap[$case['verdict']];
                         }
                     }
+                    $index = max($verdictWeight);
                     $worstVerdict = \OmegaUp\Controllers\Run::VERDICTS[$index];
                     $details['details']['feedback_summary'] = \OmegaUp\ApiUtils::formatString(
                         \OmegaUp\Translations::getInstance()->get(
@@ -933,11 +940,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
     }
 
-    private static function sholudShowRunDetails(
+    private static function shouldShowRunDetails(
         int $identityId,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
-        ?\Omegaup\DAO\VO\Contests $contest
+        ?\OmegaUp\DAO\VO\Contests $contest
     ): bool {
         if (is_null($problemset) || is_null($problemset->contest_id)) {
             return \OmegaUp\DAO\Problems::isProblemSolved(
