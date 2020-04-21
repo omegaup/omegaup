@@ -3,7 +3,7 @@
     <h5 class="card-header">
       {{
         isIndex
-          ? UI.formatString(T.rankHeader, {
+          ? UI.formatString(T.userRankOfTheMonthHeader, {
               count: length,
             })
           : UI.formatString(T.rankRangeHeader, {
@@ -69,7 +69,7 @@
       </thead>
       <tbody>
         <tr v-bind:key="index" v-for="(rank, index) in ranking">
-          <th scope="row">{{ rank.rank }}</th>
+          <th scope="row">{{ rank.ranking }}</th>
           <td>
             <omegaup-countryflag
               v-bind:country="rank.country"
@@ -93,7 +93,7 @@
     </table>
     <div class="card-footer">
       <template v-if="isIndex">
-        <a href="/rank/">{{ T.rankViewFull }}</a>
+        <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
       </template>
       <template v-else="">
         <template v-if="page &gt; 1">

@@ -15,7 +15,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 1,
+                "visibility": 2,
                 "title": "Sumas",
                 "problem_alias": "sumas",
                 "validator": "token-numeric",
@@ -37,7 +37,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 1,
+                "visibility": 2,
                 "title": "Sumas_2",
                 "problem_alias": "sumas_2",
                 "validator": "token-numeric",

@@ -4,7 +4,7 @@
       class="slide d-flex align-items-center justify-content-around flex-wrap flex-lg-nowrap"
     >
       <div>
-        <h3>{{ title }}</h3>
+        <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
           class="btn btn-primary mb-3"
@@ -26,6 +26,14 @@
 .slide {
   @media only screen and (min-width: 767px) {
     height: 500px;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+  }
+
+  p {
+    font-size: 1.2rem;
   }
 }
 </style>

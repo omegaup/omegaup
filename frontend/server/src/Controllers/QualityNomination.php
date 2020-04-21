@@ -518,7 +518,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
             'status',
-            ['open', 'approved', 'denied']
+            ['open', 'resolved', 'banned', 'warning']
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['rationale'],
@@ -559,22 +559,32 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        $isProblemPublic = (
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC ||
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING ||
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
+        );
         $newProblemVisibility = $problem->visibility;
         switch ($r['status']) {
-            case 'approved':
-                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
-                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
+            case 'resolved':
+                if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                 }
                 break;
-            case 'denied':
-                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
-                    // If banning is reverted, problem will become private.
-                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
-                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
-                    // If banning is reverted, problem will become public.
+            case 'banned':
+                if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                }
+                break;
+            case 'warning':
+                if ($isProblemPublic) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
                 }
                 break;
             case 'open':
@@ -582,7 +592,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'resolved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
