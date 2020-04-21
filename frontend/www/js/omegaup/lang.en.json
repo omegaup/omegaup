@@ -362,7 +362,6 @@
 	"errorEc2RunInstances": "Error executing ec2-run-instances. Please check log for details.",
 	"errorEc2TerminateInstance": "Error executing ec2-terminate-instances. Please check log for details.",
 	"errorWhileSendingMail": "There was an error sending the verification email. Please try again later or contact omegaup-soporte@googlegroups.com for support. Your email is not verified yet.",
-	"feedbackSubmissionContestSummary": "The score of this submission is <strong>%(points)</strong>.<br>The lowest verdict in this submmission has been <strong>%(worstSubmissionVerdict)</strong>.",
 	"firstSumbissionWithIdentity": "Note that you are trying to send a submission with an identity account",
 	"followOmegaUp": "Follow @omegaup",
 	"forSelectedItems": "For selected items",

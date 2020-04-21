@@ -2034,7 +2034,6 @@ export namespace messages {
         };
       };
       contest_score: number;
-      feedback_summary: string;
       groups: {
         cases: {
           contest_score: number;
@@ -2048,6 +2047,7 @@ export namespace messages {
         group: string;
         max_score: number;
         score: number;
+        verdict: string;
       }[];
       judged_by: string;
       max_score: number;

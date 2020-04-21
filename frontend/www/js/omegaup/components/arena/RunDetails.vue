@@ -2,14 +2,14 @@
   <form class="run-details-view">
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases" v-if="data.groups && data.feedback === 'detailed'">
+      <div class="cases" v-if="data.groups">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
           <thead>
             <tr>
               <th>{{ T.wordsGroup }}</th>
-              <th>{{ T.wordsCase }}</th>
+              <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
               <th colspan="3">
                 {{ T.rankScore }}
@@ -20,7 +20,10 @@
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th colspan="2">
+              <th class="text-center" v-if="element.verdict">
+                {{ element.verdict }}
+              </th>
+              <th colspan="2" v-else="">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <span
                     v-bind:class="{
@@ -63,10 +66,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <div v-else-if="data.feedback === 'summary'">
-        <h3>{{ T.wordsFeedback }}</h3>
-        <div v-html="data.feedback_summary"></div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a

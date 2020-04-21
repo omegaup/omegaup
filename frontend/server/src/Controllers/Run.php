@@ -787,7 +787,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, feedback_summary?: string, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return array{admin: bool, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases?: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -806,18 +806,18 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $problemset = null;
-        $contest = null;
         if (!is_null($submission->problemset_id)) {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $submission->problemset_id
             );
         }
+        $contest = null;
         if (!is_null($problemset) && !is_null($problemset->contest_id)) {
             $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
-        }
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (
@@ -861,29 +861,23 @@ class Run extends \OmegaUp\Controllers\Controller {
             isset($details['details']) &&
             isset($details['details']['groups'])
         ) {
-            if (!is_null($contest) && $contest->feedback !== 'detailed') {
+            if (!is_null($contest)) {
                 if ($contest->feedback === 'summary') {
-                    $verdictMap = array_flip(self::VERDICTS);
-                    $verdictWeight = [];
-                    foreach ($details['details']['groups'] as $group) {
+                    $verdictIndexMap = array_flip(self::VERDICTS);
+                    foreach ($details['details']['groups'] as &$group) {
+                        $worstVerdictIndex = 0;
                         foreach ($group['cases'] as $case) {
-                            $verdictWeight[] = $verdictMap[$case['verdict']];
+                            $worstVerdictIndex = max(
+                                $worstVerdictIndex,
+                                $verdictIndexMap[$case['verdict']]
+                            );
                         }
+                        $group['verdict'] = self::VERDICTS[$worstVerdictIndex];
+                        unset($group['cases']);
                     }
-                    $index = max($verdictWeight);
-                    $worstVerdict = \OmegaUp\Controllers\Run::VERDICTS[$index];
-                    $details['details']['feedback_summary'] = \OmegaUp\ApiUtils::formatString(
-                        \OmegaUp\Translations::getInstance()->get(
-                            'feedbackSubmissionContestSummary'
-                        )
-                            ?: 'feedbackSubmissionContestSummary',
-                        [
-                            'worstSubmissionVerdict' => strval($worstVerdict),
-                            'points' => strval($run->contest_score),
-                        ]
-                    );
+                } elseif ($contest->feedback === 'none') {
+                    unset($details['details']['groups']);
                 }
-                unset($details['details']['groups']);
             }
             $response['details'] = $details['details'];
         }

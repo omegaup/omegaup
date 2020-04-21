@@ -362,7 +362,6 @@
 	"errorEc2RunInstances": "",
 	"errorEc2TerminateInstance": "",
 	"errorWhileSendingMail": "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
-	"feedbackSubmissionContestSummary": "El puntaje de este env\u00edo es de <strong>%(points)</strong>.<br>El valor m\u00e1s bajo de veredictos en este env\u00edo ha sido <strong>%(worstSubmissionVerdict)</strong>.",
 	"firstSumbissionWithIdentity": "Ten en cuenta que est\u00e1s intentando enviar una soluci\u00f3n con una cuenta de identidad",
 	"followOmegaUp": "Sigue a @omegaup",
 	"forSelectedItems": "Para los items seleccionados",

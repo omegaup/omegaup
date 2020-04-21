@@ -2102,6 +2102,9 @@ export class Arena {
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
+        if (!detailsGroups[i].cases) {
+          continue;
+        }
         detailsGroups[i].cases.sort(numericSort('name'));
       }
       groups = detailsGroups;
@@ -2123,11 +2126,6 @@ export class Arena {
       feedback: self.options.contestAlias
         ? self.currentProblemset.feedback
         : 'detailed',
-      feedback_summary:
-        self.options.contestAlias &&
-        self.currentProblemset.feedback === 'summary'
-          ? data.details.feedback_summary
-          : '',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

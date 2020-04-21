@@ -363,7 +363,6 @@ const translations: { [key: string]: string; } = {
   errorEc2RunInstances: "",
   errorEc2TerminateInstance: "",
   errorWhileSendingMail: "Houve um erro ao enviar o e-mail de verifica\u00e7\u00e3o. Por favor, tente novamente mais tarde ou entre em contato omegaup-soporte@googlegroups.com para apoio. Seu e-mail n\u00e3o est\u00e1 verificado ainda.",
-  feedbackSubmissionContestSummary: "A pontua\u00e7\u00e3o desta submiss\u00e3o \u00e9 <strong>%(points)</strong>.<br>O veredicto mais baixo nesta submiss\u00e3o foi <strong>%(worstSubmissionVerdict)</strong>.",
   firstSumbissionWithIdentity: "Tenha em mente que voc\u00ea est\u00e1 tentando enviar uma solu\u00e7\u00e3o com uma conta de identidade",
   followOmegaUp: "Siga um @omegaup",
   forSelectedItems: "Para os itens selecionados",
