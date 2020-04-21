@@ -17,7 +17,6 @@ OmegaUp.on('ready', function() {
           myView: payload.myView,
           nominations: this.nominations,
           pagerItems: this.pagerItems,
-          show: true,
         },
         on: {
           goToPage: (pageNumber, status) => {
