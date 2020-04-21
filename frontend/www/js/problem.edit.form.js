@@ -7,69 +7,6 @@ omegaup.OmegaUp.on('ready', function() {
   }
   requiredFields.each(addRemoveErrorClass);
 
-  omegaup.API.Tag.list({ query: '' })
-    .then(function(response) {
-      response.forEach(function(e) {
-        $('#problem-form .tag-list').append(
-          $('<a></a>')
-            .attr('href', '#tags')
-            .data('key', e.name)
-            .addClass('tag')
-            .addClass('pull-left')
-            .text(omegaup.T.hasOwnProperty(e.name) ? omegaup.T[e.name] : e.name)
-            .on('click', onTabClicked),
-        );
-      });
-    })
-    .catch(omegaup.UI.apiError);
-
-  function onTabClicked() {
-    var tagname = $(this).data('key');
-    var public = $('#tag-public').val() == 'true';
-    $(this).remove();
-    refreshProblemTags(tagname, public);
-    return false; // Prevent refresh
-  }
-
-  function refreshProblemTags(tagname, public) {
-    var tagLocalizedName = omegaup.T.hasOwnProperty(tagname)
-      ? omegaup.T[tagname]
-      : tagname;
-    $('#problem-tags').append(
-      $('<tr></tr>')
-        .append(
-          $('<td class="tag-name"></td>').append(
-            $('<a></a>')
-              .data('key', tagname)
-              .attr('href', '/problem/?tag[]=' + encodeURIComponent(tagname))
-              .text(tagLocalizedName),
-          ),
-        )
-        .append(
-          $('<td></td>')
-            .addClass('is-public')
-            .text(public),
-        )
-        .append(
-          $('<td></td>')
-            .append('<button type="button" class="close">&times;</button>')
-            .on('click', function(e) {
-              var tr = e.target.parentElement.parentElement;
-              $('#problem-form .tag-list').append(
-                $('<a></a>')
-                  .attr('href', '#tags')
-                  .data('key', tagname)
-                  .addClass('tag')
-                  .addClass('pull-left')
-                  .text(tagLocalizedName)
-                  .on('click', onTabClicked),
-              );
-              $(tr).remove();
-            }),
-        ),
-    );
-  }
-
   $('#problem-form').on('submit', function() {
     $('.has-error').removeClass('has-error');
     var errors = false;
@@ -91,19 +28,6 @@ omegaup.OmegaUp.on('ready', function() {
       // the rest of the form.
       visibilityFields.attr('name', '');
     }
-    var selectedTags = [];
-    $('#problem-tags tr').each(function(index) {
-      selectedTags.push({
-        tagname: $(this)
-          .find('td.tag-name a')
-          .data('key'),
-        public:
-          $(this)
-            .find('td.is-public')
-            .text() == 'true',
-      });
-    });
-    $('input[name=selected_tags]').val(JSON.stringify(selectedTags));
   });
 
   function addRemoveErrorClass(inputId) {

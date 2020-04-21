@@ -76,50 +76,7 @@ OmegaUp.on('ready', function() {
     $(event.target).attr('data-alias', val.value),
   );
 
-  refreshProblemTags();
-
-  API.Tag.list({ query: '' })
-    .then(function(response) {
-      var tags = {};
-      $('#problem-tags a').each(function(index) {
-        tags[$(this).html()] = true;
-      });
-      response.forEach(function(e) {
-        if (tags.hasOwnProperty(e.name)) {
-          return;
-        }
-        $('#tags .tag-list').append(
-          $('<a></a>')
-            .attr('href', '#tags')
-            .attr('data-key', e.name)
-            .addClass('tag')
-            .addClass('pull-left')
-            .text(T.hasOwnProperty(e.name) ? T[e.name] : e.name),
-        );
-      });
-      $(document).on('click', '.tag', function(event) {
-        var tagname = $(this).data('key');
-        var isPublic = $('#tag-public').val();
-        $(this).remove();
-        API.Problem.addTag({
-          problem_alias: problemAlias,
-          name: tagname,
-          public: isPublic,
-        })
-          .then(function(response) {
-            ui.success(T.tagAdded);
-            $('div.post.footer').show();
-
-            refreshProblemTags();
-          })
-          .catch(ui.apiError);
-
-        return false; // Prevent refresh
-      });
-    })
-    .catch(ui.apiError);
-
-  typeahead.tagTypeahead($('#tag-name'));
+  typeahead.tagTypeahead($('input[name=tag_name]'));
 
   $('#add-admin-form').on('submit', function() {
     var username = $('#username-admin').val();
@@ -484,83 +441,6 @@ OmegaUp.on('ready', function() {
     },
   });
   solutionEdit.getInitialContents();
-
-  $('#tags form').on('submit', function() {
-    var tagname = $('#tag-name').val();
-    var isPublic = $('#tag-public').val();
-
-    API.Problem.addTag({
-      problem_alias: problemAlias,
-      name: tagname,
-      public: isPublic,
-    })
-      .then(function(response) {
-        ui.success(T.tagAdded);
-        $('div.post.footer').show();
-
-        refreshProblemTags();
-      })
-      .catch(ui.apiError);
-
-    return false; // Prevent refresh
-  });
-
-  function refreshProblemTags() {
-    API.Problem.tags({
-      problem_alias: problemAlias,
-      include_voted: false,
-    })
-      .then(function(result) {
-        $('#problem-tags').empty();
-        // Got the contests, lets populate the dropdown with them
-        for (var i = 0; i < result.tags.length; i++) {
-          var tag = result.tags[i];
-          $('#problem-tags').append(
-            $('<tr></tr>')
-              .append(
-                $('<td></td>').append(
-                  $('<a></a>')
-                    .attr('href', '/problem/?tag[]=' + tag.name)
-                    .text(tag.name),
-                ),
-              )
-              .append($('<td></td>').text(tag['public']))
-              .append(
-                $(
-                  '<td><button type="button" class="close">' +
-                    '&times;</button></td>',
-                ).on(
-                  'click',
-                  (function(tagname) {
-                    return function(e) {
-                      API.Problem.removeTag({
-                        problem_alias: problemAlias,
-                        name: tagname,
-                      })
-                        .then(function(response) {
-                          ui.success(T.tagRemoved);
-                          $('div.post.footer').show();
-                          var tr = e.target.parentElement.parentElement;
-                          $('#tags .tag-list').append(
-                            '<a href="#tags" ' +
-                              'class="tag pull-left">' +
-                              $(tr)
-                                .find('a')
-                                .html() +
-                              '</a>',
-                          );
-                          $(tr).remove();
-                        })
-                        .catch(ui.apiError);
-                    };
-                  })(tag.name),
-                ),
-              ),
-          );
-        }
-      })
-      .catch(ui.apiError);
-  }
 
   var imageMapping = {};
   var markdownConverter = markdown.markdownConverter({

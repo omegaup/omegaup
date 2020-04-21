@@ -1594,7 +1594,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param mixed $usernameOrEmail
      *
-     * @return array{problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}>}>}
+     * @return array{problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}>}
      */
     public static function apiStudentProgress(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2913,7 +2913,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
      *
-     * @return array{runs: list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>}
+     * @return array{runs: list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -2941,8 +2941,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         $result = [];
 
         foreach ($runs as $run) {
-            $run['time'] = intval($run['time']);
-            $run['score'] = floatval($run['score']);
             $run['contest_score'] = floatval($run['contest_score']);
             $result[] = $run;
         }

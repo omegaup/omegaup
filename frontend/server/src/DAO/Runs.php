@@ -103,7 +103,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>
+     * @return list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>
      */
     final public static function getAllRuns(
         ?int $problemset_id,
@@ -119,7 +119,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             SELECT
                 r.run_id, s.guid, s.language, r.status, r.verdict, r.runtime,
                 r.penalty, r.memory, r.score, r.contest_score, r.judged_by,
-                UNIX_TIMESTAMP(s.time) AS time, s.submit_delay, s.type, i.username, p.alias,
+                s.`time`, s.submit_delay, s.type, i.username, p.alias,
                 i.country_id, c.alias AS contest_alias
             FROM
                 Submissions s
@@ -174,7 +174,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: int, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -720,7 +720,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: int, submit_delay: int}>
+     * @return list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -730,8 +730,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             SELECT
                 s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
-                r.memory, r.score, r.contest_score, UNIX_TIMESTAMP(s.time) AS time,
-                s.submit_delay
+                r.memory, r.score, r.contest_score, s.`time`, s.submit_delay
             FROM
                 Submissions s
             INNER JOIN
@@ -746,7 +745,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: int, verdict: string}> */
+        /** @var list<array{contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

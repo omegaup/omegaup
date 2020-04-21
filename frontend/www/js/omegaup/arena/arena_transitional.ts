@@ -4,6 +4,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import { types } from '../api_types';
 import T from '../lang';
 import { OmegaUp } from '../omegaup';
+import * as time from '../time';
 
 Vue.use(Vuex);
 
@@ -202,11 +203,11 @@ export class EventsSocket {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
-      data.run.time = OmegaUp.remoteTime(data.run.time * 1000);
+      data.run.time = time.remoteTime(data.run.time * 1000);
       this.arena.updateRun(data.run);
     } else if (data.message == '/clarification/update/') {
       if (!this.arena.options.disableClarifications) {
-        data.clarification.time = OmegaUp.remoteTime(
+        data.clarification.time = time.remoteTime(
           data.clarification.time * 1000,
         );
         this.arena.updateClarification(data.clarification);
