@@ -1,10 +1,13 @@
 <template>
   <div class="panel">
-    <div
-      class="solution"
-      v-html="solution"
+    <div class="solution"
       v-if="status === 'unlocked' &amp;&amp; solution !== null"
-    ></div>
+    >
+      <vue-mathjax
+        v-bind:formula="solution"
+        v-bind:safe="false"
+      ></vue-mathjax>
+    </div>
     <div class="interstitial" v-else="">
       <p>{{ statusMessage }}</p>
       <p
@@ -58,8 +61,13 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as UI from '../../ui';
+import { VueMathjax } from 'vue-mathjax';
 
-@Component
+@Component({
+  components: {
+    VueMathjax,
+  }
+})
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop() solution!: string;
