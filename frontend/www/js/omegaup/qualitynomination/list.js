@@ -20,9 +20,9 @@ OmegaUp.on('ready', function() {
           show: true,
         },
         on: {
-          goToPage: (pageNumber, onlyOpen) => {
+          goToPage: (pageNumber, status) => {
             if (pageNumber > 0) {
-              showNominations(pageNumber, onlyOpen);
+              showNominations(pageNumber, status);
             }
           },
         },
@@ -36,12 +36,12 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  function showNominations(pageNumber, onlyOpen) {
+  function showNominations(pageNumber, status) {
     if (!payload.myView) {
       API.QualityNomination.list({
         offset: pageNumber,
         rowcount: payload.length,
-        onlyopen: !onlyOpen,
+        status: status,
       })
         .then(data => {
           nominationsList.nominations = data.nominations;
@@ -63,5 +63,5 @@ OmegaUp.on('ready', function() {
     }
   }
 
-  showNominations(1, true);
+  showNominations(1, 'all');
 });

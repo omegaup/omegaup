@@ -761,7 +761,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $onlyopen
+     * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $rowcount
      *
      * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
@@ -775,8 +775,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        $r->ensureBool('onlyopen', false);
-        ;
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['status'],
+            'status',
+            ['all','open','resolved','banned','warning']
+        );
+        $status = $r['status'] ?? 'all';
         self::validateMemberOfReviewerGroup($r);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
@@ -799,7 +803,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $offset,
             $rowCount,
             $types,
-            boolval($r['onlyopen'])
+            $status
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(

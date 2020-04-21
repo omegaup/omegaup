@@ -19,7 +19,7 @@
           <input
             type="checkbox"
             v-model="showAll"
-            v-on:click="$emit('goToPage', 1, !showAll)"
+            v-on:change="$emit('goToPage', 1, showAll ? 'all' : 'open')"
           />
           {{ T.qualityNominationShowAll }}
         </label>
@@ -70,7 +70,9 @@
     </table>
     <omegaup-common-paginator
       v-bind:pager-items="pagerItems"
-      v-on:page-changed="page => $emit('goToPage', page, this.showAll)"
+      v-on:page-changed="
+        page => $emit('goToPage', page, this.showAll ? 'all' : 'open')
+      "
     ></omegaup-common-paginator>
   </div>
 </template>

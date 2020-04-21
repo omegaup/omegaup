@@ -264,7 +264,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         int $page,
         int $rowcount,
         array $types = ['demotion', 'promotion'],
-        bool $onlyOpen = false
+        string $status = 'all'
     ): array {
         $offset = ($page - 1) * $rowcount;
         $sqlFrom = '
@@ -341,12 +341,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         if (!empty($conditions)) {
             $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
         }
-        //error_log($onlyOpen.'---2');
-        if ($onlyOpen) {
-            $sqlFrom .= " AND qn.status = 'open' ";
+
+        if ($status != 'all') {
+            $sqlFrom .= " AND qn.status = '{$status}'";
         }
 
-        $sqlOrder = ' ORDER BY p.alias asc, time desc';
+        $sqlOrder = ' ORDER BY p.alias ASC, qn.qualitynomination_id DESC';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */
