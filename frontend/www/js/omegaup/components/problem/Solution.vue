@@ -1,12 +1,10 @@
 <template>
   <div class="panel">
-    <div class="solution"
+    <div
+      class="solution"
       v-if="status === 'unlocked' &amp;&amp; solution !== null"
     >
-      <vue-mathjax
-        v-bind:formula="solution"
-        v-bind:safe="false"
-      ></vue-mathjax>
+      <vue-mathjax v-bind:formula="solution" v-bind:safe="false"></vue-mathjax>
     </div>
     <div class="interstitial" v-else="">
       <p>{{ statusMessage }}</p>
@@ -66,7 +64,7 @@ import { VueMathjax } from 'vue-mathjax';
 @Component({
   components: {
     VueMathjax,
-  }
+  },
 })
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
