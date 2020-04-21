@@ -623,12 +623,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transEnd();
             if (
                 $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED  ||
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED ||
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  ||
+                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING
             ) {
-                self::sendDemotionEmail(
+                self::sendDemotionEmailAndNotification(
                     $problem,
                     $qualitynomination,
-                    $qualitynominationlog->rationale ?? ''
+                    $qualitynominationlog->rationale ?? '',
+                    strval($r['status'])
                 );
             }
         } catch (\Exception $e) {
@@ -652,12 +655,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Send a mail with demotion notification to the original creator
      */
-    private static function sendDemotionEmail(
+    private static function sendDemotionEmailAndNotification(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\QualityNominations $qualitynomination,
-        string $rationale
+        string $rationale,
+        string $status
     ): void {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
+
         if (is_null($adminUser)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -665,25 +670,65 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
+        $user = \OmegaUp\DAO\Identities::findByUsernameOrName($username)[0];
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
             'problem_name' => htmlspecialchars(strval($problem->title)),
             'user_name' => $username,
         ];
-        $subject = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get(
-                'demotionProblemEmailSubject'
-            )
-                ?: 'demotionProblemEmailSubject',
-            $emailParams
-        );
-        $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get(
-                'demotionProblemEmailBody'
-            )
-                ?: 'demotionProblemEmailBody',
-            $emailParams
+
+        if ($status == 'resolved') {
+            $contentNotification = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemNotificationBanned'
+                )
+                    ?: 'demotionProblemNotificationBanned',
+                ['problem_name' => strval($problem->title)]
+            );
+            $subject = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailBannedSubject'
+                )
+                    ?: 'demotionProblemEmailBannedSubject',
+                $emailParams
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailBody'
+                )
+                    ?: 'demotionProblemEmailBody',
+                $emailParams
+            );
+        } else {
+            $contentNotification = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemNotificationWarning'
+                )
+                    ?: 'demotionProblemNotificationWarning',
+                ['problem_name' => strval($problem->title)]
+            );
+            $subject = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailWarningSubject'
+                )
+                    ?: 'demotionProblemEmailWarningSubject',
+                $emailParams
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailWarningBody'
+                )
+                    ?: 'demotionProblemEmailWarningBody',
+                $emailParams
+            );
+        }
+
+        \OmegaUp\DAO\Base\Notifications::create(
+            new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $user->user_id,
+                'contents' => $contentNotification,
+            ])
         );
 
         \OmegaUp\Email::sendEmail([$email], $subject, $body);
