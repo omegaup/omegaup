@@ -45,6 +45,7 @@
                   class="no-bottom-margin"
                   id="wmd-preview-solution"
                   v-html="markdownPreview"
+                  ref="solutionPreview"
                 ></div>
                 <!-- id-lint on -->
               </div>
@@ -100,6 +101,12 @@ export default class ProblemStatementEdit extends Vue {
   languages = ['es', 'en', 'pt'];
   solutions: omegaup.Solutions = {};
 
+  mounted(): void {
+    console.log('Voy a setear solutionpreview, soy MOUNTED');
+    console.log(this.$refs.solutionPreview);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionPreview]);
+  }
+
   getLanguageNameText(language: string): string {
     switch (language) {
       case 'en':
@@ -122,6 +129,11 @@ export default class ProblemStatementEdit extends Vue {
   onMarkdownContentsChange(newMarkdown: string): void {
     this.currentMarkdown = newMarkdown;
     this.solutions[this.currentLanguage] = newMarkdown;
+  }
+
+  @Watch('currentMarkdown')
+  onCurrentMarkdownChange(): void {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionPreview]);
   }
 
   @Watch('currentLanguage')
