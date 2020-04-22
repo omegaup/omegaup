@@ -2,11 +2,12 @@
   <div class="panel">
     <div
       class="solution"
-      v-if="status === 'unlocked' &amp;&amp; solution !== null"
+      v-html="solution"
+      ref="solution"
     >
-      <vue-mathjax v-bind:formula="solution" v-bind:safe="false"></vue-mathjax>
+      <!-- <vue-mathjax v-bind:formula="solution" v-bind:safe="false"></vue-mathjax> -->
     </div>
-    <div class="interstitial" v-else="">
+    <div class="interstitial" v-if="status !== 'unlocked' || solution === null">
       <p>{{ statusMessage }}</p>
       <p
         v-html="
@@ -74,6 +75,17 @@ export default class ProblemSolution extends Vue {
 
   T = T;
   UI = UI;
+
+  mounted(): void {
+    console.log("Estoy ejecutando mounted y cargando mathjax");
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solution]);
+  }
+
+  @Watch('solution')
+  onSolutionUpdated() {
+    console.log("Estoy ejecutando onSolutionUpdated y cargando mathjax");
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solution]);
+  }
 
   get statusMessage(): string {
     switch (this.status) {
