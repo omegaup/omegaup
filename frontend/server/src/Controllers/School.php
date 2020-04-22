@@ -3,9 +3,11 @@
  namespace OmegaUp\Controllers;
 
 /**
- * Description of SchoolController
+ * SchoolController
  *
  * @author joemmanuel
+ *
+ * @psalm-type SchoolRankPayload=array{page: int, length: int, showHeader: bool}
  */
 class School extends \OmegaUp\Controllers\Controller {
     /**
@@ -299,7 +301,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{schoolRankPayload: array{page: int, length: int, showHeader: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: SchoolRankPayload}, template: string}
      */
     public static function getRankForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('page', null, null, false);
@@ -310,7 +312,7 @@ class School extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'schoolRankPayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'showHeader' => false,
