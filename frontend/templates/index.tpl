@@ -13,7 +13,7 @@
 
       <script type="text/json" id="payload">{$payload|json_encode}</script>
       {js_include entrypoint="common_index" async}
-      <div id="common-index"></div>
+      <div id="main-container"></div>
     </main>
     {include file='footer_v2.tpl' inline}
   </body>
