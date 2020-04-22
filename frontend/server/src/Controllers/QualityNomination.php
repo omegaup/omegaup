@@ -695,9 +695,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
-                    'demotionProblemEmailBody'
+                    'demotionProblemEmailBannedBody'
                 )
-                    ?: 'demotionProblemEmailBody',
+                    ?: 'demotionProblemEmailBannedBody',
                 $emailParams
             );
         } else {
