@@ -501,7 +501,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+     * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $qualitynomination_id
@@ -566,14 +566,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         $newProblemVisibility = $problem->visibility;
         switch ($r['status']) {
-            case 'resolved':
+            case 'banned':
                 if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                 } else {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                 }
                 break;
-            case 'banned':
+            case 'resolved':
                 if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
                 } else {
@@ -592,7 +592,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'resolved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
@@ -621,13 +621,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
-            if (
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED  ||
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED ||
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  ||
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING
-            ) {
-                self::sendDemotionEmailAndNotification(
+            if ($r['status'] == 'banned' || $r['status'] == 'warning') {
+                self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
                     $qualitynominationlog->rationale ?? '',
@@ -655,7 +650,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Send a mail with demotion notification to the original creator
      */
-    private static function sendDemotionEmailAndNotification(
+    private static function sendNotificationEmail(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\QualityNominations $qualitynomination,
         string $rationale,
@@ -678,7 +673,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'user_name' => $username,
         ];
 
-        if ($status == 'resolved') {
+        if ($status == 'banned') {
             $contentNotification = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationBanned'
@@ -727,7 +722,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Base\Notifications::create(
             new \OmegaUp\DAO\VO\Notifications([
                 'user_id' => $user->user_id,
-                'contents' => $contentNotification,
+                'contents' =>  json_encode(
+                    [
+                        'type' => 'demotion',
+                        'message' => $contentNotification,
+                        'status' => $status
+                    ]
+                ),
             ])
         );
 

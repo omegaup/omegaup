@@ -3350,7 +3350,7 @@ Displays the nominations that this user has been assigned.
 
 ### Description
 
-Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
 
 ### Parameters
 
