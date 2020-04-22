@@ -23,12 +23,18 @@ class ProblemArtifacts {
         $this->revision = $revision;
     }
 
-    public function get(string $path, bool $quiet = false): string {
+    public function get(
+        string $path,
+        bool $quiet = false,
+        bool $includeHeaders = true
+    ): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
-        $browser->headers[] = 'Accept: application/octet-stream';
+        if ($includeHeaders) {
+            $browser->headers[] = 'Accept: application/octet-stream';
+        }
         /** @var string */
         return $browser->exec();
     }

@@ -2184,7 +2184,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
         }
-        $result = self::getValidProblemAndProblemset(
+        [
+            'exists' => $problemExisits,
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
             $r->identity,
             $r['contest_alias'],
             $r['problem_alias'],
@@ -2192,12 +2196,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             !is_null($r['statement_type']) ? strval($r['statement_type']) : '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
-        [
-            'exists' => $problemExisits,
-            'problem' => $problem,
-            'problemset' => $problemset,
-        ] = $result;
-        unset($result['lang']);
         if (!$problemExisits || is_null($problem)) {
             return ['exists' => false];
         }
@@ -2211,9 +2209,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias']
         );
         if (is_null($details)) {
-            return [
-                'exists' => false,
-            ];
+            return ['exists' => false];
         }
         $details['exists'] = true;
         return $details;

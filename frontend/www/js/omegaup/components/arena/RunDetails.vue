@@ -23,7 +23,7 @@
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th colspan="6">
+              <th v-bind:colspan="data.show_diff !== 'none' ? 6 : 2">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <span
                     v-bind:class="{

@@ -868,35 +868,47 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
+            $dataCases = self::getProblemCases($problemArtifacts, 'cases');
+            if (is_null($dataCases)) {
+                // Forcing to hide diffs when inputs or outpus exceeds 4kb
+                $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
+                return $response;
+            }
+            $response['cases'] = $dataCases;
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
-            $response['cases'] = self::getProblemCases(
-                $problemArtifacts,
-                'cases'
-            );
             return $response;
         }
+        $dataCases = self::getProblemCases($problemArtifacts, 'examples');
+        if (is_null($dataCases)) {
+            // Forcing to hide diffs when inputs or outpus exceeds 4kb
+            $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
+            return $response;
+        }
+        $response['cases'] = $dataCases;
         $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ONLY_EXAMPLE_DIFF;
-        $response['cases'] = self::getProblemCases(
-            $problemArtifacts,
-            'examples'
-        );
 
         return $response;
     }
 
     /**
-     * @return ProblemCases
+     * @return ProblemCases|null
      */
     private static function getProblemCases(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $casesType
-    ): array {
+    ): ?array {
         $existingCases = $problemArtifacts->lsTreeRecursive($casesType);
         $response = [];
+        $sizeFiles = [];
         foreach ($existingCases as $file) {
-            /** @var string $problemContent */
+            /** @var array{contents: string, id: string, size: int} $problemContent */
             $problemContent = json_decode(
-                $problemArtifacts->get($file['path'])
+                $problemArtifacts->get(
+                    $file['path'],
+                    /*$quiet=*/false,
+                    /*$includeHeaders=*/false
+                ),
+                /*$assoc=*/true
             );
             [$_, $filename] = explode("{$casesType}/", $file['path']);
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
@@ -904,7 +916,16 @@ class Run extends \OmegaUp\Controllers\Controller {
             if (!isset($response[$basename])) {
                 $response[$basename] = [];
             }
-            $response[$basename][$extension] = $problemContent;
+            /* @var string $contents */
+            $contents = base64_decode($problemContent['contents']);
+            $response[$basename][$extension] = $contents;
+            if (!isset($sizeFiles[$extension])) {
+                $sizeFiles[$extension] = 0;
+            }
+            $sizeFiles[$extension] += $problemContent['size'];
+        }
+        if ($sizeFiles['in'] > 4000 || $sizeFiles['out'] > 4000) {
+            return null;
         }
         return $response;
     }
