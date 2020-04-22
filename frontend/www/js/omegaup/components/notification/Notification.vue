@@ -1,58 +1,31 @@
 <template>
-  <li class="dropdown-item notification">
-    <hr class="notification-separator" />
-    <div class="notification-header">
+  <div class="d-flex align-items-center flex-wrap px-4">
+    <hr class="w-100 my-2" />
+    <div class="w-100 d-flex justify-content-between">
       <div class="notification-date">
         {{ date }}
       </div>
-      <button class="close" v-on:click="$emit('remove', notification)">
+      <button class="close" v-on:click.prevent="$emit('remove', notification)">
         ❌
       </button>
     </div>
-    <img class="notification-img" v-bind:src="iconUrl" />
-    <div class="notification-text">
-      {{ text }}
+    <div class="d-flex align-items-center pt-1">
+      <img class="d-block" width="80" v-bind:src="iconUrl" />
+      <div>
+        {{ text }}
+      </div>
     </div>
-  </li>
+  </div>
 </template>
 
-<style>
-.notification {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.notification-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.notification-header .close {
+<style scoped>
+.close {
   font-size: inherit;
 }
 
 .notification-date {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: #666;
-}
-
-.notification-img {
-  display: block;
-  width: 15%;
-  height: auto;
-}
-
-.notification-text {
-  padding: 0 0 0 5px;
-  width: 85%;
-}
-
-.notification-separator {
-  width: 100%;
-  margin: 5px 0;
 }
 </style>
 

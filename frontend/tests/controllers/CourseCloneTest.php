@@ -191,7 +191,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 ]));
 
                 $this->assertEquals(
-                    1,
+                    2,
                     $problem['visibility'],
                     'Problem visibility must be public'
                 );

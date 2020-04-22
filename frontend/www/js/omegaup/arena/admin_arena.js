@@ -3,6 +3,7 @@ import Vue from 'vue';
 import * as api from '../api_transitional';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
+import * as time from '../time';
 
 import { runsStore } from './arena_transitional';
 

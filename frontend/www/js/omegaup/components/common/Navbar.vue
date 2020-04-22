@@ -84,13 +84,11 @@
                   T.navAllProblems
                 }}</a>
               </li>
-              <template v-if="isLoggedIn && isMainUserIdentity">
-                <li>
-                  <a href="/problem/new/" data-nav-problems-create>{{
-                    T.myproblemsListCreateProblem
-                  }}</a>
-                </li>
-              </template>
+              <li v-if="isLoggedIn && isMainUserIdentity">
+                <a href="/problem/new/" data-nav-problems-create>{{
+                  T.myproblemsListCreateProblem
+                }}</a>
+              </li>
               <li>
                 <a href="/submissions/">{{ T.wordsLatestSubmissions }}</a>
               </li>
@@ -185,7 +183,7 @@
             <ul class="dropdown-menu">
               <template v-show="!omegaUpLockDown && !inContest">
                 <li>
-                  <a href="/profile/"
+                  <a href="/profile/" data-nav-profile
                     ><span class="glyphicon glyphicon-user"></span>
                     {{ T.navViewProfile }}</a
                   >

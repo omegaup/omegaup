@@ -16,7 +16,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 2,
             'author' => $authorIdentity
         ]));
 
@@ -146,7 +146,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemDetailsNotInContest() {
         // Get 1 problem public
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1
+            'visibility' => 2
         ]));
 
         // Get a user for our scenario
