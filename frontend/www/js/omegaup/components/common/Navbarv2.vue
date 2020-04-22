@@ -255,6 +255,7 @@
                   {{ T.navLogOut }}
                 </a>
                 <omegaup-common-grader-status
+                  v-show="isAdmin"
                   v-bind:status="errorMessage !== null ? 'down' : 'ok'"
                   v-bind:error="errorMessage"
                   v-bind:graderInfo="graderInfo"
