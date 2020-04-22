@@ -1,4 +1,4 @@
-import schools_Rank from '../components/schools/Rankv2.vue';
+import schools_Rank from '../components/schools/Rank.vue';
 import { OmegaUp, omegaup } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api_transitional';
