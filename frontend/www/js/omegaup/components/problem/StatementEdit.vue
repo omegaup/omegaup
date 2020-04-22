@@ -102,8 +102,6 @@ export default class ProblemStatementEdit extends Vue {
   solutions: omegaup.Solutions = {};
 
   mounted(): void {
-    console.log('Voy a setear solutionpreview, soy MOUNTED');
-    console.log(this.$refs.solutionPreview);
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionPreview]);
   }
 
