@@ -1325,6 +1325,7 @@ const translations: { [key: string]: string; } = {
   wordsVerdictsOf: "Verdicts of %(alias)",
   wordsVeryEasy: "VeryEasy",
   wordsWallTimeInSeconds: "Wall-time (Sec)",
+  wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   youMustOpenBeforeSubmit: "You must open the problem before trying to submit a solution.",
 };
