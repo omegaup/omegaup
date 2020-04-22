@@ -11,7 +11,16 @@
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
-    <div class="container-lg py-5">
+    <div
+      class="container-lg py-5"
+      v-if="
+        coderOfTheMonthFemale ||
+          coderOfTheMonth ||
+          schoolOfTheMonth ||
+          rankTable.resultTotal ||
+          schoolsRank.totalRows
+      "
+    >
       <div class="row align-items-stretch justify-content-around">
         <div
           class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"

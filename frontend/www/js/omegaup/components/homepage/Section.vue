@@ -13,8 +13,8 @@
     >
       <p class="section-description">{{ description }}</p>
       <a
-        v-for="button in buttons"
-        v-bind:key="button"
+        v-for="(button, index) in buttons"
+        v-bind:key="index"
         class="btn btn-primary section-link mx-2 mb-3"
         role="button"
         v-bind:href="button.href"
