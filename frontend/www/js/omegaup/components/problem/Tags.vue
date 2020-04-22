@@ -42,13 +42,11 @@
           </button>
         </div>
         <div class="form-group">
-          <div class="switch">
-            <label>
+          <label>
+            <div class="switch">
               <input type="checkbox" v-model="allowTags" />
               <span class="slider round"></span>
-            </label>
-          </div>
-          <label>
+            </div>
             {{ T.problemEditFormAllowUserAddTags }}
           </label>
         </div>

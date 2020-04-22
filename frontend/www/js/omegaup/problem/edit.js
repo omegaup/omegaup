@@ -469,19 +469,6 @@ OmegaUp.on('ready', function() {
       statement_type: 'markdown',
     })
       .then(function(problem) {
-        $('#allow_user_add_tags').on('change', () => {
-          const isChecked = $(this).is(':checked');
-          API.Problem.update({
-            problem_alias: problemAlias,
-            title: problem.title,
-            allow_user_add_tags: isChecked,
-            message: `${T.problemEditFormAllowUserAddTags}: ${isChecked}`,
-          })
-            .then(() => {
-              ui.success(T.problemEditUpdatedSuccessfully);
-            })
-            .catch(T.apiError);
-        });
         problemCallback(problem);
       })
       .catch(ui.apiError);

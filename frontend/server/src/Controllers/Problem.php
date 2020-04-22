@@ -4157,15 +4157,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $tagData = [];
-        $allTags = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::TAGS_LIST,
-            'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
-            APC_USER_CACHE_SESSION_TIMEOUT
-        );
+        $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
             $tagData[] = ['name' => $tag->name];
@@ -4194,6 +4186,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'template' => 'problems.tpl',
         ];
+    }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\Tags>
+     */
+    private static function getAllTagsFromCache() {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            'all',
+            /** @return list<\OmegaUp\DAO\VO\Tags> */
+            function () {
+                return \OmegaUp\DAO\Tags::getAll();
+            },
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
     }
 
     /**
@@ -4290,15 +4297,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $tags = [];
         $selectedTags = [];
-        $allTags = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::TAGS_LIST,
-            'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
-            APC_USER_CACHE_SESSION_TIMEOUT
-        );
+        $allTags = self::getAllTagsFromCache();
         // TODO: Change this list when the final list be defined
         $filteredTags = array_slice($allTags, 0, 100);
         $tagnames = array_column($filteredTags, 'name');
@@ -4427,15 +4426,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = [];
         $selectedTags = null;
 
-        $allTags = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::TAGS_LIST,
-            'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
-            APC_USER_CACHE_SESSION_TIMEOUT
-        );
+        $allTags = self::getAllTagsFromCache();
+        ;
         // TODO: Change this list when the final list be defined
         $filteredTags = array_slice($allTags, 0, 100);
         foreach ($filteredTags as $tag) {
