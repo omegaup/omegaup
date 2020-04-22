@@ -83,7 +83,7 @@ let config = [
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',
       school_profile: './frontend/www/js/omegaup/schools/profile.js',
-      schools_rank: './frontend/www/js/omegaup/schools/rank.js',
+      schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
       user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',

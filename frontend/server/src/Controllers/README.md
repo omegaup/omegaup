@@ -3601,7 +3601,7 @@ Get basic details of a run
 
 # School
 
-Description of SchoolController
+SchoolController
 
 ## `/api/school/create/`
 

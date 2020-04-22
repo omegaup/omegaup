@@ -232,6 +232,14 @@ export namespace types {
       );
     }
 
+    export function SchoolRankPayload(
+      elementId: string,
+    ): types.SchoolRankPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -533,6 +541,12 @@ export namespace types {
     alias: string;
     country_id?: string;
     contest_alias?: string;
+  }
+
+  export interface SchoolRankPayload {
+    page: number;
+    length: number;
+    showHeader: boolean;
   }
 
   export interface Scoreboard {

@@ -124,7 +124,7 @@ import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
-import school_Rank from '../schools/Rankv2.vue';
+import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
 
