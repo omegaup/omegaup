@@ -42,12 +42,14 @@
           </button>
         </div>
         <div class="form-group">
-          <label>
+          <label class="switch-container">
             <div class="switch">
               <input type="checkbox" v-model="allowTags" />
               <span class="slider round"></span>
             </div>
-            {{ T.problemEditFormAllowUserAddTags }}
+            <span class="switch-text">
+              {{ T.problemEditFormAllowUserAddTags }}
+            </span>
           </label>
         </div>
       </form>
@@ -167,6 +169,20 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.switch-container {
+  width: 100%;
+  position: relative;
+}
+
+.switch-container span.switch-text {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  margin-left: 5px;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 </style>
 
