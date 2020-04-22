@@ -76,38 +76,50 @@
       <omegaup-section
         v-bind:title="T.homepageCompeteSectionTitle"
         v-bind:description="T.homepageCompeteSectionDescription"
-        v-bind:button="{
-          text: T.buttonGoToProblems,
-          href: '/arena/',
-        }"
+        v-bind:buttons="[
+          {
+            text: T.buttonGoToContests,
+            href: '/arena/',
+          },
+        ]"
         v-bind:image-src="'/media/homepage/contests_section.svg'"
       ></omegaup-section>
       <omegaup-section
         v-bind:title="T.homepageTrainSectionTitle"
         v-bind:description="T.homepageTrainSectionDescription"
-        v-bind:button="{
-          text: T.buttonGoToProblems,
-          href: '/problem/',
-        }"
+        v-bind:buttons="[
+          {
+            text: T.buttonGoToProblems,
+            href: '/problem/',
+          },
+        ]"
         v-bind:image-src="'/media/homepage/problems_section.svg'"
         v-bind:image-to-right="true"
       ></omegaup-section>
       <omegaup-section
         v-bind:title="T.homepageCreateSectionTitle"
         v-bind:description="T.homepageCreateSectionDescription"
-        v-bind:button="{
-          text: T.buttonGoToCreateProblem,
-          href: '/problem/new/',
-        }"
+        v-bind:buttons="[
+          {
+            text: T.buttonCreateProblem,
+            href: '/problem/new/',
+          },
+          {
+            text: T.buttonCreateContest,
+            href: '/contest/new/',
+          },
+        ]"
         v-bind:image-src="'/media/homepage/create_section.svg'"
       ></omegaup-section>
       <omegaup-section
         v-bind:title="T.homepageTeachSectionTitle"
         v-bind:description="T.homepageTeachSectionDescription"
-        v-bind:button="{
-          text: T.buttonGoToCourses,
-          href: '/course/',
-        }"
+        v-bind:buttons="[
+          {
+            text: T.buttonGoToCourses,
+            href: '/course/',
+          },
+        ]"
         v-bind:image-src="'/media/homepage/courses_section.svg'"
         v-bind:image-to-right="true"
       ></omegaup-section>
