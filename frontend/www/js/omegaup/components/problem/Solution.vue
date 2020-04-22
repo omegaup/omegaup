@@ -1,13 +1,12 @@
 <template>
   <div class="panel">
     <div
+      v-show="showSolution"
       class="solution"
       v-html="solution"
-      ref="solution"
-    >
-      <!-- <vue-mathjax v-bind:formula="solution" v-bind:safe="false"></vue-mathjax> -->
-    </div>
-    <div class="interstitial" v-if="status !== 'unlocked' || solution === null">
+      ref="solutionRef"
+    ></div>
+    <div class="interstitial" v-if="!showSolution">
       <p>{{ statusMessage }}</p>
       <p
         v-html="
@@ -60,13 +59,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as UI from '../../ui';
-import { VueMathjax } from 'vue-mathjax';
 
-@Component({
-  components: {
-    VueMathjax,
-  },
-})
+@Component
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop() solution!: string;
@@ -77,14 +71,21 @@ export default class ProblemSolution extends Vue {
   UI = UI;
 
   mounted(): void {
-    console.log("Estoy ejecutando mounted y cargando mathjax");
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solution]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
   }
 
   @Watch('solution')
   onSolutionUpdated() {
-    console.log("Estoy ejecutando onSolutionUpdated y cargando mathjax");
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solution]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
+  }
+
+  @Watch('showSolution')
+  onShowSolutionUpdated() {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
+  }
+
+  get showSolution(): boolean {
+    return this.status === 'unlocked' && this.solution !== null;
   }
 
   get statusMessage(): string {
