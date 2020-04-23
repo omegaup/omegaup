@@ -1,90 +1,87 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title" v-if="showHeader">
+  <div v-bind:class="{ 'container-lg': !showHeader, 'p-5': !showHeader }">
+    <div class="card">
+      <h5 class="card-header">
         {{
-          UI.formatString(T.schoolRankHeader, { count: rank ? rank.length : 0 })
+          showHeader
+            ? UI.formatString(T.schoolRankOfTheMonthHeader, {
+                count: rank ? rank.length : 0,
+              })
+            : UI.formatString(T.schoolRankRangeHeader, {
+                lowCount: (page - 1) * length + 1,
+                highCount: page * length,
+              })
         }}
-      </h3>
-      <h3 class="panel-title" v-else="">
-        {{
-          UI.formatString(T.schoolRankRangeHeader, {
-            lowCount: (page - 1) * length + 1,
-            highCount: page * length,
-          })
-        }}
-      </h3>
-    </div>
-    <div class="panel-body" v-if="showControls">
-      <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
-          {{ T.wordsPrevPage }}</a
+      </h5>
+      <div class="card-body" v-if="showControls">
+        <template v-if="page > 1">
+          <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
+            {{ T.wordsPrevPage }}</a
+          >
+          <span v-show="showNextPage">|</span>
+        </template>
+        <a
+          class="next"
+          v-show="showNextPage"
+          v-bind:href="`/rank/schools/?page=${page + 1}`"
+          >{{ T.wordsNextPage }}</a
         >
-        <span class="delimiter" v-show="showNextPage">|</span>
-      </template>
-      <a
-        class="next"
-        v-show="showNextPage"
-        v-bind:href="`/rank/schools/?page=${page + 1}`"
-        >{{ T.wordsNextPage }}</a
-      >
-    </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th colspan="2">{{ T.profileSchool }}</th>
-          <th class="numericColumn data-rank">{{ T.wordsScore }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(school, index) in rank">
-          <td v-if="showHeader">{{ index + 1 }}</td>
-          <td v-else="">{{ school.ranking ? school.ranking : '' }}</td>
-          <td class="cell-school-name" colspan="2" v-bind:title="school.name">
-            <omegaup-countryflag
-              v-bind:country="school.country_id"
-            ></omegaup-countryflag>
-            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
-              school.name
-            }}</a>
-          </td>
-          <td class="numericColumn data-rank">
-            {{ school.score }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="panel-footer" v-if="showHeader">
-      <a href="/schoolofthemonth/">{{ T.rankViewFull }}</a>
-    </div>
-    <div class="panel-footer" v-else-if="showControls">
-      <template v-if="page > 1">
-        <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
-          {{ T.wordsPrevPage }}</a
+      </div>
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{ T.profileSchool }}</th>
+            <th class="text-right" scope="col">{{ T.wordsScore }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-bind:key="index" v-for="(school, index) in rank">
+            <th scope="row">
+              {{ showHeader ? index + 1 : school.ranking || '' }}
+            </th>
+            <td class="text-truncate">
+              <omegaup-countryflag
+                v-bind:country="school.country_id"
+              ></omegaup-countryflag>
+              <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+                school.name
+              }}</a>
+            </td>
+            <td class="text-right">
+              {{ school.score }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="card-footer" v-if="showHeader">
+        <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
+      </div>
+      <div class="card-footer" v-else-if="showControls">
+        <template v-if="page > 1">
+          <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
+            {{ T.wordsPrevPage }}</a
+          >
+          <span v-show="showNextPage">|</span>
+        </template>
+        <a
+          class="next"
+          v-show="showNextPage"
+          v-bind:href="`/rank/schools/?page=${page + 1}`"
+          >{{ T.wordsNextPage }}</a
         >
-        <span class="delimiter" v-show="showNextPage">|</span>
-      </template>
-      <a
-        class="next"
-        v-show="showNextPage"
-        v-bind:href="`/rank/schools/?page=${page + 1}`"
-        >{{ T.wordsNextPage }}</a
-      >
+      </div>
     </div>
   </div>
 </template>
 
-<style>
-.cell-school-name {
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.data-rank {
-  width: 15%;
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+// FIXME: This prevents wrapping a table cell when the name of the school is too long.
+// So, both tables (users rank and the current one) are perfectly aligned.
+// Another solution should  be taken in the future.
+.text-truncate {
+  max-width: 250px;
 }
 </style>
 
@@ -101,7 +98,7 @@ import CountryFlag from '../CountryFlag.vue';
     'omegaup-countryflag': CountryFlag,
   },
 })
-export default class Rank extends Vue {
+export default class SchoolRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() showHeader!: boolean;
