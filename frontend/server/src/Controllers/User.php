@@ -3302,9 +3302,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{rankTablePayload: UserRankTablePayload}, template: string}
+     * @return array{smartyProperties: array{payload: UserRankTablePayload}, template: string}
      */
-    public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getRankForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3321,7 +3321,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'smartyProperties' => [
-                'rankTablePayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'filter' => $filter,
@@ -3330,7 +3330,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'isLogged' => false,
                 ],
             ],
-            'template' => 'rank.tpl',
+            'template' => 'rank.users.tpl',
         ];
         try {
             $r->ensureIdentity();

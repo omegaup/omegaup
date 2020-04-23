@@ -78,7 +78,6 @@ let config = [
         './frontend/www/js/omegaup/qualitynomination/details.js',
       qualitynomination_qualityreview:
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.ts',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',
@@ -91,6 +90,7 @@ let config = [
         './frontend/www/js/omegaup/user/manage_identities.js',
       user_profile: './frontend/www/js/omegaup/user/profile.js',
       user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+      users_rank: './frontend/www/js/omegaup/user/rank.ts',
     },
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

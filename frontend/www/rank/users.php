@@ -4,7 +4,7 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
-        return \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+        return \OmegaUp\Controllers\User::getRankForSmarty(
             $r
         );
     }

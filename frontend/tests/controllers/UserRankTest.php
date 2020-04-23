@@ -186,7 +186,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runDataContestantWithNoCountry);
 
         // User should not have filters
-        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+        $availableFilters = \OmegaUp\Controllers\User::getRankForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -221,7 +221,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks();
 
         // Getting available filters from identities
-        $availableFilters = \OmegaUp\Controllers\User::getRankDetailsForSmarty(
+        $availableFilters = \OmegaUp\Controllers\User::getRankForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])

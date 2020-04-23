@@ -1,13 +1,13 @@
-import rank_table from './components/RankTable.vue';
+import users_Rank from '../components/user/Rank.vue';
 import Vue from 'vue';
-import { OmegaUp } from './omegaup';
-import { types } from './api_types';
-import * as api from './api_transitional';
-import * as ui from './ui';
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
+import * as api from '../api_transitional';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload(
-    'rank-table-payload',
+    'payload',
   );
 
   api.User.rankByProblemsSolved({
@@ -34,9 +34,9 @@ OmegaUp.on('ready', () => {
       }
 
       const rankTable = new Vue({
-        el: '#rank-table',
+        el: '#main-container',
         render: function(createElement) {
-          return createElement('rankTable', {
+          return createElement('omegaup-user-rank', {
             props: {
               page: this.page,
               length: this.length,
@@ -60,7 +60,7 @@ OmegaUp.on('ready', () => {
           resultTotal: result.total,
         },
         components: {
-          rankTable: rank_table,
+          'omegaup-user-rank': users_Rank,
         },
       });
     })
