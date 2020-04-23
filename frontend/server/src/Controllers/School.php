@@ -3,9 +3,12 @@
  namespace OmegaUp\Controllers;
 
 /**
- * Description of SchoolController
+ * SchoolController
  *
  * @author joemmanuel
+ *
+ * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
+ * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool}
  */
 class School extends \OmegaUp\Controllers\Controller {
     /**
@@ -265,41 +268,12 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the historical rank of schools
-     *
-     * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $rowcount
-     *
-     * @return array{rank: list<array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}>, totalRows: int}
-     */
-    public static function apiRank(\OmegaUp\Request $r) {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        return \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::SCHOOL_RANK,
-            "{$offset}-{$rowCount}",
-            /** @return array{rank: list<array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}>, totalRows: int} */
-            function () use (
-                $offset,
-                $rowCount
-            ): array {
-                return \OmegaUp\DAO\Schools::getRank($offset, $rowCount);
-            },
-            3600 // 1 hour
-        );
-    }
-
-    /**
      * Gets the details for historical rank of schools with pagination
      *
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{schoolRankPayload: array{page: int, length: int, showHeader: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: SchoolRankPayload}, template: string}
      */
     public static function getRankForSmarty(\OmegaUp\Request $r): array {
         $r->ensureInt('page', null, null, false);
@@ -308,12 +282,27 @@ class School extends \OmegaUp\Controllers\Controller {
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
 
+        $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_RANK,
+            "{$page}-{$length}",
+            /** @return array{rank: list<School>, totalRows: int} */
+            function () use (
+                $page,
+                $length
+            ): array {
+                return \OmegaUp\DAO\Schools::getRank($page, $length);
+            },
+            3600 // 1 hour
+        );
+
         return [
             'smartyProperties' => [
-                'schoolRankPayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'showHeader' => false,
+                    'rank' => $schoolRank['rank'],
+                    'totalRows' => $schoolRank['totalRows'],
                 ],
             ],
             'template' => 'rank.schools.tpl',

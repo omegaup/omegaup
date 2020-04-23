@@ -1017,9 +1017,6 @@ export const School = {
     messages.SchoolMonthlySolvedProblemsCountRequest,
     messages.SchoolMonthlySolvedProblemsCountResponse
   >('/api/school/monthlySolvedProblemsCount/'),
-  rank: apiCall<messages.SchoolRankRequest, messages.SchoolRankResponse>(
-    '/api/school/rank/',
-  ),
   schoolCodersOfTheMonth: apiCall<
     messages.SchoolSchoolCodersOfTheMonthRequest,
     messages.SchoolSchoolCodersOfTheMonthResponse

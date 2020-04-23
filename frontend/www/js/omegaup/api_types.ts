@@ -232,6 +232,14 @@ export namespace types {
       );
     }
 
+    export function SchoolRankPayload(
+      elementId: string,
+    ): types.SchoolRankPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function StatsPayload(elementId: string): types.StatsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -533,6 +541,22 @@ export namespace types {
     alias: string;
     country_id?: string;
     contest_alias?: string;
+  }
+
+  export interface School {
+    country_id?: string;
+    name: string;
+    ranking?: number;
+    school_id: number;
+    score: number;
+  }
+
+  export interface SchoolRankPayload {
+    page: number;
+    length: number;
+    rank: types.School[];
+    totalRows: number;
+    showHeader: boolean;
   }
 
   export interface Scoreboard {
@@ -2174,17 +2198,6 @@ export namespace messages {
       year: number;
     }[];
   };
-  export type SchoolRankRequest = { [key: string]: any };
-  export type SchoolRankResponse = {
-    rank: {
-      country_id?: string;
-      name: string;
-      ranking?: number;
-      school_id: number;
-      score: number;
-    }[];
-    totalRows: number;
-  };
   export type SchoolSchoolCodersOfTheMonthRequest = { [key: string]: any };
   export type SchoolSchoolCodersOfTheMonthResponse = {
     coders: { time: string; username: string; classname: string }[];
@@ -2963,9 +2976,6 @@ export namespace controllers {
     monthlySolvedProblemsCount: (
       params?: messages.SchoolMonthlySolvedProblemsCountRequest,
     ) => Promise<messages.SchoolMonthlySolvedProblemsCountResponse>;
-    rank: (
-      params?: messages.SchoolRankRequest,
-    ) => Promise<messages.SchoolRankResponse>;
     schoolCodersOfTheMonth: (
       params?: messages.SchoolSchoolCodersOfTheMonthRequest,
     ) => Promise<messages.SchoolSchoolCodersOfTheMonthResponse>;

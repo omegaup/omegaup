@@ -176,7 +176,6 @@
   - [`/api/school/create/`](#apischoolcreate)
   - [`/api/school/list/`](#apischoollist)
   - [`/api/school/monthlySolvedProblemsCount/`](#apischoolmonthlysolvedproblemscount)
-  - [`/api/school/rank/`](#apischoolrank)
   - [`/api/school/schoolCodersOfTheMonth/`](#apischoolschoolcodersofthemonth)
   - [`/api/school/selectSchoolOfTheMonth/`](#apischoolselectschoolofthemonth)
   - [`/api/school/users/`](#apischoolusers)
@@ -3601,7 +3600,7 @@ Get basic details of a run
 
 # School
 
-Description of SchoolController
+SchoolController
 
 ## `/api/school/create/`
 
@@ -3665,26 +3664,6 @@ months (including the current one)
 | Name                       | Type                                                          |
 | -------------------------- | ------------------------------------------------------------- |
 | `distinct_problems_solved` | `{ month: number; problems_solved: number; year: number; }[]` |
-
-## `/api/school/rank/`
-
-### Description
-
-Returns the historical rank of schools
-
-### Parameters
-
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `offset`   | `mixed` |             |
-| `rowcount` | `mixed` |             |
-
-### Returns
-
-| Name        | Type                                                                                         |
-| ----------- | -------------------------------------------------------------------------------------------- |
-| `rank`      | `{ country_id: string; name: string; ranking: number; school_id: number; score: number; }[]` |
-| `totalRows` | `number`                                                                                     |
 
 ## `/api/school/schoolCodersOfTheMonth/`
 
