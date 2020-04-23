@@ -16,27 +16,13 @@ OmegaUp.on('ready', () => {
           page: payload.page,
           length: payload.length,
           showHeader: payload.showHeader,
-          rank: this.rank,
-          totalRows: this.totalRows,
+          rank: payload.rank,
+          totalRows: payload.totalRows,
         },
       });
-    },
-    data: {
-      rank: <omegaup.SchoolsRank[]>[],
-      totalRows: 0,
     },
     components: {
       'omegaup-schools-rank': schools_Rank,
     },
   });
-
-  api.School.rank({
-    offset: payload.page,
-    rowcount: payload.length,
-  })
-    .then(data => {
-      schoolsRank.totalRows = data.totalRows;
-      schoolsRank.rank = data.rank;
-    })
-    .catch(UI.apiError);
 });
