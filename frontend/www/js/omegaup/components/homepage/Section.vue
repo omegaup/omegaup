@@ -13,8 +13,9 @@
     >
       <p class="section-description">{{ description }}</p>
       <a
-        v-if="button"
-        class="btn btn-primary section-link mb-3"
+        v-for="(button, index) in buttons"
+        v-bind:key="index"
+        class="btn btn-primary section-link mx-2 mb-3"
         role="button"
         v-bind:href="button.href"
       >
@@ -52,10 +53,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class Homepage extends Vue {
   @Prop() title!: string;
   @Prop() description!: string;
-  @Prop() button!: {
+  @Prop() buttons!: {
     text: string;
     href: string;
-  };
+  }[];
   @Prop() imageSrc!: string;
   @Prop({ default: false }) imageToRight!: boolean;
 }
