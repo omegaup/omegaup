@@ -674,7 +674,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ];
 
         if ($status == 'banned') {
-            $contentNotification = \OmegaUp\ApiUtils::formatString(
+            $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationBanned'
                 )
@@ -696,7 +696,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $emailParams
             );
         } else {
-            $contentNotification = \OmegaUp\ApiUtils::formatString(
+            $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationWarning'
                 )
@@ -725,7 +725,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'contents' =>  json_encode(
                     [
                         'type' => 'demotion',
-                        'message' => $contentNotification,
+                        'message' => $notificationContents,
                         'status' => $status
                     ]
                 ),
