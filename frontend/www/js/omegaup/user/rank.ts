@@ -6,9 +6,7 @@ import * as api from '../api_transitional';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.UserRankTablePayload(
-    'payload',
-  );
+  const payload = types.payloadParsers.UserRankTablePayload('payload');
 
   api.User.rankByProblemsSolved({
     offset: payload.page,
