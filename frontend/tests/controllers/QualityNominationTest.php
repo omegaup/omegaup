@@ -368,7 +368,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'status' => 'resolved',
+            'status' => 'banned',
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
         ]);
@@ -383,7 +383,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion can be resolved and then reverted by a reviewer.
+     * Check that a demotion can be banned and then reverted by a reviewer.
      */
     public function testDemotionCanBeResolvedAndLaterRevertedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -410,36 +410,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else',
-        ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            $request
-        );
-
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals(
-            'resolved',
-            $details['nomination_status'],
-            'qualitynomination should have been marked as resolved'
-        );
-
-        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            $problem['visibility'],
-            'Problem should have been public banned'
-        );
-
-        // Revert ban.
-        $request = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
             'status' => 'banned',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew'
+            'rationale' => 'ew plus something else',
         ]);
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
             $request
@@ -454,6 +428,32 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            $problem['visibility'],
+            'Problem should have been public banned'
+        );
+
+        // Revert ban.
+        $request = new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'status' => 'resolved',
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+            'rationale' => 'ew'
+        ]);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            'resolved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as resolved'
+        );
+
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
             'Problem should have been made public'
@@ -461,7 +461,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion resolved by a reviewer sends an email to the problem creator.
+     * Check that a demotion banned by a reviewer sends an email to the problem creator.
      */
     public function testDemotionResolvedByReviewerAndSendMail() {
         $emailSender = new \OmegaUp\Test\ScopedEmailSender();
@@ -489,7 +489,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
+            'status' => 'banned',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'qwert plus something else'
@@ -518,7 +518,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion can be banned by a reviewer.
+     * Check that a demotion can be resolved by a reviewer.
      */
     public function testDemotionCanBeBannedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -547,7 +547,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'banned',
+            'status' => 'resolved',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
@@ -558,9 +558,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
         $this->assertEquals(
-            'banned',
+            'resolved',
             $details['nomination_status'],
-            'qualitynomination should have been marked as banned'
+            'qualitynomination should have been marked as resolved'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
@@ -572,7 +572,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion can be resolved and then reopned by a reviewer.
+     * Check that a demotion can be banned and then reopned by a reviewer.
      */
     public function testDemotionCanBeResolvedAndThenReopenedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -599,7 +599,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
+            'status' => 'banned',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
@@ -610,9 +610,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
         $this->assertEquals(
-            'resolved',
+            'banned',
             $details['nomination_status'],
-            'qualitynomination should have been marked as resolved'
+            'qualitynomination should have been marked as banned'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
@@ -650,8 +650,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion of a private problem can be resolved and
-     * then banned, and it keeps its original visibility
+     * Check that a demotion of a private problem can be banned and
+     * then resolved, and it keeps its original visibility
      */
     public function testDemotionOfPrivateProblemResolvedAndThenBannedKeepsItsOriginalVisibility() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -680,7 +680,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
+            'status' => 'banned',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
@@ -691,22 +691,22 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
         $this->assertEquals(
-            'resolved',
+            'banned',
             $details['nomination_status'],
-            'qualitynomination should have been marked as resolved'
+            'qualitynomination should have been marked as banned'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
             $problem['visibility'],
-            'Problem should have been private banned'
+            'Problem should have been private resolved'
         );
 
         // Reopen demotion request.
         $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'banned',
+            'status' => 'resolved',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
@@ -717,7 +717,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
         $this->assertEquals(
-            'banned',
+            'resolved',
             $details['nomination_status'],
             'qualitynomination should have been re-opened'
         );
