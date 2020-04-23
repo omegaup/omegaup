@@ -98,9 +98,8 @@
               <label class="radio-inline">
                 <input
                   type="radio"
-                  v-bind:name="!bannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="bannedOrPromoted"
-                  v-bind:value="2"
+                  v-bind:disabled="!isEditable"
+                  v-bind:value="true"
                   v-model="formattedVisibility"
                 />
                 {{ T.wordsYes }}
@@ -108,9 +107,8 @@
               <label class="radio-inline">
                 <input
                   type="radio"
-                  v-bind:name="!bannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="bannedOrPromoted"
-                  v-bind:value="0"
+                  v-bind:disabled="!isEditable"
+                  v-bind:value="false"
                   v-model="formattedVisibility"
                 />
                 {{ T.wordsNo }}
@@ -197,6 +195,12 @@
           </div>
         </div>
 
+        <input
+          type="hidden"
+          name="visibility"
+          v-bind:value="visibility"
+          v-if="isEditable"
+        />
         <input name="request" value="submit" type="hidden" />
 
         <div class="row">
@@ -236,6 +240,7 @@ import { types } from '../../api_types';
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
   @Prop({ default: false }) isUpdate!: boolean;
+  @Prop({ default: 0 }) originalVisibility!: number;
 
   T = T;
   title = this.data.title;
@@ -275,19 +280,30 @@ export default class ProblemForm extends Vue {
     return JSON.stringify(this.selectedTags);
   }
 
-  get formattedVisibility(): number {
-    const visibility = Math.max(0, Math.min(2, this.visibility));
+  get formattedVisibility(): boolean {
     // when visibility is public warning, then the problem is shown as public
-    return visibility === 1 ? 2 : visibility;
+    return this.visibility > this.data.visibilityStatuses.private;
   }
 
-  set formattedVisibility(visibility: number) {
-    this.visibility = visibility;
+  set formattedVisibility(visibility: boolean) {
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicWarning
+    ) {
+      this.visibility = visibility
+        ? this.data.visibilityStatuses.publicWarning
+        : this.data.visibilityStatuses.privateWarning;
+      return;
+    }
+    this.visibility = visibility
+      ? this.data.visibilityStatuses.public
+      : this.data.visibilityStatuses.private;
   }
 
-  get bannedOrPromoted(): boolean {
-    const visibility = Math.max(0, Math.min(2, this.visibility));
-    return visibility !== this.visibility;
+  get isEditable(): boolean {
+    return (
+      this.visibility < this.data.visibilityStatuses.promoted &&
+      this.visibility > this.data.visibilityStatuses.publicBanned
+    );
   }
 
   onSubmit(e: Event): void {

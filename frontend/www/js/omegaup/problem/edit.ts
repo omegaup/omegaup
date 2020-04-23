@@ -20,6 +20,7 @@ OmegaUp.on('ready', () => {
         props: {
           data: payload,
           isUpdate: true,
+          originalVisibility: payload.visibility,
         },
         on: {
           'alias-changed': (alias: string): void => {

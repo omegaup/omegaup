@@ -9,8 +9,8 @@
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
- * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float|int, outputLimit: int, overallWallTimeLimit: float, source: string, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string,  languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
+ * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float|int, outputLimit: int, overallWallTimeLimit: float, source: string, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string,  languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
@@ -994,7 +994,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        $response = self::updateProblem(
+        [
+            'rejudged' => $rejudged,
+        ] = self::updateProblem(
             $r->identity,
             $r->user,
             $problemParams,
@@ -1002,8 +1004,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemParams->updatePublished,
             boolval($r['redirect'])
         );
-        unset($response['problem']);
-        return $response;
+        return [
+            'rejudged' => $rejudged,
+        ];
     }
 
     /**
@@ -4198,7 +4201,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>}
+     * @return array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>, visibilityStatuses: array<string, int>}
      */
     public static function getCommonPayloadForSmarty(): array {
         $validatorTypes = [
@@ -4233,9 +4236,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'wordsNoSubmissions'
             ),
         ];
+        $visibilityStatuses = [
+            'deleted' => \OmegaUp\ProblemParams::VISIBILITY_DELETED,
+            'privateBanned' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+            'publicBanned' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            'privateWarning' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+            'private' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            'publicWarning' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            'public' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            'promoted' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+        ];
         return [
           'validatorTypes' => $validatorTypes,
           'validLanguages' => $validLanguages,
+          'visibilityStatuses' => $visibilityStatuses,
         ];
     }
 
@@ -4336,6 +4350,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         if ($r['request'] === 'submit') {
             try {
+                $originalVisibility = $problem->visibility;
                 [
                     'problem' => $problem,
                 ] = self::updateProblem(

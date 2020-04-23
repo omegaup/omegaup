@@ -455,6 +455,7 @@ export namespace types {
     validatorTimeLimit: number | number;
     validatorTypes: { [key: string]: null | string };
     visibility: number;
+    visibilityStatuses: { [key: string]: number };
   }
 
   export interface ProblemFormPayload {
@@ -479,6 +480,7 @@ export namespace types {
     validatorTimeLimit: number | string;
     validatorTypes: { [key: string]: null | string };
     visibility: number;
+    visibilityStatuses: { [key: string]: number };
   }
 
   export interface ProblemListItem {
