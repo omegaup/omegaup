@@ -85,9 +85,10 @@ export const Badge = {
     messages._BadgeBadgeDetailsServerResponse,
     messages.BadgeBadgeDetailsResponse
   >('/api/badge/badgeDetails/', x => {
-    x.assignation_time = ((x: number) => new Date(x * 1000))(
-      x.assignation_time,
-    );
+    if (x.assignation_time)
+      x.assignation_time = ((x: number) => new Date(x * 1000))(
+        x.assignation_time,
+      );
     if (x.first_assignation)
       x.first_assignation = ((x: number) => new Date(x * 1000))(
         x.first_assignation,
@@ -118,9 +119,10 @@ export const Badge = {
         return x;
       }
       return x.map(x => {
-        x.assignation_time = ((x: number) => new Date(x * 1000))(
-          x.assignation_time,
-        );
+        if (x.assignation_time)
+          x.assignation_time = ((x: number) => new Date(x * 1000))(
+            x.assignation_time,
+          );
         if (x.first_assignation)
           x.first_assignation = ((x: number) => new Date(x * 1000))(
             x.first_assignation,
@@ -140,9 +142,10 @@ export const Badge = {
         return x;
       }
       return x.map(x => {
-        x.assignation_time = ((x: number) => new Date(x * 1000))(
-          x.assignation_time,
-        );
+        if (x.assignation_time)
+          x.assignation_time = ((x: number) => new Date(x * 1000))(
+            x.assignation_time,
+          );
         if (x.first_assignation)
           x.first_assignation = ((x: number) => new Date(x * 1000))(
             x.first_assignation,

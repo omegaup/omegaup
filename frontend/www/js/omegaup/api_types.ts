@@ -42,9 +42,10 @@ export namespace types {
     ): types.BadgeDetailsPayload {
       return (x => {
         x.badge = (x => {
-          x.assignation_time = ((x: number) => new Date(x * 1000))(
-            x.assignation_time,
-          );
+          if (x.assignation_time)
+            x.assignation_time = ((x: number) => new Date(x * 1000))(
+              x.assignation_time,
+            );
           if (x.first_assignation)
             x.first_assignation = ((x: number) => new Date(x * 1000))(
               x.first_assignation,
@@ -260,7 +261,7 @@ export namespace types {
   }
 
   export interface Badge {
-    assignation_time: Date;
+    assignation_time?: Date;
     badge_alias: string;
     unlocked: boolean;
     first_assignation?: Date;
