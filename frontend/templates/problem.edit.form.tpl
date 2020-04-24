@@ -40,7 +40,7 @@
 			{js_include entrypoint="problem_settings"}
 			{/if}
 			<div class="row">
-				<div class="form-group  col-md-4" id="source-group">
+				<div class="form-group  col-md-{if $IS_UPDATE eq false}4{else}6{/if}" id="source-group">
 					<label for="email_clarifications">{#problemEditEmailClarifications#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="er2" name="email_clarifications" value="1" {if $IS_UPDATE eq false && $EMAIL_CLARIFICATIONS ne 0}checked="checked"{/if}>{#wordsYes#}</label>
@@ -48,21 +48,22 @@
 					</div>
 				</div>
 
-				<div class="form-group col-md-4">
+				<div class="form-group col-md-{if $IS_UPDATE eq false}4{else}6{/if}">
 					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
 						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="2" {if $IS_UPDATE eq false && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq false && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
-
+				{if $IS_UPDATE eq false}
 				<div class="form-group col-md-4">
-					<label for="visibility">{#problemEditFormAllowUserAddTags#}</label>
+					<label for="allow_user_add_tags">{#problemEditFormAllowUserAddTags#}</label>
 					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="t2" name="allow_user_add_tags" value="1" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 1}checked=checked{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="t1" name="allow_user_add_tags" value="0" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 0}checked=checked{/if}>{#wordsNo#}</label>
+						<label class="radio-inline"><input type="radio" id="t2" name="allow_user_add_tags" value="1" {if $ALLOW_TAGS eq 1}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="t1" name="allow_user_add_tags" value="0" {if $ALLOW_TAGS eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>
+				{/if}
 			</div>
 
 			<div class="row">
