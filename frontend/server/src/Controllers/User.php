@@ -1330,17 +1330,23 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getProfileProgress(
-        \OmegaUp\DAO\VO\Users $user
+        ?\OmegaUp\DAO\VO\Users $user
     ): float {
-        if (is_null($user->main_identity_id)) {
+        if (
+            is_null($user) ||
+            is_null($user->main_identity_id) ||
+            is_null($user->user_id)
+        ) {
             return 0;
         }
 
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
+        $profile = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
+            $user->user_id
+        );
+        if (is_null($identity) || is_null($profile)) {
             return 0;
         }
-
         $fields = [
             'username' => !is_null($identity->username) ? 1 : 0,
             'name' => !is_null($identity->name) ? 1 : 0,
@@ -1348,25 +1354,16 @@ class User extends \OmegaUp\Controllers\Controller {
             'gender' => !is_null($identity->gender) ? 1 : 0,
             'scholar_degree' => !is_null($user->scholar_degree) ? 1 : 0,
             'preferred_language' => !is_null($user->preferred_language) ? 1 : 0,
-            'verified' => $user->verified == '1' ? 1 : 0,
+            'verified' => $user->verified ? 1 : 0,
+            'graduation_date' => !is_null(
+                $profile['graduation_date']
+            ) ? 1 : 0,
+            'email' => !is_null($profile['email']) ? 1 : 0,
+            'country_id' => !is_null($profile['country_id']) ? 1 : 0,
+            'state_id' => !is_null($profile['state_id']) ? 1 : 0,
+            'school_id' => !is_null($profile['school_id']) ? 1 : 0,
+            'locale' => !is_null($profile['locale']) ? 1 : 0,
         ];
-
-        $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
-            intval($user->user_id)
-        );
-        if (is_null($userDb)) {
-            return 0;
-        }
-
-        $fields['graduation_date'] = !is_null(
-            $userDb['graduation_date']
-        ) ? 1 : 0;
-        $fields['email'] = !is_null($userDb['email']) ? 1 : 0;
-        $fields['country_id'] = !is_null($userDb['country_id']) ? 1 : 0;
-        $fields['state_id'] = !is_null($userDb['state_id']) ? 1 : 0;
-        $fields['school_id'] = !is_null($userDb['school_id']) ? 1 : 0;
-        $fields['locale'] = !is_null($userDb['locale']) ? 1 : 0;
-
         return array_sum($fields) / count($fields);
     }
 
