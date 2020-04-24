@@ -423,14 +423,11 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertGreaterThan($school0->score, $school1->score);
 
         // Test apiRank
-        $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
-            'offset' => 1,
-            'rowcount' => 100,
-        ]));
-        $this->assertGreaterThanOrEqual(3, count($response['rank']));
+        $results = \OmegaUp\DAO\Schools::getRank(1, 100);
+        $this->assertGreaterThanOrEqual(3, count($results['rank']));
         $this->assertGreaterThanOrEqual(
-            $response['rank'][0]['ranking'],
-            $response['rank'][1]['ranking']
+            $results['rank'][0]['ranking'],
+            $results['rank'][1]['ranking']
         ); /** is sorted */
     }
 }

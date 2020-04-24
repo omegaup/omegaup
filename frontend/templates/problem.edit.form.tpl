@@ -51,7 +51,7 @@
 				<div class="form-group col-md-{if $IS_UPDATE eq false}4{else}6{/if}">
 					<label for="visibility">{#problemEditFormAppearsAsPublic#}</label>
 					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="1" {if $IS_UPDATE eq false && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
+						<label class="radio-inline"><input type="radio" id="r2" name="visibility" value="2" {if $IS_UPDATE eq false && $VISIBILITY eq 1}checked=checked{/if}>{#wordsYes#}</label>
 						<label class="radio-inline"><input type="radio" id="r1" name="visibility" value="0" {if $IS_UPDATE eq false && $VISIBILITY eq 0}checked=checked{/if}>{#wordsNo#}</label>
 					</div>
 				</div>

@@ -100,7 +100,7 @@
                   type="radio"
                   v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
                   v-bind:disabled="data.isBannedOrPromoted"
-                  v-bind:value="1"
+                  v-bind:value="2"
                   v-model="visibility"
                 />
                 {{ T.wordsYes }}

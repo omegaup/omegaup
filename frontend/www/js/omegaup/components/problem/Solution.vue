@@ -1,11 +1,12 @@
 <template>
   <div class="panel">
     <div
+      v-show="showSolution"
       class="solution"
       v-html="solution"
-      v-if="status === 'unlocked' &amp;&amp; solution !== null"
+      ref="solutionRef"
     ></div>
-    <div class="interstitial" v-else="">
+    <div class="interstitial" v-if="!showSolution">
       <p>{{ statusMessage }}</p>
       <p
         v-html="
@@ -68,6 +69,24 @@ export default class ProblemSolution extends Vue {
 
   T = T;
   UI = UI;
+
+  mounted(): void {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
+  }
+
+  @Watch('solution')
+  onSolutionUpdated() {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
+  }
+
+  @Watch('showSolution')
+  onShowSolutionUpdated() {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
+  }
+
+  get showSolution(): boolean {
+    return this.status === 'unlocked' && this.solution !== null;
+  }
 
   get statusMessage(): string {
     switch (this.status) {
