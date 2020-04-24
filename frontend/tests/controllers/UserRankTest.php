@@ -190,7 +190,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['rankTablePayload']['availableFilters'];
+        )['smartyProperties']['payload']['availableFilters'];
         $this->assertArrayNotHasKey('country', $availableFilters);
         $this->assertArrayNotHasKey('state', $availableFilters);
         $this->assertArrayNotHasKey('school', $availableFilters);
@@ -225,7 +225,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['rankTablePayload']['availableFilters'];
+        )['smartyProperties']['payload']['availableFilters'];
 
         // Call API
         $this->assertArrayHasKey('country', $availableFilters);

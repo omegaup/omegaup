@@ -3339,7 +3339,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return $response;
         }
 
-        $response['smartyProperties']['rankTablePayload']['isLogged'] = true;
+        $response['smartyProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance()->get(
@@ -3368,7 +3368,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
-        $response['smartyProperties']['rankTablePayload']['availableFilters'] = $availableFilters;
+        $response['smartyProperties']['payload']['availableFilters'] = $availableFilters;
         return $response;
     }
 
