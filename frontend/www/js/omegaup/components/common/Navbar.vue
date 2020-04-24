@@ -252,8 +252,7 @@
     }
 
     .navbar-brand {
-      background-color: $white;
-      background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
+      background-color: #f2f2f2;
     }
   }
 
