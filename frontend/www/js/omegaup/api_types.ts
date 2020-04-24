@@ -212,6 +212,14 @@ export namespace types {
       );
     }
 
+    export function ProblemEditPayload(
+      elementId: string,
+    ): types.ProblemEditPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemFormPayload(
       elementId: string,
     ): types.ProblemFormPayload {
@@ -441,13 +449,33 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemEditPayload {
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number;
+    inputLimit: number;
+    languages: string;
+    memoryLimit: number | number;
+    outputLimit: number;
+    overallWallTimeLimit: number;
+    source: string;
+    timeLimit: number;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | number;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+    visibilityStatuses: { [key: string]: number };
+  }
+
   export interface ProblemFormPayload {
     alias: string;
     allowUserAddTags: boolean;
     emailClarifications: boolean;
     extraWallTime: number | string;
     inputLimit: number | string;
-    isUpdate: boolean;
     languages: string;
     memoryLimit: number | string;
     message?: string;
@@ -464,6 +492,7 @@ export namespace types {
     validatorTimeLimit: number | string;
     validatorTypes: { [key: string]: null | string };
     visibility: number;
+    visibilityStatuses: { [key: string]: number };
   }
 
   export interface ProblemListItem {

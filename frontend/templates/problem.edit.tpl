@@ -27,7 +27,9 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="edit">
-    {include file='problem.edit.form.tpl' inline}
+    <div id="problem-edit"></div>
+    <script type="text/json" id="problem-edit-payload">{$problemEditPayload|json_encode}</script>
+    {js_include entrypoint="problem_edit_form"}
   </div>
 
   <div class="tab-pane" id="markdown">
