@@ -4427,7 +4427,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $selectedTags = null;
 
         $allTags = self::getAllTagsFromCache();
-        ;
         // TODO: Change this list when the final list be defined
         $filteredTags = array_slice($allTags, 0, 100);
         foreach ($filteredTags as $tag) {
