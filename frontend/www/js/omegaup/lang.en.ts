@@ -920,7 +920,7 @@ const translations: { [key: string]: string; } = {
   showLinks: "Links",
   showTotalScoreboard: "Show total scoreboard",
   solutionConfirm: "Please click on the button to see this solution.",
-  solutionLocked: "You can't see this solution yet.<ul><li>Try solving the problem first or use one of your tokens for unlocking it.You receive one token to unlock viewing the solution of a problem you are struggling with for each ten problems you solve.<li>Once you decide to unlock the solution for a problem, it won't count towards your score for omegaUp's ranking.</li></ul>",
+  solutionLocked: "You can't see this solution yet.<ul><li>Try solving the problem first or use one of your tokens for unlocking it. You receive one token to unlock viewing the solution of a problem you are struggling with for each ten problems you solve.<li>Once you decide to unlock the solution for a problem, it won't count towards your score for omegaUp's ranking.</li></ul>",
   solutionNoTokens: "You don't have enough tokens to perform this action.",
   solutionNotFound: "There isn't any solution for this problem.",
   solutionNotLoggedIn: "You must login to unlock/see this solution.",
