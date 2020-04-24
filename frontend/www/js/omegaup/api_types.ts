@@ -656,6 +656,26 @@ export namespace types {
     verified: boolean;
   }
 
+  export interface UserRank {
+    rank: {
+      classname: string;
+      country_id?: string;
+      name?: string;
+      problems_solved: number;
+      ranking: number;
+      score: number;
+      user_id: number;
+      username: string;
+    }[];
+    total: number;
+  }
+
+  export interface UserRankInfo {
+    name: string;
+    problems_solved: number;
+    rank: number;
+  }
+
   export interface UserRankTablePayload {
     availableFilters: { country?: string; school?: string; state?: string };
     filter: string;
@@ -663,6 +683,7 @@ export namespace types {
     isLogged: boolean;
     length: number;
     page: number;
+    rank: types.UserRank;
   }
 }
 
@@ -2395,24 +2416,6 @@ export namespace messages {
     username?: string;
     verified?: boolean;
   };
-  export type UserRankByProblemsSolvedRequest = { [key: string]: any };
-  export type UserRankByProblemsSolvedResponse = {
-    rank:
-      | {
-          classname: string;
-          country_id?: string;
-          name?: string;
-          problems_solved: number;
-          ranking: number;
-          score: number;
-          user_id: number;
-          username: string;
-        }[]
-      | number;
-    total?: number;
-    name?: string;
-    problems_solved?: number;
-  };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -3096,9 +3099,6 @@ export namespace controllers {
     profile: (
       params?: messages.UserProfileRequest,
     ) => Promise<messages.UserProfileResponse>;
-    rankByProblemsSolved: (
-      params?: messages.UserRankByProblemsSolvedRequest,
-    ) => Promise<messages.UserRankByProblemsSolvedResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;

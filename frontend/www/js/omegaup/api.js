@@ -473,8 +473,6 @@ export default {
       return data;
     }),
 
-    rankByProblemsSolved: api.User.rankByProblemsSolved,
-
     removeExperiment: api.User.removeExperiment,
 
     removeGroup: api.User.removeGroup,

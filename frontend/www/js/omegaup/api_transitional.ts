@@ -1189,10 +1189,6 @@ export const User = {
   profile: apiCall<messages.UserProfileRequest, messages.UserProfileResponse>(
     '/api/user/profile/',
   ),
-  rankByProblemsSolved: apiCall<
-    messages.UserRankByProblemsSolvedRequest,
-    messages.UserRankByProblemsSolvedResponse
-  >('/api/user/rankByProblemsSolved/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse
