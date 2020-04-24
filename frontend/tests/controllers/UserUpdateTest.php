@@ -111,6 +111,43 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testFillAllProfileFields() {
+        // Create the user to edit
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $locale = \OmegaUp\DAO\Languages::getByName('pt');
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
+        $token = $login->auth_token;
+        $r = new \OmegaUp\Request([
+            'auth_token' => $token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'gender' => 'female',
+            'scholar_degree' => 'master',
+            'birth_date' => strtotime('1998-01-01'),
+            'graduation_date' => strtotime('2016-02-02'),
+            'preferred_language' => 'c',
+            'locale' => $locale->name,
+        ]);
+
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        $user = \OmegaUp\DAO\Users::getByPK($user->user_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+
+        $profile = \OmegaUp\Controllers\User::getProfileImpl(
+            $user,
+            $identity
+        );
+        $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
+            $user
+        );
+        $this->assertEquals(1, $profileProgress);
+    }
+
     /**
      * Testing the modifications on IdentitiesSchools
      * on each user information update
