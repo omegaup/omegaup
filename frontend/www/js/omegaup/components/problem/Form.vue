@@ -68,7 +68,7 @@
         ></omegaup-problem-settings>
 
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditEmailClarifications }}</label>
             <div class="form-control">
               <label class="radio-inline">
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditFormAppearsAsPublic }}</label>
             <div class="form-control">
               <label class="radio-inline">
@@ -112,30 +112,6 @@
                   v-bind:disabled="data.isBannedOrPromoted"
                   v-bind:value="0"
                   v-model="visibility"
-                />
-                {{ T.wordsNo }}
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group col-md-4">
-            <label>{{ T.problemEditFormAllowUserAddTags }}</label>
-            <div class="form-control">
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  name="allow_user_add_tags"
-                  v-bind:value="true"
-                  v-model="allowUserAddTags"
-                />
-                {{ T.wordsYes }}
-              </label>
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  name="allow_user_add_tags"
-                  v-bind:value="false"
-                  v-model="allowUserAddTags"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -174,15 +150,35 @@
           </div>
         </div>
 
-        <omegaup-problem-tags
-          v-bind:initialTags="data.tags"
-          v-bind:initialSelectedTags="data.selectedTags || []"
-          v-bind:alias="data.alias"
-          v-if="!data.isUpdate"
-        ></omegaup-problem-tags>
+        <template v-if="!data.isUpdate">
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label>{{ T.wordsShowCasesDiff }}</label>
+              <select name="show_diff" class="form-control" v-model="showDiff">
+                <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+                <option value="examples">{{ T.wordsOnlyExamples }}</option>
+                <option value="all">{{ T.wordsAll }}</option>
+              </select>
+            </div>
+          </div>
+
+          <omegaup-problem-tags
+            v-bind:initialTags="data.tags"
+            v-bind:initialSelectedTags="data.selectedTags || []"
+            v-bind:alias="data.alias"
+          ></omegaup-problem-tags>
+        </template>
         <div class="row" v-else="">
+          <div class="form-group col-md-6">
+            <label>{{ T.wordsShowCasesDiff }}</label>
+            <select name="show_diff" class="form-control" v-model="showDiff">
+              <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+              <option value="examples">{{ T.wordsOnlyExamples }}</option>
+              <option value="all">{{ T.wordsAll }}</option>
+            </select>
+          </div>
           <div
-            class="form-group  col-md-12"
+            class="form-group col-md-6"
             v-bind:class="{ 'has-error': errors.includes('message') }"
           >
             <label class="control-label">{{
@@ -248,6 +244,7 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
+  showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = this.data.message;
   hasFile = false;

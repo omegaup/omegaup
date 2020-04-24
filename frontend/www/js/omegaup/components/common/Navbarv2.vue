@@ -255,6 +255,7 @@
                   {{ T.navLogOut }}
                 </a>
                 <omegaup-common-grader-status
+                  v-show="isAdmin"
                   v-bind:status="errorMessage !== null ? 'down' : 'ok'"
                   v-bind:error="errorMessage"
                   v-bind:graderInfo="graderInfo"
@@ -274,8 +275,7 @@ nav.navbar {
   background-color: $header-primary-color;
 
   .navbar-brand {
-    background-color: $white;
-    background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
+    background-color: #f2f2f2;
   }
 
   a.dropdown-item {

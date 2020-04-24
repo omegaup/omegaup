@@ -58,25 +58,6 @@
 			</div>
 
 			<div class="row">
-				<div class="form-group col-md-6">
-					<label for="visibility">{#problemEditFormAllowUserAddTags#}</label>
-					<div class="form-control">
-						<label class="radio-inline"><input type="radio" id="t2" name="allow_user_add_tags" value="1" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 1}checked=checked{/if}>{#wordsYes#}</label>
-						<label class="radio-inline"><input type="radio" id="t1" name="allow_user_add_tags" value="0" {if $IS_UPDATE eq false && $ALLOW_TAGS eq 0}checked=checked{/if}>{#wordsNo#}</label>
-					</div>
-				</div>
-
-				<div class="form-group col-md-6">
-					<label>{{#wordsShowCasesDiff#}}</label>
-					<select name="show_diff" class="form-control">
-						<option value="none">{#problemVersionDiffModeNone#}</option>
-						<option value="examples">{#wordsOnlyExamples#}</option>
-						<option value="all">{#wordsAll#}</option>
-					</select>
-				</div>
-			</div>
-
-			<div class="row">
 				<div class="form-group  col-md-6">
 					<label class="control-label" for="source">{#problemEditSource#}</label>
 					<input id='source' name='source' value='{if $IS_UPDATE eq false}{$SOURCE|htmlspecialchars}{/if}' type='text' class="form-control" />
@@ -121,14 +102,23 @@
 			</div>
 			{/if}
 
-      {if $IS_UPDATE eq true}
 			<div class="row">
-				<div class="form-group  col-md-12" id="update-message-group">
+				<div class="form-group col-md-6">
+					<label>{{#wordsShowCasesDiff#}}</label>
+					<select name="show_diff" class="form-control">
+						<option value="none">{#problemVersionDiffModeNone#}</option>
+						<option value="examples">{#wordsOnlyExamples#}</option>
+						<option value="all">{#wordsAll#}</option>
+					</select>
+				</div>
+
+      {if $IS_UPDATE eq true}
+				<div class="form-group  col-md-6" id="update-message-group">
 					<label class="control-label" for="update-message">{#problemEditCommitMessage#}</label>
 					<input id="update-message" name="message" type="text" class="form-control" />
 				</div>
-			</div>
       {/if}
+			</div>
 
 			<input id='' name='request' value='submit' type='hidden'>
 

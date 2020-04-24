@@ -7,10 +7,10 @@
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
- * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
+ * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: int, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
- * @psalm-type ProblemTagsPayload=array{alias: string, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, isUpdate: false, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int}
+ * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
@@ -2954,7 +2954,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{runs: list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, alias: string, username: string, run_id?: int, judged_by?: null|string, type?: null|string, country_id?: null|string, contest_alias?: null|string}>}
+     * @return array{runs: list<array{alias: string, classname?: string, contest_alias?: null|string, contest_score: float|null, country_id?: null|string, guid: string, judged_by?: null|string, language: string, memory: int, penalty: int, run_id?: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type?: null|string, username: string, verdict: string}>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Get user
@@ -4154,8 +4154,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $tagData = [];
+        $allTags = self::getAllTagsFromCache();
 
-        foreach (\OmegaUp\DAO\Tags::getAll() as $tag) {
+        foreach ($allTags as $tag) {
             $tagData[] = ['name' => $tag->name];
         }
 
@@ -4182,6 +4183,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'template' => 'problems.tpl',
         ];
+    }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\Tags>
+     */
+    private static function getAllTagsFromCache() {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            'all',
+            /** @return list<\OmegaUp\DAO\VO\Tags> */
+            function () {
+                return \OmegaUp\DAO\Tags::getAll();
+            },
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
     }
 
     /**
@@ -4269,19 +4285,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r,
             /*$isRequired=*/ false
         );
-        $tags = [];
-        $selectedTags = [];
-        $allTags = \OmegaUp\DAO\Tags::getAll();
-        // TODO: Change this list when the final list be defined
-        $filteredTags = array_slice($allTags, 0, 100);
-        $tagnames = array_column($filteredTags, 'name');
-
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
         }
+
+        $tags = [];
+        $selectedTags = [];
+        $allTags = self::getAllTagsFromCache();
+        // TODO: Change this list when the final list be defined
+        $filteredTags = array_slice($allTags, 0, 100);
+        $tagnames = array_column($filteredTags, 'name');
+
         $problemSelectedTags = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problem,
             !\OmegaUp\Authorization::canEditProblem($r->identity, $problem)
@@ -4305,6 +4322,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'payload' => self::getCommonPayloadForSmarty(),
                 'problemTagsPayload' => [
                     'alias' => $problem->alias,
+                    'title' => $problem->title,
+                    'allowTags' => $problem->allow_user_add_tags,
                     'tags' => $tags,
                     'selectedTags' => $selectedTags,
                 ],
@@ -4314,6 +4333,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!isset($r['request'])) {
             return $result;
         }
+
         // Validate commit message.
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         if ($r['request'] === 'submit') {
@@ -4403,7 +4423,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $tags = [];
         $selectedTags = null;
 
-        $allTags = \OmegaUp\DAO\Tags::getAll();
+        $allTags = self::getAllTagsFromCache();
         // TODO: Change this list when the final list be defined
         $filteredTags = array_slice($allTags, 0, 100);
         foreach ($filteredTags as $tag) {
@@ -4447,6 +4467,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'selectedTags' => $selectedTags,
                                 'isUpdate' => false,
                                 'allowUserAddTags' => true,
+                                'showDiff' => strval($r['show_diff']),
                                 'timeLimit' => strval($r['time_limit']),
                                 'validatorTimeLimit' => strval(
                                     $r['validator_time_limit']
@@ -4488,6 +4509,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'selectedTags' => null,
                         'isUpdate' => false,
                         'allowUserAddTags' => true,
+                        'showDiff' => 'none',
                         'timeLimit' => 1000,
                         'validatorTimeLimit' => 1000,
                         'overallWallTimeLimit' => 60000,
