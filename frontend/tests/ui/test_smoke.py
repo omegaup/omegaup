@@ -181,7 +181,8 @@ def create_problem(driver, problem_alias):
         driver.browser.find_element_by_name('source').send_keys('test')
         # Make the problem public
         driver.browser.find_element_by_xpath(
-            '//input[@name="visibility" and @value = "2"]').click()
+            '//input[@type = "radio" and @name = "visibility" and @value = '
+            '"true"]').click()
         contents_element = driver.browser.find_element_by_name(
             'problem_contents')
         contents_element.send_keys(os.path.join(

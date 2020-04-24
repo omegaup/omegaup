@@ -337,8 +337,6 @@ export default {
       '/api/school/monthlySolvedProblemsCount',
     ),
 
-    rank: api.School.rank,
-
     schoolsOfTheMonth: api.School.schoolsOfTheMonth,
 
     schoolCodersOfTheMonth: api.apiCall(
