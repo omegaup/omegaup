@@ -432,6 +432,8 @@ export namespace types {
   export interface NotificationContents {
     type: string;
     badge?: string;
+    message?: string;
+    status?: string;
   }
 
   export interface PageItem {
