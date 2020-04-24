@@ -62,9 +62,7 @@ export default class Notification extends Vue {
           badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
       case 'demotion':
-        return !!this.notification.contents.message
-          ? this.notification.contents.message
-          : '';
+        return this.notification.contents.message || '';
       default:
         return '';
     }
