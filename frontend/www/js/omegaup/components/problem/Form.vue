@@ -1,6 +1,6 @@
 <template>
   <div class="panel panel-primary problem-form">
-    <div class="panel-heading" v-if="!data.isUpdate">
+    <div class="panel-heading" v-if="!isUpdate">
       <h3 class="panel-title">
         {{ T.problemNew }}
       </h3>
@@ -48,7 +48,7 @@
               ref="alias"
               type="text"
               class="form-control"
-              v-bind:disabled="data.isUpdate"
+              v-bind:disabled="isUpdate"
             />
           </div>
         </div>
@@ -98,20 +98,20 @@
               <label class="radio-inline">
                 <input
                   type="radio"
-                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="data.isBannedOrPromoted"
-                  v-bind:value="2"
-                  v-model="visibility"
+                  name="visibility"
+                  v-bind:disabled="!isEditable"
+                  v-bind:value="true"
+                  v-model="isPublic"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
                   type="radio"
-                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="data.isBannedOrPromoted"
-                  v-bind:value="0"
-                  v-model="visibility"
+                  name="visibility"
+                  v-bind:disabled="!isEditable"
+                  v-bind:value="false"
+                  v-model="isPublic"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -150,7 +150,7 @@
           </div>
         </div>
 
-        <template v-if="!data.isUpdate">
+        <template v-if="!isUpdate">
           <div class="row">
             <div class="form-group col-md-12">
               <label>{{ T.wordsShowCasesDiff }}</label>
@@ -184,10 +184,21 @@
             <label class="control-label">{{
               T.problemEditCommitMessage
             }}</label>
-            <input class="form-control" name="message" type="text" />
+            <input
+              class="form-control"
+              name="message"
+              v-model="message"
+              type="text"
+            />
           </div>
         </div>
 
+        <input
+          type="hidden"
+          name="visibility"
+          v-bind:value="visibility"
+          v-if="isEditable"
+        />
         <input name="request" value="submit" type="hidden" />
 
         <div class="row">
@@ -226,6 +237,8 @@ import { types } from '../../api_types';
 })
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
+  @Prop({ default: false }) isUpdate!: boolean;
+  @Prop({ default: 0 }) originalVisibility!: number;
 
   T = T;
   title = this.data.title;
@@ -246,7 +259,7 @@ export default class ProblemForm extends Vue {
   tags = this.data.tags;
   showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
-  message = this.data.message;
+  message = '';
   hasFile = false;
   public = false;
   errors: string[] = [];
@@ -256,7 +269,7 @@ export default class ProblemForm extends Vue {
   }
 
   get buttonText(): string {
-    if (this.data.isUpdate) {
+    if (this.isUpdate) {
       return T.problemEditFormUpdateProblem;
     }
     return T.problemEditFormCreateProblem;
@@ -266,9 +279,45 @@ export default class ProblemForm extends Vue {
     return JSON.stringify(this.selectedTags);
   }
 
+  get isPublic(): boolean {
+    // when visibility is public warning, then the problem is shown as public
+    return this.visibility > this.data.visibilityStatuses.private;
+  }
+
+  set isPublic(isPublic: boolean) {
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicWarning ||
+      this.originalVisibility === this.data.visibilityStatuses.privateWarning
+    ) {
+      this.visibility = isPublic
+        ? this.data.visibilityStatuses.publicWarning
+        : this.data.visibilityStatuses.privateWarning;
+      return;
+    }
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicBanned ||
+      this.originalVisibility === this.data.visibilityStatuses.privateBanned
+    ) {
+      this.visibility = isPublic
+        ? this.data.visibilityStatuses.publicBanned
+        : this.data.visibilityStatuses.privateBanned;
+      return;
+    }
+    this.visibility = isPublic
+      ? this.data.visibilityStatuses.public
+      : this.data.visibilityStatuses.private;
+  }
+
+  get isEditable(): boolean {
+    return (
+      this.data.visibilityStatuses.publicBanned < this.visibility &&
+      this.visibility < this.data.visibilityStatuses.promoted
+    );
+  }
+
   onSubmit(e: Event): void {
     this.errors = [];
-    if (this.data.isUpdate && this.message) {
+    if (this.isUpdate && this.message) {
       return;
     }
     if (this.title && this.alias && this.source && this.hasFile) {
@@ -284,10 +333,10 @@ export default class ProblemForm extends Vue {
     if (!this.source) {
       this.errors.push('source');
     }
-    if (!this.hasFile) {
+    if (!this.isUpdate && !this.hasFile) {
       this.errors.push('file');
     }
-    if (this.data.isUpdate && !this.message) {
+    if (this.isUpdate && !this.message) {
       this.errors.push('message');
     }
     e.preventDefault();
@@ -311,6 +360,10 @@ export default class ProblemForm extends Vue {
   }
 
   onGenerateAlias(): void {
+    if (this.isUpdate) {
+      return;
+    }
+
     // Remove accents
     let generatedAlias = latinize(this.title);
 
@@ -327,6 +380,9 @@ export default class ProblemForm extends Vue {
 
   @Watch('alias')
   onValueChanged(newValue: string): void {
+    if (this.isUpdate) {
+      return;
+    }
     this.$emit('alias-changed', newValue);
   }
 }
