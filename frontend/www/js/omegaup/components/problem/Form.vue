@@ -98,18 +98,20 @@
               <label class="radio-inline">
                 <input
                   type="radio"
+                  name="visibility"
                   v-bind:disabled="!isEditable"
                   v-bind:value="true"
-                  v-model="formattedVisibility"
+                  v-model="isPublic"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
                   type="radio"
+                  name="visibility"
                   v-bind:disabled="!isEditable"
                   v-bind:value="false"
-                  v-model="formattedVisibility"
+                  v-model="isPublic"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -280,18 +282,28 @@ export default class ProblemForm extends Vue {
     return JSON.stringify(this.selectedTags);
   }
 
-  get formattedVisibility(): boolean {
+  get isPublic(): boolean {
     // when visibility is public warning, then the problem is shown as public
     return this.visibility > this.data.visibilityStatuses.private;
   }
 
-  set formattedVisibility(visibility: boolean) {
+  set isPublic(visibility: boolean) {
     if (
-      this.originalVisibility === this.data.visibilityStatuses.publicWarning
+      this.originalVisibility === this.data.visibilityStatuses.publicWarning ||
+      this.originalVisibility === this.data.visibilityStatuses.privateWarning
     ) {
       this.visibility = visibility
         ? this.data.visibilityStatuses.publicWarning
         : this.data.visibilityStatuses.privateWarning;
+      return;
+    }
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicBanned ||
+      this.originalVisibility === this.data.visibilityStatuses.privateBanned
+    ) {
+      this.visibility = visibility
+        ? this.data.visibilityStatuses.publicBanned
+        : this.data.visibilityStatuses.privateBanned;
       return;
     }
     this.visibility = visibility
@@ -301,8 +313,8 @@ export default class ProblemForm extends Vue {
 
   get isEditable(): boolean {
     return (
-      this.visibility < this.data.visibilityStatuses.promoted &&
-      this.visibility > this.data.visibilityStatuses.publicBanned
+      this.data.visibilityStatuses.publicBanned < this.visibility &&
+      this.visibility < this.data.visibilityStatuses.promoted
     );
   }
 
