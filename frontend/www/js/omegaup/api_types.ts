@@ -683,7 +683,7 @@ export namespace types {
     isLogged: boolean;
     length: number;
     page: number;
-    rank: types.UserRank;
+    ranking: types.UserRank;
   }
 }
 

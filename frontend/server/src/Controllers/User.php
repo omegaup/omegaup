@@ -11,7 +11,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
- * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, rank: UserRank}
+ * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  */
@@ -3272,7 +3272,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
                     'isLogged' => false,
-                    'rank' => self::getRankByProblemsSolved(
+                    'ranking' => self::getRankByProblemsSolved(
                         $r->identity,
                         $filter,
                         $page,
@@ -3320,7 +3320,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
         }
         $response['smartyProperties']['payload']['availableFilters'] = $availableFilters;
-        $response['smartyProperties']['payload']['rank'] = self::getRankByProblemsSolved(
+        $response['smartyProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
             $r->identity,
             $filter,
             $page,

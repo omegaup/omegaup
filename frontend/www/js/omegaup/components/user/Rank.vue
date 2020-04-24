@@ -84,7 +84,7 @@
             </td>
             <td class="text-right">{{ user.score }}</td>
             <td class="text-right" v-if="!isIndex">
-              {{ user.problemsSolvedUser }}
+              {{ user.problems_solved }}
             </td>
           </tr>
         </tbody>
