@@ -39,6 +39,11 @@ class ProblemParams {
     // Custom validator
     const VALIDATOR_CUSTOM = 'custom';
 
+    // Diffs to show when problem is educational
+    const NO_SHOW_DIFFS = 'none';
+    const SHOW_ONLY_EXAMPLE_DIFF = 'examples';
+    const SHOW_ALL_DIFFS = 'all';
+
     /**
      * @readonly
      * @var string
