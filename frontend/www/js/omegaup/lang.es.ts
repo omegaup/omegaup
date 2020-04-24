@@ -920,7 +920,7 @@ const translations: { [key: string]: string; } = {
   showLinks: "Enlaces",
   showTotalScoreboard: "Ver scoreboard total",
   solutionConfirm: "Para ver la soluci\u00f3n de este problema, por favor haz click en el bot\u00f3n siguiente.",
-  solutionLocked: "A\u00fan no puedes ver esta soluci\u00f3n. Intenta resolver el problema primero o usa alguno de tus tokens para desbloquearla. Recibir\u00e1s un token para desbloquear la visualizaci\u00f3n de la soluci\u00f3n de un problema, por cada diez problemas que resuelvas. Una vez que decidas desbloquear la soluci\u00f3n de un problema, \u00e9ste no contar\u00e1 en tu puntaje en el ranking de omegaUp.",
+  solutionLocked: "<ul><li>Intenta resolver el problema primero o usa alguno de tus tokens para desbloquearla. Recibir\u00e1s un token para desbloquear la visualizaci\u00f3n de la soluci\u00f3n de un problema, por cada diez problemas que resuelvas.</li><li>Una vez que decidas desbloquear la soluci\u00f3n de un problema, \u00e9ste no contar\u00e1 en tu puntaje en el ranking de omegaUp.</li></ul>",
   solutionNoTokens: "No tienes tokens suficientes para realizar esta acci\u00f3n.",
   solutionNotFound: "A\u00fan no ha sido agregada la soluci\u00f3n para este problema.",
   solutionNotLoggedIn: "Debes iniciar sesi\u00f3n para desbloquear/ver esta soluci\u00f3n.",
