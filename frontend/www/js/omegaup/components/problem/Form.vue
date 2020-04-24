@@ -68,7 +68,7 @@
         ></omegaup-problem-settings>
 
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditEmailClarifications }}</label>
             <div class="form-control">
               <label class="radio-inline">
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditFormAppearsAsPublic }}</label>
             <div class="form-control">
               <label class="radio-inline">
@@ -112,30 +112,6 @@
                   v-bind:disabled="data.isBannedOrPromoted"
                   v-bind:value="0"
                   v-model="visibility"
-                />
-                {{ T.wordsNo }}
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group col-md-4">
-            <label>{{ T.problemEditFormAllowUserAddTags }}</label>
-            <div class="form-control">
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  name="allow_user_add_tags"
-                  v-bind:value="true"
-                  v-model="allowUserAddTags"
-                />
-                {{ T.wordsYes }}
-              </label>
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  name="allow_user_add_tags"
-                  v-bind:value="false"
-                  v-model="allowUserAddTags"
                 />
                 {{ T.wordsNo }}
               </label>
