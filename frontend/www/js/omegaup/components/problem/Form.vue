@@ -287,12 +287,12 @@ export default class ProblemForm extends Vue {
     return this.visibility > this.data.visibilityStatuses.private;
   }
 
-  set isPublic(visibility: boolean) {
+  set isPublic(isPublic: boolean) {
     if (
       this.originalVisibility === this.data.visibilityStatuses.publicWarning ||
       this.originalVisibility === this.data.visibilityStatuses.privateWarning
     ) {
-      this.visibility = visibility
+      this.visibility = isPublic
         ? this.data.visibilityStatuses.publicWarning
         : this.data.visibilityStatuses.privateWarning;
       return;
@@ -301,12 +301,12 @@ export default class ProblemForm extends Vue {
       this.originalVisibility === this.data.visibilityStatuses.publicBanned ||
       this.originalVisibility === this.data.visibilityStatuses.privateBanned
     ) {
-      this.visibility = visibility
+      this.visibility = isPublic
         ? this.data.visibilityStatuses.publicBanned
         : this.data.visibilityStatuses.privateBanned;
       return;
     }
-    this.visibility = visibility
+    this.visibility = isPublic
       ? this.data.visibilityStatuses.public
       : this.data.visibilityStatuses.private;
   }
