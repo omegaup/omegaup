@@ -499,8 +499,10 @@ export namespace types {
 
   export interface ProblemTagsPayload {
     alias: string;
+    allowTags: boolean;
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
+    title?: string;
   }
 
   export interface ProblemsetProblem {

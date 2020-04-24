@@ -36,9 +36,22 @@
             <option v-bind:value="true">{{ T.wordsYes }}</option>
           </select>
         </div>
-        <button class="btn btn-primary" v-if="canAddNewTags" type="submit">
-          {{ T.wordsAddTag }}
-        </button>
+        <div class="form-group">
+          <button class="btn btn-primary" v-if="canAddNewTags" type="submit">
+            {{ T.wordsAddTag }}
+          </button>
+        </div>
+        <div class="form-group">
+          <label class="switch-container">
+            <div class="switch">
+              <input type="checkbox" v-model="allowTags" />
+              <span class="slider round"></span>
+            </div>
+            <span class="switch-text">
+              {{ T.problemEditFormAllowUserAddTags }}
+            </span>
+          </label>
+        </div>
       </form>
     </div>
 
@@ -85,11 +98,96 @@
       v-bind:value="selectedTagsList"
       v-if="!canAddNewTags"
     />
+    <input
+      type="hidden"
+      name="allow_user_add_tags"
+      v-bind:value="allowTags"
+      v-if="!canAddNewTags"
+    />
   </div>
 </template>
 
+<style>
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.switch-container {
+  width: 100%;
+  position: relative;
+}
+
+.switch-container span.switch-text {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  margin-left: 5px;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+</style>
+
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -99,11 +197,14 @@ export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
   @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
   @Prop() alias!: string;
+  @Prop({ default: '' }) title!: string;
+  @Prop({ default: true }) initialAllowTags!: boolean;
   @Prop({ default: false }) canAddNewTags!: boolean;
 
   T = T;
   tags = this.initialTags;
   selectedTags = this.initialSelectedTags;
+  allowTags = this.initialAllowTags;
   public = false;
   tagname = '';
 
@@ -127,6 +228,14 @@ export default class ProblemTags extends Vue {
     if (this.canAddNewTags) {
       this.$emit('remove-tag', this.alias, tagname);
     }
+  }
+
+  @Watch('allowTags')
+  onPropertyChanged(newValue: boolean): void {
+    if (!this.canAddNewTags) {
+      return;
+    }
+    this.$emit('change-allow-user-add-tag', this.alias, this.title, newValue);
   }
 }
 </script>

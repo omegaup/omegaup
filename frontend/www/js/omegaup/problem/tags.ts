@@ -18,6 +18,8 @@ OmegaUp.on('ready', () => {
           initialTags: payload.tags,
           initialSelectedTags: payload.selectedTags,
           alias: payload.alias,
+          title: payload.title,
+          initialAllowTags: payload.allowTags,
           canAddNewTags: true,
         },
         on: {
@@ -39,6 +41,22 @@ OmegaUp.on('ready', () => {
             })
               .then(response => {
                 ui.success(T.tagRemoved);
+              })
+              .catch(ui.apiError);
+          },
+          'change-allow-user-add-tag': (
+            alias: string,
+            title: string,
+            allowTags: boolean,
+          ) => {
+            api.Problem.update({
+              problem_alias: alias,
+              title: title,
+              allow_user_add_tags: allowTags,
+              message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
+            })
+              .then(response => {
+                ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(ui.apiError);
           },

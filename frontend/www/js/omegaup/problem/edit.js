@@ -468,7 +468,9 @@ OmegaUp.on('ready', function() {
       problem_alias: problemAlias,
       statement_type: 'markdown',
     })
-      .then(problemCallback)
+      .then(function(problem) {
+        problemCallback(problem);
+      })
       .catch(ui.apiError);
   }
 
