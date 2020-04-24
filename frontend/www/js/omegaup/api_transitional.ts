@@ -294,9 +294,10 @@ export const Contest = {
       return x.map(x => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        x.original_finish_time = ((x: number) => new Date(x * 1000))(
-          x.original_finish_time,
-        );
+        if (x.original_finish_time)
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
@@ -315,9 +316,10 @@ export const Contest = {
       return x.map(x => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        x.original_finish_time = ((x: number) => new Date(x * 1000))(
-          x.original_finish_time,
-        );
+        if (x.original_finish_time)
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
@@ -708,16 +710,17 @@ export const Interview = {
     messages._InterviewDetailsServerResponse,
     messages.InterviewDetailsResponse
   >('/api/interview/details/', x => {
-    x.users = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        if (x.access_time)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        return x;
-      });
-    })(x.users);
+    if (x.users)
+      x.users = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          if (x.access_time)
+            x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+          return x;
+        });
+      })(x.users);
     return x;
   }),
   list: apiCall<messages.InterviewListRequest, messages.InterviewListResponse>(
@@ -802,15 +805,16 @@ export const Problem = {
     messages._ProblemDetailsServerResponse,
     messages.ProblemDetailsResponse
   >('/api/problem/details/', x => {
-    x.runs = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.runs);
+    if (x.runs)
+      x.runs = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        });
+      })(x.runs);
     return x;
   }),
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
@@ -901,16 +905,17 @@ export const Problemset = {
     messages._ProblemsetDetailsServerResponse,
     messages.ProblemsetDetailsResponse
   >('/api/problemset/details/', x => {
-    x.users = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        if (x.access_time)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        return x;
-      });
-    })(x.users);
+    if (x.users)
+      x.users = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          if (x.access_time)
+            x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+          return x;
+        });
+      })(x.users);
     return x;
   }),
   scoreboard: apiCall<

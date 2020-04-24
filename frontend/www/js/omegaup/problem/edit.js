@@ -20,44 +20,15 @@ OmegaUp.on('ready', function() {
       .tab('show');
   }
   const payload = JSON.parse(
-    document.getElementById('problem-payload').innerText,
+    document.getElementById('problem-edit-payload').innerText,
   );
-  let problemSettings = new Vue({
-    el: '#problem-settings',
-    render: function(createElement) {
-      return createElement('omegaup-problem-settings', {
-        props: {
-          timeLimit: this.timeLimit,
-          extraWallTime: this.extraWallTime,
-          memoryLimit: this.memoryLimit,
-          outputLimit: this.outputLimit,
-          inputLimit: this.inputLimit,
-          overallWallTimeLimit: this.overallWallTimeLimit,
-          validatorTimeLimit: this.validatorTimeLimit,
-          initialLanguage: this.languages,
-          validLanguages: this.validLanguages,
-          initialValidator: this.validator,
-          validatorTypes: this.validatorTypes,
-        },
-      });
-    },
-    data: {
-      timeLimit: 0,
-      extraWallTime: 0,
-      memoryLimit: 0,
-      outputLimit: 0,
-      inputLimit: 0,
-      overallWallTimeLimit: 0,
-      validatorTimeLimit: 0,
-      validLanguages: payload.validLanguages,
-      validatorTypes: payload.validatorTypes,
-      validator: '',
-      languages: '',
-    },
-    components: {
-      'omegaup-problem-settings': problem_Settings,
-    },
-  });
+
+  $('.page-header h1 span').html(
+    `${T.problemEditEditProblem} ${ui.escape(payload.title)}`,
+  );
+  $('.page-header h1 small').html(
+    `&ndash; <a href="/arena/problem/${payload.alias}/">${T.problemEditGoToProblem}</a>`,
+  );
 
   $('#sections').on('click', 'a', function(e) {
     e.preventDefault();
@@ -67,7 +38,6 @@ OmegaUp.on('ready', function() {
   });
 
   var problemAlias = $('#problem-alias').val();
-  refreshEditForm(problemAlias);
 
   // Add typeaheads
   refreshProblemAdmins();
@@ -450,90 +420,12 @@ OmegaUp.on('ready', function() {
   var markdownEditor = new Markdown.Editor(markdownConverter, '-statement'); // Global.
   markdownEditor.run();
 
-  function refreshEditForm(problemAlias) {
-    if (problemAlias === '') {
-      $('input[name=title]').val('');
-      $('input[name=time_limit]').val('');
-      $('input[name=validator_time_limit]').val('');
-      $('input[name=overall_wall_time_limit]').val('');
-      $('input[name=extra_wall_time]').val('');
-      $('input[name=memory_limit]').val('');
-      $('input[name=output_limit]').val('');
-      $('input[name=input_limit]').val('');
-      $('input[name=source]').val('');
-      return;
-    }
-
-    API.Problem.details({
-      problem_alias: problemAlias,
-      statement_type: 'markdown',
-    })
-      .then(problemCallback)
-      .catch(ui.apiError);
-  }
-
   function problemCallback(problem) {
-    $('.page-header h1 span').html(
-      `${T.problemEditEditProblem} ${ui.escape(problem.title)}`,
-    );
-    $('.page-header h1 small').html(
-      '&ndash; <a href="/arena/problem/' +
-        problemAlias +
-        '/">' +
-        T.problemEditGoToProblem +
-        '</a>',
-    );
-
     $('#statement-preview .title').html(ui.escape(problem.title));
-    problemSettings.languages = problem.languages.sort().join();
-    $('input[name=title]').val(problem.title);
-    problemSettings.timeLimit = time.parseDuration(
-      problem.settings.limits.TimeLimit,
-    );
-
-    if (
-      problem.settings.validator.custom_validator &&
-      problem.settings.validator.custom_validator.limits
-    ) {
-      problemSettings.validatorTimeLimit = time.parseDuration(
-        problem.settings.validator.custom_validator.limits.TimeLimit,
-      );
-    } else {
-      problemSettings.validatorTimeLimit = 0;
-    }
-    problemSettings.overallWallTimeLimit = time.parseDuration(
-      problem.settings.limits.OverallWallTimeLimit,
-    );
-    problemSettings.extraWallTime = time.parseDuration(
-      problem.settings.limits.ExtraWallTime,
-    );
-    problemSettings.memoryLimit = problem.settings.limits.MemoryLimit / 1024;
-    problemSettings.outputLimit = problem.settings.limits.OutputLimit;
-    problemSettings.inputLimit = problem.input_limit;
-    $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(ui.escape(problem.source));
     $('#statement-preview .problemsetter')
       .attr('href', '/profile/' + problem.problemsetter.username + '/')
       .html(ui.escape(problem.problemsetter.name));
-    $(
-      'input[name=email_clarifications][value=' +
-        (problem.email_clarifications ? '1' : '0') +
-        ']',
-    ).attr('checked', 1);
-    $(
-      'input[name=allow_user_add_tags][value=' +
-        (problem.allow_user_add_tags ? '1' : '0') +
-        ']',
-    ).attr('checked', 1);
-    problemSettings.validator = problem.settings.validator.name;
-    var visibility = Math.max(0, Math.min(2, problem.visibility));
-    $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
-    if (visibility != problem.visibility) {
-      // The problem is banned or promoted, so the user isn't allowed to
-      // make change visibility.
-      $('input[name=visibility]').attr('disabled', 1);
-    }
-    $('input[name=alias]').val(problemAlias);
 
     if (
       chosenLanguage == null ||
