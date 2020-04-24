@@ -1329,6 +1329,47 @@ class User extends \OmegaUp\Controllers\Controller {
         return $response;
     }
 
+    public static function getProfileProgress(
+        \OmegaUp\DAO\VO\Users $user
+    ): float {
+        if (is_null($user->main_identity_id)) {
+            return 0;
+        }
+
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        if (is_null($identity)) {
+            return 0;
+        }
+
+        $fields = [
+            'username' => !is_null($identity->username) ? 1 : 0,
+            'name' => !is_null($identity->name) ? 1 : 0,
+            'birth_date' => !is_null($user->birth_date) ? 1 : 0,
+            'gender' => !is_null($identity->gender) ? 1 : 0,
+            'scholar_degree' => !is_null($user->scholar_degree) ? 1 : 0,
+            'preferred_language' => !is_null($user->preferred_language) ? 1 : 0,
+            'verified' => $user->verified == '1' ? 1 : 0,
+        ];
+
+        $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
+            intval($user->user_id)
+        );
+        if (is_null($userDb)) {
+            return 0;
+        }
+
+        $fields['graduation_date'] = !is_null(
+            $userDb['graduation_date']
+        ) ? 1 : 0;
+        $fields['email'] = !is_null($userDb['email']) ? 1 : 0;
+        $fields['country_id'] = !is_null($userDb['country_id']) ? 1 : 0;
+        $fields['state_id'] = !is_null($userDb['state_id']) ? 1 : 0;
+        $fields['school_id'] = !is_null($userDb['school_id']) ? 1 : 0;
+        $fields['locale'] = !is_null($userDb['locale']) ? 1 : 0;
+
+        return array_sum($fields) / count($fields);
+    }
+
     /**
      * Get general user info
      *

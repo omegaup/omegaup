@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float|null, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  */
 class UITools {
     /** @var ?\Smarty */
@@ -244,6 +244,11 @@ class UITools {
                 $identity->username :
                 ''
             ),
+            'profileProgress' => !is_null(
+                $user
+            ) ? \OmegaUp\Controllers\User::getProfileProgress(
+                $user
+            ) : null,
             'isMainUserIdentity' => !is_null($user),
             'isAdmin' => $isAdmin,
             'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
