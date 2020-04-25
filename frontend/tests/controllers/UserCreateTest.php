@@ -37,7 +37,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
             $user
         );
-        $this->assertLessThan(.5, $profileProgress);
+        $this->assertLessThan(50, $profileProgress);
     }
 
     /**
