@@ -230,10 +230,7 @@
                   >
                     <font-awesome-icon v-bind:icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
-                    <div
-                      class="progress mt-2"
-                      v-if="profileProgress !== 0"
-                    >
+                    <div class="progress mt-2" v-if="profileProgress !== 0">
                       <div
                         class="progress-bar progress-bar-striped bg-info"
                         role="progressbar"
