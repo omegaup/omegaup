@@ -320,6 +320,7 @@ export namespace types {
     isReviewer: boolean;
     gravatarURL51: string;
     currentUsername: string;
+    profileProgress: number;
     isMainUserIdentity: boolean;
     isAdmin: boolean;
     lockDownImage: string;

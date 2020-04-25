@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
@@ -1364,7 +1364,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'school_id' => !is_null($profile['school_id']) ? 1 : 0,
             'locale' => !is_null($profile['locale']) ? 1 : 0,
         ];
-        return array_sum($fields) / count($fields);
+        return (array_sum($fields) / count($fields)) * 100;
     }
 
     /**
