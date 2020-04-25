@@ -46,9 +46,9 @@ export default class Notification extends Vue {
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
       case 'demotion':
         if (this.notification.contents.status == 'banned') {
-          return '/media/error.png';
+          return '/media/banned.svg';
         } else {
-          return '/media/alert.png';
+          return '/media/warning.svg';
         }
       default:
         return 'media/info.png';
