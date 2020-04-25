@@ -395,7 +395,7 @@ export default {
 
     addRole: api.User.addrole,
 
-    changePassword: api.User.changepassword,
+    changePassword: api.User.changePassword,
 
     contestStats: api.apiCall('/api/user/contestStats/', function(data) {
       let contests = [];
