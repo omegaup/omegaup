@@ -214,7 +214,6 @@
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
-  - [`/api/user/rankByProblemsSolved/`](#apiuserrankbyproblemssolved)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
@@ -4255,32 +4254,6 @@ Get general user info
 | `state_id`           | `string`                                                      |
 | `username`           | `string`                                                      |
 | `verified`           | `boolean`                                                     |
-
-## `/api/user/rankByProblemsSolved/`
-
-### Description
-
-If no username provided: Gets the top N users who have solved more problems
-If username provided: Gets rank for username provided
-
-### Parameters
-
-| Name         | Type          | Description |
-| ------------ | ------------- | ----------- |
-| `auth_token` | `null|string` |             |
-| `filter`     | `mixed`       |             |
-| `offset`     | `mixed`       |             |
-| `rowcount`   | `mixed`       |             |
-| `username`   | `mixed`       |             |
-
-### Returns
-
-| Name              | Type                                                                                                                                                            |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rank`            | `{ classname: string; country_id: string; name: string; problems_solved: number; ranking: number; score: number; user_id: number; username: string; }[]|number` |
-| `total`           | `number`                                                                                                                                                        |
-| `name`            | `string`                                                                                                                                                        |
-| `problems_solved` | `number`                                                                                                                                                        |
 
 ## `/api/user/removeExperiment/`
 
