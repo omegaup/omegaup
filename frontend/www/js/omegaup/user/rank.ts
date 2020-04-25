@@ -2,8 +2,6 @@ import users_Rank from '../components/user/Rank.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as api from '../api_transitional';
-import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload('payload');
