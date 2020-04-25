@@ -212,6 +212,14 @@ export namespace types {
       );
     }
 
+    export function ProblemAdminsPayload(
+      elementId: string,
+    ): types.ProblemAdminsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemEditPayload(
       elementId: string,
     ): types.ProblemEditPayload {
@@ -449,6 +457,17 @@ export namespace types {
     difficulty: number;
   }
 
+  export interface ProblemAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ProblemAdminsPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    group_admins: types.ProblemGroupAdmin[];
+  }
+
   export interface ProblemEditPayload {
     alias: string;
     allowUserAddTags: boolean;
@@ -493,6 +512,12 @@ export namespace types {
     validatorTypes: { [key: string]: null | string };
     visibility: number;
     visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ProblemListItem {
@@ -1696,8 +1721,8 @@ export namespace messages {
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
-    admins: { role: string; username: string }[];
-    group_admins: { alias: string; name: string; role: string }[];
+    admins: types.ProblemAdmin[];
+    group_admins: types.ProblemGroupAdmin[];
   };
   export type ProblemBestScoreRequest = { [key: string]: any };
   export type ProblemBestScoreResponse = { score: number };

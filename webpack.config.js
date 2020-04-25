@@ -59,6 +59,7 @@ let config = [
       course_submissions_list:
         './frontend/www/js/omegaup/course/submissions_list.js',
       group_list: './frontend/www/js/omegaup/group/list.js',
+      problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_edit_form: './frontend/www/js/omegaup/problem/edit.ts',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
