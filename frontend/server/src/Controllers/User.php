@@ -6,10 +6,12 @@ namespace OmegaUp\Controllers;
  *  UserController
  *
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int}
+ * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: int|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: int|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
- * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int}
+ * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  */
@@ -2386,71 +2388,13 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * If no username provided: Gets the top N users who have solved more problems
-     * If username provided: Gets rank for username provided
-     *
-     * @omegaup-request-param null|string $auth_token
-     * @omegaup-request-param mixed $filter
-     * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $rowcount
-     * @omegaup-request-param mixed $username
-     *
-     * @return array{rank: int|list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total?: int, name?: string, problems_solved?: int}
-     */
-    public static function apiRankByProblemsSolved(\OmegaUp\Request $r): array {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
-
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['filter'],
-            'filter',
-            ['', 'country', 'state', 'school']
-        );
-
-        $filter = is_null($r['filter']) ? '' : strval($r['filter']);
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
-
-        $identity = null;
-        if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['username'],
-                'username'
-            );
-            $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
-            return self::getFullRankByProblemsSolved(
-                $identity,
-                $filter,
-                $offset,
-                $rowCount
-            );
-        }
-
-        [
-            'identity' => $identity,
-        ] = \OmegaUp\Controllers\Session::getCurrentSession($r);
-        return self::getRankByProblemsSolved(
-            $identity,
-            $filter,
-            $offset,
-            $rowCount
-        );
-    }
-
-    /**
      * Get full rank by problems solved logic. It has its own func so it can be
      * accesed internally without authentication.
      *
-     * @return array{name: string, problems_solved: int, rank: int}
+     * @return UserRankInfo
      */
-    public static function getFullRankByProblemsSolved(
-        \OmegaUp\DAO\VO\Identities $identity,
-        string $filteredBy,
-        int $offset,
-        int $rowCount
+    public static function getUserRankInfo(
+        \OmegaUp\DAO\VO\Identities $identity
     ) {
         $response = [
             'rank' => 0,
@@ -2507,7 +2451,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Get rank by problems solved logic. It has its own func so it can be
      * accesed internally without authentication.
      *
-     * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
+     * @return UserRank
      */
     public static function getRankByProblemsSolved(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2524,7 +2468,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
             $rankCacheName,
             /**
-             * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
+             * @return UserRank
              */
             function () use (
                 $loggedIdentity,
@@ -3340,9 +3284,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $length
      * @omegaup-request-param mixed $page
      *
-     * @return array{smartyProperties: array{rankTablePayload: UserRankTablePayload}, template: string}
+     * @return array{smartyProperties: array{payload: UserRankTablePayload}, template: string}
      */
-    public static function getRankDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getRankForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3359,17 +3303,24 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'smartyProperties' => [
-                'rankTablePayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'filter' => $filter,
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
                     'isLogged' => false,
+                    'ranking' => self::getRankByProblemsSolved(
+                        $r->identity,
+                        $filter,
+                        $page,
+                        $length
+                    ),
                 ],
             ],
-            'template' => 'rank.tpl',
+            'template' => 'rank.users.tpl',
         ];
+
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3377,7 +3328,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return $response;
         }
 
-        $response['smartyProperties']['rankTablePayload']['isLogged'] = true;
+        $response['smartyProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance()->get(
@@ -3406,7 +3357,13 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
-        $response['smartyProperties']['rankTablePayload']['availableFilters'] = $availableFilters;
+        $response['smartyProperties']['payload']['availableFilters'] = $availableFilters;
+        $response['smartyProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
+            $r->identity,
+            $filter,
+            $page,
+            $length
+        );
         return $response;
     }
 
