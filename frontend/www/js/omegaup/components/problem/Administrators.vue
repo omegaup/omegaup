@@ -88,6 +88,7 @@
                       (ev, val) => (groupAlias = val.value),
                     )
                 "
+                v-model="groupAlias"
               ></omegaup-autocomplete>
             </label>
           </div>

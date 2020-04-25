@@ -12,6 +12,7 @@
                   (ev, val) => (groupName = val.value),
                 )
             "
+            v-model="groupName"
           ></omegaup-autocomplete>
         </div>
         <button class="btn btn-primary" type="submit">

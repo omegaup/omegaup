@@ -104,6 +104,7 @@
                       (ev, val) => (adminGroup = val.value),
                     )
                 "
+                v-model="adminGroup"
               ></omegaup-autocomplete>
             </div>
             <div class="form-group pull-right">
