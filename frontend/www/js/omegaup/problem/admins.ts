@@ -2,7 +2,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
-import problem_Admins from '../components/problem/Admins.vue';
+import problem_Admins from '../components/problem/Administrators.vue';
 import * as ui from '../ui';
 import * as api from '../api_transitional';
 
