@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
@@ -1366,7 +1366,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'school_id' => !is_null($profile['school_id']) ? 1 : 0,
             'locale' => !is_null($profile['locale']) ? 1 : 0,
         ];
-        return array_sum($fields) / count($fields);
+        return (array_sum($fields) / count($fields)) * 100;
     }
 
     /**

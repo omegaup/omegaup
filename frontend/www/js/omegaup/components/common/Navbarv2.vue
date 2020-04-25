@@ -230,6 +230,16 @@
                   >
                     <font-awesome-icon v-bind:icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
+                    <div class="progress mt-2" v-if="profileProgress !== 0">
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        v-bind:style="{ width: `${profileProgress}px` }"
+                        v-bind:aria-valuenow="profileProgress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
                   </a>
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
@@ -323,6 +333,7 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
+  @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: omegaup.Clarification[];
 
   clarifications: omegaup.Clarification[] = this.initialClarifications;

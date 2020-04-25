@@ -145,7 +145,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
             $user
         );
-        $this->assertEquals(1, $profileProgress);
+        $this->assertEquals(100.0, $profileProgress);
     }
 
     /**
