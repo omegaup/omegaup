@@ -43,7 +43,9 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             WHERE
                 c.alias = ?
             ORDER BY
-                a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
+                a.`assignment_id` ASC,
+                pp.`order` ASC,
+                `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
         /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: int}> $problemsAssignments */

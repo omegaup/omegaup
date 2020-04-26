@@ -1607,6 +1607,7 @@ API to Create an assignment
 | `description`        | `mixed` |             |
 | `finish_time`        | `mixed` |             |
 | `name`               | `mixed` |             |
+| `order`              | `mixed` |             |
 | `publish_time_delay` | `mixed` |             |
 | `start_time`         | `mixed` |             |
 | `unlimited_duration` | `mixed` |             |

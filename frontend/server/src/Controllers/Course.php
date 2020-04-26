@@ -660,6 +660,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $order
      * @omegaup-request-param mixed $publish_time_delay
      * @omegaup-request-param mixed $start_time
      * @omegaup-request-param mixed $unlimited_duration
@@ -675,6 +676,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
             'course_alias'
+        );
+        \OmegaUp\Validators::validateOptionalNumber(
+            $r['order'],
+            'order'
         );
         $course = self::validateCourseExists($r['course_alias']);
         self::validateCreateAssignment($r, $course);
@@ -693,6 +698,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_type' => $r['assignment_type'],
             'start_time' => $r['start_time'],
             'finish_time' => $r['finish_time'],
+            'order' => intval($r['order']),
         ]));
 
         return [
