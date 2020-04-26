@@ -97,13 +97,7 @@
                 v-bind:title="T.courseEditAddGroupAdminsTooltip"
               ></span>
               <omegaup-autocomplete
-                v-bind:init="
-                  el =>
-                    typeahead.groupTypeahead(
-                      el,
-                      (ev, val) => (adminGroup = val.value),
-                    )
-                "
+                v-bind:init="el => typeahead.groupTypeahead(el)"
                 v-model="adminGroup"
               ></omegaup-autocomplete>
             </div>

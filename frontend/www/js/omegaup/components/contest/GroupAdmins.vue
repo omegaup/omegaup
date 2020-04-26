@@ -5,13 +5,7 @@
         <div class="form-group">
           <label>{{ T.wordsGroupAdmin }}</label>
           <omegaup-autocomplete
-            v-bind:init="
-              el =>
-                typeahead.groupTypeahead(
-                  el,
-                  (ev, val) => (groupName = val.value),
-                )
-            "
+            v-bind:init="el => typeahead.groupTypeahead(el)"
             v-model="groupName"
           ></omegaup-autocomplete>
         </div>

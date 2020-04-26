@@ -81,13 +81,7 @@
               {{ T.wordsGroupAdmin }}
               <omegaup-autocomplete
                 class="form-control"
-                v-bind:init="
-                  el =>
-                    typeahead.groupTypeahead(
-                      el,
-                      (ev, val) => (groupAlias = val.value),
-                    )
-                "
+                v-bind:init="el => typeahead.groupTypeahead(el)"
                 v-model="groupAlias"
               ></omegaup-autocomplete>
             </label>

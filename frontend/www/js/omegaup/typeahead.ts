@@ -252,7 +252,7 @@ export function groupTypeahead(
 ): void {
   if (!cb) {
     cb = (event: Event, val: { label: string; value: string }) =>
-      $(<EventTarget>event.target).val(val.label);
+      $(<EventTarget>event.target).val(val.value);
   }
   typeahead<{ label: string; value: string }>(elem, api.Group.list, cb);
 }
