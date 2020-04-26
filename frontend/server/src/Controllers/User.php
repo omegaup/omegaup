@@ -1512,7 +1512,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
+     * @return array{within_last_day: bool, verified: bool, username: string, last_login: \OmegaUp\Timestamp|null}
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();

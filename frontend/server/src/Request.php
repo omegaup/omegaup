@@ -184,7 +184,7 @@ class Request extends \ArrayObject {
         string $key,
         ?int $lowerBound = null,
         ?int $upperBound = null
-    ): void {
+    ): \OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -199,7 +199,13 @@ class Request extends \ArrayObject {
             $lowerBound,
             $upperBound
         );
-        $this[$key] = intval($val);
+        if ($val instanceof \OmegaUp\Timestamp) {
+            $timestampVal = $val;
+        } else {
+            $timestampVal = new \OmegaUp\Timestamp(intval($val));
+        }
+        $this[$key] = $timestampVal;
+        return $timestampVal;
     }
 
     public function ensureOptionalTimestamp(
@@ -207,25 +213,17 @@ class Request extends \ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required
-    ): void {
+    ): ?\OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
             if (!$required) {
-                return;
+                return null;
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
         }
-        /** @var mixed */
-        $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateTimestampInRange(
-            $val,
-            $key,
-            $lowerBound,
-            $upperBound
-        );
-        $this[$key] = intval($val);
+        return $this->ensureTimestamp($key, $lowerBound, $upperBound);
     }
 
     /**

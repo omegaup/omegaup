@@ -126,16 +126,16 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
+     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: \OmegaUp\Timestamp|null}
      */
     public static function getExtraInformation(string $email): ?array {
         $sql = 'SELECT
-                  UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
+                  u.reset_sent_at,
                   u.verified,
                   IFNULL(i.username, "") AS `username`,
                   (
                     SELECT
-                      MAX(UNIX_TIMESTAMP(ill.time))
+                      MAX(ill.time)
                     FROM
                       Identity_Login_Log AS ill
                     WHERE
@@ -157,15 +157,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        /** @var array{last_login: int|null, reset_sent_at: int|null, username: string, verified: bool}|null */
+        /** @var array{last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }
         return [
-            'within_last_day' => (\OmegaUp\Time::get() - intval(
-                $rs['reset_sent_at']
-            )) < 60 * 60 * 24,
+            'within_last_day' => (
+                !is_null($rs['reset_sent_at']) &&
+                (
+                    \OmegaUp\Time::get() - intval($rs['reset_sent_at']->time)
+                ) < 60 * 60 * 24
+            ),
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username'],
             'last_login' => $rs['last_login'],

@@ -33,7 +33,7 @@ final class DAO {
      * Helper function to convert from internal timestamps to the format that
      * MySQL expects.
      *
-     * @param string|int|null $timestamp the POSIX timestamp.
+     * @param \OmegaUp\Timestamp|string|int|null $timestamp the POSIX timestamp.
      * @return string|null the timestamp in MySQL format.
      */
     final public static function toMySQLTimestamp($timestamp): ?string {
@@ -44,6 +44,9 @@ final class DAO {
         // format.
         if (is_string($timestamp)) {
             return $timestamp;
+        }
+        if ($timestamp instanceof \OmegaUp\Timestamp) {
+            $timestamp = $timestamp->time;
         }
         return gmdate('Y-m-d H:i:s', $timestamp);
     }

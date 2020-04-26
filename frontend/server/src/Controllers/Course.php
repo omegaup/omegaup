@@ -50,13 +50,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $assignment_type
      * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $start_time
      * @omegaup-request-param mixed $unlimited_duration
-     *
-     * @param \OmegaUp\DAO\VO\Courses $course
-     * @param \OmegaUp\DAO\VO\Assignments $assignment
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -64,7 +59,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Courses $course
     ): void {
-        $isRequired = true;
         $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $course->start_time
         );
@@ -72,53 +66,49 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->finish_time
         );
 
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['name'],
-            'name',
-            $isRequired
+            'name'
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+        \OmegaUp\Validators::validateStringNonEmpty(
             $r['description'],
-            'description',
-            $isRequired
+            'description'
         );
 
         $r->ensureBool('unlimited_duration', false);
-        $r->ensureOptionalTimestamp(
+        $startTime = $r->ensureTimestamp(
             'start_time',
             $courseStartTime,
-            $courseFinishTime,
-            $isRequired
+            $courseFinishTime
         );
-        $r->ensureOptionalTimestamp(
+        $finishTime = $r->ensureOptionalTimestamp(
             'finish_time',
             $courseStartTime,
             $courseFinishTime,
-            /* required */ (
+            /*$isRequired=*/(
                 !is_null($courseFinishTime) ||
                 !$r['unlimited_duration']
             )
         );
 
         if (
-            !is_null($r['finish_time']) &&
-            $r['start_time'] > $r['finish_time']
+            !is_null($finishTime) &&
+            $startTime->time > $finishTime->time
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
         }
 
-        \OmegaUp\Validators::validateOptionalInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['assignment_type'],
             'assignment_type',
-            ['test', 'homework'],
-            $isRequired
+            ['test', 'homework']
         );
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
             'alias',
-            $isRequired
+            /*$isRequired=*/true
         );
     }
 
@@ -415,12 +405,18 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => intval(
-                        $assignmentProblems['start_time']
-                    ) + $offset,
-                    'finish_time' => intval(
-                        $assignmentProblems['finish_time']
-                    ) + $offset,
+                    'start_time' => new \OmegaUp\Timestamp(
+                        $assignmentProblems['start_time']->time +
+                        $offset
+                    ),
+                    'finish_time' => (
+                        is_null($assignmentProblems['finish_time']) ?
+                        null :
+                        new \OmegaUp\Timestamp(
+                            $assignmentProblems['finish_time']->time +
+                            $offset
+                        )
+                    ),
                     'order' => $assignmentProblems['order'],
                     'max_points' => $assignmentProblems['max_points'],
                 ]));
@@ -743,22 +739,22 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $assignment->start_time;
         }
-        $r->ensureTimestamp(
+        $startTime = $r->ensureTimestamp(
             'start_time',
             $course->start_time,
             $course->finish_time
         );
+
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
         }
-
-        $r->ensureBool('unlimited_duration', false);
-
-        $r->ensureTimestamp(
+        $finishTime = $r->ensureTimestamp(
             'finish_time',
             $course->start_time,
             $course->finish_time
         );
+
+        $r->ensureBool('unlimited_duration', false);
 
         if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -766,17 +762,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (
-            !is_null($r['finish_time']) &&
-            $r['start_time'] > $r['finish_time']
-        ) {
+        if ($startTime->time > $finishTime->time) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
         }
 
         // Prevent date changes if a course already has runs
-        if ($r['start_time'] !== $assignment->start_time) {
+        if ($startTime->time !== $assignment->start_time) {
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 intval($assignment->problemset_id)
             );
@@ -1177,7 +1170,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: null|int, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}>}
+     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}>}
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -1224,7 +1217,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ) > 0;
             unset($assignment['problemset_id']);
             if (
-                $assignment['start_time'] > $time &&
+                $assignment['start_time']->time > $time &&
                 !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
             ) {
                 // Non-admins should not be able to see the assignments ahead
@@ -2599,7 +2592,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{events: list<array{username: string, ip: int, time: int, classname?: string, alias?: string}>}
+     * @return array{events: list<array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
      */
     public static function apiActivityReport(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3189,7 +3182,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $token
      *
-     * @return array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: int, title: string}
+     * @return array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: \OmegaUp\Timestamp, title: string}
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3214,7 +3207,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         $group = self::resolveGroup($tokenAuthenticationResult['course']);
 
         if (!$tokenAuthenticationResult['hasToken']) {
-            $r->ensureIdentity();
             if (
                 !\OmegaUp\Authorization::canViewCourse(
                     $r->identity,

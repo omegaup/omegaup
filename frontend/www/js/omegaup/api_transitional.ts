@@ -175,8 +175,20 @@ export const Clarification = {
 export const Contest = {
   activityReport: apiCall<
     messages.ContestActivityReportRequest,
+    messages._ContestActivityReportServerResponse,
     messages.ContestActivityReportResponse
-  >('/api/contest/activityReport/'),
+  >('/api/contest/activityReport/', x => {
+    x.events = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.events);
+    return x;
+  }),
   addAdmin: apiCall<
     messages.ContestAddAdminRequest,
     messages.ContestAddAdminResponse
@@ -363,8 +375,12 @@ export const Contest = {
   >('/api/contest/removeUser/'),
   report: apiCall<
     messages.ContestReportRequest,
+    messages._ContestReportServerResponse,
     messages.ContestReportResponse
-  >('/api/contest/report/'),
+  >('/api/contest/report/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   requests: apiCall<
     messages.ContestRequestsRequest,
     messages._ContestRequestsServerResponse,
@@ -408,8 +424,12 @@ export const Contest = {
   >('/api/contest/runsDiff/'),
   scoreboard: apiCall<
     messages.ContestScoreboardRequest,
+    messages._ContestScoreboardServerResponse,
     messages.ContestScoreboardResponse
-  >('/api/contest/scoreboard/'),
+  >('/api/contest/scoreboard/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   scoreboardEvents: apiCall<
     messages.ContestScoreboardEventsRequest,
     messages.ContestScoreboardEventsResponse
@@ -422,9 +442,15 @@ export const Contest = {
     messages.ContestSetRecommendedRequest,
     messages.ContestSetRecommendedResponse
   >('/api/contest/setRecommended/'),
-  stats: apiCall<messages.ContestStatsRequest, messages.ContestStatsResponse>(
-    '/api/contest/stats/',
-  ),
+  stats: apiCall<
+    messages.ContestStatsRequest,
+    messages._ContestStatsServerResponse,
+    messages.ContestStatsResponse
+  >('/api/contest/stats/', x => {
+    if (x.max_wait_time)
+      x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time);
+    return x;
+  }),
   update: apiCall<
     messages.ContestUpdateRequest,
     messages.ContestUpdateResponse
@@ -433,16 +459,44 @@ export const Contest = {
     messages.ContestUpdateEndTimeForIdentityRequest,
     messages.ContestUpdateEndTimeForIdentityResponse
   >('/api/contest/updateEndTimeForIdentity/'),
-  users: apiCall<messages.ContestUsersRequest, messages.ContestUsersResponse>(
-    '/api/contest/users/',
-  ),
+  users: apiCall<
+    messages.ContestUsersRequest,
+    messages._ContestUsersServerResponse,
+    messages.ContestUsersResponse
+  >('/api/contest/users/', x => {
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.access_time)
+          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+        if (x.end_time)
+          x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+        return x;
+      });
+    })(x.users);
+    return x;
+  }),
 };
 
 export const Course = {
   activityReport: apiCall<
     messages.CourseActivityReportRequest,
+    messages._CourseActivityReportServerResponse,
     messages.CourseActivityReportResponse
-  >('/api/course/activityReport/'),
+  >('/api/course/activityReport/', x => {
+    x.events = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.events);
+    return x;
+  }),
   addAdmin: apiCall<
     messages.CourseAddAdminRequest,
     messages.CourseAddAdminResponse
@@ -476,8 +530,12 @@ export const Course = {
   >('/api/course/assignmentDetails/'),
   assignmentScoreboard: apiCall<
     messages.CourseAssignmentScoreboardRequest,
+    messages._CourseAssignmentScoreboardServerResponse,
     messages.CourseAssignmentScoreboardResponse
-  >('/api/course/assignmentScoreboard/'),
+  >('/api/course/assignmentScoreboard/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   assignmentScoreboardEvents: apiCall<
     messages.CourseAssignmentScoreboardEventsRequest,
     messages.CourseAssignmentScoreboardEventsResponse
@@ -506,8 +564,22 @@ export const Course = {
   >('/api/course/introDetails/'),
   listAssignments: apiCall<
     messages.CourseListAssignmentsRequest,
+    messages._CourseListAssignmentsServerResponse,
     messages.CourseListAssignmentsResponse
-  >('/api/course/listAssignments/'),
+  >('/api/course/listAssignments/', x => {
+    x.assignments = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.assignments);
+    return x;
+  }),
   listCourses: apiCall<
     messages.CourseListCoursesRequest,
     messages.CourseListCoursesResponse
@@ -649,9 +721,22 @@ export const Group = {
   members: apiCall<messages.GroupMembersRequest, messages.GroupMembersResponse>(
     '/api/group/members/',
   ),
-  myList: apiCall<messages.GroupMyListRequest, messages.GroupMyListResponse>(
-    '/api/group/myList/',
-  ),
+  myList: apiCall<
+    messages.GroupMyListRequest,
+    messages._GroupMyListServerResponse,
+    messages.GroupMyListResponse
+  >('/api/group/myList/', x => {
+    x.groups = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+        return x;
+      });
+    })(x.groups);
+    return x;
+  }),
   removeUser: apiCall<
     messages.GroupRemoveUserRequest,
     messages.GroupRemoveUserResponse
@@ -815,6 +900,16 @@ export const Problem = {
           return x;
         });
       })(x.runs);
+    if (x.solvers)
+      x.solvers = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        });
+      })(x.solvers);
     return x;
   }),
   list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
@@ -920,8 +1015,12 @@ export const Problemset = {
   }),
   scoreboard: apiCall<
     messages.ProblemsetScoreboardRequest,
+    messages._ProblemsetScoreboardServerResponse,
     messages.ProblemsetScoreboardResponse
-  >('/api/problemset/scoreboard/'),
+  >('/api/problemset/scoreboard/', x => {
+    if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   scoreboardEvents: apiCall<
     messages.ProblemsetScoreboardEventsRequest,
     messages.ProblemsetScoreboardEventsResponse
@@ -935,20 +1034,96 @@ export const QualityNomination = {
   >('/api/qualityNomination/create/'),
   details: apiCall<
     messages.QualityNominationDetailsRequest,
+    messages._QualityNominationDetailsServerResponse,
     messages.QualityNominationDetailsResponse
-  >('/api/qualityNomination/details/'),
+  >('/api/qualityNomination/details/', x => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.votes = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.votes);
+    return x;
+  }),
   list: apiCall<
     messages.QualityNominationListRequest,
+    messages._QualityNominationListServerResponse,
     messages.QualityNominationListResponse
-  >('/api/qualityNomination/list/'),
+  >('/api/qualityNomination/list/', x => {
+    x.nominations = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.votes = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.votes);
+        return x;
+      });
+    })(x.nominations);
+    return x;
+  }),
   myAssignedList: apiCall<
     messages.QualityNominationMyAssignedListRequest,
+    messages._QualityNominationMyAssignedListServerResponse,
     messages.QualityNominationMyAssignedListResponse
-  >('/api/qualityNomination/myAssignedList/'),
+  >('/api/qualityNomination/myAssignedList/', x => {
+    x.nominations = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.votes = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.votes);
+        return x;
+      });
+    })(x.nominations);
+    return x;
+  }),
   myList: apiCall<
     messages.QualityNominationMyListRequest,
+    messages._QualityNominationMyListServerResponse,
     messages.QualityNominationMyListResponse
-  >('/api/qualityNomination/myList/'),
+  >('/api/qualityNomination/myList/', x => {
+    x.nominations = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.votes = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.votes);
+        return x;
+      });
+    })(x.nominations);
+    return x;
+  }),
   resolve: apiCall<
     messages.QualityNominationResolveRequest,
     messages.QualityNominationResolveResponse
@@ -1059,8 +1234,20 @@ export const Session = {
 export const Submission = {
   latestSubmissions: apiCall<
     messages.SubmissionLatestSubmissionsRequest,
+    messages._SubmissionLatestSubmissionsServerResponse,
     messages.SubmissionLatestSubmissionsResponse
-  >('/api/submission/latestSubmissions/'),
+  >('/api/submission/latestSubmissions/', x => {
+    x.submissions = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.submissions);
+    return x;
+  }),
 };
 
 export const Tag = {
@@ -1142,8 +1329,13 @@ export const User = {
   ),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
+    messages._UserExtraInformationServerResponse,
     messages.UserExtraInformationResponse
-  >('/api/user/extraInformation/'),
+  >('/api/user/extraInformation/', x => {
+    if (x.last_login)
+      x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
+    return x;
+  }),
   generateGitToken: apiCall<
     messages.UserGenerateGitTokenRequest,
     messages.UserGenerateGitTokenResponse

@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int|null, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
+     * @return array<string, array{name: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -24,8 +24,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.name,
                 a.alias AS assignment_alias,
                 a.description,
-                UNIX_TIMESTAMP(a.start_time) AS start_time,
-                UNIX_TIMESTAMP(a.finish_time) AS finish_time,
+                a.start_time,
+                a.finish_time,
                 a.assignment_type,
                 a.order,
                 a.max_points,
@@ -48,7 +48,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: int}> $problemsAssignments */
+        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}> $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $val
@@ -285,7 +285,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         \OmegaUp\DAO\VO\Users $user,
         string $updatePublished
     ): void {
-        $now = \OmegaUp\Time::get();
+        $now = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         if ($updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '
@@ -306,7 +306,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 SET
                     pp.commit = ?, pp.version = ?
                 WHERE
-                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    c.finish_time >= ? AND
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
@@ -336,7 +336,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 SET
                     pp.commit = ?, pp.version = ?
                 WHERE
-                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    a.finish_time >= ? AND
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
@@ -364,7 +364,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ON
                     c.contest_id = p.contest_id
                 WHERE
-                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    c.finish_time >= ? AND
                     pp.problem_id = ?;
             ';
             /** @var list<array{acl_id: int, problemset_id: int}> */
@@ -390,7 +390,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ON
                     a.assignment_id = p.assignment_id
                 WHERE
-                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    a.finish_time >= ? AND
                     pp.problem_id = ?;
             ';
             /** @var list<array{acl_id: int, problemset_id: int}> */
