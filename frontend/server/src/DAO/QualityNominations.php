@@ -136,7 +136,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * assigned reviewers.
      *
      * @param int $qualitynomination_id
-     * @return list<array{time: int|null, vote: int, user: array{username: string, name: string|null}}>
+     * @return list<array{time: \OmegaUp\Timestamp|null, vote: int, user: array{username: string, name: string|null}}>
      */
     private static function getVotesForNomination(int $qualitynomination_id) {
         $sql = '
@@ -144,7 +144,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             i.username,
             i.name,
             IFNULL(qnc.vote, 0) AS vote,
-            UNIX_TIMESTAMP(qnc.time) AS time
+            qnc.`time`
         FROM
             QualityNomination_Reviewers qnr
         LEFT JOIN
@@ -175,7 +175,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $votes = [];
 
-        /** @var array{name: null|string, time: int|null, username: string, vote: int} $vote */
+        /** @var array{name: null|string, time: \OmegaUp\Timestamp|null, username: string, vote: int} $vote */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -198,15 +198,13 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * Gets additional details for $nomination and structures it as an object
      * instead of as a flat array.
      *
-     * @param null|array{qualitynomination_id: int, nomination: string, contents?: string, time: int, status: string, nominator_username: string, nominator_name: null|string, alias: string, title: string, author_username: string, author_name: null|string} $nomination
-     * @return array{qualitynomination_id: int, nomination: string, contents?: array{statements?: array<string, string>, rationale?: string, reason?: string, before_ac?: bool, quality?: int, tags?: list<string>, difficulty?: int}, time: int, status: string, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}, votes: list<array{time: int|null, vote: int, user: array{username: string, name: null|string}}>}|null
+     * @param null|array{qualitynomination_id: int, nomination: string, contents?: string, time: \OmegaUp\Timestamp, status: string, nominator_username: string, nominator_name: null|string, alias: string, title: string, author_username: string, author_name: null|string} $nomination
+     * @return array{qualitynomination_id: int, nomination: string, contents?: array{statements?: array<string, string>, rationale?: string, reason?: string, before_ac?: bool, quality?: int, tags?: list<string>, difficulty?: int}, time: \OmegaUp\Timestamp, status: string, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}, votes: list<array{time: \OmegaUp\Timestamp|null, vote: int, user: array{username: string, name: null|string}}>}|null
      */
     private static function processNomination($nomination) {
         if (is_null($nomination) || empty($nomination)) {
             return null;
         }
-
-        $nomination['time'] = intval($nomination['time']);
 
         $nomination['nominator'] = [
             'username' => $nomination['nominator_username'],
@@ -256,17 +254,17 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      *
      * @param list<string> $types
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
      */
     public static function getNominations(
         ?int $nominatorUserId,
         ?int $asigneeUserId,
         int $page,
         int $rowcount,
-        array $types = ['demotion', 'promotion']
+        array $types = ['demotion', 'promotion'],
+        string $status = 'all'
     ): array {
         $offset = ($page - 1) * $rowcount;
-
         $sqlFrom = '
             FROM
                 QualityNominations qn
@@ -293,14 +291,15 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             SELECT
                 qn.qualitynomination_id,
                 qn.nomination,
-                UNIX_TIMESTAMP(qn.time) as time,
+                qn.`time`,
                 qn.status,
                 nominatorIdentity.username as nominator_username,
                 nominatorIdentity.name as nominator_name,
                 p.alias,
                 p.title,
                 authorIdentity.username as author_username,
-                authorIdentity.name as author_name
+                authorIdentity.name as author_name,
+                qn.contents
         ';
 
         $params = [];
@@ -341,7 +340,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
-        $sqlOrder = ' ORDER BY qn.qualitynomination_id';
+        if ($status != 'all') {
+            $sqlFrom .= " AND qn.status = '{$status}'";
+        }
+
+        // TODO(#3696): Change to ASC once duplicates are removed.
+        $sqlOrder = ' ORDER BY p.alias ASC, qn.qualitynomination_id DESC';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */
@@ -354,7 +358,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params[] = $rowcount;
 
         $nominations = [];
-        /** @var array{alias: string, author_name: null|string, author_username: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string} $nomination */
+        /** @var array{alias: string, author_name: null|string, author_username: string, contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, title: string} $nomination */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 "${sql}{$sqlFrom}{$sqlOrder}{$sqlLimit}",
@@ -373,7 +377,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Gets a single nomination by ID.
      *
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null
      */
     public static function getById(int $qualitynomination_id) {
         $sql = '
@@ -381,7 +385,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             qn.qualitynomination_id,
             qn.nomination,
             qn.contents,
-            UNIX_TIMESTAMP(qn.time) as time,
+            qn.`time`,
             qn.status,
             nominatorIdentity.username as nominator_username,
             nominatorIdentity.name as nominator_name,
@@ -418,7 +422,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         WHERE
             qn.qualitynomination_id = ?;';
 
-        /** @var array{alias: string, author_name: null|string, author_username: string, contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: int, title: string}|null $result */
+        /** @var array{alias: string, author_name: null|string, author_username: string, contents: string, nomination: string, nominator_name: null|string, nominator_username: string, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, title: string}|null $result */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$qualitynomination_id]

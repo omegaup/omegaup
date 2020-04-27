@@ -379,13 +379,16 @@ class Validators {
         if (!self::isPresent($parameter, $parameterName, true)) {
             return;
         }
-        if (!is_numeric($parameter)) {
+        if (is_numeric($parameter)) {
+            $parameter = intval($parameter);
+        } elseif ($parameter instanceof \OmegaUp\Timestamp) {
+            $parameter = $parameter->time;
+        } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotADate',
                 $parameterName
             );
         }
-        $parameter = intval($parameter);
         if (!is_null($lowerBound) && $parameter < $lowerBound) {
             $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooSmall',

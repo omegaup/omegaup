@@ -5,11 +5,13 @@ namespace OmegaUp;
 class ProblemParams {
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
-    const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
-    const VISIBILITY_PUBLIC_BANNED = -1; // Problem that was public before it was banned
+    const VISIBILITY_PRIVATE_BANNED = -3; // Problem that was private before it was banned
+    const VISIBILITY_PUBLIC_BANNED = -2; // Problem that was public before it was banned
+    const VISIBILITY_PRIVATE_WARNING = -1; // Problem that was private before it was warning
     const VISIBILITY_PRIVATE = 0;
-    const VISIBILITY_PUBLIC = 1;
-    const VISIBILITY_PROMOTED = 2;
+    const VISIBILITY_PUBLIC_WARNING = 1; // Problem that was public before it was warning
+    const VISIBILITY_PUBLIC = 2;
+    const VISIBILITY_PROMOTED = 3;
 
     // Do not update the published branch.
     const UPDATE_PUBLISHED_NONE = 'none';
@@ -162,6 +164,8 @@ class ProblemParams {
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
             \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
         ] : [
             \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,

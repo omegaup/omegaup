@@ -157,6 +157,8 @@ class MySQLConnection {
         for ($i = 0; $i < count($params); ++$i) {
             if (is_null($params[$i])) {
                 $chunks[] = 'NULL';
+            } elseif ($params[$i] instanceof \OmegaUp\Timestamp) {
+                $chunks[] = "FROM_UNIXTIME({$params[$i]->time})";
             } elseif (is_int($params[$i]) || is_float($params[$i])) {
                 $chunks[] = $params[$i];
             } elseif (is_bool($params[$i])) {

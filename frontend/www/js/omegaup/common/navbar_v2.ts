@@ -23,6 +23,7 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: payload.isMainUserIdentity,
           lockDownImage: payload.lockDownImage,
           navbarSection: payload.navbarSection,
+          profileProgress: payload.profileProgress,
           notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,

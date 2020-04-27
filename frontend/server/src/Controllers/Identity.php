@@ -690,11 +690,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $response['rankinfo'] = [];
         } else {
             $response['rankinfo'] =
-                \OmegaUp\Controllers\User::getFullRankByProblemsSolved(
-                    $identity,
-                    '',
-                    1,
-                    100
+                \OmegaUp\Controllers\User::getUserRankInfo(
+                    $identity
                 );
         }
 

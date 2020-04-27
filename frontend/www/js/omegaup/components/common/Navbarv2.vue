@@ -224,11 +224,22 @@
                 <template v-show="!omegaUpLockDown && !inContest">
                   <a
                     class="dropdown-item"
+                    data-nav-profile
                     href="/profile/"
                     v-show="!omegaUpLockDown && !inContest"
                   >
                     <font-awesome-icon v-bind:icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
+                    <div class="progress mt-2" v-if="profileProgress !== 0">
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        v-bind:style="{ width: `${profileProgress}%` }"
+                        v-bind:aria-valuenow="profileProgress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
                   </a>
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
@@ -254,6 +265,7 @@
                   {{ T.navLogOut }}
                 </a>
                 <omegaup-common-grader-status
+                  v-show="isAdmin"
                   v-bind:status="errorMessage !== null ? 'down' : 'ok'"
                   v-bind:error="errorMessage"
                   v-bind:graderInfo="graderInfo"
@@ -273,8 +285,7 @@ nav.navbar {
   background-color: $header-primary-color;
 
   .navbar-brand {
-    background-color: $white;
-    background-image: linear-gradient(to bottom, $white 0, #ddd 100%);
+    background-color: #f2f2f2;
   }
 
   a.dropdown-item {
@@ -322,6 +333,7 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
+  @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: omegaup.Clarification[];
 
   clarifications: omegaup.Clarification[] = this.initialClarifications;

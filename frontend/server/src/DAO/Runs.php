@@ -16,14 +16,14 @@ namespace OmegaUp\DAO;
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
-     * @return list<array{username: string, language: string, runtime: float, memory: float, time: int}>
+     * @return list<array{username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId
     ): array {
         $sql = '
             SELECT
-                i.username, s.language, r.runtime, r.memory, UNIX_TIMESTAMP(s.time) time
+                i.username, s.language, r.runtime, r.memory, s.`time`
             FROM
                 (SELECT
                     MIN(s.submission_id) submission_id, s.identity_id, r.runtime
@@ -63,7 +63,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
-        /** @var list<array{language: string, memory: int, runtime: int, time: int, username: string}> */
+        /** @var list<array{language: string, memory: int, runtime: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -103,7 +103,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>
      */
     final public static function getAllRuns(
         ?int $problemset_id,
@@ -117,10 +117,44 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.run_id, s.guid, s.language, r.status, r.verdict, r.runtime,
-                r.penalty, r.memory, r.score, r.contest_score, r.judged_by,
-                s.`time`, s.submit_delay, s.type, i.username, p.alias,
-                i.country_id, c.alias AS contest_alias
+                `r`.`run_id`,
+                `s`.`guid`,
+                `s`.`language`,
+                `r`.`status`,
+                `r`.`verdict`,
+                `r`.`runtime`,
+                `r`.`penalty`,
+                `r`.`memory`,
+                `r`.`score`,
+                `r`.`contest_score`,
+                `r`.`judged_by`,
+                `s`.`time`,
+                `s`.`submit_delay`,
+                `s`.`type`,
+                `i`.`username`,
+                `p`.`alias`,
+                `i`.`country_id`,
+                `c`.`alias` AS `contest_alias`,
+                IFNULL(
+                    (
+                        SELECT `urc`.`classname` FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.`user_id` = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
             FROM
                 Submissions s
             USE INDEX(PRIMARY)
@@ -174,7 +208,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -298,14 +332,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets the largest queued time of a run in seconds.
      *
-     * @return array{guid: string, time: int}|null
+     * @return array{guid: string, time: \OmegaUp\Timestamp}|null
      */
     final public static function getLargestWaitTimeOfProblemset(
         int $problemsetId
     ) {
         $sql = '
             SELECT
-                s.guid, UNIX_TIMESTAMP(s.time) AS time
+                s.guid, s.`time`
             FROM
                 Submissions s
             INNER JOIN
@@ -320,7 +354,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
         $val = [$problemsetId];
 
-        /** @var array{guid: string, time: int}|null */
+        /** @var array{guid: string, time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $val);
         if (empty($row)) {
             return null;
@@ -550,7 +584,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: int, submit_delay: int, guid: string}>
+     * @return list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}>
      */
     final public static function getProblemsetRuns(
         \OmegaUp\DAO\VO\Problemsets $problemset,
@@ -564,7 +598,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problem_id,
                 s.identity_id,
                 s.type,
-                UNIX_TIMESTAMP(s.time) AS time,
+                s.`time`,
                 s.submit_delay,
                 s.guid
             FROM
@@ -588,7 +622,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ) .
             ' ORDER BY s.submission_id;';
 
-        /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: int, type: null|string}> */
+        /** @var list<array{contest_score: float|null, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemset->problemset_id]
@@ -773,7 +807,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             );
         }
 
-        return \OmegaUp\Time::get() >= ($lastRunTime + $submissionGap);
+        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
     }
 
     /**

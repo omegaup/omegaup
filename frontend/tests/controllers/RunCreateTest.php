@@ -1004,12 +1004,12 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $acRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertTrue(array_key_exists('details', $response));
+        $this->assertFalse(array_key_exists('details', $response));
         $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $waRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertTrue(array_key_exists('details', $response));
+        $this->assertFalse(array_key_exists('details', $response));
 
         // But having solved a problem does not grant permission to view
         // details to runs that the user would otherwise not had permission to

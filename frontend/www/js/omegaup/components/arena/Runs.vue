@@ -159,7 +159,14 @@
             <tt>{{ run.guid.substring(0, 8) }}</tt>
           </acronym>
         </td>
-        <td v-if="showUser">{{ run.username }}</td>
+        <td v-if="showUser">
+          <omegaup-user-username
+            v-bind:classname="run.classname"
+            v-bind:username="run.username"
+            v-bind:country="run.country_id"
+            v-bind:linkify="true"
+          ></omegaup-user-username>
+        </td>
         <td v-if="showContest">
           <a
             v-bind:href="
@@ -227,6 +234,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as typeahead from '../../typeahead';
+import user_Username from '../user/Username.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -239,6 +247,7 @@ declare global {
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Runs extends Vue {
