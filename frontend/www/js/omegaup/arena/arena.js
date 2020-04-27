@@ -980,7 +980,7 @@ export class Arena {
     if (self.elements.rankingTable) {
       self.elements.rankingTable.ranking = ranking;
       if (data.time) {
-        self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+        self.elements.rankingTable.lastUpdated = data.time;
       }
     }
 

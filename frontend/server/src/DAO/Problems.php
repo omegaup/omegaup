@@ -407,10 +407,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         );
     }
 
-    final public static function getPracticeDeadline(int $problemId): int {
+    final public static function getPracticeDeadline(int $problemId): ?\OmegaUp\Timestamp {
         $sql = '
             SELECT
-                IFNULL(UNIX_TIMESTAMP(MAX(finish_time)), 0)
+                MAX(finish_time)
             FROM
                 Contests c
             INNER JOIN
@@ -418,7 +418,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             WHERE
                 pp.problem_id = ?;
         ';
-        /** @var int */
+        /** @var \OmegaUp\Timestamp|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$problemId]

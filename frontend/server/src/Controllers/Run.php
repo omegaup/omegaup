@@ -181,14 +181,18 @@ class Run extends \OmegaUp\Controllers\Controller {
         } else {
             // Check for practice or public problem, there is no contest info
             // in this scenario.
+            $practiceDeadline = \OmegaUp\DAO\Problems::getPracticeDeadline(
+                $problem->problem_id
+            );
             if (
                 \OmegaUp\DAO\Problems::isVisible($problem) ||
                 \OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
                     $problem
                 ) ||
-                \OmegaUp\Time::get() > \OmegaUp\DAO\Problems::getPracticeDeadline(
-                    $problem->problem_id
+                (
+                    is_null($practiceDeadline) ||
+                    \OmegaUp\Time::get() > $practiceDeadline->time
                 )
             ) {
                 if (

@@ -440,9 +440,9 @@ Returns a report with all user activity for a contest.
 
 ### Returns
 
-| Name     | Type                                                                                    |
-| -------- | --------------------------------------------------------------------------------------- |
-| `events` | `{ username: string; ip: number; time: number; classname?: string; alias?: string; }[]` |
+| Name     | Type                                                                                  |
+| -------- | ------------------------------------------------------------------------------------- |
+| `events` | `{ username: string; ip: number; time: Date; classname?: string; alias?: string; }[]` |
 
 ## `/api/contest/addAdmin/`
 
@@ -1055,7 +1055,7 @@ Returns a detailed report of the contest
 | `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
 | `start_time`  | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `time`        | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ## `/api/contest/requests/`
@@ -1161,7 +1161,7 @@ Returns the Scoreboard
 | `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
 | `start_time`  | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `time`        | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ## `/api/contest/scoreboardEvents/`
@@ -1239,7 +1239,7 @@ Stats of a contest
 | -------------------- | ---------------------------- |
 | `total_runs`         | `number`                     |
 | `pending_runs`       | `string[]`                   |
-| `max_wait_time`      | `number`                     |
+| `max_wait_time`      | `Date`                       |
 | `max_wait_time_guid` | `string`                     |
 | `verdict_counts`     | `{ [key: string]: number; }` |
 | `distribution`       | `{ [key: number]: number; }` |
@@ -1310,10 +1310,10 @@ Returns ALL identities participating in a contest
 
 ### Returns
 
-| Name     | Type                                                                                                   |
-| -------- | ------------------------------------------------------------------------------------------------------ |
-| `users`  | `{ access_time: number; country_id: string; end_time: number; is_owner: number; username: string; }[]` |
-| `groups` | `{ alias: string; name: string; }[]`                                                                   |
+| Name     | Type                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------- |
+| `users`  | `{ access_time: Date; country_id: string; end_time: Date; is_owner: number; username: string; }[]` |
+| `groups` | `{ alias: string; name: string; }[]`                                                               |
 
 # Course
 
@@ -1333,9 +1333,9 @@ Returns a report with all user activity for a course.
 
 ### Returns
 
-| Name     | Type                                                                                    |
-| -------- | --------------------------------------------------------------------------------------- |
-| `events` | `{ username: string; ip: number; time: number; classname?: string; alias?: string; }[]` |
+| Name     | Type                                                                                  |
+| -------- | ------------------------------------------------------------------------------------- |
+| `events` | `{ username: string; ip: number; time: Date; classname?: string; alias?: string; }[]` |
 
 ## `/api/course/addAdmin/`
 
@@ -1522,7 +1522,7 @@ Gets Scoreboard for an assignment
 | `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
 | `start_time`  | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `time`        | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ## `/api/course/assignmentScoreboardEvents/`
@@ -1688,9 +1688,9 @@ List course assignments
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `assignments` | `{ alias: string; assignment_type: string; description: string; finish_time: number; has_runs: boolean; name: string; order: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: number; }[]` |
+| Name          | Type                                                                                                                                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assignments` | `{ alias: string; assignment_type: string; description: string; finish_time: Date; has_runs: boolean; name: string; order: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; }[]` |
 
 ## `/api/course/listCourses/`
 
@@ -2154,9 +2154,9 @@ Returns a list of groups by owner
 
 ### Returns
 
-| Name     | Type                                                                           |
-| -------- | ------------------------------------------------------------------------------ |
-| `groups` | `{ alias: string; create_time: number; description: string; name: string; }[]` |
+| Name     | Type                                                                         |
+| -------- | ---------------------------------------------------------------------------- |
+| `groups` | `{ alias: string; create_time: Date; description: string; name: string; }[]` |
 
 ## `/api/group/removeUser/`
 
@@ -2676,7 +2676,7 @@ Entry point for Problem Details API
 | `runs`                 | `{ alias: string; contest_score: number; guid: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; username: string; verdict: string; }[]` |
 | `score`                | `number`                                                                                                                                                                                                                            |
 | `settings`             | `{ cases: { [key: string]: { in: string; out: string; weight?: number; }; }; limits: { MemoryLimit: number|string; OverallWallTimeLimit: string; TimeLimit: string; }; validator?: { name: string; tolerance?: number; }; }`        |
-| `solvers`              | `{ language: string; memory: number; runtime: number; time: number; username: string; }[]`                                                                                                                                          |
+| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]`                                                                                                                                            |
 | `source`               | `string`                                                                                                                                                                                                                            |
 | `statement`            | `{ images: { [key: string]: string; }; language: string; markdown: string; }`                                                                                                                                                       |
 | `submissions`          | `number`                                                                                                                                                                                                                            |
@@ -3289,8 +3289,8 @@ nominator or a member of the reviewer group.
 | `problem`              | `{ alias: string; title: string; }`                                                                                                                                            |
 | `qualitynomination_id` | `number`                                                                                                                                                                       |
 | `reviewer`             | `boolean`                                                                                                                                                                      |
-| `time`                 | `number`                                                                                                                                                                       |
-| `votes`                | `{ time: number; user: { name: string; username: string; }; vote: number; }[]`                                                                                                 |
+| `time`                 | `Date`                                                                                                                                                                         |
+| `votes`                | `{ time: Date; user: { name: string; username: string; }; vote: number; }[]`                                                                                                   |
 
 ## `/api/qualityNomination/list/`
 
@@ -3306,10 +3306,10 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: number; votes: { time: number; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
+| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3326,9 +3326,9 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: number; votes: { time: number; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
 
 ## `/api/qualityNomination/myList/`
 
@@ -3343,10 +3343,10 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: number; votes: { time: number; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
+| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ## `/api/qualityNomination/resolve/`
 
@@ -3801,10 +3801,10 @@ Returns the latest submissions
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                              |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `submissions` | `{ time: number; username: string; school_id: number; school_name: string; alias: string; title: string; language: string; verdict: string; runtime: number; memory: number; }[]` |
-| `totalRows`   | `number`                                                                                                                                                                          |
+| Name          | Type                                                                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `submissions` | `{ time: Date; username: string; school_id: number; school_name: string; alias: string; title: string; language: string; verdict: string; runtime: number; memory: number; }[]` |
+| `totalRows`   | `number`                                                                                                                                                                        |
 
 # Tag
 
@@ -4051,7 +4051,7 @@ Gets extra information of the identity:
 | `within_last_day` | `boolean` |
 | `verified`        | `boolean` |
 | `username`        | `string`  |
-| `last_login`      | `number`  |
+| `last_login`      | `Date`    |
 
 ## `/api/user/generateGitToken/`
 

@@ -569,7 +569,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'username' => $contestantIdentity->username,
-            'end_time' => $identities['users'][$index]['access_time'] + 60 * 60,
+            'end_time' => $identities['users'][$index]['access_time']->time + 60 * 60,
         ]));
 
         $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
@@ -581,14 +581,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             if ($identity['username'] === $contestantIdentity->username) {
                 // Identity with extended time
                 $this->assertEquals(
-                    $identity['end_time'],
-                    $identity['access_time'] + 60 * 60
+                    $identity['end_time']->time,
+                    $identity['access_time']->time + 60 * 60
                 );
             } else {
                 // Other identities keep end time with window length
                 $this->assertEquals(
-                    $identity['end_time'],
-                    $identity['access_time'] + $windowLength * 60
+                    $identity['end_time']->time,
+                    $identity['access_time']->time + $windowLength * 60
                 );
             }
         }
@@ -606,8 +606,8 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($identities['users'] as $identity) {
             // End time for all participants has been updated and extended time for the identity is no longer available
             $this->assertEquals(
-                $identity['end_time'],
-                $identity['access_time'] + $windowLength * 60
+                $identity['end_time']->time,
+                $identity['access_time']->time + $windowLength * 60
             );
         }
 

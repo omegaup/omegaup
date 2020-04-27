@@ -120,14 +120,7 @@ export default {
   },
 
   Course: {
-    activityReport: api.apiCall('/api/course/activityReport/', function(
-      result,
-    ) {
-      for (let ev of result.events) {
-        ev.time = OmegaUp.remoteTime(ev.time * 1000);
-      }
-      return result;
-    }),
+    activityReport: api.Course.activityReport,
 
     addAdmin: api.Course.addAdmin,
 
@@ -179,19 +172,7 @@ export default {
       return data;
     }),
 
-    listAssignments: api.apiCall('/api/course/listAssignments/', function(
-      result,
-    ) {
-      // We cannot use OmegaUp.remoteTime() because admins need to
-      // be able to get the unmodified times.
-      result.assignments.forEach(assignment => {
-        assignment.start_time = new Date(assignment.start_time * 1000);
-        if (assignment.finish_time) {
-          assignment.finish_time = new Date(assignment.finish_time * 1000);
-        }
-      });
-      return result;
-    }),
+    listAssignments: api.Course.listAssignments,
 
     listCourses: api.apiCall('/api/course/listCourses/', function(result) {
       result.admin.forEach(res => {
@@ -242,25 +223,7 @@ export default {
 
   Problemset: api.Problemset,
 
-  QualityNomination: {
-    create: api.QualityNomination.create,
-
-    list: api.apiCall('/api/qualityNomination/list/', function(data) {
-      data.nominations.forEach(nomination => {
-        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
-      });
-      return data;
-    }),
-
-    myList: api.apiCall('/api/qualityNomination/myList/', function(data) {
-      data.nominations.forEach(nomination => {
-        nomination.time = OmegaUp.remoteTime(nomination.time * 1000);
-      });
-      return data;
-    }),
-
-    resolve: api.QualityNomination.resolve,
-  },
+  QualityNomination: api.QualityNomination,
 
   Reset: api.Reset,
 
@@ -269,9 +232,7 @@ export default {
   School: {
     create: api.School.create,
 
-    monthlySolvedProblemsCount: api.apiCall(
-      '/api/school/monthlySolvedProblemsCount',
-    ),
+    monthlySolvedProblemsCount: api.School.monthlySolvedProblemsCount,
 
     schoolsOfTheMonth: api.School.schoolsOfTheMonth,
 
@@ -304,17 +265,7 @@ export default {
 
   Session: api.Session,
 
-  Submission: {
-    latestSubmissions: api.apiCall(
-      '/api/submission/latestSubmissions/',
-      function(data) {
-        data.submissions.forEach(submission => {
-          submission.time = new Date(submission.time * 1000);
-        });
-        return data;
-      },
-    ),
-  },
+  Submission: api.Submission,
 
   User: {
     acceptPrivacyPolicy: api.User.acceptPrivacyPolicy,
