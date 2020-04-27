@@ -205,11 +205,11 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         create_run_user(driver, alias, problem, 'Main_wrong.cpp17-gcc',
                         verdict='WA', score=0)
 
-    update_scoreboard_for_contest(driver, alias)
-
     with driver.login(driver.user_username, 'user'):
         create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
                         verdict='AC', score=1)
+
+    update_scoreboard_for_contest(driver, alias)
 
     with driver.login(driver.user_username, 'user'):
         driver.wait.until(
@@ -232,23 +232,6 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         # on the same page is going back to the page.
         check_ranking(driver, problem, driver.user_username,
                       scores=['0.00', '+100.00'])
-
-        # User enters to problem in contest, the ranking for this problem
-        # should update.
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "#problems"]'))).click()
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#problems')))
-
-        driver.browser.find_element_by_xpath(
-            '//a[contains(text(), "%s")]/parent::div' %
-            problem.title()).click()
-
-        # Now, user checks the score again, ranking should be +100
-        check_ranking(driver, problem, driver.user_username,
-                      scores=['+100.00'])
 
 
 @util.annotate
