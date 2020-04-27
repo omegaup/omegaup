@@ -2779,7 +2779,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *
-     * @return array{name: null|string, description: null|string, assignment_type: null|string, start_time: int, finish_time: null|int, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, director: string, problemset_id: int, admin: bool}
+     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, description: null|string, director: string, finish_time: null|int, name: string, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, quality_payload: array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id: int, start_time: int}
      */
     public static function apiAssignmentDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2815,13 +2815,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-            $tokenAuthenticationResult['assignment']->problemset_id
-        );
-        $letter = 0;
-        foreach ($problems as &$problem) {
+        $problems = [];
+        $problemIndex = 0;
+        foreach (
+            \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+                $tokenAuthenticationResult['assignment']->problemset_id
+            ) as $problem
+        ) {
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
-                $letter++
+                $problemIndex++
             );
 
             if (
@@ -2844,14 +2846,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
 
                 [
-                    'tried' => $nominationStatus['tried'],
-                    'solved' => $nominationStatus['solved'],
+                    'tried' => $tried,
+                    'solved' => $solved,
                 ] = \OmegaUp\DAO\Runs::getSolvedAndTriedProblemByIdentity(
                     $problem['problem_id'],
                     $r->identity->identity_id
                 );
 
-                $nominationStatus['problem_alias'] = $problem['alias'];
+                $nominationStatus['tried'] = $tried;
+                $nominationStatus['solved'] = $solved;
                 $nominationStatus['language'] = \OmegaUp\Controllers\Problem::getProblemStatement(
                     $problem['alias'],
                     $problem['commit'],
@@ -2859,10 +2862,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                         self::resolveTargetIdentity($r)
                     )
                 )['language'];
-                $nominationStatus['can_nominate_problem'] = !is_null($r->user);
             }
+            $nominationStatus['canNominateProblem'] = !is_null($r->user);
+            $nominationStatus['problemAlias'] = $problem['alias'];
             $problem['quality_payload'] = $nominationStatus;
             unset($problem['problem_id']);
+
+            $problems[] = $problem;
         }
 
         $acl = \OmegaUp\DAO\ACLs::getByPK(
@@ -2892,8 +2898,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'name' => $tokenAuthenticationResult['assignment']->name,
-            'alias' => $tokenAuthenticationResult['assignment']->alias,
+            'name' => strval($tokenAuthenticationResult['assignment']->name),
+            'alias' => strval($tokenAuthenticationResult['assignment']->alias),
             'description' => $tokenAuthenticationResult['assignment']->description,
             'assignment_type' => $tokenAuthenticationResult['assignment']->assignment_type,
             'start_time' => $tokenAuthenticationResult['assignment']->start_time,

@@ -543,10 +543,21 @@ export namespace types {
     commit: string;
     difficulty: number;
     languages: string;
-    letter?: string;
+    letter: string;
     order: number;
     points: number;
-    problem_id: number;
+    problem_id?: number;
+    quality_payload?: {
+      canNominateProblem: boolean;
+      dismissed: boolean;
+      dismissedBeforeAC: boolean;
+      language?: string;
+      nominated: boolean;
+      nominatedBeforeAC: boolean;
+      problemAlias: string;
+      solved: boolean;
+      tried: boolean;
+    };
     submissions: number;
     title: string;
     version: string;
@@ -1272,29 +1283,54 @@ export namespace messages {
   export type CourseArbitrateRequestResponse = {};
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type CourseAssignmentDetailsResponse = {
-    name?: string;
-    description?: string;
+    admin: boolean;
+    alias: string;
     assignment_type?: string;
-    start_time: number;
+    courseAssignments: {
+      name: string;
+      description: string;
+      alias: string;
+      publish_time_delay?: number;
+      assignment_type: string;
+      start_time: number;
+      finish_time?: number;
+      max_points: number;
+      order: number;
+      scoreboard_url: string;
+      scoreboard_url_admin: string;
+    }[];
+    description?: string;
+    director: string;
     finish_time?: number;
+    name: string;
     problems: {
       accepted: number;
       alias: string;
       commit: string;
       difficulty: number;
       languages: string;
+      letter: string;
       order: number;
       points: number;
-      problem_id: number;
+      quality_payload: {
+        canNominateProblem: boolean;
+        dismissed: boolean;
+        dismissedBeforeAC: boolean;
+        language?: string;
+        nominated: boolean;
+        nominatedBeforeAC: boolean;
+        problemAlias: string;
+        solved: boolean;
+        tried: boolean;
+      };
       submissions: number;
       title: string;
       version: string;
       visibility: number;
       visits: number;
     }[];
-    director: string;
     problemset_id: number;
-    admin: boolean;
+    start_time: number;
   };
   export type CourseAssignmentScoreboardRequest = { [key: string]: any };
   export type CourseAssignmentScoreboardResponse = {
@@ -1919,8 +1955,21 @@ export namespace messages {
     alias?: string;
     assignment_type?: string;
     contest_alias?: string;
+    courseAssignments?: {
+      name: string;
+      description: string;
+      alias: string;
+      publish_time_delay?: number;
+      assignment_type: string;
+      start_time: number;
+      finish_time?: number;
+      max_points: number;
+      order: number;
+      scoreboard_url: string;
+      scoreboard_url_admin: string;
+    }[];
     description?: string;
-    director?: string | dao.Identities;
+    director?: string;
     exists?: boolean;
     feedback?: string;
     finish_time?: number;
@@ -2122,6 +2171,7 @@ export namespace messages {
   export type RunDetailsRequest = { [key: string]: any };
   export type RunDetailsResponse = {
     admin: boolean;
+    alias: string;
     compile_error?: string;
     details?: {
       compile_meta?: {
@@ -2231,6 +2281,7 @@ export namespace messages {
   export type RunStatusRequest = { [key: string]: any };
   export type _RunStatusServerResponse = any;
   export type RunStatusResponse = {
+    alias: string;
     contest_score?: number;
     memory: number;
     penalty: number;
