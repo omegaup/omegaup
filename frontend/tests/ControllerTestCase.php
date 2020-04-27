@@ -168,20 +168,20 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
         $this->assertGreaterThanOrEqual(
             $r['start_time'] - 1,
-            $contest->start_time
+            $contest->start_time->time
         );
         $this->assertGreaterThanOrEqual(
             $r['start_time'],
-            $contest->start_time + 1
+            $contest->start_time->time + 1
         );
 
         $this->assertGreaterThanOrEqual(
             $r['finish_time'] - 1,
-            $contest->finish_time
+            $contest->finish_time->time
         );
         $this->assertGreaterThanOrEqual(
             $r['finish_time'],
-            $contest->finish_time + 1
+            $contest->finish_time->time + 1
         );
 
         $this->assertEquals($r['window_length'], $contest->window_length);

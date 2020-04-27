@@ -51,8 +51,8 @@ class QualityNominationComments extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['time'])) {
             /**
-             * @var string|int|float $data['time']
-             * @var int $this->time
+             * @var \OmegaUp\Timestamp|string|int|float $data['time']
+             * @var \OmegaUp\Timestamp $this->time
              */
             $this->time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -60,7 +60,9 @@ class QualityNominationComments extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->time = \OmegaUp\Time::get();
+            $this->time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['vote'])) {
             $this->vote = intval(
@@ -100,7 +102,7 @@ class QualityNominationComments extends \OmegaUp\DAO\VO\VO {
     /**
      * Fecha de creacion de este comentario
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $time;  // CURRENT_TIMESTAMP
 

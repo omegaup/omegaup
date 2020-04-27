@@ -57,22 +57,30 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
         $problemsetContainer,
         ?\OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
     ): bool {
-        if (is_null($problemsetIdentity)) {
-            return isset($problemsetContainer->finish_time) &&
-                   (\OmegaUp\Time::get() > $problemsetContainer->finish_time);
+        if (empty($problemsetContainer->finish_time)) {
+            return false;
         }
-        return (
-            !empty($problemsetContainer->finish_time) &&
-            (\OmegaUp\Time::get() > $problemsetIdentity->end_time)
-        );
+        if (
+            !is_null($problemsetIdentity) &&
+            !is_null($problemsetIdentity->end_time)
+        ) {
+            return (
+                \OmegaUp\Time::get() > $problemsetIdentity->end_time->time
+            );
+        }
+        /** @var \OmegaUp\Timestamp $problemsetContainer->finish_time */
+        return \OmegaUp\Time::get() > $problemsetContainer->finish_time->time;
     }
 
     /**
      * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $problemsetContainer
      */
     public static function isSubmissionWindowOpen($problemsetContainer): bool {
-        return isset($problemsetContainer->start_time) &&
-                \OmegaUp\Time::get() >= $problemsetContainer->start_time;
+        if (!isset($problemsetContainer->start_time)) {
+            return false;
+        }
+        /** @var \OmegaUp\Timestamp $problemsetContainer->start_time */
+        return \OmegaUp\Time::get() >= $problemsetContainer->start_time->time;
     }
 
     /**

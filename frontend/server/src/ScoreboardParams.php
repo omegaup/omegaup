@@ -17,10 +17,10 @@ class ScoreboardParams {
     /** @var int */
     public $problemset_id;
 
-    /** @var int */
+    /** @var \OmegaUp\Timestamp */
     public $start_time;
 
-    /** @var null|int */
+    /** @var \OmegaUp\Timestamp|null */
     public $finish_time;
 
     /** @var int */
@@ -86,9 +86,17 @@ class ScoreboardParams {
             $params,
             true /*is_required*/
         );
-        $this->start_time = is_int($params['start_time'])
-            ? $params['start_time']
-            : strtotime(strval($params['start_time']));
+        if ($params['start_time'] instanceof \OmegaUp\Timestamp) {
+            $this->start_time = $params['start_time'];
+        } else {
+            $this->start_time = new \OmegaUp\Timestamp(
+                intval(
+                    is_string($params['start_time'])
+                        ? strtotime(strval($params['start_time']))
+                        : $params['start_time']
+                )
+            );
+        }
 
         ScoreboardParams::validateParameter(
             'finish_time',
@@ -96,9 +104,17 @@ class ScoreboardParams {
             false /*is_required*/
         );
         if (!is_null($params['finish_time'])) {
-            $this->finish_time = is_int($params['finish_time'])
-            ? $params['finish_time']
-            : strtotime(strval($params['finish_time']));
+            if ($params['finish_time'] instanceof \OmegaUp\Timestamp) {
+                $this->finish_time = $params['finish_time'];
+            } else {
+                $this->finish_time = new \OmegaUp\Timestamp(
+                    intval(
+                        is_string($params['finish_time'])
+                            ? strtotime(strval($params['finish_time']))
+                            : $params['finish_time']
+                    )
+                );
+            }
         } else {
             $this->finish_time = null;
         }

@@ -212,7 +212,7 @@ class Request extends \ArrayObject {
         string $key,
         ?int $lowerBound = null,
         ?int $upperBound = null,
-        bool $required
+        bool $required = false
     ): ?\OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
             if (!$required) {

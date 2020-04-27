@@ -211,8 +211,13 @@ export const Contest = {
   >('/api/contest/addUser/'),
   adminDetails: apiCall<
     messages.ContestAdminDetailsRequest,
+    messages._ContestAdminDetailsServerResponse,
     messages.ContestAdminDetailsResponse
-  >('/api/contest/adminDetails/'),
+  >('/api/contest/adminDetails/', x => {
+    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    return x;
+  }),
   adminList: apiCall<
     messages.ContestAdminListRequest,
     messages._ContestAdminListServerResponse,
@@ -271,8 +276,17 @@ export const Contest = {
   >('/api/contest/createVirtual/'),
   details: apiCall<
     messages.ContestDetailsRequest,
+    messages._ContestDetailsServerResponse,
     messages.ContestDetailsResponse
-  >('/api/contest/details/'),
+  >('/api/contest/details/', x => {
+    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.submission_deadline)
+      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+        x.submission_deadline,
+      );
+    return x;
+  }),
   list: apiCall<
     messages.ContestListRequest,
     messages._ContestListServerResponse,
@@ -347,8 +361,13 @@ export const Contest = {
   >('/api/contest/problems/'),
   publicDetails: apiCall<
     messages.ContestPublicDetailsRequest,
+    messages._ContestPublicDetailsServerResponse,
     messages.ContestPublicDetailsResponse
-  >('/api/contest/publicDetails/'),
+  >('/api/contest/publicDetails/', x => {
+    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    return x;
+  }),
   registerForContest: apiCall<
     messages.ContestRegisterForContestRequest,
     messages.ContestRegisterForContestResponse
@@ -378,6 +397,9 @@ export const Contest = {
     messages._ContestReportServerResponse,
     messages.ContestReportResponse
   >('/api/contest/report/', x => {
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
@@ -427,6 +449,9 @@ export const Contest = {
     messages._ContestScoreboardServerResponse,
     messages.ContestScoreboardResponse
   >('/api/contest/scoreboard/', x => {
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
@@ -515,8 +540,27 @@ export const Course = {
   >('/api/course/addStudent/'),
   adminDetails: apiCall<
     messages.CourseAdminDetailsRequest,
+    messages._CourseAdminDetailsServerResponse,
     messages.CourseAdminDetailsResponse
-  >('/api/course/adminDetails/'),
+  >('/api/course/adminDetails/', x => {
+    if (x.assignments)
+      x.assignments = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.assignments);
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    if (x.start_time)
+      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    return x;
+  }),
   admins: apiCall<messages.CourseAdminsRequest, messages.CourseAdminsResponse>(
     '/api/course/admins/',
   ),
@@ -526,13 +570,33 @@ export const Course = {
   >('/api/course/arbitrateRequest/'),
   assignmentDetails: apiCall<
     messages.CourseAssignmentDetailsRequest,
+    messages._CourseAssignmentDetailsServerResponse,
     messages.CourseAssignmentDetailsResponse
-  >('/api/course/assignmentDetails/'),
+  >('/api/course/assignmentDetails/', x => {
+    x.courseAssignments = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        return x;
+      });
+    })(x.courseAssignments);
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    return x;
+  }),
   assignmentScoreboard: apiCall<
     messages.CourseAssignmentScoreboardRequest,
     messages._CourseAssignmentScoreboardServerResponse,
     messages.CourseAssignmentScoreboardResponse
   >('/api/course/assignmentScoreboard/', x => {
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
@@ -552,8 +616,27 @@ export const Course = {
   >('/api/course/createAssignment/'),
   details: apiCall<
     messages.CourseDetailsRequest,
+    messages._CourseDetailsServerResponse,
     messages.CourseDetailsResponse
-  >('/api/course/details/'),
+  >('/api/course/details/', x => {
+    if (x.assignments)
+      x.assignments = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.assignments);
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    if (x.start_time)
+      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    return x;
+  }),
   getProblemUsers: apiCall<
     messages.CourseGetProblemUsersRequest,
     messages.CourseGetProblemUsersResponse
@@ -582,8 +665,44 @@ export const Course = {
   }),
   listCourses: apiCall<
     messages.CourseListCoursesRequest,
+    messages._CourseListCoursesServerResponse,
     messages.CourseListCoursesResponse
-  >('/api/course/listCourses/'),
+  >('/api/course/listCourses/', x => {
+    x.admin = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.admin);
+    x.public = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.public);
+    x.student = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.student);
+    return x;
+  }),
   listSolvedProblems: apiCall<
     messages.CourseListSolvedProblemsRequest,
     messages.CourseListSolvedProblemsResponse
@@ -750,8 +869,21 @@ export const GroupScoreboard = {
   >('/api/groupScoreboard/addContest/'),
   details: apiCall<
     messages.GroupScoreboardDetailsRequest,
+    messages._GroupScoreboardDetailsServerResponse,
     messages.GroupScoreboardDetailsResponse
-  >('/api/groupScoreboard/details/'),
+  >('/api/groupScoreboard/details/', x => {
+    x.contests = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        return x;
+      });
+    })(x.contests);
+    return x;
+  }),
   list: apiCall<
     messages.GroupScoreboardListRequest,
     messages.GroupScoreboardListResponse
@@ -890,6 +1022,16 @@ export const Problem = {
     messages._ProblemDetailsServerResponse,
     messages.ProblemDetailsResponse
   >('/api/problem/details/', x => {
+    if (x.creation_date)
+      x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
+    if (x.problemsetter)
+      x.problemsetter = (x => {
+        if (x.creation_date)
+          x.creation_date = ((x: number) => new Date(x * 1000))(
+            x.creation_date,
+          );
+        return x;
+      })(x.problemsetter);
     if (x.runs)
       x.runs = (x => {
         if (!Array.isArray(x)) {
@@ -983,8 +1125,27 @@ export const Problem = {
   >('/api/problem/updateStatement/'),
   versions: apiCall<
     messages.ProblemVersionsRequest,
+    messages._ProblemVersionsServerResponse,
     messages.ProblemVersionsResponse
-  >('/api/problem/versions/'),
+  >('/api/problem/versions/', x => {
+    x.log = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        x.author = (x => {
+          if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.author);
+        x.committer = (x => {
+          if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.committer);
+        return x;
+      });
+    })(x.log);
+    return x;
+  }),
 };
 
 export const ProblemForfeited = {
@@ -1000,6 +1161,26 @@ export const Problemset = {
     messages._ProblemsetDetailsServerResponse,
     messages.ProblemsetDetailsResponse
   >('/api/problemset/details/', x => {
+    if (x.courseAssignments)
+      x.courseAssignments = (x => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map(x => {
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          return x;
+        });
+      })(x.courseAssignments);
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    if (x.start_time)
+      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.submission_deadline)
+      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+        x.submission_deadline,
+      );
     if (x.users)
       x.users = (x => {
         if (!Array.isArray(x)) {
@@ -1018,6 +1199,10 @@ export const Problemset = {
     messages._ProblemsetScoreboardServerResponse,
     messages.ProblemsetScoreboardResponse
   >('/api/problemset/scoreboard/', x => {
+    if (x.finish_time)
+      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    if (x.start_time)
+      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
@@ -1147,9 +1332,19 @@ export const Run = {
   counts: apiCall<messages.RunCountsRequest, messages.RunCountsResponse>(
     '/api/run/counts/',
   ),
-  create: apiCall<messages.RunCreateRequest, messages.RunCreateResponse>(
-    '/api/run/create/',
-  ),
+  create: apiCall<
+    messages.RunCreateRequest,
+    messages._RunCreateServerResponse,
+    messages.RunCreateResponse
+  >('/api/run/create/', x => {
+    x.submission_deadline = ((x: number) => new Date(x * 1000))(
+      x.submission_deadline,
+    );
+    x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+      x.nextSubmissionTimestamp,
+    );
+    return x;
+  }),
   details: apiCall<messages.RunDetailsRequest, messages.RunDetailsResponse>(
     '/api/run/details/',
   ),
@@ -1288,8 +1483,21 @@ export const User = {
   >('/api/user/changePassword/'),
   coderOfTheMonth: apiCall<
     messages.UserCoderOfTheMonthRequest,
+    messages._UserCoderOfTheMonthServerResponse,
     messages.UserCoderOfTheMonthResponse
-  >('/api/user/coderOfTheMonth/'),
+  >('/api/user/coderOfTheMonth/', x => {
+    if (x.coderinfo)
+      x.coderinfo = (x => {
+        if (x.birth_date)
+          x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+        if (x.graduation_date)
+          x.graduation_date = ((x: number) => new Date(x * 1000))(
+            x.graduation_date,
+          );
+        return x;
+      })(x.coderinfo);
+    return x;
+  }),
   coderOfTheMonthList: apiCall<
     messages.UserCoderOfTheMonthListRequest,
     messages.UserCoderOfTheMonthListResponse
@@ -1378,9 +1586,19 @@ export const User = {
     messages.UserProblemsSolvedRequest,
     messages.UserProblemsSolvedResponse
   >('/api/user/problemsSolved/'),
-  profile: apiCall<messages.UserProfileRequest, messages.UserProfileResponse>(
-    '/api/user/profile/',
-  ),
+  profile: apiCall<
+    messages.UserProfileRequest,
+    messages._UserProfileServerResponse,
+    messages.UserProfileResponse
+  >('/api/user/profile/', x => {
+    if (x.birth_date)
+      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+    if (x.graduation_date)
+      x.graduation_date = ((x: number) => new Date(x * 1000))(
+        x.graduation_date,
+      );
+    return x;
+  }),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse
