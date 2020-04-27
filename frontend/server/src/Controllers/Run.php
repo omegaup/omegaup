@@ -7,7 +7,7 @@
  *
  * @author joemmanuel
  * @psalm-type ProblemCases=array<string, array<string, string>>
- * @psalm-type RunDetails=array{admin: bool, cases?: ProblemCases, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source: string}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCases, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -183,14 +183,18 @@ class Run extends \OmegaUp\Controllers\Controller {
         } else {
             // Check for practice or public problem, there is no contest info
             // in this scenario.
+            $practiceDeadline = \OmegaUp\DAO\Problems::getPracticeDeadline(
+                $problem->problem_id
+            );
             if (
                 \OmegaUp\DAO\Problems::isVisible($problem) ||
                 \OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
                     $problem
                 ) ||
-                \OmegaUp\Time::get() > \OmegaUp\DAO\Problems::getPracticeDeadline(
-                    $problem->problem_id
+                (
+                    is_null($practiceDeadline) ||
+                    \OmegaUp\Time::get() > $practiceDeadline->time
                 )
             ) {
                 if (
@@ -588,7 +592,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp}
+     * @return array{alias: string, contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp}
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -602,6 +606,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run' => $run,
             'submission' => $submission,
         ] = self::validateDetailsRequest($r['run_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            intval($submission->problem_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
@@ -623,6 +633,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
+        $filtered['alias'] = strval($problem->alias);
         $filtered['time'] = new \OmegaUp\Timestamp(intval($filtered['time']));
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
@@ -830,6 +841,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             ),
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
+            'alias' => strval($problem->alias),
         ];
 
         // Get the details, compile error, logs, etc.

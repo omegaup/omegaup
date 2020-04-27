@@ -74,12 +74,12 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
-     * @return list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}>
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}>
      */
     public static function getWithExtraInformation(int $problemsetId): array {
         $sql = 'SELECT
-                    UNIX_TIMESTAMP(pi.access_time) as access_time,
-                    UNIX_TIMESTAMP(pi.end_time) as end_time,
+                    pi.access_time,
+                    pi.end_time,
                     i.username,
                     i.country_id,
                     IF(a.owner_id=i.identity_id, 1, NULL) as is_owner
@@ -100,7 +100,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 WHERE
                     p.problemset_id = ?;';
 
-        /** @var list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}> */
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]

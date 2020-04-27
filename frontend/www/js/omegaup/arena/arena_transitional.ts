@@ -213,6 +213,7 @@ export class EventsSocket {
         this.arena.updateClarification(data.clarification);
       }
     } else if (data.message == '/scoreboard/update/') {
+      data.time = time.remoteTime(data.time * 1000);
       if (this.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
         if (this.arena.options.originalContestAlias == null) return;
         this.arena.virtualRankingChange(data.scoreboard);

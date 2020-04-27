@@ -44,6 +44,12 @@ export default class Notification extends Vue {
     switch (this.notification.contents.type) {
       case 'badge':
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
+      case 'demotion':
+        if (this.notification.contents.status == 'banned') {
+          return '/media/banned.svg';
+        } else {
+          return '/media/warning.svg';
+        }
       default:
         return 'media/info.png';
     }
@@ -55,6 +61,8 @@ export default class Notification extends Vue {
         return ui.formatString(T.notificationNewBadge, {
           badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
+      case 'demotion':
+        return this.notification.contents.message || '';
       default:
         return '';
     }

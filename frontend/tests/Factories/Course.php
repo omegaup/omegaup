@@ -165,11 +165,13 @@ class Course {
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         $assignmentAliases = [];
         $assignmentProblemsetIds = [];
+        $order = 1;
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
                 $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
-                $r = new \OmegaUp\Request([
+
+                \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => \OmegaUp\Test\Utils::createRandomString(),
                     'alias' => $assignmentAlias,
@@ -177,10 +179,9 @@ class Course {
                     'start_time' => (\OmegaUp\Time::get()),
                     'finish_time' => (\OmegaUp\Time::get() + 120),
                     'course_alias' => $courseAlias,
-                    'assignment_type' => $assignmentType
-                ]);
-
-                \OmegaUp\Controllers\Course::apiCreateAssignment($r);
+                    'assignment_type' => $assignmentType,
+                    'order' => $order++,
+                ]));
                 $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                     $assignmentAlias,
                     $course->course_id
