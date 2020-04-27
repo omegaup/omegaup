@@ -23,7 +23,13 @@
           }}
         </td>
       </tr>
-      <tr v-if="showRanking && duration != Infinity">
+      <tr
+        v-if="
+          showRanking &&
+            typeof contest.scoreboard === 'number' &&
+            duration != Infinity
+        "
+      >
         <td>
           <strong>{{ T.arenaPracticeScoreboardCutoff }}</strong>
         </td>
