@@ -501,7 +501,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Marks a nomination (only the demotion type supported for now) as resolved (approved or denied).
+     * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $qualitynomination_id
@@ -518,7 +518,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
             'status',
-            ['open', 'approved', 'denied']
+            ['open', 'resolved', 'banned', 'warning']
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['rationale'],
@@ -559,22 +559,32 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        $isProblemPublic = (
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC ||
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING ||
+            $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
+        );
         $newProblemVisibility = $problem->visibility;
         switch ($r['status']) {
-            case 'approved':
-                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE) {
-                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
+            case 'banned':
+                if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                 }
                 break;
-            case 'denied':
-                if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) {
-                    // If banning is reverted, problem will become private.
-                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
-                } elseif ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED) {
-                    // If banning is reverted, problem will become public.
+            case 'resolved':
+                if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                }
+                break;
+            case 'warning':
+                if ($isProblemPublic) {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                } else {
+                    $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
                 }
                 break;
             case 'open':
@@ -582,7 +592,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'approved') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
@@ -611,14 +621,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
-            if (
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED  ||
-                $newProblemVisibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
-            ) {
-                self::sendDemotionEmail(
+            if ($r['status'] == 'banned' || $r['status'] == 'warning') {
+                self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
-                    $qualitynominationlog->rationale ?? ''
+                    $qualitynominationlog->rationale ?? '',
+                    strval($r['status'])
                 );
             }
         } catch (\Exception $e) {
@@ -642,12 +650,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Send a mail with demotion notification to the original creator
      */
-    private static function sendDemotionEmail(
+    private static function sendNotificationEmail(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\QualityNominations $qualitynomination,
-        string $rationale
+        string $rationale,
+        string $status
     ): void {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
+
         if (is_null($adminUser)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -655,25 +665,71 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
+        $user = \OmegaUp\DAO\Identities::findByUsernameOrName($username)[0];
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
             'problem_name' => htmlspecialchars(strval($problem->title)),
             'user_name' => $username,
         ];
-        $subject = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get(
-                'demotionProblemEmailSubject'
-            )
-                ?: 'demotionProblemEmailSubject',
-            $emailParams
-        );
-        $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get(
-                'demotionProblemEmailBody'
-            )
-                ?: 'demotionProblemEmailBody',
-            $emailParams
+
+        if ($status == 'banned') {
+            $notificationContents = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemNotificationBanned'
+                )
+                    ?: 'demotionProblemNotificationBanned',
+                ['problem_name' => strval($problem->title)]
+            );
+            $subject = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailBannedSubject'
+                )
+                    ?: 'demotionProblemEmailBannedSubject',
+                $emailParams
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailBannedBody'
+                )
+                    ?: 'demotionProblemEmailBannedBody',
+                $emailParams
+            );
+        } else {
+            $notificationContents = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemNotificationWarning'
+                )
+                    ?: 'demotionProblemNotificationWarning',
+                ['problem_name' => strval($problem->title)]
+            );
+            $subject = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailWarningSubject'
+                )
+                    ?: 'demotionProblemEmailWarningSubject',
+                $emailParams
+            );
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get(
+                    'demotionProblemEmailWarningBody'
+                )
+                    ?: 'demotionProblemEmailWarningBody',
+                $emailParams
+            );
+        }
+
+        \OmegaUp\DAO\Base\Notifications::create(
+            new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $user->user_id,
+                'contents' =>  json_encode(
+                    [
+                        'type' => 'demotion',
+                        'message' => $notificationContents,
+                        'status' => $status
+                    ]
+                ),
+            ])
         );
 
         \OmegaUp\Email::sendEmail([$email], $subject, $body);
@@ -751,6 +807,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $rowcount
      *
      * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: int, votes: list<array{time: int|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
@@ -764,6 +821,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['status'],
+            'status',
+            ['all','open','resolved','banned','warning']
+        );
+        $status = $r['status'] ?? 'all';
         self::validateMemberOfReviewerGroup($r);
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
@@ -785,7 +848,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             /* assignee */ null,
             $offset,
             $rowCount,
-            $types
+            $types,
+            $status
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(

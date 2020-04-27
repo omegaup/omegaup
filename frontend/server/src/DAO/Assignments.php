@@ -153,27 +153,31 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     final public static function getSortedCourseAssignments(
         int $courseId
     ): array {
-        $sql = 'SELECT
-                   `a`.`problemset_id`,
-                   `a`.`name`,
-                   `a`.`description`,
-                   `a`.`alias`,
-                   `a`.`assignment_type`,
-                   UNIX_TIMESTAMP(`a`.`start_time`) AS `start_time`,
-                   UNIX_TIMESTAMP(`a`.`finish_time`) AS `finish_time`,
-                   `a`.`order`,
-                   `ps`.`scoreboard_url`,
-                   `ps`.`scoreboard_url_admin`
-                FROM
-                    `Assignments` `a`
-                INNER JOIN
-                    `Problemsets` `ps`
-                ON
-                    `ps`.`problemset_id` = `a`.`problemset_id`
-                WHERE
-                    course_id = ?
-                ORDER BY
-                    `order` ASC, `start_time` ASC';
+        $sql = '
+            SELECT
+               `a`.`problemset_id`,
+               `a`.`name`,
+               `a`.`description`,
+               `a`.`alias`,
+               `a`.`assignment_type`,
+               UNIX_TIMESTAMP(`a`.`start_time`) AS `start_time`,
+               UNIX_TIMESTAMP(`a`.`finish_time`) AS `finish_time`,
+               `a`.`order`,
+               `ps`.`scoreboard_url`,
+               `ps`.`scoreboard_url_admin`
+            FROM
+                `Assignments` `a`
+            INNER JOIN
+                `Problemsets` `ps`
+            ON
+                `ps`.`problemset_id` = `a`.`problemset_id`
+            WHERE
+                course_id = ?
+            ORDER BY
+                `order` ASC,
+                `start_time` ASC,
+                `a`.`assignment_id` ASC
+        ';
 
         /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(

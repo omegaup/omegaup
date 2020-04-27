@@ -32,12 +32,11 @@ OmegaUp.on('ready', function() {
           initialRationale: payload.contents.rationale,
         },
         on: {
-          'mark-resolution': function(viewDetails, banProblem) {
+          'mark-resolution': function(viewDetails, newStatus) {
             if (!viewDetails.rationale) {
               UI.error(T.editFieldRequired);
               return;
             }
-            let newStatus = banProblem ? 'approved' : 'denied';
             API.QualityNomination.resolve({
               problem_alias: viewDetails.problem.alias,
               status: newStatus,

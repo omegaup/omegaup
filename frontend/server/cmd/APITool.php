@@ -236,6 +236,9 @@ class TypeMapper {
                         if ($isNullable) {
                             $propertyType->removeType('null');
                         }
+                        if ($propertyType->possibly_undefined) {
+                            $isNullable = true;
+                        }
                         $conversionResult = $this->convertTypeToTypeScript(
                             $propertyType,
                             $methodName,

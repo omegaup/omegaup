@@ -60,13 +60,14 @@ let config = [
         './frontend/www/js/omegaup/course/submissions_list.js',
       group_list: './frontend/www/js/omegaup/group/list.js',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
+      problem_edit_form: './frontend/www/js/omegaup/problem/edit.ts',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.ts',
       problem_mine: './frontend/www/js/omegaup/problem/mine.js',
       problem_new: './frontend/www/js/omegaup/problem/new.ts',
       problem_print: './frontend/www/js/omegaup/problem/print.ts',
       problem_solution: './frontend/www/js/omegaup/problem/solution.js',
-      problem_settings: './frontend/www/js/omegaup/problem/settings.js',
+      problem_tags: './frontend/www/js/omegaup/problem/tags.ts',
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:
@@ -77,12 +78,11 @@ let config = [
         './frontend/www/js/omegaup/qualitynomination/details.js',
       qualitynomination_qualityreview:
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.ts',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',
       school_profile: './frontend/www/js/omegaup/schools/profile.js',
-      schools_rank: './frontend/www/js/omegaup/schools/rank.js',
+      schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
       user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
@@ -90,6 +90,7 @@ let config = [
         './frontend/www/js/omegaup/user/manage_identities.js',
       user_profile: './frontend/www/js/omegaup/user/profile.js',
       user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+      users_rank: './frontend/www/js/omegaup/user/rank.ts',
     },
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

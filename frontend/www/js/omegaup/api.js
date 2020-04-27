@@ -47,27 +47,17 @@ export default {
       return contest;
     }),
 
-    adminList: api.apiCall('/api/contest/adminList/', function(result) {
-      for (var idx in result.contests) {
-        var contest = result.contests[idx];
-        OmegaUp.convertTimes(contest);
-      }
-      return result;
-    }),
-
     admins: api.Contest.admins,
 
     arbitrateRequest: api.Contest.arbitrateRequest,
 
-    clarifications: api.Contest.clarifications,
+    clone: api.Contest.clone,
 
     contestants: api.Contest.contestants,
 
     create: api.Contest.create,
 
     createVirtual: api.Contest.createVirtual,
-
-    clone: api.Contest.clone,
 
     details: api.apiCall('/api/contest/details/', _normalizeContestFields),
 
@@ -110,15 +100,7 @@ export default {
 
     requests: api.Contest.requests,
 
-    runs: api.Contest.runs,
-
     runsDiff: api.Contest.runsDiff,
-
-    scoreboard: api.Contest.scoreboard,
-
-    scoreboardMerge: api.Contest.scoreboardMerge,
-
-    stats: api.Contest.stats,
 
     update: api.Contest.update,
 
@@ -153,8 +135,6 @@ export default {
 
     addProblem: api.Course.addProblem,
 
-    addStudent: api.Course.addStudent,
-
     adminDetails: api.apiCall('/api/course/adminDetails/', function(result) {
       if (result.finish_time) {
         result.finish_time = new Date(result.finish_time * 1000);
@@ -171,13 +151,11 @@ export default {
 
     admins: api.Course.admins,
 
-    assignmentScoreboard: api.Course.assignmentScoreboard,
-
-    arbitrateRequest: api.Course.arbitrateRequest,
-
     clone: api.Course.clone,
 
     create: api.Course.create,
+
+    createAssignment: api.Course.createAssignment,
 
     details: api.apiCall('/api/course/details/', function(data) {
       if (data.finish_time) {
@@ -193,10 +171,6 @@ export default {
       return data;
     }),
 
-    myProgress: api.Course.myProgress,
-
-    createAssignment: api.Course.createAssignment,
-
     getAssignment: api.apiCall('/api/course/assignmentDetails', function(data) {
       data.start_time = new Date(data.start_time * 1000);
       if (data.finish_time) {
@@ -204,16 +178,6 @@ export default {
       }
       return data;
     }),
-
-    /**
-     * Returns the list of users signed up for the course that have
-     * attempted the requested problem.
-     *
-     * @param {string} course_alias
-     * @param {string} problem_alias
-     * @return {Promise}
-     */
-    getProblemUsers: api.Course.getProblemUsers,
 
     listAssignments: api.apiCall('/api/course/listAssignments/', function(
       result,
@@ -251,40 +215,20 @@ export default {
       return result;
     }),
 
-    listStudents: api.Course.listStudents,
-
     listSolvedProblems: api.Course.listSolvedProblems,
 
     listUnsolvedProblems: api.Course.listUnsolvedProblems,
 
-    registerForCourse: api.Course.registerForCourse,
-
-    removeAdmin: api.Course.removeAdmin,
-
     removeAssignment: api.Course.removeAssignment,
-
-    removeGroupAdmin: api.Course.removeGroupAdmin,
 
     removeProblem: api.Course.removeProblem,
 
-    removeStudent: api.Course.removeStudent,
-
-    requests: api.Course.requests,
-
-    runs: api.Course.runs,
-
-    studentProgress: api.Course.studentProgress,
-
-    update: api.Course.update,
-
     updateAssignment: api.Course.updateAssignment,
 
-    updateProblemsOrder: api.Course.updateProblemsOrder,
-
     updateAssignmentsOrder: api.Course.updateAssignmentsOrder,
-  },
 
-  Grader: api.Grader,
+    updateProblemsOrder: api.Course.updateProblemsOrder,
+  },
 
   Group: api.Group,
 
@@ -294,18 +238,12 @@ export default {
 
   Interview: api.Interview,
 
-  Notification: api.Notification,
-
   Problem: api.Problem,
-
-  ProblemForfeited: api.ProblemForfeited,
 
   Problemset: api.Problemset,
 
   QualityNomination: {
     create: api.QualityNomination.create,
-
-    details: api.QualityNomination.details,
 
     list: api.apiCall('/api/qualityNomination/list/', function(data) {
       data.nominations.forEach(nomination => {
@@ -331,13 +269,9 @@ export default {
   School: {
     create: api.School.create,
 
-    list: api.School.list,
-
     monthlySolvedProblemsCount: api.apiCall(
       '/api/school/monthlySolvedProblemsCount',
     ),
-
-    rank: api.School.rank,
 
     schoolsOfTheMonth: api.School.schoolsOfTheMonth,
 
@@ -382,10 +316,6 @@ export default {
     ),
   },
 
-  Time: api.Time,
-
-  Tag: api.Tag,
-
   User: {
     acceptPrivacyPolicy: api.User.acceptPrivacyPolicy,
 
@@ -393,11 +323,11 @@ export default {
 
     addGroup: api.User.addgroup,
 
-    associateIdentity: api.User.associateIdentity,
-
     addRole: api.User.addrole,
 
-    changePassword: api.User.changepassword,
+    associateIdentity: api.User.associateIdentity,
+
+    changePassword: api.User.changePassword,
 
     contestStats: api.apiCall('/api/user/contestStats/', function(data) {
       let contests = [];
@@ -413,23 +343,11 @@ export default {
       return contests;
     }),
 
-    coderOfTheMonthList: api.User.coderOfTheMonthList,
-
-    /**
-     * Creates a new user.
-     * @param {string} email - The user's email address.
-     * @param {string} username - The user's username.
-     * @param {string} password - The user's password.
-     * @param {string} recaptcha - The answer to the recaptcha challenge.
-     * @return {Promise}
-     */
     create: api.User.create,
 
     extraInformation: api.User.extraInformation,
 
     interviewStats: api.User.interviewstats,
-
-    list: api.User.list,
 
     listAssociatedIdentities: api.User.listAssociatedIdentities,
 
@@ -445,7 +363,7 @@ export default {
       },
     ),
 
-    problemsSolved: api.apiCall('/api/user/problemsSolved/', function(data) {
+    problemsCreated: api.apiCall('/api/user/problemsCreated', function(data) {
       if (data.hasOwnProperty('problems')) {
         data.problems = data.problems.map(
           problem => new types.Problem(problem),
@@ -454,7 +372,7 @@ export default {
       return data;
     }),
 
-    problemsCreated: api.apiCall('/api/user/problemsCreated', function(data) {
+    problemsSolved: api.apiCall('/api/user/problemsSolved/', function(data) {
       if (data.hasOwnProperty('problems')) {
         data.problems = data.problems.map(
           problem => new types.Problem(problem),
@@ -475,17 +393,15 @@ export default {
       return data;
     }),
 
-    rankByProblemsSolved: api.User.rankByProblemsSolved,
-
     removeExperiment: api.User.removeExperiment,
 
     removeGroup: api.User.removeGroup,
 
     removeRole: api.User.removeRole,
 
-    stats: api.User.stats,
-
     selectCoderOfTheMonth: api.User.selectCoderOfTheMonth,
+
+    stats: api.User.stats,
 
     update: api.User.update,
 

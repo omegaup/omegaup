@@ -13,7 +13,7 @@ INNER JOIN
 WHERE
     `r`.`verdict` = "AC" AND
     `s`.`type` = "normal" AND
-    `p`.`visibility` >= 1 AND
+    `p`.`visibility` >= 2 AND
     `s`.`language` = "pas"
 GROUP BY
     `u`.`user_id`

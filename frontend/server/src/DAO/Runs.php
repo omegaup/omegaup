@@ -103,7 +103,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>
      */
     final public static function getAllRuns(
         ?int $problemset_id,
@@ -117,10 +117,44 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.run_id, s.guid, s.language, r.status, r.verdict, r.runtime,
-                r.penalty, r.memory, r.score, r.contest_score, r.judged_by,
-                s.`time`, s.submit_delay, s.type, i.username, p.alias,
-                i.country_id, c.alias AS contest_alias
+                `r`.`run_id`,
+                `s`.`guid`,
+                `s`.`language`,
+                `r`.`status`,
+                `r`.`verdict`,
+                `r`.`runtime`,
+                `r`.`penalty`,
+                `r`.`memory`,
+                `r`.`score`,
+                `r`.`contest_score`,
+                `r`.`judged_by`,
+                `s`.`time`,
+                `s`.`submit_delay`,
+                `s`.`type`,
+                `i`.`username`,
+                `p`.`alias`,
+                `i`.`country_id`,
+                `c`.`alias` AS `contest_alias`,
+                IFNULL(
+                    (
+                        SELECT `urc`.`classname` FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.`user_id` = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
             FROM
                 Submissions s
             USE INDEX(PRIMARY)
@@ -174,7 +208,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{alias: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 

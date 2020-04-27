@@ -717,16 +717,16 @@ export class Arena {
 
     if (self.socket != null) return;
 
-    if (run.status == 'ready') {
-      if (
-        !self.options.isPractice &&
-        !self.options.isOnlyProblem &&
-        self.options.contestAlias != 'admin'
-      ) {
-        self.refreshRanking();
-      }
-    } else {
+    if (run.status != 'ready') {
       self.updateRunFallback(run.guid);
+      return;
+    }
+    if (
+      !self.options.isPractice &&
+      !self.options.isOnlyProblem &&
+      self.options.contestAlias != 'admin'
+    ) {
+      self.refreshRanking();
     }
   }
 
@@ -1533,100 +1533,6 @@ export class Arena {
           self.myRunsList.problemAlias = problem.alias;
         }
 
-        function showQualityNominationPopup() {
-          let qualityPayload = self.currentProblem.quality_payload;
-          if (typeof qualityPayload === 'undefined') {
-            // Quality Nomination only works for Courses
-            return;
-          }
-          if (self.qualityNominationForm !== null) {
-            self.qualityNominationForm.nominated = qualityPayload.nominated;
-            self.qualityNominationForm.nominatedBeforeAC =
-              qualityPayload.nominatedBeforeAC;
-            self.qualityNominationForm.solved = qualityPayload.solved;
-            self.qualityNominationForm.tried = qualityPayload.tried;
-            self.qualityNominationForm.dismissed = qualityPayload.dismissed;
-            self.qualityNominationForm.dismissedBeforeAC =
-              qualityPayload.dismissedBeforeAC;
-            self.qualityNominationForm.canNominateProblem =
-              qualityPayload.canNominateProblem;
-            self.qualityNominationForm.problemAlias =
-              qualityPayload.problemAlias;
-            return;
-          }
-          self.qualityNominationForm = new Vue({
-            el: '#qualitynomination-popup',
-            mounted: function() {
-              ui.reportEvent('quality-nomination', 'shown');
-            },
-            render: function(createElement) {
-              return createElement('qualitynomination-popup', {
-                props: {
-                  nominated: this.nominated,
-                  nominatedBeforeAC: this.nominatedBeforeAC,
-                  solved: this.solved,
-                  tried: this.tried,
-                  dismissed: this.dismissed,
-                  dismissedBeforeAC: this.dismissedBeforeAC,
-                  canNominateProblem: this.canNominateProblem,
-                  problemAlias: this.problemAlias,
-                },
-                on: {
-                  submit: function(ev) {
-                    const contents = {
-                      before_ac: !ev.solved && ev.tried,
-                      difficulty:
-                        ev.difficulty !== ''
-                          ? Number.parseInt(ev.difficulty, 10)
-                          : 0,
-                      tags: ev.tags.length > 0 ? ev.tags : [],
-                      quality:
-                        ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
-                    };
-                    api.QualityNomination.create({
-                      problem_alias: qualityPayload.problem_alias,
-                      nomination: 'suggestion',
-                      contents: JSON.stringify(contents),
-                    })
-                      .then(() => {
-                        ui.reportEvent('quality-nomination', 'submit');
-                      })
-                      .catch(ui.apiError);
-                  },
-                  dismiss: function(ev) {
-                    const contents = {
-                      before_ac: !ev.solved && ev.tried,
-                    };
-                    api.QualityNomination.create({
-                      problem_alias: qualityPayload.problem_alias,
-                      nomination: 'dismissal',
-                      contents: JSON.stringify(contents),
-                    })
-                      .then(function(data) {
-                        ui.info(T.qualityNominationRateProblemDesc);
-                        ui.reportEvent('quality-nomination', 'dismiss');
-                      })
-                      .catch(ui.apiError);
-                  },
-                },
-              });
-            },
-            data: {
-              nominated: qualityPayload.nominated,
-              nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
-              solved: qualityPayload.solved,
-              tried: qualityPayload.tried,
-              dismissed: qualityPayload.dismissed,
-              dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
-              canNominateProblem: qualityPayload.can_nominate_problem,
-              problemAlias: qualityPayload.problem_alias,
-            },
-            components: {
-              'qualitynomination-popup': qualitynomination_Popup,
-            },
-          });
-        }
-
         if (self.options.isPractice || self.options.isOnlyProblem) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
@@ -1636,7 +1542,7 @@ export class Arena {
             .catch(ui.apiError);
         } else {
           updateRuns(problem.runs);
-          showQualityNominationPopup();
+          self.showQualityNominationPopup();
         }
 
         self.initSubmissionCountdown();
@@ -1722,6 +1628,103 @@ export class Arena {
         $('#clarifications-count').css('font-weight', 'normal');
       }
     }
+  }
+
+  showQualityNominationPopup() {
+    let self = this;
+
+    let qualityPayload = self.currentProblem.quality_payload;
+    if (typeof qualityPayload === 'undefined') {
+      // Quality Nomination only works for Courses
+      return;
+    }
+    if (!qualityPayload.canNominateProblem) {
+      // Only real users can perform this action.
+      return;
+    }
+    if (self.qualityNominationForm !== null) {
+      self.qualityNominationForm.nominated = qualityPayload.nominated;
+      self.qualityNominationForm.nominatedBeforeAC =
+        qualityPayload.nominatedBeforeAC;
+      self.qualityNominationForm.solved = qualityPayload.solved;
+      self.qualityNominationForm.tried = qualityPayload.tried;
+      self.qualityNominationForm.dismissed = qualityPayload.dismissed;
+      self.qualityNominationForm.dismissedBeforeAC =
+        qualityPayload.dismissedBeforeAC;
+      self.qualityNominationForm.canNominateProblem =
+        qualityPayload.canNominateProblem;
+      self.qualityNominationForm.problemAlias = qualityPayload.problemAlias;
+      return;
+    }
+    self.qualityNominationForm = new Vue({
+      el: '#qualitynomination-popup',
+      mounted: function() {
+        ui.reportEvent('quality-nomination', 'shown');
+      },
+      render: function(createElement) {
+        return createElement('qualitynomination-popup', {
+          props: {
+            nominated: this.nominated,
+            nominatedBeforeAC: this.nominatedBeforeAC,
+            solved: this.solved,
+            tried: this.tried,
+            dismissed: this.dismissed,
+            dismissedBeforeAC: this.dismissedBeforeAC,
+            canNominateProblem: this.canNominateProblem,
+            problemAlias: this.problemAlias,
+          },
+          on: {
+            submit: function(ev) {
+              const contents = {
+                before_ac: !ev.solved && ev.tried,
+                difficulty:
+                  ev.difficulty !== '' ? Number.parseInt(ev.difficulty, 10) : 0,
+                tags: ev.tags.length > 0 ? ev.tags : [],
+                quality:
+                  ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
+              };
+              api.QualityNomination.create({
+                problem_alias: qualityPayload.problemAlias,
+                nomination: 'suggestion',
+                contents: JSON.stringify(contents),
+              })
+                .then(() => {
+                  ui.reportEvent('quality-nomination', 'submit');
+                })
+                .catch(ui.apiError);
+            },
+            dismiss: function(ev) {
+              const contents = {
+                before_ac: !ev.solved && ev.tried,
+              };
+              api.QualityNomination.create({
+                problem_alias: qualityPayload.problemAlias,
+                nomination: 'dismissal',
+                contents: JSON.stringify(contents),
+              })
+                .then(function(data) {
+                  ui.info(T.qualityNominationRateProblemDesc);
+                  ui.reportEvent('quality-nomination', 'dismiss');
+                })
+                .catch(ui.apiError);
+            },
+          },
+        });
+      },
+      data: {
+        nominated: qualityPayload.nominated,
+        nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
+        solved: qualityPayload.solved,
+        tried: qualityPayload.tried,
+        dismissed: qualityPayload.dismissed,
+        dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
+        canNominateProblem: qualityPayload.canNominateProblem,
+        problemAlias: qualityPayload.problemAlias,
+      },
+      components: {
+        'qualitynomination-popup': qualitynomination_Popup,
+      },
+    });
   }
 
   renderProblem(problem) {
@@ -2127,11 +2130,26 @@ export class Arena {
   trackRun(run) {
     let self = this;
     runsStore.commit('addRun', run);
-    if (run.username == OmegaUp.username) {
-      myRunsStore.commit('addRun', run);
-      if (typeof self.problems[run.alias] != 'undefined') {
-        self.updateProblemScore(run.alias, self.problems[run.alias].points, 0);
-      }
+    if (run.username !== OmegaUp.username) {
+      return;
+    }
+    myRunsStore.commit('addRun', run);
+    if (run.status !== 'ready') {
+      return;
+    }
+    const problem = self.problems[run.alias];
+    if (typeof problem === 'undefined') {
+      return;
+    }
+    self.updateProblemScore(run.alias, problems.points, 0);
+    if (typeof problem.quality_payload === 'undefined') {
+      return;
+    }
+    problem.quality_payload.tried |=
+      run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE';
+    problem.quality_payload.solved |= run.verdict === 'AC';
+    if (problem.alias === self.currentProblem.alias) {
+      self.showQualityNominationPopup();
     }
   }
 

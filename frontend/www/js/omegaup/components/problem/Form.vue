@@ -1,6 +1,6 @@
 <template>
   <div class="panel panel-primary problem-form">
-    <div class="panel-heading" v-if="!data.isUpdate">
+    <div class="panel-heading" v-if="!isUpdate">
       <h3 class="panel-title">
         {{ T.problemNew }}
       </h3>
@@ -48,7 +48,7 @@
               ref="alias"
               type="text"
               class="form-control"
-              v-bind:disabled="data.isUpdate"
+              v-bind:disabled="isUpdate"
             />
           </div>
         </div>
@@ -68,7 +68,7 @@
         ></omegaup-problem-settings>
 
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditEmailClarifications }}</label>
             <div class="form-control">
               <label class="radio-inline">
@@ -92,50 +92,26 @@
             </div>
           </div>
 
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.problemEditFormAppearsAsPublic }}</label>
             <div class="form-control">
               <label class="radio-inline">
                 <input
                   type="radio"
-                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="data.isBannedOrPromoted"
-                  v-bind:value="1"
-                  v-model="visibility"
-                />
-                {{ T.wordsYes }}
-              </label>
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  v-bind:name="!data.isBannedOrPromoted ? 'visibility' : ''"
-                  v-bind:disabled="data.isBannedOrPromoted"
-                  v-bind:value="0"
-                  v-model="visibility"
-                />
-                {{ T.wordsNo }}
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group col-md-4">
-            <label>{{ T.problemEditFormAllowUserAddTags }}</label>
-            <div class="form-control">
-              <label class="radio-inline">
-                <input
-                  type="radio"
-                  name="allow_user_add_tags"
+                  name="visibility"
+                  v-bind:disabled="!isEditable"
                   v-bind:value="true"
-                  v-model="allowUserAddTags"
+                  v-model="isPublic"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
                   type="radio"
-                  name="allow_user_add_tags"
+                  name="visibility"
+                  v-bind:disabled="!isEditable"
                   v-bind:value="false"
-                  v-model="allowUserAddTags"
+                  v-model="isPublic"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -174,79 +150,12 @@
           </div>
         </div>
 
-        <div class="panel panel-primary" v-if="!data.isUpdate">
-          <div class="panel-body">
-            <div class="form-group">
-              <label>{{ T.wordsTags }}</label>
-            </div>
-            <div class="form-group">
-              <div class="tag-list pull-left">
-                <a
-                  class="tag pull-left"
-                  href="#tags"
-                  v-bind:data-key="tag.name"
-                  v-for="tag in tags"
-                  v-on:click.prevent="onAddTag(tag.name, public)"
-                >
-                  {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
-                </a>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>{{ T.problemEditTagPublic }}</label>
-              <select class="form-control" v-model="public">
-                <option v-bind:value="false" selected="selected">
-                  {{ T.wordsNo }}
-                </option>
-                <option v-bind:value="true">{{ T.wordsYes }}</option>
-              </select>
-            </div>
-          </div>
-
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>{{ T.contestEditTagName }}</th>
-                <th>{{ T.contestEditTagPublic }}</th>
-                <th>{{ T.contestEditTagDelete }}</th>
-              </tr>
-            </thead>
-            <tbody class="problem-tags">
-              <tr v-for="selectedTag in selectedTags">
-                <td class="tag-name">
-                  <a
-                    v-bind:data-key="selectedTag.tagname"
-                    v-bind:href="`/problem/?tag[]=${selectedTag.tagname}`"
-                  >
-                    {{
-                      T.hasOwnProperty(selectedTag.tagname)
-                        ? T[selectedTag.tagname]
-                        : selectedTag.tagname
-                    }}
-                  </a>
-                </td>
-                <td class="is_public">
-                  {{ selectedTag.public ? T.wordsYes : T.wordsNo }}
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="close"
-                    v-on:click="onRemoveTag(selectedTag.tagname)"
-                  >
-                    &times;
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <input
-            type="hidden"
-            name="selected_tags"
-            v-bind:value="selectedTagsList"
-          />
-        </div>
-
+        <omegaup-problem-tags
+          v-bind:initialTags="data.tags"
+          v-bind:initialSelectedTags="data.selectedTags || []"
+          v-bind:alias="data.alias"
+          v-if="!isUpdate"
+        ></omegaup-problem-tags>
         <div class="row" v-else="">
           <div
             class="form-group  col-md-12"
@@ -255,10 +164,21 @@
             <label class="control-label">{{
               T.problemEditCommitMessage
             }}</label>
-            <input class="form-control" name="message" type="text" />
+            <input
+              class="form-control"
+              name="message"
+              v-model="message"
+              type="text"
+            />
           </div>
         </div>
 
+        <input
+          type="hidden"
+          name="visibility"
+          v-bind:value="visibility"
+          v-if="isEditable"
+        />
         <input name="request" value="submit" type="hidden" />
 
         <div class="row">
@@ -283,6 +203,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
+import problem_Tags from './Tags.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
 import latinize from 'latinize';
@@ -291,10 +212,13 @@ import { types } from '../../api_types';
 @Component({
   components: {
     'omegaup-problem-settings': problem_Settings,
+    'omegaup-problem-tags': problem_Tags,
   },
 })
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
+  @Prop({ default: false }) isUpdate!: boolean;
+  @Prop({ default: 0 }) originalVisibility!: number;
 
   T = T;
   title = this.data.title;
@@ -314,7 +238,7 @@ export default class ProblemForm extends Vue {
   languages = this.data.languages;
   tags = this.data.tags;
   selectedTags = this.data.selectedTags || [];
-  message = this.data.message;
+  message = '';
   hasFile = false;
   public = false;
   errors: string[] = [];
@@ -324,7 +248,7 @@ export default class ProblemForm extends Vue {
   }
 
   get buttonText(): string {
-    if (this.data.isUpdate) {
+    if (this.isUpdate) {
       return T.problemEditFormUpdateProblem;
     }
     return T.problemEditFormCreateProblem;
@@ -334,9 +258,45 @@ export default class ProblemForm extends Vue {
     return JSON.stringify(this.selectedTags);
   }
 
+  get isPublic(): boolean {
+    // when visibility is public warning, then the problem is shown as public
+    return this.visibility > this.data.visibilityStatuses.private;
+  }
+
+  set isPublic(isPublic: boolean) {
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicWarning ||
+      this.originalVisibility === this.data.visibilityStatuses.privateWarning
+    ) {
+      this.visibility = isPublic
+        ? this.data.visibilityStatuses.publicWarning
+        : this.data.visibilityStatuses.privateWarning;
+      return;
+    }
+    if (
+      this.originalVisibility === this.data.visibilityStatuses.publicBanned ||
+      this.originalVisibility === this.data.visibilityStatuses.privateBanned
+    ) {
+      this.visibility = isPublic
+        ? this.data.visibilityStatuses.publicBanned
+        : this.data.visibilityStatuses.privateBanned;
+      return;
+    }
+    this.visibility = isPublic
+      ? this.data.visibilityStatuses.public
+      : this.data.visibilityStatuses.private;
+  }
+
+  get isEditable(): boolean {
+    return (
+      this.data.visibilityStatuses.publicBanned < this.visibility &&
+      this.visibility < this.data.visibilityStatuses.promoted
+    );
+  }
+
   onSubmit(e: Event): void {
     this.errors = [];
-    if (this.data.isUpdate && this.message) {
+    if (this.isUpdate && this.message) {
       return;
     }
     if (this.title && this.alias && this.source && this.hasFile) {
@@ -352,10 +312,10 @@ export default class ProblemForm extends Vue {
     if (!this.source) {
       this.errors.push('source');
     }
-    if (!this.hasFile) {
+    if (!this.isUpdate && !this.hasFile) {
       this.errors.push('file');
     }
-    if (this.data.isUpdate && !this.message) {
+    if (this.isUpdate && !this.message) {
       this.errors.push('message');
     }
     e.preventDefault();
@@ -379,6 +339,10 @@ export default class ProblemForm extends Vue {
   }
 
   onGenerateAlias(): void {
+    if (this.isUpdate) {
+      return;
+    }
+
     // Remove accents
     let generatedAlias = latinize(this.title);
 
@@ -395,6 +359,9 @@ export default class ProblemForm extends Vue {
 
   @Watch('alias')
   onValueChanged(newValue: string): void {
+    if (this.isUpdate) {
+      return;
+    }
     this.$emit('alias-changed', newValue);
   }
 }

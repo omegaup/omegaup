@@ -50,8 +50,10 @@ OmegaUp.on('ready', () => {
 
   const getDistribution = (stats: types.StatsPayload) => {
     const distribution: number[] = [];
-    for (const val in stats.distribution) {
-      distribution.push(stats.distribution[val]);
+    if (stats.distribution) {
+      for (const val in stats.distribution) {
+        distribution.push(stats.distribution[val]);
+      }
     }
 
     return distribution;
@@ -60,9 +62,11 @@ OmegaUp.on('ready', () => {
   const getCategories = (stats: types.StatsPayload) => {
     const categoriesDistributionValues: { [key: number]: number } = {};
     let startOfBucket = 0;
-    for (const val in stats.distribution) {
-      categoriesDistributionValues[val] = startOfBucket;
-      startOfBucket += stats.size_of_bucket;
+    if (stats.distribution && stats.size_of_bucket) {
+      for (const val in stats.distribution) {
+        categoriesDistributionValues[val] = startOfBucket;
+        startOfBucket += stats.size_of_bucket;
+      }
     }
     return categoriesDistributionValues;
   };
