@@ -88,21 +88,21 @@
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('banned')"
+              v-on:click="mark('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('resolved')"
+              v-on:click="mark('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
               class="btn btn-warning"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('warning')"
+              v-on:click="mark('warning')"
             >
               {{ T.wordsWarningProblem }}
             </button>
@@ -110,6 +110,37 @@
         </div>
       </div>
     </div>
+    <!--<div class="confirmation" v-if="confirmationShow">
+      <button class="close" type="button" v-on:click="onHide">×</button>
+      <div class="form-group">
+        <div class="question-text">
+          {{ T.demotionProblemMultipleQuestion}}
+        </div>
+        <button
+          class="btn btn-success"
+          v-bind:disabled="!rationale"
+          v-on:click="markResolution(true)"
+          >
+          {{ T.demotionProblemMultipleAnswerYes }}
+        </button>
+        <button
+          class="btn btn-danger"
+          v-bind:disabled="!rationale"
+          v-on:click="markResolution(false)"
+          >
+          {{ T.demotionProblemMultipleAnswerNo }}
+        </button>
+      </div>
+    </div>-->
+    <omegaup-common-confirmation
+      v-if="confirmationShow"
+      v-bind:question="T.demotionProblemMultipleQuestion"
+      v-bind:answer-yes="T.demotionProblemMultipleAnswerYes"
+      v-bind:answer-no="T.demotionProblemMultipleAnswerNo"
+      v-on:close="confirmationShow = false"
+      v-on:yes="markResolution(true)"
+      v-on:no="markResolution(false)"
+    ></omegaup-common-confirmation>
   </div>
 </template>
 
@@ -117,6 +148,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import confirmation from '../common/Confirmation.vue';
 
 interface QualityNominationContents {
   original: string;
@@ -124,7 +156,11 @@ interface QualityNominationContents {
   reason: string;
 }
 
-@Component
+@Component({
+  components: {
+    'omegaup-common-confirmation': confirmation,
+  },
+})
 export default class QualityNominationDetails extends Vue {
   @Prop() author!: omegaup.User;
   @Prop() contents!: QualityNominationContents;
@@ -138,6 +174,8 @@ export default class QualityNominationDetails extends Vue {
 
   T = T;
   rationale = this.initialRationale;
+  confirmationShow = false;
+  status = 'banned';
 
   userUrl(alias: string): string {
     return `/profile/${alias}/`;
@@ -147,8 +185,17 @@ export default class QualityNominationDetails extends Vue {
     return `/arena/problem/${alias}/`;
   }
 
-  markResolution(newStatus: string): void {
-    this.$emit('mark-resolution', this, newStatus);
+  markResolution(all: boolean): void {
+    this.$emit('mark-resolution', this, this.status, all);
+  }
+
+  mark(status: string): void {
+    this.status = status;
+    this.confirmationShow = true;
+  }
+
+  onHide(): void {
+    this.confirmationShow = false;
   }
 }
 </script>
@@ -156,5 +203,25 @@ export default class QualityNominationDetails extends Vue {
 <style>
 textarea {
   margin: 0 0 10px;
+}
+
+.confirmation {
+  position: fixed;
+  top: 25%;
+  left: 30%;
+  z-index: 9999999 !important;
+  width: 350px;
+  height: 150px;
+  margin: 2em auto 0 auto;
+  border: 2px solid #ccc;
+  padding: 1em;
+  overflow: auto;
+  background: gray;
+}
+
+.confirmation .question-text {
+  font-weight: bold;
+  padding-bottom: 4px;
+  text-align: center;
 }
 </style>

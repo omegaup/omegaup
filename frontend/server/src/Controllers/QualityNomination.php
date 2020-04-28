@@ -507,6 +507,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $qualitynomination_id
      * @omegaup-request-param mixed $rationale
      * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $all
      *
      * @return array{status: string}
      */
@@ -524,7 +525,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['rationale'],
             'rationale'
         );
-
+        $r->ensureBool('all', false);
+        //error_log($r['all'].'-'.$r['status']);
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
@@ -594,6 +596,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
+        if ($r['all']) {
+            $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionPerProblem(
+                $qualitynomination->problem_id ?? -1
+            );
+        } else {
+            $nominations = [$qualitynomination];
+        }
+        /*error_log(print_r($nominations,true));
         $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
             'qualitynomination_id' => $qualitynomination->qualitynomination_id,
@@ -602,7 +612,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'rationale' => $r['rationale']
         ]);
         $qualitynomination->status = $qualitynominationlog->to_status;
-
+*/
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
             'problem_alias' => $r['problem_alias'],
@@ -618,17 +628,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams->updatePublished,
                 /*$redirect=*/ false
             );
-            \OmegaUp\DAO\QualityNominations::update($qualitynomination);
-            \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
-            \OmegaUp\DAO\DAO::transEnd();
-            if ($r['status'] == 'banned' || $r['status'] == 'warning') {
-                self::sendNotificationEmail(
-                    $problem,
-                    $qualitynomination,
-                    $qualitynominationlog->rationale ?? '',
-                    strval($r['status'])
+            foreach ($nominations as $index => $nomination) {
+                $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
+                    'user_id' => $nomination->user_id,
+                    'qualitynomination_id' => $nomination->qualitynomination_id,
+                    'from_status' => $nomination->status,
+                    'to_status' => $r['status'],
+                    'rationale' => $r['rationale']
+                ]);
+                $nomination->status = $qualitynominationlog->to_status;
+                \OmegaUp\DAO\QualityNominations::update($nomination);
+                \OmegaUp\DAO\QualityNominationLog::create(
+                    $qualitynominationlog
                 );
+                if (
+                    ($r['status'] == 'banned'
+                    || $r['status'] == 'warning')
+                    && intval($r['qualitynomination_id']) == $nomination->qualitynomination_id
+                ) {
+                    self::sendNotificationEmail(
+                        $problem,
+                        $qualitynomination,
+                        $qualitynominationlog->rationale ?? '',
+                        strval($r['status'])
+                    );
+                }
             }
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);

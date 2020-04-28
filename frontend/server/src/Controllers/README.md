@@ -3362,6 +3362,7 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 | `qualitynomination_id` | `mixed` |             |
 | `rationale`            | `mixed` |             |
 | `status`               | `mixed` |             |
+| `all`                  | `mixed` |             |
 
 ### Returns
 
