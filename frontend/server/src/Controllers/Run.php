@@ -852,7 +852,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
         ];
-        $shouldShowRunDetails = self::shouldShowRunDetails(
+        $showRunDetails = self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,
             $contest
@@ -862,32 +862,30 @@ class Run extends \OmegaUp\Controllers\Controller {
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
-            $response['admin'] || $shouldShowRunDetails
+            $response['admin'],
+            $showRunDetails
         );
         $response['source'] = $details['source'];
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (
-            isset($details['details']) &&
-            isset($details['details']['groups'])
-        ) {
+        if (isset($details['details'])) {
             if (!is_null($contest)) {
                 if ($contest->feedback === 'summary') {
                     $verdictIndexMap = array_flip(self::VERDICTS);
-                    foreach ($details['details']['groups'] as &$group) {
-                        $worstVerdictIndex = 0;
-                        foreach ($group['cases'] as $case) {
-                            $worstVerdictIndex = max(
-                                $worstVerdictIndex,
-                                $verdictIndexMap[$case['verdict']]
-                            );
+                    if (isset($details['details']['groups'])) {
+                        foreach ($details['details']['groups'] as &$group) {
+                            $worstVerdictIndex = 0;
+                            foreach ($group['cases'] as $case) {
+                                $worstVerdictIndex = max(
+                                    $worstVerdictIndex,
+                                    $verdictIndexMap[$case['verdict']]
+                                );
+                            }
+                            $group['verdict'] = self::VERDICTS[$worstVerdictIndex];
+                            unset($group['cases']);
                         }
-                        $group['verdict'] = self::VERDICTS[$worstVerdictIndex];
-                        unset($group['cases']);
                     }
-                } elseif ($contest->feedback === 'none') {
-                    unset($details['details']['groups']);
                 }
             }
             $response['details'] = $details['details'];
@@ -940,8 +938,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         return self::getOptionalRunDetails(
             $submission,
-            $run,
-            false
+            $run
         );
     }
 
@@ -949,14 +946,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         int $identityId,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
-    ): bool {
-        if (!is_null($contest) && $contest->feedback !== 'none') {
-            return true;
+    ): string {
+        if (!is_null($contest)) {
+            return $contest->feedback;
         }
         return \OmegaUp\DAO\Problems::isProblemSolved(
             $problem,
             $identityId
-        );
+        ) ? 'detailed' : 'none';
     }
 
     /**
@@ -965,7 +962,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
-        bool $showDetails
+        bool $isAdmin = false,
+        string $showDetails = 'none'
     ): array {
         $response = [];
         if (OMEGAUP_LOCKDOWN) {
@@ -975,7 +973,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 strval($submission->guid)
             );
         }
-        if (!$showDetails && $run->verdict != 'CE') {
+        if (($showDetails === 'none' || $isAdmin) && $run->verdict != 'CE') {
             return $response;
         }
         $detailsJson = self::getGraderResource($run, 'details.json');
@@ -990,7 +988,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (!OMEGAUP_LOCKDOWN && $showDetails) {
+        if (!OMEGAUP_LOCKDOWN && ($showDetails !== 'none' || $isAdmin)) {
             $response['details'] = $details;
         }
         return $response;
