@@ -58,6 +58,14 @@ export namespace types {
       );
     }
 
+    export function CoderOfTheMonthPayload(
+      elementId: string,
+    ): types.CoderOfTheMonthPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CommonPayload(elementId: string): types.CommonPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -316,6 +324,38 @@ export namespace types {
     time: string;
     user_id: number;
     username: string;
+  }
+
+  export interface CoderOfTheMonthList {
+    username: string;
+    country_id: string;
+    gravatar_32: string;
+    date: string;
+    classname: string;
+  }
+  [];
+
+  export interface CoderOfTheMonthPayload {
+    codersOfCurrentMonth: types.CoderOfTheMonthList;
+    codersOfPreviousMonth: types.CoderOfTheMonthList;
+    candidatesToCoderOfTheMonth: {
+      category: string;
+      classname: string;
+      coder_of_the_month_id: number;
+      country_id: string;
+      description?: string;
+      interview_url?: string;
+      problems_solved: number;
+      ranking: number;
+      school_id?: number;
+      score: number;
+      selected_by?: number;
+      time: string;
+      username: string;
+    }[];
+    isMentor: boolean;
+    category: string;
+    options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
   export interface CommonPayload {
@@ -2431,13 +2471,7 @@ export namespace messages {
   };
   export type UserCoderOfTheMonthListRequest = { [key: string]: any };
   export type UserCoderOfTheMonthListResponse = {
-    coders: {
-      username: string;
-      country_id: string;
-      gravatar_32: string;
-      date: string;
-      classname: string;
-    }[];
+    coders: types.CoderOfTheMonthList;
   };
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;

@@ -3992,9 +3992,9 @@ Returns the list of coders of the month
 
 ### Returns
 
-| Name     | Type                                                                                                |
-| -------- | --------------------------------------------------------------------------------------------------- |
-| `coders` | `{ username: string; country_id: string; gravatar_32: string; date: string; classname: string; }[]` |
+| Name     | Type                        |
+| -------- | --------------------------- |
+| `coders` | `types.CoderOfTheMonthList` |
 
 ## `/api/user/contestStats/`
 
