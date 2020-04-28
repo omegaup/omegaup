@@ -12,7 +12,7 @@
     <div class="d-flex align-items-center pt-1">
       <img class="d-block" width="80" v-bind:src="iconUrl" />
       <div>
-        {{ text }}
+        <p v-html="text"></p>
       </div>
     </div>
   </div>
@@ -50,6 +50,8 @@ export default class Notification extends Vue {
         } else {
           return '/media/warning.svg';
         }
+      case 'general_notification':
+        return '/media/email.svg';
       default:
         return 'media/info.png';
     }
@@ -62,6 +64,8 @@ export default class Notification extends Vue {
           badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
       case 'demotion':
+        return this.notification.contents.message || '';
+      case 'general_notification':
         return this.notification.contents.message || '';
       default:
         return '';
