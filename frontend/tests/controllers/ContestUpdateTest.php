@@ -949,4 +949,32 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
     }
+
+    public function testCreateSubmissionAfterUpdateContest() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Call API
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'admission_mode' => 'public',
+                'languages' => '',
+            ])
+        );
+
+        $this->createRunInContest($contestData);
+    }
 }
