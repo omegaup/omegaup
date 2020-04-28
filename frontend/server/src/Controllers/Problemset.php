@@ -253,11 +253,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             if (isset($r['auth_token']) && is_string($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
             }
+            /** @psalm-suppress MixedArgument $r['tokens'] is definitely an array here. */
             if (
                 isset($r['tokens']) &&
                 is_array($r['tokens']) &&
                 count($r['tokens']) >= 4
             ) {
+                /** @psalm-suppress MixedArrayAccess $r['tokens'] is definitely an array here. */
                 $request['token'] = strval($r['tokens'][3]);
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails($request);

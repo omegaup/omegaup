@@ -66,8 +66,8 @@ function shouldRedirect(string $url): bool {
     }
     // Just the path portion of the URL was given.
     if (
-        !isset($redirectParsedUrl['scheme']) &&
-        !isset($redirectParsedUrl['host'])
+        empty($redirectParsedUrl['scheme']) ||
+        empty($redirectParsedUrl['host'])
     ) {
         return true;
     }

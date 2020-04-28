@@ -31,6 +31,11 @@ stage_script() {
 	yarn run build
 	yarn test
 
+	# Create optional directories to simplify psalm config.
+	mkdir -p frontend/www/{phpminiadmin,preguntas}
+	touch 'frontend/server/config.php'
+	touch 'frontend/tests/test_config.php'
+
 	python3 stuff/db-migrate.py validate
 	"${OMEGAUP_ROOT}/stuff/lint.sh" validate --all < /dev/null
 }

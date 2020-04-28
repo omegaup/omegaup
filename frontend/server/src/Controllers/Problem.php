@@ -2804,6 +2804,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
+        /** @psalm-suppress RedundantCondition OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE may be defined as true in tests. */
         if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info(
                 'Calling \OmegaUp\Controllers\Problem::apiRejudge'
