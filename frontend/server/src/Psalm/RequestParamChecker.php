@@ -240,7 +240,7 @@ class RequestParamChecker implements
         \Psalm\Type\Union &$returnTypeCandidate = null
     ) {
         if (is_null($context->calling_function_id)) {
-            // Not being called form within a function-like.
+            // Not being called from within a function-like.
             return;
         }
         $functionId = strtolower($context->calling_function_id);
@@ -250,22 +250,6 @@ class RequestParamChecker implements
         self::$methodCallGraph[$functionId][strtolower(
             $appearingMethodId
         )] = true;
-
-        if (
-            !array_key_exists(
-                strtolower($appearingMethodId),
-                self::$methodTypeMapping
-            )
-        ) {
-            return;
-        }
-        if (!array_key_exists($functionId, self::$methodTypeMapping)) {
-            self::$methodTypeMapping[$functionId] = [];
-        }
-        self::$methodTypeMapping[$functionId] = array_merge(
-            self::$methodTypeMapping[$functionId],
-            self::$methodTypeMapping[strtolower($appearingMethodId)]
-        );
     }
 
     /**
@@ -356,14 +340,17 @@ class RequestParamChecker implements
             }
 
             if (
-                !isset(self::$methodTypeMapping[$functionId]) ||
                 // Methods that do not have an \OmegaUp\Request argument don't
                 // need the annotations.
                 !$hasRequestArgument
             ) {
                 $expected = [];
             } else {
-                $expected = self::$methodTypeMapping[$functionId];
+                if (isset(self::$methodTypeMapping[$functionId])) {
+                    $expected = self::$methodTypeMapping[$functionId];
+                } else {
+                    $expected = [];
+                }
 
                 // Now go through the callgraph, parsing any unvisited methods if needed.
                 foreach (self::$methodCallGraph[$functionId] ?? [] as $calleeMethodId => $_) {
