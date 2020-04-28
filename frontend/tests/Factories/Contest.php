@@ -75,7 +75,13 @@ class ContestParams {
     public $penaltyCalcPolicy;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string} $params
+     * @readonly
+     * @var string
+     */
+    public $feedback;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string, feedback?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -102,6 +108,7 @@ class ContestParams {
         $this->finishTime = $params['finishTime'] ?? (\OmegaUp\Time::get() + 60 * 60);
         $this->lastUpdated = $params['lastUpdated'] ?? (\OmegaUp\Time::get() + 60 * 60);
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
+        $this->feedback = $params['feedback'] ?? 'detailed';
     }
 }
 
@@ -129,7 +136,7 @@ class Contest {
             'points_decay_factor' => '0.02',
             'partial_score' => '0',
             'submissions_gap' => '60',
-            'feedback' => 'detailed',
+            'feedback' => $params->feedback,
             'penalty' => 100,
             'scoreboard' => 100,
             'penalty_type' => 'contest_start',

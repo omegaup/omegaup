@@ -852,39 +852,40 @@ class Run extends \OmegaUp\Controllers\Controller {
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
         ];
-        $showRunDetails = self::shouldShowRunDetails(
+        $showRunDetails = !$response['admin'] ? self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,
             $contest
-        );
+        ) : 'detailed';
 
         // Get the details, compile error, logs, etc.
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
-            $response['admin'] || $showRunDetails !== 'none'
+            /*$showDetails=*/$showRunDetails !== 'none'
         );
+
         $response['source'] = $details['source'];
         if (isset($details['compile_error'])) {
             $response['compile_error'] = $details['compile_error'];
         }
         if (isset($details['details'])) {
-            if (!is_null($contest)) {
-                if ($contest->feedback === 'summary') {
-                    $verdictIndexMap = array_flip(self::VERDICTS);
-                    if (isset($details['details']['groups'])) {
-                        foreach ($details['details']['groups'] as &$group) {
-                            $worstVerdictIndex = 0;
-                            foreach ($group['cases'] as $case) {
-                                $worstVerdictIndex = max(
-                                    $worstVerdictIndex,
-                                    $verdictIndexMap[$case['verdict']]
-                                );
-                            }
-                            $group['verdict'] = self::VERDICTS[$worstVerdictIndex];
-                            unset($group['cases']);
-                        }
+            if (
+                !is_null($contest)
+                && $contest->feedback === 'summary'
+                && isset($details['details']['groups'])
+            ) {
+                $verdictIndexMap = array_flip(self::VERDICTS);
+                foreach ($details['details']['groups'] as &$group) {
+                    $worstVerdictIndex = 0;
+                    foreach ($group['cases'] as $case) {
+                        $worstVerdictIndex = max(
+                            $worstVerdictIndex,
+                            $verdictIndexMap[$case['verdict']]
+                        );
                     }
+                    $group['verdict'] = self::VERDICTS[$worstVerdictIndex];
+                    unset($group['cases']);
                 }
             }
             $response['details'] = $details['details'];
@@ -946,7 +947,17 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
     ): string {
-        if (!is_null($contest)) {
+        $isProblemSolved = \OmegaUp\DAO\Problems::isProblemSolved(
+            $problem,
+            $identityId
+        );
+        if (
+            !is_null($contest)
+            && (
+                !$isProblemSolved
+                || $contest->finish_time > \OmegaUp\Time::get()
+            )
+        ) {
             return $contest->feedback;
         }
         return \OmegaUp\DAO\Problems::isProblemSolved(
