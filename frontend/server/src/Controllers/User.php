@@ -138,6 +138,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (!is_null($createUserParams->facebookUserId)) {
             $userData['facebook_user_id'] = $createUserParams->facebookUserId;
         }
+        /** @psalm-suppress TypeDoesNotContainType OMEGAUP_VALIDATE_CAPTCHA may be defined as true in tests. */
         if ($forceVerification) {
             $userData['verified'] = 1;
         } elseif (OMEGAUP_VALIDATE_CAPTCHA) {
@@ -153,16 +154,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $createUserParams->recaptcha,
-                'remoteip' => $_SERVER['REMOTE_ADDR']];
+                'remoteip' => $_SERVER['REMOTE_ADDR'],
+            ];
 
             // use key 'http' even if you send the request to https://...
             $options = [
-                    'http' => [
-                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                        'method'  => 'POST',
-                        'content' => http_build_query($data),
-                        ],
-                    ];
+                'http' => [
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                ],
+            ];
             $context  = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
 
@@ -379,6 +381,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * Expects in request:
      * user
      * password
+     *
+     * @omegaup-request-param string $password
+     * @omegaup-request-param string $usernameOrEmail
      *
      * @param \OmegaUp\Request $r
      *
@@ -1868,6 +1873,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by user
      *
+     * @omegaup-request-param mixed $username
+     *
      * @return array{problems: list<Problem>}
      */
     public static function apiProblemsSolved(\OmegaUp\Request $r): array {
@@ -1899,6 +1906,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get Problems unsolved by user
+     *
+     * @omegaup-request-param mixed $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1933,6 +1942,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get Problems created by user
+     *
+     * @omegaup-request-param mixed $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -2000,6 +2011,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get stats
+     *
+     * @omegaup-request-param mixed $username
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -2998,6 +3011,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the last privacy policy saved in the data base
      *
+     * @omegaup-request-param mixed $username
+     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
@@ -3082,6 +3097,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Gets the last privacy policy accepted by user
+     *
+     * @omegaup-request-param mixed $username
      *
      * @param \OmegaUp\Request $r
      *
@@ -3514,6 +3531,8 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $username
+     *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
@@ -3542,6 +3561,8 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $username
+     *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
@@ -3580,6 +3601,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param null|string $auth_token
+     * @omegaup-request-param mixed $username
+     *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
@@ -3616,6 +3640,8 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $username
+     *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, admin?: true, practice?: false, profile?: array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: false|null|string, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}}, template: string}
      */
     public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {

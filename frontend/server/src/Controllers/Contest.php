@@ -4023,6 +4023,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a detailed report of the contest
      *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $filterBy
+     *
      * @return array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: \OmegaUp\Timestamp, title: string}
      */
     public static function apiReport(\OmegaUp\Request $r): array {
