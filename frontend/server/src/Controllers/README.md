@@ -1047,6 +1047,14 @@ _Nothing_
 
 Returns a detailed report of the contest
 
+### Parameters
+
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `auth_token`    | `mixed` |             |
+| `contest_alias` | `mixed` |             |
+| `filterBy`      | `mixed` |             |
+
 ### Returns
 
 | Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -1658,6 +1666,13 @@ types.CourseDetails;
 ### Description
 
 Show course intro only on public courses when user is not yet registered
+
+### Parameters
+
+| Name               | Type    | Description |
+| ------------------ | ------- | ----------- |
+| `assignment_alias` | `mixed` |             |
+| `course_alias`     | `mixed` |             |
 
 ### Returns
 
@@ -3758,6 +3773,12 @@ server roundtrip (about ~100msec on each pageload), it also returns the
 current time to be able to calculate the time delta between the
 contestant's machine and the server.
 
+### Parameters
+
+| Name         | Type          | Description |
+| ------------ | ------------- | ----------- |
+| `auth_token` | `null|string` |             |
+
 ### Returns
 
 | Name      | Type                                                                                                                   |
@@ -4120,6 +4141,12 @@ Get the results for this user in a given interview
 
 Gets the last privacy policy accepted by user
 
+### Parameters
+
+| Name       | Type    | Description |
+| ---------- | ------- | ----------- |
+| `username` | `mixed` |             |
+
 ### Returns
 
 | Name          | Type      |
@@ -4164,6 +4191,12 @@ Get the identities that have been associated to the logged user
 
 Get Problems unsolved by user
 
+### Parameters
+
+| Name       | Type    | Description |
+| ---------- | ------- | ----------- |
+| `username` | `mixed` |             |
+
 ### Returns
 
 | Name       | Type              |
@@ -4178,6 +4211,13 @@ Exposes API /user/login
 Expects in request:
 user
 password
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `password`        | `string` |             |
+| `usernameOrEmail` | `string` |             |
 
 ### Returns
 
@@ -4203,6 +4243,12 @@ Registers to the mailing list all users that have not been added before. Admin o
 
 Get Problems created by user
 
+### Parameters
+
+| Name       | Type    | Description |
+| ---------- | ------- | ----------- |
+| `username` | `mixed` |             |
+
 ### Returns
 
 | Name       | Type              |
@@ -4214,6 +4260,12 @@ Get Problems created by user
 ### Description
 
 Get Problems solved by user
+
+### Parameters
+
+| Name       | Type    | Description |
+| ---------- | ------- | ----------- |
+| `username` | `mixed` |             |
 
 ### Returns
 
@@ -4331,6 +4383,12 @@ _Nothing_
 ### Description
 
 Get stats
+
+### Parameters
+
+| Name       | Type    | Description |
+| ---------- | ------- | ----------- |
+| `username` | `mixed` |             |
 
 ### Returns
 
