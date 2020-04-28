@@ -68,10 +68,13 @@ class RequestParamChecker implements
             }
             return null;
         }
-        if (is_null($context->calling_function_id)) {
-            throw new \Exception('Should never happen');
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            throw new \Exception('Empty calling method/function id');
         }
-        $functionId = strtolower($context->calling_function_id);
         if (!array_key_exists($functionId, self::$methodTypeMapping)) {
             self::$methodTypeMapping[$functionId] = [];
         }
@@ -239,11 +242,14 @@ class RequestParamChecker implements
         array &$fileReplacements = [],
         \Psalm\Type\Union &$returnTypeCandidate = null
     ) {
-        if (is_null($context->calling_function_id)) {
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
             // Not being called from within a function-like.
             return;
         }
-        $functionId = strtolower($context->calling_function_id);
         if (!array_key_exists($functionId, self::$methodCallGraph)) {
             self::$methodCallGraph[$functionId] = [];
         }
@@ -310,7 +316,7 @@ class RequestParamChecker implements
             );
             $docblockStart = (
                 !is_null($docblock) ?
-                $docblock->getFilePos() :
+                $docblock->getStartFilePos() :
                 intval(
                     $methodStmt->getAttribute(
                         'startFilePos'

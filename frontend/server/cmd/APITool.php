@@ -857,6 +857,23 @@ function listDir(string $path): Generator {
     closedir($dh);
 }
 
+// Psalm requires having a ProjectAnalyzer instance set up in order to resolve
+// some more complex types.
+//
+// It's a bit brittle to be fiddling with internal objects, but there is no
+// other way to get a valid instance.
+$rootDirectory = dirname(__DIR__, 3);
+define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
+$projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
+    \Psalm\Config::loadFromXMLFile(
+        "{$rootDirectory}/psalm.xml",
+        $rootDirectory
+    ),
+    new \Psalm\Internal\Provider\Providers(
+        new \Psalm\Internal\Provider\FileProvider()
+    )
+);
+
 $options = getopt('', ['file:']);
 if (!isset($options['file']) || !is_string($options['file'])) {
     throw new \Exception('Missing option for --file');

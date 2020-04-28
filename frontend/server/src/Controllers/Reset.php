@@ -35,6 +35,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $user->reset_sent_at = \OmegaUp\Time::get();
         \OmegaUp\DAO\Users::update($user);
 
+        /** @psalm-suppress TypeDoesNotContainType IS_TEST may be defined as true in tests. */
         if (IS_TEST) {
             return ['token' => $token];
         }
@@ -219,6 +220,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Identities::update($identity);
 
+        /** @psalm-suppress TypeDoesNotContainType IS_TEST may be defined as true in tests. */
         return [
             'message' => IS_TEST ?
                 'message' :
