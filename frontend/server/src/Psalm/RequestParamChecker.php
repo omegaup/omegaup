@@ -68,10 +68,13 @@ class RequestParamChecker implements
             }
             return null;
         }
-        if (is_null($context->calling_function_id)) {
-            throw new \Exception('Should never happen');
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            throw new \Exception('Empty calling method/function id');
         }
-        $functionId = strtolower($context->calling_function_id);
         if (!array_key_exists($functionId, self::$methodTypeMapping)) {
             self::$methodTypeMapping[$functionId] = [];
         }
@@ -239,33 +242,20 @@ class RequestParamChecker implements
         array &$fileReplacements = [],
         \Psalm\Type\Union &$returnTypeCandidate = null
     ) {
-        if (is_null($context->calling_function_id)) {
-            // Not being called form within a function-like.
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            // Not being called from within a function-like.
             return;
         }
-        $functionId = strtolower($context->calling_function_id);
         if (!array_key_exists($functionId, self::$methodCallGraph)) {
             self::$methodCallGraph[$functionId] = [];
         }
         self::$methodCallGraph[$functionId][strtolower(
             $appearingMethodId
         )] = true;
-
-        if (
-            !array_key_exists(
-                strtolower($appearingMethodId),
-                self::$methodTypeMapping
-            )
-        ) {
-            return;
-        }
-        if (!array_key_exists($functionId, self::$methodTypeMapping)) {
-            self::$methodTypeMapping[$functionId] = [];
-        }
-        self::$methodTypeMapping[$functionId] = array_merge(
-            self::$methodTypeMapping[$functionId],
-            self::$methodTypeMapping[strtolower($appearingMethodId)]
-        );
     }
 
     /**
@@ -326,7 +316,7 @@ class RequestParamChecker implements
             );
             $docblockStart = (
                 !is_null($docblock) ?
-                $docblock->getFilePos() :
+                $docblock->getStartFilePos() :
                 intval(
                     $methodStmt->getAttribute(
                         'startFilePos'
@@ -356,14 +346,17 @@ class RequestParamChecker implements
             }
 
             if (
-                !isset(self::$methodTypeMapping[$functionId]) ||
                 // Methods that do not have an \OmegaUp\Request argument don't
                 // need the annotations.
                 !$hasRequestArgument
             ) {
                 $expected = [];
             } else {
-                $expected = self::$methodTypeMapping[$functionId];
+                if (isset(self::$methodTypeMapping[$functionId])) {
+                    $expected = self::$methodTypeMapping[$functionId];
+                } else {
+                    $expected = [];
+                }
 
                 // Now go through the callgraph, parsing any unvisited methods if needed.
                 foreach (self::$methodCallGraph[$functionId] ?? [] as $calleeMethodId => $_) {

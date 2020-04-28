@@ -61,6 +61,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      *
+     * @omegaup-request-param null|string $auth_token
+     *
      * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
