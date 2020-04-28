@@ -138,6 +138,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (!is_null($createUserParams->facebookUserId)) {
             $userData['facebook_user_id'] = $createUserParams->facebookUserId;
         }
+        /** @psalm-suppress TypeDoesNotContainType OMEGAUP_VALIDATE_CAPTCHA may be defined as true in tests. */
         if ($forceVerification) {
             $userData['verified'] = 1;
         } elseif (OMEGAUP_VALIDATE_CAPTCHA) {
@@ -153,16 +154,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $createUserParams->recaptcha,
-                'remoteip' => $_SERVER['REMOTE_ADDR']];
+                'remoteip' => $_SERVER['REMOTE_ADDR'],
+            ];
 
             // use key 'http' even if you send the request to https://...
             $options = [
-                    'http' => [
-                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                        'method'  => 'POST',
-                        'content' => http_build_query($data),
-                        ],
-                    ];
+                'http' => [
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                ],
+            ];
             $context  = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
 
