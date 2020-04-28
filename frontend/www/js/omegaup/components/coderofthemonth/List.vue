@@ -79,13 +79,15 @@
             {{ T.profileStatisticsNumberOfSolvedProblems }}
           </th>
           <th
+            scope="col"
             class="text-right"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
             {{ T.rankScore }}
           </th>
           <th
-            class="text-right"
+            scope="col"
+            class="text-center"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
           >
             {{ T.wordsActions }}
@@ -125,11 +127,11 @@
             {{ coder.score }}
           </td>
           <td
-            class="text-right"
+            class="text-center"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
           >
             <button
-              class="btn btn-primary"
+              class="btn btn-sm btn-primary"
               v-if="canChooseCoder && !coderIsSelected"
               v-on:click="$emit('select-coder', coder.username)"
             >
