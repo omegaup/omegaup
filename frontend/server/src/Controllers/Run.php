@@ -862,8 +862,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
-            $response['admin'],
-            $showRunDetails
+            $response['admin'] || $showRunDetails !== 'none'
         );
         $response['source'] = $details['source'];
         if (isset($details['compile_error'])) {
@@ -962,8 +961,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
-        bool $isAdmin = false,
-        string $showDetails = 'none'
+        bool $showDetails = false
     ): array {
         $response = [];
         if (OMEGAUP_LOCKDOWN) {
@@ -973,7 +971,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 strval($submission->guid)
             );
         }
-        if (($showDetails === 'none' || $isAdmin) && $run->verdict != 'CE') {
+        if (!$showDetails && $run->verdict != 'CE') {
             return $response;
         }
         $detailsJson = self::getGraderResource($run, 'details.json');
@@ -988,7 +986,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (!OMEGAUP_LOCKDOWN && ($showDetails !== 'none' || $isAdmin)) {
+        if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;
         }
         return $response;
