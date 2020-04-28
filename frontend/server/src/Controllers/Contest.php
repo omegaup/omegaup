@@ -3548,9 +3548,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'languages' => [
                 'transform' =>
                     /** @param list<string>|string $value */
-                    function ($value): string {
+                    function ($value): ?string {
                         if (!is_array($value)) {
-                            return $value;
+                            return $value ?: null;
                         }
                         return join(',', $value);
                     }
