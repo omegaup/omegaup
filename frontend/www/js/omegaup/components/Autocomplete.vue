@@ -10,6 +10,13 @@
   />
 </template>
 
+<style lang="scss" scoped>
+.tt-menu {
+  background: white;
+  padding: 10px;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
 
