@@ -219,7 +219,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
-import * as ui from '../../ui';
 
 interface GroupVisibility {
   [name: string]: boolean;

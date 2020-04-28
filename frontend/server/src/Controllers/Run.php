@@ -855,7 +855,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         $shouldShowRunDetails = self::shouldShowRunDetails(
             $r->identity->identity_id,
             $problem,
-            $problemset,
             $contest
         );
 
@@ -949,19 +948,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function shouldShowRunDetails(
         int $identityId,
         \OmegaUp\DAO\VO\Problems $problem,
-        ?\OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Contests $contest
     ): bool {
-        if (is_null($problemset) || is_null($problemset->contest_id)) {
-            return \OmegaUp\DAO\Problems::isProblemSolved(
-                $problem,
-                $identityId
-            );
+        if (!is_null($contest) && $contest->feedback !== 'none') {
+            return true;
         }
-        if (is_null($contest)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
-        }
-        return $contest->feedback !== 'none';
+        return \OmegaUp\DAO\Problems::isProblemSolved(
+            $problem,
+            $identityId
+        );
     }
 
     /**
