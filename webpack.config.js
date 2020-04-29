@@ -31,7 +31,7 @@ let config = [
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
       badge_details: './frontend/www/js/omegaup/badge/details.ts',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
-      coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
+      coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
       common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_footer_v2: './frontend/www/js/omegaup/common/footer_v2.ts',
       common_index: './frontend/www/js/omegaup/common/index.ts',
