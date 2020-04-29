@@ -95,17 +95,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, courseAssignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, description?: null|string, director?: null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $interview_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
      * @omegaup-request-param mixed $username
-     *
-     * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, courseAssignments?: list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: int, finish_time: int|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, description?: null|string, director?: null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [
@@ -140,15 +140,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return Scoreboard
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     *
-     * @return Scoreboard
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [
@@ -181,17 +181,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the Scoreboard events
      *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}>}
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     *
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     *
-     * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}>}
      */
     public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
         [
@@ -221,17 +221,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $problemset_id
-     * @omegaup-request-param mixed $token
-     * @omegaup-request-param mixed $tokens
-     *
      * @param \OmegaUp\Request $r $r['tokens'][0] = invalid filter $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem) $r['tokens'][2] = Id of entity ($tokens[2]) $r['tokens'][3] = Token given by the filter
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param int $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
      */
     public static function wrapRequest(\OmegaUp\Request $r): array {
         $r->ensureInt('problemset_id');

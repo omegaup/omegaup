@@ -1304,15 +1304,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
+     *
      * @omegaup-request-param mixed $language
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int $offset
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
-     *
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
