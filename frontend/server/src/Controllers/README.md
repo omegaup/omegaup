@@ -389,9 +389,9 @@ API for getting a clarification
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `clarification_id` | `mixed` |             |
+| Name               | Type  | Description |
+| ------------------ | ----- | ----------- |
+| `clarification_id` | `int` |             |
 
 ### Returns
 
@@ -411,11 +411,12 @@ Update a clarification
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `answer`           | `mixed` |             |
-| `clarification_id` | `mixed` |             |
-| `message`          | `mixed` |             |
+| Name               | Type        | Description |
+| ------------------ | ----------- | ----------- |
+| `answer`           | `mixed`     |             |
+| `clarification_id` | `int`       |             |
+| `message`          | `mixed`     |             |
+| `public`           | `bool|null` |             |
 
 ### Returns
 
@@ -503,13 +504,13 @@ Adds a problem to a contest
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `commit`           | `mixed` |             |
-| `contest_alias`    | `mixed` |             |
-| `order_in_contest` | `mixed` |             |
-| `points`           | `mixed` |             |
-| `problem_alias`    | `mixed` |             |
+| Name               | Type         | Description |
+| ------------------ | ------------ | ----------- |
+| `commit`           | `mixed`      |             |
+| `contest_alias`    | `mixed`      |             |
+| `order_in_contest` | `int`        |             |
+| `points`           | `float|null` |             |
+| `problem_alias`    | `mixed`      |             |
 
 ### Returns
 
@@ -593,10 +594,10 @@ the director).
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `page`      | `int` |             |
+| `page_size` | `int` |             |
 
 ### Returns
 
@@ -651,8 +652,8 @@ Get clarifications of a contest
 | Name            | Type    | Description |
 | --------------- | ------- | ----------- |
 | `contest_alias` | `mixed` |             |
-| `offset`        | `mixed` |             |
-| `rowcount`      | `mixed` |             |
+| `offset`        | `int`   |             |
+| `rowcount`      | `int`   |             |
 
 ### Returns
 
@@ -711,28 +712,28 @@ Creates a new contest
 
 ### Parameters
 
-| Name                        | Type    | Description |
-| --------------------------- | ------- | ----------- |
-| `admission_mode`            | `mixed` |             |
-| `alias`                     | `mixed` |             |
-| `basic_information`         | `mixed` |             |
-| `description`               | `mixed` |             |
-| `feedback`                  | `mixed` |             |
-| `finish_time`               | `mixed` |             |
-| `languages`                 | `mixed` |             |
-| `partial_score`             | `mixed` |             |
-| `penalty`                   | `mixed` |             |
-| `penalty_calc_policy`       | `mixed` |             |
-| `penalty_type`              | `mixed` |             |
-| `points_decay_factor`       | `mixed` |             |
-| `problems`                  | `mixed` |             |
-| `requests_user_information` | `mixed` |             |
-| `scoreboard`                | `mixed` |             |
-| `show_scoreboard_after`     | `mixed` |             |
-| `start_time`                | `mixed` |             |
-| `submissions_gap`           | `mixed` |             |
-| `title`                     | `mixed` |             |
-| `window_length`             | `mixed` |             |
+| Name                        | Type        | Description |
+| --------------------------- | ----------- | ----------- |
+| `admission_mode`            | `mixed`     |             |
+| `alias`                     | `mixed`     |             |
+| `basic_information`         | `bool|null` |             |
+| `description`               | `mixed`     |             |
+| `feedback`                  | `mixed`     |             |
+| `finish_time`               | `mixed`     |             |
+| `languages`                 | `mixed`     |             |
+| `partial_score`             | `mixed`     |             |
+| `penalty`                   | `mixed`     |             |
+| `penalty_calc_policy`       | `mixed`     |             |
+| `penalty_type`              | `mixed`     |             |
+| `points_decay_factor`       | `mixed`     |             |
+| `problems`                  | `mixed`     |             |
+| `requests_user_information` | `mixed`     |             |
+| `scoreboard`                | `mixed`     |             |
+| `show_scoreboard_after`     | `mixed`     |             |
+| `start_time`                | `mixed`     |             |
+| `submissions_gap`           | `mixed`     |             |
+| `title`                     | `mixed`     |             |
+| `window_length`             | `mixed`     |             |
 
 ### Returns
 
@@ -747,7 +748,7 @@ _Nothing_
 | Name         | Type    | Description |
 | ------------ | ------- | ----------- |
 | `alias`      | `mixed` |             |
-| `start_time` | `mixed` |             |
+| `start_time` | `int`   |             |
 
 ### Returns
 
@@ -814,8 +815,8 @@ Returns a list of contests
 | ---------------- | ------- | ----------- |
 | `active`         | `mixed` |             |
 | `admission_mode` | `mixed` |             |
-| `page`           | `mixed` |             |
-| `page_size`      | `mixed` |             |
+| `page`           | `int`   |             |
+| `page_size`      | `int`   |             |
 | `participating`  | `mixed` |             |
 | `query`          | `mixed` |             |
 | `recommended`    | `mixed` |             |
@@ -837,8 +838,8 @@ Returns a list of contests where current user is participating in
 
 | Name        | Type    | Description |
 | ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| `page`      | `int`   |             |
+| `page_size` | `int`   |             |
 | `query`     | `mixed` |             |
 
 ### Returns
@@ -857,8 +858,8 @@ Returns a list of contests where current user is the director
 
 | Name        | Type    | Description |
 | ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| `page`      | `int`   |             |
+| `page_size` | `int`   |             |
 | `query`     | `mixed` |             |
 
 ### Returns
@@ -875,13 +876,13 @@ Joins a contest - explicitly adds a identity to a contest.
 
 ### Parameters
 
-| Name                     | Type    | Description |
-| ------------------------ | ------- | ----------- |
-| `contest_alias`          | `mixed` |             |
-| `privacy_git_object_id`  | `mixed` |             |
-| `share_user_information` | `mixed` |             |
-| `statement_type`         | `mixed` |             |
-| `token`                  | `mixed` |             |
+| Name                     | Type        | Description |
+| ------------------------ | ----------- | ----------- |
+| `contest_alias`          | `mixed`     |             |
+| `privacy_git_object_id`  | `mixed`     |             |
+| `share_user_information` | `bool|null` |             |
+| `statement_type`         | `mixed`     |             |
+| `token`                  | `mixed`     |             |
 
 ### Returns
 
@@ -1220,10 +1221,10 @@ Only omegaUp admins can call this API.
 
 ### Parameters
 
-| Name            | Type    | Description |
-| --------------- | ------- | ----------- |
-| `contest_alias` | `mixed` |             |
-| `value`         | `mixed` |             |
+| Name            | Type        | Description |
+| --------------- | ----------- | ----------- |
+| `contest_alias` | `mixed`     |             |
+| `value`         | `bool|null` |             |
 
 ### Returns
 
@@ -1262,24 +1263,28 @@ Update a Contest
 
 ### Parameters
 
-| Name                        | Type    | Description |
-| --------------------------- | ------- | ----------- |
-| `admission_mode`            | `mixed` |             |
-| `alias`                     | `mixed` |             |
-| `basic_information`         | `mixed` |             |
-| `contest_alias`             | `mixed` |             |
-| `description`               | `mixed` |             |
-| `feedback`                  | `mixed` |             |
-| `finish_time`               | `mixed` |             |
-| `languages`                 | `mixed` |             |
-| `penalty_calc_policy`       | `mixed` |             |
-| `penalty_type`              | `mixed` |             |
-| `problems`                  | `mixed` |             |
-| `requests_user_information` | `mixed` |             |
-| `start_time`                | `mixed` |             |
-| `submissions_gap`           | `mixed` |             |
-| `title`                     | `mixed` |             |
-| `window_length`             | `mixed` |             |
+| Name                        | Type         | Description |
+| --------------------------- | ------------ | ----------- |
+| `admission_mode`            | `mixed`      |             |
+| `alias`                     | `mixed`      |             |
+| `basic_information`         | `bool|null`  |             |
+| `contest_alias`             | `mixed`      |             |
+| `description`               | `mixed`      |             |
+| `feedback`                  | `mixed`      |             |
+| `finish_time`               | `int`        |             |
+| `languages`                 | `mixed`      |             |
+| `partial_score`             | `bool|null`  |             |
+| `penalty_calc_policy`       | `mixed`      |             |
+| `penalty_type`              | `mixed`      |             |
+| `points_decay_factor`       | `float|null` |             |
+| `problems`                  | `mixed`      |             |
+| `requests_user_information` | `mixed`      |             |
+| `scoreboard`                | `float|null` |             |
+| `show_scoreboard_after`     | `bool|null`  |             |
+| `start_time`                | `mixed`      |             |
+| `submissions_gap`           | `int`        |             |
+| `title`                     | `mixed`      |             |
+| `window_length`             | `int`        |             |
 
 ### Returns
 
@@ -1297,7 +1302,7 @@ option is turned on
 | Name            | Type    | Description |
 | --------------- | ------- | ----------- |
 | `contest_alias` | `mixed` |             |
-| `end_time`      | `mixed` |             |
+| `end_time`      | `int`   |             |
 | `username`      | `mixed` |             |
 
 ### Returns
@@ -1582,20 +1587,20 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type    | Description |
-| --------------------------- | ------- | ----------- |
-| `admission_mode`            | `mixed` |             |
-| `alias`                     | `mixed` |             |
-| `description`               | `mixed` |             |
-| `finish_time`               | `mixed` |             |
-| `name`                      | `mixed` |             |
-| `needs_basic_information`   | `mixed` |             |
-| `public`                    | `mixed` |             |
-| `requests_user_information` | `mixed` |             |
-| `school_id`                 | `mixed` |             |
-| `show_scoreboard`           | `mixed` |             |
-| `start_time`                | `mixed` |             |
-| `unlimited_duration`        | `mixed` |             |
+| Name                        | Type        | Description |
+| --------------------------- | ----------- | ----------- |
+| `admission_mode`            | `mixed`     |             |
+| `alias`                     | `mixed`     |             |
+| `description`               | `mixed`     |             |
+| `finish_time`               | `mixed`     |             |
+| `name`                      | `mixed`     |             |
+| `needs_basic_information`   | `mixed`     |             |
+| `public`                    | `mixed`     |             |
+| `requests_user_information` | `mixed`     |             |
+| `school_id`                 | `mixed`     |             |
+| `show_scoreboard`           | `mixed`     |             |
+| `start_time`                | `mixed`     |             |
+| `unlimited_duration`        | `bool|null` |             |
 
 ### Returns
 
@@ -1609,18 +1614,18 @@ API to Create an assignment
 
 ### Parameters
 
-| Name                 | Type    | Description |
-| -------------------- | ------- | ----------- |
-| `alias`              | `mixed` |             |
-| `assignment_type`    | `mixed` |             |
-| `course_alias`       | `mixed` |             |
-| `description`        | `mixed` |             |
-| `finish_time`        | `mixed` |             |
-| `name`               | `mixed` |             |
-| `order`              | `mixed` |             |
-| `publish_time_delay` | `mixed` |             |
-| `start_time`         | `mixed` |             |
-| `unlimited_duration` | `mixed` |             |
+| Name                 | Type        | Description |
+| -------------------- | ----------- | ----------- |
+| `alias`              | `mixed`     |             |
+| `assignment_type`    | `mixed`     |             |
+| `course_alias`       | `mixed`     |             |
+| `description`        | `mixed`     |             |
+| `finish_time`        | `mixed`     |             |
+| `name`               | `mixed`     |             |
+| `order`              | `mixed`     |             |
+| `publish_time_delay` | `mixed`     |             |
+| `start_time`         | `mixed`     |             |
+| `unlimited_duration` | `bool|null` |             |
 
 ### Returns
 
@@ -1718,10 +1723,10 @@ for in which the user is a student.
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `page`      | `int` |             |
+| `page_size` | `int` |             |
 
 ### Returns
 
@@ -1957,18 +1962,20 @@ Edit Course contents
 
 ### Parameters
 
-| Name                        | Type    | Description |
-| --------------------------- | ------- | ----------- |
-| `admission_mode`            | `mixed` |             |
-| `alias`                     | `mixed` |             |
-| `course_alias`              | `mixed` |             |
-| `description`               | `mixed` |             |
-| `finish_time`               | `mixed` |             |
-| `name`                      | `mixed` |             |
-| `requests_user_information` | `mixed` |             |
-| `school_id`                 | `mixed` |             |
-| `start_time`                | `mixed` |             |
-| `unlimited_duration`        | `mixed` |             |
+| Name                        | Type        | Description |
+| --------------------------- | ----------- | ----------- |
+| `admission_mode`            | `mixed`     |             |
+| `alias`                     | `mixed`     |             |
+| `course_alias`              | `mixed`     |             |
+| `description`               | `mixed`     |             |
+| `finish_time`               | `mixed`     |             |
+| `name`                      | `mixed`     |             |
+| `needs_basic_information`   | `bool|null` |             |
+| `requests_user_information` | `mixed`     |             |
+| `school_id`                 | `int`       |             |
+| `show_scoreboard`           | `bool|null` |             |
+| `start_time`                | `mixed`     |             |
+| `unlimited_duration`        | `mixed`     |             |
 
 ### Returns
 
@@ -1982,13 +1989,13 @@ Update an assignment
 
 ### Parameters
 
-| Name                 | Type    | Description |
-| -------------------- | ------- | ----------- |
-| `assignment`         | `mixed` |             |
-| `course`             | `mixed` |             |
-| `finish_time`        | `mixed` |             |
-| `start_time`         | `mixed` |             |
-| `unlimited_duration` | `mixed` |             |
+| Name                 | Type                | Description |
+| -------------------- | ------------------- | ----------- |
+| `assignment`         | `mixed`             |             |
+| `course`             | `mixed`             |             |
+| `finish_time`        | `OmegaUp\Timestamp` |             |
+| `start_time`         | `OmegaUp\Timestamp` |             |
+| `unlimited_duration` | `bool|null`         |             |
 
 ### Returns
 
@@ -2202,13 +2209,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `contest_alias`    | `mixed` |             |
-| `group_alias`      | `mixed` |             |
-| `only_ac`          | `mixed` |             |
-| `scoreboard_alias` | `mixed` |             |
-| `weight`           | `mixed` |             |
+| Name               | Type         | Description |
+| ------------------ | ------------ | ----------- |
+| `contest_alias`    | `mixed`      |             |
+| `group_alias`      | `mixed`      |             |
+| `only_ac`          | `bool|null`  |             |
+| `scoreboard_alias` | `mixed`      |             |
+| `weight`           | `float|null` |             |
 
 ### Returns
 
@@ -2392,7 +2399,7 @@ _Nothing_
 | ------------- | ------- | ----------- |
 | `alias`       | `mixed` |             |
 | `description` | `mixed` |             |
-| `duration`    | `mixed` |             |
+| `duration`    | `int`   |             |
 | `title`       | `mixed` |             |
 
 ### Returns
@@ -2528,10 +2535,10 @@ the owner).
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `page`      | `int` |             |
+| `page_size` | `int` |             |
 
 ### Returns
 
@@ -2610,26 +2617,26 @@ Create a new problem
 
 ### Parameters
 
-| Name                      | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `allow_user_add_tags`     | `bool`   |             |
-| `email_clarifications`    | `mixed`  |             |
-| `extra_wall_time`         | `mixed`  |             |
-| `input_limit`             | `mixed`  |             |
-| `languages`               | `mixed`  |             |
-| `memory_limit`            | `mixed`  |             |
-| `output_limit`            | `mixed`  |             |
-| `overall_wall_time_limit` | `mixed`  |             |
-| `problem_alias`           | `mixed`  |             |
-| `selected_tags`           | `mixed`  |             |
-| `show_diff`               | `string` |             |
-| `source`                  | `mixed`  |             |
-| `time_limit`              | `mixed`  |             |
-| `title`                   | `mixed`  |             |
-| `update_published`        | `mixed`  |             |
-| `validator`               | `mixed`  |             |
-| `validator_time_limit`    | `mixed`  |             |
-| `visibility`              | `mixed`  |             |
+| Name                      | Type        | Description |
+| ------------------------- | ----------- | ----------- |
+| `allow_user_add_tags`     | `bool`      |             |
+| `email_clarifications`    | `bool|null` |             |
+| `extra_wall_time`         | `mixed`     |             |
+| `input_limit`             | `mixed`     |             |
+| `languages`               | `mixed`     |             |
+| `memory_limit`            | `mixed`     |             |
+| `output_limit`            | `mixed`     |             |
+| `overall_wall_time_limit` | `mixed`     |             |
+| `problem_alias`           | `mixed`     |             |
+| `selected_tags`           | `mixed`     |             |
+| `show_diff`               | `string`    |             |
+| `source`                  | `mixed`     |             |
+| `time_limit`              | `mixed`     |             |
+| `title`                   | `mixed`     |             |
+| `update_published`        | `mixed`     |             |
+| `validator`               | `mixed`     |             |
+| `validator_time_limit`    | `mixed`     |             |
+| `visibility`              | `mixed`     |             |
 
 ### Returns
 
@@ -2659,15 +2666,15 @@ Entry point for Problem Details API
 
 ### Parameters
 
-| Name                      | Type    | Description |
-| ------------------------- | ------- | ----------- |
-| `contest_alias`           | `mixed` |             |
-| `lang`                    | `mixed` |             |
-| `prevent_problemset_open` | `mixed` |             |
-| `problem_alias`           | `mixed` |             |
-| `problemset_id`           | `mixed` |             |
-| `show_solvers`            | `mixed` |             |
-| `statement_type`          | `mixed` |             |
+| Name                      | Type        | Description |
+| ------------------------- | ----------- | ----------- |
+| `contest_alias`           | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
+| `prevent_problemset_open` | `bool|null` |             |
+| `problem_alias`           | `mixed`     |             |
+| `problemset_id`           | `mixed`     |             |
+| `show_solvers`            | `bool|null` |             |
+| `statement_type`          | `mixed`     |             |
 
 ### Returns
 
@@ -2741,11 +2748,12 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `offset`   | `mixed` |             |
-| `page`     | `mixed` |             |
-| `rowcount` | `mixed` |             |
+| Name        | Type    | Description |
+| ----------- | ------- | ----------- |
+| `offset`    | `mixed` |             |
+| `page`      | `int`   |             |
+| `page_size` | `int`   |             |
+| `rowcount`  | `mixed` |             |
 
 ### Returns
 
@@ -2891,14 +2899,14 @@ Returns the solution for a problem if conditions are satisfied.
 
 ### Parameters
 
-| Name              | Type    | Description |
-| ----------------- | ------- | ----------- |
-| `contest_alias`   | `mixed` |             |
-| `forfeit_problem` | `mixed` |             |
-| `lang`            | `mixed` |             |
-| `problem_alias`   | `mixed` |             |
-| `problemset_id`   | `mixed` |             |
-| `statement_type`  | `mixed` |             |
+| Name              | Type        | Description |
+| ----------------- | ----------- | ----------- |
+| `contest_alias`   | `mixed`     |             |
+| `forfeit_problem` | `bool|null` |             |
+| `lang`            | `mixed`     |             |
+| `problem_alias`   | `mixed`     |             |
+| `problemset_id`   | `mixed`     |             |
+| `statement_type`  | `mixed`     |             |
 
 ### Returns
 
@@ -2955,28 +2963,28 @@ Update problem contents
 
 ### Parameters
 
-| Name                      | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `allow_user_add_tags`     | `bool`   |             |
-| `email_clarifications`    | `mixed`  |             |
-| `extra_wall_time`         | `mixed`  |             |
-| `input_limit`             | `mixed`  |             |
-| `languages`               | `mixed`  |             |
-| `memory_limit`            | `mixed`  |             |
-| `message`                 | `mixed`  |             |
-| `output_limit`            | `mixed`  |             |
-| `overall_wall_time_limit` | `mixed`  |             |
-| `problem_alias`           | `mixed`  |             |
-| `redirect`                | `mixed`  |             |
-| `selected_tags`           | `mixed`  |             |
-| `show_diff`               | `string` |             |
-| `source`                  | `mixed`  |             |
-| `time_limit`              | `mixed`  |             |
-| `title`                   | `mixed`  |             |
-| `update_published`        | `mixed`  |             |
-| `validator`               | `mixed`  |             |
-| `validator_time_limit`    | `mixed`  |             |
-| `visibility`              | `mixed`  |             |
+| Name                      | Type        | Description |
+| ------------------------- | ----------- | ----------- |
+| `allow_user_add_tags`     | `bool`      |             |
+| `email_clarifications`    | `bool|null` |             |
+| `extra_wall_time`         | `mixed`     |             |
+| `input_limit`             | `mixed`     |             |
+| `languages`               | `mixed`     |             |
+| `memory_limit`            | `mixed`     |             |
+| `message`                 | `mixed`     |             |
+| `output_limit`            | `mixed`     |             |
+| `overall_wall_time_limit` | `mixed`     |             |
+| `problem_alias`           | `mixed`     |             |
+| `redirect`                | `mixed`     |             |
+| `selected_tags`           | `mixed`     |             |
+| `show_diff`               | `string`    |             |
+| `source`                  | `mixed`     |             |
+| `time_limit`              | `mixed`     |             |
+| `title`                   | `mixed`     |             |
+| `update_published`        | `mixed`     |             |
+| `validator`               | `mixed`     |             |
+| `validator_time_limit`    | `mixed`     |             |
+| `visibility`              | `mixed`     |             |
 
 ### Returns
 
@@ -2992,29 +3000,29 @@ Updates problem solution only
 
 ### Parameters
 
-| Name                      | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `allow_user_add_tags`     | `bool`   |             |
-| `email_clarifications`    | `mixed`  |             |
-| `extra_wall_time`         | `mixed`  |             |
-| `input_limit`             | `mixed`  |             |
-| `lang`                    | `mixed`  |             |
-| `languages`               | `mixed`  |             |
-| `memory_limit`            | `mixed`  |             |
-| `message`                 | `mixed`  |             |
-| `output_limit`            | `mixed`  |             |
-| `overall_wall_time_limit` | `mixed`  |             |
-| `problem_alias`           | `mixed`  |             |
-| `selected_tags`           | `mixed`  |             |
-| `show_diff`               | `string` |             |
-| `solution`                | `mixed`  |             |
-| `source`                  | `mixed`  |             |
-| `time_limit`              | `mixed`  |             |
-| `title`                   | `mixed`  |             |
-| `update_published`        | `mixed`  |             |
-| `validator`               | `mixed`  |             |
-| `validator_time_limit`    | `mixed`  |             |
-| `visibility`              | `mixed`  |             |
+| Name                      | Type        | Description |
+| ------------------------- | ----------- | ----------- |
+| `allow_user_add_tags`     | `bool`      |             |
+| `email_clarifications`    | `bool|null` |             |
+| `extra_wall_time`         | `mixed`     |             |
+| `input_limit`             | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
+| `languages`               | `mixed`     |             |
+| `memory_limit`            | `mixed`     |             |
+| `message`                 | `mixed`     |             |
+| `output_limit`            | `mixed`     |             |
+| `overall_wall_time_limit` | `mixed`     |             |
+| `problem_alias`           | `mixed`     |             |
+| `selected_tags`           | `mixed`     |             |
+| `show_diff`               | `string`    |             |
+| `solution`                | `mixed`     |             |
+| `source`                  | `mixed`     |             |
+| `time_limit`              | `mixed`     |             |
+| `title`                   | `mixed`     |             |
+| `update_published`        | `mixed`     |             |
+| `validator`               | `mixed`     |             |
+| `validator_time_limit`    | `mixed`     |             |
+| `visibility`              | `mixed`     |             |
 
 ### Returns
 
@@ -3028,29 +3036,29 @@ Updates problem statement only
 
 ### Parameters
 
-| Name                      | Type     | Description |
-| ------------------------- | -------- | ----------- |
-| `allow_user_add_tags`     | `bool`   |             |
-| `email_clarifications`    | `mixed`  |             |
-| `extra_wall_time`         | `mixed`  |             |
-| `input_limit`             | `mixed`  |             |
-| `lang`                    | `mixed`  |             |
-| `languages`               | `mixed`  |             |
-| `memory_limit`            | `mixed`  |             |
-| `message`                 | `mixed`  |             |
-| `output_limit`            | `mixed`  |             |
-| `overall_wall_time_limit` | `mixed`  |             |
-| `problem_alias`           | `mixed`  |             |
-| `selected_tags`           | `mixed`  |             |
-| `show_diff`               | `string` |             |
-| `source`                  | `mixed`  |             |
-| `statement`               | `mixed`  |             |
-| `time_limit`              | `mixed`  |             |
-| `title`                   | `mixed`  |             |
-| `update_published`        | `mixed`  |             |
-| `validator`               | `mixed`  |             |
-| `validator_time_limit`    | `mixed`  |             |
-| `visibility`              | `mixed`  |             |
+| Name                      | Type        | Description |
+| ------------------------- | ----------- | ----------- |
+| `allow_user_add_tags`     | `bool`      |             |
+| `email_clarifications`    | `bool|null` |             |
+| `extra_wall_time`         | `mixed`     |             |
+| `input_limit`             | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
+| `languages`               | `mixed`     |             |
+| `memory_limit`            | `mixed`     |             |
+| `message`                 | `mixed`     |             |
+| `output_limit`            | `mixed`     |             |
+| `overall_wall_time_limit` | `mixed`     |             |
+| `problem_alias`           | `mixed`     |             |
+| `selected_tags`           | `mixed`     |             |
+| `show_diff`               | `string`    |             |
+| `source`                  | `mixed`     |             |
+| `statement`               | `mixed`     |             |
+| `time_limit`              | `mixed`     |             |
+| `title`                   | `mixed`     |             |
+| `update_published`        | `mixed`     |             |
+| `validator`               | `mixed`     |             |
+| `validator_time_limit`    | `mixed`     |             |
+| `visibility`              | `mixed`     |             |
 
 ### Returns
 
@@ -3108,7 +3116,7 @@ and the number of solutions already seen
 | `contest_alias`   | `mixed` |             |
 | `course`          | `mixed` |             |
 | `interview_alias` | `mixed` |             |
-| `problemset_id`   | `mixed` |             |
+| `problemset_id`   | `int`   |             |
 | `token`           | `mixed` |             |
 | `tokens`          | `mixed` |             |
 | `username`        | `mixed` |             |
@@ -3163,7 +3171,7 @@ and the number of solutions already seen
 | `auth_token`    | `mixed` |             |
 | `contest_alias` | `mixed` |             |
 | `course`        | `mixed` |             |
-| `problemset_id` | `mixed` |             |
+| `problemset_id` | `int`   |             |
 | `token`         | `mixed` |             |
 | `tokens`        | `mixed` |             |
 
@@ -3187,7 +3195,7 @@ Returns the Scoreboard events
 | `auth_token`    | `mixed` |             |
 | `contest_alias` | `mixed` |             |
 | `course`        | `mixed` |             |
-| `problemset_id` | `mixed` |             |
+| `problemset_id` | `int`   |             |
 | `token`         | `mixed` |             |
 | `tokens`        | `mixed` |             |
 
@@ -3287,9 +3295,9 @@ nominator or a member of the reviewer group.
 
 ### Parameters
 
-| Name                   | Type    | Description |
-| ---------------------- | ------- | ----------- |
-| `qualitynomination_id` | `mixed` |             |
+| Name                   | Type  | Description |
+| ---------------------- | ----- | ----------- |
+| `qualitynomination_id` | `int` |             |
 
 ### Returns
 
@@ -3315,9 +3323,9 @@ nominator or a member of the reviewer group.
 
 | Name       | Type    | Description |
 | ---------- | ------- | ----------- |
-| `offset`   | `mixed` |             |
+| `offset`   | `int`   |             |
+| `rowcount` | `int`   |             |
 | `status`   | `mixed` |             |
-| `rowcount` | `mixed` |             |
 
 ### Returns
 
@@ -3334,10 +3342,10 @@ Displays the nominations that this user has been assigned.
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `mixed` |             |
-| `page_size` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `page`      | `int` |             |
+| `page_size` | `int` |             |
 
 ### Returns
 
@@ -3351,10 +3359,10 @@ Displays the nominations that this user has been assigned.
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `offset`   | `mixed` |             |
-| `rowcount` | `mixed` |             |
+| Name       | Type  | Description |
+| ---------- | ----- | ----------- |
+| `offset`   | `int` |             |
+| `rowcount` | `int` |             |
 
 ### Returns
 
@@ -3542,9 +3550,9 @@ Gets a list of latest runs overall
 | Name            | Type    | Description |
 | --------------- | ------- | ----------- |
 | `language`      | `mixed` |             |
-| `offset`        | `mixed` |             |
+| `offset`        | `int`   |             |
 | `problem_alias` | `mixed` |             |
-| `rowcount`      | `mixed` |             |
+| `rowcount`      | `int`   |             |
 | `status`        | `mixed` |             |
 | `username`      | `mixed` |             |
 | `verdict`       | `mixed` |             |
@@ -3675,9 +3683,9 @@ months (including the current one)
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `school_id` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `school_id` | `int` |             |
 
 ### Returns
 
@@ -3693,9 +3701,9 @@ Returns rank of best schools in last month
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `school_id` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `school_id` | `int` |             |
 
 ### Returns
 
@@ -3711,9 +3719,9 @@ Selects a certain school as school of the month
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `school_id` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `school_id` | `int` |             |
 
 ### Returns
 
@@ -3728,9 +3736,9 @@ with the number of created problems, solved problems and organized contests.
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `school_id` | `mixed` |             |
+| Name        | Type  | Description |
+| ----------- | ----- | ----------- |
+| `school_id` | `int` |             |
 
 ### Returns
 
@@ -3816,8 +3824,8 @@ Returns the latest submissions
 
 | Name       | Type    | Description |
 | ---------- | ------- | ----------- |
-| `offset`   | `mixed` |             |
-| `rowcount` | `mixed` |             |
+| `offset`   | `int`   |             |
+| `rowcount` | `int`   |             |
 | `username` | `mixed` |             |
 
 ### Returns
@@ -4281,11 +4289,11 @@ Get general user info
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `category`  | `mixed` |             |
-| `omit_rank` | `mixed` |             |
-| `username`  | `mixed` |             |
+| Name        | Type        | Description |
+| ----------- | ----------- | ----------- |
+| `category`  | `mixed`     |             |
+| `omit_rank` | `bool|null` |             |
+| `username`  | `mixed`     |             |
 
 ### Returns
 
@@ -4423,20 +4431,22 @@ Update user profile
 
 ### Parameters
 
-| Name              | Type    | Description |
-| ----------------- | ------- | ----------- |
-| `auth_token`      | `mixed` |             |
-| `birth_date`      | `mixed` |             |
-| `country_id`      | `mixed` |             |
-| `gender`          | `mixed` |             |
-| `graduation_date` | `mixed` |             |
-| `locale`          | `mixed` |             |
-| `name`            | `mixed` |             |
-| `scholar_degree`  | `mixed` |             |
-| `school_id`       | `mixed` |             |
-| `school_name`     | `mixed` |             |
-| `state_id`        | `mixed` |             |
-| `username`        | `mixed` |             |
+| Name                | Type        | Description |
+| ------------------- | ----------- | ----------- |
+| `auth_token`        | `mixed`     |             |
+| `birth_date`        | `mixed`     |             |
+| `country_id`        | `mixed`     |             |
+| `gender`            | `mixed`     |             |
+| `graduation_date`   | `mixed`     |             |
+| `hide_problem_tags` | `bool|null` |             |
+| `is_private`        | `bool|null` |             |
+| `locale`            | `mixed`     |             |
+| `name`              | `mixed`     |             |
+| `scholar_degree`    | `mixed`     |             |
+| `school_id`         | `mixed`     |             |
+| `school_name`       | `mixed`     |             |
+| `state_id`          | `mixed`     |             |
+| `username`          | `mixed`     |             |
 
 ### Returns
 
@@ -4499,7 +4509,7 @@ contest updates with an access token.
 | `contest_admin` | `mixed` |             |
 | `contest_alias` | `mixed` |             |
 | `filter`        | `mixed` |             |
-| `problemset_id` | `mixed` |             |
+| `problemset_id` | `int`   |             |
 | `token`         | `mixed` |             |
 | `tokens`        | `mixed` |             |
 

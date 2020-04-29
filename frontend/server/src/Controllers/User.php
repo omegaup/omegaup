@@ -1377,11 +1377,11 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get general user info
      *
-     * @omegaup-request-param mixed $category
-     * @omegaup-request-param mixed $omit_rank
-     * @omegaup-request-param mixed $username
-     *
      * @return array{birth_date?: int|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
+     *
+     * @omegaup-request-param mixed $category
+     * @omegaup-request-param bool|null $omit_rank
+     * @omegaup-request-param mixed $username
      */
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2112,11 +2112,17 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Update user profile
      *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return array{status: string}
+     *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $birth_date
      * @omegaup-request-param mixed $country_id
      * @omegaup-request-param mixed $gender
      * @omegaup-request-param mixed $graduation_date
+     * @omegaup-request-param bool|null $hide_problem_tags
+     * @omegaup-request-param bool|null $is_private
      * @omegaup-request-param mixed $locale
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $scholar_degree
@@ -2124,10 +2130,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $school_name
      * @omegaup-request-param mixed $state_id
      * @omegaup-request-param mixed $username
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     *
-     * @return array{status: string}
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -2623,15 +2625,15 @@ class User extends \OmegaUp\Controllers\Controller {
      * This API does not need authentication to be used. This allows to track
      * contest updates with an access token.
      *
+     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
+     *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_admin
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $filter
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     *
-     * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
@@ -3297,11 +3299,11 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @omegaup-request-param mixed $filter
-     * @omegaup-request-param mixed $length
-     * @omegaup-request-param mixed $page
-     *
      * @return array{smartyProperties: array{payload: UserRankTablePayload}, template: string}
+     *
+     * @omegaup-request-param mixed $filter
+     * @omegaup-request-param int $length
+     * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r) {
         $r->ensureInt('page', null, null, false);

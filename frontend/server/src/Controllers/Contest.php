@@ -18,15 +18,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *
+     * @return array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>}
+     *
      * @omegaup-request-param mixed $active
      * @omegaup-request-param mixed $admission_mode
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
      * @omegaup-request-param mixed $participating
      * @omegaup-request-param mixed $query
      * @omegaup-request-param mixed $recommended
-     *
-     * @return array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Check who is visiting, but a not logged user can still view
@@ -228,10 +228,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a list of contests where current user has admin rights (or is
      * the director).
      *
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     *
      * @return array{contests: list<array{admission_mode: string, alias: string, finish_time: \OmegaUp\Timestamp, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string}>}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -267,14 +267,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Callback to get contests list, depending on a given method
      *
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     * @omegaup-request-param mixed $query
-     *
      * @param \OmegaUp\Request $r
      * @param Closure(int, int, int, null|string):list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}> $callbackUserFunction
      *
      * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param mixed $query
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
@@ -308,11 +308,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests where current user is the director
      *
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     * @omegaup-request-param mixed $query
-     *
      * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param mixed $query
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -337,11 +337,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests where current user is participating in
      *
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     * @omegaup-request-param mixed $query
-     *
      * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param mixed $query
      */
     public static function apiListParticipating(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -488,11 +488,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
+     * @return array{inContest?: bool, smartyProperties: array{needsBasicInformation?: bool, requestsUserInformation?: false, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
+     *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $is_practice
-     *
-     * @return array{inContest?: bool, smartyProperties: array{needsBasicInformation?: bool, requestsUserInformation?: false, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
+     * @omegaup-request-param bool|null $is_practice
      */
     public static function getContestDetailsForSmarty(
         \OmegaUp\Request $r
@@ -603,11 +603,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     * @omegaup-request-param mixed $query
-     *
      * @return array{smartyProperties: array{contestListPayload: ContestListPayload}, template: string}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param mixed $query
      */
     public static function getContestListDetailsForSmarty(
         \OmegaUp\Request $r
@@ -705,11 +705,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $page
-     * @omegaup-request-param mixed $page_size
-     * @omegaup-request-param mixed $query
-     *
      * @return array{smartyProperties: array{payload: array{contests: list<array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: \OmegaUp\Timestamp, start_time: \OmegaUp\Timestamp|null, finish_time: \OmegaUp\Timestamp|null, last_updated: \OmegaUp\Timestamp|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}>}, privateContestsAlert: bool}, template: string}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param mixed $query
      */
     public static function getContestListMineForSmarty(
         \OmegaUp\Request $r
@@ -1005,15 +1005,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Joins a contest - explicitly adds a identity to a contest.
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $privacy_git_object_id
-     * @omegaup-request-param mixed $share_user_information
-     * @omegaup-request-param mixed $statement_type
-     * @omegaup-request-param mixed $token
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $privacy_git_object_id
+     * @omegaup-request-param bool|null $share_user_information
+     * @omegaup-request-param mixed $statement_type
+     * @omegaup-request-param mixed $token
      */
     public static function apiOpen(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -1496,10 +1496,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $start_time
-     *
      * @return array{alias: string}
+     *
+     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param int $start_time
      */
     public static function apiCreateVirtual(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -1652,9 +1652,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a new contest
      *
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     *
+     * @return array{status: string}
+     *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $basic_information
+     * @omegaup-request-param bool|null $basic_information
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param mixed $finish_time
@@ -1672,10 +1676,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $submissions_gap
      * @omegaup-request-param mixed $title
      * @omegaup-request-param mixed $window_length
-     *
-     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
-     *
-     * @return array{status: string}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1740,21 +1740,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * In case of update, everything is optional except the contest_alias
      * In case of error, this function throws.
      *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param mixed $problems
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
+     * @omegaup-request-param int $start_time
+     * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @omegaup-request-param int $window_length
      */
     private static function validateCommonCreateOrUpdate(
         \OmegaUp\Request $r,
@@ -1945,21 +1949,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Validates that Request contains expected data to create a contest
      * In case of error, this function throws.
      *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param mixed $problems
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
+     * @omegaup-request-param int $start_time
+     * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @omegaup-request-param int $window_length
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
@@ -1973,23 +1981,27 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * everything is optional except the contest_alias
      * In case of error, this function throws.
      *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return \OmegaUp\DAO\VO\Contests
+     *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param mixed $problems
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
+     * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     *
-     * @return \OmegaUp\DAO\VO\Contests
+     * @omegaup-request-param int $window_length
      */
     private static function validateUpdate(
         \OmegaUp\Request $r,
@@ -2121,13 +2133,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to a contest
      *
+     * @return array{status: string}
+     *
      * @omegaup-request-param mixed $commit
      * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $order_in_contest
-     * @omegaup-request-param mixed $points
+     * @omegaup-request-param int $order_in_contest
+     * @omegaup-request-param float|null $points
      * @omegaup-request-param mixed $problem_alias
-     *
-     * @return array{status: string}
      */
     public static function apiAddProblem(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2871,6 +2883,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Validate the Clarifications request
      *
      * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
      */
     private static function validateClarifications(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Contests {
         // Check contest_alias
@@ -2893,11 +2907,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of a contest
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $rowcount
-     *
      * @return array{clarifications: list<Clarification>}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3454,24 +3468,28 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Contest
      *
+     * @return array{status: string}
+     *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $basic_information
+     * @omegaup-request-param bool|null $basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param mixed $problems
      * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
+     * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
-     *
-     * @return array{status: string}
+     * @omegaup-request-param int $window_length
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -3632,13 +3650,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Update Contest end time for an identity when window_length
      * option is turned on
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $end_time
-     * @omegaup-request-param mixed $username
-     *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param int $end_time
+     * @omegaup-request-param mixed $username
      */
     public static function apiUpdateEndTimeForIdentity(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -3726,19 +3744,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Validates runs API
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $language
-     * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $rowcount
-     * @omegaup-request-param mixed $status
-     * @omegaup-request-param mixed $username
-     * @omegaup-request-param mixed $verdict
-     *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{0: \OmegaUp\DAO\VO\Contests, 1: \OmegaUp\DAO\VO\Problems|null, 2: \OmegaUp\DAO\VO\Identities|null}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param int $rowcount
+     * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $username
+     * @omegaup-request-param mixed $verdict
      */
     private static function validateRuns(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -4312,10 +4330,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Given a contest_alias, sets the recommended flag on/off.
      * Only omegaUp admins can call this API.
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $value
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param bool|null $value
      */
     public static function apiSetRecommended(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
