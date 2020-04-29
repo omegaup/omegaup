@@ -75,15 +75,15 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Add contest to a group scoreboard
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $only_ac
-     * @omegaup-request-param mixed $scoreboard_alias
-     * @omegaup-request-param mixed $weight
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param bool|null $only_ac
+     * @omegaup-request-param mixed $scoreboard_alias
+     * @omegaup-request-param float|null $weight
      */
     public static function apiAddContest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
