@@ -46,8 +46,8 @@ class Groups extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['create_time'])) {
             /**
-             * @var string|int|float $data['create_time']
-             * @var int $this->create_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['create_time']
+             * @var \OmegaUp\Timestamp $this->create_time
              */
             $this->create_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -55,7 +55,9 @@ class Groups extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->create_time = \OmegaUp\Time::get();
+            $this->create_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['alias'])) {
             $this->alias = strval(
@@ -93,7 +95,7 @@ class Groups extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $create_time;  // CURRENT_TIMESTAMP
 

@@ -49,8 +49,8 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['time'])) {
             /**
-             * @var string|int|float $data['time']
-             * @var int $this->time
+             * @var \OmegaUp\Timestamp|string|int|float $data['time']
+             * @var \OmegaUp\Timestamp $this->time
              */
             $this->time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -58,7 +58,9 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->time = \OmegaUp\Time::get();
+            $this->time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -86,7 +88,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $time;  // CURRENT_TIMESTAMP
 }

@@ -119,8 +119,8 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['creation_date'])) {
             /**
-             * @var string|int|float $data['creation_date']
-             * @var int $this->creation_date
+             * @var \OmegaUp\Timestamp|string|int|float $data['creation_date']
+             * @var \OmegaUp\Timestamp $this->creation_date
              */
             $this->creation_date = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -128,7 +128,9 @@ class Problems extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->creation_date = \OmegaUp\Time::get();
+            $this->creation_date = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['source'])) {
             $this->source = strval(
@@ -278,7 +280,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $creation_date;  // CURRENT_TIMESTAMP
 

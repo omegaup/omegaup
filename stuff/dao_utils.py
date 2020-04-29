@@ -32,7 +32,7 @@ class Column:
         if 'tinyint' in self.type:
             self.php_primitive_type = 'bool'
         elif 'timestamp' in self.type or 'datetime' in self.type:
-            self.php_primitive_type = 'int'
+            self.php_primitive_type = '\\OmegaUp\\Timestamp'
         elif 'int' in self.type:
             self.php_primitive_type = 'int'
         elif 'double' in self.type:
@@ -160,7 +160,7 @@ def _listformat(value, format: Text = '', **kwargs):
     return [format.format(element, **kwargs) for element in value]
 
 
-def _parse_date(value):
+def _parse_date(value: str) -> int:
     return int(
         datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S').replace(
             tzinfo=datetime.timezone.utc).timestamp())
