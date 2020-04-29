@@ -57,11 +57,13 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  api.Notification.myList()
-    .then(data => {
-      commonNavbar.notifications = data.notifications;
-    })
-    .catch(UI.apiError);
+  if (payload.isLoggedIn) {
+    api.Notification.myList()
+      .then(data => {
+        commonNavbar.notifications = data.notifications;
+      })
+      .catch(UI.apiError);
+  }
 
   if (payload.isAdmin) {
     const updateGraderStatus = () => {
