@@ -10,10 +10,11 @@
   />
 </template>
 
-<style lang="scss" scoped>
-.tt-menu {
+<style lang="scss">
+.tt-dataset {
   background: white;
   padding: 10px;
+  border: 1px solid gray;
 }
 </style>
 
