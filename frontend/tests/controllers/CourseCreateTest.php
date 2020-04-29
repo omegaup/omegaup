@@ -390,7 +390,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $assignmentAlias,
             $updatedCourse->course_id
         );
-        $this->assertEquals($finishTime, $assignment->finish_time);
+        $this->assertEquals($finishTime, $assignment->finish_time->time);
     }
 
     /**
@@ -609,7 +609,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $newCourse = \OmegaUp\DAO\Courses::getByPK(
             $courseData['request']['course']->course_id
         );
-        $this->assertEquals($newFinishTime, $newCourse->finish_time);
+        $this->assertEquals($newFinishTime, $newCourse->finish_time->time);
     }
 
     /**

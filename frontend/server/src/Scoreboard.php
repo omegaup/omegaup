@@ -35,7 +35,7 @@ class Scoreboard {
     /**
      * Generate Scoreboard snapshot
      *
-     * @return array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     public function generate(
         bool $withRunDetails = false,
@@ -60,7 +60,7 @@ class Scoreboard {
                     strval($this->params->problemset_id)
                 );
             }
-            /** @var null|array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: \OmegaUp\Timestamp, title: string} */
+            /** @var null|array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string} */
             $result = $cache->get();
             if (!is_null($result)) {
                 \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
@@ -108,7 +108,7 @@ class Scoreboard {
             ];
         }
 
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitUnixTimestamp(
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $this->params
         );
 
@@ -133,7 +133,7 @@ class Scoreboard {
                 0 :
                 max(
                     0,
-                    $this->params->finish_time - \OmegaUp\Time::get()
+                    $this->params->finish_time->time - \OmegaUp\Time::get()
                 );
             $cache->set($result, $timeout);
         }
@@ -222,7 +222,7 @@ class Scoreboard {
             0 :
             max(
                 0,
-                $this->params->finish_time - \OmegaUp\Time::get()
+                $this->params->finish_time->time - \OmegaUp\Time::get()
             );
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
@@ -302,7 +302,7 @@ class Scoreboard {
             ];
         }
 
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitUnixTimestamp(
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $params
         );
 
@@ -312,7 +312,7 @@ class Scoreboard {
             0 :
             max(
                 0,
-                $params->finish_time - \OmegaUp\Time::get()
+                $params->finish_time->time - \OmegaUp\Time::get()
             );
 
         $contestantScoreboardCache = new \OmegaUp\Cache(
@@ -351,7 +351,7 @@ class Scoreboard {
             \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX,
             strval($params->problemset_id)
         );
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitUnixTimestamp(
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $params
         );
         $adminScoreboard = \OmegaUp\Scoreboard::getScoreboardFromRuns(
@@ -419,31 +419,33 @@ class Scoreboard {
     }
 
     /**
-     * getScoreboardTimeLimitUnixTimestamp
+     * getScoreboardTimeLimitTimestamp
      * Returns the max timestamp to consider for the given problemset
      */
-    private static function getScoreboardTimeLimitUnixTimestamp(
+    private static function getScoreboardTimeLimitTimestamp(
         \OmegaUp\ScoreboardParams $params
-    ): ?int {
+    ): ?\OmegaUp\Timestamp {
         if (
             $params->admin
-            || ((\OmegaUp\Time::get() >= $params->finish_time)
-            && $params->show_scoreboard_after)
             || is_null($params->finish_time)
+            || (
+                (\OmegaUp\Time::get() >= $params->finish_time->time)
+                && $params->show_scoreboard_after
+            )
         ) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
             return null;
         }
 
-        $start = $params->start_time;
-        $finish = $params->finish_time;
+        $start = $params->start_time->time;
+        $finish = $params->finish_time->time;
 
         $percentage = floatval($params->scoreboard_pct) / 100.0;
 
-        $limit = $start + intval(($finish - $start) * $percentage);
-
-        return $limit;
+        return new \OmegaUp\Timestamp(
+            $start + intval(($finish - $start) * $percentage)
+        );
     }
 
     /**
@@ -479,15 +481,12 @@ class Scoreboard {
      * @param array<int, array{order: int, alias: string}> $problemMapping
      * @param int $contestPenalty
      * @param string $contestPenaltyCalcPolicy
-     * @param null|int $scoreboardTimeLimit
      * @param string $contestTitle
-     * @param int $contestStartTime
-     * @param int $contestFinishTime
      * @param bool $showAllRuns
      * @param bool $sortByName
      * @param bool $withRunDetails
      * @param null|string $authToken
-     * @return array{finish_time: int|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: int, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     private static function getScoreboardFromRuns(
         array $contestRuns,
@@ -495,10 +494,10 @@ class Scoreboard {
         array $problemMapping,
         int $contestPenalty,
         string $contestPenaltyCalcPolicy,
-        ?int $scoreboardTimeLimit,
+        ?\OmegaUp\Timestamp $scoreboardTimeLimit,
         string $contestTitle,
-        int $contestStartTime,
-        ?int $contestFinishTime,
+        \OmegaUp\Timestamp $contestStartTime,
+        ?\OmegaUp\Timestamp $contestFinishTime,
         bool $showAllRuns,
         bool $sortByName,
         bool $withRunDetails = false,
@@ -574,7 +573,7 @@ class Scoreboard {
                 }
                 if (
                     !is_null($scoreboardTimeLimit)
-                    && $run['time']->time >= $scoreboardTimeLimit
+                    && $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
                     $problem['runs']++;
                     $problem['pending'] = true;
@@ -758,7 +757,7 @@ class Scoreboard {
         /** @var array<int, array<int, array{points: int, penalty: int}>> */
         $identityProblemsScore = [];
         $contestStart = $params->start_time;
-        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitUnixTimestamp(
+        $scoreboardTimeLimit = \OmegaUp\Scoreboard::getScoreboardTimeLimitTimestamp(
             $params
         );
 
@@ -768,14 +767,9 @@ class Scoreboard {
                 continue;
             }
 
-            $log = \Logger::getLogger('Scoreboard');
-            $log->debug(
-                ">>      run_delay : {$run['submit_delay']}\n>>scoreboardLimit : {$scoreboardTimeLimit}"
-            );
-
             if (
                 !is_null($scoreboardTimeLimit) &&
-                $run['time']->time >= $scoreboardTimeLimit
+                $run['time']->time >= $scoreboardTimeLimit->time
             ) {
                 continue;
             }
@@ -821,7 +815,7 @@ class Scoreboard {
                 'username' => $identity['username'],
                 'delta' => max(
                     0.0,
-                    ($run['time']->time - $contestStart) / 60.0
+                    ($run['time']->time - $contestStart->time) / 60.0
                 ),
                 'problem' => [
                     'alias' => $problemMapping[$problemId]['alias'],
