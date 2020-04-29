@@ -43,8 +43,8 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['view_time'])) {
             /**
-             * @var string|int|float $data['view_time']
-             * @var int $this->view_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['view_time']
+             * @var \OmegaUp\Timestamp $this->view_time
              */
             $this->view_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -52,7 +52,9 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->view_time = \OmegaUp\Time::get();
+            $this->view_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -75,7 +77,7 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $view_time;  // CURRENT_TIMESTAMP
 }
