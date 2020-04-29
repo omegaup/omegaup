@@ -32,7 +32,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             );
         }
         $user->reset_digest = $reset_digest;
-        $user->reset_sent_at = \OmegaUp\Time::get();
+        $user->reset_sent_at = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         \OmegaUp\DAO\Users::update($user);
 
         /** @psalm-suppress TypeDoesNotContainType IS_TEST may be defined as true in tests. */
@@ -118,7 +118,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             );
         }
         $user->reset_digest = $reset_digest;
-        $user->reset_sent_at = \OmegaUp\Time::get();
+        $user->reset_sent_at = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         \OmegaUp\DAO\Users::update($user);
 
         $link = OMEGAUP_URL . '/login/password/reset/?';
@@ -194,7 +194,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
                 'passwordResetResetExpired'
             );
         }
-        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
+        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at->time;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'passwordResetResetExpired'
@@ -261,7 +261,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         if (is_null($user->reset_sent_at)) {
             return;
         }
-        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
+        $seconds = \OmegaUp\Time::get() - $user->reset_sent_at->time;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'passwordResetMinWait'

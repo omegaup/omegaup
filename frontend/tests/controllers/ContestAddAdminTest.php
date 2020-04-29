@@ -44,34 +44,29 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new \OmegaUp\Request([
+
+        // Call api
+        \OmegaUp\Controllers\Contest::apiAddAdmin(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $identity->username,
             'contest_alias' => $contestData['request']['alias'],
-        ]);
-
-        // Call api
-        \OmegaUp\Controllers\Contest::apiAddAdmin($r);
+        ]));
         unset($login);
-
-        // Prepare request for an update
-        $r = new \OmegaUp\Request();
-        $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
         $login = self::login($identity);
-        $r['auth_token'] = $login->auth_token;
 
         // Update title
-        $r['title'] = \OmegaUp\Test\Utils::createRandomString();
-
-        // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        $contestData['request']['title'] = \OmegaUp\Test\Utils::createRandomString();
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'title' => $contestData['request']['title'],
+        ]));
 
         // To validate, we update the title to the original request and send
         // the entire original request to assertContest. Any other parameter
         // should not be modified by Update api
-        $contestData['request']['title'] = $r['title'];
         $this->assertContest($contestData['request']);
     }
 
