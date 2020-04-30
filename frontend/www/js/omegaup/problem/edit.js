@@ -419,6 +419,7 @@ OmegaUp.on('ready', function() {
   });
   var markdownEditor = new Markdown.Editor(markdownConverter, '-statement'); // Global.
   markdownEditor.run();
+  problemCallback(payload);
 
   function problemCallback(problem) {
     $('#statement-preview .title').html(ui.escape(problem.title));
