@@ -378,15 +378,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ]),
         ]));
 
-        $request = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'status' => $status,
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else'
-        ]);
         try {
             $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-                $request
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'status' => $status,
+                    'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                    'rationale' => 'ew plus something else'
+                ])
             );
             $this->fail("Normal user shouldn't be able to resolve demotion");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
@@ -424,25 +423,30 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
-        $request = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => $status,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else',
-        ]);
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            $request
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+            ])
         );
 
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
         $this->assertEquals(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
         );
 
-        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
         $this->assertEquals(
             $visibility,
             $problem['visibility'],
@@ -450,25 +454,30 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Revert ban.
-        $request = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew'
-        ]);
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            $request
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew'
+            ])
         );
 
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
         $this->assertEquals(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been marked as resolved'
         );
 
-        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
         $this->assertEquals(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],
@@ -520,34 +529,31 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
-        $request = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => $status,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else',
-            'all' => true,
-        ]);
-        $request1 = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => $status,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
-            'rationale' => 'ew plus something else',
-            'all' => true,
-        ]);
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            $request
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+                'all' => true,
+            ])
         );
 
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
         $this->assertEquals(
             $status,
             $details['nomination_status'],
             "qualitynomination should have been marked as {$status}"
         );
         $details1 = \OmegaUp\Controllers\QualityNomination::apiDetails(
-            $request1
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
+            ])
         );
         $this->assertEquals(
             $status,
@@ -555,7 +561,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             "qualitynomination should have been marked as {$status}"
         );
 
-        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
         $this->assertEquals(
             $visibility,
             $problem['visibility'],
@@ -563,34 +572,31 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Revert ban.
-        $request = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew',
-            'all' => true,
-        ]);
-        $request1 = new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'resolved',
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
-            'rationale' => 'ew',
-            'all' => true,
-        ]);
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            $request
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew',
+                'all' => true,
+            ])
         );
 
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
         $this->assertEquals(
             'resolved',
             $details['nomination_status'],
             'qualitynomination should have been marked as resolved'
         );
         $details1 = \OmegaUp\Controllers\QualityNomination::apiDetails(
-            $request1
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
+            ])
         );
         $this->assertEquals(
             'resolved',
@@ -598,7 +604,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'qualitynomination should have been marked as resolved'
         );
 
-        $problem = \OmegaUp\Controllers\Problem::apiDetails($request1);
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
         $this->assertEquals(
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             $problem['visibility'],

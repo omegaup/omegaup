@@ -507,7 +507,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $qualitynomination_id
      * @omegaup-request-param mixed $rationale
      * @omegaup-request-param mixed $status
-     * @omegaup-request-param mixed $all
+     * @omegaup-request-param bool|null $all
      *
      * @return array{status: string}
      */
