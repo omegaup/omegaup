@@ -22,6 +22,67 @@ class RequestParamChecker implements
     private static $methodCallGraph = [];
 
     /**
+     * A mapping of \OmegaUp\Request::ensureXxx() methods to the type that they
+     * are enforcing the API parameter to be.
+     */
+    const ENSURE_TYPE_MAPPING = [
+        'OmegaUp\\Request::ensurebool' => 'bool|null',
+        'OmegaUp\\Request::ensureint' => 'int',
+        'OmegaUp\\Request::ensureoptionalint' => 'int|null',
+        'OmegaUp\\Request::ensurefloat' => 'float|null',
+        'OmegaUp\\Request::ensuretimestamp' => '\\OmegaUp\\Timestamp',
+        'OmegaUp\\Request::ensureoptionaltimestamp' => '\\OmegaUp\\Timestamp|null',
+    ];
+
+    /**
+     * Registers the fact that $functionId expects a parameter of name
+     * $parameterName to have the specified $type.
+     *
+     * If the method type mapping table already contains an entry for that
+     * function/parameter combination, the type that is expected will be the
+     * intersection of the previously defined type and the specified one. This
+     * allows mixed parameters to be gradually narrowed down to more specific
+     * types.
+     */
+    private static function processParameter(
+        string $functionId,
+        string $parameterName,
+        \Psalm\Type\Union $type,
+        \Psalm\Codebase $codebase
+    ): void {
+        if (!array_key_exists($functionId, self::$methodTypeMapping)) {
+            self::$methodTypeMapping[$functionId] = [];
+        }
+        if (
+            array_key_exists(
+                $parameterName,
+                self::$methodTypeMapping[$functionId]
+            )
+        ) {
+            $previousType = self::$methodTypeMapping[$functionId][$parameterName]->type;
+            $intersectedType = \Psalm\Type::intersectUnionTypes(
+                $previousType,
+                $type,
+                $codebase
+            );
+            if (is_null($intersectedType)) {
+                throw new \Exception(
+                    'Unable to reconcile types ' .
+                    strval($previousType) .
+                    ' and ' .
+                    strval($type) .
+                    " for {$functionId}, parameter '{$parameterName}'"
+                );
+            }
+            $type = $intersectedType;
+        }
+        self::$methodTypeMapping[$functionId][$parameterName] = new RequestParamDescription(
+            $type,
+            $parameterName
+        );
+    }
+
+    /**
      * Called for every Request property fetch.
      *
      * @param \Psalm\FileManipulation[] $fileReplacements
@@ -68,16 +129,18 @@ class RequestParamChecker implements
             }
             return null;
         }
-        if (is_null($context->calling_function_id)) {
-            throw new \Exception('Should never happen');
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            throw new \Exception('Empty calling method/function id');
         }
-        $functionId = strtolower($context->calling_function_id);
-        if (!array_key_exists($functionId, self::$methodTypeMapping)) {
-            self::$methodTypeMapping[$functionId] = [];
-        }
-        self::$methodTypeMapping[$functionId][$expr->dim->value] = new RequestParamDescription(
+        self::processParameter(
+            $functionId,
+            $expr->dim->value,
             \Psalm\Type::getMixed(),
-            $expr->dim->value
+            $codebase
         );
         return null;
     }
@@ -239,33 +302,45 @@ class RequestParamChecker implements
         array &$fileReplacements = [],
         \Psalm\Type\Union &$returnTypeCandidate = null
     ) {
-        if (is_null($context->calling_function_id)) {
-            // Not being called form within a function-like.
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            // Not being called from within a function-like.
             return;
         }
-        $functionId = strtolower($context->calling_function_id);
+        if (array_key_exists($methodId, self::ENSURE_TYPE_MAPPING)) {
+            if (!$expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_) {
+                if (
+                    // Methods within \OmegaUp\Request are exempt
+                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$methodId}() argument not a literal string",
+                            new \Psalm\CodeLocation($statementsSource, $expr)
+                        ),
+                        $statementsSource->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            self::processParameter(
+                $functionId,
+                $expr->args[0]->value->value,
+                \Psalm\Type::parseString(self::ENSURE_TYPE_MAPPING[$methodId]),
+                $codebase
+            );
+            return;
+        }
         if (!array_key_exists($functionId, self::$methodCallGraph)) {
             self::$methodCallGraph[$functionId] = [];
         }
         self::$methodCallGraph[$functionId][strtolower(
             $appearingMethodId
         )] = true;
-
-        if (
-            !array_key_exists(
-                strtolower($appearingMethodId),
-                self::$methodTypeMapping
-            )
-        ) {
-            return;
-        }
-        if (!array_key_exists($functionId, self::$methodTypeMapping)) {
-            self::$methodTypeMapping[$functionId] = [];
-        }
-        self::$methodTypeMapping[$functionId] = array_merge(
-            self::$methodTypeMapping[$functionId],
-            self::$methodTypeMapping[strtolower($appearingMethodId)]
-        );
     }
 
     /**
@@ -326,7 +401,7 @@ class RequestParamChecker implements
             );
             $docblockStart = (
                 !is_null($docblock) ?
-                $docblock->getFilePos() :
+                $docblock->getStartFilePos() :
                 intval(
                     $methodStmt->getAttribute(
                         'startFilePos'
@@ -356,14 +431,17 @@ class RequestParamChecker implements
             }
 
             if (
-                !isset(self::$methodTypeMapping[$functionId]) ||
                 // Methods that do not have an \OmegaUp\Request argument don't
                 // need the annotations.
                 !$hasRequestArgument
             ) {
                 $expected = [];
             } else {
-                $expected = self::$methodTypeMapping[$functionId];
+                if (isset(self::$methodTypeMapping[$functionId])) {
+                    $expected = self::$methodTypeMapping[$functionId];
+                } else {
+                    $expected = [];
+                }
 
                 // Now go through the callgraph, parsing any unvisited methods if needed.
                 foreach (self::$methodCallGraph[$functionId] ?? [] as $calleeMethodId => $_) {
@@ -409,6 +487,7 @@ class RequestParamChecker implements
                     $requestParam->type->isMixed()
                 ) {
                     $modified = true;
+                    continue;
                 }
                 // The type in the annotation is more specific than what we
                 // found. Trust the annotator.
@@ -421,14 +500,14 @@ class RequestParamChecker implements
 
             unset($parsedDocComment['specials']['omegaup-request-param']);
             if (!empty($expected)) {
-                $parsedDocComment['specials'] = [
+                $parsedDocComment['specials'] = $parsedDocComment['specials'] + [
                     'omegaup-request-param' => array_map(
                         function (RequestParamDescription $description): string {
                             return strval($description);
                         },
                         array_values($expected)
                     ),
-                ] + $parsedDocComment['specials'];
+                ];
             }
 
             if ($codebase->alter_code) {

@@ -30,11 +30,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
-            $response['start_time'],
+            $response['start_time']->time,
             'start_time'
         );
         \OmegaUp\Validators::validateNumber(
-            $response['finish_time'],
+            $response['finish_time']->time,
             'finish_time'
         );
 
@@ -52,11 +52,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertNotNull($assignment['finish_time']);
 
             \OmegaUp\Validators::validateNumber(
-                $assignment['start_time'],
+                $assignment['start_time']->time,
                 'start_time'
             );
             \OmegaUp\Validators::validateNumber(
-                $assignment['finish_time'],
+                $assignment['finish_time']->time,
                 'finish_time'
             );
         }
@@ -90,11 +90,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($courseData['course_alias'], $response['alias']);
         \OmegaUp\Validators::validateNumber(
-            $response['start_time'],
+            $response['start_time']->time,
             'start_time'
         );
         \OmegaUp\Validators::validateNumber(
-            $response['finish_time'],
+            $response['finish_time']->time,
             'finish_time'
         );
 

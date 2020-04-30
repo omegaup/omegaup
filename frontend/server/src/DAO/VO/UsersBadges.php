@@ -49,8 +49,8 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['assignation_time'])) {
             /**
-             * @var string|int|float $data['assignation_time']
-             * @var int $this->assignation_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['assignation_time']
+             * @var \OmegaUp\Timestamp $this->assignation_time
              */
             $this->assignation_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -58,7 +58,9 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->assignation_time = \OmegaUp\Time::get();
+            $this->assignation_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -88,7 +90,7 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $assignation_time;  // CURRENT_TIMESTAMP
 }

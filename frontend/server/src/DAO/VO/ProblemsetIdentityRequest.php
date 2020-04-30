@@ -46,8 +46,8 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['request_time'])) {
             /**
-             * @var string|int|float $data['request_time']
-             * @var int $this->request_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['request_time']
+             * @var \OmegaUp\Timestamp $this->request_time
              */
             $this->request_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -55,12 +55,14 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->request_time = \OmegaUp\Time::get();
+            $this->request_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['last_update'])) {
             /**
-             * @var string|int|float $data['last_update']
-             * @var int $this->last_update
+             * @var \OmegaUp\Timestamp|string|int|float $data['last_update']
+             * @var \OmegaUp\Timestamp $this->last_update
              */
             $this->last_update = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -99,14 +101,14 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $request_time;  // CURRENT_TIMESTAMP
 
     /**
      * [Campo no documentado]
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $last_update = null;
 

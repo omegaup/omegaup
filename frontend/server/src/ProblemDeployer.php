@@ -48,7 +48,7 @@ class ProblemDeployer {
             && isset($_FILES['problem_contents']['tmp_name'])
             && is_string($_FILES['problem_contents']['tmp_name'])
             && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                $_FILES['problem_contents']['tmp_name']
+                strval($_FILES['problem_contents']['tmp_name'])
             )
         ) {
             /** @psalm-suppress MixedArrayAccess */

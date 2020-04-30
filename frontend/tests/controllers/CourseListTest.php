@@ -41,7 +41,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($response['admin']));
         $course_array = $response['admin'][0];
         \OmegaUp\Validators::validateNumber(
-            $course_array['finish_time'],
+            $course_array['finish_time']->time,
             'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
@@ -62,7 +62,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($studentCourses));
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(
-            $course_array['finish_time'],
+            $course_array['finish_time']->time,
             'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
