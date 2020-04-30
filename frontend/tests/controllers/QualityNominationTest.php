@@ -360,10 +360,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionCannotBeResolvedByRegularUser($status) {
+    public function testDemotionCannotBeResolvedByRegularUser(string $status) {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -394,8 +394,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a demotion can be banned or warning and then reverted by a reviewer.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
     public function testDemotionCanBeResolvedAndLaterRevertedByReviewer(
         string $status,
@@ -486,8 +486,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that multiple demotion can be banned or warning and then reverted by a reviewer.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
     public function testMultipleDemotionCanBeResolvedAndLaterRevertedByReviewer(
         string $status,
@@ -616,8 +616,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a demotion banned or warning by a reviewer sends an email to the problem creator.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
     public function testDemotionResolvedByReviewerAndSendMail(string $status) {
         $emailSender = new \OmegaUp\Test\ScopedEmailSender();
@@ -674,8 +674,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a multiple demotion banned or warning by a reviewer sends an email to the problem creator.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
     public function testMultipleDemotionResolvedByReviewerAndSendMail(string $status) {
         $emailSender = new \OmegaUp\Test\ScopedEmailSender();
@@ -886,11 +886,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a demotion of a private problem can be banned and
      * then resolved, and it keeps its original visibility
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionOfPrivateProblemResolvedAndThenBannedKeepsItsOriginalVisibility(string $status) {
+    public function testDemotionOfPrivateProblemResolvedAndThenBannedKeepsItsOriginalVisibility(
+        string $status,
+        int $visibility
+    ) {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
         ]));
@@ -935,7 +938,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
         $this->assertEquals(
-            $status == 'banned' ? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+            /*To transform from de public to private (banned or warning)*/
+            $visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
             $problem['visibility'],
             'Problem should have been private resolved'
         );

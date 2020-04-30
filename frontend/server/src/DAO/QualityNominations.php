@@ -485,7 +485,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      *
      * @return list<\OmegaUp\DAO\VO\QualityNominations>
      */
-    public static function getAllDemotionForProblem(int $problemId): array {
+    public static function getAllDemotionsForProblem(int $problemId): array {
         $sql = '
             SELECT
                 *

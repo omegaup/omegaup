@@ -603,7 +603,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
         if ($r['all']) {
-            $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionForProblem(
+            $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
                 $qualitynomination->problem_id
             );
         } else {
