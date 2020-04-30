@@ -15,14 +15,7 @@ export default {
   Clarification: api.Clarification,
 
   Contest: {
-    activityReport: api.apiCall('/api/contest/activityReport/', function(
-      result,
-    ) {
-      for (let ev of result.events) {
-        ev.time = OmegaUp.remoteTime(ev.time * 1000);
-      }
-      return result;
-    }),
+    activityReport: api.Contest.activityReport,
 
     addAdmin: api.Contest.addAdmin,
 
@@ -61,21 +54,9 @@ export default {
 
     details: api.apiCall('/api/contest/details/', _normalizeContestFields),
 
-    list: api.apiCall('/api/contest/list/', function(result) {
-      for (var idx in result.results) {
-        var contest = result.results[idx];
-        OmegaUp.convertTimes(contest);
-      }
-      return result;
-    }),
+    list: api.Contest.list,
 
-    myList: api.apiCall('/api/contest/myList/', function(result) {
-      for (var idx in result.contests) {
-        var contest = result.contests[idx];
-        OmegaUp.convertTimes(contest);
-      }
-      return result;
-    }),
+    myList: api.Contest.myList,
 
     open: api.Contest.open,
 
@@ -106,110 +87,10 @@ export default {
 
     updateEndTimeForIdentity: api.Contest.updateEndTimeForIdentity,
 
-    users: api.apiCall('/api/contest/users/', function(result) {
-      for (const user of result.users) {
-        if (user.access_time !== null) {
-          user.access_time = OmegaUp.remoteTime(user.access_time * 1000);
-        }
-        if (user.end_time !== null) {
-          user.end_time = OmegaUp.remoteTime(user.end_time * 1000);
-        }
-      }
-      return result;
-    }),
+    users: api.Contest.users,
   },
 
-  Course: {
-    activityReport: api.Course.activityReport,
-
-    addAdmin: api.Course.addAdmin,
-
-    addGroupAdmin: api.Course.addGroupAdmin,
-
-    addProblem: api.Course.addProblem,
-
-    adminDetails: api.apiCall('/api/course/adminDetails/', function(result) {
-      if (result.finish_time) {
-        result.finish_time = new Date(result.finish_time * 1000);
-      }
-      result.start_time = new Date(result.start_time * 1000);
-      result.assignments.forEach(assignment => {
-        assignment.start_time = new Date(assignment.start_time * 1000);
-        if (assignment.finish_time) {
-          assignment.finish_time = new Date(assignment.finish_time * 1000);
-        }
-      });
-      return result;
-    }),
-
-    admins: api.Course.admins,
-
-    clone: api.Course.clone,
-
-    create: api.Course.create,
-
-    createAssignment: api.Course.createAssignment,
-
-    details: api.apiCall('/api/course/details/', function(data) {
-      if (data.finish_time) {
-        data.finish_time = new Date(data.finish_time * 1000);
-      }
-      data.start_time = new Date(data.start_time * 1000);
-      data.assignments.forEach(assignment => {
-        assignment.start_time = new Date(assignment.start_time * 1000);
-        if (assignment.finish_time) {
-          assignment.finish_time = new Date(assignment.finish_time * 1000);
-        }
-      });
-      return data;
-    }),
-
-    getAssignment: api.apiCall('/api/course/assignmentDetails', function(data) {
-      data.start_time = new Date(data.start_time * 1000);
-      if (data.finish_time) {
-        data.finish_time = new Date(data.finish_time * 1000);
-      }
-      return data;
-    }),
-
-    listAssignments: api.Course.listAssignments,
-
-    listCourses: api.apiCall('/api/course/listCourses/', function(result) {
-      result.admin.forEach(res => {
-        res.start_time = new Date(res.start_time * 1000);
-        if (res.finish_time) {
-          res.finish_time = new Date(res.finish_time * 1000);
-        }
-      });
-      result.student.forEach(res => {
-        res.start_time = new Date(res.start_time * 1000);
-        if (res.finish_time) {
-          res.finish_time = new Date(res.finish_time * 1000);
-        }
-      });
-      result.public.forEach(res => {
-        res.start_time = new Date(res.start_time * 1000);
-        if (res.finish_time) {
-          res.finish_time = new Date(res.finish_time * 1000);
-        }
-      });
-      return result;
-    }),
-
-    listSolvedProblems: api.Course.listSolvedProblems,
-
-    listUnsolvedProblems: api.Course.listUnsolvedProblems,
-
-    removeAssignment: api.Course.removeAssignment,
-
-    removeProblem: api.Course.removeProblem,
-
-    updateAssignment: api.Course.updateAssignment,
-
-    updateAssignmentsOrder: api.Course.updateAssignmentsOrder,
-
-    updateProblemsOrder: api.Course.updateProblemsOrder,
-  },
+  Course: api.Course,
 
   Group: api.Group,
 
@@ -332,17 +213,7 @@ export default {
       return data;
     }),
 
-    profile: api.apiCall('/api/user/profile/', function(data) {
-      if (data.birth_date !== null) {
-        data.birth_date = omegaup.OmegaUp.remoteTime(data.birth_date * 1000);
-      }
-      if (data.graduation_date !== null) {
-        data.graduation_date = omegaup.OmegaUp.remoteTime(
-          data.graduation_date * 1000,
-        );
-      }
-      return data;
-    }),
+    profile: api.User.profile,
 
     removeExperiment: api.User.removeExperiment,
 

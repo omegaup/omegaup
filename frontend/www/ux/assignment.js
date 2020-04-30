@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   var arenaInstance = new arena.Arena(options);
   Highcharts.setOptions({ global: { useUTC: false } });
-  omegaup.API.Course.getAssignment({
+  omegaup.API.Course.assignmentDetails({
     course: arenaInstance.options.courseAlias,
     assignment: arenaInstance.options.assignmentAlias,
   })
