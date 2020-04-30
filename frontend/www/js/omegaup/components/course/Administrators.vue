@@ -85,7 +85,7 @@
         <div class="col-md-6">
           <form
             class="form"
-            v-on:submit.prevent="$emit('add-group-admin', adminGroup)"
+            v-on:submit.prevent="$emit('add-group-admin', adminGroupAlias)"
           >
             <div class="form-group">
               <label>{{ T.wordsGroupAdmin }}</label>
@@ -97,8 +97,9 @@
                 v-bind:title="T.courseEditAddGroupAdminsTooltip"
               ></span>
               <omegaup-autocomplete
-                v-bind:init="el => typeahead.userTypeahead(el)"
+                v-bind:init="el => typeahead.groupTypeahead(el)"
                 v-model="adminGroup"
+                v-on:emit-update-input="onUpdateInput"
               ></omegaup-autocomplete>
             </div>
             <div class="form-group pull-right">
@@ -172,6 +173,11 @@ export default class CourseAdministrators extends Vue {
   showSiteAdmins = false;
   adminUsername = '';
   adminGroup = '';
+  adminGroupAlias = '';
+
+  onUpdateInput(alias: string): void {
+    this.adminGroupAlias = alias;
+  }
 
   adminProfile(admin: omegaup.CourseAdmin): string {
     return `/profile/${admin.username}/`;
