@@ -2,93 +2,12 @@ import * as types from './types.ts';
 import { OmegaUp } from './omegaup';
 import * as api from './api_transitional';
 
-function _normalizeContestFields(contest) {
-  OmegaUp.convertTimes(contest);
-  contest.submissions_gap = parseInt(contest.submissions_gap);
-  contest.show_penalty = contest.penalty != 0 || contest.penalty_type != 'none';
-  return contest;
-}
-
 export default {
   Badge: api.Badge,
 
   Clarification: api.Clarification,
 
-  Contest: {
-    activityReport: api.Contest.activityReport,
-
-    addAdmin: api.Contest.addAdmin,
-
-    addGroup: api.Contest.addGroup,
-
-    addGroupAdmin: api.Contest.addGroupAdmin,
-
-    addProblem: api.Contest.addProblem,
-
-    addUser: api.Contest.addUser,
-
-    adminDetails: api.apiCall('/api/contest/adminDetails/', function(contest) {
-      // We cannot use |_normalizeContestFields| because admins need to be
-      // able to get the unmodified times.
-      contest.start_time = new Date(contest.start_time * 1000);
-      contest.finish_time = new Date(contest.finish_time * 1000);
-      contest.submission_deadline = OmegaUp.remoteTime(
-        contest.submission_deadline * 1000,
-      );
-      contest.show_penalty =
-        contest.penalty != 0 || contest.penalty_type != 'none';
-      return contest;
-    }),
-
-    admins: api.Contest.admins,
-
-    arbitrateRequest: api.Contest.arbitrateRequest,
-
-    clone: api.Contest.clone,
-
-    contestants: api.Contest.contestants,
-
-    create: api.Contest.create,
-
-    createVirtual: api.Contest.createVirtual,
-
-    details: api.apiCall('/api/contest/details/', _normalizeContestFields),
-
-    list: api.Contest.list,
-
-    myList: api.Contest.myList,
-
-    open: api.Contest.open,
-
-    problems: api.Contest.problems,
-
-    publicDetails: api.apiCall(
-      '/api/contest/publicDetails/',
-      _normalizeContestFields,
-    ),
-
-    registerForContest: api.Contest.registerForContest,
-
-    removeAdmin: api.Contest.removeAdmin,
-
-    removeGroup: api.Contest.removeGroup,
-
-    removeGroupAdmin: api.Contest.removeGroupAdmin,
-
-    removeProblem: api.Contest.removeProblem,
-
-    removeUser: api.Contest.removeUser,
-
-    requests: api.Contest.requests,
-
-    runsDiff: api.Contest.runsDiff,
-
-    update: api.Contest.update,
-
-    updateEndTimeForIdentity: api.Contest.updateEndTimeForIdentity,
-
-    users: api.Contest.users,
-  },
+  Contest: api.Contest,
 
   Course: api.Course,
 

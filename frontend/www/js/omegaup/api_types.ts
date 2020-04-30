@@ -1018,6 +1018,7 @@ export namespace messages {
     scoreboard: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
@@ -1106,6 +1107,7 @@ export namespace messages {
     problemset_id: number;
     requests_user_information: string;
     scoreboard: number;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
@@ -1236,6 +1238,7 @@ export namespace messages {
     problemset_id: number;
     rerun_id: number;
     scoreboard: number;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
