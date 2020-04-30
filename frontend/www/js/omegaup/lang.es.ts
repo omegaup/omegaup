@@ -1112,7 +1112,7 @@ const translations: { [key: string]: string; } = {
   wordsAuthor: "Autor",
   wordsBack: "Atr\u00e1s",
   wordsBadgesObtained: "Insignias obtenidas",
-  wordsBadgesSeeAll: "Ver todas",
+  wordsBadgesSeeAll: "Ver todas las insignias disponibles",
   wordsBanProblem: "Suspender problema",
   wordsBannedProblem: "Problema suspendido",
   wordsBestSolvers: "Mejores env\u00edos aceptados",

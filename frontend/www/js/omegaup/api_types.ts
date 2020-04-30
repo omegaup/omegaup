@@ -252,8 +252,18 @@ export namespace types {
     export function ProblemEditPayload(
       elementId: string,
     ): types.ProblemEditPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+      return (x => {
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -617,8 +627,14 @@ export namespace types {
     memoryLimit: number | number;
     outputLimit: number;
     overallWallTimeLimit: number;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
     showDiff: string;
     source: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };

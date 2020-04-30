@@ -458,6 +458,7 @@ OmegaUp.on('ready', function() {
       $('.slow-warning').show();
     }
   }
+  problemCallback(payload);
 
   $('#statement-preview-link').on('show.bs.tab', function(e) {
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#wmd-preview').get(0)]);

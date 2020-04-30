@@ -11,7 +11,7 @@
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float|int, outputLimit: int, overallWallTimeLimit: float, showDiff: string, source: string, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float|int, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, showDiff: string, source: string, statement: array{images: array<string, string>, language: string, markdown: string}, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
@@ -4440,7 +4440,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, showDiff: string, source: string, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
+     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, showDiff: string, source: string, statement: array{images: array<string, string>, language: string, markdown: string}, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -4485,6 +4485,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'inputLimit' => $details['input_limit'],
             'outputLimit' => intval($limitsSettings['OutputLimit']),
             'validatorTimeLimit' => 0,
+            'statement' => $details['statement'],
         ];
         if (
             isset($validatorSettings['custom_validator']) &&
@@ -4495,6 +4496,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $validatorSettings['custom_validator']['limits']['TimeLimit']
                 )
             );
+        }
+        if (isset($details['problemsetter'])) {
+            $result['problemsetter'] = $details['problemsetter'];
         }
         return $result;
     }
