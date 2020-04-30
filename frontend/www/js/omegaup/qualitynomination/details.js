@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
           initialRationale: payload.contents.rationale,
         },
         on: {
-          'mark-resolution': function(viewDetails, newStatus, all) {
+          'mark-resolution': function(viewDetails, newStatus) {
             if (!viewDetails.rationale) {
               UI.error(T.editFieldRequired);
               return;
@@ -42,7 +42,6 @@ OmegaUp.on('ready', function() {
               status: newStatus,
               qualitynomination_id: viewDetails.qualitynomination_id,
               rationale: viewDetails.rationale,
-              all: all,
             })
               .then(function(data) {
                 UI.success(T.qualityNominationResolutionSuccess);
