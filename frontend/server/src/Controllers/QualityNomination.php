@@ -526,7 +526,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'rationale'
         );
         $r->ensureBool('all', false);
-        //error_log($r['all'].'-'.$r['status']);
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
@@ -556,7 +555,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($qualitynomination->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemIdNotFound'
+            );
+        }
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $qualitynomination->problem_id
+        );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -598,21 +604,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         if ($r['all']) {
             $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionPerProblem(
-                $qualitynomination->problem_id ?? -1
+                $qualitynomination->problem_id
             );
         } else {
             $nominations = [$qualitynomination];
         }
-        /*error_log(print_r($nominations,true));
-        $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
-            'user_id' => $r->user->user_id,
-            'qualitynomination_id' => $qualitynomination->qualitynomination_id,
-            'from_status' => $qualitynomination->status,
-            'to_status' => $r['status'],
-            'rationale' => $r['rationale']
-        ]);
-        $qualitynomination->status = $qualitynominationlog->to_status;
-*/
+
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
             'problem_alias' => $r['problem_alias'],
@@ -628,33 +625,31 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams->updatePublished,
                 /*$redirect=*/ false
             );
-            foreach ($nominations as $index => $nomination) {
-                $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
-                    'user_id' => $nomination->user_id,
-                    'qualitynomination_id' => $nomination->qualitynomination_id,
-                    'from_status' => $nomination->status,
-                    'to_status' => $r['status'],
-                    'rationale' => $r['rationale']
-                ]);
-                $nomination->status = $qualitynominationlog->to_status;
+            foreach ($nominations as $nomination) {
+                $nomination->status = strval($r['status']);
                 \OmegaUp\DAO\QualityNominations::update($nomination);
                 \OmegaUp\DAO\QualityNominationLog::create(
-                    $qualitynominationlog
+                    new \OmegaUp\DAO\VO\QualityNominationLog([
+                        'user_id' => $nomination->user_id,
+                        'qualitynomination_id' => $nomination->qualitynomination_id,
+                        'from_status' => $nomination->status,
+                        'to_status' => $r['status'],
+                        'rationale' => $r['rationale']
+                    ])
                 );
-                if (
-                    ($r['status'] == 'banned'
-                    || $r['status'] == 'warning')
-                    && intval($r['qualitynomination_id']) == $nomination->qualitynomination_id
-                ) {
-                    self::sendNotificationEmail(
-                        $problem,
-                        $qualitynomination,
-                        $qualitynominationlog->rationale ?? '',
-                        strval($r['status'])
-                    );
-                }
             }
             \OmegaUp\DAO\DAO::transEnd();
+            if (
+                $r['status'] == 'banned'
+                || $r['status'] == 'warning'
+            ) {
+                self::sendNotificationEmail(
+                    $problem,
+                    $qualitynomination,
+                    $r['rationale'] ?? '',
+                    strval($r['status'])
+                );
+            }
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);
