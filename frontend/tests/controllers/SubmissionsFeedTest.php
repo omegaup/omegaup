@@ -109,7 +109,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(

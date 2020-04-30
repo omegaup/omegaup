@@ -32,11 +32,11 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
-            'course' => $courseAlias
+            'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']);
-        $this->assertEquals($updatedFinishTime, $response['finish_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']->time);
+        $this->assertEquals($updatedFinishTime, $response['finish_time']->time);
 
         $this->assertEquals('some new name', $response['name']);
         $this->assertEquals(
@@ -105,10 +105,10 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
-            'course' => $courseAlias
+            'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']->time);
         $this->assertNull($response['finish_time']);
     }
 
@@ -249,7 +249,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $responseArray['errorname']
             );
             $this->assertEquals(
-                $courseData['course']->finish_time,
+                $courseData['course']->finish_time->time,
                 $responseArray['payload']['upper_bound']
             );
         }

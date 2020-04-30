@@ -62,8 +62,8 @@ class QualityNominations extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['time'])) {
             /**
-             * @var string|int|float $data['time']
-             * @var int $this->time
+             * @var \OmegaUp\Timestamp|string|int|float $data['time']
+             * @var \OmegaUp\Timestamp $this->time
              */
             $this->time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -71,7 +71,9 @@ class QualityNominations extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->time = \OmegaUp\Time::get();
+            $this->time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['status'])) {
             $this->status = strval(
@@ -120,7 +122,7 @@ class QualityNominations extends \OmegaUp\DAO\VO\VO {
     /**
      * Fecha de creacion de esta nominación
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $time;  // CURRENT_TIMESTAMP
 

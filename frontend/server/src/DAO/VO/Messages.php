@@ -61,8 +61,8 @@ class Messages extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['date'])) {
             /**
-             * @var string|int|float $data['date']
-             * @var int $this->date
+             * @var \OmegaUp\Timestamp|string|int|float $data['date']
+             * @var \OmegaUp\Timestamp $this->date
              */
             $this->date = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -70,7 +70,9 @@ class Messages extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->date = \OmegaUp\Time::get();
+            $this->date = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -114,7 +116,7 @@ class Messages extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $date;  // CURRENT_TIMESTAMP
 }

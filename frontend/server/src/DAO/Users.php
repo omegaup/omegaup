@@ -65,7 +65,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     /**
-     * @return null|array{reset_digest: ?string, reset_sent_at: ?int}
+     * @return null|array{reset_digest: ?string, reset_sent_at: \OmegaUp\Timestamp|null}
      */
     public static function FindResetInfoByEmail(string $email): ?array {
         $user = self::findByEmail($email);
@@ -74,7 +74,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         }
         return [
             'reset_digest' => $user->reset_digest,
-            'reset_sent_at' => $user->reset_sent_at
+            'reset_sent_at' => $user->reset_sent_at,
         ];
     }
     /**

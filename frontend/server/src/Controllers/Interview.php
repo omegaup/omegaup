@@ -4,12 +4,12 @@
 
 class Interview extends \OmegaUp\Controllers\Controller {
     /**
+     * @return array{status: string}
+     *
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $duration
+     * @omegaup-request-param int $duration
      * @omegaup-request-param mixed $title
-     *
-     * @return array{status: string}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
