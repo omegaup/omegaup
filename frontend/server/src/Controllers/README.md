@@ -579,6 +579,7 @@ remaining time from the contest, or register the opened time.
 | `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
 | `scoreboard_url`            | `string`                                                                                                                                                                                                                                                    |
 | `scoreboard_url_admin`      | `string`                                                                                                                                                                                                                                                    |
+| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
 | `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
 | `start_time`                | `Date`                                                                                                                                                                                                                                                      |
 | `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
@@ -796,6 +797,7 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 | `problemset_id`             | `number`                                                                                                                                                                                                                                                    |
 | `requests_user_information` | `string`                                                                                                                                                                                                                                                    |
 | `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
+| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
 | `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
 | `start_time`                | `Date`                                                                                                                                                                                                                                                      |
 | `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
@@ -934,6 +936,7 @@ Gets the problems from a contest
 | `problemset_id`               | `number`  |
 | `rerun_id`                    | `number`  |
 | `scoreboard`                  | `number`  |
+| `show_penalty`                | `boolean` |
 | `show_scoreboard_after`       | `boolean` |
 | `start_time`                  | `Date`    |
 | `submissions_gap`             | `number`  |
