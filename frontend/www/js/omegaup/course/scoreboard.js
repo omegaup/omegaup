@@ -1,6 +1,6 @@
 import { Arena } from '../arena/arena.js';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api_transitional';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -22,7 +22,7 @@ OmegaUp.on('ready', function() {
   let arena = new Arena(options);
   let getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 
-  API.Course.getAssignment({
+  api.Course.assignmentDetails({
     course: arena.options.courseAlias,
     assignment: arena.options.assignmentAlias,
     token: arena.options.scoreboardToken,
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
       arena.initClock(course.start_time, course.finish_time);
       $('#title .course-title').text(course.name);
 
-      API.Problemset.scoreboard({
+      api.Problemset.scoreboard({
         problemset_id: arena.options.problemsetId,
         token: arena.options.scoreboardToken,
       })
@@ -41,7 +41,7 @@ OmegaUp.on('ready', function() {
         .catch(UI.ignoreError);
       if (new Date() < course.finish_time && !arena.socket) {
         setInterval(function() {
-          API.Problemset.scoreboard({
+          api.Problemset.scoreboard({
             problemset_id: arena.options.problemsetId,
             token: arena.options.scoreboardToken,
           })
