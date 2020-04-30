@@ -68,6 +68,11 @@
                   iconTitleForProblem(problem.quality_seal, problem.visibility)
                 "
               ></span>
+              <span
+                v-if="problem.visibility == -1"
+                v-bind:class="`glyphicon glyphicon-eye-close`"
+                v-bind:title="T.wordsPrivate"
+              ></span>
               <div class="tag-list" v-if="problem.tags.length">
                 <a
                   v-bind:class="`tag tag-${tag.source}`"

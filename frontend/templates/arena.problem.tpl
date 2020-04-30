@@ -17,7 +17,8 @@
       <h1 class="title">
         {$title|escape}
         {if $quality_seal || $visibility == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-        {if $visibility ==1 || $visibility ==-1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
+        {if $visibility == 1 || $visibility == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
+        {if $visibility == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
         {if $visibility <= -2}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
         {if $visibility == 0}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
         {if $problem_admin}
