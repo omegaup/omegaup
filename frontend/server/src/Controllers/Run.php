@@ -343,7 +343,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
+     * @return array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -424,7 +424,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             if (!is_null($start)) {
                 // assuming submit_delay is in minutes.
-                $submitDelay = intval((\OmegaUp\Time::get() - $start) / 60);
+                $submitDelay = intval(
+                    (\OmegaUp\Time::get() - $start->time) / 60
+                );
             } else {
                 $submitDelay = 0;
             }
@@ -520,7 +522,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Problems::update($problem);
 
         if ($isPractice) {
-            $response['submission_deadline'] = 0;
+            $response['submission_deadline'] = new \OmegaUp\Timestamp(0);
         } else {
             // Add remaining time to the response
             $problemsetIdentity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
@@ -529,17 +531,16 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
             if (
                 !is_null($problemsetIdentity) &&
-                !is_null(
-                    $problemsetIdentity->end_time
-                )
+                !is_null($problemsetIdentity->end_time)
             ) {
-                $response['submission_deadline'] =
-                    intval($problemsetIdentity->end_time);
+                $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($problemsetContainer->finish_time)) {
-                $response['submission_deadline'] =
-                    intval($problemsetContainer->finish_time);
+                /** @var \OmegaUp\Timestamp $problemsetContainer->finish_time */
+                $response['submission_deadline'] = new \OmegaUp\Timestamp(
+                    $problemsetContainer->finish_time
+                );
             } else {
-                $response['submission_deadline'] = 0;
+                $response['submission_deadline'] = new \OmegaUp\Timestamp(0);
             }
         }
 
@@ -634,7 +635,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             ])
         );
         $filtered['alias'] = strval($problem->alias);
-        $filtered['time'] = new \OmegaUp\Timestamp(intval($filtered['time']));
+        /** @var \OmegaUp\Timestamp $filtered['time'] */
+        $filtered['time'] = new \OmegaUp\Timestamp($filtered['time']);
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
         $filtered['penalty'] = intval($filtered['penalty']);
@@ -881,6 +883,15 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
             $dataCases = self::getProblemCases($problemArtifacts, 'cases');
+            $dataCases = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::DATA_CASES,
+                'cases',
+                /** @return ProblemCases|null */
+                function () use ($problemArtifacts) {
+                    return self::getProblemCases($problemArtifacts, 'cases');
+                },
+                24 * 60 * 60 /*expire in 1 day*/
+            );
             if (is_null($dataCases)) {
                 // Forcing to hide diffs when inputs or outpus exceeds 4kb
                 $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
@@ -890,7 +901,15 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
             return $response;
         }
-        $dataCases = self::getProblemCases($problemArtifacts, 'examples');
+        $dataCases = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES,
+            'examples',
+            /** @return ProblemCases|null */
+            function () use ($problemArtifacts) {
+                return self::getProblemCases($problemArtifacts, 'examples');
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
         if (is_null($dataCases)) {
             // Forcing to hide diffs when inputs or outpus exceeds 4kb
             $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
@@ -1040,14 +1059,45 @@ class Run extends \OmegaUp\Controllers\Controller {
             $r['run_alias'],
             'run_alias'
         );
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($r['run_alias']);
         if (
-            !self::downloadSubmission(
-                $r['run_alias'],
-                $r->identity,
-                /*$passthru=*/true,
-                isset($r['show_diff']) ? boolval($r['show_diff']) : false
-            )
+            is_null($submission) ||
+            is_null($submission->current_run_id) ||
+            is_null($submission->problem_id)
         ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        if ($problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS) {
+            return;
+        }
+        $showDiff = isset($r['show_diff']) ? boolval($r['show_diff']) : false;
+        if (
+            !\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
+            && !$showDiff
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        if (!self::downloadSubmission($run, $submission, /*$passthru=*/true)) {
             http_response_code(404);
         }
         exit;
@@ -1056,11 +1106,10 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * @return bool|null|string
      */
-    public static function downloadSubmission(
+    public static function downloadSubmissionForTesting(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $passthru,
-        bool $showDiff = false
+        bool $passthru
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
@@ -1081,21 +1130,30 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (
-            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
-            && !$showDiff
-        ) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
-        if (
-            $showDiff
-            && $problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS
-        ) {
-            return;
-        }
 
+        if ($passthru) {
+            header('Content-Type: application/zip');
+            header(
+                "Content-Disposition: attachment; filename={$submission->guid}.zip"
+            );
+            return self::getGraderResourcePassthru($run, 'files.zip');
+        }
+        return self::getGraderResource($run, 'files.zip');
+    }
+
+    /**
+     * @return bool|null|string
+     */
+    private static function downloadSubmission(
+        \OmegaUp\DAO\VO\Runs $run,
+        \OmegaUp\DAO\VO\Submissions $submission,
+        bool $passthru
+    ) {
         if ($passthru) {
             header('Content-Type: application/zip');
             header(

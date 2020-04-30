@@ -213,7 +213,7 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Expire token manually
         $authToken = \OmegaUp\DAO\AuthTokens::getByPK($login->auth_token);
-        $authToken->create_time -= 9 * 3600;  // 9 hours
+        $authToken->create_time->time -= 9 * 3600;  // 9 hours
         \OmegaUp\DAO\AuthTokens::update($authToken);
 
         $login2 = self::login($identity);

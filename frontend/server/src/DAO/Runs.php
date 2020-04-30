@@ -815,16 +815,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function nextSubmissionTimestamp(
         ?\OmegaUp\DAO\VO\Contests $contest
-    ): int {
-        $submission_gap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+    ): \OmegaUp\Timestamp {
+        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
-            $submission_gap = max(
-                $submission_gap,
+            $submissionGap = max(
+                $submissionGap,
                 intval($contest->submissions_gap)
             );
         }
-        return intval(\OmegaUp\Time::get() + $submission_gap);
+        return new \OmegaUp\Timestamp(\OmegaUp\Time::get() + $submissionGap);
     }
 
     /**

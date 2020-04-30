@@ -208,7 +208,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         self::updateValueProperties($r, $clarification, $valueProperties);
 
         // Save the clarification
-        $clarification->time = \OmegaUp\Time::get();
+        $clarification->time = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         \OmegaUp\DAO\Clarifications::update($clarification);
 
         self::clarificationUpdated($r, $clarification, null, null, null);
