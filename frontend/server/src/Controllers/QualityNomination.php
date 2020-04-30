@@ -507,6 +507,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $qualitynomination_id
      * @omegaup-request-param mixed $rationale
      * @omegaup-request-param mixed $status
+     * @omegaup-request-param bool|null $all
      *
      * @return array{status: string}
      */
@@ -524,7 +525,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['rationale'],
             'rationale'
         );
-
+        $r->ensureBool('all', false);
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
@@ -554,7 +555,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($qualitynomination->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemIdNotFound'
+            );
+        }
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $qualitynomination->problem_id
+        );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -594,14 +602,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
-        $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
-            'user_id' => $r->user->user_id,
-            'qualitynomination_id' => $qualitynomination->qualitynomination_id,
-            'from_status' => $qualitynomination->status,
-            'to_status' => $r['status'],
-            'rationale' => $r['rationale']
-        ]);
-        $qualitynomination->status = $qualitynominationlog->to_status;
+        if ($r['all']) {
+            $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
+                $qualitynomination->problem_id
+            );
+        } else {
+            $nominations = [$qualitynomination];
+        }
 
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
@@ -618,14 +625,25 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams->updatePublished,
                 /*$redirect=*/ false
             );
-            \OmegaUp\DAO\QualityNominations::update($qualitynomination);
-            \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
+            foreach ($nominations as $nomination) {
+                $nomination->status = strval($r['status']);
+                \OmegaUp\DAO\QualityNominations::update($nomination);
+                \OmegaUp\DAO\QualityNominationLog::create(
+                    new \OmegaUp\DAO\VO\QualityNominationLog([
+                        'user_id' => $nomination->user_id,
+                        'qualitynomination_id' => $nomination->qualitynomination_id,
+                        'from_status' => $nomination->status,
+                        'to_status' => $r['status'],
+                        'rationale' => $r['rationale']
+                    ])
+                );
+            }
             \OmegaUp\DAO\DAO::transEnd();
             if ($r['status'] == 'banned' || $r['status'] == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
-                    $qualitynominationlog->rationale ?? '',
+                    $r['rationale'] ?? '',
                     strval($r['status'])
                 );
             }

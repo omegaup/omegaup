@@ -3380,12 +3380,13 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 
 ### Parameters
 
-| Name                   | Type    | Description |
-| ---------------------- | ------- | ----------- |
-| `problem_alias`        | `mixed` |             |
-| `qualitynomination_id` | `mixed` |             |
-| `rationale`            | `mixed` |             |
-| `status`               | `mixed` |             |
+| Name                   | Type        | Description |
+| ---------------------- | ----------- | ----------- |
+| `problem_alias`        | `mixed`     |             |
+| `qualitynomination_id` | `mixed`     |             |
+| `rationale`            | `mixed`     |             |
+| `status`               | `mixed`     |             |
+| `all`                  | `bool|null` |             |
 
 ### Returns
 
