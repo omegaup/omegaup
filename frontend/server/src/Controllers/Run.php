@@ -962,10 +962,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             return $contest->feedback;
         }
-        return \OmegaUp\DAO\Problems::isProblemSolved(
-            $problem,
-            $identityId
-        ) ? 'detailed' : 'none';
+        return $isProblemSolved ? 'detailed' : 'none';
     }
 
     /**

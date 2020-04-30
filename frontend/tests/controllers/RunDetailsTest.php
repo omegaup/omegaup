@@ -7,6 +7,38 @@
  */
 
 class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
+    protected $contestData;
+    protected $admin;
+    protected $problemData;
+    protected $identity;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        // Get a contest
+        $this->contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        $this->admin = $this->contestData['director'];
+        $adminLogin = self::login($this->admin);
+
+        // Get a problem
+        $this->problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            /*$params=*/null,
+            $adminLogin
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $this->problemData,
+            $this->contestData
+        );
+
+        // Create contestant
+        [
+            'identity' => $this->identity
+        ] = \OmegaUp\Test\Factories\User::createUser();
+    }
+
     private function assertCanSeeRunDetails(
         string $guid,
         \OmegaUp\DAO\VO\Identities $user
@@ -40,9 +72,31 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all the tests that can accept feedback.
      *
+     * @return list<list<array{0: string, 1: bool, 2: bbol, 3: bool}>>
+     */
+    public function contestUserFeedbackProvider(): array {
+        return [
+            // feedback, solved, before contest end, can see details
+            ['none', false, false, false],
+            ['none', false, true, false],
+            ['none', true, true, false],
+            ['summary', false, false, true],
+            ['summary', false, true, true],
+            ['summary', true, false, true],
+            ['summary', true, true, true],
+            ['detailed', false, false, true],
+            ['detailed', false, true, true],
+            ['detailed', true, false, true],
+            ['detailed', true, true, true],
+        ];
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept feedback.
+     *
      * @return list<list<string>>
      */
-    public function contestFeedbackProvider(): array {
+    public function contestAdminFeedbackProvider(): array {
         return [
             ['none'],
             ['summary'],
@@ -51,115 +105,186 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Admin should be able to see run details for all submissions, no matter
-     * what is the verdict. Contestant only can see details when feedback field
-     * in contest has not been set as none or verdict gotten is AC
-     *
-     * @dataProvider contestFeedbackProvider
+     * Admin always can see run details for all submissions
      */
-    public function testGetRunDetailsInContest(string $feedback) {
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+    public function testAdminOutOfContest() {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
 
-        // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'feedback' => $feedback,
-            ])
-        );
-
-        $admin = $contestData['director'];
-        $adminLogin = self::login($admin);
-
-        // Get a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/null,
-            $adminLogin
-        );
-
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problemData,
-            $contestData
-        );
-        // Create contestant
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        $login = self::login($identity);
-        $submissions = [];
         $waRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemData,
-            $identity,
+            $this->problemData,
+            $this->identity,
             $login
         );
         \OmegaUp\Test\Factories\Run::gradeRun($waRunData, 0, 'WA', 60);
 
-        $submissions[] = ['outContest', $waRunData['response']['guid']];
-        // Admin always can see run details for all submissions
-        $this->assertCanSeeRunDetails($waRunData['response']['guid'], $admin);
-        // Contestant can not see run details when verdict is different to AC
-        // or the submission is out of a contest
-        $this->assertCanNotSeeRunDetails(
+        $this->assertCanSeeRunDetails(
             $waRunData['response']['guid'],
-            $identity
+            $this->admin
         );
 
-        $paRunData = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $identity
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($paRunData, 0.5, 'PA', 55);
-
-        $submissions[] = ['inContest', $paRunData['response']['guid']];
-
-        // Admin always can see run details for all submissions, even if it is
-        // in a contest
-        $this->assertCanSeeRunDetails($paRunData['response']['guid'], $admin);
-        if ($feedback === 'none') {
-            // Whether contest feedback is set as 'none', user can not see run
-            // details
-            $this->assertCanNotSeeRunDetails(
-                $paRunData['response']['guid'],
-                $identity
-            );
-        } else {
-            // When contest feedback is set as 'detailed' or 'summary' user can
-            // see run details
-            $this->assertCanSeeRunDetails(
-                $paRunData['response']['guid'],
-                $identity
-            );
-        }
-
-        $login = self::login($identity);
-        // Once again, user tries to solve the problem out of contest context
         $acRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemData,
-            $identity,
+            $this->problemData,
+            $this->identity,
             $login
         );
         \OmegaUp\Test\Factories\Run::gradeRun($acRunData, 1, 'AC', 65);
 
-        $submissions[] = ['outContest', $acRunData['response']['guid']];
+        $this->assertCanSeeRunDetails(
+            $acRunData['response']['guid'],
+            $this->admin
+        );
+    }
 
-        foreach ($submissions as $runGUID) {
-            // Even though problem has been solved by user, details still
-            // remain hidden for contest feedback 'none' until contest finishes
-            $this->assertCanSeeRunDetails($runGUID[1], $admin);
-            if ($feedback === 'none' && $runGUID[0] !== 'outContest') {
-                $this->assertCanNotSeeRunDetails($runGUID[1], $identity);
-            } else {
-                $this->assertCanSeeRunDetails($runGUID[1], $identity);
-            }
+    /**
+     * User only can see run details for submissions when gets the verdict AC
+     */
+    public function testUserOutOfContest() {
+        $login = self::login($this->identity);
+
+        $waRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($waRunData, 0, 'WA', 60);
+
+        $this->assertCanNotSeeRunDetails(
+            $waRunData['response']['guid'],
+            $this->identity
+        );
+
+        $login = self::login($this->identity);
+
+        $acRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acRunData, 1, 'AC', 65);
+
+        $this->assertCanSeeRunDetails(
+            $acRunData['response']['guid'],
+            $this->identity
+        );
+        $this->assertCanSeeRunDetails(
+            $waRunData['response']['guid'],
+            $this->identity
+        );
+    }
+
+    /**
+     * Admin always can see run details for all submissions
+     *
+     * @dataProvider contestAdminFeedbackProvider
+     */
+    public function testAdminInContest(string $feedback) {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        // Call API
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'contest_alias' => $this->contestData['request']['alias'],
+            'feedback' => $feedback,
+        ]));
+
+        $waRunData = \OmegaUp\Test\Factories\Run::createRun(
+            $this->problemData,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($waRunData, 0, 'WA', 60);
+
+        $this->assertCanSeeRunDetails(
+            $waRunData['response']['guid'],
+            $this->admin
+        );
+
+        // Two minutes later
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60 * 2);
+
+        $acRunData = \OmegaUp\Test\Factories\Run::createRun(
+            $this->problemData,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acRunData, 1, 'AC', 60);
+
+        $this->assertCanSeeRunDetails(
+            $acRunData['response']['guid'],
+            $this->admin
+        );
+    }
+
+    /**
+     * User can see run details in contest only when feedback is not set 'none'
+     *
+     * @dataProvider contestUserFeedbackProvider
+     */
+    public function testUserInContest(
+        string $feedback,
+        bool $solved,
+        bool $beforeContestEnd,
+        bool $canSeeDetails
+    ) {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        // Call API
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'contest_alias' => $this->contestData['request']['alias'],
+            'feedback' => $feedback,
+        ]));
+
+        $waRunData = \OmegaUp\Test\Factories\Run::createRun(
+            $this->problemData,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($waRunData, 0, 'WA', 60);
+
+        if ($canSeeDetails) {
+            $this->assertCanSeeRunDetails(
+                $waRunData['response']['guid'],
+                $this->identity
+            );
+        } else {
+            $this->assertCanNotSeeRunDetails(
+                $waRunData['response']['guid'],
+                $this->identity
+            );
         }
 
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60 * 60 * 2);
+        // Two minutes later
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60 * 2);
 
-        foreach ($submissions as $runGUID) {
-            // Now that contest has finished, both contestant and admin can see
-            // run details for every submission related to the problem
-            $this->assertCanSeeRunDetails($runGUID[1], $admin);
-            $this->assertCanSeeRunDetails($runGUID[1], $identity);
+        $acRunData = \OmegaUp\Test\Factories\Run::createRun(
+            $this->problemData,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($acRunData, 1, 'AC', 60);
+
+        if ($canSeeDetails) {
+            $this->assertCanSeeRunDetails(
+                $acRunData['response']['guid'],
+                $this->identity
+            );
+        } else {
+            $this->assertCanNotSeeRunDetails(
+                $acRunData['response']['guid'],
+                $this->identity
+            );
+        }
+
+        if (!$beforeContestEnd) {
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 7200);
+            $this->assertCanSeeRunDetails(
+                $acRunData['response']['guid'],
+                $this->identity
+            );
         }
     }
 }
