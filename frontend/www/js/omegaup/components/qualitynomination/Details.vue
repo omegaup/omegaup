@@ -117,11 +117,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+
 interface QualityNominationContents {
   original: string;
   rationale: string;
   reason: string;
 }
+
 @Component
 export default class QualityNominationDetails extends Vue {
   @Prop() author!: omegaup.User;
@@ -133,14 +135,18 @@ export default class QualityNominationDetails extends Vue {
   @Prop() qualitynomination_id!: number;
   @Prop() reviewer!: boolean;
   @Prop() votes!: omegaup.NominationVote[];
+
   T = T;
   rationale = this.initialRationale;
+
   userUrl(alias: string): string {
     return `/profile/${alias}/`;
   }
+
   problemUrl(alias: string): string {
     return `/arena/problem/${alias}/`;
   }
+
   markResolution(newStatus: string): void {
     this.$emit('mark-resolution', this, newStatus);
   }
