@@ -341,7 +341,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
+     * @return array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -422,7 +422,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             if (!is_null($start)) {
                 // assuming submit_delay is in minutes.
-                $submitDelay = intval((\OmegaUp\Time::get() - $start) / 60);
+                $submitDelay = intval(
+                    (\OmegaUp\Time::get() - $start->time) / 60
+                );
             } else {
                 $submitDelay = 0;
             }
@@ -518,7 +520,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Problems::update($problem);
 
         if ($isPractice) {
-            $response['submission_deadline'] = 0;
+            $response['submission_deadline'] = new \OmegaUp\Timestamp(0);
         } else {
             // Add remaining time to the response
             $problemsetIdentity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
@@ -527,17 +529,16 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
             if (
                 !is_null($problemsetIdentity) &&
-                !is_null(
-                    $problemsetIdentity->end_time
-                )
+                !is_null($problemsetIdentity->end_time)
             ) {
-                $response['submission_deadline'] =
-                    intval($problemsetIdentity->end_time);
+                $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($problemsetContainer->finish_time)) {
-                $response['submission_deadline'] =
-                    intval($problemsetContainer->finish_time);
+                /** @var \OmegaUp\Timestamp $problemsetContainer->finish_time */
+                $response['submission_deadline'] = new \OmegaUp\Timestamp(
+                    $problemsetContainer->finish_time
+                );
             } else {
-                $response['submission_deadline'] = 0;
+                $response['submission_deadline'] = new \OmegaUp\Timestamp(0);
             }
         }
 
@@ -632,7 +633,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             ])
         );
         $filtered['alias'] = strval($problem->alias);
-        $filtered['time'] = new \OmegaUp\Timestamp(intval($filtered['time']));
+        /** @var \OmegaUp\Timestamp $filtered['time'] */
+        $filtered['time'] = new \OmegaUp\Timestamp($filtered['time']);
         $filtered['score'] = round(floatval($filtered['score']), 4);
         $filtered['runtime'] = intval($filtered['runtime']);
         $filtered['penalty'] = intval($filtered['penalty']);
@@ -1304,15 +1306,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
+     *
      * @omegaup-request-param mixed $language
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int $offset
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
-     *
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request

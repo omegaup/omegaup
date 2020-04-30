@@ -95,8 +95,8 @@ class Users extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['reset_sent_at'])) {
             /**
-             * @var string|int|float $data['reset_sent_at']
-             * @var int $this->reset_sent_at
+             * @var \OmegaUp\Timestamp|string|int|float $data['reset_sent_at']
+             * @var \OmegaUp\Timestamp $this->reset_sent_at
              */
             $this->reset_sent_at = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -201,7 +201,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $reset_sent_at = null;
 

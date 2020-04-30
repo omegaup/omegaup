@@ -139,6 +139,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
@@ -162,8 +163,8 @@ import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
   },
 })
 export default class Homepage extends Vue {
-  @Prop() coderOfTheMonth!: omegaup.CoderOfTheMonth;
-  @Prop() coderOfTheMonthFemale!: omegaup.CoderOfTheMonth;
+  @Prop() coderOfTheMonth!: types.UserProfile;
+  @Prop() coderOfTheMonthFemale!: types.UserProfile;
   @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;

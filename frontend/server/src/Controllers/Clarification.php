@@ -111,9 +111,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * API for getting a clarification
      *
-     * @omegaup-request-param mixed $clarification_id
-     *
      * @return array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
+     *
+     * @omegaup-request-param int $clarification_id
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
@@ -157,11 +157,12 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Update a clarification
      *
-     * @omegaup-request-param mixed $answer
-     * @omegaup-request-param mixed $clarification_id
-     * @omegaup-request-param mixed $message
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $answer
+     * @omegaup-request-param int $clarification_id
+     * @omegaup-request-param mixed $message
+     * @omegaup-request-param bool|null $public
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -207,7 +208,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         self::updateValueProperties($r, $clarification, $valueProperties);
 
         // Save the clarification
-        $clarification->time = \OmegaUp\Time::get();
+        $clarification->time = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         \OmegaUp\DAO\Clarifications::update($clarification);
 
         self::clarificationUpdated($r, $clarification, null, null, null);
