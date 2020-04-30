@@ -67,3 +67,12 @@ a {
     text-decoration: none;
   }
 }
+
+a.card-header-help {
+  color: white;
+
+  &:hover {
+    color: $omegaup-links--hover;
+    text-decoration: none;
+  }
+}
