@@ -291,6 +291,14 @@ export namespace types {
       );
     }
 
+    export function SchoolProfileDetailsPayload(
+      elementId: string,
+    ): types.SchoolProfileDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolRankPayload(
       elementId: string,
     ): types.SchoolRankPayload {
@@ -766,12 +774,40 @@ export namespace types {
     score: number;
   }
 
+  export interface SchoolCoderOfTheMonth {
+    time: string;
+    username: string;
+    classname: string;
+  }
+
+  export interface SchoolProblemsSolved {
+    month: number;
+    problems_solved: number;
+    year: number;
+  }
+
+  export interface SchoolProfileDetailsPayload {
+    school_id: number;
+    school_name: string;
+    ranking: number;
+    country?: { id: string; name: string };
+    state_name?: string;
+  }
+
   export interface SchoolRankPayload {
     page: number;
     length: number;
     rank: types.School[];
     totalRows: number;
     showHeader: boolean;
+  }
+
+  export interface SchoolUser {
+    username: string;
+    classname: string;
+    created_problems: number;
+    solved_problems: number;
+    organized_contests: number;
   }
 
   export interface Scoreboard {
@@ -2510,28 +2546,16 @@ export namespace messages {
   }[];
   export type SchoolMonthlySolvedProblemsCountRequest = { [key: string]: any };
   export type SchoolMonthlySolvedProblemsCountResponse = {
-    distinct_problems_solved: {
-      month: number;
-      problems_solved: number;
-      year: number;
-    }[];
+    distinct_problems_solved: types.SchoolProblemsSolved[];
   };
   export type SchoolSchoolCodersOfTheMonthRequest = { [key: string]: any };
   export type SchoolSchoolCodersOfTheMonthResponse = {
-    coders: { time: string; username: string; classname: string }[];
+    coders: types.SchoolCoderOfTheMonth[];
   };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
   export type SchoolUsersRequest = { [key: string]: any };
-  export type SchoolUsersResponse = {
-    users: {
-      username: string;
-      classname: string;
-      created_problems: number;
-      solved_problems: number;
-      organized_contests: number;
-    }[];
-  };
+  export type SchoolUsersResponse = { users: types.SchoolUser[] };
 
   // Scoreboard
   export type ScoreboardRefreshRequest = { [key: string]: any };

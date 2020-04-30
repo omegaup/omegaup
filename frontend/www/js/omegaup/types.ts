@@ -1,5 +1,6 @@
 import { omegaup } from './omegaup';
 import { Optional } from 'typescript-optional';
+import { types } from './api_types';
 
 export interface LinkableResource {
   toString(): string;
@@ -102,7 +103,7 @@ export class SchoolCoderOfTheMonth implements LinkableResource {
   time: string = '';
   username: string = '';
 
-  constructor(coderOfTheMonth: omegaup.SchoolCoderOfTheMonth) {
+  constructor(coderOfTheMonth: types.SchoolCoderOfTheMonth) {
     this.classname = coderOfTheMonth.classname;
     this.time = coderOfTheMonth.time;
     this.username = coderOfTheMonth.username;
@@ -129,18 +130,12 @@ export class SchoolUser implements LinkableResource {
   solved_problems: number = 0;
   displayField: string = 'solved_problems';
 
-  constructor(
-    classname: string,
-    username: string,
-    created_problems: number,
-    solved_problems: number,
-    organized_contests: number,
-  ) {
-    this.classname = classname;
-    this.username = username;
-    this.created_problems = created_problems;
-    this.solved_problems = solved_problems;
-    this.organized_contests = organized_contests;
+  constructor(user: types.SchoolUser) {
+    this.classname = user.classname;
+    this.username = user.username;
+    this.created_problems = user.created_problems;
+    this.solved_problems = user.solved_problems;
+    this.organized_contests = user.organized_contests;
   }
 
   toString(): string {

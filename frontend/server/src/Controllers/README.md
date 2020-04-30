@@ -3694,9 +3694,9 @@ months (including the current one)
 
 ### Returns
 
-| Name                       | Type                                                          |
-| -------------------------- | ------------------------------------------------------------- |
-| `distinct_problems_solved` | `{ month: number; problems_solved: number; year: number; }[]` |
+| Name                       | Type                           |
+| -------------------------- | ------------------------------ |
+| `distinct_problems_solved` | `types.SchoolProblemsSolved[]` |
 
 ## `/api/school/schoolCodersOfTheMonth/`
 
@@ -3712,9 +3712,9 @@ Returns rank of best schools in last month
 
 ### Returns
 
-| Name     | Type                                                       |
-| -------- | ---------------------------------------------------------- |
-| `coders` | `{ time: string; username: string; classname: string; }[]` |
+| Name     | Type                            |
+| -------- | ------------------------------- |
+| `coders` | `types.SchoolCoderOfTheMonth[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -3747,9 +3747,9 @@ with the number of created problems, solved problems and organized contests.
 
 ### Returns
 
-| Name    | Type                                                                                                                        |
-| ------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `users` | `{ username: string; classname: string; created_problems: number; solved_problems: number; organized_contests: number; }[]` |
+| Name    | Type                 |
+| ------- | -------------------- |
+| `users` | `types.SchoolUser[]` |
 
 # Scoreboard
 

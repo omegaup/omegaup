@@ -505,12 +505,6 @@ export namespace omegaup {
     source_url?: string;
   }
 
-  export interface SchoolCoderOfTheMonth {
-    classname: string;
-    time: string;
-    username: string;
-  }
-
   export interface SchoolOfTheMonth extends SchoolsRank {
     time?: string;
     country?: string;
