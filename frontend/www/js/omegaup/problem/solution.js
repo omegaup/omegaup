@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
               .catch(ui.apiError);
           },
           'get-tokens': function() {
-            api.ProblemForfeited.getCounts({})
+            api.ProblemForfeited.getCounts()
               .then(function(data) {
                 problemSolution.allTokens = data.allowed;
                 problemSolution.availableTokens = data.allowed - data.seen;
