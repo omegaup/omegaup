@@ -1,5 +1,20 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleSchoolsOfTheMonth#}" inline}
-<script type="text/json" id="school-of-the-month-payload">{$schoolOfTheMonthPayload|json_encode}</script>
-<div id="school-of-the-month"></div>
-{js_include entrypoint="school_of_the_month"}
-{include file='footer.tpl' inline}
+<!DOCTYPE html>
+<html lang="{#locale#}" class="h-100">
+  {include file='head_v2.tpl' htmlTitle="{#omegaupTitleSchoolsOfTheMonth#}" inline}
+  <body class="d-flex flex-column h-100 pt-5">
+    {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
+	  <main role="main">
+      {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+        <div class="alert alert-danger">
+          {$ERROR_MESSAGE}
+        </div>
+      {/if}
+      {include file='status.tpl' inline}
+
+      <script type="text/json" id="payload">{$payload|json_encode}</script>
+      {js_include entrypoint="school_of_the_month" async}
+      <div id="main-container"></div>
+    </main>
+    {include file='footer_v2.tpl' inline}
+  </body>
+</html>
