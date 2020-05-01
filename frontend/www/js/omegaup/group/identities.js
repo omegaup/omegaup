@@ -1,6 +1,6 @@
 import group_Identities from '../components/group/Identities.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
         props: { identities: this.identities, groupAlias: this.groupAlias },
         on: {
           'bulk-identities': function(identities) {
-            API.Identity.bulkCreate({
+            api.Identity.bulkCreate({
               identities: JSON.stringify(identities),
               group_alias: groupAlias,
             })

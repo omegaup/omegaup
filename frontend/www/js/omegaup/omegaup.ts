@@ -1,5 +1,5 @@
 import * as ui from './ui';
-import * as api from './api_transitional';
+import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
 

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import user_BasicEdit from '../components/user/BasicEdit.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 
 OmegaUp.on('ready', function() {
   let basicEdit = new Vue({
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           update: function(username, password) {
-            API.User.updateBasicInfo({
+            api.User.updateBasicInfo({
               username,
               password,
             })
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  API.User.profile({})
+  api.User.profile({})
     .then(function(data) {
       basicEdit.username = data.username;
     })

@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as markdown from '../markdown';
 import * as ui from '../ui';
 import problem_Solution from '../components/problem/Solution.vue';

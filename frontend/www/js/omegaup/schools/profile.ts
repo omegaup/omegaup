@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import * as api from '../api_transitional';
+import * as api from '../api';
 import { types } from '../api_types';
 import school_Profile from '../components/schools/Profile.vue';
 import { OmegaUp } from '../omegaup';

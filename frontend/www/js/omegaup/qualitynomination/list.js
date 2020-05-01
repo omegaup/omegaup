@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import qualitynomination_List from '../components/qualitynomination/List.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -37,7 +37,7 @@ OmegaUp.on('ready', function() {
 
   function showNominations(pageNumber, status) {
     if (!payload.myView) {
-      API.QualityNomination.list({
+      api.QualityNomination.list({
         offset: pageNumber,
         rowcount: payload.length,
         status: status,
@@ -49,7 +49,7 @@ OmegaUp.on('ready', function() {
         })
         .catch(UI.apiError);
     } else {
-      API.QualityNomination.myList({
+      api.QualityNomination.myList({
         offset: pageNumber,
         rowcount: payload.length,
       })

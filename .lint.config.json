@@ -77,8 +77,7 @@
 		"api": {
 			"whitelist": [
 				"frontend/server/src/Controllers/.*\\.php$",
-				"frontend/www/js/omegaup/api.d.ts$",
-				"frontend/www/js/omegaup/api_transitional.ts$",
+				"frontend/www/js/omegaup/api.ts$",
 				"frontend/www/js/omegaup/api_types.ts$"
 			]
 		},

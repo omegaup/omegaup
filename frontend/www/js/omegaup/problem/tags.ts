@@ -3,7 +3,7 @@ import problem_Tags from '../components/problem/Tags.vue';
 import { OmegaUp } from '../omegaup.js';
 import { types } from '../api_types';
 import T from '../lang';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
