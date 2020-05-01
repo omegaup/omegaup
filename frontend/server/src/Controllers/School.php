@@ -8,7 +8,11 @@
  * @author joemmanuel
  *
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
+ * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
+ * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}
+ * @psalm-type SchoolProblemsSolved=array{month: int, problems_solved: int, year: int}
  * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool}
+ * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
  */
 class School extends \OmegaUp\Controllers\Controller {
     /**
@@ -51,7 +55,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}}}
+     * @return array{template: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -63,7 +67,7 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        $details = [
+        $payload = [
             'school_id' => intval($school->school_id),
             'school_name' => strval($school->name),
             'ranking' => intval($school->ranking),
@@ -78,7 +82,7 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country'] = [
+                $payload['country'] = [
                     'id' => strval($country->country_id),
                     'name' => strval($country->name),
                 ];
@@ -90,16 +94,16 @@ class School extends \OmegaUp\Controllers\Controller {
                     strval($school->state_id)
                 );
                 if (!is_null($state)) {
-                    $details['state_name'] = $state->name;
+                    $payload['state_name'] = $state->name;
                 }
             }
         }
 
         return [
             'smartyProperties' => [
-                'details' => $details
+                'payload' => $payload,
             ],
-            'template' => 'school.profile.tpl'  ,
+            'template' => 'school.profile.tpl',
         ];
     }
 
@@ -174,7 +178,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{coders: list<array{time: string, username: string, classname: string}>}
+     * @return array{coders: list<SchoolCoderOfTheMonth>}
      *
      * @omegaup-request-param int $school_id
      */
@@ -198,7 +202,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{distinct_problems_solved: list<array{month: int, problems_solved: int, year: int}>}
+     * @return array{distinct_problems_solved: list<SchoolProblemsSolved>}
      *
      * @omegaup-request-param int $school_id
      */
@@ -223,7 +227,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
+     * @return array{users: list<SchoolUser>}
      *
      * @omegaup-request-param int $school_id
      */

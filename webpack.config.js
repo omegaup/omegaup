@@ -81,7 +81,7 @@ let config = [
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
         './frontend/www/js/omegaup/schools/schoolofthemonth.js',
-      school_profile: './frontend/www/js/omegaup/schools/profile.js',
+      school_profile: './frontend/www/js/omegaup/schools/profile.ts',
       schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',

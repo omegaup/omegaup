@@ -29,40 +29,6 @@ export default {
 
   Run: api.Run,
 
-  School: {
-    create: api.School.create,
-
-    monthlySolvedProblemsCount: api.School.monthlySolvedProblemsCount,
-
-    schoolsOfTheMonth: api.School.schoolsOfTheMonth,
-
-    schoolCodersOfTheMonth: api.apiCall(
-      '/api/school/schoolCodersOfTheMonth',
-      function(data) {
-        data.coders = data.coders.map(
-          coderOfTheMonth => new types.SchoolCoderOfTheMonth(coderOfTheMonth),
-        );
-        return data;
-      },
-    ),
-
-    selectSchoolOfTheMonth: api.School.selectSchoolOfTheMonth,
-
-    users: api.apiCall('/api/school/users/', function(data) {
-      data.users = data.users.map(
-        user =>
-          new types.SchoolUser(
-            user.classname,
-            user.username,
-            user.created_problems,
-            user.solved_problems,
-            user.organized_contests,
-          ),
-      );
-      return data;
-    }),
-  },
-
   Session: api.Session,
 
   Submission: api.Submission,
