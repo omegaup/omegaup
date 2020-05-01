@@ -58,4 +58,5 @@
   {if isset($recaptchaFile)}
       <script type="text/javascript" src="{$recaptchaFile}"></script>
   {/if}
+  {include file='status.tpl' inline}
 </head>

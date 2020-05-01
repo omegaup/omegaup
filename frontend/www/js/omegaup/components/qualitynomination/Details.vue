@@ -1,111 +1,116 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">{{ T.wordsReviewingProblem }}</h2>
-    </div>
-    <div class="panel-body">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.qualityNominationType }}</strong>
+  <div class="container-lg p-5">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">{{ T.wordsReviewingProblem }}</h2>
+      </div>
+      <div class="card-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.qualityNominationType }}</strong>
+            </div>
+            <div class="col-sm-4">
+              {{ this.nomination }}
+            </div>
           </div>
-          <div class="col-sm-4">
-            {{ this.nomination }}
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.wordsNominator }}</strong>
+            </div>
+            <div class="col-sm-4">
+              {{ this.nominator.name }} (<a
+                v-bind:href="userUrl(this.nominator.username)"
+                >{{ this.nominator.username }}</a
+              >)
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.wordsNominator }}</strong>
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.wordsProblem }}</strong>
+            </div>
+            <div class="col-sm-4">
+              {{ this.problem.title }} (<a
+                v-bind:href="problemUrl(this.problem.alias)"
+                >{{ this.problem.alias }}</a
+              >)
+            </div>
           </div>
-          <div class="col-sm-4">
-            {{ this.nominator.name }} (<a
-              v-bind:href="userUrl(this.nominator.username)"
-              >{{ this.nominator.username }}</a
-            >)
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.wordsAuthor }}</strong>
+            </div>
+            <div class="col-sm-4">
+              {{ this.author.name }} (<a
+                v-bind:href="userUrl(this.author.username)"
+                >{{ this.author.username }}</a
+              >)
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.wordsProblem }}</strong>
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.wordsDetails }}</strong>
+            </div>
+            <div class="col-sm-8">
+              <pre class="border rounded bg-light">{{ this.contents }}</pre>
+            </div>
           </div>
-          <div class="col-sm-4">
-            {{ this.problem.title }} (<a
-              v-bind:href="problemUrl(this.problem.alias)"
-              >{{ this.problem.alias }}</a
-            >)
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.wordsAuthor }}</strong>
-          </div>
-          <div class="col-sm-4">
-            {{ this.author.name }} (<a
-              v-bind:href="userUrl(this.author.username)"
-              >{{ this.author.username }}</a
-            >)
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.wordsDetails }}</strong>
-          </div>
-          <div class="col-sm-8">
-            <pre>{{ this.contents }}</pre>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <strong>{{ T.banProblemFormQuestion }}</strong>
-            <span
-              aria-hidden="true"
-              class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
-              v-bind:title="T.banProblemFormComments"
-            ></span>
+          <div class="row">
+            <div class="col-sm-3">
+              <strong>{{ T.banProblemFormQuestion }}</strong>
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.banProblemFormComments"
+              ></span>
+            </div>
+            <div
+              class="col-sm-8"
+              v-bind:class="{
+                'has-error': !rationale,
+                'has-success': rationale,
+              }"
+            >
+              <textarea
+                class="form-control"
+                name="rationale"
+                type="text"
+                v-model="rationale"
+              ></textarea>
+            </div>
           </div>
           <div
-            class="col-sm-8"
-            v-bind:class="{ 'has-error': !rationale, 'has-success': rationale }"
+            class="row"
+            v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true"
           >
-            <textarea
-              class="form-control"
-              name="rationale"
-              type="text"
-              v-model="rationale"
-            ></textarea>
-          </div>
-        </div>
-        <div
-          class="row"
-          v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true"
-        >
-          <div class="col-sm-3">
-            <strong>{{ T.wordsVerdict }}</strong>
-          </div>
-          <div class="col-sm-8">
-            <button
-              class="btn btn-danger"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('banned')"
-            >
-              {{ T.wordsBanProblem }}
-            </button>
-            <button
-              class="btn btn-success"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('resolved')"
-            >
-              {{ T.wordsKeepProblem }}
-            </button>
-            <button
-              class="btn btn-warning"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('warning')"
-            >
-              {{ T.wordsWarningProblem }}
-            </button>
+            <div class="col-sm-3">
+              <strong>{{ T.wordsVerdict }}</strong>
+            </div>
+            <div class="col-sm-8 button-group">
+              <button
+                class="btn btn-danger"
+                v-bind:disabled="!rationale"
+                v-on:click="showConfirmationDialog('banned')"
+              >
+                {{ T.wordsBanProblem }}
+              </button>
+              <button
+                class="btn btn-success"
+                v-bind:disabled="!rationale"
+                v-on:click="showConfirmationDialog('resolved')"
+              >
+                {{ T.wordsKeepProblem }}
+              </button>
+              <button
+                class="btn btn-warning"
+                v-bind:disabled="!rationale"
+                v-on:click="showConfirmationDialog('warning')"
+              >
+                {{ T.wordsWarningProblem }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -178,5 +183,9 @@ export default class QualityNominationDetails extends Vue {
 <style>
 textarea {
   margin: 0 0 10px;
+}
+
+.button-group {
+  text-align: center;
 }
 </style>
