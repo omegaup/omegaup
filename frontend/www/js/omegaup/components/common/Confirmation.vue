@@ -1,37 +1,52 @@
 <template>
-  <div class="confirmation">
-    <form class="panel panel-default popup">
-      <button class="close" type="button" v-on:click="$emit('close')">×</button>
-      <div class="form-group">
-        <div class="question-text">
-          {{ question }}
+  <div class="mask">
+    <div class="confirmation">
+      <form class="panel panel-default popup">
+        <button class="close" type="button" v-on:click.prevent="$emit('close')">
+          ×
+        </button>
+        <div class="form-group">
+          <div class="question-text">
+            {{ question }}
+          </div>
+          <div class="button-row">
+            <button class="btn btn-success" v-on:click.prevent="$emit('yes')">
+              {{ answerYes }}
+            </button>
+            <button class="btn btn-danger" v-on:click.prevent="$emit('no')">
+              {{ answerNo }}
+            </button>
+          </div>
         </div>
-        <div class="button-row">
-          <button class="btn btn-success" v-on:click="$emit('yes')">
-            {{ answerYes }}
-          </button>
-          <button class="btn btn-danger" v-on:click="$emit('no')">
-            {{ answerNo }}
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 
 <style>
-.confirmation .popup {
+.mask {
   position: fixed;
-  top: 25%;
-  left: 30%;
-  z-index: 9999999 !important;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.confirmation .popup {
+  position: absolute;
   width: 350px;
-  height: 150px;
+  top: 50%;
+  left: 50%;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
   overflow: auto;
   background: white;
+  margin-top: -75px; /* height/2 = 500px / 2 */
+  margin-left: -175px;
 }
 
 .confirmation .question-text {

@@ -88,21 +88,21 @@
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="mark('banned')"
+              v-on:click="showConfirmationDialog('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="mark('resolved')"
+              v-on:click="showConfirmationDialog('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
               class="btn btn-warning"
               v-bind:disabled="!rationale"
-              v-on:click="mark('warning')"
+              v-on:click="showConfirmationDialog('warning')"
             >
               {{ T.wordsWarningProblem }}
             </button>
@@ -164,16 +164,13 @@ export default class QualityNominationDetails extends Vue {
   }
 
   markResolution(all: boolean): void {
+    this.confirmationShow = false;
     this.$emit('mark-resolution', this, this.status, all);
   }
 
-  mark(status: string): void {
+  showConfirmationDialog(status: string): void {
     this.status = status;
     this.confirmationShow = true;
-  }
-
-  onHide(): void {
-    this.confirmationShow = false;
   }
 }
 </script>
