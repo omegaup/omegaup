@@ -2,7 +2,7 @@ import Vue from 'vue';
 import problem_Mine from '../components/problem/Mine.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
@@ -26,7 +26,7 @@ OmegaUp.on('ready', () => {
           'change-visibility': (ev, selectedProblems, visibility) => {
             Promise.all(
               selectedProblems.map(problemAlias =>
-                API.Problem.update({
+                api.Problem.update({
                   problem_alias: problemAlias,
                   visibility: visibility,
                   message:
@@ -67,10 +67,10 @@ OmegaUp.on('ready', () => {
 
   function showProblems(showAllProblems, pageNumber) {
     (showAllProblems
-      ? API.Problem.adminList({
+      ? api.Problem.adminList({
           page: pageNumber,
         })
-      : API.Problem.myList({
+      : api.Problem.myList({
           page: pageNumber,
         })
     )

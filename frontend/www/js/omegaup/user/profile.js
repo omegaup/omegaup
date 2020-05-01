@@ -2,7 +2,7 @@ import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as ui from '../ui';
 import { Problem, ContestResult } from '../types';
 

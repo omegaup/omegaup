@@ -1,6 +1,6 @@
 import course_List from '../components/course/List.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  API.Course.listCourses()
+  api.Course.listCourses()
     .then(function(data) {
       const timeTypes = {
         CURRENT: 0,

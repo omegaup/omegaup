@@ -1,6 +1,6 @@
 import course_Form from '../components/course/Form.vue';
 import { OmegaUp } from '../omegaup';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';

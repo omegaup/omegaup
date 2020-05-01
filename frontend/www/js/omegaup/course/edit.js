@@ -7,7 +7,7 @@ import course_ProblemList from '../components/course/ProblemList.vue';
 import common_Publish from '../components/common/Publish.vue';
 import course_Clone from '../components/course/Clone.vue';
 import { OmegaUp } from '../omegaup';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import API from '../api';
 import * as UI from '../ui';
 import T from '../lang';

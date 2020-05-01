@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import activity_Feed from '../components/activity/Feed.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -12,13 +12,13 @@ OmegaUp.on('ready', function() {
   let problemsetAlias = match[2];
 
   if (problemsetType == 'contest') {
-    API.Contest.activityReport({ contest_alias: problemsetAlias })
+    api.Contest.activityReport({ contest_alias: problemsetAlias })
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
       .catch(UI.apiError);
   } else if (problemsetType == 'course') {
-    API.Course.activityReport({ course_alias: problemsetAlias })
+    api.Course.activityReport({ course_alias: problemsetAlias })
       .then(function(report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })

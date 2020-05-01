@@ -1,6 +1,6 @@
 import course_ViewProgress from '../components/course/ViewProgress.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
