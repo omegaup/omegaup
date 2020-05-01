@@ -88,21 +88,21 @@
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('banned')"
+              v-on:click="mark('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('resolved')"
+              v-on:click="mark('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
               class="btn btn-warning"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('warning')"
+              v-on:click="mark('warning')"
             >
               {{ T.wordsWarningProblem }}
             </button>
@@ -110,6 +110,15 @@
         </div>
       </div>
     </div>
+    <omegaup-common-confirmation
+      v-if="confirmationShow"
+      v-bind:question="T.demotionProblemMultipleQuestion"
+      v-bind:answer-yes="T.demotionProblemMultipleAnswerYes"
+      v-bind:answer-no="T.demotionProblemMultipleAnswerNo"
+      v-on:close="confirmationShow = false"
+      v-on:yes="markResolution(true)"
+      v-on:no="markResolution(false)"
+    ></omegaup-common-confirmation>
   </div>
 </template>
 
@@ -117,6 +126,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import confirmation from '../common/Confirmation.vue';
 
 interface QualityNominationContents {
   original: string;
@@ -124,7 +134,11 @@ interface QualityNominationContents {
   reason: string;
 }
 
-@Component
+@Component({
+  components: {
+    'omegaup-common-confirmation': confirmation,
+  },
+})
 export default class QualityNominationDetails extends Vue {
   @Prop() author!: omegaup.User;
   @Prop() contents!: QualityNominationContents;
@@ -138,6 +152,8 @@ export default class QualityNominationDetails extends Vue {
 
   T = T;
   rationale = this.initialRationale;
+  confirmationShow = false;
+  status = 'banned';
 
   userUrl(alias: string): string {
     return `/profile/${alias}/`;
@@ -147,8 +163,17 @@ export default class QualityNominationDetails extends Vue {
     return `/arena/problem/${alias}/`;
   }
 
-  markResolution(newStatus: string): void {
-    this.$emit('mark-resolution', this, newStatus);
+  markResolution(all: boolean): void {
+    this.$emit('mark-resolution', this, this.status, all);
+  }
+
+  mark(status: string): void {
+    this.status = status;
+    this.confirmationShow = true;
+  }
+
+  onHide(): void {
+    this.confirmationShow = false;
   }
 }
 </script>
