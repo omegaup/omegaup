@@ -291,6 +291,14 @@ export namespace types {
       );
     }
 
+    export function SchoolOfTheMonthPayload(
+      elementId: string,
+    ): types.SchoolOfTheMonthPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolProfileDetailsPayload(
       elementId: string,
     ): types.SchoolProfileDetailsPayload {
@@ -778,6 +786,31 @@ export namespace types {
     time: string;
     username: string;
     classname: string;
+  }
+
+  export interface SchoolOfTheMonthPayload {
+    candidatesToSchoolOfTheMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+      school_of_the_month_id: number;
+      score: number;
+    }[];
+    isMentor: boolean;
+    options?: { canChooseSchool: boolean; schoolIsSelected: boolean };
+    schoolsOfPreviousMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+    }[];
+    schoolsOfPreviousMonths: {
+      country_id: string;
+      name: string;
+      school_id: number;
+      time: string;
+    }[];
   }
 
   export interface SchoolProblemsSolved {
