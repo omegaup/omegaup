@@ -882,15 +882,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
-            $dataCases = self::getProblemCases($problemArtifacts, 'cases');
-            $dataCases = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::DATA_CASES,
+            $dataCases = self::getProblemCases(
+                $problemArtifacts,
                 'cases',
-                /** @return ProblemCases|null */
-                function () use ($problemArtifacts) {
-                    return self::getProblemCases($problemArtifacts, 'cases');
-                },
-                24 * 60 * 60 /*expire in 1 day*/
+                $problem->alias,
+                $run->version
             );
             if (is_null($dataCases)) {
                 // Forcing to hide diffs when inputs or outpus exceeds 4kb
@@ -901,14 +897,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
             return $response;
         }
-        $dataCases = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::DATA_CASES,
+        $dataCases = self::getProblemCases(
+            $problemArtifacts,
             'examples',
-            /** @return ProblemCases|null */
-            function () use ($problemArtifacts) {
-                return self::getProblemCases($problemArtifacts, 'examples');
-            },
-            24 * 60 * 60 /*expire in 1 day*/
+            $problem->alias,
+            $run->version
         );
         if (is_null($dataCases)) {
             // Forcing to hide diffs when inputs or outpus exceeds 4kb
@@ -926,22 +919,58 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemCases(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
-        string $casesType
+        string $directory,
+        string $problemAlias,
+        ?string $version
     ): ?array {
-        $existingCases = $problemArtifacts->lsTreeRecursive($casesType);
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES,
+            "{$problemAlias}-{$version}-{$directory}",
+            /** @return ProblemCases|null */
+            function () use (
+                $problemArtifacts,
+                $directory,
+                $problemAlias,
+                $version
+            ) {
+                return self::getProblemCasesImpl(
+                    $problemArtifacts,
+                    $directory,
+                    $problemAlias,
+                    $version
+                );
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
+    }
+
+    /**
+     * @return ProblemCases|null
+     */
+    private static function getProblemCasesImpl(
+        \OmegaUp\ProblemArtifacts $problemArtifacts,
+        string $directory,
+        string $problemAlias,
+        ?string $version
+    ): ?array {
+        $existingCases = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_FILES,
+            "{$problemAlias}-{$version}-{$directory}",
+            /** @return list<array{path: string, mode: int, id: string, type: string}> */
+            function () use ($problemArtifacts, $directory) {
+                return $problemArtifacts->lsTreeRecursive($directory);
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
         $response = [];
         $sizeFiles = [];
         foreach ($existingCases as $file) {
             /** @var array{contents: string, id: string, size: int} $problemContent */
             $problemContent = json_decode(
-                $problemArtifacts->get(
-                    $file['path'],
-                    /*$quiet=*/false,
-                    /*$includeHeaders=*/false
-                ),
+                $problemArtifacts->get($file['path']),
                 /*$assoc=*/true
             );
-            [$_, $filename] = explode("{$casesType}/", $file['path']);
+            [$_, $filename] = explode("{$directory}/", $file['path']);
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
             $basename = basename($filename, ".{$extension}");
             if (!isset($response[$basename])) {
@@ -1060,44 +1089,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run_alias'
         );
 
-        $submission = \OmegaUp\DAO\Submissions::getByGuid($r['run_alias']);
         if (
-            is_null($submission) ||
-            is_null($submission->current_run_id) ||
-            is_null($submission->problem_id)
+            !self::downloadSubmission(
+                $r['run_alias'],
+                $r->identity,
+                /*$passthru=*/true,
+                isset($r['show_diff']) ? boolval($r['show_diff']) : false
+            )
         ) {
-            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
-        }
-
-        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        if (is_null($run)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
-        }
-
-        $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
-        if ($problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS) {
-            return;
-        }
-        $showDiff = isset($r['show_diff']) ? boolval($r['show_diff']) : false;
-        if (
-            !\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)
-            && !$showDiff
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-        if (!self::downloadSubmission($run, $submission, /*$passthru=*/true)) {
             http_response_code(404);
         }
         exit;
@@ -1106,10 +1105,11 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * @return bool|null|string
      */
-    public static function downloadSubmissionForTesting(
+    public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $passthru
+        bool $passthru,
+        bool $showDiff = false
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
@@ -1130,30 +1130,15 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+            && !$showDiff
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
 
-        if ($passthru) {
-            header('Content-Type: application/zip');
-            header(
-                "Content-Disposition: attachment; filename={$submission->guid}.zip"
-            );
-            return self::getGraderResourcePassthru($run, 'files.zip');
-        }
-        return self::getGraderResource($run, 'files.zip');
-    }
-
-    /**
-     * @return bool|null|string
-     */
-    private static function downloadSubmission(
-        \OmegaUp\DAO\VO\Runs $run,
-        \OmegaUp\DAO\VO\Submissions $submission,
-        bool $passthru
-    ) {
         if ($passthru) {
             header('Content-Type: application/zip');
             header(

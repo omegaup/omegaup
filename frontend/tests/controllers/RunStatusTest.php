@@ -58,7 +58,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
-            \OmegaUp\Controllers\Run::downloadSubmissionForTesting(
+            \OmegaUp\Controllers\Run::downloadSubmission(
                 $runData['response']['guid'],
                 $contestantIdentity,
                 false
@@ -68,7 +68,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
-        $submissionZip = \OmegaUp\Controllers\Run::downloadSubmissionForTesting(
+        $submissionZip = \OmegaUp\Controllers\Run::downloadSubmission(
             $runData['response']['guid'],
             $authorIdentity,
             false

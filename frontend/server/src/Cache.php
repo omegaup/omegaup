@@ -223,6 +223,7 @@ class Cache {
     const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
     const TAGS_LIST = 'tags-list-';
     const DATA_CASES = 'data-cases-';
+    const DATA_CASES_FILES = 'data-cases-files-';
 
     /** @var \Logger */
     private $log;
