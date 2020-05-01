@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import * as api from '../api_transitional';
+import * as api from '../api';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
 import * as time from '../time';

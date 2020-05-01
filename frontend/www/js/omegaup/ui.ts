@@ -1,6 +1,4 @@
-import API from './api.js';
 import { types } from './api_types';
-import * as api from './api_transitional';
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';

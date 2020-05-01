@@ -97,18 +97,12 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
 import UserName from '../user/Username.vue';
+import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
-
-interface ProblemsSolvedCount {
-  year: number;
-  month: number;
-  count: number;
-}
 
 @Component({
   components: {
@@ -123,12 +117,11 @@ export default class SchoolProfile extends Vue {
   @Prop() rank!: number;
   @Prop() country!: omegaup.Country;
   @Prop() stateName!: string;
-  @Prop() monthlySolvedProblemsCount!: ProblemsSolvedCount[];
+  @Prop() monthlySolvedProblemsCount!: types.SchoolProblemsSolved[];
   @Prop() users!: SchoolUser[];
   @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
 
   T = T;
-  UI = UI;
   sortBy = 'solved_problems';
   sortOptions = [
     {
