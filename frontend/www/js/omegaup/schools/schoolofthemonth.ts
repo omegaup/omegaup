@@ -7,7 +7,7 @@ import Vue from 'vue';
 import schoolOfTheMonth_List from '../components/schoolofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.SchoolOfTheMonthPayload('payload');
+  const payload = types.payloadParsers.SchoolOfTheMonthPayload();
   let schoolOfTheMonthList = new Vue({
     el: '#main-container',
     render: function(createElement) {

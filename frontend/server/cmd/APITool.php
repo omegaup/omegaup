@@ -620,19 +620,17 @@ class APIGenerator {
                 ) {
                     continue;
                 }
+                echo "   export function {$typeName}(elementId: string = 'payload'): types.{$typeName} {\n";
                 if (is_null($conversionResult->conversionFunction)) {
-                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
                     echo "     return JSON.parse(\n";
                     echo "       (<HTMLElement>document.getElementById(elementId)).innerText,\n";
                     echo "     );\n\n";
-                    echo "   }\n\n";
                 } else {
-                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
                     echo "     return ({$conversionResult->conversionFunction})(\n";
                     echo "       JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),\n";
                     echo "     );\n\n";
-                    echo "   }\n\n";
                 }
+                echo "   }\n\n";
             }
             echo "  }\n\n";
 
