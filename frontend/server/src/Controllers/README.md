@@ -2580,7 +2580,6 @@ Returns the best score for a problem
 | Name             | Type    | Description |
 | ---------------- | ------- | ----------- |
 | `contest_alias`  | `mixed` |             |
-| `lang`           | `mixed` |             |
 | `problem_alias`  | `mixed` |             |
 | `problemset_id`  | `mixed` |             |
 | `statement_type` | `mixed` |             |
@@ -2672,7 +2671,6 @@ Entry point for Problem Details API
 | Name                      | Type        | Description |
 | ------------------------- | ----------- | ----------- |
 | `contest_alias`           | `mixed`     |             |
-| `lang`                    | `mixed`     |             |
 | `prevent_problemset_open` | `bool|null` |             |
 | `problem_alias`           | `mixed`     |             |
 | `problemset_id`           | `mixed`     |             |
@@ -2907,7 +2905,6 @@ Returns the solution for a problem if conditions are satisfied.
 | ----------------- | ----------- | ----------- |
 | `contest_alias`   | `mixed`     |             |
 | `forfeit_problem` | `bool|null` |             |
-| `lang`            | `mixed`     |             |
 | `problem_alias`   | `mixed`     |             |
 | `problemset_id`   | `mixed`     |             |
 | `statement_type`  | `mixed`     |             |
@@ -3010,7 +3007,6 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
-| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |
