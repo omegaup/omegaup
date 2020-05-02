@@ -45,7 +45,9 @@ abstract class Users {
                 `hide_problem_tags` = ?,
                 `in_mailing_list` = ?,
                 `is_private` = ?,
-                `preferred_language` = ?
+                `preferred_language` = ?,
+                `author_score` = ?,
+                `author_ranking` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -79,6 +81,12 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            floatval($Users->author_score),
+            (
+                is_null($Users->author_ranking) ?
+                null :
+                intval($Users->author_ranking)
+            ),
             intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -114,7 +122,9 @@ abstract class Users {
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`author_score`,
+                `Users`.`author_ranking`
             FROM
                 `Users`
             WHERE
@@ -210,7 +220,9 @@ abstract class Users {
                 `Users`.`hide_problem_tags`,
                 `Users`.`in_mailing_list`,
                 `Users`.`is_private`,
-                `Users`.`preferred_language`
+                `Users`.`preferred_language`,
+                `Users`.`author_score`,
+                `Users`.`author_ranking`
             FROM
                 `Users`
         ';
@@ -274,8 +286,12 @@ abstract class Users {
                     `hide_problem_tags`,
                     `in_mailing_list`,
                     `is_private`,
-                    `preferred_language`
+                    `preferred_language`,
+                    `author_score`,
+                    `author_ranking`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -320,6 +336,12 @@ abstract class Users {
             intval($Users->in_mailing_list),
             intval($Users->is_private),
             $Users->preferred_language,
+            floatval($Users->author_score),
+            (
+                is_null($Users->author_ranking) ?
+                null :
+                intval($Users->author_ranking)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
