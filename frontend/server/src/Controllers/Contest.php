@@ -497,7 +497,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function getContestDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $r->ensureBool('is_practice', false);
+        $r->ensureOptionalBool('is_practice');
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['contest_alias'],
@@ -1038,7 +1038,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureBool('share_user_information', false);
+        $r->ensureOptionalBool('share_user_information');
         \OmegaUp\DAO\DAO::transBegin();
         try {
             \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
@@ -1699,7 +1699,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureBool('basic_information', false);
+        $r->ensureOptionalBool('basic_information');
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
             'needs_basic_information' => boolval($r['basic_information']),
@@ -1850,7 +1850,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $r->ensureFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureFloat('points_decay_factor', 0, 1, $isRequired);
-        $r->ensureBool('partial_score', false);
+        $r->ensureOptionalBool('partial_score');
         $r->ensureInt('submissions_gap', 0, null, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
@@ -1926,7 +1926,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Show scoreboard is always optional
-        $r->ensureBool('show_scoreboard_after', false);
+        $r->ensureOptionalBool('show_scoreboard_after');
 
         // languages is always optional
         if (!empty($r['languages'])) {
@@ -3515,7 +3515,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'required',
             ]
         );
-        $r->ensureBool('basic_information', /*$required=*/ false);
+        $r->ensureOptionalBool('basic_information');
 
         self::forbiddenInVirtual($contest);
 
@@ -4354,10 +4354,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        // Validate value param
-        $r->ensureBool('value');
-
-        $contest->recommended = boolval($r['value']);
+        $contest->recommended = $r->ensureBool('value');
         \OmegaUp\DAO\Contests::update($contest);
 
         return ['status' => 'ok'];

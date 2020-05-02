@@ -98,10 +98,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias' => $r['problem_alias'],
         ];
         if (!is_null($r['email_clarifications'])) {
-            $r->ensureBool('email_clarifications', false);
-            $params['email_clarifications'] = boolval(
-                $r['email_clarifications']
-            );
+            $params['email_clarifications'] = $r->ensureOptionalBool(
+                'email_clarifications'
+            ) ?? false;
         }
         if (!is_null($r['extra_wall_time'])) {
             $params['extra_wall_time'] = intval($r['extra_wall_time']);
@@ -157,10 +156,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params['show_diff'] = strval($r['show_diff']);
         }
         if (!is_null($r['allow_user_add_tags'])) {
-            $r->ensureBool('allow_user_add_tags', false);
-            $params['allow_user_add_tags'] = boolval(
-                $r['allow_user_add_tags']
-            );
+            $params['allow_user_add_tags'] = $r->ensureOptionalBool(
+                'allow_user_add_tags'
+            ) ?? false;
         }
         return new \OmegaUp\ProblemParams($params, $isRequired);
     }
@@ -2182,8 +2180,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $statement_type
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
-        $r->ensureBool('show_solvers', /*required=*/false);
-        $r->ensureBool('prevent_problemset_open', /*required=*/false);
+        $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
+        $preventProblemsetOptin = $r->ensureOptionalBool(
+            'prevent_problemset_open'
+        ) ?? false;
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['contest_alias'],
@@ -2220,7 +2220,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem,
             $problemset,
             strval($r['lang']),
-            boolval($r['show_solvers']),
+            $showSolvers,
             boolval($r['prevent_problemset_open']),
             $r['contest_alias']
         );
@@ -2554,8 +2554,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem
             )
         ) {
-            $r->ensureBool('forfeit_problem', false /*isRequired*/);
-            if ($r['forfeit_problem'] !== true) {
+            $forfeitProblem = $r->ensureOptionalBool('forfeit_problem');
+            if ($forfeitProblem !== true) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'problemSolutionNotVisible'
                 );
@@ -3930,7 +3930,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Do nothing. Not logged user can access here
             $r->identity = null;
         }
-        $r->ensureBool('prevent_problemset_open', /*required=*/false);
+        $preventProblemsetOpen = $r->ensureOptionalBool(
+            'prevent_problemset_open'
+        ) ?? false;
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['contest_alias'],
@@ -3962,7 +3964,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset,
             strval($r['lang']),
             /*showSolvers=*/true,
-            boolval($r['prevent_problemset_open']),
+            $preventProblemsetOpen,
             $r['contest_alias']
         );
         if (is_null($details)) {
