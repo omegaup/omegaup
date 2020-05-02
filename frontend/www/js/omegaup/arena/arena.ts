@@ -3,6 +3,13 @@
 import Vue from 'vue';
 
 import * as api from '../api';
+import T from '../lang';
+import * as markdown from '../markdown';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
+import * as typeahead from '../typeahead';
+import * as ui from '../ui';
+
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
@@ -14,74 +21,108 @@ import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import T from '../lang';
-import * as markdown from '../markdown';
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import * as typeahead from '../typeahead';
-import * as ui from '../ui';
 
 import ArenaAdmin from './admin_arena';
 import {
+  ArenaOptions,
   EphemeralGrader,
   EventsSocket,
   GetOptionsFromLocation,
+  getMaxScore,
+  scoreboardColors,
   myRunsStore,
   runsStore,
 } from './arena_transitional';
 
 export { ArenaAdmin, GetOptionsFromLocation };
 
-let ScoreboardColors = [
-  '#FB3F51',
-  '#FF5D40',
-  '#FFA240',
-  '#FFC740',
-  '#59EA3A',
-  '#37DD6F',
-  '#34D0BA',
-  '#3AAACF',
-  '#8144D6',
-  '#CD35D3',
-];
-
-function getMaxScore(runs, alias, previousScore) {
-  let maxScore = previousScore;
-  for (let run of runs) {
-    if (alias != run.alias) {
-      continue;
-    }
-    let score = run.contest_score;
-    if (score > maxScore) {
-      maxScore = score;
-    }
-  }
-  return maxScore;
-}
+// Number of digits after the decimal point to show.
+const digitsAfterDecimalPoint: number = 2;
 
 export class Arena {
-  constructor(options) {
-    let self = this;
+  options: ArenaOptions;
 
-    self.options = options;
+  // Currently opened problem.
+  currentProblem: types.ProblemsetProblem | null = null;
 
-    // The current problemset.
-    self.currentProblemset = null;
+  // The current problemset.
+  currentProblemset: types.Problemset | null = null;
 
-    // The interval for clock updates.
-    self.clockInterval = null;
+  // The interval for clock updates.
+  clockInterval = null;
 
-    // The start time of the contest.
-    self.startTime = null;
+  // The start time of the contest.
+  startTime = null;
 
-    // The finish time of the contest.
-    self.finishTime = null;
+  // The finish time of the contest.
+  finishTime = null;
 
-    // The deadline for submissions. self might be different from the end time.
-    self.submissionDeadline = null;
+  // The deadline for submissions. This might be different from the end time.
+  submissionDeadline = null;
 
-    // All runs in self contest/problem.
-    self.myRunsList = new Vue({
+  // The guid of any run that is pending.
+  pendingRuns = {};
+
+  // The set of problems in this contest.
+  problems = {};
+
+  // WebSocket for real-time updates.
+  socket: EventsSocket | null = null;
+
+  // The offset of each user into the ranking table.
+  currentRanking = {};
+
+  // The previous ranking information. Useful to show diffs.
+  prevRankingState = null;
+
+  // Every time a recent event is shown, have this interval clear it after
+  // 30s.
+  removeRecentEventClassTimeout = null;
+
+  // The last known scoreboard event stream.
+  currentEvents = null;
+
+  // The Markdown-to-HTML converter.
+  markdownConverter: Markdown.Converter = markdown.markdownConverter();
+
+  // If we have admin powers in this contest.
+  problemsetAdmin: boolean = false;
+
+  answeredClarifications: number = 0;
+  clarificationsOffset: number = 0;
+  clarificationsRowcount: number = 20;
+  activeTab: string = 'problems';
+  clarifications = {};
+  submissionGap: number = 0;
+
+  // The interval of time that submissions button will be disabled
+  submissionGapInterval: number = 0;
+
+  // Cache scoreboard data for virtual contest
+  originalContestScoreboardEvent = null;
+
+  // Virtual contest refresh interval
+  virtualContestRefreshInterval = null;
+
+  // Ephemeral grader support.
+  ephemeralGrader: EphemeralGrader = new EphemeralGrader();
+
+  // UI elements
+  codeEditor:
+    | (Vue & {
+        language: string;
+        code: string;
+        refresh: () => void;
+      })
+    | null = null;
+
+  qualityNominationForm = null;
+
+  constructor(options: ArenaOptions) {
+    this.options = options;
+
+    // All runs in this contest/problem.
+    this.myRunsList = new Vue({
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -105,45 +146,20 @@ export class Arena {
       },
       data: {
         isContestFinished: false,
-        isProblemsetOpened: false,
+        isProblemsetOpened: true,
         problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
       },
       components: { 'omegaup-arena-runs': arena_Runs },
     });
     const myRunsListElement = document.querySelector('#problem table.runs');
     if (myRunsListElement) {
-      self.myRunsList.$mount(myRunsListElement);
+      this.myRunsList.$mount(myRunsListElement);
     }
 
-    // The guid of any run that is pending.
-    self.pendingRuns = {};
-
-    // The set of problems in self contest.
-    self.problems = {};
-
-    // WebSocket for real-time updates.
-    self.socket = null;
-
-    // The offset of each user into the ranking table.
-    self.currentRanking = {};
-
-    // The previous ranking information. Useful to show diffs.
-    self.prevRankingState = null;
-
-    // Every time a recent event is shown, have self interval clear it after
-    // 30s.
-    self.removeRecentEventClassTimeout = null;
-
-    // The last known scoreboard event stream.
-    self.currentEvents = null;
-
-    // The Markdown-to-HTML converter.
-    self.markdownConverter = markdown.markdownConverter();
-
     // Currently opened clarification notifications.
-    self.commonNavbar = null;
+    this.commonNavbar = null;
     if (document.getElementById('common-navbar')) {
-      self.commonNavbar = new Vue({
+      this.commonNavbar = new Vue({
         el: '#common-navbar',
         render: function(createElement) {
           return createElement('omegaup-common-navbar', {
@@ -166,16 +182,16 @@ export class Arena {
           });
         },
         data: {
-          omegaUpLockDown: self.options.payload.omegaUpLockDown,
-          inContest: self.options.payload.inContest,
-          isLoggedIn: self.options.payload.isLoggedIn,
-          isReviewer: self.options.payload.isReviewer,
-          gravatarURL51: self.options.payload.gravatarURL51,
-          currentUsername: self.options.payload.currentUsername,
-          isAdmin: self.options.payload.isAdmin,
-          isMainUserIdentity: self.options.payload.isMainUserIdentity,
-          lockDownImage: self.options.payload.lockDownImage,
-          navbarSection: self.options.payload.navbarSection,
+          omegaUpLockDown: options.payload.omegaUpLockDown,
+          inContest: options.payload.inContest,
+          isLoggedIn: options.payload.isLoggedIn,
+          isReviewer: options.payload.isReviewer,
+          gravatarURL51: options.payload.gravatarURL51,
+          currentUsername: options.payload.currentUsername,
+          isAdmin: options.payload.isAdmin,
+          isMainUserIdentity: options.payload.isMainUserIdentity,
+          lockDownImage: options.payload.lockDownImage,
+          navbarSection: options.payload.navbarSection,
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
@@ -186,56 +202,43 @@ export class Arena {
         },
       });
 
-      if (self.options.payload.isAdmin) {
+      if (this.options.payload.isAdmin) {
         api.Notification.myList({})
           .then(data => {
-            self.commonNavbar.notifications = data.notifications;
+            this.commonNavbar.notifications = data.notifications;
           })
           .catch(ui.apiError);
 
-        function updateGraderStatus() {
+        const updateGraderStatus = () => {
           api.Grader.status()
             .then(stats => {
-              self.commonNavbar.graderInfo = stats.grader;
+              this.commonNavbar.graderInfo = stats.grader;
               if (stats.status !== 'ok') {
-                self.commonNavbar.errorMessage = T.generalError;
+                this.commonNavbar.errorMessage = T.generalError;
                 return;
               }
               if (stats.grader.queue) {
-                self.commonNavbar.graderQueueLength =
+                this.commonNavbar.graderQueueLength =
                   stats.grader.queue.run_queue_length +
                   stats.grader.queue.running.length;
               }
-              self.commonNavbar.errorMessage = null;
+              this.commonNavbar.errorMessage = null;
             })
             .catch(stats => {
-              self.commonNavbar.errorMessage = stats.error;
+              this.commonNavbar.errorMessage = stats.error;
             });
-        }
+        };
 
         updateGraderStatus();
         setInterval(updateGraderStatus, 30000);
       }
     }
 
-    // Currently opened problem.
-    self.currentProblem = null;
-
-    // If we have admin powers in self contest.
-    self.problemsetAdmin = false;
-    self.myRunsList.isProblemsetOpened = true;
-    self.answeredClarifications = 0;
-    self.clarificationsOffset = 0;
-    self.clarificationsRowcount = 20;
-    self.activeTab = 'problems';
-    self.clarifications = {};
-    self.submissionGap = 0;
-
     // Setup preferred language
-    self.preferredLanguage = options.preferredLanguage || null;
+    this.preferredLanguage = options.preferredLanguage || null;
 
     // UI elements
-    self.elements = {
+    this.elements = {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
@@ -245,7 +248,7 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
-      self.elements.navBar = new Vue({
+      this.elements.navBar = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-problems', {
@@ -255,7 +258,7 @@ export class Arena {
               inAssignment: this.inAssignment,
             },
             on: {
-              'navigate-to-problem': function(problemAlias) {
+              'navigate-to-problem': (problemAlias: string) => {
                 window.location.hash = `#problems/${problemAlias}`;
               },
             },
@@ -264,7 +267,7 @@ export class Arena {
         data: {
           problems: [],
           activeProblem: null,
-          inAssignment: !!self.options.courseAlias,
+          inAssignment: !!options.courseAlias,
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
@@ -277,7 +280,7 @@ export class Arena {
     }
 
     if (document.getElementById('arena-navbar-miniranking') !== null) {
-      self.elements.miniRanking = new Vue({
+      this.elements.miniRanking = new Vue({
         el: '#arena-navbar-miniranking',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-miniranking', {
@@ -297,17 +300,17 @@ export class Arena {
       });
     }
 
-    if (self.elements.ranking.length) {
-      self.elements.rankingTable = new Vue({
-        el: self.elements.ranking[0],
+    if (this.elements.ranking.length) {
+      this.elements.rankingTable = new Vue({
+        el: this.elements.ranking[0],
         render: function(createElement) {
           return createElement('omegaup-scoreboard', {
             props: {
-              scoreboardColors: ScoreboardColors,
+              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
-              digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
+              digitsAfterDecimalPoint: digitsAfterDecimalPoint,
             },
           });
         },
@@ -315,22 +318,21 @@ export class Arena {
           problems: [],
           ranking: [],
           lastUpdated: null,
-          digitsAfterDecimalPoint: self.digitsAfterDecimalPoint,
         },
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
         },
       });
     }
-    $.extend(self.elements.submitForm, {
-      code: $('textarea[name="code"]', self.elements.submitForm),
-      file: $('input[type="file"]', self.elements.submitForm),
-      language: $('select[name="language"]', self.elements.submitForm),
+    $.extend(this.elements.submitForm, {
+      code: $('textarea[name="code"]', this.elements.submitForm),
+      file: $('input[type="file"]', this.elements.submitForm),
+      language: $('select[name="language"]', this.elements.submitForm),
     });
 
     // Setup run details view, if available.
     if (document.getElementById('run-details') != null) {
-      self.runDetailsView = new Vue({
+      this.runDetailsView = new Vue({
         el: '#run-details',
         render: function(createElement) {
           return createElement('omegaup-arena-rundetails', {
@@ -347,15 +349,15 @@ export class Arena {
     }
 
     // Setup any global hooks.
-    self.bindGlobalHandlers();
+    this.bindGlobalHandlers();
 
     // Contest summary view model
-    self.summaryView = new Vue({
+    this.summaryView = new Vue({
       render: function(createElement) {
         return createElement('omegaup-arena-contestsummary', {
           props: {
             contest: this.contest,
-            showRanking: !self.options.isPractice,
+            showRanking: !options.isPractice,
           },
         });
       },
@@ -375,32 +377,15 @@ export class Arena {
     });
     const summaryElement = document.getElementById('summary');
     if (summaryElement) {
-      self.summaryView.$mount(summaryElement);
+      this.summaryView.$mount(summaryElement);
     }
 
-    // The interval of time that submissions button will be disabled
-    self.submissionGapInterval = 0;
-
-    // Cache scoreboard data for virtual contest
-    self.originalContestScoreboardEvent = null;
-
-    // Virtual contest refresh interval
-    self.virtualContestRefreshInterval = null;
-
-    // Ephemeral grader support.
-    self.ephemeralGrader = new EphemeralGrader();
-
-    // Number of digits after the decimal point to show.
-    self.digitsAfterDecimalPoint = 2;
-
-    self.qualityNominationForm = null;
-
-    self.elements.assignmentsNav = null;
+    this.elements.assignmentsNav = null;
   }
 
   installLibinteractiveHooks() {
     let self = this;
-    $('.libinteractive-download form').on('submit', function(e) {
+    $('.libinteractive-download form').on('submit', (e: Event) => {
       let form = $(e.target);
       e.preventDefault();
       let alias = self.currentProblem.alias;
@@ -419,7 +404,7 @@ export class Arena {
       return false;
     });
 
-    $('.libinteractive-download .download-lang').on('change', function(e) {
+    $('.libinteractive-download .download-lang').on('change', (e: Event) => {
       var form = e.target;
       while (!form.classList.contains('libinteractive-download')) {
         form = form.parentElement;
@@ -454,9 +439,9 @@ export class Arena {
           : ''),
     );
 
-    function connect(uris, index) {
+    const connect = (uris, index) => {
       self.socket = new EventsSocket(uris[index], self);
-      self.socket.connect().catch(function(e) {
+      self.socket.connect().catch(e => {
         console.log(e);
         // Try the next uri.
         index++;
@@ -465,12 +450,12 @@ export class Arena {
         } else {
           // Out of options. Falling back to polls.
           self.socket = null;
-          setTimeout(function() {
+          setTimeout(() => {
             self.setupPolls();
           }, Math.random() * 15000);
         }
       });
-    }
+    };
 
     self.elements.socketStatus.html('↻').css('color', '#888');
     connect(uris, 0, 10);
@@ -485,7 +470,7 @@ export class Arena {
     self.refreshClarifications();
 
     if (!self.socket) {
-      self.clarificationInterval = setInterval(function() {
+      self.clarificationInterval = setInterval(() => {
         self.clarificationsOffset = 0; // Return pagination to start on refresh
         self.refreshClarifications();
       }, 5 * 60 * 1000);
@@ -523,14 +508,14 @@ export class Arena {
     }
   }
 
-  problemsetLoaded(problemset) {
+  problemsetLoaded(problemset: types.Problemset) {
     let self = this;
     if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
         window.location = '/login/?redirect=' + escape(window.location);
       } else if (problemset.start_time) {
-        let f = (function(x, y) {
-          return function() {
+        let f = ((x, y) => {
+          return () => {
             let t = new Date();
             self.elements.loadingOverlay.html(
               `${x} ${time.formatDelta(y.getTime() - t.getTime())}`,
@@ -631,7 +616,7 @@ export class Arena {
               currentAssignmentAlias: this.currentAssignmentAlias,
             },
             on: {
-              'navigate-to-assignment': function(assignmentAlias) {
+              'navigate-to-assignment': (assignmentAlias: string) => {
                 window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
               },
             },
@@ -648,7 +633,7 @@ export class Arena {
     }
   }
 
-  initProblems(problemset) {
+  initProblems(problemset: types.Problemset) {
     let self = this;
     self.currentProblemset = problemset;
     self.problemsetAdmin = problemset.admin;
@@ -704,7 +689,7 @@ export class Arena {
   updateRunFallback(guid) {
     let self = this;
     if (self.socket != null) return;
-    setTimeout(function() {
+    setTimeout(() => {
       api.Run.status({ run_alias: guid })
         .then(time.remoteTimeAdapter)
         .then(self.updateRun.bind(self))
@@ -744,7 +729,7 @@ export class Arena {
 
     if (self.options.contestAlias != null) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then(function(response) {
+        .then(response => {
           // Differentiate ranking change between virtual and normal contest
           if (self.options.originalContestAlias != null)
             self.virtualRankingChange(response);
@@ -796,7 +781,7 @@ export class Arena {
     // Refresh after time T
     let refreshTime = 30 * 1000; // 30 seconds
 
-    events.forEach(function(evt) {
+    events.forEach(evt => {
       let key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
         originalContestRanking[key] = {
@@ -851,7 +836,7 @@ export class Arena {
     }
 
     api.Problemset.scoreboardEvents(scoreboardEventsParams)
-      .then(function(response) {
+      .then(response => {
         // Change username to username-virtual
         for (let evt of response.events) {
           evt.username = ui.formatString(T.virtualSuffix, {
@@ -866,7 +851,7 @@ export class Arena {
       })
       .catch(ui.ignoreError);
 
-    self.virtualContestRefreshInterval = setTimeout(function() {
+    self.virtualContestRefreshInterval = setTimeout(() => {
       self.onVirtualRankingChange(virtualContestData);
     }, refreshTime);
   }
@@ -883,7 +868,7 @@ export class Arena {
       api.Problemset.scoreboardEvents({
         problemset_id: self.options.originalProblemsetId,
       })
-        .then(function(response) {
+        .then(response => {
           self.originalContestScoreboardEvent = response.events;
           self.onVirtualRankingChange(data);
         })
@@ -988,7 +973,7 @@ export class Arena {
 
     this.currentRanking = newRanking;
     this.prevRankingState = currentRankingState;
-    self.removeRecentEventClassTimeout = setTimeout(function() {
+    self.removeRecentEventClassTimeout = setTimeout(() => {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
   }
@@ -1008,7 +993,7 @@ export class Arena {
       let curr = data.events[i];
 
       // limit chart to top n users
-      if (this.currentRanking[curr.username] > ScoreboardColors.length - 1)
+      if (this.currentRanking[curr.username] > scoreboardColors.length - 1)
         continue;
 
       if (!dataInSeries[curr.name]) {
@@ -1047,9 +1032,7 @@ export class Arena {
       }
     }
 
-    series.sort(function(a, b) {
-      return a.ranking - b.ranking;
-    });
+    series.sort((a, b) => a.ranking - b.ranking);
 
     navigatorData.push([
       this.finishTime
@@ -1064,7 +1047,7 @@ export class Arena {
     let self = this;
     if (series.length == 0 || self.elements.ranking.length == 0) return;
 
-    Highcharts.setOptions({ colors: ScoreboardColors });
+    Highcharts.setOptions({ colors: scoreboardColors });
 
     window.chart = new Highcharts.StockChart({
       chart: { renderTo: 'ranking-chart', height: 300, spacingTop: 20 },
@@ -1079,7 +1062,7 @@ export class Arena {
         showLastLabel: true,
         showFirstLabel: false,
         min: 0,
-        max: (function(problems) {
+        max: (problems => {
           let total = 0;
           for (let prob in problems) {
             if (!problems.hasOwnProperty(prob)) continue;
@@ -1154,13 +1137,13 @@ export class Arena {
         if (clarifications !== null) {
           clarifications.push(clarification);
         }
-        (function(id, answerNode) {
+        ((id, answerNode) => {
           let responseFormNode = $(
             '#create-response-form',
             answerNode,
           ).removeClass('template');
           let cannedResponse = $('#create-response-canned', answerNode);
-          cannedResponse.on('change', function() {
+          cannedResponse.on('change', () => {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
             } else {
@@ -1177,7 +1160,7 @@ export class Arena {
               true,
             );
           }
-          responseFormNode.on('submit', function() {
+          responseFormNode.on('submit', () => {
             let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
@@ -1192,11 +1175,11 @@ export class Arena {
               answer: responseText,
               public: $('#create-response-is-public', this)[0].checked ? 1 : 0,
             })
-              .then(function() {
+              .then(() => {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               })
-              .catch(function() {
+              .catch(() => {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               });
@@ -1343,7 +1326,7 @@ export class Arena {
     let langElement = self.elements.submitForm.language;
 
     if (self.preferredLanguage) {
-      $('option', langElement).each(function() {
+      $('option', langElement).each(() => {
         let option = $(this);
         if (option.val() != self.preferredLanguage) return;
         option.prop('selected', true);
@@ -1352,7 +1335,7 @@ export class Arena {
     }
     if (langElement.val()) return;
 
-    $('option', langElement).each(function() {
+    $('option', langElement).each(() => {
       let option = $(this);
 
       option.prop('selected', true);
@@ -1380,7 +1363,7 @@ export class Arena {
         code: template,
       },
       methods: {
-        refresh: function() {
+        refresh: () => {
           // It's possible for codeMirror not to have been set yet
           // if this method is used before the mounted event handler
           // is called.
@@ -1390,18 +1373,17 @@ export class Arena {
         },
       },
       mounted: function() {
-        let self = this;
         // Wait for sub-components to be mounted...
         this.$nextTick(() => {
           // ... and then fish out a reference to the wrapped
           // CodeMirror instance.
           //
           // The full path is:
-          // - self: this unnamed component
+          // - this: this unnamed component
           // - $children[0]: CodeView instance
           // - $refs['cm-wrapper']: vue-codemirror instance
           // - editor: the actual CodeMirror instance
-          self.codeMirror = self.$children[0].$refs['cm-wrapper'].editor;
+          this.codeMirror = this.$children[0].$refs['cm-wrapper'].editor;
         });
       },
       render: function(createElement) {
@@ -1467,7 +1449,7 @@ export class Arena {
         self.elements.navBar.activeProblem = self.currentProblem.alias;
       }
 
-      function update(problem) {
+      const update = problem => {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
@@ -1485,11 +1467,7 @@ export class Arena {
         $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
         self.renderProblem(problem);
         let karel_langs = ['kp', 'kj'];
-        if (
-          karel_langs.every(function(x) {
-            return problem.languages.indexOf(x) != -1;
-          })
-        ) {
+        if (karel_langs.every(x => problem.languages.indexOf(x) != -1)) {
           let original_href = $('#problem .karel-js-link a').attr('href');
           let hash_index = original_href.indexOf('#');
           if (hash_index != -1) {
@@ -1526,19 +1504,19 @@ export class Arena {
 
         $('#problem tbody.added').remove();
 
-        function updateRuns(runs) {
+        const updateRuns = runs => {
           if (runs) {
             for (let run of runs) {
               self.trackRun(run);
             }
           }
           self.myRunsList.problemAlias = problem.alias;
-        }
+        };
 
         if (self.options.isPractice || self.options.isOnlyProblem) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
-            .then(function(data) {
+            .then(data => {
               updateRuns(data.runs);
             })
             .catch(ui.apiError);
@@ -1548,7 +1526,7 @@ export class Arena {
         }
 
         self.initSubmissionCountdown();
-      }
+      };
 
       if (problemChanged) {
         // Ping Analytics with updated problem id
@@ -1568,7 +1546,7 @@ export class Arena {
                 self.problemsetAdmin && !self.myRunsList.isProblemsetOpened,
             }),
           )
-            .then(function(problem_ext) {
+            .then(problem_ext => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
               problem.statement = problem_ext.statement;
@@ -1660,7 +1638,7 @@ export class Arena {
     }
     self.qualityNominationForm = new Vue({
       el: '#qualitynomination-popup',
-      mounted: function() {
+      mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
       },
       render: function(createElement) {
@@ -1676,7 +1654,7 @@ export class Arena {
             problemAlias: this.problemAlias,
           },
           on: {
-            submit: function(ev) {
+            submit: ev => {
               const contents = {
                 before_ac: !ev.solved && ev.tried,
                 difficulty:
@@ -1695,7 +1673,7 @@ export class Arena {
                 })
                 .catch(ui.apiError);
             },
-            dismiss: function(ev) {
+            dismiss: ev => {
               const contents = {
                 before_ac: !ev.solved && ev.tried,
               };
@@ -1704,7 +1682,7 @@ export class Arena {
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
-                .then(function(data) {
+                .then(data => {
                   ui.info(T.qualityNominationRateProblemDesc);
                   ui.reportEvent('quality-nomination', 'dismiss');
                 })
@@ -1786,7 +1764,7 @@ export class Arena {
       $('#overlay').show();
       api.Run.details({ run_alias: showRunMatch[1] })
         .then(time.remoteTimeAdapter)
-        .then(function(data) {
+        .then(data => {
           self.displayRunDetails(showRunMatch[1], data);
         })
         .catch(ui.apiError);
@@ -1866,7 +1844,7 @@ export class Arena {
       clearInterval(self.submissionGapInterval);
       self.submissionGapInterval = 0;
     }
-    self.submissionGapInterval = setInterval(function() {
+    self.submissionGapInterval = setInterval(() => {
       let submissionGapSecondsRemaining = Math.ceil(
         (nextSubmissionTimestamp - Date.now()) / 1000,
       );
@@ -1937,7 +1915,7 @@ export class Arena {
       file = file.files[0];
       let reader = new FileReader();
 
-      reader.onload = function(e) {
+      reader.onload = e => {
         self.submitRun(e.target.result);
       };
 
@@ -2015,7 +1993,7 @@ export class Arena {
         source: code,
       }),
     )
-      .then(function(run) {
+      .then(run => {
         ui.reportEvent('submission', 'submit');
         if (self.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${run.guid}`, code);
@@ -2042,7 +2020,7 @@ export class Arena {
         self.clearInputFile();
         self.initSubmissionCountdown();
       })
-      .catch(function(run) {
+      .catch(run => {
         alert(run.error);
         $('input', self.elements.submitForm).prop('disabled', false);
         ui.reportEvent('submission', 'submit-fail', run.errorname);
@@ -2075,11 +2053,9 @@ export class Arena {
       sourceHTML = data.source;
     }
 
-    function numericSort(key) {
-      function isDigit(x) {
-        return '0' <= x && x <= '9';
-      }
-      return function(x, y) {
+    const numericSort = key => {
+      const isDigit = x => '0' <= x && x <= '9';
+      return (x, y) => {
         let i = 0,
           j = 0;
         for (; i < x[key].length && j < y[key].length; i++, j++) {
@@ -2101,7 +2077,7 @@ export class Arena {
         }
         return x[key].length - i - (y[key].length - j);
       };
-    }
+    };
     let detailsGroups = data.details && data.details.groups;
     let groups = null;
     if (detailsGroups && detailsGroups.length) {
