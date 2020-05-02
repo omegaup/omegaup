@@ -1402,11 +1402,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 'Identity'
             );
         }
-        $r->ensureBool('omit_rank', false);
         return self::getUserProfile(
             $r->identity,
             $identity,
-            boolval($r['omit_rank']),
+            $r->ensureOptionalBool('omit_rank') ?? false,
             $category
         );
     }
@@ -2301,8 +2300,8 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity->language_id = $language->language_id;
         }
 
-        $r->ensureBool('is_private', false);
-        $r->ensureBool('hide_problem_tags', false);
+        $r->ensureOptionalBool('is_private');
+        $r->ensureOptionalBool('hide_problem_tags');
 
         if (!is_null($r['gender'])) {
             \OmegaUp\Validators::validateInEnum(
