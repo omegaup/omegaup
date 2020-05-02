@@ -891,6 +891,7 @@ const translations: { [key: string]: string; } = {
   reviewerNominationCategory: "Which one is the category of this problem?",
   reviewerNominationFormTitle: "\u00a1Qualify this problem!",
   reviewerNominationQuality: "Is this a quality problem?",
+  runDisqualifyConfirm: "Do you really want to disqualify this run?",
   runNotEvenOpened: "You must open the problem before trying to submit a solution.",
   runNotFound: "Run not found.",
   runNotInsideContest: "Contest time has expired or not started yet.",
