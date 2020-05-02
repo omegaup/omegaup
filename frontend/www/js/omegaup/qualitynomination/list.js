@@ -17,6 +17,7 @@ OmegaUp.on('ready', function() {
           myView: payload.myView,
           nominations: this.nominations,
           pagerItems: this.pagerItems,
+          isAdmin: payload.isAdmin,
         },
         on: {
           goToPage: (pageNumber, status) => {
