@@ -5,6 +5,7 @@
     {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
 	  <main role="main">
       <script type="text/json" id="payload">{$payload|json_encode}</script>
+      {include file='status.tpl' inline}
       <div id="qualitynomination-details"></div>
       <div id="qualitynomination-demotionpopup"></div>
       {js_include entrypoint="qualitynomination_details" async}
