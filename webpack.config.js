@@ -22,7 +22,7 @@ let config = [
         './frontend/www/js/omegaup/polyfills.js',
         './frontend/www/js/omegaup/omegaup.js',
       ],
-      arena: './frontend/www/js/omegaup/arena/arena.js',
+      arena: './frontend/www/js/omegaup/arena/arena.ts',
       activity_feed: './frontend/www/js/omegaup/activity/feed.js',
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
