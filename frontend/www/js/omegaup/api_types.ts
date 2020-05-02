@@ -283,6 +283,24 @@ export namespace types {
       );
     }
 
+    export function ProblemMarkdownPayload(
+      elementId: string,
+    ): types.ProblemMarkdownPayload {
+      return (x => {
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemTagsPayload(
       elementId: string,
     ): types.ProblemTagsPayload {
@@ -627,7 +645,7 @@ export namespace types {
     extraWallTime: number;
     inputLimit: number;
     languages: string;
-    memoryLimit: number | number;
+    memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
     problemsetter?: { creation_date?: Date; name: string; username: string };
@@ -701,6 +719,18 @@ export namespace types {
     modes: string[];
     tagData: { name?: string }[];
     tags: string[];
+  }
+
+  export interface ProblemMarkdownPayload {
+    alias: string;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    source?: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
+    title?: string;
   }
 
   export interface ProblemTagsPayload {

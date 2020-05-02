@@ -533,7 +533,7 @@ export namespace omegaup {
     time: string;
   }
 
-  export interface Solutions {
+  export interface Statements {
     [language: string]: string;
   }
 
