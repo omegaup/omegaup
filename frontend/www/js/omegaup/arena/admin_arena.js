@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import * as api from '../api';
+import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
 import * as time from '../time';
@@ -34,6 +35,9 @@ export default class ArenaAdmin {
               window.location.hash += `/show-run:${run.guid}`;
             },
             disqualify: run => {
+              if (!window.confirm(T.runDisqualifyConfirm)) {
+                return;
+              }
               api.Run.disqualify({ run_alias: run.guid })
                 .then(data => {
                   run.type = 'disqualified';
