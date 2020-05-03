@@ -4,7 +4,7 @@ import T from '../lang';
 import Vue from 'vue';
 import problem_Admins from '../components/problem/Administrators.vue';
 import * as ui from '../ui';
-import * as api from '../api_transitional';
+import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemAdminsPayload(

@@ -82,7 +82,7 @@
               <omegaup-autocomplete
                 class="form-control"
                 v-bind:init="el => typeahead.groupTypeahead(el)"
-                v-model="groupAlias"
+                v-bind:value.sync="groupAlias"
               ></omegaup-autocomplete>
             </label>
           </div>
