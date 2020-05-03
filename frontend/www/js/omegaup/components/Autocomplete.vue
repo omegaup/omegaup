@@ -39,7 +39,7 @@ export default class Autocomplete extends Vue {
   }
 
   @Watch('value')
-  onValueChanged(newValue: string, oldValue: string) {
+  onPropertyChanged(newValue: string, oldValue: string) {
     const alias = this.input.getAttribute('data-alias');
     if (alias !== null) {
       this.$emit('update:value', alias);

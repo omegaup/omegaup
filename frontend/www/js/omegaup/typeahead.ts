@@ -251,9 +251,8 @@ export function groupTypeahead(
   cb?: CallbackType<{ label: string; value: string }>,
 ): void {
   if (!cb) {
-    cb = (event: Event, val: { label: string; value: string }) => {
+    cb = (event: Event, val: { label: string; value: string }) =>
       $(<EventTarget>event.target).attr('data-alias', val.value);
-    };
   }
   typeahead<{ label: string; value: string }>(elem, api.Group.list, cb);
 }
