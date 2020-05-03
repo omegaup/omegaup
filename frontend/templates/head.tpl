@@ -27,7 +27,7 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}" defer></script>
 {/if}
 
-{if isset($jsfile)}
+{if isset($jsfile) && !is_null($jsfile)}
 		<script type="text/javascript" src="{$jsfile}" defer></script>
 {/if}
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}

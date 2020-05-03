@@ -3,8 +3,8 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 
-export function navigateTo(url: Location): void {
-  window.location = url;
+export function navigateTo(href: string): void {
+  window.location.href = href;
 }
 
 function escapeString(s: string): string {
