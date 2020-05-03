@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CommonPayload('payload');
+  const payload = types.payloadParsers.CommonPayload();
 
   const commonFooter = new Vue({
     el: '#common-footer',

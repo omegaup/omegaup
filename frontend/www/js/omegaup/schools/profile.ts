@@ -8,7 +8,7 @@ import { SchoolCoderOfTheMonth, SchoolUser } from '../types';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.SchoolProfileDetailsPayload('payload');
+  const payload = types.payloadParsers.SchoolProfileDetailsPayload();
   const schoolProfile = new Vue({
     el: '#school-profile',
     render: function(createElement) {
