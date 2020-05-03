@@ -58,9 +58,8 @@ def _generate_new_contents(contents_callback: Callable[[str], bytes]
                            ) -> Tuple[Dict[str, bytes], Dict[str, bytes]]:
     new_contents: Dict[str, bytes] = {}
     original_contents: Dict[str, bytes] = {}
-    for path in ('frontend/www/js/omegaup/api.d.ts',
+    for path in ('frontend/www/js/omegaup/api.ts',
                  'frontend/www/js/omegaup/api_types.ts',
-                 'frontend/www/js/omegaup/api_transitional.ts',
                  'frontend/server/src/Controllers/README.md'):
         _generate_content_entry(
             new_contents,

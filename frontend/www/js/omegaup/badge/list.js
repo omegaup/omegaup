@@ -2,7 +2,7 @@ import Vue from 'vue';
 import badge_List from '../components/badge/List.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
     },
   });
   if (payload.logged_in) {
-    API.Badge.myList({})
+    api.Badge.myList({})
       .then(function(data) {
         badgeList.visitorBadges = new Set(
           data['badges'].map(badge => badge.badge_alias),
@@ -36,7 +36,7 @@ OmegaUp.on('ready', function() {
       .catch(UI.apiError);
   }
 
-  API.Badge.list({})
+  api.Badge.list({})
     .then(function(data) {
       badgeList.allBadges = new Set(data);
     })

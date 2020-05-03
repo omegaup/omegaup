@@ -94,9 +94,8 @@ class Request extends \ArrayObject {
      * Ensures that the value associated with the key is a bool.
      */
     public function ensureBool(
-        string $key,
-        bool $required = true
-    ): void {
+        string $key
+    ): bool {
         /** @var mixed */
         $val = $this->offsetGet($key);
         if (is_int($val)) {
@@ -104,17 +103,37 @@ class Request extends \ArrayObject {
         } elseif (is_bool($val)) {
             $this[$key] = $val;
         } else {
-            if (empty($val)) {
-                if (!$required) {
-                    return;
-                }
+            if ($val === '0' || $val === 'false') {
+                $this[$key] = false;
+            } elseif (empty($val)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterEmpty',
                     $key
                 );
+            } else {
+                $this[$key] = $val == '1' || $val == 'true';
             }
-            $this[$key] = $val == '1' || $val == 'true';
         }
+        return boolval($this[$key]);
+    }
+
+    /**
+     * Ensures that the value associated with the key is a bool or null.
+     */
+    public function ensureOptionalBool(
+        string $key,
+        bool $required = false
+    ): ?bool {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return null;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        return self::ensureBool($key);
     }
 
     /**

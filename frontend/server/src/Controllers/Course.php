@@ -78,7 +78,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description'
         );
 
-        $r->ensureBool('unlimited_duration', false);
+        $r->ensureOptionalBool('unlimited_duration');
         $startTime = $r->ensureTimestamp(
             'start_time',
             $courseStartTime->time,
@@ -251,7 +251,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        $r->ensureBool('unlimited_duration', false);
         $r->ensureInt('start_time', null, null, !$isUpdate);
         $r->ensureOptionalInt(
             'finish_time',
@@ -259,7 +258,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             null,
             /* required */ (
                 !$isUpdate &&
-                !$r['unlimited_duration']
+                !($r->ensureOptionalBool('unlimited_duration') ?? false)
             )
         );
 
@@ -270,8 +269,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         // Show scoreboard, needs basic information and request user information are always optional
-        $r->ensureBool('needs_basic_information', false /*isRequired*/);
-        $r->ensureBool('show_scoreboard', false /*isRequired*/);
+        $r->ensureOptionalBool('needs_basic_information');
+        $r->ensureOptionalBool('show_scoreboard');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['requests_user_information'],
             'requests_user_information',
@@ -770,9 +769,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             is_null($course->finish_time) ? null : $course->finish_time->time
         );
 
-        $r->ensureBool('unlimited_duration', false);
+        $unlimitedDuration = $r->ensureOptionalBool(
+            'unlimited_duration'
+        ) ?? false;
 
-        if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
+        if ($unlimitedDuration && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseDoesNotHaveUnlimitedDuration'
             );
@@ -806,10 +807,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
 
-        if (
-            is_null($course->finish_time) &&
-            $r['unlimited_duration']
-        ) {
+        if (is_null($course->finish_time) && $unlimitedDuration) {
             $assignment->finish_time = null;
         }
         \OmegaUp\DAO\DAO::transBegin();
@@ -1543,9 +1541,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureBool('resolution');
-
-        $request->accepted = boolval($r['resolution']);
+        $request->accepted = $r->ensureBool('resolution');
         $request->last_update = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         \OmegaUp\DAO\CourseIdentityRequest::update($request);
