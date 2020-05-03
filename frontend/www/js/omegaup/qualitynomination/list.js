@@ -6,6 +6,9 @@ import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
+  const headerPayload = JSON.parse(
+    document.getElementById('header-payload').innerText,
+  );
 
   let nominationsList = new Vue({
     el: '#qualitynomination-list',
@@ -17,6 +20,7 @@ OmegaUp.on('ready', function() {
           myView: payload.myView,
           nominations: this.nominations,
           pagerItems: this.pagerItems,
+          isAdmin: headerPayload.isAdmin,
         },
         on: {
           goToPage: (pageNumber, status) => {
