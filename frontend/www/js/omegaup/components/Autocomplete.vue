@@ -35,15 +35,15 @@ export default class Autocomplete extends Vue {
 
   @Emit('input')
   onUpdateInput(): string {
+    const value = this.input.getAttribute('data-value');
+    if (value !== null) {
+      this.$emit('update:value', value);
+    }
     return this.input.value;
   }
 
   @Watch('value')
   onPropertyChanged(newValue: string, oldValue: string) {
-    const alias = this.input.getAttribute('data-alias');
-    if (alias !== null) {
-      this.$emit('update:value', alias);
-    }
     this.input.value = newValue;
   }
 }
