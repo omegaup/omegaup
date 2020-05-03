@@ -99,7 +99,7 @@
               <omegaup-autocomplete
                 v-bind:init="el => typeahead.groupTypeahead(el)"
                 v-model="adminGroup"
-                v-on:emit-update-input="onUpdateInput"
+                v-bind:value.sync="adminGroupAlias"
               ></omegaup-autocomplete>
             </div>
             <div class="form-group pull-right">
@@ -174,10 +174,6 @@ export default class CourseAdministrators extends Vue {
   adminUsername = '';
   adminGroup = '';
   adminGroupAlias = '';
-
-  onUpdateInput(alias: string): void {
-    this.adminGroupAlias = alias;
-  }
 
   adminProfile(admin: omegaup.CourseAdmin): string {
     return `/profile/${admin.username}/`;
