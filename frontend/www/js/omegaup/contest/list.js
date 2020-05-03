@@ -1,6 +1,6 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
@@ -8,7 +8,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   function fillContestsTable() {
-    (contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList())
+    (contestList.showAdmin ? api.Contest.adminList() : api.Contest.myList())
       .then(result => {
         contestList.contests = result.contests;
       })
@@ -59,7 +59,7 @@ OmegaUp.on('ready', () => {
       changeAdmissionMode: (ev, selectedContests, admissionMode) => {
         Promise.all(
           selectedContests.map(contestAlias =>
-            API.Contest.update({
+            api.Contest.update({
               contest_alias: contestAlias,
               admission_mode: admissionMode,
             }),
@@ -76,7 +76,7 @@ OmegaUp.on('ready', () => {
           });
       },
       downloadCsvUsers: contestAlias => {
-        API.Contest.contestants({
+        api.Contest.contestants({
           contest_alias: contestAlias,
         })
           .then(result => {

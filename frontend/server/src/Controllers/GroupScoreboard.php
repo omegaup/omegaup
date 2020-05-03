@@ -106,13 +106,12 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $r['contest_alias']
         );
 
-        $r->ensureBool('only_ac');
         $r->ensureFloat('weight');
 
         \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
             'problemset_id' => $contestScoreboard['contest']->problemset_id,
-            'only_ac' => $r['only_ac'],
+            'only_ac' => $r->ensureBool('only_ac'),
             'weight' => $r['weight'],
         ]));
 

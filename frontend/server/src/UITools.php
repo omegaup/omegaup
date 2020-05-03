@@ -255,14 +255,15 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template?: string, entrypoint?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
         try {
             $response = $callback(new Request($_REQUEST));
             $smartyProperties = $response['smartyProperties'];
-            $template = $response['template'];
+            $entrypoint = $response['entrypoint'] ?? null;
+            $template = $response['template'] ?? '';
             $supportsBootstrap4 = $response['supportsBootstrap4'] ?? false;
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
@@ -270,6 +271,20 @@ class UITools {
             $payload = $smartyProperties['payload'] ?? [];
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
+        }
+
+        if (!is_null($entrypoint)) {
+            if (!isset($smartyProperties['title'])) {
+                $titleVar = (
+                    'omegaupTitle' .
+                    str_replace('_', '', ucwords($entrypoint, '_'))
+                );
+            } else {
+                $titleVar = strval($smartyProperties['title']);
+            }
+            $smartyProperties['title'] = strval(
+                $smarty->getConfigVars($titleVar)
+            );
         }
 
         /** @var mixed $value */
@@ -285,12 +300,27 @@ class UITools {
             $navbarSection
         );
 
-        $smarty->display(
-            sprintf(
-                '%s/templates/%s',
-                strval(OMEGAUP_ROOT),
-                $template
-            )
-        );
+        if (!is_null($entrypoint)) {
+            $smarty->display(
+                sprintf(
+                    (
+                        'extends:file:%s/templates/template.tpl|' .
+                        'string:{block name="entrypoint"}{js_include entrypoint="' .
+                        $entrypoint .
+                        '" async}{/block}'
+                    ),
+                    strval(OMEGAUP_ROOT),
+                    $template
+                )
+            );
+        } else {
+            $smarty->display(
+                sprintf(
+                    '%s/templates/%s',
+                    strval(OMEGAUP_ROOT),
+                    $template
+                )
+            );
+        }
     }
 }

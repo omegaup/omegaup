@@ -1,6 +1,6 @@
 import course_SubmissionsList from '../components/activity/SubmissionsList.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -11,8 +11,8 @@ let course_alias = /\/course\/([^\/]+)\/list\/?/.exec(
 
 OmegaUp.on('ready', function() {
   Promise.all([
-    API.Course.listSolvedProblems({ course_alias: course_alias }),
-    API.Course.listUnsolvedProblems({ course_alias: course_alias }),
+    api.Course.listSolvedProblems({ course_alias: course_alias }),
+    api.Course.listUnsolvedProblems({ course_alias: course_alias }),
   ])
     .then(([solvedProblems, unsolvedProblems]) => {
       let submissionsList = new Vue({
