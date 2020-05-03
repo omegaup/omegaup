@@ -7,7 +7,7 @@
       ref="solutionRef"
     ></div>
     <div class="interstitial" v-if="!showSolution">
-      <p>{{ statusMessage }}</p>
+      <p v-html="statusMessage"></p>
       <p
         v-html="
           UI.formatString(T.solutionTokens, {

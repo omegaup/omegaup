@@ -43,8 +43,8 @@ class ProblemsForfeited extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['forfeited_date'])) {
             /**
-             * @var string|int|float $data['forfeited_date']
-             * @var int $this->forfeited_date
+             * @var \OmegaUp\Timestamp|string|int|float $data['forfeited_date']
+             * @var \OmegaUp\Timestamp $this->forfeited_date
              */
             $this->forfeited_date = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -52,7 +52,9 @@ class ProblemsForfeited extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->forfeited_date = \OmegaUp\Time::get();
+            $this->forfeited_date = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -75,7 +77,7 @@ class ProblemsForfeited extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $forfeited_date;  // CURRENT_TIMESTAMP
 }

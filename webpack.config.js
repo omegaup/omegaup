@@ -31,7 +31,7 @@ let config = [
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
       badge_details: './frontend/www/js/omegaup/badge/details.ts',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
-      coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
+      coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
       common_footer: './frontend/www/js/omegaup/common/footer.js',
       common_footer_v2: './frontend/www/js/omegaup/common/footer_v2.ts',
       common_index: './frontend/www/js/omegaup/common/index.ts',
@@ -79,11 +79,10 @@ let config = [
         './frontend/www/js/omegaup/qualitynomination/details.js',
       qualitynomination_qualityreview:
         './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-      rank_table: './frontend/www/js/omegaup/ranktable.ts',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       school_of_the_month:
-        './frontend/www/js/omegaup/schools/schoolofthemonth.js',
-      school_profile: './frontend/www/js/omegaup/schools/profile.js',
+        './frontend/www/js/omegaup/schools/schoolofthemonth.ts',
+      school_profile: './frontend/www/js/omegaup/schools/profile.ts',
       schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
       submissions_list: './frontend/www/js/omegaup/submissions/list.js',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
@@ -92,6 +91,7 @@ let config = [
         './frontend/www/js/omegaup/user/manage_identities.js',
       user_profile: './frontend/www/js/omegaup/user/profile.js',
       user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+      users_rank: './frontend/www/js/omegaup/user/rank.ts',
     },
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

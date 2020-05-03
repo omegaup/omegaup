@@ -56,8 +56,8 @@ class IdentitiesSchools extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['creation_time'])) {
             /**
-             * @var string|int|float $data['creation_time']
-             * @var int $this->creation_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['creation_time']
+             * @var \OmegaUp\Timestamp $this->creation_time
              */
             $this->creation_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -65,12 +65,14 @@ class IdentitiesSchools extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->creation_time = \OmegaUp\Time::get();
+            $this->creation_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['end_time'])) {
             /**
-             * @var string|int|float $data['end_time']
-             * @var int $this->end_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['end_time']
+             * @var \OmegaUp\Timestamp $this->end_time
              */
             $this->end_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -113,14 +115,14 @@ class IdentitiesSchools extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $creation_time;  // CURRENT_TIMESTAMP
 
     /**
      * [Campo no documentado]
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $end_time = null;
 }

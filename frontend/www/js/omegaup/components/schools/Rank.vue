@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="{ 'container-lg': !showHeader, 'p-5': !showHeader }">
+  <div v-bind:class="{ 'container-lg p-5': !showHeader }">
     <div class="card">
       <h5 class="card-header">
         {{
@@ -15,13 +15,12 @@
       </h5>
       <div class="card-body" v-if="showControls">
         <template v-if="page > 1">
-          <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
+          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
           >
           <span v-show="showNextPage">|</span>
         </template>
         <a
-          class="next"
           v-show="showNextPage"
           v-bind:href="`/rank/schools/?page=${page + 1}`"
           >{{ T.wordsNextPage }}</a
@@ -59,13 +58,12 @@
       </div>
       <div class="card-footer" v-else-if="showControls">
         <template v-if="page > 1">
-          <a class="prev" v-bind:href="`/rank/schools/?page=${page - 1}`">
+          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
             {{ T.wordsPrevPage }}</a
           >
           <span v-show="showNextPage">|</span>
         </template>
         <a
-          class="next"
           v-show="showNextPage"
           v-bind:href="`/rank/schools/?page=${page + 1}`"
           >{{ T.wordsNextPage }}</a

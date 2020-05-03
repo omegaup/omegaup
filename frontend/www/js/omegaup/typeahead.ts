@@ -1,5 +1,5 @@
 import T from './lang';
-import * as api from './api_transitional';
+import * as api from './api';
 import { types } from './api_types';
 import * as ui from './ui';
 
@@ -252,7 +252,9 @@ export function groupTypeahead(
 ): void {
   if (!cb) {
     cb = (event: Event, val: { label: string; value: string }) =>
-      $(<EventTarget>event.target).val(val.value);
+      $(<EventTarget>event.target)
+        .attr('data-value', val.value)
+        .val(val.label);
   }
   typeahead<{ label: string; value: string }>(elem, api.Group.list, cb);
 }

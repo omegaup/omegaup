@@ -88,19 +88,23 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['start_time'])) {
             /**
-             * @var string|int|float $data['start_time']
-             * @var int $this->start_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['start_time']
+             * @var \OmegaUp\Timestamp $this->start_time
              */
             $this->start_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $data['start_time']
                 )
             );
+        } else {
+            $this->start_time = new \OmegaUp\Timestamp(
+                946706400
+            ); // 2000-01-01 06:00:00
         }
         if (isset($data['finish_time'])) {
             /**
-             * @var string|int|float $data['finish_time']
-             * @var int $this->finish_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['finish_time']
+             * @var \OmegaUp\Timestamp $this->finish_time
              */
             $this->finish_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -188,14 +192,14 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
-    public $start_time = 946706400; // 2000-01-01 06:00:00
+    public $start_time;  // 2000-01-01 06:00:00
 
     /**
      * [Campo no documentado]
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $finish_time = null;
 

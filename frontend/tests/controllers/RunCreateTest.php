@@ -176,7 +176,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ) ? $contest->submissions_gap : \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         $this->assertEquals(
             \OmegaUp\Time::get() + $submission_gap,
-            $response['nextSubmissionTimestamp']
+            $response['nextSubmissionTimestamp']->time
         );
 
         $log = \OmegaUp\DAO\SubmissionLog::getByPK($submission->submission_id);
@@ -186,7 +186,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         if (!is_null($contest)) {
             $this->assertEqualsWithDelta(
-                (\OmegaUp\Time::get() - $contest->start_time) / 60,
+                (\OmegaUp\Time::get() - $contest->start_time->time) / 60,
                 $run->penalty,
                 0.5
             );

@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import qualitynomination_demotionPopup from '../components/qualitynomination/DemotionPopup.vue';
 import Vue from 'vue';
@@ -16,7 +16,7 @@ OmegaUp.on('ready', function() {
         props: {},
         on: {
           submit: function(ev) {
-            API.QualityNomination.create({
+            api.QualityNomination.create({
               problem_alias: reportProblemPayload.problem_alias,
               nomination: 'demotion',
               contents: JSON.stringify({

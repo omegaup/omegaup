@@ -1,5 +1,9 @@
 <?php
+/** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined... */
 require_once OMEGAUP_ROOT . '/server/try_define.php';
+
+/** @var string */
+$_omegaUpRoot = OMEGAUP_ROOT;
 
 # ####################################
 # EXPERIMENTS
@@ -17,8 +21,8 @@ try_define('OMEGAUP_DB_HOST', '127.0.0.1');
 # ####################################
 # TEST CONFIG
 # ####################################
-try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
-try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
+try_define('OMEGAUP_TEST_ROOT', "{$_omegaUpRoot}/tests/controllers/");
+try_define('OMEGAUP_TEST_RESOURCES_ROOT', "{$_omegaUpRoot}/tests/resources/");
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 
 # ####################################
@@ -35,10 +39,10 @@ try_define('DUMP_MYSQL_QUERY_RESULT_TYPES', true);
 # ####################################
 # GRADER CONFIG
 # ####################################
-try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
+try_define('BIN_PATH', "{$_omegaUpRoot}/../bin");
 try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
-try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
+try_define('OMEGAUP_CACERT_URL', "{$_omegaUpRoot}/omegaup.pem");
 try_define('OMEGAUP_GITSERVER_PORT', '33863');
 try_define(
     'OMEGAUP_GITSERVER_URL',
@@ -48,7 +52,7 @@ try_define(
     'OMEGAUP_GITSERVER_SECRET_TOKEN',
     'cbaf89d3bb2ee6b0a90bc7a90d937f9ade16739ed9f573c76e1ac72064e397aac2b35075040781dd0df9a8f1d6fc4bd4a4941eb6b0b62541b0a35fb0f89cfc3f'
 );
-try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
+try_define('OMEGAUP_SSLCERT_URL', "{$_omegaUpRoot}/omegaup.pem");
 try_define('TEMPLATES_PATH', OMEGAUP_TEST_ROOT . '/templates/');
 
 # #########################

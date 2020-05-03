@@ -19,13 +19,12 @@ abstract class Smarty_Internal_Data {
      * @api  Smarty::getConfigVars()
      * @link http://www.smarty.net/docs/en/api.get.config.vars.tpl
      *
-     * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
-     * @param ?string                                                 $varname        variable name or null
-     * @param boolean                                                 $search_parents include parent templates?
+     * @param string|null $varName       variable name or null
+     * @param bool        $searchParents include parent templates?
      *
      * @return mixed variable value or or array of variables
      */
-    public function getConfigVars(\Smarty_Internal_Data $data, $varname = null, boolean $search_parents = true) {}
+    public function getConfigVars($varName = null, $searchParents = true) {}
 }
 
 abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data {

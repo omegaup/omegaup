@@ -656,7 +656,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{birth_date?: int|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool}
+     * @return array{birth_date?: \OmegaUp\Timestamp|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -674,7 +674,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
-            /** @return array{birth_date?: int|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: int|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool} */
+            /** @return array{birth_date?: \OmegaUp\Timestamp|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool} */
             function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
@@ -690,11 +690,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $response['rankinfo'] = [];
         } else {
             $response['rankinfo'] =
-                \OmegaUp\Controllers\User::getFullRankByProblemsSolved(
-                    $identity,
-                    '',
-                    1,
-                    100
+                \OmegaUp\Controllers\User::getUserRankInfo(
+                    $identity
                 );
         }
 

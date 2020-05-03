@@ -9,8 +9,15 @@ class Timestamp implements \JsonSerializable {
      */
     public $time;
 
-    public function __construct(int $time) {
-        $this->time = $time;
+    /**
+     * @param int|\OmegaUp\Timestamp $time
+     */
+    public function __construct($time) {
+        $this->time = (
+            $time instanceof \OmegaUp\Timestamp ?
+            $time->time :
+            $time
+        );
     }
 
     public function jsonSerialize() {

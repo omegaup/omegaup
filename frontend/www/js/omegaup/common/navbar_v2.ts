@@ -1,6 +1,6 @@
 import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { omegaup, OmegaUp } from '../omegaup';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
 import * as UI from '../ui';
@@ -23,6 +23,7 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: payload.isMainUserIdentity,
           lockDownImage: payload.lockDownImage,
           navbarSection: payload.navbarSection,
+          profileProgress: payload.profileProgress,
           notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
@@ -56,13 +57,15 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  if (payload.isAdmin) {
+  if (payload.isLoggedIn) {
     api.Notification.myList()
       .then(data => {
         commonNavbar.notifications = data.notifications;
       })
       .catch(UI.apiError);
+  }
 
+  if (payload.isAdmin) {
     const updateGraderStatus = () => {
       api.Grader.status()
         .then(stats => {

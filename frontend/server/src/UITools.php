@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  */
 class UITools {
     /** @var ?\Smarty */
@@ -244,6 +244,9 @@ class UITools {
                 $identity->username :
                 ''
             ),
+            'profileProgress' => \OmegaUp\Controllers\User::getProfileProgress(
+                $user
+            ),
             'isMainUserIdentity' => !is_null($user),
             'isAdmin' => $isAdmin,
             'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
@@ -252,14 +255,15 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template?: string, entrypoint?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
         try {
             $response = $callback(new Request($_REQUEST));
             $smartyProperties = $response['smartyProperties'];
-            $template = $response['template'];
+            $entrypoint = $response['entrypoint'] ?? null;
+            $template = $response['template'] ?? '';
             $supportsBootstrap4 = $response['supportsBootstrap4'] ?? false;
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
@@ -267,6 +271,20 @@ class UITools {
             $payload = $smartyProperties['payload'] ?? [];
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
+        }
+
+        if (!is_null($entrypoint)) {
+            if (!isset($smartyProperties['title'])) {
+                $titleVar = (
+                    'omegaupTitle' .
+                    str_replace('_', '', ucwords($entrypoint, '_'))
+                );
+            } else {
+                $titleVar = strval($smartyProperties['title']);
+            }
+            $smartyProperties['title'] = strval(
+                $smarty->getConfigVars($titleVar)
+            );
         }
 
         /** @var mixed $value */
@@ -282,12 +300,27 @@ class UITools {
             $navbarSection
         );
 
-        $smarty->display(
-            sprintf(
-                '%s/templates/%s',
-                strval(OMEGAUP_ROOT),
-                $template
-            )
-        );
+        if (!is_null($entrypoint)) {
+            $smarty->display(
+                sprintf(
+                    (
+                        'extends:file:%s/templates/template.tpl|' .
+                        'string:{block name="entrypoint"}{js_include entrypoint="' .
+                        $entrypoint .
+                        '" async}{/block}'
+                    ),
+                    strval(OMEGAUP_ROOT),
+                    $template
+                )
+            );
+        } else {
+            $smarty->display(
+                sprintf(
+                    '%s/templates/%s',
+                    strval(OMEGAUP_ROOT),
+                    $template
+                )
+            );
+        }
     }
 }

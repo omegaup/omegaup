@@ -11,7 +11,7 @@
       </h3>
     </div>
     <div class="panel-body">
-      <a href="/group/omegaup:quality-reviewer/edit/#members">
+      <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
         {{ T.addUsersToReviewerGroup }}
       </a>
       <div class="pull-right" v-if="!myView">
@@ -96,6 +96,7 @@ export default class QualityNominationList extends Vue {
   @Prop() myView!: boolean;
   @Prop() nominations!: omegaup.Nomination[];
   @Prop() pagerItems!: types.PageItem[];
+  @Prop() isAdmin!: boolean;
 
   showAll = true;
   T = T;
