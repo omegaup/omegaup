@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -10,7 +10,7 @@ OmegaUp.on('ready', function() {
     window.location.pathname,
   )[1];
   let detail;
-  API.Contest.publicDetails({ contest_alias: contestAlias })
+  api.Contest.publicDetails({ contest_alias: contestAlias })
     .then(function(detail) {
       let virtual_ = new Vue({
         el: '#arena-virtual',
@@ -26,7 +26,7 @@ OmegaUp.on('ready', function() {
             },
             on: {
               submit: function(ev) {
-                API.Contest.createVirtual({
+                api.Contest.createVirtual({
                   alias: contestAlias,
                   start_time: ev.virtualContestStartTime.getTime() / 1000,
                 })

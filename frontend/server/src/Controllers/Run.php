@@ -1082,7 +1082,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         // Get the user who is calling this API
         $r->ensureIdentity();
-        $r->ensureBool('show_diff', /*$required=*/false);
+        $r->ensureOptionalBool('show_diff');
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['run_alias'],

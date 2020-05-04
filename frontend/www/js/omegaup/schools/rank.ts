@@ -1,12 +1,12 @@
 import schools_Rank from '../components/schools/Rank.vue';
 import { OmegaUp, omegaup } from '../omegaup';
 import { types } from '../api_types';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.SchoolRankPayload('payload');
+  const payload = types.payloadParsers.SchoolRankPayload();
 
   const schoolsRank = new Vue({
     el: '#main-container',
