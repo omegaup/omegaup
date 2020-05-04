@@ -31,8 +31,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'in_mailing_list' => true,
         'is_private' => true,
         'preferred_language' => true,
-        'author_score' => true,
-        'author_ranking' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -124,16 +122,6 @@ class Users extends \OmegaUp\DAO\VO\VO {
         if (isset($data['preferred_language'])) {
             $this->preferred_language = strval(
                 $data['preferred_language']
-            );
-        }
-        if (isset($data['author_score'])) {
-            $this->author_score = floatval(
-                $data['author_score']
-            );
-        }
-        if (isset($data['author_ranking'])) {
-            $this->author_ranking = intval(
-                $data['author_ranking']
             );
         }
     }
@@ -244,18 +232,4 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $preferred_language = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var float
-     */
-    public $author_score = 0.00;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var int|null
-     */
-    public $author_ranking = null;
 }

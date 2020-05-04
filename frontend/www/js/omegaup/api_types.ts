@@ -16,8 +16,6 @@ export namespace dao {
   }
 
   export interface Users {
-    author_ranking?: number;
-    author_score?: number;
     birth_date?: string;
     facebook_user_id?: string;
     git_token?: string;

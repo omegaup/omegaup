@@ -1,5 +1,5 @@
 ALTER TABLE
-    `Users`
+    `User_Rank`
 ADD COLUMN
     `author_score` double NOT NULL DEFAULT '0',
 ADD COLUMN
