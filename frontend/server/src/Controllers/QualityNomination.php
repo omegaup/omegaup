@@ -525,7 +525,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['rationale'],
             'rationale'
         );
-        $r->ensureBool('all', false);
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
@@ -602,7 +601,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
-        if ($r['all']) {
+        if ($r->ensureOptionalBool('all') ?? false) {
             $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
                 $qualitynomination->problem_id
             );

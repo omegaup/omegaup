@@ -6,7 +6,7 @@ import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.SchoolRankPayload('payload');
+  const payload = types.payloadParsers.SchoolRankPayload();
 
   const schoolsRank = new Vue({
     el: '#main-container',

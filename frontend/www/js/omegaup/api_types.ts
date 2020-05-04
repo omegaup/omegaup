@@ -40,7 +40,7 @@ export namespace dao {
 export namespace types {
   export namespace payloadParsers {
     export function BadgeDetailsPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
       return (x => {
         x.badge = (x => {
@@ -61,21 +61,23 @@ export namespace types {
     }
 
     export function CoderOfTheMonthPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
-    export function CommonPayload(elementId: string): types.CommonPayload {
+    export function CommonPayload(
+      elementId: string = 'payload',
+    ): types.CommonPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
     export function ContestListPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ContestListPayload {
       return (x => {
         x.contests = (x => {
@@ -216,7 +218,9 @@ export namespace types {
       );
     }
 
-    export function IndexPayload(elementId: string): types.IndexPayload {
+    export function IndexPayload(
+      elementId: string = 'payload',
+    ): types.IndexPayload {
       return (x => {
         x.coderOfTheMonthData = (x => {
           if (x.all)
@@ -252,7 +256,7 @@ export namespace types {
     }
 
     export function ProblemEditPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemEditPayload {
       return (x => {
         if (x.problemsetter)
@@ -270,7 +274,7 @@ export namespace types {
     }
 
     export function ProblemFormPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemFormPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -278,7 +282,7 @@ export namespace types {
     }
 
     export function ProblemListPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemListPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -286,7 +290,7 @@ export namespace types {
     }
 
     export function ProblemTagsPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemTagsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -294,7 +298,7 @@ export namespace types {
     }
 
     export function SchoolOfTheMonthPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -302,7 +306,7 @@ export namespace types {
     }
 
     export function SchoolProfileDetailsPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.SchoolProfileDetailsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -310,14 +314,16 @@ export namespace types {
     }
 
     export function SchoolRankPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.SchoolRankPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
-    export function StatsPayload(elementId: string): types.StatsPayload {
+    export function StatsPayload(
+      elementId: string = 'payload',
+    ): types.StatsPayload {
       return (x => {
         if (x.max_wait_time)
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
@@ -330,7 +336,7 @@ export namespace types {
     }
 
     export function UserRankTablePayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.UserRankTablePayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,

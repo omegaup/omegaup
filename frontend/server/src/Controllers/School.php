@@ -275,7 +275,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{smartyProperties: array{payload: SchoolRankPayload}, template: string}
+     * @return array{smartyProperties: array{payload: SchoolRankPayload}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -310,14 +310,14 @@ class School extends \OmegaUp\Controllers\Controller {
                     'totalRows' => $schoolRank['totalRows'],
                 ],
             ],
-            'template' => 'rank.schools.tpl',
+            'entrypoint' => 'schools_rank',
         ];
     }
 
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload}, template: string}
+     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload}, entrypoint: string}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -347,7 +347,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     'isMentor' => $isMentor,
                 ],
             ],
-            'template' => 'schoolofthemonth.tpl',
+            'entrypoint' => 'school_of_the_month',
         ];
 
         if (!$isMentor) {
