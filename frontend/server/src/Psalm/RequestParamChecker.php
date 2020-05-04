@@ -26,7 +26,8 @@ class RequestParamChecker implements
      * are enforcing the API parameter to be.
      */
     const ENSURE_TYPE_MAPPING = [
-        'OmegaUp\\Request::ensurebool' => 'bool|null',
+        'OmegaUp\\Request::ensurebool' => 'bool',
+        'OmegaUp\\Request::ensureoptionalbool' => 'bool|null',
         'OmegaUp\\Request::ensureint' => 'int',
         'OmegaUp\\Request::ensureoptionalint' => 'int|null',
         'OmegaUp\\Request::ensurefloat' => 'float|null',

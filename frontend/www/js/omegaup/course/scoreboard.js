@@ -1,6 +1,6 @@
 import { Arena } from '../arena/arena.js';
 import { OmegaUp } from '../omegaup';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {

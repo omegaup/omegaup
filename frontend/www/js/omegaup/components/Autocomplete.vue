@@ -30,11 +30,15 @@ export default class Autocomplete extends Vue {
   @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {
-    this.init($(<HTMLElement>this.$el));
+    this.init($(<HTMLElement>this.$refs.input));
   }
 
   @Emit('input')
   onUpdateInput(): string {
+    const value = this.input.getAttribute('data-value');
+    if (value !== null) {
+      this.$emit('update:value', value);
+    }
     return this.input.value;
   }
 

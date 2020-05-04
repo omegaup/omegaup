@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import badge_Details from '../components/badge/Details.vue';
 import { OmegaUp } from '../omegaup';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import { types } from '../api_types';
 import * as UI from '../ui';
 

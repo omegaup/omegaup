@@ -6,7 +6,7 @@
           <label>{{ T.wordsGroupAdmin }}</label>
           <omegaup-autocomplete
             v-bind:init="el => typeahead.groupTypeahead(el)"
-            v-model="groupName"
+            v-bind:value.sync="groupAlias"
           ></omegaup-autocomplete>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -61,7 +61,7 @@ export default class GroupAdmin extends Vue {
 
   T = T;
   typeahead = typeahead;
-  groupName = '';
+  groupAlias = '';
   groupAdmins = this.data;
   selected: omegaup.ContestGroupAdmin = {};
 

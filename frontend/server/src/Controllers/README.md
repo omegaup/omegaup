@@ -579,6 +579,7 @@ remaining time from the contest, or register the opened time.
 | `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
 | `scoreboard_url`            | `string`                                                                                                                                                                                                                                                    |
 | `scoreboard_url_admin`      | `string`                                                                                                                                                                                                                                                    |
+| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
 | `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
 | `start_time`                | `Date`                                                                                                                                                                                                                                                      |
 | `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
@@ -796,6 +797,7 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 | `problemset_id`             | `number`                                                                                                                                                                                                                                                    |
 | `requests_user_information` | `string`                                                                                                                                                                                                                                                    |
 | `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
+| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
 | `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
 | `start_time`                | `Date`                                                                                                                                                                                                                                                      |
 | `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
@@ -934,6 +936,7 @@ Gets the problems from a contest
 | `problemset_id`               | `number`  |
 | `rerun_id`                    | `number`  |
 | `scoreboard`                  | `number`  |
+| `show_penalty`                | `boolean` |
 | `show_scoreboard_after`       | `boolean` |
 | `start_time`                  | `Date`    |
 | `submissions_gap`             | `number`  |
@@ -2577,7 +2580,6 @@ Returns the best score for a problem
 | Name             | Type    | Description |
 | ---------------- | ------- | ----------- |
 | `contest_alias`  | `mixed` |             |
-| `lang`           | `mixed` |             |
 | `problem_alias`  | `mixed` |             |
 | `problemset_id`  | `mixed` |             |
 | `statement_type` | `mixed` |             |
@@ -2669,7 +2671,6 @@ Entry point for Problem Details API
 | Name                      | Type        | Description |
 | ------------------------- | ----------- | ----------- |
 | `contest_alias`           | `mixed`     |             |
-| `lang`                    | `mixed`     |             |
 | `prevent_problemset_open` | `bool|null` |             |
 | `problem_alias`           | `mixed`     |             |
 | `problemset_id`           | `mixed`     |             |
@@ -2904,7 +2905,6 @@ Returns the solution for a problem if conditions are satisfied.
 | ----------------- | ----------- | ----------- |
 | `contest_alias`   | `mixed`     |             |
 | `forfeit_problem` | `bool|null` |             |
-| `lang`            | `mixed`     |             |
 | `problem_alias`   | `mixed`     |             |
 | `problemset_id`   | `mixed`     |             |
 | `statement_type`  | `mixed`     |             |
@@ -3007,7 +3007,6 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
-| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |
@@ -3691,9 +3690,9 @@ months (including the current one)
 
 ### Returns
 
-| Name                       | Type                                                          |
-| -------------------------- | ------------------------------------------------------------- |
-| `distinct_problems_solved` | `{ month: number; problems_solved: number; year: number; }[]` |
+| Name                       | Type                           |
+| -------------------------- | ------------------------------ |
+| `distinct_problems_solved` | `types.SchoolProblemsSolved[]` |
 
 ## `/api/school/schoolCodersOfTheMonth/`
 
@@ -3709,9 +3708,9 @@ Returns rank of best schools in last month
 
 ### Returns
 
-| Name     | Type                                                       |
-| -------- | ---------------------------------------------------------- |
-| `coders` | `{ time: string; username: string; classname: string; }[]` |
+| Name     | Type                            |
+| -------- | ------------------------------- |
+| `coders` | `types.SchoolCoderOfTheMonth[]` |
 
 ## `/api/school/selectSchoolOfTheMonth/`
 
@@ -3744,9 +3743,9 @@ with the number of created problems, solved problems and organized contests.
 
 ### Returns
 
-| Name    | Type                                                                                                                        |
-| ------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `users` | `{ username: string; classname: string; created_problems: number; solved_problems: number; organized_contests: number; }[]` |
+| Name    | Type                 |
+| ------- | -------------------- |
+| `users` | `types.SchoolUser[]` |
 
 # Scoreboard
 

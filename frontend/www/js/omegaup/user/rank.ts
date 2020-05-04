@@ -4,7 +4,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.UserRankTablePayload('payload');
+  const payload = types.payloadParsers.UserRankTablePayload();
 
   const ranking = payload.ranking.rank.map((user, index) => ({
     rank: index + 1,

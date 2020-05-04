@@ -4,7 +4,7 @@ import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as markdown from '../markdown';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
@@ -51,7 +51,7 @@ OmegaUp.on('ready', function() {
   $('#add-admin-form').on('submit', function() {
     var username = $('#username-admin').val();
 
-    API.Problem.addAdmin({
+    api.Problem.addAdmin({
       problem_alias: problemAlias,
       usernameOrEmail: username,
     })
@@ -74,7 +74,7 @@ OmegaUp.on('ready', function() {
   });
 
   $('#add-group-admin-form').on('submit', function() {
-    API.Problem.addGroupAdmin({
+    api.Problem.addGroupAdmin({
       problem_alias: problemAlias,
       group: $('#groupalias-admin').attr('data-alias'),
     })
@@ -98,7 +98,7 @@ OmegaUp.on('ready', function() {
 
   $('#delete form').on('submit', function(event) {
     event.preventDefault();
-    API.Problem.delete({ problem_alias: problemAlias })
+    api.Problem.delete({ problem_alias: problemAlias })
       .then(function(response) {
         window.location = '/problem/mine/';
       })
@@ -114,7 +114,7 @@ OmegaUp.on('ready', function() {
       if (statements[lang].current === statements[lang].original) continue;
       promises.push(
         new Promise(function(resolve, reject) {
-          API.Problem.updateStatement({
+          api.Problem.updateStatement({
             problem_alias: problemAlias,
             statement: statements[lang].current,
             message: $('#markdown-message').val(),
@@ -147,7 +147,7 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshProblemAdmins() {
-    API.Problem.admins({ problem_alias: problemAlias })
+    api.Problem.admins({ problem_alias: problemAlias })
       .then(function(admins) {
         $('#problem-admins').empty();
         // Got the contests, lets populate the dropdown with them
@@ -175,7 +175,7 @@ OmegaUp.on('ready', function() {
                       'click',
                       (function(username) {
                         return function(e) {
-                          API.Problem.removeAdmin({
+                          api.Problem.removeAdmin({
                             problem_alias: problemAlias,
                             usernameOrEmail: username,
                           })
@@ -216,7 +216,7 @@ OmegaUp.on('ready', function() {
                       'click',
                       (function(alias) {
                         return function(e) {
-                          API.Problem.removeGroupAdmin({
+                          api.Problem.removeGroupAdmin({
                             problem_alias: problemAlias,
                             group: alias,
                           })
@@ -251,7 +251,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'select-version': function(selectedRevision, updatePublished) {
-            API.Problem.selectVersion({
+            api.Problem.selectVersion({
               problem_alias: problemAlias,
               commit: selectedRevision.commit,
               update_published: updatePublished,
@@ -263,7 +263,7 @@ OmegaUp.on('ready', function() {
               .catch(ui.apiError);
           },
           'runs-diff': function(versions, selectedCommit) {
-            API.Problem.runsDiff({
+            api.Problem.runsDiff({
               problem_alias: problemAlias,
               version: selectedCommit.version,
             })
@@ -287,7 +287,7 @@ OmegaUp.on('ready', function() {
       'omegaup-problem-versions': problem_Versions,
     },
   });
-  API.Problem.versions({ problem_alias: problemAlias })
+  api.Problem.versions({ problem_alias: problemAlias })
     .then(function(result) {
       problemVersions.log = result.log;
       for (const revision of result.log) {
@@ -322,7 +322,7 @@ OmegaUp.on('ready', function() {
               solutionEdit.updateAndRefresh(solutions[language]);
               return;
             }
-            API.Problem.solution({
+            api.Problem.solution({
               problem_alias: problemAlias,
               lang: language,
             })
@@ -345,7 +345,7 @@ OmegaUp.on('ready', function() {
               if (solutions[lang] === solutionEdit.solutions[lang]) continue;
               promises.push(
                 new Promise(function(resolve, reject) {
-                  API.Problem.updateSolution({
+                  api.Problem.updateSolution({
                     problem_alias: problemAlias,
                     solution: solutions[lang],
                     message: commitMessage,
@@ -391,7 +391,7 @@ OmegaUp.on('ready', function() {
       },
       getInitialContents() {
         let self = this;
-        API.Problem.solution({
+        api.Problem.solution({
           problem_alias: problemAlias,
         })
           .then(function(response) {
@@ -466,7 +466,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    API.Problem.details({
+    api.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',
       show_solvers: false,

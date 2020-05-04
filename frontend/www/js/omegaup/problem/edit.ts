@@ -4,7 +4,7 @@ import T from '../lang';
 import Vue from 'vue';
 import problem_Edit from '../components/problem/Form.vue';
 import * as ui from '../ui';
-import * as api from '../api_transitional';
+import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload(
