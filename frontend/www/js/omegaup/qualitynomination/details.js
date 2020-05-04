@@ -2,7 +2,7 @@ import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -37,7 +37,7 @@ OmegaUp.on('ready', function() {
               UI.error(T.editFieldRequired);
               return;
             }
-            API.QualityNomination.resolve({
+            api.QualityNomination.resolve({
               problem_alias: viewDetails.problem.alias,
               status: newStatus,
               qualitynomination_id: viewDetails.qualitynomination_id,

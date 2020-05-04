@@ -148,7 +148,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Get the course assigments sorted by order and start_time
      *
-     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     final public static function getSortedCourseAssignments(
         int $courseId
@@ -160,8 +160,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                `a`.`description`,
                `a`.`alias`,
                `a`.`assignment_type`,
-               UNIX_TIMESTAMP(`a`.`start_time`) AS `start_time`,
-               UNIX_TIMESTAMP(`a`.`finish_time`) AS `finish_time`,
+               `a`.`start_time`,
+               `a`.`finish_time`,
                `a`.`order`,
                `ps`.`scoreboard_url`,
                `ps`.`scoreboard_url_admin`
@@ -176,10 +176,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             ORDER BY
                 `order` ASC,
                 `start_time` ASC,
-                `a`.`assignment_id` ASC
+                `a`.`assignment_id` ASC;
         ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}> */
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]

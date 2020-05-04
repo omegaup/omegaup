@@ -10,6 +10,14 @@
   />
 </template>
 
+<style lang="scss">
+.tt-dataset {
+  background: white;
+  padding: 10px;
+  border: 1px solid gray;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
 
@@ -22,11 +30,15 @@ export default class Autocomplete extends Vue {
   @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {
-    this.init($(<HTMLElement>this.$el));
+    this.init($(<HTMLElement>this.$refs.input));
   }
 
   @Emit('input')
   onUpdateInput(): string {
+    const value = this.input.getAttribute('data-value');
+    if (value !== null) {
+      this.$emit('update:value', value);
+    }
     return this.input.value;
   }
 

@@ -33,7 +33,7 @@ final class DAO {
      * Helper function to convert from internal timestamps to the format that
      * MySQL expects.
      *
-     * @param string|int|null $timestamp the POSIX timestamp.
+     * @param \OmegaUp\Timestamp|string|int|null $timestamp the POSIX timestamp.
      * @return string|null the timestamp in MySQL format.
      */
     final public static function toMySQLTimestamp($timestamp): ?string {
@@ -45,6 +45,9 @@ final class DAO {
         if (is_string($timestamp)) {
             return $timestamp;
         }
+        if ($timestamp instanceof \OmegaUp\Timestamp) {
+            $timestamp = $timestamp->time;
+        }
         return gmdate('Y-m-d H:i:s', $timestamp);
     }
 
@@ -53,23 +56,23 @@ final class DAO {
      * timestamp format.
      *
      * @param string|int|float|\OmegaUp\Timestamp|null $timestamp the MySQL timestamp.
-     * @return int|null the POSIX timestamp.
+     * @return \OmegaUp\Timestamp|null the POSIX timestamp.
      */
-    final public static function fromMySQLTimestamp($timestamp): ?int {
+    final public static function fromMySQLTimestamp($timestamp): ?\OmegaUp\Timestamp {
         if (is_null($timestamp)) {
             return null;
         }
         // Temporary migration code to allow the timestamps to be in either
         // format.
         if ($timestamp instanceof \OmegaUp\Timestamp) {
-            return $timestamp->time;
-        }
-        if (is_int($timestamp)) {
             return $timestamp;
         }
-        if (is_float($timestamp)) {
-            return intval($timestamp);
+        if (is_int($timestamp)) {
+            return new \OmegaUp\Timestamp($timestamp);
         }
-        return strtotime($timestamp);
+        if (is_float($timestamp)) {
+            return new \OmegaUp\Timestamp(intval($timestamp));
+        }
+        return new \OmegaUp\Timestamp(strtotime($timestamp));
     }
 }

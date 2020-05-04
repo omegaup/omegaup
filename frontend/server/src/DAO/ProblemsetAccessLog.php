@@ -13,13 +13,13 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
     /**
-     * @return list<array{classname: string, ip: int, time: int, username: string}>
+     * @return list<array{classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
     public static function GetAccessForProblemset(int $problemsetId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
-                    UNIX_TIMESTAMP(pal.time) AS `time`,
+                    pal.`time`,
                     IFNULL(
                         (
                             SELECT `urc`.classname FROM
@@ -51,18 +51,18 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 ORDER BY `time`;';
         $val = [$problemsetId];
 
-        /** @var list<array{classname: string, ip: int, time: int, username: string}> */
+        /** @var list<array{classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
-     * @return list<array{ip: int, time: int, username: string}>
+     * @return list<array{ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
     final public static function getAccessForCourse(int $courseId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
-                    UNIX_TIMESTAMP(pal.time) AS `time`
+                    pal.`time`
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
@@ -77,7 +77,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        /** @var list<array{ip: int, time: int, username: string}> */
+        /** @var list<array{ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]

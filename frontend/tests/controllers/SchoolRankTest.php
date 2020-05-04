@@ -63,7 +63,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'WA');
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -73,7 +73,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -83,7 +83,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -93,7 +93,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'WA');
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         \OmegaUp\Test\Utils::runUpdateRanks();
@@ -134,7 +134,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -144,7 +144,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -154,7 +154,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -164,7 +164,7 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runCreationDate)
+            new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
         \OmegaUp\Test\Utils::runUpdateRanks();

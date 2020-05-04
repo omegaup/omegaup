@@ -128,11 +128,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     public static function hasStarted(\OmegaUp\DAO\VO\Contests $contest): bool {
-        return \OmegaUp\Time::get() >= $contest->start_time;
+        return \OmegaUp\Time::get() >= $contest->start_time->time;
     }
 
     public static function hasFinished(\OmegaUp\DAO\VO\Contests $contest): bool {
-        return \OmegaUp\Time::get() >= $contest->finish_time;
+        return \OmegaUp\Time::get() >= $contest->finish_time->time;
     }
 
     /**

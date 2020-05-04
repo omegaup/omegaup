@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import * as api from '../api_transitional';
+import * as api from '../api';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
@@ -980,7 +980,7 @@ export class Arena {
     if (self.elements.rankingTable) {
       self.elements.rankingTable.ranking = ranking;
       if (data.time) {
-        self.elements.rankingTable.lastUpdated = OmegaUp.remoteTime(data.time);
+        self.elements.rankingTable.lastUpdated = data.time;
       }
     }
 

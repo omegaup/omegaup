@@ -24,7 +24,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
 
         // Assert status of new contest
         $this->assertEquals('ok', $response['status']);

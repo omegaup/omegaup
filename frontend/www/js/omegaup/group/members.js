@@ -1,7 +1,7 @@
 import group_Members from '../components/group/Members.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import Vue from 'vue';
 
@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'add-member': function(groupMembersInstance, username) {
-            API.Group.addUser({
+            api.Group.addUser({
               group_alias: groupAlias,
               usernameOrEmail: username,
             })
@@ -48,7 +48,7 @@ OmegaUp.on('ready', function() {
             countryId,
             stateId,
           ) {
-            API.Identity.update({
+            api.Identity.update({
               username: identity.username,
               name: identity.name,
               country_id: countryId,
@@ -85,7 +85,7 @@ OmegaUp.on('ready', function() {
               return;
             }
 
-            API.Identity.changePassword({
+            api.Identity.changePassword({
               group_alias: groupAlias,
               password: newPassword,
               username: username,
@@ -99,7 +99,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           remove: function(username) {
-            API.Group.removeUser({
+            api.Group.removeUser({
               group_alias: groupAlias,
               usernameOrEmail: username,
             })
@@ -132,7 +132,7 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshMemberList() {
-    API.Group.members({ group_alias: groupAlias })
+    api.Group.members({ group_alias: groupAlias })
       .then(function(data) {
         groupMembers.identities = [];
         groupMembers.identitiesCsv = [];

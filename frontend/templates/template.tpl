@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="{#locale#}" class="h-100">
-  {include file='head_v2.tpl' htmlTitle="{#navUserRanking#}" inline}
+  {include file='head_v2.tpl' htmlTitle="{$title|escape}" inline}
   <body class="d-flex flex-column h-100 pt-5">
     {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
 	  <main role="main">
@@ -12,7 +12,7 @@
       {include file='status.tpl' inline}
 
       <script type="text/json" id="payload">{$payload|json_encode}</script>
-      {js_include entrypoint="users_rank" async}
+      {block name="entrypoint"}{/block}
       <div id="main-container"></div>
     </main>
     {include file='footer_v2.tpl' inline}

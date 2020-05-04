@@ -1,8 +1,16 @@
 <template>
   <div class="card h-100">
-    <h5 class="card-header">
-      {{ T.schoolOfTheMonth }}
-    </h5>
+    <div class="d-flex justify-content-between card-header">
+      <h5 class="m-0">
+        {{ T.schoolOfTheMonth }}
+      </h5>
+      <a
+        class="card-header-help"
+        href="https://blog.omegaup.com/el-nuevo-ranking-de-escuelas-de-omegaup/"
+      >
+        <font-awesome-icon v-bind:icon="['fas', 'info-circle']" />
+      </a>
+    </div>
     <div
       class="card-body text-center d-flex flex-column justify-content-center"
     >
@@ -32,7 +40,7 @@
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-h5.card-header {
+.card-header {
   color: $omegaup-white;
   background-color: $omegaup-pink;
 }
@@ -44,8 +52,14 @@ import { omegaup } from '../../omegaup';
 import CountryFlag from '../CountryFlag.vue';
 import T from '../../lang';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faInfoCircle);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
   },
 })

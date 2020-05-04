@@ -52,19 +52,19 @@ class ContestParams {
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $startTime;
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $finishTime;
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $lastUpdated;
 
@@ -75,7 +75,7 @@ class ContestParams {
     public $penaltyCalcPolicy;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string} $params
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -98,9 +98,18 @@ class ContestParams {
         }
         $this->windowLength = $params['windowLength'] ?? null;
         $this->languages = $params['languages'] ?? null;
-        $this->startTime = $params['startTime'] ?? (\OmegaUp\Time::get() - 60 * 60);
-        $this->finishTime = $params['finishTime'] ?? (\OmegaUp\Time::get() + 60 * 60);
-        $this->lastUpdated = $params['lastUpdated'] ?? (\OmegaUp\Time::get() + 60 * 60);
+        $this->startTime = (
+            $params['startTime'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60)
+        );
+        $this->finishTime = (
+            $params['finishTime'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60)
+        );
+        $this->lastUpdated = (
+            $params['lastUpdated'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60)
+        );
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
     }
 }
@@ -120,9 +129,13 @@ class Contest {
         $r = new \OmegaUp\Request([
             'title' => $params->title,
             'description' => 'description',
-            'start_time' => $params->startTime,
-            'finish_time' => $params->finishTime,
-            'last_updated' => $params->lastUpdated,
+            'start_time' => (new \OmegaUp\Timestamp($params->startTime))->time,
+            'finish_time' => (new \OmegaUp\Timestamp(
+                $params->finishTime
+            ))->time,
+            'last_updated' => (new \OmegaUp\Timestamp(
+                $params->lastUpdated
+            ))->time,
             'window_length' => $params->windowLength,
             'admission_mode' => $params->admissionMode,
             'alias' => substr($params->title, 0, 20),
@@ -195,7 +208,7 @@ class Contest {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
         if ($params->admissionMode === 'public') {
             self::forcePublic($contestData, $params->lastUpdated);
             $r['admission_mode'] = 'public';
@@ -385,7 +398,7 @@ class Contest {
      */
     public static function forcePublic(
         array $contestData,
-        ?int $lastUpdated = null
+        ?\OmegaUp\Timestamp $lastUpdated = null
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             strval($contestData['request']['alias'])
