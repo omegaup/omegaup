@@ -4,7 +4,7 @@
 		<span class="message">{$STATUS_ERROR}</span>
 	</div>
 {else if isset($STATUS_SUCCESS) && $STATUS_SUCCESS !== ''}
-	<div class="alert alert-success" id="status" role="alert">
+	<div class="alert alert-success" id="status">
 		<button type="button" class="close" id="alert-close">&times;</button>
 		<span class="message">{$STATUS_SUCCESS}</span>
 	</div>

@@ -188,4 +188,8 @@ textarea {
 .button-group {
   text-align: center;
 }
+
+.alert {
+  margin-top: 30px;
+}
 </style>
