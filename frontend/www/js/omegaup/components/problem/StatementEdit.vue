@@ -1,10 +1,6 @@
 <template>
   <div class="panel panel-primary">
     <form class="panel-body form" enctype="multipart/form-data" method="post">
-      <template v-if="markdownType === 'statement'">
-        <input type="hidden" name="problem_alias" v-bind:value="alias" />
-        <input type="hidden" name="request" value="markdown" />
-      </template>
       <div class="row">
         <label
           >{{ T.statementLanguage }}
@@ -43,7 +39,6 @@
                 <textarea
                   class="wmd-input"
                   v-bind:id="`wmd-input-${markdownType}`"
-                  v-bind:name="`wmd-input-${markdownType}`"
                   v-model="currentMarkdown"
                 ></textarea>
               </div>
@@ -56,7 +51,7 @@
                   v-html="markdownPreview"
                 ></div>
                 <!-- id-lint on -->
-                <template v-if="markdownType === 'statement'">
+                <template v-if="markdownType === 'statements'">
                   <hr />
                   <div>
                     <em
@@ -102,22 +97,24 @@
           <button
             class="btn btn-primary"
             v-bind:disabled="commitMessage === ''"
-            v-on:click.prevent="handleEditMarkdown"
-            v-if="markdownType === 'solution'"
+            v-on:click="handleEditMarkdown"
           >
-            {{ T.problemEditFormUpdateSolution }}
-          </button>
-          <button
-            class="btn btn-primary"
-            type="submit"
-            v-bind:disabled="commitMessage === ''"
-            v-on:submit="handleEditSubmitMarkdown"
-            v-else=""
-          >
-            {{ T.problemEditFormUpdateMarkdown }}
+            {{
+              markdownType === 'solutions'
+                ? T.problemEditFormUpdateSolution
+                : T.problemEditFormUpdateMarkdown
+            }}
           </button>
         </div>
       </div>
+      <input
+        type="hidden"
+        name="wmd-input"
+        v-bind:value="JSON.stringify(this.statements)"
+      />
+      <input type="hidden" name="directory" v-bind:value="markdownType" />
+      <input type="hidden" name="problem_alias" v-bind:value="alias" />
+      <input type="hidden" name="request" value="markdown" />
     </form>
   </div>
 </template>
@@ -145,7 +142,7 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() markdownContents!: string;
   @Prop() markdownPreview!: string;
   @Prop() initialLanguage!: string;
-  @Prop({ default: 'statement' }) markdownType!: string;
+  @Prop() markdownType!: string;
 
   T = T;
   showTab = 'source';
@@ -204,29 +201,10 @@ export default class ProblemStatementEdit extends Vue {
     );
   }
 
-  handleEditMarkdown(): void {
-    this.statements[this.currentLanguage] = this.currentMarkdown;
-    if (this.markdownType === 'solution') {
-      this.$emit(
-        'edit-statement',
-        this.statements,
-        this.commitMessage,
-        this.currentLanguage,
-      );
-      return;
-    }
-  }
-
-  handleEditSubmitMarkdown(e: Event): void {
+  handleEditMarkdown(e: Event) {
     this.errors = [];
     this.statements[this.currentLanguage] = this.currentMarkdown;
     if (this.commitMessage) {
-      this.$emit(
-        'edit-statement',
-        this.statements,
-        this.commitMessage,
-        this.currentLanguage,
-      );
       return;
     }
     this.errors.push('message');

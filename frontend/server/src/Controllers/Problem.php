@@ -1568,6 +1568,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             $problem,
+            /*$directory=*/ 'statements',
             $r['statement'],
             $r['message'],
             $r['lang'],
@@ -1582,6 +1583,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Problems $problem,
+        string $directory,
         string $statement,
         string $message,
         ?string $lang,
@@ -1591,7 +1593,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity,
             $user,
             $problem,
-            'statements',
+            $directory,
             $statement,
             $message,
             $lang,
@@ -1655,17 +1657,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\Problem::ISO639_1
         );
 
-        $updatedFileLanguages = self::updateLooseFile(
+        self::updateStatement(
             $r->identity,
             $r->user,
             $problem,
-            'solutions',
+            /*$directory=*/ 'solutions',
             $r['solution'],
             $r['message'],
             $r['lang'],
             $problemParams->updatePublished
         );
-        self::invalidateSolutionCache($problem, $updatedFileLanguages);
+
         return [
             'status' => 'ok'
         ];
@@ -4284,6 +4286,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{IS_UPDATE: true, LOAD_MATHJAX: true, STATUS_ERROR?: string, STATUS_SUCCESS: null|string, problemEditPayload: ProblemEditPayload, problemMarkdownPayload: ProblemMarkdownPayload, problemTagsPayload: ProblemTagsPayload}, template: string}
      *
      * @omegaup-request-param bool $allow_user_add_tags
+     * @omegaup-request-param string $directory
      * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4299,14 +4302,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
-     * @omegaup-request-param mixed $statement-language
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param mixed $title
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
-     * @omegaup-request-param mixed $wmd-input-statement
+     * @omegaup-request-param string $wmd-input
      */
     public static function getProblemEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4419,24 +4421,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($r['request'] === 'markdown') {
             \OmegaUp\Validators::validateStringNonEmpty(
-                $r['wmd-input-statement'],
-                'statement'
+                $r['directory'],
+                'directory'
             );
-            \OmegaUp\Validators::validateOptionalInEnum(
-                $r['statement-language'],
-                'lang',
-                \OmegaUp\Controllers\Problem::ISO639_1
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['wmd-input'],
+                'wmd-input'
             );
-
-            self::updateStatement(
-                $r->identity,
-                $r->user,
-                $problem,
-                $r['wmd-input-statement'],
-                $r['message'],
-                $r['statement-language'],
-                $problemParams->updatePublished
-            );
+            /** @var array<string, string> $statements */
+            $statements = json_decode($r['wmd-input'], true);
+            foreach ($statements as $language => $statement) {
+                self::updateStatement(
+                    $r->identity,
+                    $r->user,
+                    $problem,
+                    $r['directory'],
+                    $statement,
+                    $r['message'],
+                    $language,
+                    $problemParams->updatePublished
+                );
+            }
             $details = self::getProblemEditDetails($problem, $r->identity);
             $result['smartyProperties']['problemMarkdownPayload']['statement'] = $details['statement'];
         }
