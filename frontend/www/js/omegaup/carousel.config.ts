@@ -22,14 +22,17 @@ const carouselConfig: {
   {
     image: '/media/homepage/carousel_slide_1.svg',
     title: {
-      en: 'Welcome to omegaUp',
-      es: 'Bienvenido a omegaUp',
-      pt: 'Bem-vindo a omegaUp',
+      en: 'Improve your programming skills',
+      es: 'Mejora tus habilidades de programación',
+      pt: 'Melhore suas habilidades de programação',
     },
     description: {
-      en: 'Is this the first time you use omegaUp?',
-      es: '¿Es la primera vez que usas omegaUp?',
-      pt: 'Esta é a primeira vez que você usa o omegaUp?',
+      en:
+        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+      es:
+        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por miles de estudiantes y profesores en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+      pt:
+        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
     },
     button: {
       text: {
@@ -43,17 +46,17 @@ const carouselConfig: {
   {
     image: '/media/homepage/carousel_slide_2.svg',
     title: {
-      en: 'Introductory Course to C++',
-      es: 'Curso de Introducción a C++',
-      pt: 'Curso Introdutório ao C++',
+      en: 'Would you like to learn to program?',
+      es: '¿Te gustaría aprender a programar?',
+      pt: 'Deseja aprender a programar?',
     },
     description: {
       en:
-        'Would you like to learn to program? Join the Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+        'Join the Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
       es:
-        '¿Te gustaría aprender a programar? Apúntate al curso de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+        'Apúntate al curso de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
       pt:
-        'Deseja aprender a programar? Participe do curso Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+        'Participe do curso Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
     },
     button: {
       text: {
