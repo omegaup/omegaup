@@ -51,7 +51,14 @@
       </template>
     </div>
     <div class="card-footer">
-      <a href="/coderofthemonth/">{{ T.coderOfTheMonthFullList }}</a>
+      <a
+        v-bind:href="
+          category == 'female'
+            ? '/coderofthemonth/female/'
+            : '/coderofthemonth/'
+        "
+        >{{ T.coderOfTheMonthFullList }}</a
+      >
     </div>
   </div>
 </template>
