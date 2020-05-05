@@ -129,7 +129,6 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
-import * as ui from '../../ui';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 
