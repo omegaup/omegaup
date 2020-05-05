@@ -224,6 +224,7 @@ class Cache {
     const TAGS_LIST = 'tags-list-';
     const DATA_CASES = 'data-cases-';
     const DATA_CASES_FILES = 'data-cases-files-';
+    const DATA_CASES_SIZE = 'data-cases-size-';
 
     /** @var \Logger */
     private $log;

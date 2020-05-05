@@ -829,7 +829,8 @@ export namespace types {
     judged_by?: string;
     language: string;
     logs?: string;
-    source?: string;
+    show_diff: string;
+    source: string;
   }
 
   export interface School {

@@ -7,7 +7,7 @@
  *
  * @author joemmanuel
  * @psalm-type ProblemCases=array<string, array<string, string>>
- * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCases, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCases|null, compile_error?: string, details?: array{compile_meta?: array<string, array{memory: float, sys_time: float, time: float, verdict: string, wall_time: float}>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: array{verdict: string}, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -875,8 +875,25 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             $response['judged_by'] = strval($run->judged_by);
         }
+        $responseSize = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_SIZE,
+            "{$problem->alias}-{$problem->commit}",
+            /** @return int */
+            function () use ($problem, $run) {
+                if (is_null($problem->alias)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemNotFound'
+                    );
+                }
+                return self::getCasesSize($problem->alias, $problem->commit);
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
 
-        if ($problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS) {
+        if (
+            $problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS
+            && $responseSize < 4000 // Forcing to hide diffs when inputs/outpus exceeds 4kb
+        ) {
             $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
             return $response;
         }
@@ -888,11 +905,6 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $problem->alias,
                 $run->version
             );
-            if (is_null($dataCases)) {
-                // Forcing to hide diffs when inputs or outpus exceeds 4kb
-                $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
-                return $response;
-            }
             $response['cases'] = $dataCases;
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
             return $response;
@@ -903,30 +915,55 @@ class Run extends \OmegaUp\Controllers\Controller {
             $problem->alias,
             $run->version
         );
-        if (is_null($dataCases)) {
-            // Forcing to hide diffs when inputs or outpus exceeds 4kb
-            $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
-            return $response;
-        }
         $response['cases'] = $dataCases;
         $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ONLY_EXAMPLE_DIFF;
 
         return $response;
     }
 
+    private static function getCasesSize(
+        string $problemAlias,
+        string $commit
+    ): int {
+        $ch = curl_init();
+        curl_setopt(
+            $ch,
+            CURLOPT_URL,
+            OMEGAUP_GITSERVER_URL . "/{$problemAlias}/+/{$commit}/"
+        );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+        $headers = [];
+        $headers[] = \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
+            $problemAlias,
+            'omegaup:system'
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+        /** @var int */
+        $size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+        curl_close($ch);
+        return intval($size);
+    }
+
     /**
-     * @return ProblemCases|null
+     * @return ProblemCases
      */
     private static function getProblemCases(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $directory,
         string $problemAlias,
         ?string $version
-    ): ?array {
+    ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::DATA_CASES,
             "{$problemAlias}-{$version}-{$directory}",
-            /** @return ProblemCases|null */
+            /** @return ProblemCases */
             function () use (
                 $problemArtifacts,
                 $directory,
@@ -945,14 +982,14 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return ProblemCases|null
+     * @return ProblemCases
      */
     private static function getProblemCasesImpl(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $directory,
         string $problemAlias,
         ?string $version
-    ): ?array {
+    ): array {
         $existingCases = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::DATA_CASES_FILES,
             "{$problemAlias}-{$version}-{$directory}",
@@ -963,7 +1000,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             24 * 60 * 60 /*expire in 1 day*/
         );
         $response = [];
-        $sizeFiles = [];
         foreach ($existingCases as $file) {
             /** @var array{contents: string, id: string, size: int} $problemContent */
             $problemContent = json_decode(
@@ -979,13 +1015,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             /* @var string $contents */
             $contents = base64_decode($problemContent['contents']);
             $response[$basename][$extension] = $contents;
-            if (!isset($sizeFiles[$extension])) {
-                $sizeFiles[$extension] = 0;
-            }
-            $sizeFiles[$extension] += $problemContent['size'];
-        }
-        if ($sizeFiles['in'] > 4000 || $sizeFiles['out'] > 4000) {
-            return null;
         }
         return $response;
     }
