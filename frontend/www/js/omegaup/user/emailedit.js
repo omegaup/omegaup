@@ -1,7 +1,8 @@
 import user_EmailEdit from '../components/user/EmailEdit.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
-import * as UI from '../ui';
+import * as api from '../api';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -14,11 +15,11 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: function(newEmail) {
-            API.User.updateMainEmail({ email: newEmail })
+            api.User.updateMainEmail({ email: newEmail })
               .then(function(response) {
-                UI.success(T.userEditSuccessfulEmailUpdate);
+                ui.success(T.userEditSuccessfulEmailUpdate);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

@@ -4,7 +4,7 @@ import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import problem_Settings from '../components/problem/Settings.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as markdown from '../markdown';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
@@ -40,54 +40,7 @@ OmegaUp.on('ready', function() {
   var problemAlias = $('#problem-alias').val();
 
   // Add typeaheads
-  refreshProblemAdmins();
-  typeahead.userTypeahead($('#username-admin'));
-  typeahead.groupTypeahead($('#groupalias-admin'), (event, val) =>
-    $(event.target).attr('data-alias', val.value),
-  );
-
   typeahead.tagTypeahead($('input[name=tag_name]'));
-
-  $('#add-admin-form').on('submit', function() {
-    var username = $('#username-admin').val();
-
-    API.Problem.addAdmin({
-      problem_alias: problemAlias,
-      usernameOrEmail: username,
-    })
-      .then(function(response) {
-        ui.success(T.adminAdded);
-        $('div.post.footer').show();
-        refreshProblemAdmins();
-      })
-      .catch(ui.apiError);
-
-    return false; // Prevent refresh
-  });
-
-  $('#toggle-site-admins').on('change', function() {
-    if ($(this).is(':checked')) {
-      $('#problem-admins .site-admin').show();
-    } else {
-      $('#problem-admins .site-admin').hide();
-    }
-  });
-
-  $('#add-group-admin-form').on('submit', function() {
-    API.Problem.addGroupAdmin({
-      problem_alias: problemAlias,
-      group: $('#groupalias-admin').attr('data-alias'),
-    })
-      .then(function(response) {
-        ui.success(T.groupAdminAdded);
-        $('div.post.footer').show();
-
-        refreshProblemAdmins();
-      })
-      .catch(ui.apiError);
-
-    return false; // Prevent refresh
-  });
 
   $('#download form').on('submit', function() {
     window.location = `/api/problem/download/problem_alias/${ui.escape(
@@ -98,7 +51,7 @@ OmegaUp.on('ready', function() {
 
   $('#delete form').on('submit', function(event) {
     event.preventDefault();
-    API.Problem.delete({ problem_alias: problemAlias })
+    api.Problem.delete({ problem_alias: problemAlias })
       .then(function(response) {
         window.location = '/problem/mine/';
       })
@@ -114,7 +67,7 @@ OmegaUp.on('ready', function() {
       if (statements[lang].current === statements[lang].original) continue;
       promises.push(
         new Promise(function(resolve, reject) {
-          API.Problem.updateStatement({
+          api.Problem.updateStatement({
             problem_alias: problemAlias,
             statement: statements[lang].current,
             message: $('#markdown-message').val(),
@@ -146,99 +99,6 @@ OmegaUp.on('ready', function() {
     return false;
   });
 
-  function refreshProblemAdmins() {
-    API.Problem.admins({ problem_alias: problemAlias })
-      .then(function(admins) {
-        $('#problem-admins').empty();
-        // Got the contests, lets populate the dropdown with them
-        for (var i = 0; i < admins.admins.length; i++) {
-          var admin = admins.admins[i];
-          var siteAdmin = admin.role == 'site-admin' ? admin.role : '';
-          $('#problem-admins').append(
-            $('<tr></tr>')
-              .addClass(siteAdmin)
-              .append(
-                $('<td></td>').append(
-                  $('<a></a>')
-                    .attr('href', '/profile/' + admin.username + '/')
-                    .text(admin.username),
-                ),
-              )
-              .append($('<td></td>').text(admin.role))
-              .append(
-                admin.role != 'admin'
-                  ? $('<td></td>')
-                  : $(
-                      '<td><button type="button" class="close">' +
-                        '&times;</button></td>',
-                    ).on(
-                      'click',
-                      (function(username) {
-                        return function(e) {
-                          API.Problem.removeAdmin({
-                            problem_alias: problemAlias,
-                            usernameOrEmail: username,
-                          })
-                            .then(function(response) {
-                              ui.success(T.adminRemoved);
-                              $('div.post.footer').show();
-                              var tr = e.target.parentElement.parentElement;
-                              $(tr).remove();
-                            })
-                            .catch(ui.apiError);
-                        };
-                      })(admin.username),
-                    ),
-              ),
-          );
-        }
-        $('#problem-group-admins').empty();
-        // Got the contests, lets populate the dropdown with them
-        for (var i = 0; i < admins.group_admins.length; i++) {
-          var group_admin = admins.group_admins[i];
-          $('#problem-group-admins').append(
-            $('<tr></tr>')
-              .append(
-                $('<td></td>').append(
-                  $('<a></a>')
-                    .attr('href', '/group/' + group_admin.alias + '/edit/')
-                    .text(group_admin.name),
-                ),
-              )
-              .append($('<td></td>').text(group_admin.role))
-              .append(
-                group_admin.role != 'admin'
-                  ? $('<td></td>')
-                  : $(
-                      '<td><button type="button" class="close">' +
-                        '&times;</button></td>',
-                    ).on(
-                      'click',
-                      (function(alias) {
-                        return function(e) {
-                          API.Problem.removeGroupAdmin({
-                            problem_alias: problemAlias,
-                            group: alias,
-                          })
-                            .then(function(response) {
-                              ui.success(T.groupAdminRemoved);
-                              $('div.post.footer').show();
-                              var tr = e.target.parentElement.parentElement;
-                              $(tr).remove();
-                            })
-                            .catch(ui.apiError);
-                        };
-                      })(group_admin.alias),
-                    ),
-              ),
-          );
-        }
-
-        $('#problem-admins .site-admin').hide();
-      })
-      .catch(ui.apiError);
-  }
-
   const problemVersions = new Vue({
     el: '#version div.panel div',
     render: function(createElement) {
@@ -251,7 +111,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'select-version': function(selectedRevision, updatePublished) {
-            API.Problem.selectVersion({
+            api.Problem.selectVersion({
               problem_alias: problemAlias,
               commit: selectedRevision.commit,
               update_published: updatePublished,
@@ -263,7 +123,7 @@ OmegaUp.on('ready', function() {
               .catch(ui.apiError);
           },
           'runs-diff': function(versions, selectedCommit) {
-            API.Problem.runsDiff({
+            api.Problem.runsDiff({
               problem_alias: problemAlias,
               version: selectedCommit.version,
             })
@@ -287,7 +147,7 @@ OmegaUp.on('ready', function() {
       'omegaup-problem-versions': problem_Versions,
     },
   });
-  API.Problem.versions({ problem_alias: problemAlias })
+  api.Problem.versions({ problem_alias: problemAlias })
     .then(function(result) {
       problemVersions.log = result.log;
       for (const revision of result.log) {
@@ -322,7 +182,7 @@ OmegaUp.on('ready', function() {
               solutionEdit.updateAndRefresh(solutions[language]);
               return;
             }
-            API.Problem.solution({
+            api.Problem.solution({
               problem_alias: problemAlias,
               lang: language,
             })
@@ -345,7 +205,7 @@ OmegaUp.on('ready', function() {
               if (solutions[lang] === solutionEdit.solutions[lang]) continue;
               promises.push(
                 new Promise(function(resolve, reject) {
-                  API.Problem.updateSolution({
+                  api.Problem.updateSolution({
                     problem_alias: problemAlias,
                     solution: solutions[lang],
                     message: commitMessage,
@@ -391,7 +251,7 @@ OmegaUp.on('ready', function() {
       },
       getInitialContents() {
         let self = this;
-        API.Problem.solution({
+        api.Problem.solution({
           problem_alias: problemAlias,
         })
           .then(function(response) {
@@ -458,6 +318,7 @@ OmegaUp.on('ready', function() {
       $('.slow-warning').show();
     }
   }
+  problemCallback(payload);
 
   $('#statement-preview-link').on('show.bs.tab', function(e) {
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#wmd-preview').get(0)]);
@@ -465,7 +326,7 @@ OmegaUp.on('ready', function() {
 
   $('#statement-language').on('change', function(e) {
     chosenLanguage = $('#statement-language').val();
-    API.Problem.details({
+    api.Problem.details({
       problem_alias: problemAlias,
       statement_type: 'markdown',
       show_solvers: false,

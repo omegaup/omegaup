@@ -1,6 +1,6 @@
 import admin_Support from '../components/admin/Support.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -21,7 +21,7 @@ OmegaUp.on('ready', function() {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
-            API.User.extraInformation({ email: email })
+            api.User.extraInformation({ email: email })
               .then(function(data) {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'verify-user': function(email) {
-            API.User.verifyEmail({ usernameOrEmail: email })
+            api.User.verifyEmail({ usernameOrEmail: email })
               .then(function() {
                 adminSupport.verified = true;
                 UI.success(T.userVerified);
@@ -41,7 +41,7 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           'generate-token': function(email) {
-            API.Reset.generateToken({
+            api.Reset.generateToken({
               email: email,
             })
               .then(function(data) {

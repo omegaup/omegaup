@@ -941,6 +941,8 @@ CREATE TABLE `User_Rank` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `school_id` int DEFAULT NULL,
+  `author_score` double NOT NULL DEFAULT '0',
+  `author_ranking` int DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `rank` (`ranking`),

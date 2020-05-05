@@ -15,8 +15,8 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
         $courseAlias = $courseData['course_alias'];
 
-        $updatedStartTime = $courseData['request']['start_time'] + 10;
-        $updatedFinishTime = $courseData['request']['start_time'] + 20;
+        $updatedStartTime = $courseData['request']['start_time']->time + 10;
+        $updatedFinishTime = $courseData['request']['start_time']->time + 20;
 
         \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -32,11 +32,11 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
-            'course' => $courseAlias
+            'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']);
-        $this->assertEquals($updatedFinishTime, $response['finish_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']->time);
+        $this->assertEquals($updatedFinishTime, $response['finish_time']->time);
 
         $this->assertEquals('some new name', $response['name']);
         $this->assertEquals(
@@ -59,7 +59,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
         $courseAlias = $courseData['course_alias'];
 
-        $updatedStartTime = $courseData['request']['start_time'] + 10;
+        $updatedStartTime = $courseData['request']['start_time']->time + 10;
 
         try {
             // Try to set unlimited duration to assignment
@@ -105,10 +105,10 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
-            'course' => $courseAlias
+            'course' => $courseAlias,
         ]));
 
-        $this->assertEquals($updatedStartTime, $response['start_time']);
+        $this->assertEquals($updatedStartTime, $response['start_time']->time);
         $this->assertNull($response['finish_time']);
     }
 
@@ -169,8 +169,8 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
                 'course' => $courseData['course_alias'],
-                'start_time' => $courseData['request']['start_time'] + 10,
-                'finish_time' => $courseData['request']['start_time'] + 9,
+                'start_time' => $courseData['request']['start_time']->time + 10,
+                'finish_time' => $courseData['request']['start_time']->time + 9,
             ]));
 
             $this->fail(
@@ -233,8 +233,8 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => $response['assignments'][0]['name'],
                 'assignment' => $response['assignments'][0]['alias'],
                 'description' => $response['assignments'][0]['description'],
-                'start_time' => $response['assignments'][0]['start_time'] + 240,
-                'finish_time' => $response['assignments'][0]['finish_time'] + 240,
+                'start_time' => $response['assignments'][0]['start_time']->time + 240,
+                'finish_time' => $response['assignments'][0]['finish_time']->time + 240,
                 'assignment_type' => $response['assignments'][0]['assignment_type'],
             ]));
             $this->fail(
@@ -249,7 +249,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $responseArray['errorname']
             );
             $this->assertEquals(
-                $courseData['course']->finish_time,
+                $courseData['course']->finish_time->time,
                 $responseArray['payload']['upper_bound']
             );
         }
@@ -321,8 +321,8 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Updating finish time to let participants create runs
-        $updatedStartTime = $courseData['request']['start_time'];
-        $updatedFinishTime = $courseData['request']['start_time'] + 160;
+        $updatedStartTime = $courseData['request']['start_time']->time;
+        $updatedFinishTime = $courseData['request']['start_time']->time + 160;
 
         // Login
         $login = self::login($courseData['admin']);

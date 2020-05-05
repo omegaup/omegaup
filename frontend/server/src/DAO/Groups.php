@@ -55,7 +55,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * Returns all groups that a user can manage.
      * @param int $userId
      * @param int $identityId
-     * @return list<array{alias: string, create_time: int, description: null|string, name: string}>
+     * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
      */
     final public static function getAllGroupsAdminedByUser(
         int $userId,
@@ -66,7 +66,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         $sql = '
             SELECT
                 DISTINCT g.alias,
-                UNIX_TIMESTAMP(g.create_time) AS create_time,
+                g.create_time,
                 g.description,
                 g.name,
                 g.group_id
@@ -87,7 +87,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             ORDER BY
                 g.group_id DESC;';
 
-        /** @var list<array{alias: string, create_time: int, description: null|string, group_id: int, name: string}> */
+        /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
             $userId,
             \OmegaUp\Authorization::ADMIN_ROLE,

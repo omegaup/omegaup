@@ -49,8 +49,8 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['access_time'])) {
             /**
-             * @var string|int|float $data['access_time']
-             * @var int $this->access_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['access_time']
+             * @var \OmegaUp\Timestamp $this->access_time
              */
             $this->access_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -60,8 +60,8 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['end_time'])) {
             /**
-             * @var string|int|float $data['end_time']
-             * @var int $this->end_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['end_time']
+             * @var \OmegaUp\Timestamp $this->end_time
              */
             $this->end_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -115,14 +115,14 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
     /**
      * Hora a la que entró el usuario al concurso
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $access_time = null;
 
     /**
      * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
      *
-     * @var int|null
+     * @var \OmegaUp\Timestamp|null
      */
     public $end_time = null;
 

@@ -4,10 +4,10 @@ namespace OmegaUp;
 
 class ActivityReport {
     /**
-     * @param list<array{alias?: string, classname?: string, ip: int, time: int, username: string}> $accesses
-     * @param list<array{alias?: string, classname?: string, ip: int, time: int, username: string}> $submissions
+     * @param list<array{alias?: string, classname?: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $accesses
+     * @param list<array{alias?: string, classname?: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $submissions
      *
-     * @return list<array{username: string, ip: int, time: int, classname?: string, alias?: string}>
+     * @return list<array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>
      */
     final public static function getActivityReport(
         array $accesses,
@@ -63,9 +63,9 @@ class ActivityReport {
     }
 
     /**
-     * @param array{username: string, ip: int, time: int, classname?: string, alias?: string} $data
+     * @param array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string} $data
      * @param bool $isSubmission
-     * @return array{username: string, classname?: string, time: int, ip: int, event: array{name: string, problem?: string}}
+     * @return array{username: string, classname?: string, time: \OmegaUp\Timestamp, ip: int, event: array{name: string, problem?: string}}
      */
     private static function processData(
         array $data,
@@ -74,7 +74,7 @@ class ActivityReport {
         return [
             'username' => $data['username'],
             'classname' => $data['classname'] ?? 'user-rank-unranked',
-            'time' => intval($data['time']),
+            'time' => $data['time'],
             'ip' => intval($data['ip']),
             'event' => $isSubmission ?
                 [

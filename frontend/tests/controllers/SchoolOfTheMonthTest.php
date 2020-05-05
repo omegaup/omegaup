@@ -60,7 +60,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -70,7 +70,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -80,7 +80,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -90,7 +90,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -100,7 +100,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -110,7 +110,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -120,7 +120,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -130,7 +130,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         // Now solve more problems:
@@ -143,7 +143,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -153,7 +153,7 @@ class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
         \OmegaUp\Test\Factories\Run::updateRunTime(
             $runData['response']['guid'],
-            strtotime($runDate)
+            new \OmegaUp\Timestamp(strtotime($runDate))
         );
     }
 

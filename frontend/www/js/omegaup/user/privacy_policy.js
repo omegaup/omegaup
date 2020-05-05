@@ -2,7 +2,7 @@ import Vue from 'vue';
 import user_Privacy_Policy from '../components/user/PrivacyPolicy.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', function() {
@@ -18,7 +18,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           submit: function(ev) {
-            API.User.acceptPrivacyPolicy({
+            api.User.acceptPrivacyPolicy({
               privacy_git_object_id: payload.git_object_id,
               statement_type: payload.statement_type,
             })

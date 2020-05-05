@@ -1,5 +1,5 @@
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
@@ -41,7 +41,7 @@ OmegaUp.on('ready', function() {
             if (ev.quality !== '') {
               contents.quality = Number.parseInt(ev.quality, 10);
             }
-            API.QualityNomination.create({
+            api.QualityNomination.create({
               problem_alias: qualityPayload.problem_alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
@@ -52,7 +52,7 @@ OmegaUp.on('ready', function() {
             if (!ev.solved && ev.tried) {
               contents.before_ac = true;
             }
-            API.QualityNomination.create({
+            api.QualityNomination.create({
               problem_alias: qualityPayload.problem_alias,
               nomination: 'dismissal',
               contents: JSON.stringify(contents),

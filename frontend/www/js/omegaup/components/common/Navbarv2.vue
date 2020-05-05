@@ -234,7 +234,7 @@
                       <div
                         class="progress-bar progress-bar-striped bg-info"
                         role="progressbar"
-                        v-bind:style="{ width: `${profileProgress}px` }"
+                        v-bind:style="{ width: `${profileProgress}%` }"
                         v-bind:aria-valuenow="profileProgress"
                         aria-valuemin="0"
                         aria-valuemax="100"

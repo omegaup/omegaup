@@ -68,6 +68,11 @@
                   iconTitleForProblem(problem.quality_seal, problem.visibility)
                 "
               ></span>
+              <span
+                v-if="problem.visibility == -1"
+                v-bind:class="`glyphicon glyphicon-eye-close`"
+                v-bind:title="T.wordsPrivate"
+              ></span>
               <div class="tag-list" v-if="problem.tags.length">
                 <a
                   v-bind:class="`tag tag-${tag.source}`"
@@ -194,6 +199,8 @@ export default class ProblemList extends Vue {
 
   iconClassForProblem(qualitySeal: boolean, visibility: number): string {
     if (qualitySeal || visibility == 3) return 'omegaup-quality-badge';
+    else if (visibility == 1 || visibility == -1)
+      return 'glyphicon-warning-sign';
     else if (visibility <= -2) return 'glyphicon-ban-circle';
     else if (visibility == 0) return 'glyphicon-eye-close';
     return '';
@@ -201,6 +208,7 @@ export default class ProblemList extends Vue {
 
   iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
     if (qualitySeal || visibility == 3) return T.wordsHighQualityProblem;
+    else if (visibility == 1 || visibility == -1) return T.wordsWarningProblem;
     else if (visibility <= -3) return T.wordsBannedProblem;
     else if (visibility == 0) return T.wordsPrivate;
     return '';
