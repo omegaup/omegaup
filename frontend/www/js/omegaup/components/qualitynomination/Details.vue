@@ -83,12 +83,12 @@
           </div>
           <div
             class="row"
-            v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true"
+            v-if="this.nomination == 'demotion' && this.reviewer == true"
           >
             <div class="col-sm-3">
               <strong>{{ T.wordsVerdict }}</strong>
             </div>
-            <div class="col-sm-8 button-group">
+            <div class="col-sm-8 text-center">
               <button
                 class="btn btn-danger"
                 v-bind:disabled="!rationale"
@@ -116,11 +116,11 @@
       </div>
     </div>
     <omegaup-common-confirmation
-      v-if="confirmationShow"
+      v-if="showConfirmation"
       v-bind:question="T.demotionProblemMultipleQuestion"
       v-bind:answer-yes="T.demotionProblemMultipleAnswerYes"
       v-bind:answer-no="T.demotionProblemMultipleAnswerNo"
-      v-on:close="confirmationShow = false"
+      v-on:close="showConfirmation = false"
       v-on:yes="markResolution(true)"
       v-on:no="markResolution(false)"
     ></omegaup-common-confirmation>
@@ -157,7 +157,7 @@ export default class QualityNominationDetails extends Vue {
 
   T = T;
   rationale = this.initialRationale;
-  confirmationShow = false;
+  showConfirmation = false;
   status = 'banned';
 
   userUrl(alias: string): string {
@@ -169,13 +169,13 @@ export default class QualityNominationDetails extends Vue {
   }
 
   markResolution(all: boolean): void {
-    this.confirmationShow = false;
+    this.showConfirmation = false;
     this.$emit('mark-resolution', this, this.status, all);
   }
 
   showConfirmationDialog(status: string): void {
     this.status = status;
-    this.confirmationShow = true;
+    this.showConfirmation = true;
   }
 }
 </script>
@@ -183,13 +183,5 @@ export default class QualityNominationDetails extends Vue {
 <style>
 textarea {
   margin: 0 0 10px;
-}
-
-.button-group {
-  text-align: center;
-}
-
-.alert {
-  margin-top: 30px;
 }
 </style>

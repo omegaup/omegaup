@@ -8,7 +8,7 @@ import * as UI from '../ui';
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
   let viewDetails = new Vue({
-    el: '#qualitynomination-details',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
