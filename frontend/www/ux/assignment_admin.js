@@ -19,7 +19,7 @@ omegaup.OmegaUp.on('ready', function() {
   $('#root').fadeIn('slow');
 
   Highcharts.setOptions({ global: { useUTC: false } });
-  omegaup.API.Course.getAssignment({
+  omegaup.API.Course.assignmentDetails({
     course: arenaInstance.options.courseAlias,
     assignment: arenaInstance.options.assignmentAlias,
   })

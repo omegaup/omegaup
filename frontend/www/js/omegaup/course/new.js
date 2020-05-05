@@ -1,6 +1,6 @@
 import course_Form from '../components/course/Form.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
@@ -23,7 +23,7 @@ OmegaUp.on('ready', function() {
               if (ev.school_id) {
                 accept(ev.school_id);
               } else if (ev.school_name) {
-                API.School.create({ name: ev.school_name })
+                api.School.create({ name: ev.school_name })
                   .then(data => {
                     accept(data.school_id);
                   })
@@ -50,7 +50,7 @@ OmegaUp.on('ready', function() {
                   params.finish_time = ev.finishTime.getTime() / 1000;
                 }
 
-                API.Course.create(params)
+                api.Course.create(params)
                   .then(() => {
                     window.location.replace(
                       '/course/' + ev.alias + '/edit/#assignments',

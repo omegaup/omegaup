@@ -483,6 +483,33 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * This function gets contents of QualityNomination table
      *
+     * @return list<\OmegaUp\DAO\VO\QualityNominations>
+     */
+    public static function getAllDemotionsForProblem(int $problemId): array {
+        $sql = '
+            SELECT
+                *
+            FROM
+                QualityNominations
+            WHERE
+                nomination = "demotion" AND
+                problem_id = ?;
+        ';
+        /** @var list<array{contents: string, nomination: string, problem_id: int, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, user_id: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId]
+        );
+
+        $nominations = [];
+        foreach ($rs as $row) {
+            $nominations[] = new \OmegaUp\DAO\VO\QualityNominations($row);
+        }
+        return $nominations;
+    }
+    /**
+     * This function gets contents of QualityNomination table
+     *
      * @return list<array{contents: string}>
      */
     public static function getAllSuggestionsPerProblem(int $problemId): array {
