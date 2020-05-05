@@ -109,7 +109,7 @@
       </div>
       <input
         type="hidden"
-        name="wmd-input"
+        name="contents"
         v-bind:value="JSON.stringify(this.statements)"
       />
       <input type="hidden" name="directory" v-bind:value="markdownType" />
@@ -132,7 +132,7 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class ProblemStatementEdit extends Vue {
-  @Ref() readonly preview!: HTMLElement;
+  @Ref() readonly preview!: HTMLDivElement;
   @Prop() alias!: string;
   @Prop() title!: string;
   @Prop() source!: string;
@@ -191,6 +191,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
     if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
 
     this.$emit(

@@ -40,54 +40,7 @@ OmegaUp.on('ready', function() {
   var problemAlias = $('#problem-alias').val();
 
   // Add typeaheads
-  refreshProblemAdmins();
-  typeahead.userTypeahead($('#username-admin'));
-  typeahead.groupTypeahead($('#groupalias-admin'), (event, val) =>
-    $(event.target).attr('data-alias', val.value),
-  );
-
   typeahead.tagTypeahead($('input[name=tag_name]'));
-
-  $('#add-admin-form').on('submit', function() {
-    var username = $('#username-admin').val();
-
-    api.Problem.addAdmin({
-      problem_alias: problemAlias,
-      usernameOrEmail: username,
-    })
-      .then(function(response) {
-        ui.success(T.adminAdded);
-        $('div.post.footer').show();
-        refreshProblemAdmins();
-      })
-      .catch(ui.apiError);
-
-    return false; // Prevent refresh
-  });
-
-  $('#toggle-site-admins').on('change', function() {
-    if ($(this).is(':checked')) {
-      $('#problem-admins .site-admin').show();
-    } else {
-      $('#problem-admins .site-admin').hide();
-    }
-  });
-
-  $('#add-group-admin-form').on('submit', function() {
-    api.Problem.addGroupAdmin({
-      problem_alias: problemAlias,
-      group: $('#groupalias-admin').attr('data-alias'),
-    })
-      .then(function(response) {
-        ui.success(T.groupAdminAdded);
-        $('div.post.footer').show();
-
-        refreshProblemAdmins();
-      })
-      .catch(ui.apiError);
-
-    return false; // Prevent refresh
-  });
 
   $('#download form').on('submit', function() {
     window.location = `/api/problem/download/problem_alias/${ui.escape(
@@ -105,99 +58,6 @@ OmegaUp.on('ready', function() {
       .catch(ui.apiError);
     return false;
   });
-
-  function refreshProblemAdmins() {
-    api.Problem.admins({ problem_alias: problemAlias })
-      .then(function(admins) {
-        $('#problem-admins').empty();
-        // Got the contests, lets populate the dropdown with them
-        for (var i = 0; i < admins.admins.length; i++) {
-          var admin = admins.admins[i];
-          var siteAdmin = admin.role == 'site-admin' ? admin.role : '';
-          $('#problem-admins').append(
-            $('<tr></tr>')
-              .addClass(siteAdmin)
-              .append(
-                $('<td></td>').append(
-                  $('<a></a>')
-                    .attr('href', '/profile/' + admin.username + '/')
-                    .text(admin.username),
-                ),
-              )
-              .append($('<td></td>').text(admin.role))
-              .append(
-                admin.role != 'admin'
-                  ? $('<td></td>')
-                  : $(
-                      '<td><button type="button" class="close">' +
-                        '&times;</button></td>',
-                    ).on(
-                      'click',
-                      (function(username) {
-                        return function(e) {
-                          api.Problem.removeAdmin({
-                            problem_alias: problemAlias,
-                            usernameOrEmail: username,
-                          })
-                            .then(function(response) {
-                              ui.success(T.adminRemoved);
-                              $('div.post.footer').show();
-                              var tr = e.target.parentElement.parentElement;
-                              $(tr).remove();
-                            })
-                            .catch(ui.apiError);
-                        };
-                      })(admin.username),
-                    ),
-              ),
-          );
-        }
-        $('#problem-group-admins').empty();
-        // Got the contests, lets populate the dropdown with them
-        for (var i = 0; i < admins.group_admins.length; i++) {
-          var group_admin = admins.group_admins[i];
-          $('#problem-group-admins').append(
-            $('<tr></tr>')
-              .append(
-                $('<td></td>').append(
-                  $('<a></a>')
-                    .attr('href', '/group/' + group_admin.alias + '/edit/')
-                    .text(group_admin.name),
-                ),
-              )
-              .append($('<td></td>').text(group_admin.role))
-              .append(
-                group_admin.role != 'admin'
-                  ? $('<td></td>')
-                  : $(
-                      '<td><button type="button" class="close">' +
-                        '&times;</button></td>',
-                    ).on(
-                      'click',
-                      (function(alias) {
-                        return function(e) {
-                          api.Problem.removeGroupAdmin({
-                            problem_alias: problemAlias,
-                            group: alias,
-                          })
-                            .then(function(response) {
-                              ui.success(T.groupAdminRemoved);
-                              $('div.post.footer').show();
-                              var tr = e.target.parentElement.parentElement;
-                              $(tr).remove();
-                            })
-                            .catch(ui.apiError);
-                        };
-                      })(group_admin.alias),
-                    ),
-              ),
-          );
-        }
-
-        $('#problem-admins .site-admin').hide();
-      })
-      .catch(ui.apiError);
-  }
 
   const problemVersions = new Vue({
     el: '#version div.panel div',
@@ -422,9 +282,15 @@ OmegaUp.on('ready', function() {
       markdownPreview: '',
       markdownEditor: null,
       initialLanguage: null,
-      username: null,
-      name: null,
-      classname: null,
+      username: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.username
+        : null,
+      name: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.name
+        : null,
+      classname: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.classname
+        : null,
       statements: {},
     },
     methods: {
@@ -439,11 +305,6 @@ OmegaUp.on('ready', function() {
         const lang = markdownPayload.statement.language;
         self.initialLanguage = lang;
         self.statements[lang] = markdownPayload.statement.markdown;
-        if (markdownPayload.problemsetter) {
-          self.username = markdownPayload.problemsetter.username;
-          self.name = markdownPayload.problemsetter.name;
-          self.classname = markdownPayload.problemsetter.classname;
-        }
         self.updateAndRefresh(markdownPayload.statement.markdown);
       },
     },

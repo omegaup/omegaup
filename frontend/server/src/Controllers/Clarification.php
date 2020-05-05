@@ -170,7 +170,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $r->ensureInt('clarification_id');
-        $r->ensureBool('public', false /* not required */);
+        $r->ensureOptionalBool('public');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['answer'],
             'answer'

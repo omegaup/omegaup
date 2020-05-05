@@ -2564,10 +2564,10 @@ Returns all problem administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name           | Type                        |
+| -------------- | --------------------------- |
+| `admins`       | `types.ProblemAdmin[]`      |
+| `group_admins` | `types.ProblemGroupAdmin[]` |
 
 ## `/api/problem/bestScore/`
 
@@ -2580,7 +2580,6 @@ Returns the best score for a problem
 | Name             | Type    | Description |
 | ---------------- | ------- | ----------- |
 | `contest_alias`  | `mixed` |             |
-| `lang`           | `mixed` |             |
 | `problem_alias`  | `mixed` |             |
 | `problemset_id`  | `mixed` |             |
 | `statement_type` | `mixed` |             |
@@ -3010,7 +3009,6 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
-| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |

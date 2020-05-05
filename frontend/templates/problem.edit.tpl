@@ -39,61 +39,9 @@
   </div>
 
   <div class="tab-pane" id="admins">
-    <div class="panel panel-primary">
-      <div class="panel-body">
-        <form class="form" id="add-admin-form">
-          <div class="form-group">
-            <label for="username-admin">{#wordsAdmin#}</label>
-            <input id="username-admin" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
-          </div>
-
-          <div class="form-group">
-            <div class="col-xs-5 col-sm-3 col-md-3 action-container">
-              <button class="btn btn-primary" type="submit">{#wordsAddAdmin#}</button>
-            </div>
-            <div class="col-xs-7 col-sm-9 col-md-9 toggle-container">
-              <input type="checkbox" name="toggle-site-admins" id="toggle-site-admins">
-              <label for="toggle-site-admins">{#wordsShowSiteAdmins#}</label>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{#contestEditRegisteredAdminUsername#}</th>
-            <th>{#contestEditRegisteredAdminRole#}</th>
-            <th>{#contestEditRegisteredAdminDelete#}</th>
-          </tr>
-        </thead>
-        <tbody id="problem-admins"></tbody>
-      </table>
-    </div>
-
-    <div class="panel panel-primary">
-      <div class="panel-body">
-        <form class="form" id="add-group-admin-form">
-          <div class="form-group">
-            <label for="groupalias-admin">{#wordsGroupAdmin#}</label>
-            <input id="groupalias-admin" name="name" value="" type="text" size="20" class="form-control" autocomplete="off" />
-          </div>
-
-          <button class="btn btn-primary" type='submit'>{#contestAddgroupAddGroup#}</button>
-        </form>
-      </div>
-
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{#contestEditRegisteredGroupAdminName#}</th>
-            <th>{#contestEditRegisteredAdminRole#}</th>
-            <th>{#contestEditRegisteredAdminDelete#}</th>
-          </tr>
-        </thead>
-        <tbody id="problem-group-admins"></tbody>
-      </table>
-    </div>
+    <div id="problem-admins"></div>
+    <script type="text/json" id="problem-admins-payload">{$problemAdminsPayload|json_encode}</script>
+    {js_include entrypoint="problem_admins"}
   </div>
 
   <div class="tab-pane" id="version">

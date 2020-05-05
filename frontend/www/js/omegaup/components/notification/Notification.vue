@@ -11,7 +11,12 @@
     </div>
     <div class="d-flex align-items-center pt-1">
       <img class="d-block" width="80" v-bind:src="iconUrl" />
-      <div>
+      <div v-if="url">
+        <a v-bind:href="url">
+          {{ text }}
+        </a>
+      </div>
+      <div v-else>
         {{ text }}
       </div>
     </div>
@@ -50,6 +55,8 @@ export default class Notification extends Vue {
         } else {
           return '/media/warning.svg';
         }
+      case 'general_notification':
+        return '/media/email.svg';
       default:
         return 'media/info.png';
     }
@@ -63,6 +70,23 @@ export default class Notification extends Vue {
         });
       case 'demotion':
         return this.notification.contents.message || '';
+      case 'general_notification':
+        return this.notification.contents.message || '';
+      default:
+        return '';
+    }
+  }
+
+  get url(): string {
+    switch (this.notification.contents.type) {
+      case 'general_notification':
+        return this.notification.contents.url || '';
+      case 'badge':
+        // TODO: Add link to badge page.
+        return '';
+      case 'demotion':
+        // TODO: Add link to problem page.
+        return '';
       default:
         return '';
     }
