@@ -109,6 +109,12 @@
         <div class="d-none d-md-block">
           <ul class="m-0">
             <li>
+              <a
+                href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+                >{{ T.frontPageFooterCodeConduct }}</a
+              >
+            </li>
+            <li>
               <a href="https://blog.omegaup.com/privacy-policy/">{{
                 T.frontPageFooterPrivacyPolicy
               }}</a>
