@@ -1,0 +1,3 @@
+ALTER TABLE
+    `User_Rank`
+MODIFY COLUMN `ranking` INT DEFAULT NULL;
