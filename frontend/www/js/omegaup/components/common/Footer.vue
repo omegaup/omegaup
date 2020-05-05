@@ -88,6 +88,12 @@
         <div class="menu">
           <ul>
             <li>
+              <a
+                href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+                >{{ T.frontPageFooterCodeConduct }}</a
+              >
+            </li>
+            <li>
               <a href="https://blog.omegaup.com/privacy-policy/">{{
                 T.frontPageFooterPrivacyPolicy
               }}</a>

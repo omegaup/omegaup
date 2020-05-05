@@ -550,6 +550,7 @@ export namespace types {
     badge?: string;
     message?: string;
     status?: string;
+    url?: string;
   }
 
   export interface PageItem {
