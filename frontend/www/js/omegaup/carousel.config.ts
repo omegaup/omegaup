@@ -52,11 +52,11 @@ const carouselConfig: {
     },
     description: {
       en:
-        'Join the Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+        'Join the free Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
       es:
-        'Apúntate al curso de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+        'Apúntate al curso gratuito de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
       pt:
-        'Participe do curso Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+        'Participe do curso gratuito de Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
     },
     button: {
       text: {
