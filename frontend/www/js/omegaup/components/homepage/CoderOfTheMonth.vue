@@ -53,7 +53,9 @@
     <div class="card-footer">
       <a
         v-bind:href="
-          category == 'female' ? '/coderofthemonth/female' : /coderofthemonth/
+          category == 'female'
+            ? '/coderofthemonth/female/'
+            : '/coderofthemonth/'
         "
         >{{ T.coderOfTheMonthFullList }}</a
       >
