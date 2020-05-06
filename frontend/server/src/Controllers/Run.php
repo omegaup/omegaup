@@ -875,29 +875,40 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             $response['judged_by'] = strval($run->judged_by);
         }
-        $responseSize = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::DATA_CASES_SIZE,
-            "{$problem->alias}-{$problem->commit}",
-            /** @return int */
-            function () use ($problem, $run) {
-                if (is_null($problem->alias)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'problemNotFound'
-                    );
+
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias,
+            $problem->commit
+        );
+
+        $cases = self::getCases(
+            $problemArtifacts,
+            'cases',
+            $problem->alias,
+            $problem->commit
+        );
+        /** @var int $responseSize */
+        $responseSize = array_reduce(
+            $cases,
+            /**
+             * @param array{mode: int, type: string, id: string, size: int, path: string} $case
+             */
+            function (?int $sum, $case): int {
+                if (is_null($sum)) {
+                    return $case['size'];
                 }
-                return self::getCasesSize($problem->alias, $problem->commit);
-            },
-            24 * 60 * 60 /*expire in 1 day*/
+                $sum += $case['size'];
+                return $sum;
+            }
         );
 
         if (
             $problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS
-            && $responseSize < 4000 // Forcing to hide diffs when inputs/outpus exceeds 4kb
+            || $responseSize > 4096 // Forcing to hide diffs when inputs/outpus exceed 4kb
         ) {
             $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
             return $response;
         }
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
             $dataCases = self::getProblemCases(
                 $problemArtifacts,
@@ -919,36 +930,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ONLY_EXAMPLE_DIFF;
 
         return $response;
-    }
-
-    private static function getCasesSize(
-        string $problemAlias,
-        string $commit
-    ): int {
-        $ch = curl_init();
-        curl_setopt(
-            $ch,
-            CURLOPT_URL,
-            OMEGAUP_GITSERVER_URL . "/{$problemAlias}/+/{$commit}/"
-        );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        $headers = [];
-        $headers[] = \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
-            $problemAlias,
-            'omegaup:system'
-        );
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        /** @var int */
-        $size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-        if (curl_errno($ch)) {
-            echo 'Error:' . curl_error($ch);
-        }
-        curl_close($ch);
-        return intval($size);
     }
 
     /**
@@ -982,6 +963,26 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return list<array{mode: int, type: string, id: string, size: int, path: string}>
+     */
+    private static function getCases(
+        \OmegaUp\ProblemArtifacts $problemArtifacts,
+        string $directory,
+        string $problemAlias,
+        ?string $version
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_FILES,
+            "{$problemAlias}-{$version}-{$directory}",
+            /** @return list<array{id: string, mode: int, path: string, size: int, type: string}> */
+            function () use ($problemArtifacts, $directory) {
+                return $problemArtifacts->lsTreeRecursive($directory);
+            },
+            24 * 60 * 60 /*expire in 1 day*/
+        );
+    }
+
+    /**
      * @return ProblemCases
      */
     private static function getProblemCasesImpl(
@@ -990,14 +991,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         string $problemAlias,
         ?string $version
     ): array {
-        $existingCases = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::DATA_CASES_FILES,
-            "{$problemAlias}-{$version}-{$directory}",
-            /** @return list<array{path: string, mode: int, id: string, type: string}> */
-            function () use ($problemArtifacts, $directory) {
-                return $problemArtifacts->lsTreeRecursive($directory);
-            },
-            24 * 60 * 60 /*expire in 1 day*/
+        $existingCases = self::getCases(
+            $problemArtifacts,
+            $directory,
+            $problemAlias,
+            $version
         );
         $response = [];
         foreach ($existingCases as $file) {
