@@ -463,6 +463,10 @@ export const Contest = {
     messages.ContestScoreboardMergeRequest,
     messages.ContestScoreboardMergeResponse
   >('/api/contest/scoreboardMerge/'),
+  searchUsers: apiCall<
+    messages.ContestSearchUsersRequest,
+    messages.ContestSearchUsersResponse
+  >('/api/contest/searchUsers/'),
   setRecommended: apiCall<
     messages.ContestSetRecommendedRequest,
     messages.ContestSetRecommendedResponse

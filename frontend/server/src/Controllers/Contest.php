@@ -3415,6 +3415,49 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Search users in contest
+     *
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $contest_alias
+     *
+     * @return list<array{label: string, value: string}>
+     */
+    public static function apiSearchUsers(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
+
+        if (!is_string($r['query'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
+        }
+        $param = $r['query'];
+
+        $users = \OmegaUp\DAO\ProblemsetIdentities::searchUsers(
+            $param,
+            intval($contest->problemset_id)
+        );
+        $response = [];
+        foreach ($users as $user) {
+            $response[] = [
+                'label' => $user['name'] ?? $user['username'],
+                'value' => $user['username'],
+            ];
+        }
+        return $response;
+    }
+
+    /**
      * Returns all contest administrators
      *
      * @omegaup-request-param mixed $contest_alias
