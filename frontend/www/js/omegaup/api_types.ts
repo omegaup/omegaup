@@ -972,7 +972,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
