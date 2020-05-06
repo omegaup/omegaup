@@ -8,7 +8,7 @@ import * as UI from '../ui';
 OmegaUp.on('ready', function() {
   let payload = JSON.parse(document.getElementById('payload').innerText);
   let viewDetails = new Vue({
-    el: '#qualitynomination-details',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
@@ -32,7 +32,7 @@ OmegaUp.on('ready', function() {
           initialRationale: payload.contents.rationale,
         },
         on: {
-          'mark-resolution': function(viewDetails, newStatus) {
+          'mark-resolution': function(viewDetails, newStatus, all) {
             if (!viewDetails.rationale) {
               UI.error(T.editFieldRequired);
               return;
@@ -42,6 +42,7 @@ OmegaUp.on('ready', function() {
               status: newStatus,
               qualitynomination_id: viewDetails.qualitynomination_id,
               rationale: viewDetails.rationale,
+              all: all,
             })
               .then(function(data) {
                 UI.success(T.qualityNominationResolutionSuccess);
