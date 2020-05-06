@@ -356,7 +356,8 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
-    driver.browser.find_element_by_tag_name('form').submit()
+    with driver.page_transition():
+        driver.browser.find_element_by_tag_name('form').submit()
 
 
 @util.annotate
