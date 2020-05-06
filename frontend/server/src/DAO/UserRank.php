@@ -85,7 +85,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}> */
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int|null, score: float, user_id: int, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sql}{$sqlFrom}{$sqlLimit}",
             $params
