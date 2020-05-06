@@ -15,16 +15,23 @@
           {{ T.contestNewFormConacupStyle }}
         </button>
       </div>
-      <form class="new_contest_form" v-on:submit.prevent="onSubmit">
+      <form class="contest-form" v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
-            <input class="form-control" size="30" type="text" v-model="title" />
+            <input
+              class="form-control"
+              name="title"
+              size="30"
+              type="text"
+              v-model="title"
+            />
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
             <input
               class="form-control"
+              name="alias"
               v-bind:disabled="update"
               type="text"
               v-model="alias"
@@ -55,6 +62,7 @@
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
               class="form-control"
+              name="description"
               cols="30"
               rows="10"
               v-model="description"
@@ -83,6 +91,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               class="form-control scoreboard-time-percent"
+              name="scoreboard"
               size="3"
               type="text"
               v-model="scoreboard"
