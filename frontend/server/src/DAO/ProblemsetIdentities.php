@@ -128,7 +128,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
-     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string}>
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string, name: string}>
      */
     public static function searchUsers(
         string $usernameOrName,
@@ -136,6 +136,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     ): array {
         $sql = 'SELECT DISTINCT
                     i.username,
+                    i.name,
                     i.country_id,
                     pi.access_time,
                     pi.end_time
@@ -158,7 +159,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                         i.name LIKE CONCAT("%", ?, "%")
                     );';
 
-        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string}> */
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [

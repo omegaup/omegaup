@@ -1220,7 +1220,7 @@ Gets the accomulative scoreboard for an array of contests
 
 ### Description
 
-Searchs users in contest
+Search users in contest
 
 ### Parameters
 

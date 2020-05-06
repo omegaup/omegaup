@@ -3415,7 +3415,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Searchs users in contest
+     * Search users in contest
      *
      * @omegaup-request-param mixed $query
      * @omegaup-request-param mixed $contest_alias
@@ -3435,15 +3435,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        $param = '';
-        if (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        if (!is_string($r['query'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
             );
         }
+        $param = $r['query'];
 
         $users = \OmegaUp\DAO\ProblemsetIdentities::searchUsers(
             $param,
@@ -3452,7 +3450,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($users as $user) {
             $response[] = [
-                'label' => $user['username'],
+                'label' => $user['name'] ?? $user['username'],
                 'value' => $user['username'],
             ];
         }
