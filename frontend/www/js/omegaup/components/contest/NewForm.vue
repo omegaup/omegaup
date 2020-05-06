@@ -4,7 +4,7 @@
       <h3 class="panel-title">{{ T.contestNew }}</h3>
     </div>
     <div class="panel-body">
-      <div class="btn-group bottom-margin" v-if="update">
+      <div class="btn-group bottom-margin">
         <button class="btn btn-default" v-on:click="fillOmi()">
           {{ T.contestNewFormOmiStyle }}
         </button>
@@ -25,7 +25,7 @@
             <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
             <input
               class="form-control"
-              disabled="update"
+              v-bind:disabled="update"
               type="text"
               v-model="alias"
             />
@@ -98,7 +98,6 @@
               size="2"
               type="text"
               v-model="submissionsGap"
-              value="1"
             />
             <p class="help-block">
               {{ T.contestNewFormSubmissionsSeparationDesc }}
@@ -243,7 +242,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -256,32 +255,50 @@ import DateTimePicker from '../DateTimePicker.vue';
 export default class NewForm extends Vue {
   @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
+  @Prop() allLanguages!: string[];
+  @Prop() initialStartTime!: Date;
+  @Prop() initialFinishTime!: Date;
 
   T = T;
-  alias = this.data.alias;
-  availableLanguages = this.data.available_languages;
-  contest = this.data;
-  contestantMustRegister = this.data.contestant_must_register;
-  description = this.data.description;
-  feedback = this.data.feedback;
-  finishTime = this.data.finish_time;
-  scoreboard = this.data.scoreboard;
-  languages = this.data.languages;
-  needsBasicInformation = this.data.needs_basic_information;
-  penalty = this.data.penalty;
-  penaltyType = this.data.penalty_type;
-  penaltyCalcPolicy = this.data.penalty_calc_policy;
-  pointsDecayFactor = this.data.points_decay_factor;
-  requestsUserInformation = this.data.requests_user_information;
-  startTime = this.data.start_time;
-  showPenalty = this.data.show_penalty;
-  showScoreboardAfter = this.data.show_scoreboard_after;
-  submissionsGap = this.data.submissions_gap;
-  title = this.data.title;
+  alias = this.data ? this.data.alias : null;
+  availableLanguages = this.data
+    ? this.data.available_languages
+    : this.allLanguages;
+  contest = this.data || null;
+  contestantMustRegister = this.data
+    ? this.data.contestant_must_register
+    : null;
+  description = this.data ? this.data.description : null;
+  feedback = this.data ? this.data.feedback : 'yes';
+  finishTime = this.data ? this.data.finish_time : this.initialFinishTime;
+  scoreboard = this.data ? this.data.scoreboard : 100;
+  languages = this.data ? this.data.languages : [];
+  needsBasicInformation = this.data ? this.data.needs_basic_information : null;
+  penalty = this.data ? this.data.penalty : 0;
+  penaltyType = this.data ? this.data.penalty_type : 'none';
+  penaltyCalcPolicy = this.data ? this.data.penalty_calc_policy : null;
+  pointsDecayFactor = this.data ? this.data.points_decay_factor : 0.0;
+  requestsUserInformation = this.data
+    ? this.data.requests_user_information
+    : 'no';
+  startTime = this.data ? this.data.start_time : this.initialStartTime;
+  showPenalty = this.data ? this.data.show_penalty : null;
+  showScoreboardAfter = this.data ? this.data.show_scoreboard_after : true;
+  submissionsGap =
+    this.data && this.data.submissions_gap ? this.data.submissions_gap / 60 : 1;
+  title = this.data ? this.data.title : null;
   titlePlaceHolder = '';
-  windowLength = this.data.window_length || 0;
-  windowLengthEnabled =
-    this.data.window_length != 0 && this.data.window_length != null;
+  windowLength = this.data ? this.data.window_length || 0 : null;
+  windowLengthEnabled = this.data
+    ? this.data.window_length != 0 && this.data.window_length != null
+    : false;
+
+  @Watch('windowLengthEnabled')
+  onPropertyChange(newValue: boolean): void {
+    if (!newValue) {
+      this.windowLength = null;
+    }
+  }
 
   fillOmi(): void {
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
@@ -323,11 +340,35 @@ export default class NewForm extends Vue {
   }
 
   onSubmit() {
-    this.$emit('emit-update-contest', this);
-  }
-
-  mounted() {
-    $('.selectpicker', this.$el).selectpicker();
+    if (this.update) {
+      this.$emit('emit-update-contest', this);
+      return;
+    }
+    this.$emit('create-contest', {
+      alias: this.alias,
+      title: this.title,
+      description: this.description,
+      start_time: this.startTime
+        ? this.startTime.getTime() / 1000
+        : this.initialStartTime.getTime() / 1000,
+      finish_time: this.finishTime
+        ? this.finishTime.getTime() / 1000
+        : this.initialFinishTime.getTime() / 1000,
+      window_length:
+        this.windowLength === null || !this.windowLengthEnabled
+          ? 0
+          : this.windowLength,
+      points_decay_factor: this.pointsDecayFactor,
+      submissions_gap: this.submissionsGap ? this.submissionsGap * 60 : 60,
+      languages: this.languages,
+      feedback: this.feedback,
+      penalty: this.penalty,
+      scoreboard: this.scoreboard,
+      penalty_type: this.penaltyType,
+      show_scoreboard_after: this.showScoreboardAfter,
+      basic_information: this.needsBasicInformation ? 1 : 0,
+      requests_user_information: this.requestsUserInformation,
+    });
   }
 }
 </script>

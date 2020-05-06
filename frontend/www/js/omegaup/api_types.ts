@@ -216,6 +216,14 @@ export namespace types {
       );
     }
 
+    export function ContestNewPayload(
+      elementId: string = 'payload',
+    ): types.ContestNewPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -470,6 +478,10 @@ export namespace types {
     };
     isLogged: boolean;
     query: string;
+  }
+
+  export interface ContestNewPayload {
+    languages: string[];
   }
 
   export interface CourseAssignment {
