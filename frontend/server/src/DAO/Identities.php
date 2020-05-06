@@ -73,7 +73,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 Identities i
             WHERE
                 i.username LIKE CONCAT('%', ?, '%') OR
-                i.username LIKE CONCAT('%', ?, '%')
+                i.name LIKE CONCAT('%', ?, '%')
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 

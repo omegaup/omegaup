@@ -253,6 +253,14 @@ export namespace types {
       );
     }
 
+    export function ProblemAdminsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemAdminsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemEditPayload(
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
@@ -542,6 +550,7 @@ export namespace types {
     badge?: string;
     message?: string;
     status?: string;
+    url?: string;
   }
 
   export interface PageItem {
@@ -557,6 +566,17 @@ export namespace types {
     submissions: number;
     accepted: number;
     difficulty: number;
+  }
+
+  export interface ProblemAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ProblemAdminsPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    group_admins: types.ProblemGroupAdmin[];
   }
 
   export interface ProblemDetails {
@@ -684,6 +704,12 @@ export namespace types {
     validatorTypes: { [key: string]: null | string };
     visibility: number;
     visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ProblemListItem {
@@ -946,7 +972,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
@@ -1474,6 +1500,8 @@ export namespace messages {
       total: { points: number; penalty: number };
     }[];
   };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { label: string; value: string }[];
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -2017,8 +2045,8 @@ export namespace messages {
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
-    admins: { role: string; username: string }[];
-    group_admins: { alias: string; name: string; role: string }[];
+    admins: types.ProblemAdmin[];
+    group_admins: types.ProblemGroupAdmin[];
   };
   export type ProblemBestScoreRequest = { [key: string]: any };
   export type ProblemBestScoreResponse = { score: number };
@@ -2934,6 +2962,9 @@ export namespace controllers {
     scoreboardMerge: (
       params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
+    searchUsers: (
+      params?: messages.ContestSearchUsersRequest,
+    ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
       params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;

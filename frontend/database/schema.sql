@@ -933,7 +933,7 @@ CREATE TABLE `Tags` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
-  `ranking` int NOT NULL,
+  `ranking` int DEFAULT NULL,
   `problems_solved_count` int NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
   `username` varchar(50) NOT NULL,
@@ -941,6 +941,8 @@ CREATE TABLE `User_Rank` (
   `country_id` char(3) DEFAULT NULL,
   `state_id` char(3) DEFAULT NULL,
   `school_id` int DEFAULT NULL,
+  `author_score` double NOT NULL DEFAULT '0',
+  `author_ranking` int DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `rank` (`ranking`),

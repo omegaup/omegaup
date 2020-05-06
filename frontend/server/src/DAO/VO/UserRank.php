@@ -25,6 +25,8 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
         'country_id' => true,
         'state_id' => true,
         'school_id' => true,
+        'author_score' => true,
+        'author_ranking' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -80,6 +82,16 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
         if (isset($data['school_id'])) {
             $this->school_id = intval(
                 $data['school_id']
+            );
+        }
+        if (isset($data['author_score'])) {
+            $this->author_score = floatval(
+                $data['author_score']
+            );
+        }
+        if (isset($data['author_ranking'])) {
+            $this->author_ranking = intval(
+                $data['author_ranking']
             );
         }
     }
@@ -147,4 +159,18 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $school_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var float
+     */
+    public $author_score = 0.00;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $author_ranking = null;
 }

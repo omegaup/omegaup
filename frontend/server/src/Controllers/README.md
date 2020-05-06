@@ -49,6 +49,7 @@
   - [`/api/contest/scoreboard/`](#apicontestscoreboard)
   - [`/api/contest/scoreboardEvents/`](#apicontestscoreboardevents)
   - [`/api/contest/scoreboardMerge/`](#apicontestscoreboardmerge)
+  - [`/api/contest/searchUsers/`](#apicontestsearchusers)
   - [`/api/contest/setRecommended/`](#apicontestsetrecommended)
   - [`/api/contest/stats/`](#apiconteststats)
   - [`/api/contest/update/`](#apicontestupdate)
@@ -1214,6 +1215,29 @@ Gets the accomulative scoreboard for an array of contests
 | Name      | Type                                                                                                                                                     |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ranking` | `{ name: string; username: string; contests: { [key: string]: { points: number; penalty: number; }; }; total: { points: number; penalty: number; }; }[]` |
+
+## `/api/contest/searchUsers/`
+
+### Description
+
+Search users in contest
+
+### Parameters
+
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `query`         | `mixed` |             |
+| `contest_alias` | `mixed` |             |
+
+### Returns
+
+```typescript
+{
+  label: string;
+  value: string;
+}
+[];
+```
 
 ## `/api/contest/setRecommended/`
 
@@ -2564,10 +2588,10 @@ Returns all problem administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name           | Type                        |
+| -------------- | --------------------------- |
+| `admins`       | `types.ProblemAdmin[]`      |
+| `group_admins` | `types.ProblemGroupAdmin[]` |
 
 ## `/api/problem/bestScore/`
 
