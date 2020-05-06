@@ -68,7 +68,7 @@ OmegaUp.on('ready', function() {
                       ? 0
                       : ev.windowLength,
                   points_decay_factor: ev.pointsDecayFactor,
-                  submissions_gap: ev.submissionsGap,
+                  submissions_gap: ev.submissionsGap * 60,
                   languages: ev.languages[0] == '' ? [] : ev.languages,
                   feedback: ev.feedback,
                   penalty: ev.penalty,

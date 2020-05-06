@@ -1,6 +1,6 @@
 /* FIXME: TODO LO QUE SIGUE A CONTINUACIÓN DEBE IRSE CON BS3 */
 body {
-  padding-top: 51px;
+  padding-top: 71px;
 }
 
 // Cambio de background al pasar el mouse sobre las pestañas o al
@@ -75,4 +75,15 @@ a.card-header-help {
     color: $omegaup-links--hover;
     text-decoration: none;
   }
+}
+
+#status {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  z-index: 1;
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  top: 61px;
+  width: 100%;
 }

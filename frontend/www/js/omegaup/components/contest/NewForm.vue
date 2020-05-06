@@ -1,17 +1,20 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-heading" v-if="!update">
+  <div class="card panel panel-primary">
+    <div class="card-header bg-primary text-white panel-heading" v-if="!update">
       <h3 class="panel-title">{{ T.contestNew }}</h3>
     </div>
-    <div class="panel-body">
-      <div class="btn-group bottom-margin">
-        <button class="btn btn-default" v-on:click="fillOmi()">
+    <div class="card-body panel-body">
+      <div class="btn-group bottom-margin mb-3">
+        <button class="btn btn-default btn-secondary" v-on:click="fillOmi()">
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default" v-on:click="fillPreIoi()">
+        <button class="btn btn-default btn-secondary" v-on:click="fillPreIoi()">
           {{ T.contestNewForm }}
         </button>
-        <button class="btn btn-default" v-on:click="fillConacup()">
+        <button
+          class="btn btn-default btn-secondary"
+          v-on:click="fillConacup()"
+        >
           {{ T.contestNewFormConacupStyle }}
         </button>
       </div>
@@ -22,6 +25,7 @@
             <input
               class="form-control"
               name="title"
+              v-bind:placeholder="contestStyleDesc"
               size="30"
               type="text"
               v-model="title"
@@ -238,11 +242,12 @@
           </div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" type="submit" v-if="update">
-            {{ T.contestNewFormUpdateContest }}
-          </button>
-          <button class="btn btn-primary" type="submit" v-else="">
-            {{ T.contestNewFormScheduleContest }}
+          <button class="btn btn-primary" type="submit">
+            {{
+              update
+                ? T.contestNewFormUpdateContest
+                : T.contestNewFormScheduleContest
+            }}
           </button>
         </div>
       </form>
@@ -252,6 +257,43 @@
 
 <style>
 @import '../../../../third_party/css/bootstrap-select.min.css';
+
+.open > .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+}
+
+.bootstrap-select > .dropdown-toggle.bs-placeholder {
+  color: #999;
+}
+
+.open > .dropdown-toggle.btn-default {
+  color: #333;
+  background-color: #e6e6e6;
+  background-image: none;
+  border-color: #adadad;
+}
+
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 </style>
 
 <script lang="ts">
@@ -274,31 +316,29 @@ export default class NewForm extends Vue {
   @Prop() initialFinishTime!: Date;
 
   T = T;
-  alias = this.data?.alias ?? null;
+  alias = this.data?.alias ?? '';
   availableLanguages = this.data?.available_languages ?? this.allLanguages;
-  contest = this.data || null;
-  contestantMustRegister = this.data?.contestant_must_register ?? null;
-  description = this.data?.description ?? null;
+  contest = this.data ?? null;
+  description = this.data?.description ?? '';
   feedback = this.data?.feedback ?? 'yes';
   finishTime = this.data?.finish_time ?? this.initialFinishTime;
   scoreboard = this.data?.scoreboard ?? 100;
   languages = this.data?.languages ?? [];
-  needsBasicInformation = this.data?.needs_basic_information ?? null;
+  needsBasicInformation = this.data?.needs_basic_information ?? false;
   penalty = this.data?.penalty ?? 0;
   penaltyType = this.data?.penalty_type ?? 'none';
-  penaltyCalcPolicy = this.data?.penalty_calc_policy ?? null;
   pointsDecayFactor = this.data?.points_decay_factor ?? 0.0;
   requestsUserInformation = this.data?.requests_user_information ?? 'no';
   startTime = this.data?.start_time ?? this.initialStartTime;
-  showPenalty = this.data?.show_penalty ?? null;
   showScoreboardAfter = this.data?.show_scoreboard_after ?? true;
   submissionsGap = this.data?.submissions_gap
     ? this.data.submissions_gap / 60
     : 1;
-  title = this.data?.title ?? null;
+  title = this.data?.title ?? '';
   titlePlaceHolder = '';
   windowLength = this.data?.window_length ?? null;
   windowLengthEnabled = this.data?.window_length ?? false;
+  contestStyleDesc = '';
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
@@ -318,6 +358,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderOmiStyle;
   }
 
   fillPreIoi(): void {
@@ -331,6 +372,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderIoiStyle;
   }
 
   fillConacup(): void {
@@ -344,6 +386,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderConacupStyle;
   }
 
   onSubmit() {
@@ -376,6 +419,12 @@ export default class NewForm extends Vue {
       basic_information: this.needsBasicInformation ? 1 : 0,
       requests_user_information: this.requestsUserInformation,
     });
+  }
+
+  mounted() {
+    if (this.update) {
+      $('.selectpicker', this.$el).selectpicker();
+    }
   }
 }
 </script>

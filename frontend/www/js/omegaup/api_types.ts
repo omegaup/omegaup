@@ -481,7 +481,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
-    languages: string[];
+    languages: { [key: string]: string };
   }
 
   export interface CourseAssignment {
