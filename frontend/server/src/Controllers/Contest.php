@@ -756,7 +756,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{contestNewPayload: ContestNewPayload}, template: string}
+     * @return array{smartyProperties: array{payload: ContestNewPayload}, entrypoint: string}
      */
     public static function getContestNewForSmarty(
         \OmegaUp\Request $r
@@ -764,13 +764,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         return [
             'smartyProperties' => [
-                'contestNewPayload' => [
+                'payload' => [
                     'languages' => array_keys(
                         \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
                     ),
                 ],
             ],
-            'template' => 'contest.new.tpl',
+            'entrypoint' => 'contest_new',
         ];
     }
 

@@ -7,16 +7,14 @@ import * as ui from '../ui';
 import * as api from '../api';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ContestNewPayload('contest-new-payload');
+  const payload = types.payloadParsers.ContestNewPayload();
   const startTime = new Date();
-  const finishTime = new Date(startTime);
-  finishTime.setTime(finishTime.getTime() + 5 * 60 * 60 * 1000);
+  const finishTime = new Date(startTime.getTime() + 5 * 60 * 60 * 1000);
   const contestNew = new Vue({
-    el: '#contest-new',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-contest-new', {
         props: {
-          data: null,
           allLanguages: payload.languages,
           update: false,
           initialStartTime: startTime,

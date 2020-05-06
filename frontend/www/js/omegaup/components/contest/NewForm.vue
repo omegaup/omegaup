@@ -250,11 +250,16 @@
   </div>
 </template>
 
+<style>
+@import '../../../../third_party/css/bootstrap-select.min.css';
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
+import '@/third_party/js/bootstrap-select.min.js';
 
 @Component({
   components: {
@@ -269,38 +274,31 @@ export default class NewForm extends Vue {
   @Prop() initialFinishTime!: Date;
 
   T = T;
-  alias = this.data ? this.data.alias : null;
-  availableLanguages = this.data
-    ? this.data.available_languages
-    : this.allLanguages;
+  alias = this.data?.alias ?? null;
+  availableLanguages = this.data?.available_languages ?? this.allLanguages;
   contest = this.data || null;
-  contestantMustRegister = this.data
-    ? this.data.contestant_must_register
-    : null;
-  description = this.data ? this.data.description : null;
-  feedback = this.data ? this.data.feedback : 'yes';
-  finishTime = this.data ? this.data.finish_time : this.initialFinishTime;
-  scoreboard = this.data ? this.data.scoreboard : 100;
-  languages = this.data ? this.data.languages : [];
-  needsBasicInformation = this.data ? this.data.needs_basic_information : null;
-  penalty = this.data ? this.data.penalty : 0;
-  penaltyType = this.data ? this.data.penalty_type : 'none';
-  penaltyCalcPolicy = this.data ? this.data.penalty_calc_policy : null;
-  pointsDecayFactor = this.data ? this.data.points_decay_factor : 0.0;
-  requestsUserInformation = this.data
-    ? this.data.requests_user_information
-    : 'no';
-  startTime = this.data ? this.data.start_time : this.initialStartTime;
-  showPenalty = this.data ? this.data.show_penalty : null;
-  showScoreboardAfter = this.data ? this.data.show_scoreboard_after : true;
-  submissionsGap =
-    this.data && this.data.submissions_gap ? this.data.submissions_gap / 60 : 1;
-  title = this.data ? this.data.title : null;
+  contestantMustRegister = this.data?.contestant_must_register ?? null;
+  description = this.data?.description ?? null;
+  feedback = this.data?.feedback ?? 'yes';
+  finishTime = this.data?.finish_time ?? this.initialFinishTime;
+  scoreboard = this.data?.scoreboard ?? 100;
+  languages = this.data?.languages ?? [];
+  needsBasicInformation = this.data?.needs_basic_information ?? null;
+  penalty = this.data?.penalty ?? 0;
+  penaltyType = this.data?.penalty_type ?? 'none';
+  penaltyCalcPolicy = this.data?.penalty_calc_policy ?? null;
+  pointsDecayFactor = this.data?.points_decay_factor ?? 0.0;
+  requestsUserInformation = this.data?.requests_user_information ?? 'no';
+  startTime = this.data?.start_time ?? this.initialStartTime;
+  showPenalty = this.data?.show_penalty ?? null;
+  showScoreboardAfter = this.data?.show_scoreboard_after ?? true;
+  submissionsGap = this.data?.submissions_gap
+    ? this.data.submissions_gap / 60
+    : 1;
+  title = this.data?.title ?? null;
   titlePlaceHolder = '';
-  windowLength = this.data ? this.data.window_length || 0 : null;
-  windowLengthEnabled = this.data
-    ? this.data.window_length != 0 && this.data.window_length != null
-    : false;
+  windowLength = this.data?.window_length ?? null;
+  windowLengthEnabled = this.data?.window_length ?? false;
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
