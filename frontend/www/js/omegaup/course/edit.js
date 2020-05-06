@@ -83,40 +83,6 @@ OmegaUp.on('ready', function() {
           groupadmins: this.groupadmins,
         },
         on: {
-          edit: function(assignment) {
-            assignmentDetails.show = true;
-            assignmentDetails.update = true;
-            assignmentDetails.assignment = assignment;
-            assignmentDetails.$el.scrollIntoView();
-          },
-          delete: function(assignment) {
-            if (
-              !window.confirm(
-                UI.formatString(T.courseAssignmentConfirmDelete, {
-                  assignment: assignment.name,
-                }),
-              )
-            ) {
-              return;
-            }
-            api.Course.removeAssignment({
-              course_alias: courseAlias,
-              assignment_alias: assignment.alias,
-            })
-              .then(function(data) {
-                UI.success(T.courseAssignmentDeleted);
-                refreshAssignmentsList();
-              })
-              .catch(UI.apiError);
-          },
-          new: function() {
-            assignmentDetails.show = true;
-            assignmentDetails.update = false;
-            assignmentDetails.assignment = {
-              start_time: defaultStartTime,
-              finish_time: defaultFinishTime,
-            };
-          },
           removeAdmin: function(admin) {
             api.Course.removeAdmin({
               course_alias: courseAlias,

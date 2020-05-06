@@ -2564,10 +2564,10 @@ Returns all problem administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name           | Type                        |
+| -------------- | --------------------------- |
+| `admins`       | `types.ProblemAdmin[]`      |
+| `group_admins` | `types.ProblemGroupAdmin[]` |
 
 ## `/api/problem/bestScore/`
 
