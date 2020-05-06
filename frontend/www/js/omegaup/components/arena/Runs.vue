@@ -315,30 +315,11 @@ export default class Runs extends Vue {
     });
   }
 
-  get typeaheadProblems(): {
-    alias: string;
-    title: string;
-  }[] | null {
-    if (this.problemsetProblems === null) {
-      console.log("Enntro a la opción null");
-      return null;
-    }
-
-    console.log(this.problemsetProblems);
-    console.log(Object.values(this.problemsetProblems));
-    return this.problemsetProblems.map(problem => {
-      return {
-        alias: problem.alias,
-        title: problem.title,
-      }
-    });
-  }
-
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems !== null) {
       typeahead.problemContestTypeahead(
         el,
-        this.problemsetProblems,
+        () => this.problemsetProblems,
         (event: Event, item: { alias: string; title: string }) => {
           this.filterProblem = item.alias;
         },
