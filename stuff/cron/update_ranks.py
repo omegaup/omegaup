@@ -194,8 +194,6 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
             `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
         INNER JOIN
             `Identities` AS `i` ON `i`.`identity_id` = `u`.`main_identity_id`
-        INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = up.`identity_id`
         LEFT JOIN
             `Identities_Schools` AS `isc`
         ON
@@ -211,6 +209,7 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     prev_score = None
     rank = 0
     for index, row in enumerate(cur):
+        logging.info(row)
         if row['author_score'] != prev_score:
             rank = index + 1
         prev_score = row['author_score']
@@ -222,8 +221,8 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY
                         UPDATE
-                            author_ranking=%s,
-                            author_score=%s;''',
+                            author_ranking = %s,
+                            author_score = %s;''',
                     (row['user_id'], row['username'], row['author_score'],
                      rank, row['name'], row['country_id'], row['state_id'],
                      row['school_id'], rank, row['author_score']))
