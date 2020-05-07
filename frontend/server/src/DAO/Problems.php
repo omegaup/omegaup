@@ -148,15 +148,43 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
+        $columnDifficulty = 'p.difficulty';
+        if ($orderBy == 'difficulty' && $order == 'asc') {
+            $columnDifficulty = 'IFNULL(p.difficulty,99) AS difficulty';
+        }
+
         if ($identityType === IDENTITY_ADMIN) {
             $args = [$identityId];
-            $select = '
+            $select = "
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
                     accepted / GREATEST(1, submissions)     AS ratio,
                     ROUND(100 * IFNULL(ps.score, 0.0))      AS score,
-                    p.*
-            ';
+                    p.problem_id,
+                    p.acl_id,
+                    p.visibility,
+                    p.title,
+                    p.alias,
+                    p.commit,
+                    p.current_version,
+                    p.languages,
+                    p.input_limit,
+                    p.visits,
+                    p.submissions,
+                    p.accepted,
+                    {$columnDifficulty},
+                    p.creation_date,
+                    p.source,
+                    p.order,
+                    p.deprecated,
+                    p.email_clarifications,
+                    p.quality,
+                    p.quality_histogram,
+                    p.difficulty_histogram,
+                    p.quality_seal,
+                    p.show_diff,
+                    p.allow_user_add_tags
+            ";
             $sql = '
                 FROM
                     Problems p
