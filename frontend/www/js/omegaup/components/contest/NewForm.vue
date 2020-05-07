@@ -192,20 +192,15 @@
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.wordsLanguages }}</label
-            ><br />
-            <select
-              class="form-control selectpicker"
-              multiple="multiple"
+            <label>{{ T.wordsLanguages }}</label><br />
+            <multiselect
               v-model="languages"
+              v-bind:options="availableLanguagesKeys"
+              v-bind:multiple="true"
+              v-bind:placeholder="T.contestNewFormLanguages"
+              v-bind:close-on-select="false"
             >
-              <option
-                v-bind:value="lang"
-                v-for="(language, lang) in availableLanguages"
-              >
-                {{ language }}
-              </option>
-            </select>
+            </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
           </div>
         </div>
@@ -255,44 +250,11 @@
   </div>
 </template>
 
-<style>
-@import '../../../../third_party/css/bootstrap-select.min.css';
+<style lang="scss">
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
-.open > .dropdown-menu {
-  display: block;
-}
-
-.dropdown-menu > li > a {
-  display: block;
-  padding: 3px 20px;
-  clear: both;
-  font-weight: 400;
-  line-height: 1.42857143;
-  color: #333;
-  white-space: nowrap;
-}
-
-.bootstrap-select > .dropdown-toggle.bs-placeholder {
-  color: #999;
-}
-
-.open > .dropdown-toggle.btn-default {
-  color: #333;
-  background-color: #e6e6e6;
-  background-image: none;
-  border-color: #adadad;
-}
-
-.glyphicon {
-  position: relative;
-  top: 1px;
-  display: inline-block;
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.multiselect__tag {
+  background: #678DD7;
 }
 </style>
 
@@ -301,11 +263,12 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
-import '@/third_party/js/bootstrap-select.min.js';
+import Multiselect from 'vue-multiselect';
 
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
+    Multiselect,
   },
 })
 export default class NewForm extends Vue {
@@ -345,6 +308,10 @@ export default class NewForm extends Vue {
     if (!newValue) {
       this.windowLength = null;
     }
+  }
+
+  get availableLanguagesKeys(): string[] {
+    return Object.keys(this.availableLanguages);
   }
 
   fillOmi(): void {
@@ -419,12 +386,6 @@ export default class NewForm extends Vue {
       basic_information: this.needsBasicInformation ? 1 : 0,
       requests_user_information: this.requestsUserInformation,
     });
-  }
-
-  mounted() {
-    if (this.update) {
-      $('.selectpicker', this.$el).selectpicker();
-    }
   }
 }
 </script>
