@@ -726,6 +726,35 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * @return \OmegaUp\DAO\VO\Runs|null
+     */
+    final public static function getByGUID(string $guid) {
+        $sql = '
+            SELECT
+                `r`.*
+            FROM
+                `Runs` `r`
+            INNER JOIN
+                `Submissions` `s`
+            ON
+                `r`.`submission_id` = `s`.`submission_id`
+            WHERE
+                `s`.`guid` = ?
+            LIMIT
+                1;
+        ';
+
+        /** @var array{commit: string, contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
+
+        if (is_null($row)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\Runs($row);
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function getByProblem(
@@ -744,7 +773,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problem_id = ?;
         ';
         $params = [$problemId];
-        /** @var list<array{contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
+        /** @var list<array{commit: string, contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
