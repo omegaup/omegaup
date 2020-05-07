@@ -472,4 +472,114 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $firstPlaceUserRank['problems_solved']
         );
     }
+
+    /**
+     * Creates 6 users and 4 problems
+     * - user0 is author of problem0 and problem1
+     * - user1 is author of problem2 and problem3
+     * - The other users just solve the problems
+     * - Problems of user1 receive less quality score than problems of user0
+     * - update_ranks is executed, some users receive their user_score (as usual)
+     * - user0 receive only an author_score
+     * - user1 receive both: author_score and user_score
+     */
+    public function testAuthorsRank() {
+        $users = [];
+        $identities = [];
+        $problems = [];
+
+        ['user' => $users[0], 'identity' => $identities[0]] = \OmegaUp\Test\Factories\User::createUser();
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identities[0]
+        );
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identities[0]
+        );
+
+        ['user' => $users[1], 'identity' => $identities[1]] = \OmegaUp\Test\Factories\User::createUser();
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identities[1]
+        );
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+            $identities[1]
+        );
+
+        // user1 qualifies also problems of user0 (for receiving a user score)
+        for ($i = 0; $i < 2; $i++) {
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $identities[1]
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $identities[1],
+                $problems[$i]['request']['problem_alias'],
+                1, /* difficulty */
+                4, /* quality */
+                [],
+                false
+            );
+        }
+
+        // The other users just solve problems of user0 and user1
+        for ($i = 2; $i < 7; $i++) {
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+
+            for ($j = 0; $j < 4; $j++) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problems[$j],
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $identities[$i],
+                    $problems[$j]['request']['problem_alias'],
+                    1, /* difficulty */
+                    3, /* quality */
+                    [],
+                    false
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem0 = \Omegaup\DAO\Problems::getByPK(
+            $problems[0]['problem']->problem_id
+        );
+        $problem1 = \Omegaup\DAO\Problems::getByPK(
+            $problems[1]['problem']->problem_id
+        );
+        $problem2 = \Omegaup\DAO\Problems::getByPK(
+            $problems[2]['problem']->problem_id
+        );
+        $problem3 = \Omegaup\DAO\Problems::getByPK(
+            $problems[3]['problem']->problem_id
+        );
+
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $author0 = \OmegaUp\DAO\UserRank::getByPK($users[0]->user_id);
+        $author1 = \OmegaUp\DAO\UserRank::getByPK($users[1]->user_id);
+        $user2 = \OmegaUp\DAO\UserRank::getByPK($users[2]->user_id);
+
+        $this->assertEquals(
+            $problem0->quality + $problem1->quality,
+            $author0->author_score
+        );
+        $this->assertEquals(
+            $problem2->quality + $problem3->quality,
+            $author1->author_score
+        );
+        $this->assertGreaterThan(
+            $author1->author_score,
+            $author0->author_score
+        );
+        $this->assertGreaterThan(
+            $author1->author_ranking,
+            $author0->author_ranking
+        );
+        $this->assertNull($author0->ranking);
+        $this->assertLessThan($author1->ranking, $user2->ranking);
+    }
 }

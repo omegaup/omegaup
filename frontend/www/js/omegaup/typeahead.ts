@@ -139,7 +139,7 @@ export function problemTypeahead(
 
 export function problemContestTypeahead(
   elem: JQuery<HTMLElement>,
-  problemList: { alias: string; title: string }[],
+  problemDataset: () => { alias: string; title: string }[],
   cb?: CallbackType<{ alias: string; title: string }>,
 ) {
   const substringMatcher = (
@@ -151,7 +151,7 @@ export function problemContestTypeahead(
 
     // Filter out the results that contain the query substring.
     syncResults(
-      problemList.filter(problem => substringRegex.test(problem.alias)),
+      problemDataset().filter(problem => substringRegex.test(problem.alias)),
     );
   };
 
