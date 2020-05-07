@@ -209,7 +209,6 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
     prev_score = None
     rank = 0
     for index, row in enumerate(cur):
-        logging.info(row)
         if row['author_score'] != prev_score:
             rank = index + 1
         prev_score = row['author_score']
