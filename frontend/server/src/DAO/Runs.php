@@ -744,7 +744,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 1;
         ';
 
-        /** @var array{commit: string, contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}|null */
+        /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
 
         if (is_null($row)) {
@@ -879,7 +879,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         $result = [];
-        /** @var array{contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string} $row */
+        /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
