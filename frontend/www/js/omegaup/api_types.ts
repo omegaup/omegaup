@@ -972,7 +972,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
@@ -1500,6 +1500,8 @@ export namespace messages {
       total: { points: number; penalty: number };
     }[];
   };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { label: string; value: string }[];
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -2960,6 +2962,9 @@ export namespace controllers {
     scoreboardMerge: (
       params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
+    searchUsers: (
+      params?: messages.ContestSearchUsersRequest,
+    ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
       params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;
