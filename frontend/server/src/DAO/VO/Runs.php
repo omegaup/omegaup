@@ -144,9 +144,9 @@ class Runs extends \OmegaUp\DAO\VO\VO {
     /**
      * El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.
      *
-     * @var string
+     * @var string|null
      */
-    public $commit = 'published';
+    public $commit = null;
 
     /**
      * [Campo no documentado]

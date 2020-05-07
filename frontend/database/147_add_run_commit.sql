@@ -3,7 +3,7 @@
 ALTER TABLE
   `Runs`
 ADD COLUMN
-  `commit` char(40) NOT NULL DEFAULT 'published'
+  `commit` char(40) NOT NULL
     COMMENT 'El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.'
     AFTER `version`;
 

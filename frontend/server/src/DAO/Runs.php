@@ -1009,10 +1009,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, verdict
+                    submission_id, version, commit, verdict
                 )
             SELECT
-                s.submission_id, ?, "JE"
+                s.submission_id, ?, ?, "JE"
             FROM
                 Submissions s
             WHERE
@@ -1020,10 +1020,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ORDER BY
                 s.submission_id;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            [$problem->current_version, $problem->problem_id]
-        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
+            $problem->current_version,
+            $problem->commit,
+            $problem->problem_id,
+        ]);
     }
 
     /**
