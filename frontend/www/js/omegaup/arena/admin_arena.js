@@ -29,6 +29,7 @@ export default class ArenaAdmin {
             showPager: true,
             showRejudge: true,
             showUser: true,
+            problemsetProblems: Object.values(self.arena.problems),
           },
           on: {
             details: run => {

@@ -263,9 +263,7 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop({ default: null }) problemAlias!: string | null;
-  @Prop({ default: null }) problemsetProblems!: {
-    [alias: string]: types.ProblemsetProblem;
-  } | null;
+  @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
@@ -321,7 +319,7 @@ export default class Runs extends Vue {
     if (this.problemsetProblems !== null) {
       typeahead.problemContestTypeahead(
         el,
-        Object.values(this.problemsetProblems),
+        () => this.problemsetProblems,
         (event: Event, item: { alias: string; title: string }) => {
           this.filterProblem = item.alias;
         },
