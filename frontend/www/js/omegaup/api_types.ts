@@ -37,6 +37,14 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function AuthorRankTablePayload(
+      elementId: string = 'payload',
+    ): types.AuthorRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function BadgeDetailsPayload(
       elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
@@ -352,6 +360,24 @@ export namespace types {
 
   export interface AssignmentProgress {
     [key: string]: types.Progress;
+  }
+
+  export interface AuthorRankTablePayload {
+    length: number;
+    page: number;
+    ranking: types.AuthorsRank;
+  }
+
+  export interface AuthorsRank {
+    ranking: {
+      author_ranking?: number;
+      author_score: number;
+      classname: string;
+      country_id?: string;
+      name?: string;
+      username: string;
+    }[];
+    total: number;
   }
 
   export interface Badge {

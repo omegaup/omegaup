@@ -93,7 +93,9 @@
           <label
             >{{ T.wordsUser }}:
             <omegaup-autocomplete
-              v-bind:init="el => typeahead.userTypeahead(el)"
+              v-bind:init="
+                el => typeahead.userContestTypeahead(el, this.contestAlias)
+              "
               v-model="filterUsername"
             ></omegaup-autocomplete>
           </label>
