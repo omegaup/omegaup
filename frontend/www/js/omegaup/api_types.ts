@@ -370,11 +370,11 @@ export namespace types {
 
   export interface AuthorsRank {
     ranking: {
+      author_ranking?: number;
+      author_score: number;
       classname: string;
       country_id?: string;
       name?: string;
-      author_ranking?: number;
-      author_score?: number;
       username: string;
     }[];
     total: number;

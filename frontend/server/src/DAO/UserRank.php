@@ -97,7 +97,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{classname: string, country_id: null|string, name: null|string, author_ranking: null|int, author_score: null|float, username: string}>, total: int}
+     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
      */
     public static function getAuthorsRank(
         int $page,
@@ -150,7 +150,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         ) ?? 0;
 
         /**
-         * @var list<array{classname: string, country_id: null|string, name: null|string, author_ranking: null|int, author_score: null|float, username: string}>
+         * @var list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>
          */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",

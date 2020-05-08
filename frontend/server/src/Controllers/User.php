@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type AuthorsRank=array{ranking: list<array{classname: string, country_id: null|string, name: null|string, author_ranking: null|int, author_score: null|float, username: string}>, total: int}
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int}
