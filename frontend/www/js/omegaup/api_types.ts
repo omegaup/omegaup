@@ -984,6 +984,7 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+    author_ranking?: number;
   }
 
   export interface UserRankTablePayload {

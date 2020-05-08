@@ -6,7 +6,7 @@ namespace OmegaUp\Controllers;
  *  UserController
  *
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
- * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int}
+ * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
@@ -1411,7 +1411,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
+     * @return array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: null|string, hide_problem_tags?: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name?: null|string, problems_solved?: int|null, rank?: int|null, author_ranking?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool|null}
      */
     public static function getUserProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -1438,6 +1438,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'name' => null,
                     'problems_solved' => null,
                     'rank' => null,
+                    'author_ranking' => null,
                 ],
                 'is_private' => true,
                 'birth_date' => null,
@@ -2419,6 +2420,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'rank' => 0,
             'name' => strval($identity->name),
             'problems_solved' => 0,
+            'author_ranking' => 0,
         ];
 
         if (is_null($identity->user_id)) {
@@ -2434,6 +2436,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'rank' => intval($userRank->ranking),
             'name' => strval($identity->name),
             'problems_solved' => $userRank->problems_solved_count,
+            'author_ranking' => $userRank->author_ranking,
         ];
     }
 
