@@ -13,8 +13,8 @@
 
       <script type="text/json" id="payload">{$payload|json_encode}</script>
       {block name="entrypoint"}{/block}
-      <div id="main-container" class="container pt-4 mb-4">
-        <div></div>
+      <div {if (!isset($fullWidth) || !$fullWidth)}class="container-xl pt-4 mb-4"{/if}>
+        <div id="main-container"></div>
       </div>
     </main>
     {include file='footer_v2.tpl' inline}

@@ -9,7 +9,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolRankPayload();
 
   const schoolsRank = new Vue({
-    el: '#main-container div',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-schools-rank', {
         props: {

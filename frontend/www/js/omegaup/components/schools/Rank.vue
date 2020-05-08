@@ -1,74 +1,72 @@
 <template>
-  <div>
-    <div class="card">
-      <h5 class="card-header">
-        {{
-          showHeader
-            ? UI.formatString(T.schoolRankOfTheMonthHeader, {
-                count: rank ? rank.length : 0,
-              })
-            : UI.formatString(T.schoolRankRangeHeader, {
-                lowCount: (page - 1) * length + 1,
-                highCount: page * length,
-              })
-        }}
-      </h5>
-      <div class="card-body" v-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/schools/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
+  <div class="card">
+    <h5 class="card-header">
+      {{
+        showHeader
+          ? UI.formatString(T.schoolRankOfTheMonthHeader, {
+              count: rank ? rank.length : 0,
+            })
+          : UI.formatString(T.schoolRankRangeHeader, {
+              lowCount: (page - 1) * length + 1,
+              highCount: page * length,
+            })
+      }}
+    </h5>
+    <div class="card-body" v-if="showControls">
+      <template v-if="page > 1">
+        <a v-bind:href="`/rank/schools/?page=${page - 1}`">
+          {{ T.wordsPrevPage }}</a
         >
-      </div>
-      <table class="table mb-0">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">{{ T.profileSchool }}</th>
-            <th class="text-right" scope="col">{{ T.wordsScore }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-bind:key="index" v-for="(school, index) in rank">
-            <th scope="row">
-              {{ showHeader ? index + 1 : school.ranking || '' }}
-            </th>
-            <td class="text-truncate">
-              <omegaup-countryflag
-                v-bind:country="school.country_id"
-              ></omegaup-countryflag>
-              <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
-                school.name
-              }}</a>
-            </td>
-            <td class="text-right">
-              {{ school.score }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="card-footer" v-if="showHeader">
-        <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
-      </div>
-      <div class="card-footer" v-else-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/schools/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
+        <span v-show="showNextPage">|</span>
+      </template>
+      <a
+        v-show="showNextPage"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
+        >{{ T.wordsNextPage }}</a
+      >
+    </div>
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">{{ T.profileSchool }}</th>
+          <th class="text-right" scope="col">{{ T.wordsScore }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-bind:key="index" v-for="(school, index) in rank">
+          <th scope="row">
+            {{ showHeader ? index + 1 : school.ranking || '' }}
+          </th>
+          <td class="text-truncate">
+            <omegaup-countryflag
+              v-bind:country="school.country_id"
+            ></omegaup-countryflag>
+            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+              school.name
+            }}</a>
+          </td>
+          <td class="text-right">
+            {{ school.score }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="card-footer" v-if="showHeader">
+      <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
+    </div>
+    <div class="card-footer" v-else-if="showControls">
+      <template v-if="page > 1">
+        <a v-bind:href="`/rank/schools/?page=${page - 1}`">
+          {{ T.wordsPrevPage }}</a
         >
-      </div>
+        <span v-show="showNextPage">|</span>
+      </template>
+      <a
+        v-show="showNextPage"
+        v-bind:href="`/rank/schools/?page=${page + 1}`"
+        >{{ T.wordsNextPage }}</a
+      >
     </div>
   </div>
 </template>
