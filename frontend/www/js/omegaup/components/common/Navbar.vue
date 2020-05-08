@@ -110,6 +110,9 @@
                 <a href="/rank/">{{ T.navUserRanking }}</a>
               </li>
               <li>
+                <a href="/rank/authors/">{{ T.navAuthorRanking }}</a>
+              </li>
+              <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
               </li>
               <li>

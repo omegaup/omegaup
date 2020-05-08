@@ -136,6 +136,9 @@
                 <a class="dropdown-item" href="/rank/">{{
                   T.navUserRanking
                 }}</a>
+                <a class="dropdown-item" href="/rank/authors/">{{
+                  T.navAuthorRanking
+                }}</a>
                 <a class="dropdown-item" href="/rank/schools/">{{
                   T.navSchoolRanking
                 }}</a>

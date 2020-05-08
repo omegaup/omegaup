@@ -517,6 +517,7 @@ const translations: { [key: string]: string; } = {
   navAllContests: "All Contests",
   navAllProblems: "All Problems",
   navArena: "Arena",
+  navAuthorRanking: "Authors ranking",
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder of the Month Overall",
   navCoderOfTheMonthFemale: "Coder of the Month for Her",

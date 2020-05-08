@@ -515,6 +515,7 @@ nativeSignupDisabled = "Cadastro direto foi desativado. Por favor, registre pelo
 navAllContests = "Todos os Concursos"
 navAllProblems = "Todos os Problemas"
 navArena = "Arena"
+navAuthorRanking = "Ranking de autores"
 navBlog = "Blog"
 navCoderOfTheMonth = "Coder do Mês Geral"
 navCoderOfTheMonthFemale = "Coder do Mês para eles"
