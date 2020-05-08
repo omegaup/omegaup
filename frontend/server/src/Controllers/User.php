@@ -3371,8 +3371,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r) {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
