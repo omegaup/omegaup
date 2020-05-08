@@ -174,6 +174,59 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     return scores
 
 
+def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the author's ranking'''
+    logging.info('Updating authors ranking...')
+    cur.execute('''
+        SELECT
+            `u`.`user_id`,
+            `i`.`username`,
+            `i`.`name`,
+            `i`.`country_id`,
+            `i`.`state_id`,
+            `isc`.`school_id`,
+            SUM(`p`.`quality`) AS `author_score`
+        FROM
+            `Problems` AS `p`
+        INNER JOIN
+            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+        INNER JOIN
+            `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
+        INNER JOIN
+            `Identities` AS `i` ON `i`.`identity_id` = `u`.`main_identity_id`
+        LEFT JOIN
+            `Identities_Schools` AS `isc`
+        ON
+            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
+        WHERE
+            `p`.`quality` IS NOT NULL
+        GROUP BY
+            `u`.`user_id`
+        ORDER BY
+            `author_score`
+    ''')
+
+    prev_score = None
+    rank = 0
+    for index, row in enumerate(cur):
+        if row['author_score'] != prev_score:
+            rank = index + 1
+        prev_score = row['author_score']
+        cur.execute('''
+                    INSERT INTO
+                        `User_Rank` (`user_id`, `username`, `author_score`,
+                                     `author_ranking`, `name`, `country_id`,
+                                     `state_id`, `school_id`)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY
+                        UPDATE
+                            author_ranking = %s,
+                            author_score = %s;''',
+                    (row['user_id'], row['username'], row['author_score'],
+                     rank, row['name'], row['country_id'], row['state_id'],
+                     row['school_id'], rank, row['author_score']))
+
+
 def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                              scores: Sequence[float]) -> None:
     '''Updates the user ranking cutoff table.'''
@@ -624,6 +677,13 @@ def update_users_stats(
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
+            raise
+
+        try:
+            update_author_rank(cur)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception('Failed to update authors ranking')
             raise
 
         try:
