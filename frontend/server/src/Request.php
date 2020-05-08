@@ -142,13 +142,9 @@ class Request extends \ArrayObject {
     public function ensureInt(
         string $key,
         ?int $lowerBound = null,
-        ?int $upperBound = null,
-        bool $required = true
-    ): void {
+        ?int $upperBound = null
+    ): int {
         if (!self::offsetExists($key)) {
-            if (!$required) {
-                return;
-            }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
@@ -163,6 +159,7 @@ class Request extends \ArrayObject {
             $upperBound
         );
         $this[$key] = intval($val);
+        return intval($val);
     }
 
     /**
@@ -173,27 +170,17 @@ class Request extends \ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required = false
-    ): void {
+    ): ?int {
         if (!self::offsetExists($key)) {
             if (!$required) {
-                return;
+                return null;
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
         }
-        /** @var mixed */
-        $val = $this->offsetGet($key);
-        if (!is_null($val)) {
-            \OmegaUp\Validators::validateNumberInRange(
-                $val,
-                $key,
-                $lowerBound,
-                $upperBound
-            );
-            $this[$key] = intval($val);
-        }
+        return self::ensureInt($key, $lowerBound, $upperBound);
     }
 
     /**

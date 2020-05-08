@@ -38,7 +38,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
             $r['description'],
             'description'
         );
-        $r->ensureInt('duration', 60, 60 * 5, false);
+        $r->ensureOptionalInt('duration', 60, 60 * 5);
 
         $acl = new \OmegaUp\DAO\VO\ACLs([
             'owner_id' => $r->user->user_id,
