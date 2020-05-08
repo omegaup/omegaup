@@ -3,7 +3,7 @@
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">
 		<div id="contest-details" class="text-center">
-			<h2 id="title"></h2>
+			<h2 id="title"></h2>{print_r($payload, true)}
 			<div class="">
 				<span id="start-time" name="start_time"></span>
 				<span>-</span>
@@ -18,15 +18,15 @@
 			<!-- Click to proceed -->
 			<div id="click-to-proceed" class="hidden" >
 				<form id="start-contest-form" method="POST" action="/">
-					{if !$needsBasicInformation and $requestsUserInformation == 'no'}
+					{if !$payload.needsBasicInformation and $payload.requestsUserInformation == 'no'}
 					    <p>{#aboutToStart#}</p>
 					{/if}
-					{if $needsBasicInformation }
+					{if $payload.needsBasicInformation }
 					    <p class="basic-information-needed">{#courseBasicInformationNeeded#}</p>
 					{/if}
-					{if $requestsUserInformation != 'no'}
-					 <script type="text/json" id="payload">{$privacyStatement|json_encode}</script>
-						<p class="requests-user-information requests-user-information-{$requestsUserInformation}">
+					{if $payload.requestsUserInformation != 'no'}
+					 <script type="text/json" id="payload">{$payload.privacyStatement|json_encode}</script>
+						<p class="requests-user-information requests-user-information-{$payload.requestsUserInformation}">
 						</p>
 						<p>
 							<label>
@@ -38,7 +38,7 @@
 						</p>
 					{/if}
 					<button type="submit" id="start-contest-submit" class="btn btn-primary btn-lg"
-					{if $needsBasicInformation || $requestsUserInformation != 'no'} disabled="true"{/if}>{#startContest#}</button>
+					{if $payload.needsBasicInformation || $payload.requestsUserInformation != 'no'} disabled="true"{/if}>{#startContest#}</button>
 				</form>
 			</div>
 

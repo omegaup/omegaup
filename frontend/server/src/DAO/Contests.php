@@ -803,7 +803,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             );
         }
         return [
-            'needsBasicInformation' => $rs['needs_basic_information'] == '1',
+            'needsBasicInformation' => boolval($rs['needs_basic_information']),
             'requestsUserInformation' => $rs['requests_user_information']
         ];
     }
