@@ -203,7 +203,7 @@ def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
         GROUP BY
             `u`.`user_id`
         ORDER BY
-            `author_score`
+            `author_score` DESC
     ''')
 
     prev_score = None
