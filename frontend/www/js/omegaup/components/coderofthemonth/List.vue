@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-5">
+  <div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="nav-item">
         <a

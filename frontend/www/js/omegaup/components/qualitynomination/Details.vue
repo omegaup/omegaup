@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-5">
+  <div>
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">{{ T.wordsReviewingProblem }}</h2>

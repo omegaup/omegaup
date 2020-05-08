@@ -192,7 +192,8 @@
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.wordsLanguages }}</label><br />
+            <label>{{ T.wordsLanguages }}</label
+            ><br />
             <multiselect
               v-model="languages"
               v-bind:options="availableLanguagesKeys"
@@ -254,7 +255,7 @@
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
 .multiselect__tag {
-  background: #678DD7;
+  background: #678dd7;
 }
 </style>
 

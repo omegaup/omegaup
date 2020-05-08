@@ -1,6 +1,6 @@
 /* FIXME: TODO LO QUE SIGUE A CONTINUACIÓN DEBE IRSE CON BS3 */
 body {
-  padding-top: 71px;
+  padding-top: 51px;
 }
 
 // Cambio de background al pasar el mouse sobre las pestañas o al
@@ -56,6 +56,17 @@ body {
   height: 51px;
   margin: -51px 0 0;
 }
+
+#status {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  z-index: 1;
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  top: 61px;
+  width: 100%;
+}
 /* FIXME: TODO LO ANTERIOR DEBE IRSE CON BS3 */
 
 a {
@@ -75,15 +86,4 @@ a.card-header-help {
     color: $omegaup-links--hover;
     text-decoration: none;
   }
-}
-
-#status {
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  z-index: 1;
-  max-width: 900px;
-  margin-right: auto;
-  margin-left: auto;
-  top: 61px;
-  width: 100%;
 }

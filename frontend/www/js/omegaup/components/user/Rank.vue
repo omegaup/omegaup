@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="{ 'container-lg p-5': !isIndex }">
+  <div>
     <div class="card">
       <h5 class="card-header">
         {{

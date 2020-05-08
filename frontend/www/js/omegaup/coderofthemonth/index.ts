@@ -9,7 +9,7 @@ import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CoderOfTheMonthPayload();
   let coderOfTheMonthList = new Vue({
-    el: '#main-container',
+    el: '#main-container div',
     render: function(createElement) {
       return createElement('omegaup-coder-of-the-month-list', {
         props: {
