@@ -561,25 +561,30 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         $author0 = \OmegaUp\DAO\UserRank::getByPK($users[0]->user_id);
         $author1 = \OmegaUp\DAO\UserRank::getByPK($users[1]->user_id);
+
         $user2 = \OmegaUp\DAO\UserRank::getByPK($users[2]->user_id);
+        $this->assertNull($user2->author_ranking);
+
+        $results = \OmegaUp\Controllers\User::getAuthorsRank(
+            1,
+            100
+        )['ranking'];
 
         $this->assertEquals(
             $problem0->quality + $problem1->quality,
-            $author0->author_score
+            $results[0]['author_score']
         );
         $this->assertEquals(
             $problem2->quality + $problem3->quality,
-            $author1->author_score
+            $results[1]['author_score']
         );
         $this->assertGreaterThan(
-            $author1->author_score,
-            $author0->author_score
+            $results[1]['author_score'],
+            $results[0]['author_score']
         );
         $this->assertGreaterThan(
-            $author1->author_ranking,
-            $author0->author_ranking
+            $results[0]['author_ranking'],
+            $results[1]['author_ranking']
         );
-        $this->assertNull($author0->ranking);
-        $this->assertLessThan($author1->ranking, $user2->ranking);
     }
 }
