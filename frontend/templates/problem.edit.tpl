@@ -88,7 +88,10 @@
   </div>
 
   <div class="tab-pane" id="admins">
-    <div id="problem-admins"></div>
+    <div id="problem-admins">
+      <div class="admins"></div>
+      <div class="groups"></div>
+    </div>
     <script type="text/json" id="problem-admins-payload">{$problemAdminsPayload|json_encode}</script>
     {js_include entrypoint="problem_admins"}
   </div>

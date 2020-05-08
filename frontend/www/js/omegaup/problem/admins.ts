@@ -2,7 +2,8 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
-import problem_Admins from '../components/problem/Administrators.vue';
+import problem_Admins from '../components/common/Admins.vue';
+import problem_GroupAdmins from '../components/common/GroupAdmins.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -11,13 +12,10 @@ OmegaUp.on('ready', () => {
     'problem-admins-payload',
   );
   const problemAdmins = new Vue({
-    el: '#problem-admins',
+    el: '#problem-admins .admins',
     render: function(createElement) {
       return createElement('omegaup-problem-admins', {
-        props: {
-          admins: this.admins,
-          groupAdmins: this.groupAdmins,
-        },
+        props: { initialAdmins: this.initialAdmins },
         on: {
           'add-admin': (username: string): void => {
             api.Problem.addAdmin({
@@ -41,6 +39,30 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+        },
+      });
+    },
+    methods: {
+      refreshProblemAdmins: (): void => {
+        api.Problem.admins({ problem_alias: payload.alias })
+          .then(data => {
+            problemAdmins.initialAdmins = data.admins;
+          })
+          .catch(ui.apiError);
+      },
+    },
+    data: { initialAdmins: payload.admins },
+    components: {
+      'omegaup-problem-admins': problem_Admins,
+    },
+  });
+
+  const problemGroupAdmins = new Vue({
+    el: '#problem-admins .groups',
+    render: function(createElement) {
+      return createElement('omegaup-problem-group-admins', {
+        props: { initialGroups: this.initialGroups },
+        on: {
           'add-group-admin': (groupAlias: string): void => {
             api.Problem.addGroupAdmin({
               problem_alias: payload.alias,
@@ -70,18 +92,14 @@ OmegaUp.on('ready', () => {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
           .then(data => {
-            problemAdmins.admins = data.admins;
-            problemAdmins.groupAdmins = data.group_admins;
+            problemGroupAdmins.initialGroups = data.group_admins;
           })
           .catch(ui.apiError);
       },
     },
-    data: {
-      admins: payload.admins,
-      groupAdmins: payload.group_admins,
-    },
+    data: { initialGroups: payload.group_admins },
     components: {
-      'omegaup-problem-admins': problem_Admins,
+      'omegaup-problem-group-admins': problem_GroupAdmins,
     },
   });
 });
