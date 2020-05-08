@@ -3,7 +3,7 @@
 <div id="intro-page" class="contest panel hidden">
 	<div class="panel-body">
 		<div id="contest-details" class="text-center">
-			<h2 id="title"></h2>{print_r($payload, true)}
+			<h2 id="title"></h2>
 			<div class="">
 				<span id="start-time" name="start_time"></span>
 				<span>-</span>
