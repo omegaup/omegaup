@@ -3522,8 +3522,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             'coderIsSelected' =>
                 !empty(
-                    \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
                         $dateToSelect,
+                        false,
                         $category
                     )
                 ),

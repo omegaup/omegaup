@@ -25,9 +25,10 @@ OmegaUp.on('ready', () => {
           category: payload.category,
         },
         on: {
-          'select-coder': function(coderUsername: string) {
+          'select-coder': function(coderUsername: string, category: string) {
             api.User.selectCoderOfTheMonth({
               username: coderUsername,
+              category: category,
             })
               .then(function() {
                 ui.success(

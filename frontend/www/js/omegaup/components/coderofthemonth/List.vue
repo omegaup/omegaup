@@ -133,7 +133,7 @@
             <button
               class="btn btn-sm btn-primary"
               v-if="canChooseCoder && !coderIsSelected"
-              v-on:click="$emit('select-coder', coder.username)"
+              v-on:click="$emit('select-coder', coder.username, category)"
             >
               {{
                 category == 'all'
