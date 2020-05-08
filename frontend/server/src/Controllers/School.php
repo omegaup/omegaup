@@ -281,8 +281,8 @@ class School extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r): array {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);

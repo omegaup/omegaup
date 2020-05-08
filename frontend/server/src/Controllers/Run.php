@@ -1322,11 +1322,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Defaults for offset and rowcount
-        $r->ensureInt('offset', null, null, false);
+        $r->ensureOptionalInt('offset');
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
         }
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('rowcount');
         if (!isset($r['rowcount'])) {
             $r['rowcount'] = 100;
         }

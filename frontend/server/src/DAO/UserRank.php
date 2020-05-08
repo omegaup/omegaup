@@ -95,4 +95,71 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             'total' => $totalRows
         ];
     }
+
+    /**
+     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
+     */
+    public static function getAuthorsRank(
+        int $page,
+        int $rowsPerPage
+    ): array {
+        $sqlSelect = '
+            SELECT
+                `ur`.`author_ranking`,
+                `ur`.`author_score`,
+                `ur`.`username`,
+                `ur`.`country_id`,
+                `ur`.`name`,
+                `ur`.`country_id`,
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`
+        ';
+        $sqlCount = '
+            SELECT
+                COUNT(1)
+        ';
+        $sqlFrom = '
+            FROM
+                `User_Rank` `ur`
+            WHERE
+                `ur`.`author_score` IS NOT NULL AND
+                `ur`.`author_ranking` IS NOT NULL
+        ';
+        $sqlOrderBy = '
+            ORDER BY
+                    `ur`.`author_ranking` ASC
+        ';
+        $sqlLimit = ' LIMIT ?, ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "{$sqlCount}{$sqlFrom}",
+            []
+        ) ?? 0;
+
+        /** @var list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}> */
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
+            [
+                ($page - 1) * $rowsPerPage,
+                $rowsPerPage
+            ]
+        );
+        return [
+            'ranking' => $allData,
+            'total' => $totalRows,
+        ];
+    }
 }

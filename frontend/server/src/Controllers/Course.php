@@ -124,7 +124,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function validateClone(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-        $r->ensureInt('start_time', null, null, true);
+        $r->ensureInt('start_time');
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
     }
 
@@ -251,7 +251,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        $r->ensureInt('start_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
         $r->ensureOptionalInt(
             'finish_time',
             null,
@@ -277,7 +277,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             ['no', 'optional', 'required']
         );
 
-        $r->ensureInt('school_id', null, null, false /*isRequired*/);
+        $r->ensureOptionalInt('school_id');
 
         if (is_null($r['school_id'])) {
             $school = null;
@@ -1336,8 +1336,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureIdentity();
 
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -3029,8 +3029,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
