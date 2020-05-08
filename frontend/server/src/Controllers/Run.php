@@ -824,6 +824,9 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        if (is_null($run->commit)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
@@ -879,14 +882,14 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problem->alias,
-            $problem->commit
+            $run->commit
         );
 
         $cases = self::getCases(
             $problemArtifacts,
             'cases',
             $problem->alias,
-            $problem->commit
+            $run->commit
         );
         /** @var int $responseSize */
         $responseSize = array_reduce(
