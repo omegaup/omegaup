@@ -468,6 +468,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $problem->current_version,
+            'commit' => $problem->commit,
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
@@ -1469,11 +1470,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Defaults for offset and rowcount
-        $r->ensureInt('offset', null, null, false);
+        $r->ensureOptionalInt('offset');
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
         }
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('rowcount');
         if (!isset($r['rowcount'])) {
             $r['rowcount'] = 100;
         }

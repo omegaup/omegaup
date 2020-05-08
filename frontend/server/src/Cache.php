@@ -199,6 +199,7 @@ class InProcessCacheAdapter extends CacheAdapter {
  *
  */
 class Cache {
+    const AUTHORS_RANK = 'authors-rank-';
     const SESSION_PREFIX = 'session-';
     const CONTESTANT_SCOREBOARD_PREFIX = 'scoreboard-';
     const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-';

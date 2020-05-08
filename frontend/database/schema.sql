@@ -800,6 +800,7 @@ CREATE TABLE `Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `submission_id` int NOT NULL COMMENT 'El envío',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
+  `commit` char(40) NOT NULL COMMENT 'El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.',
   `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
   `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `runtime` int NOT NULL DEFAULT '0',
@@ -933,7 +934,7 @@ CREATE TABLE `Tags` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
-  `ranking` int NOT NULL,
+  `ranking` int DEFAULT NULL,
   `problems_solved_count` int NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
   `username` varchar(50) NOT NULL,

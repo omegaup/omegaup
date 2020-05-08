@@ -21,6 +21,7 @@ export default class ArenaAdmin {
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
+            contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
             showContest: self.arena.options.contestAlias == 'admin',
             showProblem: !arena.options.isOnlyProblem,
@@ -29,6 +30,7 @@ export default class ArenaAdmin {
             showPager: true,
             showRejudge: true,
             showUser: true,
+            problemsetProblems: Object.values(self.arena.problems),
           },
           on: {
             details: run => {
