@@ -2548,15 +2548,12 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
      *
-     * @omegaup-request-param int $length
-     * @omegaup-request-param int $page
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      */
     public static function getAuthorRankForSmarty(\OmegaUp\Request $r) {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
 
         return [
             'smartyProperties' => [

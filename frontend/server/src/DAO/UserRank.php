@@ -101,7 +101,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
      */
     public static function getAuthorsRank(
         int $page,
-        int $colsPerPage
+        int $rowsPerPage
     ): array {
         $sqlSelect = '
             SELECT
@@ -153,8 +153,8 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
-                ($page - 1) * $colsPerPage,
-                $colsPerPage
+                ($page - 1) * $rowsPerPage,
+                $rowsPerPage
             ]
         );
         return [
