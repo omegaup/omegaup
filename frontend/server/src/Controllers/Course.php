@@ -2339,7 +2339,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             true  /*onlyIntroDetails*/
         );
         $requestUserInformation = $courseDetails['requests_user_information'];
-        $inContest = false;
+
         $isCourseAdmin = \OmegaUp\Authorization::isCourseAdmin(
             $r->identity,
             $course
@@ -2361,7 +2361,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
                 'template' => 'course.details.tpl',
-                'inContest' => $inContest,
+                'inContest' => false,
             ];
         }
 
@@ -2467,7 +2467,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
                 'template' => 'arena.course.intro.tpl',
-                'inContest' => $inContest,
+                'inContest' => false,
             ];
         }
 
@@ -2491,7 +2491,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ],
             'template' => 'course.details.tpl',
-            'inContest' => $inContest,
+            'inContest' => false,
         ];
     }
 
